@@ -22,7 +22,6 @@ import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtension
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.capability.xml.DefaultExtensionSchemaGeneratorTestCase.SchemaGeneratorTestUnit.newTestUnit;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
-
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;

@@ -175,7 +175,8 @@
                             "java.lang.Comparable"
                           ],
                           "parent": "java.lang.Number",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "default": "5"
                       }
@@ -358,7 +359,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -503,7 +505,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -558,7 +561,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -647,7 +651,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -728,7 +733,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -873,7 +879,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -928,7 +935,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1014,7 +1022,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -1095,7 +1104,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -1240,7 +1250,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1295,7 +1306,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1381,7 +1393,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -1432,7 +1445,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -1577,7 +1591,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1632,7 +1647,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1710,7 +1726,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -1791,7 +1808,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -1936,7 +1954,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1991,7 +2010,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -2077,7 +2097,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -2128,7 +2149,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -2273,7 +2295,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -2328,7 +2351,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -2469,7 +2493,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -2546,7 +2571,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -2601,7 +2627,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -2687,7 +2714,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -2768,7 +2796,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -2913,7 +2942,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -2968,7 +2998,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -3117,7 +3148,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -3194,7 +3226,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -3249,7 +3282,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -3420,7 +3454,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -3565,7 +3600,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -3620,7 +3656,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -3717,7 +3754,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -3798,7 +3836,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -3943,7 +3982,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -3998,7 +4038,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -4084,7 +4125,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -4165,7 +4207,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -4310,7 +4353,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -4365,7 +4409,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -4547,7 +4592,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -4602,7 +4648,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -4688,7 +4735,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -4770,7 +4818,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -4915,7 +4964,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -4970,7 +5020,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -5056,7 +5107,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -5238,7 +5290,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -5293,7 +5346,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -5379,7 +5433,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -5460,7 +5515,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -5504,7 +5560,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -5649,7 +5706,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -5704,7 +5762,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -5790,7 +5849,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -5871,7 +5931,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -6016,7 +6077,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -6071,7 +6133,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -6157,7 +6220,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -6208,7 +6272,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -6353,7 +6418,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -6408,7 +6474,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -6486,7 +6553,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -6668,7 +6736,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -6723,7 +6792,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -6809,7 +6879,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -6991,7 +7062,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -7046,7 +7118,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -7131,7 +7204,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 }
               },
               "item": {
@@ -7466,7 +7540,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -7521,7 +7596,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -7598,7 +7674,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 }
               },
               "item": {
@@ -7625,7 +7702,8 @@
                           "isFinal": false,
                           "implementedInterfaces": [],
                           "parent": "",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "typeAlias": {
                           "value": "Object"
@@ -7978,7 +8056,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -8033,7 +8112,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -8118,7 +8198,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 }
               },
               "item": {
@@ -8145,7 +8226,8 @@
                           "isFinal": false,
                           "implementedInterfaces": [],
                           "parent": "",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "typeAlias": {
                           "value": "Object"
@@ -8172,7 +8254,8 @@
                           "isFinal": false,
                           "implementedInterfaces": [],
                           "parent": "",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "typeAlias": {
                           "value": "Object"
@@ -8516,7 +8599,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -8571,7 +8655,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -8720,7 +8805,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -8797,7 +8883,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -8852,7 +8939,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -9001,7 +9089,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -9078,7 +9167,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -9133,7 +9223,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -9219,7 +9310,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -9300,7 +9392,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -9445,7 +9538,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -9500,7 +9594,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -9619,7 +9714,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "Object"
@@ -9875,7 +9971,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -9930,7 +10027,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -10074,7 +10172,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -10129,7 +10228,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -10217,7 +10317,8 @@
                   "genericTypes": [
                     "java.lang.String",
                     "java.lang.Object"
-                  ]
+                  ],
+                  "isMap": true
                 }
               },
               "open": {
@@ -10233,7 +10334,8 @@
                     "isFinal": false,
                     "implementedInterfaces": [],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   },
                   "typeAlias": {
                     "value": "Object"
@@ -10382,7 +10484,8 @@
                               "isFinal": false,
                               "implementedInterfaces": [],
                               "parent": "",
-                              "genericTypes": []
+                              "genericTypes": [],
+                              "isMap": false
                             },
                             "typeAlias": {
                               "value": "ObjectStore"
@@ -10487,7 +10590,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -10542,7 +10646,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -10666,7 +10771,8 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 },
                 "item": {
@@ -10764,7 +10870,8 @@
                     "genericTypes": [
                       "java.lang.String",
                       "java.lang.Object"
-                    ]
+                    ],
+                    "isMap": true
                   }
                 },
                 "open": {
@@ -10780,7 +10887,8 @@
                       "isFinal": false,
                       "implementedInterfaces": [],
                       "parent": "",
-                      "genericTypes": []
+                      "genericTypes": [],
+                      "isMap": false
                     },
                     "typeAlias": {
                       "value": "Object"
@@ -10929,7 +11037,8 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           },
           "item": {
@@ -10945,7 +11054,8 @@
                 "isFinal": false,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeAlias": {
                 "value": "Object"
@@ -11123,7 +11233,8 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           },
           "item": {
@@ -11322,7 +11433,8 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           },
           "item": {
@@ -11338,7 +11450,8 @@
                 "isFinal": false,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeAlias": {
                 "value": "Object"
@@ -11516,7 +11629,8 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           },
           "item": {
@@ -11661,7 +11775,8 @@
               "isFinal": false,
               "implementedInterfaces": [],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             },
             "typeAlias": {
               "value": "Object"
@@ -11943,7 +12058,8 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           },
           "item": {
@@ -11959,7 +12075,8 @@
                 "isFinal": false,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeAlias": {
                 "value": "Object"
@@ -12039,7 +12156,8 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 },
                 "item": {
@@ -12055,7 +12173,8 @@
                       "isFinal": false,
                       "implementedInterfaces": [],
                       "parent": "",
-                      "genericTypes": []
+                      "genericTypes": [],
+                      "isMap": false
                     },
                     "typeAlias": {
                       "value": "Object"
@@ -12303,7 +12422,8 @@
               "isFinal": false,
               "implementedInterfaces": [],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             },
             "typeAlias": {
               "value": "Object"
@@ -12509,7 +12629,8 @@
                     "isFinal": false,
                     "implementedInterfaces": [],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   },
                   "typeAlias": {
                     "value": "Object"
@@ -12613,7 +12734,8 @@
               "isFinal": false,
               "implementedInterfaces": [],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             },
             "typeAlias": {
               "value": "Object"
@@ -13214,7 +13336,8 @@
                                       "java.lang.Comparable"
                                     ],
                                     "parent": "java.lang.Number",
-                                    "genericTypes": []
+                                    "genericTypes": [],
+                                    "isMap": false
                                   },
                                   "default": "2000"
                                 }
@@ -13269,7 +13392,8 @@
                                       "java.lang.Comparable"
                                     ],
                                     "parent": "java.lang.Number",
-                                    "genericTypes": []
+                                    "genericTypes": [],
+                                    "isMap": false
                                   },
                                   "default": "2000"
                                 }
@@ -13357,7 +13481,8 @@
               "genericTypes": [
                 "java.lang.String",
                 "java.lang.Object"
-              ]
+              ],
+              "isMap": true
             }
           },
           "open": {
@@ -13373,7 +13498,8 @@
                 "isFinal": false,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeAlias": {
                 "value": "Object"
@@ -13492,7 +13618,8 @@
                           "isFinal": false,
                           "implementedInterfaces": [],
                           "parent": "",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "typeAlias": {
                           "value": "ObjectStore"
@@ -13727,7 +13854,8 @@
             "java.io.Serializable"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "StringAttributes"
@@ -13758,7 +13886,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "LocationKey"
@@ -13828,7 +13957,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "Animal"
@@ -13850,7 +13980,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "org.mule.test.metadata.extension.model.animals.Animal",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeDsl": {
           "allowInlineDefinition": true,
@@ -13887,7 +14018,8 @@
             "java.io.Serializable"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "AbstractOutputAttributes"
@@ -13912,7 +14044,8 @@
             "org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeDsl": {
           "allowInlineDefinition": true,
@@ -13961,7 +14094,8 @@
             "org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeDsl": {
           "allowInlineDefinition": true,
@@ -14007,7 +14141,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "org.mule.test.metadata.extension.model.shapes.Shape",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "Circle"
@@ -14038,7 +14173,8 @@
                 "isFinal": true,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "int": {}
             }
@@ -14060,7 +14196,8 @@
                 "isFinal": true,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "int": {}
             }
@@ -14082,7 +14219,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "org.mule.test.metadata.extension.model.shapes.Shape",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "Rectangle"
@@ -14113,7 +14251,8 @@
                 "isFinal": true,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "int": {}
             }
@@ -14135,7 +14274,8 @@
                 "isFinal": true,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "int": {}
             }
@@ -14157,7 +14297,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "Shape"
@@ -14188,7 +14329,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "org.mule.test.metadata.extension.model.shapes.Rectangle",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "Square"
@@ -14219,7 +14361,8 @@
                 "isFinal": true,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "int": {}
             }
@@ -14241,7 +14384,8 @@
                 "isFinal": true,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "int": {}
             }
@@ -14265,7 +14409,8 @@
             "org.mule.runtime.api.metadata.resolving.OutputTypeResolver"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "NativeQueryOutputResolver"
@@ -14299,7 +14444,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "TestMetadataResolverUtils"
