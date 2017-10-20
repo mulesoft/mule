@@ -14,18 +14,18 @@ import org.mule.util.store.DeserializationPostInitialisable;
 import java.io.Serializable;
 
 /**
- * Wraps the {@link MuleEvent} and saves the arrivalOrder of this to an {@link EventGroup}.
+ * Wraps the {@link MuleEvent} and saves the timeOrder of this to an {@link EventGroup}.
  */
 class WrapperOrderEvent implements Serializable, DeserializationPostInitialisable
 {
 
     final MuleEvent event;
-    final int arrivalOrder;
+    final long timeOrder;
 
-    public WrapperOrderEvent(MuleEvent event, int arrivalOrder)
+    public WrapperOrderEvent(MuleEvent event, long timeOrder)
     {
         this.event = event;
-        this.arrivalOrder = arrivalOrder;
+        this.timeOrder= timeOrder;
     }
 
     public MuleEvent getEvent()
@@ -33,9 +33,9 @@ class WrapperOrderEvent implements Serializable, DeserializationPostInitialisabl
         return event;
     }
 
-    public int getArrivalOrder()
+    public long getTimeOrder()
     {
-        return arrivalOrder;
+        return timeOrder;
     }
 
     @SuppressWarnings({"unused"})
