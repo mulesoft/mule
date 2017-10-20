@@ -103,6 +103,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+  private final String muleVersion;
+
   private DependencyResolver dependencyResolver;
   private ArtifactClassificationTypeResolver artifactClassificationTypeResolver;
   private PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver();
@@ -121,6 +123,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     this.dependencyResolver = dependencyResolver;
     this.artifactClassificationTypeResolver = artifactClassificationTypeResolver;
+
+    try {
+      Properties properties = new Properties();
+      properties.load(AetherClassPathClassifier.class.getResourceAsStream("/runner.properties"));
+      muleVersion = properties.getProperty("mule.version");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -289,8 +299,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     // This brings the slf4j bridges required by transitive dependencies of the container to its classpath
     // TODO MULE-10837 Externalize this dependency along with the other commonly used container dependencies.
     directDependencies
-        .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, "4.0.0-SNAPSHOT"),
-                            COMPILE));
+        .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, muleVersion), COMPILE));
 
     logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
         "order to resolve the graph): {}", directDependencies);

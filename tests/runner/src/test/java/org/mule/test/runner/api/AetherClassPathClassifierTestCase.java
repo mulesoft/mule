@@ -63,6 +63,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,9 +102,18 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws Exception {
+    String muleVersion;
+    try {
+      Properties properties = new Properties();
+      properties.load(AetherClassPathClassifierTestCase.class.getResourceAsStream("/runner.properties"));
+      muleVersion = properties.getProperty("mule.version");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
     this.rootArtifact = new DefaultArtifact("org.foo:foo-root:1.0-SNAPSHOT");
 
-    this.loggingDep = new Dependency(new DefaultArtifact("org.mule.runtime:mule-module-logging:4.0.0-SNAPSHOT"), COMPILE);
+    this.loggingDep = new Dependency(new DefaultArtifact("org.mule.runtime:mule-module-logging:" + muleVersion), COMPILE);
     this.fooCoreDep = new Dependency(new DefaultArtifact("org.foo:foo-core:1.0-SNAPSHOT"), PROVIDED);
     this.fooToolsArtifactDep = new Dependency(new DefaultArtifact("org.foo.tools:foo-artifact:1.0-SNAPSHOT"), PROVIDED);
     this.fooTestsSupportDep = new Dependency(new DefaultArtifact("org.foo.tests:foo-tests-support:1.0-SNAPSHOT"), TEST);
