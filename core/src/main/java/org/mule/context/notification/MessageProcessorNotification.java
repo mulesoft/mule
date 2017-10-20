@@ -28,12 +28,13 @@ public class MessageProcessorNotification extends ServerNotification implements 
 
     public static final int MESSAGE_PROCESSOR_PRE_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 1;
 
+    public static final int MESSAGE_PROCESSOR_POST_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 2;
+
     /**
      * This action should be only used when you need to get the original event and not a copy of it.
      * In this case, the <code>MuleEvent<code/> must be used in read-only mode to avoid thread access errors.
      */
-    public static final int MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 2;
-    public static final int MESSAGE_PROCESSOR_POST_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 3;
+    public static final int MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 3;
 
 
     private final transient MessageProcessor processor;
