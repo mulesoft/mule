@@ -113,7 +113,7 @@ public final class TlsConfiguration
     public static final String DEFAULT_KEYSTORE = ".keystore";
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
     public static final String DEFAULT_KEYMANAGER_ALGORITHM = KeyManagerFactory.getDefaultAlgorithm();
-    public static final String DEFAULT_SSL_TYPE = "TLSv1";
+    public static final String DEFAULT_SSL_TYPE = "TLS";
     public static final String JSSE_NAMESPACE = "javax.net";
 
     public static final String PROPERTIES_FILE_PATTERN = "tls-%s.conf";
