@@ -130,7 +130,7 @@ public final class TlsConfiguration
     public static final String DEFAULT_KEYMANAGER_ALGORITHM = KeyManagerFactory.getDefaultAlgorithm();
     public static final String REVOCATION_KEYSTORE_ALGORITHM = "PKIX";
     public static final String INVALID_CRL_ALGORITHM = "TLS Context: certificate revocation checking is only available for algorithm %s (current value is %s)";
-    public static final String DEFAULT_SSL_TYPE = "TLSv1";
+    public static final String DEFAULT_SSL_TYPE = "TLS";
     public static final String JSSE_NAMESPACE = "javax.net";
 
     public static final String PROPERTIES_FILE_PATTERN = "tls-%s.conf";
