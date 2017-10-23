@@ -147,7 +147,6 @@ public final class XmlExtensionLoaderDelegate {
   private static final String ATTRIBUTE_USE = "use";
   private static final String NAMESPACE_SEPARATOR = ":";
 
-  //  private static final Pattern VALID_XML_NAME = Pattern.compile("[A-Za-z]+[a-zA-Z0-9\\-_]*");
   private static final String TRANSFORMATION_FOR_TNS_RESOURCE = "META-INF/transform_for_tns.xsl";
   private static final String XMLNS_TNS = XMLNS_ATTRIBUTE + ":" + TNS_PREFIX;
   private static final String MODULE_CONNECTION_MARKER_ATTRIBUTE = "xmlns:connection";

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-using-errormapping"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+        xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd
+           http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <petstore:config name="repeated-config-name" cashierName="cashierName">
+        <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <petstore:config name="repeated-config-name" cashierName="cashierName">
+        <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <heisenberg:config name="repeated-config-name"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="0"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER"
+                       enemies="#[mel:[]]">
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
+    </heisenberg:config>
+
+    <petstore:config name="ilegal-petstore-config-name_lal[\{#a" cashierName="cashierName">
+        <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <petstore:config name="unique-petstore-config" cashierName="cashierName" xmlns:connection="true">
+        <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <operation name="fail-raise-error">
+        <parameters>
+            <parameter name="petNames" type="string"/>
+        </parameters>
+        <body>
+            <petstore:fail config-ref="unique-petstore-config" petNames="#[vars.petNames]" />
+        </body>
+        <output type="string"/>
+    </operation>
+
+</module>

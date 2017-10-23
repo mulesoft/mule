@@ -18,6 +18,7 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate;
 import org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator;
 import org.mule.runtime.extension.internal.loader.validator.CorrectXmlNamesValidator;
+import org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator;
 import org.mule.runtime.module.extension.internal.loader.enricher.StereotypesDeclarationEnricher;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
   private final List<DeclarationEnricher> customEnrichers = unmodifiableList(asList(new StereotypesDeclarationEnricher()));
 
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(new CorrectPrefixesValidator(),
+                                                                                         new GlobalElementNamesValidator(),
                                                                                          new CorrectXmlNamesValidator()));
 
   /**
