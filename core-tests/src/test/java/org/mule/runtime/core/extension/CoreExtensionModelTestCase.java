@@ -136,7 +136,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   public void flow() {
     final ConstructModel flow = coreExtensionModel.getConstructModel("flow").get();
 
-    assertThat(flow.getStereotype().getName(), is(FLOW.getName()));
+    assertThat(flow.getStereotype().getType(), is(FLOW.getType()));
     assertThat(flow.allowsTopLevelDeclaration(), is(true));
 
     final List<ParameterModel> paramModels = flow.getAllParameterModels();
@@ -163,7 +163,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(chain.isRequired(), is(true));
     assertThat(chain, instanceOf(NestedChainModel.class));
     assertThat(((NestedChainModel) chain).getAllowedStereotypes().stream()
-        .anyMatch(s -> s.getName().equals(PROCESSOR.getName())), is(true));
+        .anyMatch(s -> s.getType().equals(PROCESSOR.getType())), is(true));
 
     NestableElementModel errorHandler = nestedComponents.get(2);
     assertThat(errorHandler.getName(), is("errorHandler"));
@@ -463,7 +463,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     final ConstructModel errorHandlerModel = coreExtensionModel.getConstructModel("errorHandler").get();
 
     assertThat(errorHandlerModel.allowsTopLevelDeclaration(), is(true));
-    assertThat(errorHandlerModel.getStereotype().getName(), is(ERROR_HANDLER.getName()));
+    assertThat(errorHandlerModel.getStereotype().getType(), is(ERROR_HANDLER.getType()));
 
     assertThat(errorHandlerModel.getAllParameterModels(), hasSize(0));
 

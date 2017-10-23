@@ -78,10 +78,10 @@ public class ParameterAllowedStereotypesDeclarionEnricherTestCase extends Abstra
   private void assertStereotype(StereotypeModel stereotypeModel, String ns, String name, StereotypeModel parent) {
     StereotypeModel expected = newStereotype(name, ns).withParent(parent).build();
     assertThat(stereotypeModel.getNamespace(), is(expected.getNamespace()));
-    assertThat(stereotypeModel.getName(), is(expected.getName()));
+    assertThat(stereotypeModel.getType(), is(expected.getType()));
     if (stereotypeModel.getParent().isPresent()) {
       assertThat(expected.getParent().isPresent(), is(true));
-      assertStereotype(stereotypeModel.getParent().get(), parent.getNamespace(), parent.getName(),
+      assertStereotype(stereotypeModel.getParent().get(), parent.getNamespace(), parent.getType(),
                        parent.getParent().orElse(null));
     } else {
       assertThat(expected.getParent().isPresent(), is(false));

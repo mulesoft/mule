@@ -199,7 +199,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     StereotypeModel stereotypeModel = operation.getStereotype();
     assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
 
-    assertThat(stereotypeModel.getName(), is(new EmpireStereotype().getName().toUpperCase()));
+    assertThat(stereotypeModel.getType(), is(new EmpireStereotype().getName().toUpperCase()));
     assertThat(stereotypeModel.getNamespace(), is(HEISENBERG.toUpperCase()));
     assertThat(stereotypeModel.getParent().get(), is(PROCESSOR));
   }
@@ -213,7 +213,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
     assertThat(stereotypeModel.isAssignableTo(VALIDATOR), is(true));
 
-    assertThat(stereotypeModel.getName(), is(VALIDATOR_DEFINITION.getName()));
+    assertThat(stereotypeModel.getType(), is(VALIDATOR_DEFINITION.getName()));
     assertThat(stereotypeModel.getNamespace(), is(HEISENBERG.toUpperCase()));
     assertThat(stereotypeModel.getParent().get(), is(VALIDATOR));
   }
@@ -226,7 +226,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     StereotypeModel stereotypeModel = operation.getStereotype();
     assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
 
-    assertThat(stereotypeModel.getName(), is(PROCESSOR_DEFINITION.getName()));
+    assertThat(stereotypeModel.getType(), is(PROCESSOR_DEFINITION.getName()));
     assertThat(stereotypeModel.getNamespace(), is("MULE"));
     assertThat(stereotypeModel.getParent().isPresent(), is(false));
   }
