@@ -7,7 +7,6 @@
 package org.mule.transport.ssl;
 
 import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -20,9 +19,6 @@ import org.mule.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -124,15 +120,4 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase
         tlsContextFactory.initialise();
     }
 
-    @Test
-    public void defaultIncludesTls12Ciphers() throws Exception {
-        DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
-        tlsContextFactory.initialise();
-        SSLSocketFactory defaultFactory = tlsContextFactory.createSslContext().getSocketFactory();
-        SSLContext tls12Context = SSLContext.getInstance("TLSv1.2");
-        tls12Context.init(null, null, null);
-        SSLSocketFactory tls12Factory = tls12Context.getSocketFactory();
-
-        assertThat(defaultFactory.getDefaultCipherSuites(), arrayContainingInAnyOrder(tls12Factory.getDefaultCipherSuites()));
-    }
 }
