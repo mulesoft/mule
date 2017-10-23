@@ -7,6 +7,7 @@
 package org.mule.runtime.module.tooling.internal;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -14,8 +15,9 @@ import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.createDeployablePomFile;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.updateArtifactPom;
 import org.mule.maven.client.api.MavenClientProvider;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
@@ -101,7 +103,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
       applicationDescriptor
           .setClassLoaderModel(new DeployableMavenClassLoaderModelLoader(mavenClientProvider
               .createMavenClient(GlobalConfigLoader.getMavenConfig()), mavenClientProvider.getLocalRepositorySuppliers())
-                  .load(applicationFolder));
+                  .load(applicationFolder, emptyMap(), ArtifactType.APP));
       return defaultApplicationFactory.createArtifact(applicationDescriptor);
     });
   }
