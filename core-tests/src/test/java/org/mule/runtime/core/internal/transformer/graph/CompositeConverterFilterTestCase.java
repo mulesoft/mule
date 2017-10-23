@@ -13,8 +13,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.tck.size.SmallTest;
 

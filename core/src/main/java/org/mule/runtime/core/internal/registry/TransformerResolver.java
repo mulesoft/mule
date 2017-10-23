@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.registry;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.internal.transformer.ResolverException;
 
 /**
  * A TransformResolver is used to find transformers that match a certain criteria in the registry. Implementations of this

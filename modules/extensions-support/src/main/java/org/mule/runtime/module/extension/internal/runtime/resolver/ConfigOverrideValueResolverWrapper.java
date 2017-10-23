@@ -13,12 +13,13 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -73,8 +74,8 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
     }
 
     if (!context.getConfig().isPresent()) {
-      throw new ResolverException(createStaticMessage("Failed to obtain the config-provided value for parameter [" + parameterName
-          + "]. No configuration was available in the current resolution context."));
+      throw new DefaultMuleException(createStaticMessage("Failed to obtain the config-provided value for parameter ["
+          + parameterName + "]. No configuration was available in the current resolution context."));
     }
 
     return resolveConfigOverrideParameter(context.getConfig().get());

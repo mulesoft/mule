@@ -34,7 +34,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToBuildMe
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.registry.ResolverException;
+import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
