@@ -116,7 +116,8 @@
                             "java.lang.Comparable"
                           ],
                           "parent": "java.lang.Number",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "default": "5"
                       }
@@ -260,7 +261,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeDsl": {
           "allowInlineDefinition": true,
@@ -308,7 +310,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeDsl": {
           "allowInlineDefinition": true,
@@ -360,7 +363,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeDsl": {
           "allowInlineDefinition": true,

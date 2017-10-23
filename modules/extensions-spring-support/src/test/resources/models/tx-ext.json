@@ -64,7 +64,8 @@
                             "java.lang.Comparable"
                           ],
                           "parent": "java.lang.Number",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "default": "5"
                       }
@@ -337,7 +338,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -392,7 +394,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -653,7 +656,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -708,7 +712,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -785,7 +790,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 }
               },
               "item": {
@@ -802,7 +808,8 @@
                       "java.lang.Comparable"
                     ],
                     "parent": "java.lang.Number",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               }
@@ -1141,7 +1148,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1196,7 +1204,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1372,7 +1381,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1427,7 +1437,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1636,7 +1647,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1691,7 +1703,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1867,7 +1880,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -1922,7 +1936,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -2098,7 +2113,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -2153,7 +2169,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -2329,7 +2346,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -2384,7 +2402,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -2565,7 +2584,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -2620,7 +2640,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -2739,7 +2760,8 @@
                                 "java.lang.Comparable"
                               ],
                               "parent": "java.lang.Number",
-                              "genericTypes": []
+                              "genericTypes": [],
+                              "isMap": false
                             },
                             "default": "4000"
                           }
@@ -3013,7 +3035,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -3068,7 +3091,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -3181,7 +3205,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -3367,7 +3392,8 @@
                               "isFinal": false,
                               "implementedInterfaces": [],
                               "parent": "",
-                              "genericTypes": []
+                              "genericTypes": [],
+                              "isMap": false
                             },
                             "typeAlias": {
                               "value": "ObjectStore"
@@ -3472,7 +3498,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -3527,7 +3554,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -3623,7 +3651,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -3809,7 +3838,8 @@
                               "isFinal": false,
                               "implementedInterfaces": [],
                               "parent": "",
-                              "genericTypes": []
+                              "genericTypes": [],
+                              "isMap": false
                             },
                             "typeAlias": {
                               "value": "ObjectStore"
@@ -3914,7 +3944,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -3969,7 +4000,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -4195,7 +4227,8 @@
                                       "java.lang.Comparable"
                                     ],
                                     "parent": "java.lang.Number",
-                                    "genericTypes": []
+                                    "genericTypes": [],
+                                    "isMap": false
                                   },
                                   "default": "2000"
                                 }
@@ -4250,7 +4283,8 @@
                                       "java.lang.Comparable"
                                     ],
                                     "parent": "java.lang.Number",
-                                    "genericTypes": []
+                                    "genericTypes": [],
+                                    "isMap": false
                                   },
                                   "default": "2000"
                                 }
@@ -4369,7 +4403,8 @@
                             "java.lang.Comparable"
                           ],
                           "parent": "java.lang.Number",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "default": "4000"
                       }
@@ -4643,7 +4678,8 @@
                                       "java.lang.Comparable"
                                     ],
                                     "parent": "java.lang.Number",
-                                    "genericTypes": []
+                                    "genericTypes": [],
+                                    "isMap": false
                                   },
                                   "default": "2000"
                                 }
@@ -4698,7 +4734,8 @@
                                       "java.lang.Comparable"
                                     ],
                                     "parent": "java.lang.Number",
-                                    "genericTypes": []
+                                    "genericTypes": [],
+                                    "isMap": false
                                   },
                                   "default": "2000"
                                 }
@@ -4804,7 +4841,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "TransactionalOperations"
@@ -4828,7 +4866,8 @@
             "org.mule.runtime.extension.api.connectivity.TransactionalConnection"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "TestTransactionalConnection"

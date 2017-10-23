@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isInputStream;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isInputStream;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLifecycle;
 import org.mule.metadata.api.model.MetadataType;

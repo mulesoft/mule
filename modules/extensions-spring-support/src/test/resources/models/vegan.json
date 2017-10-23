@@ -81,7 +81,8 @@
                       "java.lang.Comparable"
                     ],
                     "parent": "java.lang.Number",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -123,7 +124,8 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 },
                 "item": {
@@ -263,7 +265,8 @@
                             "java.lang.Comparable"
                           ],
                           "parent": "java.lang.Number",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "default": "5"
                       }
@@ -540,7 +543,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -595,7 +599,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -980,7 +985,8 @@
                     "java.util.Collection"
                   ],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 }
               },
               "item": {
@@ -1028,7 +1034,8 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     },
                     "item": {
@@ -1162,7 +1169,8 @@
                     "java.lang.Comparable"
                   ],
                   "parent": "java.lang.Number",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 }
               }
             },
@@ -1207,7 +1215,8 @@
                           "java.lang.Comparable"
                         ],
                         "parent": "java.lang.Number",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -1547,7 +1556,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -1602,7 +1612,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -1697,7 +1708,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -1805,7 +1817,8 @@
                               "isFinal": false,
                               "implementedInterfaces": [],
                               "parent": "",
-                              "genericTypes": []
+                              "genericTypes": [],
+                              "isMap": false
                             },
                             "typeAlias": {
                               "value": "ObjectStore"
@@ -1903,7 +1916,8 @@
                             "java.lang.Comparable"
                           ],
                           "parent": "java.lang.Number",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         }
                       }
                     },
@@ -2021,7 +2035,8 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     },
                     "item": {
@@ -2211,7 +2226,8 @@
                               "isFinal": false,
                               "implementedInterfaces": [],
                               "parent": "",
-                              "genericTypes": []
+                              "genericTypes": [],
+                              "isMap": false
                             },
                             "typeAlias": {
                               "value": "ObjectStore"
@@ -2417,7 +2433,8 @@
                       "java.lang.Comparable"
                     ],
                     "parent": "java.lang.Number",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -2459,7 +2476,8 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 },
                 "item": {
@@ -2599,7 +2617,8 @@
                             "java.lang.Comparable"
                           ],
                           "parent": "java.lang.Number",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "default": "5"
                       }
@@ -2831,7 +2850,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -2886,7 +2906,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -3619,7 +3640,8 @@
                     "java.util.Collection"
                   ],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 }
               },
               "item": {
@@ -3667,7 +3689,8 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     },
                     "item": {
@@ -3801,7 +3824,8 @@
                     "java.lang.Comparable"
                   ],
                   "parent": "java.lang.Number",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 }
               }
             },
@@ -3846,7 +3870,8 @@
                           "java.lang.Comparable"
                         ],
                         "parent": "java.lang.Number",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -4228,7 +4253,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -4283,7 +4309,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -4378,7 +4405,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -4486,7 +4514,8 @@
                               "isFinal": false,
                               "implementedInterfaces": [],
                               "parent": "",
-                              "genericTypes": []
+                              "genericTypes": [],
+                              "isMap": false
                             },
                             "typeAlias": {
                               "value": "ObjectStore"
@@ -4613,7 +4642,8 @@
                             "java.lang.Comparable"
                           ],
                           "parent": "java.lang.Number",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "default": "5"
                       }
@@ -4839,7 +4869,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -4894,7 +4925,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -5071,7 +5103,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -5126,7 +5159,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -5348,7 +5382,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -5403,7 +5438,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -5539,7 +5575,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -5594,7 +5631,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -5754,7 +5792,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -5809,7 +5848,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -6000,7 +6040,8 @@
                               "isFinal": false,
                               "implementedInterfaces": [],
                               "parent": "",
-                              "genericTypes": []
+                              "genericTypes": [],
+                              "isMap": false
                             },
                             "typeAlias": {
                               "value": "ObjectStore"
@@ -6105,7 +6146,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -6160,7 +6202,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -6247,7 +6290,8 @@
               "genericTypes": [
                 "java.lang.String",
                 "java.lang.String"
-              ]
+              ],
+              "isMap": true
             }
           },
           "open": {
@@ -6297,7 +6341,8 @@
                     "genericTypes": [
                       "java.lang.String",
                       "java.lang.String"
-                    ]
+                    ],
+                    "isMap": true
                   }
                 },
                 "open": {
@@ -6578,7 +6623,8 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           },
           "item": {
@@ -7076,7 +7122,8 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           },
           "item": {
@@ -7155,7 +7202,8 @@
                     "genericTypes": [
                       "java.lang.String",
                       "org.mule.tck.testmodels.fruit.Apple"
-                    ]
+                    ],
+                    "isMap": true
                   }
                 },
                 "open": {
@@ -7598,7 +7646,8 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           },
           "item": {
@@ -7646,7 +7695,8 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 },
                 "item": {
@@ -7815,7 +7865,8 @@
                     "isFinal": false,
                     "implementedInterfaces": [],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   },
                   "typeAlias": {
                     "value": "Object"
@@ -7861,7 +7912,8 @@
                     "genericTypes": [
                       "java.lang.String",
                       "java.lang.Integer"
-                    ]
+                    ],
+                    "isMap": true
                   }
                 },
                 "open": {
@@ -7878,7 +7930,8 @@
                         "java.lang.Comparable"
                       ],
                       "parent": "java.lang.Number",
-                      "genericTypes": []
+                      "genericTypes": [],
+                      "isMap": false
                     }
                   }
                 },
@@ -8011,7 +8064,8 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           },
           "item": {
@@ -8029,7 +8083,8 @@
                 "genericTypes": [
                   "java.lang.String",
                   "java.lang.String"
-                ]
+                ],
+                "isMap": true
               }
             },
             "open": {
@@ -8079,7 +8134,8 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 },
                 "item": {
@@ -8097,7 +8153,8 @@
                       "genericTypes": [
                         "java.lang.String",
                         "java.lang.String"
-                      ]
+                      ],
+                      "isMap": true
                     }
                   },
                   "open": {
@@ -8258,7 +8315,8 @@
             "java.io.Serializable"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "StringAttributes"
@@ -8291,7 +8349,8 @@
             "org.mule.tck.testmodels.fruit.Fruit"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "Apple"
@@ -8315,7 +8374,8 @@
                 "isFinal": false,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeAlias": {
                 "value": "FruitCleaner"
@@ -8352,7 +8412,8 @@
                 "isFinal": false,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeAlias": {
                 "value": "ApplePeel"
@@ -8391,7 +8452,8 @@
                         "java.util.Collection"
                       ],
                       "parent": "",
-                      "genericTypes": []
+                      "genericTypes": [],
+                      "isMap": false
                     }
                   },
                   "item": "#../.."
@@ -8427,7 +8489,8 @@
                         "java.util.Collection"
                       ],
                       "parent": "",
-                      "genericTypes": []
+                      "genericTypes": [],
+                      "isMap": false
                     }
                   },
                   "item": {
@@ -8443,7 +8506,8 @@
                         "isFinal": false,
                         "implementedInterfaces": [],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "AppleSeed"
@@ -8494,7 +8558,8 @@
                   "org.mule.runtime.api.lifecycle.Initialisable"
                 ],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeAlias": {
                 "value": "Seed"
@@ -8520,7 +8585,8 @@
                         "java.io.Serializable"
                       ],
                       "parent": "",
-                      "genericTypes": []
+                      "genericTypes": [],
+                      "isMap": false
                     },
                     "typeAlias": {
                       "value": "Fruit"
@@ -8561,7 +8627,8 @@
             "org.mule.tck.testmodels.fruit.Fruit"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "Banana"
@@ -8622,7 +8689,8 @@
             "java.io.Serializable"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "Fruit"
@@ -8646,7 +8714,8 @@
             "org.mule.tck.testmodels.fruit.Fruit"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "Kiwi"
@@ -8688,7 +8757,8 @@
             "org.mule.runtime.api.lifecycle.Disposable"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "WaterMelon"
@@ -8735,7 +8805,8 @@
                   "java.lang.Comparable"
                 ],
                 "parent": "java.lang.Number",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               }
             }
           }
@@ -8758,7 +8829,8 @@
                   "java.lang.Comparable"
                 ],
                 "parent": "java.lang.Number",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               }
             }
           }
@@ -8790,7 +8862,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "org.mule.test.vegan.extension.EasyToEatConfig",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "BananaConfig"
@@ -8816,7 +8889,8 @@
                   "org.mule.test.vegan.extension.FarmedFood"
                 ],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeDsl": {
                 "allowInlineDefinition": true,
@@ -8844,7 +8918,8 @@
                       "isFinal": false,
                       "implementedInterfaces": [],
                       "parent": "",
-                      "genericTypes": []
+                      "genericTypes": [],
+                      "isMap": false
                     },
                     "typeAlias": {
                       "value": "TasteProfile"
@@ -8902,7 +8977,8 @@
                   "java.lang.Comparable"
                 ],
                 "parent": "java.lang.Number",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               }
             }
           },
@@ -8931,7 +9007,8 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               }
             },
             "item": {
@@ -8963,7 +9040,8 @@
                   "org.mule.test.vegan.extension.FarmedFood"
                 ],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeDsl": {
                 "allowInlineDefinition": true,
@@ -8991,7 +9069,8 @@
                       "isFinal": false,
                       "implementedInterfaces": [],
                       "parent": "",
-                      "genericTypes": []
+                      "genericTypes": [],
+                      "isMap": false
                     },
                     "typeAlias": {
                       "value": "TasteProfile"
@@ -9060,7 +9139,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "FarmedFood"
@@ -9082,7 +9162,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeDsl": {
           "allowInlineDefinition": true,
@@ -9110,7 +9191,8 @@
                 "isFinal": false,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeAlias": {
                 "value": "FarmedFood"
@@ -9138,7 +9220,8 @@
                     "org.mule.test.vegan.extension.FarmedFood"
                   ],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "RottenFood"
@@ -9166,7 +9249,8 @@
             "java.io.Serializable"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "HarvestApplesAttributes"
@@ -9191,7 +9275,8 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               }
             },
             "item": {
@@ -9207,7 +9292,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "Object"
@@ -9238,7 +9324,8 @@
             "org.mule.test.vegan.extension.FarmedFood"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeDsl": {
           "allowInlineDefinition": true,
@@ -9266,7 +9353,8 @@
                 "isFinal": false,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeAlias": {
                 "value": "TasteProfile"
@@ -9316,7 +9404,8 @@
             "org.mule.test.vegan.extension.FarmedFood"
           ],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "RottenFood"
@@ -9338,7 +9427,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "extensibleType": {},
         "typeAlias": {
@@ -9364,7 +9454,8 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               }
             },
             "item": {
@@ -9395,7 +9486,8 @@
                   "java.lang.Comparable"
                 ],
                 "parent": "java.lang.Number",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               }
             }
           },
@@ -9435,7 +9527,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "VeganPolicy"
@@ -9477,7 +9570,8 @@
                 "isFinal": false,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeAlias": {
                 "value": "VeganIngredients"
@@ -9500,7 +9594,8 @@
                       "isFinal": true,
                       "implementedInterfaces": [],
                       "parent": "",
-                      "genericTypes": []
+                      "genericTypes": [],
+                      "isMap": false
                     },
                     "int": {}
                   }
@@ -9558,7 +9653,8 @@
                   "java.lang.Comparable"
                 ],
                 "parent": "java.lang.Number",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               }
             }
           },

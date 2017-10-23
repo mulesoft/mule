@@ -6,18 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isInputStream;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclarer;
 import org.mule.runtime.extension.api.annotation.Streaming;
-import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 
+import java.io.InputStream;
 import java.lang.reflect.Method;
 
 /**
@@ -58,5 +59,17 @@ public final class ModelLoaderUtils {
   public static void handleByteStreaming(Method method, ExecutableComponentDeclarer executableComponent,
                                          MetadataType outputType) {
     executableComponent.supportsStreaming(isInputStream(outputType) || method.getAnnotation(Streaming.class) != null);
+  }
+
+  /**
+   * @param type a {@link MetadataType}
+   * @return whether the given {@code type} represents an {@link InputStream} or not
+   */
+  public static boolean isInputStream(MetadataType type) {
+    return isAssignableFrom(type, InputStream.class);
+  }
+
+  private static boolean isAssignableFrom(MetadataType metadataType, Class<?> type) {
+    return getType(metadataType).map(clazz -> type.isAssignableFrom(clazz)).orElse(false);
   }
 }

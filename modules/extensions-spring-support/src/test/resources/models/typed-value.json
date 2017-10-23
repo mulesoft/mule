@@ -116,7 +116,8 @@
                             "java.lang.Comparable"
                           ],
                           "parent": "java.lang.Number",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "default": "5"
                       }
@@ -497,7 +498,8 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           },
           "item": {
@@ -513,7 +515,8 @@
                 "isFinal": false,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeAlias": {
                 "value": "Object"
@@ -668,7 +671,8 @@
                     "genericTypes": [
                       "java.lang.String",
                       "java.lang.Object"
-                    ]
+                    ],
+                    "isMap": true
                   }
                 },
                 "open": {
@@ -684,7 +688,8 @@
                       "isFinal": false,
                       "implementedInterfaces": [],
                       "parent": "",
-                      "genericTypes": []
+                      "genericTypes": [],
+                      "isMap": false
                     },
                     "typeAlias": {
                       "value": "Object"
@@ -732,7 +737,8 @@
                     "genericTypes": [
                       "java.lang.String",
                       "org.mule.runtime.api.metadata.TypedValue"
-                    ]
+                    ],
+                    "isMap": true
                   }
                 },
                 "open": {
@@ -748,7 +754,8 @@
                       "isFinal": false,
                       "implementedInterfaces": [],
                       "parent": "",
-                      "genericTypes": []
+                      "genericTypes": [],
+                      "isMap": false
                     },
                     "typeAlias": {
                       "value": "Object"
@@ -958,7 +965,8 @@
                 "java.io.Closeable"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           }
         },
@@ -1003,7 +1011,8 @@
                       "java.io.Closeable"
                     ],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -1320,7 +1329,8 @@
               "isFinal": false,
               "implementedInterfaces": [],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             },
             "typeAlias": {
               "value": "Object"
@@ -1368,7 +1378,8 @@
                     "isFinal": false,
                     "implementedInterfaces": [],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   },
                   "typeAlias": {
                     "value": "Object"
@@ -1650,7 +1661,8 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           },
           "item": {
@@ -1698,7 +1710,8 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 },
                 "item": {
@@ -1833,7 +1846,8 @@
               "genericTypes": [
                 "java.lang.String",
                 "org.mule.test.heisenberg.extension.model.KnockeableDoor"
-              ]
+              ],
+              "isMap": true
             }
           },
           "open": {
@@ -1883,7 +1897,8 @@
                     "genericTypes": [
                       "java.lang.String",
                       "org.mule.test.heisenberg.extension.model.KnockeableDoor"
-                    ]
+                    ],
+                    "isMap": true
                   }
                 },
                 "open": {
@@ -2247,7 +2262,8 @@
                       "java.lang.Comparable"
                     ],
                     "parent": "java.lang.Number",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -2378,7 +2394,8 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             }
           },
           "item": {
@@ -2426,7 +2443,8 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 },
                 "item": {
@@ -2561,7 +2579,8 @@
               "genericTypes": [
                 "java.lang.String",
                 "java.util.List"
-              ]
+              ],
+              "isMap": true
             }
           },
           "open": {
@@ -2578,7 +2597,8 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               }
             },
             "item": {
@@ -2629,7 +2649,8 @@
                     "genericTypes": [
                       "java.lang.String",
                       "java.util.List"
-                    ]
+                    ],
+                    "isMap": true
                   }
                 },
                 "open": {
@@ -2646,7 +2667,8 @@
                         "java.util.Collection"
                       ],
                       "parent": "",
-                      "genericTypes": []
+                      "genericTypes": [],
+                      "isMap": false
                     }
                   },
                   "item": {
@@ -2783,7 +2805,8 @@
               "genericTypes": [
                 "java.lang.String",
                 "java.lang.String"
-              ]
+              ],
+              "isMap": true
             }
           },
           "open": {
@@ -2833,7 +2856,8 @@
                     "genericTypes": [
                       "java.lang.String",
                       "java.lang.String"
-                    ]
+                    ],
+                    "isMap": true
                   }
                 },
                 "open": {
@@ -3187,7 +3211,8 @@
               "isFinal": false,
               "implementedInterfaces": [],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             },
             "typeAlias": {
               "value": "Object"
@@ -3295,7 +3320,8 @@
                           "isFinal": false,
                           "implementedInterfaces": [],
                           "parent": "",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "typeAlias": {
                           "value": "ObjectStore"
@@ -3409,7 +3435,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeDsl": {
           "allowInlineDefinition": true,
@@ -3475,7 +3502,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeDsl": {
           "allowInlineDefinition": true,
@@ -3541,7 +3569,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "SimplePojo"
@@ -3590,7 +3619,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "TypedValueExtension"
@@ -3627,7 +3657,8 @@
                 "isFinal": false,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "typeDsl": {
                 "allowInlineDefinition": true,
@@ -3701,7 +3732,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "VeganProductInformation"
@@ -3753,7 +3785,8 @@
                   "java.lang.Comparable"
                 ],
                 "parent": "java.lang.Number",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               }
             }
           },

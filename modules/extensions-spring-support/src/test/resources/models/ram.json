@@ -30,7 +30,8 @@
               "org.mule.runtime.api.connection.ConnectionProvider"
             ],
             "parent": "",
-            "genericTypes": []
+            "genericTypes": [],
+            "isMap": false
           },
           "typeAlias": {
             "value": "MessageDispatcherProvider"
@@ -64,7 +65,8 @@
                 "org.mule.runtime.api.lifecycle.Lifecycle"
               ],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             },
             "typeAlias": {
               "value": "DefaultHttpMessageDispatcherProvider"
@@ -140,7 +142,8 @@
                             "java.lang.Comparable"
                           ],
                           "parent": "java.lang.Number",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         },
                         "default": "5"
                       }
@@ -247,7 +250,8 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "SoapOutputPayload"
@@ -273,7 +277,8 @@
                         "genericTypes": [
                           "java.lang.String",
                           "org.mule.runtime.api.metadata.TypedValue"
-                        ]
+                        ],
+                        "isMap": true
                       }
                     },
                     "open": {
@@ -290,7 +295,8 @@
                             "java.io.Closeable"
                           ],
                           "parent": "",
-                          "genericTypes": []
+                          "genericTypes": [],
+                          "isMap": false
                         }
                       }
                     },
@@ -318,7 +324,8 @@
                           "java.io.Closeable"
                         ],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -345,7 +352,8 @@
                         "genericTypes": [
                           "java.lang.String",
                           "java.lang.String"
-                        ]
+                        ],
+                        "isMap": true
                       }
                     },
                     "open": {
@@ -380,7 +388,8 @@
                     "java.io.Serializable"
                   ],
                   "parent": "",
-                  "genericTypes": []
+                  "genericTypes": [],
+                  "isMap": false
                 },
                 "typeAlias": {
                   "value": "SoapAttributes"
@@ -406,7 +415,8 @@
                         "genericTypes": [
                           "java.lang.String",
                           "java.lang.String"
-                        ]
+                        ],
+                        "isMap": true
                       }
                     },
                     "open": {
@@ -540,7 +550,8 @@
                           "java.io.Closeable"
                         ],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -585,7 +596,8 @@
                           "java.io.Closeable"
                         ],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -822,7 +834,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -877,7 +890,8 @@
                                     "java.lang.Comparable"
                                   ],
                                   "parent": "java.lang.Number",
-                                  "genericTypes": []
+                                  "genericTypes": [],
+                                  "isMap": false
                                 },
                                 "default": "2000"
                               }
@@ -950,7 +964,8 @@
                     "isFinal": true,
                     "implementedInterfaces": [],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   },
                   "typeAlias": {
                     "value": "WebServiceTypeKey"
@@ -1113,7 +1128,8 @@
                           "org.mule.runtime.api.connection.ConnectionProvider"
                         ],
                         "parent": "",
-                        "genericTypes": []
+                        "genericTypes": [],
+                        "isMap": false
                       },
                       "typeAlias": {
                         "value": "MessageDispatcherProvider"
@@ -1220,7 +1236,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -1275,7 +1292,8 @@
                                           "java.lang.Comparable"
                                         ],
                                         "parent": "java.lang.Number",
-                                        "genericTypes": []
+                                        "genericTypes": [],
+                                        "isMap": false
                                       },
                                       "default": "2000"
                                     }
@@ -1394,7 +1412,8 @@
                                 "java.lang.Comparable"
                               ],
                               "parent": "java.lang.Number",
-                              "genericTypes": []
+                              "genericTypes": [],
+                              "isMap": false
                             },
                             "default": "4000"
                           }
@@ -1626,7 +1645,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "org.mule.test.ram.AbstractScienceTransportProvider",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "DefaultPortalGunDispatcherProvider"
@@ -1663,7 +1683,8 @@
           "isFinal": false,
           "implementedInterfaces": [],
           "parent": "org.mule.test.ram.AbstractScienceTransportProvider",
-          "genericTypes": []
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "MiniverseDispatcherProvider"
