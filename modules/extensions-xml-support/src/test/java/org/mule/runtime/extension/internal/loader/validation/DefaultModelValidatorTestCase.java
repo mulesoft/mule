@@ -21,6 +21,8 @@ import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefix
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.TYPE_RAISE_ERROR_ATTRIBUTE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.WRONG_VALUE_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectXmlNamesValidator.WRONG_XML_NAME_FORMAT_MESSAGE;
+import static org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator.ILLEGAL_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
+import static org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator.REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import com.google.common.collect.ImmutableSet;
@@ -37,6 +39,7 @@ import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
 import java.util.HashMap;
@@ -174,6 +177,26 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
     getExtensionModelFrom("validation/module-using-errormapping-wrong-targetType.xml", getDependencyExtensions());
   }
 
+  @Test
+  public void wrongGlobalElementNamesThrowsException() {
+    exception.expectMessage(allOf(
+                                  containsString(format(
+                                                        REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE,
+                                                        "repeated-config-name",
+                                                        "petstore:config",
+                                                        "petstore:config")),
+                                  containsString(format(
+                                                        REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE,
+                                                        "repeated-config-name",
+                                                        "petstore:config",
+                                                        "heisenberg:config")),
+                                  containsString(format(
+                                                        ILLEGAL_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE,
+                                                        "ilegal-petstore-config-name_lal[\\{#a",
+                                                        ""))));
+    getExtensionModelFrom("validation/module-repeated-global-elements.xml", getDependencyExtensions());
+  }
+
   private ExtensionModel getExtensionModelFrom(String modulePath) {
     return getExtensionModelFrom(modulePath, emptySet());
   }
@@ -186,7 +209,8 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
 
   private Set<ExtensionModel> getDependencyExtensions() {
     ExtensionModel petstore = loadExtension(PetStoreConnector.class, emptySet());
-    return ImmutableSet.<ExtensionModel>builder().add(petstore).build();
+    ExtensionModel heisenberg = loadExtension(HeisenbergExtension.class, emptySet());
+    return ImmutableSet.<ExtensionModel>builder().add(petstore, heisenberg).build();
   }
 
   private ExtensionModel loadExtension(Class extension, Set<ExtensionModel> deps) {
