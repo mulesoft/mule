@@ -189,8 +189,7 @@ public class ExceptionUtils {
       return empty();
     }
 
-    return (Optional<T>) stream(org.apache.commons.lang3.exception.ExceptionUtils.getThrowables(throwable))
-        .filter(throwableType::isInstance).findFirst();
+    return (Optional<T>) stream(getThrowables(throwable)).filter(throwableType::isInstance).findFirst();
   }
 
   /**
