@@ -35,23 +35,6 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Collection;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Predicate;
-
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -60,9 +43,28 @@ import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 /**
  * Creates the {@link ArtifactUrlClassification} based on the Maven dependencies declared by the rootArtifact using Eclipse
@@ -96,12 +98,27 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
   private static final String MULE_SERVICE_CLASSIFIER = "mule-service";
 
+  private static final String RUNTIME_GROUP_ID = "org.mule.runtime";
+  private static final String LOGGING_ARTIFACT_ID = "mule-module-logging";
+
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+  private final String muleVersion;
 
   private DependencyResolver dependencyResolver;
   private ArtifactClassificationTypeResolver artifactClassificationTypeResolver;
   private PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver();
   private ServiceResourcesResolver serviceResourcesResolver = new ServiceResourcesResolver();
+
+  static String getMuleVersion() {
+    try {
+      Properties properties = new Properties();
+      properties.load(AetherClassPathClassifier.class.getResourceAsStream("/runner.properties"));
+      return properties.getProperty("mule.version");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   /**
    * Creates an instance of the classifier.
@@ -116,6 +133,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     this.dependencyResolver = dependencyResolver;
     this.artifactClassificationTypeResolver = artifactClassificationTypeResolver;
+
+    muleVersion = getMuleVersion();
   }
 
   /**
@@ -280,6 +299,12 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         .map(depToTransform -> depToTransform.setScope(COMPILE))
         .collect(toList());
 
+    // Add logging dependencies to avoid every module from having to declare this dependency.
+    // This brings the slf4j bridges required by transitive dependencies of the container to its classpath
+    // TODO MULE-10837 Externalize this dependency along with the other commonly used container dependencies.
+    directDependencies
+        .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, muleVersion), COMPILE));
+
     logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
         "order to resolve the graph): {}", directDependencies);
 
@@ -354,8 +379,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       managedDependencies = directDependencies.stream()
           .map(directDep -> {
             try {
-              return dependencyResolver.readArtifactDescriptor(directDep.getArtifact(), rootArtifactRemoteRepositories)
-                  .getManagedDependencies();
+              ArtifactDescriptorResult readArtifactDescriptor =
+                  dependencyResolver.readArtifactDescriptor(directDep.getArtifact(), rootArtifactRemoteRepositories);
+              return readArtifactDescriptor == null ? Collections.<Dependency>emptyList()
+                  : readArtifactDescriptor.getManagedDependencies();
             } catch (ArtifactDescriptorException e) {
               throw new IllegalStateException("Couldn't read artifact: '" + directDep.getArtifact() +
                   "' while collecting managed dependencies for Container", e);

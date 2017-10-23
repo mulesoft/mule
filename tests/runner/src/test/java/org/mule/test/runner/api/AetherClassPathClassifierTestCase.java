@@ -31,20 +31,15 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
+import static org.mule.test.runner.api.AetherClassPathClassifier.getMuleVersion;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -67,6 +62,13 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ArtifactDescriptorResult.class, ArtifactResult.class})
 @PowerMockIgnore("javax.management.*")
@@ -88,6 +90,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
   private Artifact rootArtifact;
   private Artifact serviceArtifact;
+  private Dependency loggingDep;
   private Dependency fooCoreDep;
   private Dependency fooToolsArtifactDep;
   private Dependency fooTestsSupportDep;
@@ -99,8 +102,11 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws Exception {
+    String muleVersion = getMuleVersion();
+
     this.rootArtifact = new DefaultArtifact("org.foo:foo-root:1.0-SNAPSHOT");
 
+    this.loggingDep = new Dependency(new DefaultArtifact("org.mule.runtime:mule-module-logging:" + muleVersion), COMPILE);
     this.fooCoreDep = new Dependency(new DefaultArtifact("org.foo:foo-core:1.0-SNAPSHOT"), PROVIDED);
     this.fooToolsArtifactDep = new Dependency(new DefaultArtifact("org.foo.tools:foo-artifact:1.0-SNAPSHOT"), PROVIDED);
     this.fooTestsSupportDep = new Dependency(new DefaultArtifact("org.foo.tests:foo-tests-support:1.0-SNAPSHOT"), TEST);
@@ -151,7 +157,8 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
     when(dependencyResolver.resolveDependencies(argThat(nullValue(Dependency.class)),
                                                 (List<Dependency>) argThat(hasItems(equalTo(compileMuleCoreDep),
-                                                                                    equalTo(compileMuleArtifactDep))),
+                                                                                    equalTo(compileMuleArtifactDep),
+                                                                                    equalTo(loggingDep))),
                                                 (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
                                                 argThat(instanceOf(DependencyFilter.class)),
                                                 argThat(equalTo(emptyList()))))
@@ -172,7 +179,8 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     verify(dependencyResolver).resolveDependencies(argThat(nullValue(Dependency.class)),
                                                    (List<Dependency>) argThat(
                                                                               hasItems(equalTo(compileMuleCoreDep),
-                                                                                       equalTo(compileMuleArtifactDep))),
+                                                                                       equalTo(compileMuleArtifactDep),
+                                                                                       equalTo(loggingDep))),
                                                    (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
                                                    argThat(instanceOf(DependencyFilter.class)),
                                                    argThat(equalTo(emptyList())));
@@ -391,7 +399,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     when(dependencyResolver.resolveDependencies(argThat(nullValue(Dependency.class)),
                                                 (List<Dependency>) and((argThat(hasItems(equalTo(compileMuleCoreDep),
                                                                                          equalTo(compileMuleArtifactDep)))),
-                                                                       argThat(hasSize(2))),
+                                                                       argThat(hasSize(3))),
                                                 (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
                                                 argThat(instanceOf(DependencyFilter.class)),
                                                 argThat(equalTo(emptyList()))))
@@ -419,7 +427,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     verify(dependencyResolver, atLeastOnce()).resolveDependencies(argThat(nullValue(Dependency.class)),
                                                                   (List<Dependency>) and((argThat(hasItems(equalTo(compileMuleCoreDep),
                                                                                                            equalTo(compileMuleArtifactDep)))),
-                                                                                         argThat(hasSize(2))),
+                                                                                         argThat(hasSize(3))),
                                                                   (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
                                                                   argThat(instanceOf(DependencyFilter.class)),
                                                                   argThat(equalTo(emptyList())));
