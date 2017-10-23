@@ -20,6 +20,8 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
@@ -37,7 +39,91 @@ public class ExceptionUtils {
    * @return the index into the throwable chain, false if no match or null input
    */
   public static boolean containsType(Throwable throwable, Class<?> type) {
-    return org.apache.commons.lang3.exception.ExceptionUtils.indexOfType(throwable, type) > -1;
+    return indexOfType(throwable, type) > -1;
+  }
+
+  /**
+   * Similar to {@link org.apache.commons.lang3.exception.ExceptionUtils#indexOfType(Throwable, Class)} but avoiding the
+   * deprecated {@link org.apache.commons.lang3.exception.ExceptionUtils#getCause(Throwable)}.
+   *
+   * <p>A <code>null</code> throwable returns <code>-1</code>.
+   * A <code>null</code> type returns <code>-1</code>.
+   * No match in the chain returns <code>-1</code>.</p>
+   *
+   * @param throwable  the throwable to inspect, may be null
+   * @param type  the type to search for, subclasses match, null returns -1
+   * @return the index into the throwable chain, -1 if no match or null input
+   */
+  public static int indexOfType(final Throwable throwable, final Class<?> type) {
+    return indexOf(throwable, type, 0, true);
+  }
+
+  /**
+   * Similar to {@link org.apache.commons.lang3.exception.ExceptionUtils#indexOf(Throwable, Class, int, boolean)} but avoiding the
+   * deprecated {@link org.apache.commons.lang3.exception.ExceptionUtils#getCause(Throwable)}.
+   *
+   * @param throwable  the throwable to inspect, may be null
+   * @param type  the type to search for, subclasses match, null returns -1
+   * @param fromIndex  the (zero based) index of the starting position,
+   *  negative treated as zero, larger than chain size returns -1
+   * @param subclass if <code>true</code>, compares with {@link Class#isAssignableFrom(Class)}, otherwise compares
+   * using references
+   * @return index of the <code>type</code> within throwables nested within the specified <code>throwable</code>
+   */
+  private static int indexOf(final Throwable throwable, final Class<?> type, int fromIndex, final boolean subclass) {
+    if (throwable == null || type == null) {
+      return -1;
+    }
+    if (fromIndex < 0) {
+      fromIndex = 0;
+    }
+    final Throwable[] throwables = getThrowables(throwable);
+    if (fromIndex >= throwables.length) {
+      return -1;
+    }
+    if (subclass) {
+      for (int i = fromIndex; i < throwables.length; i++) {
+        if (type.isAssignableFrom(throwables[i].getClass())) {
+          return i;
+        }
+      }
+    } else {
+      for (int i = fromIndex; i < throwables.length; i++) {
+        if (type.equals(throwables[i].getClass())) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Similar to {@link org.apache.commons.lang3.exception.ExceptionUtils#getThrowables(Throwable)} but avoiding the deprecated
+   * {@link org.apache.commons.lang3.exception.ExceptionUtils#getCause(Throwable)}.
+   *
+   * @see #getThrowableList(Throwable)
+   * @param throwable  the throwable to inspect, may be null
+   * @return the array of throwables, never null
+   */
+  public static Throwable[] getThrowables(final Throwable throwable) {
+    final List<Throwable> list = getThrowableList(throwable);
+    return list.toArray(new Throwable[list.size()]);
+  }
+
+  /**
+   * Similar to {@link org.apache.commons.lang3.exception.ExceptionUtils#getThrowableList(Throwable)} but avoiding the deprecated
+   * {@link org.apache.commons.lang3.exception.ExceptionUtils#getCause(Throwable)}.
+   *
+   * @param throwable  the throwable to inspect, may be null
+   * @return the list of throwables, never null
+   */
+  public static List<Throwable> getThrowableList(Throwable throwable) {
+    final List<Throwable> list = new ArrayList<>();
+    while (throwable != null && list.contains(throwable) == false) {
+      list.add(throwable);
+      throwable = throwable.getCause();
+    }
+    return list;
   }
 
   /**
@@ -103,8 +189,7 @@ public class ExceptionUtils {
       return empty();
     }
 
-    return (Optional<T>) stream(org.apache.commons.lang3.exception.ExceptionUtils.getThrowables(throwable))
-        .filter(throwableType::isInstance).findFirst();
+    return (Optional<T>) stream(getThrowables(throwable)).filter(throwableType::isInstance).findFirst();
   }
 
   /**
