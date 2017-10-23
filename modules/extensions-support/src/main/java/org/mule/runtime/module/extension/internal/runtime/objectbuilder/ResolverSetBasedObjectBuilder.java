@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getDefaultEncodingFieldSetter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -20,6 +20,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.module.extension.internal.util.GroupValueSetter;
 import org.mule.runtime.module.extension.internal.util.SingleValueSetter;
 import org.mule.runtime.module.extension.internal.util.ValueSetter;
@@ -28,6 +29,8 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 
@@ -43,6 +46,7 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
   protected final ResolverSet resolverSet;
   private final List<ValueSetter> singleValueSetters;
   private final List<ValueSetter> groupValueSetters;
+  private final ConcurrentMap<Class<?>, Optional<FieldSetter>> encodingFieldSetter = new ConcurrentHashMap<>();
 
   @Inject
   private MuleContext muleContext;
@@ -85,7 +89,8 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
     setValues(object, result, singleValueSetters);
 
     if (muleContext != null) {
-      injectDefaultEncoding(object, muleContext.getConfiguration().getDefaultEncoding());
+      encodingFieldSetter.computeIfAbsent(object.getClass(), clazz -> getDefaultEncodingFieldSetter(object))
+          .ifPresent(s -> s.set(object, muleContext.getConfiguration().getDefaultEncoding()));
     }
   }
 
