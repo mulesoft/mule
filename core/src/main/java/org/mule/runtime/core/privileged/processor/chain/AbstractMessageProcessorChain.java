@@ -41,6 +41,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
+import org.mule.runtime.core.internal.processor.interceptor.ReactiveAroundInterceptorAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
@@ -358,6 +359,15 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   public void initialise() throws InitialisationException {
     processorInterceptorManager.getInterceptorFactories().stream().forEach(interceptorFactory -> {
       ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
+      try {
+        muleContext.getInjector().inject(reactiveInterceptorAdapter);
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+      additionalInterceptors.add(0, reactiveInterceptorAdapter);
+    });
+    processorInterceptorManager.getInterceptorFactories().stream().forEach(interceptorFactory -> {
+      ReactiveAroundInterceptorAdapter reactiveInterceptorAdapter = new ReactiveAroundInterceptorAdapter(interceptorFactory);
       try {
         muleContext.getInjector().inject(reactiveInterceptorAdapter);
       } catch (MuleException e) {
