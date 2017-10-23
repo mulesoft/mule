@@ -15,14 +15,13 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Mono.from;
-import static reactor.core.publisher.Mono.fromFuture;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
@@ -37,7 +36,6 @@ import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import org.slf4j.Logger;
@@ -46,8 +44,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -62,9 +58,10 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveInterceptorAdapter.class);
 
-  private static final String INTERCEPTION_COMPONENT = "core:interceptionComponent";
+  private static final String BEFORE_METHOD_NAME = "before";
+  private static final String AFTER_METHOD_NAME = "after";
 
-  private static final String AROUND_METHOD_NAME = "around";
+  private static final String INTERCEPTION_COMPONENT = "core:interceptionComponent";
 
   @Inject
   private MuleContext muleContext;
@@ -93,46 +90,43 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     final ProcessorInterceptor interceptor = interceptorFactory.get();
     Map<String, String> dslParameters = (Map<String, String>) ((Component) component).getAnnotation(ANNOTATION_PARAMETERS);
 
-    ReactiveProcessor interceptedProcessor;
-    if (implementsAround(interceptor)) {
-      LOGGER.debug("Configuring interceptor '{}' around processor '{}'...", interceptor, componentLocation.getLocation());
-      interceptedProcessor = publisher -> from(publisher)
-          .cast(InternalEvent.class)
-          .map(doBefore(interceptor, component, dslParameters))
-          .flatMapMany(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next))
-              .onErrorMap(CompletionException.class, completionException -> completionException.getCause()))
-          .onErrorMap(MessagingException.class, error -> {
-            return createMessagingException(doAfter(interceptor, component, of(error.getCause()))
-                .apply((InternalEvent) error.getEvent()),
-                                            error.getCause(), (Component) component);
-          })
-          .map(doAfter(interceptor, component, empty()));
-    } else {
-      LOGGER.debug("Configuring interceptor '{}' before and after processor '{}'...", interceptor,
-                   componentLocation.getLocation());
-      interceptedProcessor = publisher -> from(publisher)
-          .cast(InternalEvent.class)
-          .map(doBefore(interceptor, component, dslParameters))
-          .cast(CoreEvent.class)
-          .transform(next)
-          .onErrorMap(MessagingException.class, error -> {
-            return createMessagingException(doAfter(interceptor, component, of(error.getCause()))
-                .apply((InternalEvent) error.getEvent()),
-                                            error.getCause(), (Component) component);
-          })
-          .cast(InternalEvent.class)
-          .map(doAfter(interceptor, component, empty()));
-    }
+    ReactiveProcessor interceptedProcessor = doApply(component, next, componentLocation, interceptor, dslParameters);
 
     LOGGER.debug("Interceptor '{}' for processor '{}' configured.", interceptor, componentLocation.getLocation());
     return interceptedProcessor;
   }
 
-  private boolean implementsAround(ProcessorInterceptor interceptor) {
+  protected ReactiveProcessor doApply(Processor component, ReactiveProcessor next, final ComponentLocation componentLocation,
+                                      final ProcessorInterceptor interceptor, Map<String, String> dslParameters) {
+    if (implementsBeforeOrAfter(interceptor)) {
+      LOGGER.debug("Configuring interceptor '{}' before and after processor '{}'...", interceptor,
+                   componentLocation.getLocation());
+      return publisher -> from(publisher)
+          .concatMap(event -> just(event)
+              .cast(InternalEvent.class)
+              .map(doBefore(interceptor, component, dslParameters))
+              .cast(CoreEvent.class)
+              .transform(next)
+              .onErrorMap(MessagingException.class, error -> {
+                return createMessagingException(doAfter(interceptor, component, of(error.getCause()))
+                    .apply((InternalEvent) error.getEvent()),
+                                                error.getCause(), (Component) component);
+              })
+              .cast(InternalEvent.class)
+              .map(doAfter(interceptor, component, empty()))
+
+      );
+    } else {
+      return next;
+    }
+  }
+
+  private boolean implementsBeforeOrAfter(ProcessorInterceptor interceptor) {
     try {
-      return !interceptor.getClass()
-          .getMethod(AROUND_METHOD_NAME, ComponentLocation.class, Map.class, InterceptionEvent.class, InterceptionAction.class)
-          .isDefault();
+      return !(interceptor.getClass().getMethod(BEFORE_METHOD_NAME, ComponentLocation.class, Map.class, InterceptionEvent.class)
+          .isDefault()
+          && interceptor.getClass()
+              .getMethod(AFTER_METHOD_NAME, ComponentLocation.class, InterceptionEvent.class, Optional.class).isDefault());
     } catch (NoSuchMethodException | SecurityException e) {
       throw new MuleRuntimeException(e);
     }
@@ -161,43 +155,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     };
   }
 
-  private CompletableFuture<InternalEvent> doAround(InternalEvent event, ProcessorInterceptor interceptor,
-                                                    Processor component, Map<String, String> dslParameters,
-                                                    ReactiveProcessor next) {
-    final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
-
-    DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
-    final ReactiveInterceptionAction reactiveInterceptionAction =
-        new ReactiveInterceptionAction(interceptionEvent, next, component,
-                                       ((PrivilegedMuleContext) muleContext).getErrorTypeLocator());
-
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Calling around() for '{}' in processor '{}'...", interceptor,
-                   ((Component) component).getLocation().getLocation());
-    }
-
-    try {
-      return withContextClassLoader(interceptor.getClass().getClassLoader(), () -> interceptor
-          .around(((Component) component).getLocation(),
-                  getResolvedParams(eventWithResolvedParams), interceptionEvent,
-                  reactiveInterceptionAction))
-                      .exceptionally(t -> {
-                        if (t instanceof MessagingException) {
-                          throw new CompletionException(t);
-                        } else {
-                          throw new CompletionException(createMessagingException(eventWithResolvedParams,
-                                                                                 t instanceof CompletionException ? t.getCause()
-                                                                                     : t,
-                                                                                 ((Component) component)));
-                        }
-                      })
-                      .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
-    } catch (Exception e) {
-      throw propagate(createMessagingException(interceptionEvent.resolve(), e, (Component) component));
-    }
-  }
-
-  private Map<String, ProcessorParameterValue> getResolvedParams(final InternalEvent eventWithResolvedParams) {
+  protected Map<String, ProcessorParameterValue> getResolvedParams(final InternalEvent eventWithResolvedParams) {
     return (Map<String, ProcessorParameterValue>) eventWithResolvedParams.getInternalParameters()
         .get(INTERCEPTION_RESOLVED_PARAMS);
   }
@@ -227,7 +185,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     return ((Component) component).getLocation() != null;
   }
 
-  private InternalEvent addResolvedParameters(InternalEvent event, Processor component, Map<String, String> dslParameters) {
+  protected InternalEvent addResolvedParameters(InternalEvent event, Processor component, Map<String, String> dslParameters) {
     boolean sameComponent = internalParametersFrom(event).containsKey(INTERCEPTION_COMPONENT)
         ? component.equals(internalParametersFrom(event).get(INTERCEPTION_COMPONENT))
         : false;
@@ -309,11 +267,14 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     return builder.build();
   }
 
-  private MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor) {
+  protected MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor) {
     MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
     MessagingException me = new MessagingException(event, cause, processor);
 
     return exceptionResolver.resolve(me, muleContext);
   }
 
+  protected MuleContext getMuleContext() {
+    return muleContext;
+  }
 }

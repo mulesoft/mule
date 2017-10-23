@@ -33,8 +33,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
@@ -772,10 +772,10 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
-      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", TEST_PAYLOAD),
-                                          argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), any());
       inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", TEST_PAYLOAD),
                                           argThat(interceptionHasPayloadValue(TEST_PAYLOAD)));
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", TEST_PAYLOAD),
+                                          argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), any());
       inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", TEST_PAYLOAD),
                                           argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue(TEST_PAYLOAD)));
@@ -807,8 +807,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
-      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", TEST_PAYLOAD), any(), any());
       inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", TEST_PAYLOAD),
                                           argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue(TEST_PAYLOAD)));
@@ -840,8 +840,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1).before(any(), any(), any());
-      inOrder.verify(interceptor1).around(any(), any(), any(), any());
       inOrder.verify(interceptor2).before(any(), any(), any());
+      inOrder.verify(interceptor1).around(any(), any(), any(), any());
       inOrder.verify(interceptor2).around(any(), any(), any(), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
@@ -872,8 +872,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1).before(any(), any(), any());
-      inOrder.verify(interceptor1).around(any(), any(), any(), any());
       inOrder.verify(interceptor2).before(any(), any(), any());
+      inOrder.verify(interceptor1).around(any(), any(), any(), any());
       inOrder.verify(interceptor2).around(any(), any(), any(), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
@@ -907,9 +907,9 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
-      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
-      inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", TEST_PAYLOAD),
-                                          argThat(interceptionHasPayloadValue(TEST_PAYLOAD)));
+      inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""),
+                                          argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), any());
       inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", TEST_PAYLOAD),
                                           argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue(TEST_PAYLOAD)));
@@ -944,8 +944,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
-      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue(TEST_PAYLOAD)));
       inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
@@ -982,8 +982,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
-      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
@@ -1019,8 +1019,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
-      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
@@ -1057,8 +1057,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
-      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
@@ -1094,8 +1094,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1).before(any(), mapArgWithEntry("param", ""), any());
-      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).before(any(), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor1).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(interceptor2).around(any(), mapArgWithEntry("param", ""), any(), any());
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
@@ -1127,8 +1127,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
         inOrder.verify(interceptor1).before(any(), any(), any());
-        inOrder.verify(interceptor1, never()).around(any(), any(), any(), any());
         inOrder.verify(interceptor2, never()).before(any(), any(), any());
+        inOrder.verify(interceptor1, never()).around(any(), any(), any(), any());
         inOrder.verify(interceptor2, never()).around(any(), any(), any(), any());
         inOrder.verify(processor, never()).process(any());
         inOrder.verify(interceptor2, never()).after(any(), any(), eq(of(expectedException)));
@@ -1160,8 +1160,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
         inOrder.verify(interceptor1).before(any(), any(), any());
-        inOrder.verify(interceptor1).around(any(), any(), any(), any());
         inOrder.verify(interceptor2).before(any(), any(), any());
+        inOrder.verify(interceptor1, never()).around(any(), any(), any(), any());
         inOrder.verify(interceptor2, never()).around(any(), any(), any(), any());
         inOrder.verify(processor, never()).process(any());
         inOrder.verify(interceptor2).after(any(), any(), eq(of(expectedException)));
@@ -1193,8 +1193,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
         inOrder.verify(interceptor1).before(any(), any(), any());
-        inOrder.verify(interceptor1).around(any(), any(), any(), any());
         inOrder.verify(interceptor2).before(any(), any(), any());
+        inOrder.verify(interceptor1).around(any(), any(), any(), any());
         inOrder.verify(interceptor2).around(any(), any(), any(), any());
         inOrder.verify(processor).process(any());
         inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
@@ -1226,8 +1226,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
         inOrder.verify(interceptor1).before(any(), any(), any());
-        inOrder.verify(interceptor1).around(any(), any(), any(), any());
         inOrder.verify(interceptor2).before(any(), any(), any());
+        inOrder.verify(interceptor1).around(any(), any(), any(), any());
         inOrder.verify(interceptor2).around(any(), any(), any(), any());
         inOrder.verify(processor).process(any());
         inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
@@ -1261,11 +1261,11 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
         inOrder.verify(interceptor1).before(any(), any(), any());
+        inOrder.verify(interceptor2).before(any(), any(), any());
         inOrder.verify(interceptor1).around(any(), any(), any(), any());
-        inOrder.verify(interceptor2, never()).before(any(), any(), any());
         inOrder.verify(interceptor2, never()).around(any(), any(), any(), any());
         inOrder.verify(processor, never()).process(any());
-        inOrder.verify(interceptor2, never()).after(any(), any(), eq(of(expectedException)));
+        inOrder.verify(interceptor2).after(any(), any(), eq(of(expectedException)));
         inOrder.verify(interceptor1).after(any(), any(), eq(of(expectedException)));
 
         verifyParametersResolvedAndDisposed(times(1));
@@ -1296,8 +1296,78 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
         inOrder.verify(interceptor1).before(any(), any(), any());
-        inOrder.verify(interceptor1).around(any(), any(), any(), any());
         inOrder.verify(interceptor2).before(any(), any(), any());
+        inOrder.verify(interceptor1).around(any(), any(), any(), any());
+        inOrder.verify(interceptor2).around(any(), any(), any(), any());
+        inOrder.verify(processor, never()).process(any());
+        inOrder.verify(interceptor2).after(any(), any(), eq(of(expectedException)));
+        inOrder.verify(interceptor1).after(any(), any(), eq(of(expectedException)));
+
+        verifyParametersResolvedAndDisposed(times(1));
+      }
+    }
+  }
+
+  @Test
+  public void firstInterceptorFailsAround() throws Exception {
+    RuntimeException expectedException = new RuntimeException("Some Error");
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
+                                                         InterceptionEvent event, InterceptionAction action) {
+        return action.fail(expectedException);
+      }
+    });
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
+    startFlowWithInterceptors(interceptor1, interceptor2);
+
+    expected.expectCause(sameInstance(expectedException));
+    try {
+      process(flow, eventBuilder(muleContext).message(Message.of("")).build());
+    } finally {
+      if (useMockInterceptor) {
+        InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
+
+        inOrder.verify(interceptor1).before(any(), any(), any());
+        inOrder.verify(interceptor2).before(any(), any(), any());
+        inOrder.verify(interceptor1).around(any(), any(), any(), any());
+        inOrder.verify(interceptor2, never()).around(any(), any(), any(), any());
+        inOrder.verify(processor, never()).process(any());
+        inOrder.verify(interceptor2).after(any(), any(), eq(of(expectedException)));
+        inOrder.verify(interceptor1).after(any(), any(), eq(of(expectedException)));
+
+        verifyParametersResolvedAndDisposed(times(1));
+      }
+    }
+  }
+
+  @Test
+  public void secondInterceptorFailsAround() throws Exception {
+    RuntimeException expectedException = new RuntimeException("Some Error");
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {});
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
+                                                         InterceptionEvent event, InterceptionAction action) {
+        return action.fail(expectedException);
+      }
+    });
+    startFlowWithInterceptors(interceptor1, interceptor2);
+
+    expected.expectCause(sameInstance(expectedException));
+    try {
+      process(flow, eventBuilder(muleContext).message(Message.of("")).build());
+    } finally {
+      if (useMockInterceptor) {
+        InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
+
+        inOrder.verify(interceptor1).before(any(), any(), any());
+        inOrder.verify(interceptor2).before(any(), any(), any());
+        inOrder.verify(interceptor1).around(any(), any(), any(), any());
         inOrder.verify(interceptor2).around(any(), any(), any(), any());
         inOrder.verify(processor, never()).process(any());
         inOrder.verify(interceptor2).after(any(), any(), eq(of(expectedException)));
@@ -1332,11 +1402,11 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
         inOrder.verify(interceptor1).before(any(), any(), any());
-        inOrder.verify(interceptor1).around(any(), any(), any(), any());
         inOrder.verify(interceptor2).before(any(), any(), any());
+        inOrder.verify(interceptor1).around(any(), any(), any(), any());
         inOrder.verify(interceptor2).around(any(), any(), any(), any());
         inOrder.verify(processor).process(any());
-        inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
+        inOrder.verify(interceptor2, never()).after(any(), any(), eq(empty()));
         inOrder.verify(interceptor1).after(any(), any(), eq(of(expectedException)));
 
         verifyParametersResolvedAndDisposed(times(1));
@@ -1368,8 +1438,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
         inOrder.verify(interceptor1).before(any(), any(), any());
-        inOrder.verify(interceptor1).around(any(), any(), any(), any());
         inOrder.verify(interceptor2).before(any(), any(), any());
+        inOrder.verify(interceptor1).around(any(), any(), any(), any());
         inOrder.verify(interceptor2).around(any(), any(), any(), any());
         inOrder.verify(processor).process(any());
         inOrder.verify(interceptor2).after(any(), any(), eq(of(expectedException)));
@@ -1401,11 +1471,11 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1).before(any(), any(), any());
+      inOrder.verify(interceptor2).before(any(), any(), any());
       inOrder.verify(interceptor1).around(any(), any(), any(), any());
-      inOrder.verify(interceptor2, never()).before(any(), any(), any());
       inOrder.verify(interceptor2, never()).around(any(), any(), any(), any());
       inOrder.verify(processor, never()).process(any());
-      inOrder.verify(interceptor2, never()).after(any(), any(), eq(empty()));
+      inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
       inOrder.verify(interceptor1).after(any(), any(), eq(empty()));
 
       assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
@@ -1434,8 +1504,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1).before(any(), any(), any());
-      inOrder.verify(interceptor1).around(any(), any(), any(), any());
       inOrder.verify(interceptor2).before(any(), any(), any());
+      inOrder.verify(interceptor1).around(any(), any(), any(), any());
       inOrder.verify(interceptor2).around(any(), any(), any(), any());
       inOrder.verify(processor, never()).process(any());
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
@@ -1471,8 +1541,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
       inOrder.verify(interceptor1, never()).before(any(), any(), any());
-      inOrder.verify(interceptor1, never()).around(any(), any(), any(), any());
       inOrder.verify(interceptor2).before(any(), any(), any());
+      inOrder.verify(interceptor1, never()).around(any(), any(), any(), any());
       inOrder.verify(interceptor2).around(any(), any(), any(), any());
       inOrder.verify(processor).process(any());
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
