@@ -44,7 +44,8 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     private String encryptionAlgorithm;
     private int encryptionAlgorithmId;
     private PGPOutputMode pgpOutputMode;
-
+    private String fileName;
+    
     public void initialise() throws InitialisationException
     {
         if (!SecurityUtils.isFipsSecurityModel())
@@ -70,11 +71,11 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 
     public InputStream encrypt(InputStream data, Object cryptInfo) throws CryptoFailureException
     {
-        try
+        try 
         {
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-            return new EncryptStreamTransformer(publicKey, provider, encryptionAlgorithmId, pgpOutputMode).process(data);
+            return new EncryptStreamTransformer(publicKey, provider, encryptionAlgorithmId, pgpOutputMode, fileName).process(data);
         }
         catch (Exception e)
         {
@@ -175,5 +176,10 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     public void setEncryptionAlgorithm(String encryptionAlgorithm)
     {
         this.encryptionAlgorithm = encryptionAlgorithm;
+    }
+
+    public void setFileName(String fileName)
+    {
+        this.fileName = fileName;
     }
 }
