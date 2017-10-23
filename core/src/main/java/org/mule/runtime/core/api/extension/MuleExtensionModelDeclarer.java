@@ -502,7 +502,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareSubflow(ExtensionDeclarer extensionDeclarer) {
-    ConstructDeclarer flow = extensionDeclarer.withConstruct(SUBFLOW_ELEMENT_IDENTIFIER)
+    ConstructDeclarer flow = extensionDeclarer.withConstruct("subFlow")
         .allowingTopLevelDefinition();
 
     flow.withChain().setRequired(true).withAllowedStereotypes(PROCESSOR);
