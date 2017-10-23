@@ -141,7 +141,7 @@ public final class TlsConfiguration
 
     private Log logger = LogFactory.getLog(getClass());
 
-    private String sslType = DEFAULT_SSL_TYPE;
+    private String sslType;
 
     // this is the key store that is generated in-memory and available to connectors explicitly.
     // it is local to the socket.
@@ -230,6 +230,18 @@ public final class TlsConfiguration
         }
 
         tlsProperties.load(format(PROPERTIES_FILE_PATTERN, SecurityUtils.getSecurityModel()));
+
+        if (sslType == null) {
+            sslType = resolveSslType();
+        }
+    }
+
+    private String resolveSslType() {
+        if (tlsProperties.getDefaultProtocol() != null) {
+            return tlsProperties.getDefaultProtocol();
+        } else {
+            return DEFAULT_SSL_TYPE;
+        }
     }
 
     private void validate(boolean anon) throws CreateException

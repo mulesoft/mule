@@ -26,6 +26,7 @@ public class TlsProperties
 
     private String[] enabledCipherSuites;
     private String[] enabledProtocols;
+    private String defaultProtocol;
 
     public String[] getEnabledCipherSuites()
     {
@@ -35,6 +36,10 @@ public class TlsProperties
     public String[] getEnabledProtocols()
     {
         return enabledProtocols;
+    }
+
+    public String getDefaultProtocol() {
+        return defaultProtocol;
     }
 
     public void load(String fileName)
@@ -54,6 +59,7 @@ public class TlsProperties
 
                 String enabledCipherSuitesProperty = properties.getProperty("enabledCipherSuites");
                 String enabledProtocolsProperty = properties.getProperty("enabledProtocols");
+                String defaultProtocolProperty = properties.getProperty("defaultProtocol");
 
                 if (enabledCipherSuitesProperty != null)
                 {
@@ -63,6 +69,9 @@ public class TlsProperties
                 if (enabledProtocolsProperty != null)
                 {
                     enabledProtocols = StringUtils.splitAndTrim(enabledProtocolsProperty, ",");
+                }
+                if (defaultProtocolProperty != null) {
+                    defaultProtocol = defaultProtocolProperty.trim();
                 }
             }
         }
