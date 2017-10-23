@@ -9,8 +9,8 @@ package org.mule.runtime.core.privileged.processor;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -51,15 +51,15 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractC
   }
 
   public void setListener(Processor next) {
-    this.next = next;
+    if (next != null) {
+      this.next = next;
+    }
   }
 
-  protected Processor next;
+  protected Processor next = event -> event;
 
   protected CoreEvent processNext(CoreEvent event) throws MuleException {
-    if (next == null) {
-      return event;
-    } else if (event == null) {
+    if (event == null) {
       if (logger.isDebugEnabled()) {
         logger.trace("MuleEvent is null.  Next MessageProcessor '" + next.getClass().getName() + "' will not be invoked.");
       }
