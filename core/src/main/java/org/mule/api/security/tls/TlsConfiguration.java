@@ -6,6 +6,7 @@
  */
 package org.mule.api.security.tls;
 
+import static java.lang.String.format;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.TlsDirectKeyStore;
@@ -124,7 +125,7 @@ public final class TlsConfiguration
 
     private Log logger = LogFactory.getLog(getClass());
 
-    private String sslType = DEFAULT_SSL_TYPE;
+    private String sslType;
 
     // this is the key store that is generated in-memory and available to connectors explicitly.
     // it is local to the socket.
@@ -209,7 +210,24 @@ public final class TlsConfiguration
             new TlsPropertiesMapper(namespace).writeToProperties(System.getProperties(), this);
         }
 
-        tlsProperties.load(String.format(PROPERTIES_FILE_PATTERN, SecurityUtils.getSecurityModel()));
+        tlsProperties.load(format(PROPERTIES_FILE_PATTERN, SecurityUtils.getSecurityModel()));
+
+        if (sslType == null)
+        {
+            sslType = resolveSslType();
+        }
+    }
+
+    private String resolveSslType()
+    {
+        if (tlsProperties.getDefaultProtocol() != null)
+        {
+            return tlsProperties.getDefaultProtocol();
+        }
+        else
+        {
+            return DEFAULT_SSL_TYPE;
+        }
     }
 
     private void validate(boolean anon) throws CreateException
@@ -405,7 +423,7 @@ public final class TlsConfiguration
 
         if (enabledProtocols != null && !ArrayUtils.contains(enabledProtocols, sslType))
         {
-            throw new IllegalArgumentException(String.format("Protocol %s is not allowed in current configuration", sslType));
+            throw new IllegalArgumentException(format("Protocol %s is not allowed in current configuration", sslType));
         }
 
         this.sslType = sslType;
