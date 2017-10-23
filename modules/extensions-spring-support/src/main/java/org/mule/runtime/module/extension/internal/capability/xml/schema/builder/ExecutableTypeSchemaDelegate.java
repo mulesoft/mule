@@ -218,7 +218,7 @@ abstract class ExecutableTypeSchemaDelegate {
   }
 
   private String registerExtensibleElement(StereotypeModel stereotypeModel) {
-    final String name = hyphenize(stereotypeModel.getName()).toLowerCase();
+    final String name = hyphenize(stereotypeModel.getType()).toLowerCase();
 
     TopLevelElement group = substitutionGroups.get(name);
     if (group == null) {
