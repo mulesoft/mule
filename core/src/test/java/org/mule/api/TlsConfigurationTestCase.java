@@ -251,7 +251,8 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         }
     }
 
-    private File getDefaultProtocolConfigFile() throws IOException {
+    private File getDefaultProtocolConfigFile() throws IOException
+    {
         return createConfigFile(TlsConfiguration.DEFAULT_SECURITY_MODEL, String.format("defaultProtocol=%s", SUPPORTED_PROTOCOL));
     }
 

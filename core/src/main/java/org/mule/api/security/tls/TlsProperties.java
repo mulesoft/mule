@@ -38,7 +38,8 @@ public class TlsProperties
         return enabledProtocols;
     }
 
-    public String getDefaultProtocol() {
+    public String getDefaultProtocol()
+    {
         return defaultProtocol;
     }
 
@@ -70,7 +71,8 @@ public class TlsProperties
                 {
                     enabledProtocols = StringUtils.splitAndTrim(enabledProtocolsProperty, ",");
                 }
-                if (defaultProtocolProperty != null) {
+                if (defaultProtocolProperty != null)
+                {
                     defaultProtocol = defaultProtocolProperty.trim();
                 }
             }
@@ -104,7 +106,7 @@ public class TlsProperties
             return false;
         }
 
-        return true;
+        return defaultProtocol != null ? defaultProtocol.equals(that.defaultProtocol) : that.defaultProtocol == null;
     }
 
     @Override
@@ -112,6 +114,7 @@ public class TlsProperties
     {
         int result = enabledCipherSuites != null ? Arrays.hashCode(enabledCipherSuites) : 0;
         result = 31 * result + (enabledProtocols != null ? Arrays.hashCode(enabledProtocols) : 0);
+        result = 31 * result + (defaultProtocol != null ? defaultProtocol.hashCode() : 0);
         return result;
     }
 }

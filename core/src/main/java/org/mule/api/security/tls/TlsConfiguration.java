@@ -231,15 +231,20 @@ public final class TlsConfiguration
 
         tlsProperties.load(format(PROPERTIES_FILE_PATTERN, SecurityUtils.getSecurityModel()));
 
-        if (sslType == null) {
+        if (sslType == null)
+        {
             sslType = resolveSslType();
         }
     }
 
-    private String resolveSslType() {
-        if (tlsProperties.getDefaultProtocol() != null) {
+    private String resolveSslType()
+    {
+        if (tlsProperties.getDefaultProtocol() != null)
+        {
             return tlsProperties.getDefaultProtocol();
-        } else {
+        }
+        else
+        {
             return DEFAULT_SSL_TYPE;
         }
     }
