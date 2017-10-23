@@ -100,6 +100,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
           }
 
           buffer.ifComputed(this::deallocate);
+          buffer = null;
         }
       });
     }

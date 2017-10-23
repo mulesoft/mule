@@ -6,29 +6,32 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static java.util.Collections.newSetFromMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProvider;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Keeps track of active {@link Cursor cursors} and their {@link CursorProvider providers}
@@ -65,7 +68,7 @@ public class CursorManager {
    * Becomes aware of the given {@code provider} and returns a replacement provider which is managed by the runtime, allowing for
    * automatic resource handling
    *
-   * @param provider the provider to be tracked
+   * @param provider     the provider to be tracked
    * @param creatorEvent the event that created the provider
    * @return a {@link CursorContext}
    */
@@ -87,7 +90,7 @@ public class CursorManager {
   /**
    * Acknowledges that the given {@code cursor} has been opened
    *
-   * @param cursor the opnened cursor
+   * @param cursor         the opnened cursor
    * @param providerHandle the handle for the provider that generated it
    */
   public void onOpen(Cursor cursor, CursorContext providerHandle) {
@@ -107,7 +110,6 @@ public class CursorManager {
     EventStreamingState state = registry.getIfPresent(eventId);
 
     if (state != null && state.removeCursor(handle.getCursorProvider(), cursor)) {
-      state.dispose();
       registry.invalidate(eventId);
     }
   }
@@ -115,7 +117,6 @@ public class CursorManager {
   private void terminated(BaseEventContext rootContext) {
     EventStreamingState state = registry.getIfPresent(rootContext.getId());
     if (state != null) {
-      state.dispose();
       registry.invalidate(rootContext.getId());
     }
   }
@@ -138,15 +139,23 @@ public class CursorManager {
 
   private class EventStreamingState {
 
-    private boolean disposed = false;
+    private AtomicBoolean disposed = new AtomicBoolean(false);
 
-    private final LoadingCache<CursorProvider, List<Cursor>> cursors = CacheBuilder.newBuilder()
-        .build(new CacheLoader<CursorProvider, List<Cursor>>() {
+    private final LoadingCache<CursorProvider, Set<Cursor>> cursors = CacheBuilder.newBuilder()
+        .removalListener((RemovalListener<CursorProvider, Set<Cursor>>) notification -> {
+          try {
+            closeProvider(notification.getKey());
+            releaseAll(notification.getValue());
+          } finally {
+            notification.getKey().releaseResources();
+          }
+        })
+        .build(new CacheLoader<CursorProvider, Set<Cursor>>() {
 
           @Override
-          public List<Cursor> load(CursorProvider key) throws Exception {
+          public Set<Cursor> load(CursorProvider key) throws Exception {
             statistics.incrementOpenProviders();
-            return new LinkedList<>();
+            return newSetFromMap(new ConcurrentHashMap<>());
           }
         });
 
@@ -159,40 +168,26 @@ public class CursorManager {
     }
 
     private boolean removeCursor(CursorProvider provider, Cursor cursor) {
-      List<Cursor> openCursors = cursors.getUnchecked(provider);
+      Set<Cursor> openCursors = cursors.getUnchecked(provider);
       if (openCursors.remove(cursor)) {
         statistics.decrementOpenCursors();
       }
 
-      if (openCursors.isEmpty()) {
-        if (provider.isClosed()) {
-          dispose();
-          cursors.invalidate(provider);
-          return true;
-        }
+      if (openCursors.isEmpty() && provider.isClosed()) {
+        dispose();
+        return true;
       }
 
       return false;
     }
 
     private void dispose() {
-      if (disposed) {
-        return;
+      if (disposed.compareAndSet(false, true)) {
+        cursors.invalidateAll();
       }
-
-      cursors.asMap().forEach((provider, cursors) -> {
-        try {
-          closeProvider(provider);
-          releaseAll(cursors);
-        } finally {
-          provider.releaseResources();
-        }
-      });
-
-      disposed = true;
     }
 
-    private void releaseAll(List<Cursor> cursors) {
+    private void releaseAll(Collection<Cursor> cursors) {
       cursors.forEach(cursor -> {
         try {
           cursor.release();
