@@ -42,7 +42,8 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
     private boolean checkKeyExpirity = false;
     private Provider provider;
     private int encryptionAlgorithmId;
-
+    private String fileName;
+    
     public void initialise() throws InitialisationException
     {
         if (!SecurityUtils.isFipsSecurityModel())
@@ -69,7 +70,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         {
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
-            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider, encryptionAlgorithmId);
+            StreamTransformer transformer = new EncryptStreamTransformer(data, publicKey, provider, encryptionAlgorithmId, fileName);
             return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
         }
         catch (Exception e)
