@@ -41,7 +41,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.config.internal.factories.FlowRefFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -191,7 +190,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     doReturn("other").when(expressionManager).parse(eq(DYNAMIC_NON_EXISTANT), any(CoreEvent.class),
                                                     any(ComponentLocation.class));
 
-    expectedException.expectCause(instanceOf(RoutePathNotFoundException.class));
+    expectedException.expect(instanceOf(RoutePathNotFoundException.class));
     getFlowRefProcessor(createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT)).process(testEvent());
   }
 

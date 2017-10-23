@@ -43,7 +43,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -215,8 +214,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     router.initialise();
 
-    expectedException.expect(instanceOf(MessagingException.class));
-    expectedException.expectCause(instanceOf(MuleRuntimeException.class));
+    expectedException.expect(instanceOf(MuleRuntimeException.class));
     router.process(CoreEvent.builder(testEvent()).message(Message.of(new StringBufferInputStream(TEST_PAYLOAD))).build());
   }
 

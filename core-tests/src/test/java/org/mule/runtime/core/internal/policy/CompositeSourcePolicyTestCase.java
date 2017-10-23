@@ -28,15 +28,16 @@ import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
@@ -172,7 +173,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleContextTestCase {
     Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
         from(compositeSourcePolicy.process(initialEvent)).block();
     assertThat(sourcePolicyResult.isLeft(), is(true));
-    assertThat(sourcePolicyResult.getLeft().getMessagingException().getCause(), is(policyException));
+    assertThat(sourcePolicyResult.getLeft().getMessagingException().getCause().getCause(), is(policyException));
   }
 
   @Test

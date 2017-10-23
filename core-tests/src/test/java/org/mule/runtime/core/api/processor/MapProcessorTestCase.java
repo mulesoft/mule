@@ -14,11 +14,11 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
 import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
+
+import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -28,6 +28,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import reactor.core.publisher.Mono;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -99,8 +100,7 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void mapStreamBlockingGetExceptionThrown() throws Throwable {
-    thrown.expect(is(instanceOf(MessagingException.class)));
-    thrown.expectCause(is(exception));
+    thrown.expect(is(exception));
     CoreEvent result;
     try {
       result = just(event).transform(testProcessorThrowsException).block();
@@ -113,8 +113,7 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void mapStreamSubscribeExceptionThrown() throws Exception {
     just(event).transform(testProcessorThrowsException).onErrorResume(throwable -> {
-      assertThat(throwable, is(instanceOf(MessagingException.class)));
-      assertThat(throwable.getCause(), is(exception));
+      assertThat(throwable, is(exception));
 
       // If there are no assertion errors, the actual throwable will be ignored
       return Mono.empty();
@@ -135,9 +134,8 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
     } catch (Exception e) {
       Throwable problem = unwrap(e);
 
-      assertThat(problem, is(instanceOf(MessagingException.class)));
-      assertThat(problem.getCause(), is(instanceOf(MuleFatalException.class)));
-      assertThat(problem.getCause().getCause(), is(error));
+      assertThat(problem, is(instanceOf(MuleFatalException.class)));
+      assertThat(problem.getCause(), is(error));
     }
 
     assertThat(result, is(nullValue()));
@@ -146,9 +144,8 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void mapStreamSubscribeErrorThrown() throws Exception {
     just(event).transform(testProcessorThrowsError).onErrorResume(throwable -> {
-      assertThat(throwable, is(instanceOf(MessagingException.class)));
-      assertThat(throwable.getCause(), is(instanceOf(MuleFatalException.class)));
-      assertThat(throwable.getCause().getCause(), is(error));
+      assertThat(throwable, is(instanceOf(MuleFatalException.class)));
+      assertThat(throwable.getCause(), is(error));
 
       // If there are no assertion errors, the actual throwable will be ignored
       return Mono.empty();
