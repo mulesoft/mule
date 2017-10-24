@@ -21,6 +21,8 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
+import static org.apache.commons.lang.reflect.FieldUtils.readDeclaredStaticField;
+import static org.apache.commons.lang.reflect.FieldUtils.writeDeclaredStaticField;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
@@ -66,6 +68,7 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.in
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -77,6 +80,7 @@ import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -217,8 +221,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File loadsAppResourceCallbackClassFile;
   protected static File pluginEcho1TestClassFile;
 
+  private static Boolean internalIsRunningTests;
+
   @BeforeClass
-  public static void beforeClass() throws URISyntaxException {
+  public static void beforeClass() throws URISyntaxException, IllegalAccessException {
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
     barUtils1_0JarFile =
         new JarFileBuilder("barUtils1",
@@ -254,6 +260,15 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceCallback.java"));
     pluginEcho1TestClassFile =
         new SingleClassCompiler().dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
+
+    internalIsRunningTests =
+        (Boolean) readDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", true);
+    writeDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", true, true);
+  }
+
+  @BeforeClass
+  public static void afterClass() throws IllegalAccessException {
+    writeDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", internalIsRunningTests, true);
   }
 
   protected static File getResourceFile(String resource) throws URISyntaxException {
