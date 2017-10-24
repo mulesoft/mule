@@ -21,30 +21,19 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_DOMAIN_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_EE_DOMAIN_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-
-import javax.xml.namespace.QName;
-
-import org.apache.commons.lang3.ClassUtils;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -86,17 +75,31 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
-import org.w3c.dom.Node;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+
+import javax.xml.namespace.QName;
+
+import org.apache.commons.lang3.ClassUtils;
+import org.w3c.dom.Node;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
  * configuration option.
  * <p/>
- * This model is represented by a set of {@link ComponentModel}. Each {@code ComponentModel}
- * holds a piece of configuration and may have children {@code ComponentModel}s as defined in the artifact configuration.
+ * This model is represented by a set of {@link ComponentModel}. Each {@code ComponentModel} holds a piece of configuration and
+ * may have children {@code ComponentModel}s as defined in the artifact configuration.
  * <p/>
  * Once the set of {@code ComponentModel} gets created from the application
  * {@link org.mule.runtime.config.api.dsl.processor.ConfigFile}s the {@code ApplicationModel} executes a set of common validations
@@ -107,15 +110,8 @@ import com.google.common.collect.ImmutableSet;
 public class ApplicationModel {
 
   // TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
-  public static final String MULE_ROOT_ELEMENT = "mule";
-  public static final String MULE_DOMAIN_ROOT_ELEMENT = "mule-domain";
-  public static final String IMPORT_ELEMENT = "import";
   public static final String POLICY_ROOT_ELEMENT = "policy";
-  public static final String ERROR_HANDLER = "error-handler";
-  public static final String ON_ERROR_CONTINUE = "on-error-continue";
-  public static final String ON_ERROR_PROPAGATE = "on-error-propagate";
   public static final String ERROR_MAPPING = "error-mapping";
-  public static final String RAISE_ERROR = "raise-error";
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
   public static final String WHEN_CHOICE_ES_ATTRIBUTE = "when";
   public static final String TYPE_ES_ATTRIBUTE = "type";
@@ -126,13 +122,10 @@ public class ApplicationModel {
   public static final String VALUE_ATTRIBUTE = "value";
   public static final String TRANSFORMER_REFERENCE_ELEMENT = "transformer";
   public static final String ANNOTATION_ELEMENT = "annotations";
-  public static final String CONFIGURATION_ELEMENT = "configuration";
   public static final String DATA_WEAVE = "weave";
   public static final String CUSTOM_TRANSFORMER = "custom-transformer";
   public static final String DESCRIPTION_ELEMENT = "description";
   public static final String PROPERTIES_ELEMENT = "properties";
-  public static final String FLOW_ELEMENT = "flow";
-  public static final String SUBFLOW_ELEMENT = "sub-flow";
   private static final String MODULE_OPERATION_CHAIN_ELEMENT = "module-operation-chain";
 
   public static final String REDELIVERY_POLICY_ELEMENT = "redelivery-policy";
@@ -155,25 +148,12 @@ public class ApplicationModel {
   public static final String CONFIGURATION_PROPERTIES_ELEMENT = "configuration-properties";
   public static final String OBJECT_ELEMENT = "object";
 
-  public static final ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(ERROR_HANDLER).build();
-  public static final ComponentIdentifier ON_ERROR_CONTINE_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
-  public static final ComponentIdentifier ON_ERROR_PROPAGATE_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(ON_ERROR_PROPAGATE).build();
+
   public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(EXCEPTION_STRATEGY_REFERENCE_ELEMENT)
           .build();
   public static final ComponentIdentifier ERROR_MAPPING_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ERROR_MAPPING).build();
-  public static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
-  public static final ComponentIdentifier MULE_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(MULE_ROOT_ELEMENT).build();
-  public static final ComponentIdentifier MULE_DOMAIN_IDENTIFIER =
-      builder().namespace(DOMAIN_PREFIX).name(MULE_DOMAIN_ROOT_ELEMENT).build();
-  public static final ComponentIdentifier MULE_EE_DOMAIN_IDENTIFIER =
-      builder().namespace(EE_DOMAIN_PREFIX).name(MULE_DOMAIN_ROOT_ELEMENT).build();
   public static final ComponentIdentifier MULE_PROPERTY_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(PROPERTY_ELEMENT).build();
   public static final ComponentIdentifier MULE_PROPERTIES_IDENTIFIER =
@@ -182,8 +162,6 @@ public class ApplicationModel {
       builder().namespace(CORE_PREFIX).name(ANNOTATION_ELEMENT).build();
   public static final ComponentIdentifier TRANSFORMER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(TRANSFORMER_REFERENCE_ELEMENT).build();
-  public static final ComponentIdentifier CONFIGURATION_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(CONFIGURATION_ELEMENT).build();
   public static final ComponentIdentifier CUSTOM_TRANSFORMER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(CUSTOM_TRANSFORMER).build();
   public static final ComponentIdentifier DOC_DESCRIPTION_IDENTIFIER =
@@ -192,10 +170,6 @@ public class ApplicationModel {
       builder().namespace(CORE_PREFIX).name(DESCRIPTION_ELEMENT).build();
   public static final ComponentIdentifier OBJECT_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(OBJECT_ELEMENT).build();
-  public static final ComponentIdentifier FLOW_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(FLOW_ELEMENT).build();
-  public static final ComponentIdentifier SUBFLOW_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(SUBFLOW_ELEMENT).build();
   public static final ComponentIdentifier REDELIVERY_POLICY_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(REDELIVERY_POLICY_ELEMENT).build();
   public static final ComponentIdentifier GLOBAL_PROPERTY_IDENTIFIER =

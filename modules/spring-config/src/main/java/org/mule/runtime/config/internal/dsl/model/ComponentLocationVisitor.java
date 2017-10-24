@@ -15,8 +15,16 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
-import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_HANDLER_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.FLOW_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ORIGINAL_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isErrorHandler;
+import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isMessageSource;
+import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isProcessor;
+import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isRouter;
+import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
+import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
 import static org.mule.runtime.config.internal.model.ApplicationModel.HTTP_PROXY_OPERATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.HTTP_PROXY_POLICY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.HTTP_PROXY_SOURCE_POLICY_IDENTIFIER;
@@ -26,22 +34,13 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_AFTE
 import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_BEFORE_SUITE_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_BEFORE_TEST_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_TEST_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.SUBFLOW_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ORIGINAL_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isErrorHandler;
-import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isMessageSource;
-import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isProcessor;
-import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isRouter;
-import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
-import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
-import org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 

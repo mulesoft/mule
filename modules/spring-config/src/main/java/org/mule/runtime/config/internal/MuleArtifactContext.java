@@ -19,9 +19,9 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
-import static org.mule.runtime.config.internal.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.IMPORT_ELEMENT;
-import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.IMPORT_ELEMENT;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.updateAnnotationValue;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
@@ -534,7 +534,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     Optional<ComponentModel> configurationOptional =
-        applicationModel.findComponentDefinitionModel(ApplicationModel.CONFIGURATION_IDENTIFIER);
+        applicationModel.findComponentDefinitionModel(CONFIGURATION_IDENTIFIER);
     if (configurationOptional.isPresent()) {
       return;
     }
