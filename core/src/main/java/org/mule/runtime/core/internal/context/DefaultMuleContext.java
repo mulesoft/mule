@@ -41,10 +41,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -82,7 +82,6 @@ import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -105,7 +104,6 @@ import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
 import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
@@ -124,6 +122,8 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 
+import org.slf4j.Logger;
+
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Properties;
@@ -132,7 +132,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
-import org.slf4j.Logger;
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistries, PrivilegedMuleContext {
@@ -252,23 +251,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
   private ConfigurationComponentLocator componentLocator;
 
-  // TODO MULE-13679 Remove these hooks
-  // If this runs inside a Mule classloader it's automatically loaded, but in unit tests that
-  // are run outside we need to set it up here.
   static {
-    // Ensure reactor operatorError hook is always registered.
-    Hooks.onOperatorError((throwable, signal) -> {
-      // Unwrap all throwables to be consistent with reactor default hook.
-      throwable = unwrap(throwable);
-      // Only apply hook for Event signals.
-      if (signal instanceof CoreEvent) {
-        return throwable instanceof MessagingException ? throwable
-            : new MessagingException((CoreEvent) signal, throwable);
-      } else {
-        return throwable;
-      }
-    });
-
     // Log dropped events/errors
     Hooks.onErrorDropped(error -> logger.debug("ERROR DROPPED " + error));
     Hooks.onNextDropped(event -> logger.debug("EVENT DROPPED " + event));

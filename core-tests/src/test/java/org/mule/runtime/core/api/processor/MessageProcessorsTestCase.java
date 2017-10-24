@@ -29,10 +29,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -193,8 +193,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processToApplyError() throws Exception {
-    thrown.expect((is(instanceOf(MessagingException.class))));
-    thrown.expectCause(is(exception));
+    thrown.expect(is(exception));
     try {
       processToApply(input, error);
     } finally {

@@ -315,8 +315,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     setupConcurrentProcessingStrategy();
     strategy = createStrategy(processingStrategy, 4, true, MAX_VALUE);
 
-    expectedException.expect(MessagingException.class);
-    expectedException.expectCause(instanceOf(RejectedExecutionException.class));
+    expectedException.expect(RejectedExecutionException.class);
     invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(1));
   }
 
