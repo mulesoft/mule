@@ -363,7 +363,7 @@ public final class XmlExtensionLoaderDelegate {
     }
     String name = moduleModel.getParameters().get(MODULE_NAME);
 
-    String version = "4.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
+    String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
     final String category = moduleModel.getParameters().get(CATEGORY);
     final String vendor = moduleModel.getParameters().get(VENDOR);
     final XmlDslModel xmlDslModel = getXmlDslModel(moduleModel, name, version);
