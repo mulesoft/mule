@@ -115,7 +115,7 @@ public final class TlsConfiguration extends AbstractComponent
   public static final String DEFAULT_KEYSTORE = ".keystore";
   public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
   public static final String DEFAULT_KEYMANAGER_ALGORITHM = KeyManagerFactory.getDefaultAlgorithm();
-  public static final String DEFAULT_SSL_TYPE = "TLSv1";
+  public static final String DEFAULT_SSL_TYPE = "TLS";
   public static final String JSSE_NAMESPACE = "javax.net";
 
   public static final String PROPERTIES_FILE_PATTERN = "tls-%s.conf";
@@ -123,7 +123,7 @@ public final class TlsConfiguration extends AbstractComponent
 
   private Logger logger = LoggerFactory.getLogger(getClass());
 
-  private String sslType = DEFAULT_SSL_TYPE;
+  private String sslType;
 
   // this is the key store that is generated in-memory and available to connectors explicitly.
   // it is local to the socket.
@@ -187,6 +187,18 @@ public final class TlsConfiguration extends AbstractComponent
     initTrustManagerFactory();
 
     tlsProperties.load(String.format(PROPERTIES_FILE_PATTERN, SecurityUtils.getSecurityModel()));
+
+    if (sslType == null) {
+      sslType = resolveSslType();
+    }
+  }
+
+  private String resolveSslType() {
+    if (tlsProperties.getDefaultProtocol() != null) {
+      return tlsProperties.getDefaultProtocol();
+    } else {
+      return DEFAULT_SSL_TYPE;
+    }
   }
 
   private void validate(boolean anon) throws CreateException {
