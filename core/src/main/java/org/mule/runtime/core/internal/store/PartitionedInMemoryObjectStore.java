@@ -11,6 +11,7 @@ import static org.mule.runtime.core.internal.util.store.MuleObjectStoreManager.U
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.core.api.component.InternalComponent;
 
 import java.io.Serializable;
