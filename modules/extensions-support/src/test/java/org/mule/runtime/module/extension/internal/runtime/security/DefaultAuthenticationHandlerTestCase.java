@@ -19,6 +19,8 @@ import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -29,8 +31,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+@SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultAuthenticationHandlerTestCase {
+public class DefaultAuthenticationHandlerTestCase extends AbstractMuleTestCase {
 
   @Mock
   private SecurityContext securityContext;
