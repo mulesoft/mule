@@ -154,7 +154,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase {
 
   @Test
   public void defaultProtocolFromConfigFile() throws Exception {
-    File configFile = getDefaultProtocolConfigFile();
+    File configFile = createDefaultProtocolConfigFile();
 
     try {
       TlsConfiguration tlsConfiguration = new TlsConfiguration(DEFAULT_KEYSTORE);
@@ -183,7 +183,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase {
 
   @Test
   public void overrideDefaultProtocolFromConfigFile() throws Exception {
-    File configFile = getDefaultProtocolConfigFile();
+    File configFile = createDefaultProtocolConfigFile();
 
     try {
       TlsConfiguration tlsConfiguration = new TlsConfiguration(DEFAULT_KEYSTORE);
@@ -222,7 +222,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase {
     }
   }
 
-  private File getDefaultProtocolConfigFile() throws IOException {
+  private File createDefaultProtocolConfigFile() throws IOException {
     return createConfigFile(DEFAULT_SECURITY_MODEL, format("defaultProtocol=%s", SUPPORTED_PROTOCOL));
   }
 
