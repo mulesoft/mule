@@ -13,6 +13,7 @@ import static java.util.Collections.list;
 import static java.util.Locale.getDefault;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -129,6 +130,16 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     Field cacheKeyField = ResourceBundle.class.getDeclaredField("cacheKey");
     cacheKeyField.setAccessible(true);
     assertThat(cacheKeyField.get(nonExistentBundle), is(nullValue()));
+  }
+
+  @Test
+  public void createsInstanceOnlyOnce() {
+    TestArtifactClassLoader testArtifactClassLoader = new TestArtifactClassLoader(Thread.currentThread().getContextClassLoader());
+
+    ResourceReleaser firstInstance = testArtifactClassLoader.createResourceReleaserInstance();
+    ResourceReleaser secondInstance = testArtifactClassLoader.createResourceReleaserInstance();
+
+    assertThat(firstInstance, sameInstance(secondInstance));
   }
 
   private interface KeepResourceReleaserInstance {

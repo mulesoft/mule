@@ -17,12 +17,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
-import org.slf4j.Logger;
-
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
 
 /**
  * Abstract implementation of the ArtifactClassLoader interface, that manages shutdown listeners.
@@ -44,6 +44,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private final Object localResourceLocatorLock = new Object();
   private volatile LocalResourceLocator localResourceLocator;
   private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
+  private ResourceReleaser resourceReleaserInstance;
   private ArtifactDescriptor artifactDescriptor;
 
   /**
@@ -131,7 +132,10 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
    * Creates a {@link ResourceReleaser} using this classloader, only used outside in unit tests.
    */
   protected ResourceReleaser createResourceReleaserInstance() {
-    return createCustomInstance(resourceReleaserClassLocation);
+    if (resourceReleaserInstance == null) {
+      resourceReleaserInstance = createCustomInstance(resourceReleaserClassLocation);
+    }
+    return resourceReleaserInstance;
   }
 
   public void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {
