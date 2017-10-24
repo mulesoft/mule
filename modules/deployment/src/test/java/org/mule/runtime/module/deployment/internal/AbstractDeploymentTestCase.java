@@ -21,6 +21,8 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
+import static org.apache.commons.lang.reflect.FieldUtils.readDeclaredStaticField;
+import static org.apache.commons.lang.reflect.FieldUtils.writeDeclaredStaticField;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
@@ -66,6 +68,7 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.in
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -137,7 +140,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang.reflect.FieldUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -219,6 +221,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File loadsAppResourceCallbackClassFile;
   protected static File pluginEcho1TestClassFile;
 
+  private static Boolean internalIsRunningTests;
+
   @BeforeClass
   public static void beforeClass() throws URISyntaxException, IllegalAccessException {
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
@@ -257,12 +261,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     pluginEcho1TestClassFile =
         new SingleClassCompiler().dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
 
-    FieldUtils.writeDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", true, true);
+    internalIsRunningTests =
+        (Boolean) readDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", true);
+    writeDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", true, true);
   }
 
   @BeforeClass
   public static void afterClass() throws IllegalAccessException {
-    FieldUtils.writeDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", false, true);
+    writeDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", internalIsRunningTests, true);
   }
 
   protected static File getResourceFile(String resource) throws URISyntaxException {
