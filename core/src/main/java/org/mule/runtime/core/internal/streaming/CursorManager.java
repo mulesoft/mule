@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,6 +141,7 @@ public class CursorManager {
   private class EventStreamingState {
 
     private AtomicBoolean disposed = new AtomicBoolean(false);
+    private AtomicInteger cursorCount = new AtomicInteger(0);
 
     private final LoadingCache<CursorProvider, Set<Cursor>> cursors = CacheBuilder.newBuilder()
         .removalListener((RemovalListener<CursorProvider, Set<Cursor>>) notification -> {
@@ -165,17 +167,17 @@ public class CursorManager {
 
     private void addCursor(CursorProvider provider, Cursor cursor) {
       cursors.getUnchecked(provider).add(cursor);
+      cursorCount.incrementAndGet();
     }
 
     private boolean removeCursor(CursorProvider provider, Cursor cursor) {
       Set<Cursor> openCursors = cursors.getUnchecked(provider);
       if (openCursors.remove(cursor)) {
         statistics.decrementOpenCursors();
-      }
-
-      if (openCursors.isEmpty() && provider.isClosed()) {
-        dispose();
-        return true;
+        if (cursorCount.decrementAndGet() <= 0 && provider.isClosed()) {
+          dispose();
+          return true;
+        }
       }
 
       return false;
