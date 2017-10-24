@@ -9,7 +9,8 @@ package org.mule.runtime.config.privileged.dsl;
 import static java.util.Collections.emptySet;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 
 import java.util.Set;
 
@@ -18,11 +19,12 @@ import java.util.Set;
  */
 public interface BeanDefinitionPostProcessor {
 
-  default void adaptBeanDefinition(ComponentModel parentComponentModel, Class beanClass, PostProcessorIocHelper iocHelper) {
+  default void adaptBeanDefinition(ComponentConfiguration parentComponentConfiguration, Class beanClass,
+                                   PostProcessorIocHelper iocHelper) {
     // Nothing to do
   }
 
-  void postProcess(ComponentModel componentModel, PostProcessorIocHelper iocHelper);
+  void postProcess(ComponentConfiguration componentConfiguration, PostProcessorIocHelper iocHelper);
 
   default Set<ComponentIdentifier> getGenericPropertiesCustomProcessingIdentifiers() {
     return emptySet();

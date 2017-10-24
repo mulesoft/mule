@@ -70,7 +70,7 @@ import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.DataUnit;
 import org.mule.runtime.config.api.dsl.ConfigurableInstanceFactory;
 import org.mule.runtime.config.api.dsl.ConfigurableObjectFactory;
-import org.mule.runtime.config.api.dsl.model.ApplicationModel;
+import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.CustomEncryptionStrategyDelegate;
 import org.mule.runtime.config.internal.CustomSecurityProviderDelegate;
 import org.mule.runtime.config.internal.MuleConfigurationConfigurator;

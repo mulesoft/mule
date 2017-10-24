@@ -10,8 +10,8 @@ import static java.util.Collections.emptyList;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.api.LazyComponentInitializer;
-import org.mule.runtime.config.api.dsl.model.ApplicationModel;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ApplicationModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 import java.util.Iterator;

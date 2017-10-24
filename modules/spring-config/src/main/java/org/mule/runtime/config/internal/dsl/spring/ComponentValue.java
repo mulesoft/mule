@@ -7,7 +7,7 @@
 
 package org.mule.runtime.config.internal.dsl.spring;
 
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 
 /**
  * Holder for the component identifier, it's bean value and the object {@code Class} that will be created from it.

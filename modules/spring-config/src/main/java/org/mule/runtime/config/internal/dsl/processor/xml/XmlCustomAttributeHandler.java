@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.processor.xml;
 
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 
 import org.w3c.dom.Node;

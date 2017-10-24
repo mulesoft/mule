@@ -10,7 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.TypeDefinition;
 import org.mule.runtime.dsl.api.component.TypeDefinitionVisitor;
 

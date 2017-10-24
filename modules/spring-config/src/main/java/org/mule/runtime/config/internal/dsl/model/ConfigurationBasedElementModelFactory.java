@@ -68,6 +68,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -556,7 +557,8 @@ class ConfigurationBasedElementModelFactory {
 
   private void builDefaultInlineGroupElement(DslElementModel.Builder parent, ParameterGroupModel group, DslElementSyntax groupDsl,
                                              ComponentIdentifier identifier) {
-    ComponentConfiguration.Builder groupConfigBuilder = ComponentConfiguration.builder().withIdentifier(identifier);
+    InternalComponentConfiguration.Builder groupConfigBuilder =
+        InternalComponentConfiguration.builder().withIdentifier(identifier);
     DslElementModel.Builder<ParameterGroupModel> groupElementBuilder = DslElementModel.<ParameterGroupModel>builder()
         .withModel(group)
         .isExplicitInDsl(false)
@@ -574,7 +576,7 @@ class ConfigurationBasedElementModelFactory {
 
                   if (isContent(paramModel) || isText(paramModel)) {
                     getIdentifier(paramDsl)
-                        .ifPresent(tagId -> groupConfigBuilder.withNestedComponent(ComponentConfiguration.builder()
+                        .ifPresent(tagId -> groupConfigBuilder.withNestedComponent(InternalComponentConfiguration.builder()
                             .withIdentifier(tagId)
                             .withValue(defaultValue)
                             .build()));

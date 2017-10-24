@@ -12,9 +12,9 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MODULE_OPERATION_CHAIN;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
+import static org.mule.runtime.config.internal.model.ApplicationModel.FLOW_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.MODULE_OPERATION_CHAIN;
+import static org.mule.runtime.config.internal.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -29,8 +29,8 @@ import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
-import org.mule.runtime.config.api.dsl.model.ApplicationModel;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ApplicationModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
@@ -79,7 +79,7 @@ public class MacroExpansionModuleModel {
 
   /**
    * Used to leave breadcrumbs of which is the flow's name containing the macro expanded chain.
-   * @see CommonBeanDefinitionCreator#processMacroExpandedAnnotations(org.mule.runtime.config.api.dsl.model.ComponentModel, java.util.Map)
+   * @see CommonBeanDefinitionCreator#processMacroExpandedAnnotations(ComponentModel, java.util.Map)
    */
   public static final String ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME = "ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME";
 

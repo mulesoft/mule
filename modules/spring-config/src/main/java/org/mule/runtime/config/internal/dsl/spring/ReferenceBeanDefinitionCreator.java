@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.TRANSFORMER_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.TRANSFORMER_IDENTIFIER;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 

@@ -14,8 +14,8 @@ import org.jgrapht.graph.DirectedMultigraph;
 import org.jgrapht.traverse.GraphIterator;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.config.api.dsl.model.ApplicationModel;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ApplicationModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
 
 import javax.xml.XMLConstants;

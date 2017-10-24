@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.privileged.dsl;
 
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 
 import java.util.List;
 import java.util.Map;
@@ -33,9 +33,9 @@ public interface PostProcessorIocHelper {
 
   Object getPropertyValue(String propertyName);
 
-  List toBeanDefinitions(List<ComponentModel> components);
+  List toBeanDefinitions(List<ComponentConfiguration> components);
 
-  Map toBeanDefinitionsProperties(List<ComponentModel> components);
+  Map toBeanDefinitionsProperties(List<ComponentConfiguration> components);
 
   boolean isDefinitionFor(Object definition, Class beanClass);
 

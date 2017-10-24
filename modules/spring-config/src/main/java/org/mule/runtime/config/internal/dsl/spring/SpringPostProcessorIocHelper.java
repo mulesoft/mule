@@ -6,22 +6,25 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.getPropertyValueFromPropertiesComponent;
 import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
+import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.PROPERTIES_ELEMENT;
+import static org.mule.runtime.config.internal.model.ComponentModel.COMPONENT_MODEL_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
-
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.privileged.dsl.PostProcessorIocHelper;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 
 import java.util.List;
 import java.util.Map;
@@ -121,33 +124,38 @@ class SpringPostProcessorIocHelper implements PostProcessorIocHelper {
   }
 
   @Override
-  public List toBeanDefinitions(List<ComponentModel> components) {
+  public List toBeanDefinitions(List<ComponentConfiguration> components) {
     ManagedList responseMessageProcessorsBeanList = new ManagedList();
     components.forEach(responseProcessorComponentModel -> {
-      BeanDefinition beanDefinition = ((SpringComponentModel) responseProcessorComponentModel).getBeanDefinition();
+      SpringComponentModel springComponentModel = (SpringComponentModel) responseProcessorComponentModel
+          .getProperty(COMPONENT_MODEL_KEY).orElseThrow(() -> new MuleRuntimeException(
+                                                                                       createStaticMessage("Component configuration is expected to have the component model at this point.")));
+      BeanDefinition beanDefinition = springComponentModel.getBeanDefinition();
       responseMessageProcessorsBeanList.add(beanDefinition != null ? beanDefinition
-          : ((SpringComponentModel) responseProcessorComponentModel).getBeanReference());
+          : springComponentModel.getBeanReference());
     });
 
     return responseMessageProcessorsBeanList;
   }
 
   @Override
-  public Map<String, Object> toBeanDefinitionsProperties(List<ComponentModel> components) {
+  public Map<String, Object> toBeanDefinitionsProperties(List<ComponentConfiguration> components) {
     ManagedMap<String, Object> propertiesMap = new ManagedMap<>();
     components.stream()
         .filter(innerComponent -> innerComponent.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))
         .forEach(propertyComponentModel -> {
-          Pair<String, Object> propertyValue = getPropertyValueFromPropertyComponent(propertyComponentModel);
+          Pair<String, Object> propertyValue = getPropertyValueFromPropertyComponent((ComponentModel) propertyComponentModel
+              .getProperty(COMPONENT_MODEL_KEY).get());
           removePropertyValue(propertyValue.getFirst());
           propertiesMap.put(propertyValue.getFirst(), propertyValue.getSecond());
         });
     components.stream()
         .filter(innerComponent -> innerComponent.getIdentifier().getName().equals(PROPERTIES_ELEMENT)).findFirst()
         .ifPresent(propertiesComponent -> {
-          getPropertyValueFromPropertiesComponent(propertiesComponent).stream().forEach(propertyValue -> {
-            propertiesMap.put(propertyValue.getFirst(), propertyValue.getSecond());
-          });
+          getPropertyValueFromPropertiesComponent((ComponentModel) propertiesComponent.getProperty(COMPONENT_MODEL_KEY).get())
+              .stream().forEach(propertyValue -> {
+                propertiesMap.put(propertyValue.getFirst(), propertyValue.getSecond());
+              });
         });
 
     return propertiesMap;
