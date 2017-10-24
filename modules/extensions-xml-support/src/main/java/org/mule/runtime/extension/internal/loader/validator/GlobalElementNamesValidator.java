@@ -11,8 +11,8 @@ import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoes
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
