@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -48,14 +50,14 @@ import org.mule.runtime.core.internal.context.notification.Configuration;
 import org.mule.runtime.core.internal.context.notification.Policy;
 import org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler;
 
+import org.slf4j.Logger;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
-
-import org.slf4j.Logger;
 
 /**
  * A reworking of the event manager that allows efficient behaviour without global on/off switches in the config.
@@ -89,7 +91,7 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
 
   private boolean dynamic = false;
   private Configuration configuration = new Configuration();
-  private ReentrantReadWriteLock disposeLock = new ReentrantReadWriteLock();
+  private AtomicInteger activeFires = new AtomicInteger();
   private AtomicBoolean disposed = new AtomicBoolean(false);
   private MuleContext muleContext;
   private Scheduler notificationsLiteScheduler;
@@ -173,13 +175,13 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
 
   @Override
   public void fireNotification(Notification notification) {
-    disposeLock.readLock().lock();
-    try {
-      if (disposed.get()) {
-        logger.warn("Notification not enqueued after ServerNotificationManager disposal: " + notification);
-        return;
-      }
+    if (disposed.get()) {
+      logger.warn("Notification not enqueued after ServerNotificationManager disposal: " + notification);
+      return;
+    }
 
+    activeFires.incrementAndGet();
+    try {
       if (notification instanceof AbstractServerNotification) {
         ((AbstractServerNotification) notification).setServerId(muleContext.getId());
       }
@@ -195,7 +197,7 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
         });
       }
     } finally {
-      disposeLock.readLock().unlock();
+      activeFires.decrementAndGet();
     }
   }
 
@@ -220,22 +222,27 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
    * died
    */
   public void dispose() {
-    disposeLock.writeLock().lock();
-    try {
-      if (notificationsLiteScheduler != null) {
-        notificationsLiteScheduler.stop();
-        notificationsLiteScheduler = null;
-      }
-      if (notificationsIoScheduler != null) {
-        notificationsIoScheduler.stop();
-        notificationsIoScheduler = null;
-      }
+    disposed.set(true);
 
-      disposed.set(true);
-      configuration = null;
-    } finally {
-      disposeLock.writeLock().unlock();
+    while (activeFires.get() > 0) {
+      try {
+        sleep(20);
+      } catch (InterruptedException e) {
+        // Continue with the disposal after interrupt
+        currentThread().interrupt();
+      }
     }
+
+    if (notificationsLiteScheduler != null) {
+      notificationsLiteScheduler.stop();
+      notificationsLiteScheduler = null;
+    }
+    if (notificationsIoScheduler != null) {
+      notificationsIoScheduler.stop();
+      notificationsIoScheduler = null;
+    }
+
+    configuration = null;
   }
 
   /**
