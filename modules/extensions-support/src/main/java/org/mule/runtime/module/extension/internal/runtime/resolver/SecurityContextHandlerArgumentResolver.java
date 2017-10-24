@@ -21,7 +21,8 @@ public final class SecurityContextHandlerArgumentResolver implements ArgumentRes
   @Override
   public AuthenticationHandler resolve(ExecutionContext executionContext) {
     ExecutionContextAdapter context = ((ExecutionContextAdapter) executionContext);
-    return new DefaultAuthenticationHandler(context.getMuleContext().getSecurityManager(),
+    return new DefaultAuthenticationHandler(context.getSecurityContext(),
+                                            context.getMuleContext().getSecurityManager(),
                                             context::setSecurityContext);
   }
 }
