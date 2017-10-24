@@ -16,7 +16,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
+import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
 import javax.xml.XMLConstants;
 import java.util.ArrayList;

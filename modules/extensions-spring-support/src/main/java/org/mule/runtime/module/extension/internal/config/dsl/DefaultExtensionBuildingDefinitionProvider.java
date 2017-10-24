@@ -30,7 +30,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
+import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
