@@ -34,7 +34,7 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
+import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;

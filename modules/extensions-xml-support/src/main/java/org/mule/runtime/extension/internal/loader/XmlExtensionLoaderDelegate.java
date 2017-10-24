@@ -30,15 +30,6 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpa
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang3.StringUtils;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.CycleDetector;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -78,7 +69,6 @@ import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionMo
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
 import org.mule.runtime.config.internal.util.NoOpXmlErrorHandler;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -87,15 +77,13 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
+import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
-import org.w3c.dom.Document;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -108,6 +96,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang3.StringUtils;
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.w3c.dom.Document;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
