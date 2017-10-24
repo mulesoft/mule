@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.context.notification;
 
 import static java.lang.Thread.currentThread;
-import static java.lang.Thread.sleep;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -43,6 +42,7 @@ import org.mule.runtime.api.notification.SecurityNotificationListener;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -93,6 +93,7 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
   private Configuration configuration = new Configuration();
   private AtomicInteger activeFires = new AtomicInteger();
   private AtomicBoolean disposed = new AtomicBoolean(false);
+  private Latch disposeLatch = new Latch();
   private MuleContext muleContext;
   private Scheduler notificationsLiteScheduler;
   private Scheduler notificationsIoScheduler;
@@ -197,7 +198,9 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
         });
       }
     } finally {
-      activeFires.decrementAndGet();
+      if (0 == activeFires.decrementAndGet() && disposed.get()) {
+        disposeLatch.countDown();
+      }
     }
   }
 
@@ -224,13 +227,12 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
   public void dispose() {
     disposed.set(true);
 
-    while (activeFires.get() > 0) {
+    if (activeFires.get() > 0) {
       try {
-        sleep(20);
+        disposeLatch.await();
       } catch (InterruptedException e) {
         // Continue with the disposal after interrupt
         currentThread().interrupt();
-        break;
       }
     }
 
