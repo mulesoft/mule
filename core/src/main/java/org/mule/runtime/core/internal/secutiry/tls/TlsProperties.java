@@ -25,6 +25,7 @@ public class TlsProperties {
 
   private String[] enabledCipherSuites;
   private String[] enabledProtocols;
+  private String defaultProtocol;
 
   public String[] getEnabledCipherSuites() {
     return enabledCipherSuites;
@@ -32,6 +33,10 @@ public class TlsProperties {
 
   public String[] getEnabledProtocols() {
     return enabledProtocols;
+  }
+
+  public String getDefaultProtocol() {
+    return defaultProtocol;
   }
 
   public void load(String fileName) {
@@ -46,6 +51,7 @@ public class TlsProperties {
 
         String enabledCipherSuitesProperty = properties.getProperty("enabledCipherSuites");
         String enabledProtocolsProperty = properties.getProperty("enabledProtocols");
+        String defaultProtocolProperty = properties.getProperty("defaultProtocol");
 
         if (enabledCipherSuitesProperty != null) {
           enabledCipherSuites = StringUtils.splitAndTrim(enabledCipherSuitesProperty, ",");
@@ -53,6 +59,9 @@ public class TlsProperties {
         }
         if (enabledProtocolsProperty != null) {
           enabledProtocols = StringUtils.splitAndTrim(enabledProtocolsProperty, ",");
+        }
+        if (defaultProtocolProperty != null) {
+          defaultProtocol = defaultProtocolProperty.trim();
         }
       }
     } catch (IOException e) {
@@ -78,13 +87,14 @@ public class TlsProperties {
       return false;
     }
 
-    return true;
+    return defaultProtocol != null ? defaultProtocol.equals(that.defaultProtocol) : that.defaultProtocol == null;
   }
 
   @Override
   public int hashCode() {
     int result = enabledCipherSuites != null ? Arrays.hashCode(enabledCipherSuites) : 0;
     result = 31 * result + (enabledProtocols != null ? Arrays.hashCode(enabledProtocols) : 0);
+    result = 31 * result + (defaultProtocol != null ? defaultProtocol.hashCode() : 0);
     return result;
   }
 }

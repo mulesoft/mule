@@ -8,6 +8,7 @@ package org.mule.test.module.tls;
 
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -25,6 +26,9 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -134,6 +138,18 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
     assertThat(tlsContextFactory.getEnabledCipherSuites(), arrayWithSize(2));
     assertThat(tlsContextFactory.getEnabledCipherSuites(), arrayContaining("TLS_DHE_DSS_WITH_AES_128_CBC_SHA256",
                                                                            "TLS_DHE_DSS_WITH_AES_128_CBC_SHA"));
+  }
+
+  @Test
+  public void defaultIncludesTls12Ciphers() throws Exception {
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
+    tlsContextFactory.initialise();
+    SSLSocketFactory defaultFactory = tlsContextFactory.createSslContext().getSocketFactory();
+    SSLContext tls12Context = SSLContext.getInstance("TLSv1.2");
+    tls12Context.init(null, null, null);
+    SSLSocketFactory tls12Factory = tls12Context.getSocketFactory();
+
+    assertThat(defaultFactory.getDefaultCipherSuites(), arrayContainingInAnyOrder(tls12Factory.getDefaultCipherSuites()));
   }
 
 }
