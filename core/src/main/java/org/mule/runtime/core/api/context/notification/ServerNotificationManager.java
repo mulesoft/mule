@@ -230,6 +230,7 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
       } catch (InterruptedException e) {
         // Continue with the disposal after interrupt
         currentThread().interrupt();
+        break;
       }
     }
 
