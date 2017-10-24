@@ -10,6 +10,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.InternalComponent;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;

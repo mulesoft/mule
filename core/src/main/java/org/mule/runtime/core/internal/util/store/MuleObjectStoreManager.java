@@ -26,7 +26,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.store.PartitionableExpirableObjectStore;
+import org.mule.runtime.api.store.PartitionableExpirableObjectStore;
 
 import org.slf4j.Logger;
 
