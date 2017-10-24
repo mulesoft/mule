@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.config.internal.model.ApplicationModel.FLOW_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MODULE_OPERATION_CHAIN;
 import static org.mule.runtime.config.internal.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
@@ -29,13 +29,13 @@ import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
-import org.mule.runtime.config.internal.model.ApplicationModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator;
+import org.mule.runtime.config.internal.model.ApplicationModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
@@ -67,8 +67,8 @@ public class MacroExpansionModuleModel {
   /**
    * Used to obtain the {@link ComponentIdentifier} element from the <module/>'s original {@ink ComponentModel} to be later added
    * in the macro expanded element (aka: <module-operation-chain ../>) so that the location set by the
-   * {@link org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor} can properly set the paths for every
-   * element (even the macro expanded)
+   * {@link org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor} can properly set the paths for every element
+   * (even the macro expanded)
    */
   public static final String ORIGINAL_IDENTIFIER = "ORIGINAL_IDENTIFIER";
 
@@ -79,6 +79,7 @@ public class MacroExpansionModuleModel {
 
   /**
    * Used to leave breadcrumbs of which is the flow's name containing the macro expanded chain.
+   * 
    * @see CommonBeanDefinitionCreator#processMacroExpandedAnnotations(ComponentModel, java.util.Map)
    */
   public static final String ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME = "ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME";
@@ -130,15 +131,15 @@ public class MacroExpansionModuleModel {
   }
 
   /**
-   * Returns the rootest flow's name for the module chain that will be macro expanded.
-   * By default, it will assume it's a flow or even an already macro expanded element, but if not it will ask for the parent
-   * component model, making any scope (such as foreach, async, etc.) look for the flow in which is contained.
+   * Returns the rootest flow's name for the module chain that will be macro expanded. By default, it will assume it's a flow or
+   * even an already macro expanded element, but if not it will ask for the parent component model, making any scope (such as
+   * foreach, async, etc.) look for the flow in which is contained.
    *
    * @param containerComponentModel container element to look for the flow that contains it
    * @param operationModel the operation just to log if something went bad
    * @return the name of the flow that contains the {@code containerComponentModel}. Not null.
    * @throws MuleRuntimeException if it cannot find the flow. It should never happen, as the macro expansion for operations ONLY
-   * happens when being consumed from within a flow.
+   *         happens when being consumed from within a flow.
    */
   private String calculateContainerFlowName(ComponentModel containerComponentModel, OperationModel operationModel) {
     String nameAttribute;
@@ -220,8 +221,8 @@ public class MacroExpansionModuleModel {
    *        name="b"../>, <file:matcher name="c"../> and so on) that are contained within the <module/> that will be macro
    *        expanded
    * @param configRefParentTnsName parent reference to the global element if exists (it might not be global elements in the
-   *                               current module). Useful when replacing {@link #TNS_PREFIX} operations, as the references to the
-   *                               global elements will be those of the rootest element of the operations consumed by the app.
+   *        current module). Useful when replacing {@link #TNS_PREFIX} operations, as the references to the global elements will
+   *        be those of the rootest element of the operations consumed by the app.
    * @param containerFlowName name of the flow that contains the operation to be macro expanded. Not null nor empty.
    * @return a new component model that represents the old placeholder but expanded with the content of the <body/>
    */
@@ -283,7 +284,8 @@ public class MacroExpansionModuleModel {
    * If the current operation contains any {@link ApplicationModel#ERROR_MAPPING} as a child, it will copy them to the macro
    * expanded <module-operation-chain/> as childs after the list of message processors.
    *
-   * @param operationRefModel {@link ComponentModel} to look for the possible child elements {@link ApplicationModel#ERROR_MAPPING_IDENTIFIER}
+   * @param operationRefModel {@link ComponentModel} to look for the possible child elements
+   *        {@link ApplicationModel#ERROR_MAPPING_IDENTIFIER}
    * @param processorChainBuilder the <module-operation-chain/> where the errors mappings will be copied to
    */
   private void copyErrorMappings(ComponentModel operationRefModel, ComponentModel.Builder processorChainBuilder) {
@@ -297,8 +299,8 @@ public class MacroExpansionModuleModel {
    * Goes over the {@code modelToCopy} by consuming the attributes as they are.
    *
    * @param modelToCopy original source of truth that comes from the <module/>
-   * @return a transformed {@link ComponentModel} from the {@code modelToCopy}, where the element's attributes has been
-   *         updated accordingly (both global components updates plus the line number, and so on). If the value for some parameter
+   * @return a transformed {@link ComponentModel} from the {@code modelToCopy}, where the element's attributes has been updated
+   *         accordingly (both global components updates plus the line number, and so on). If the value for some parameter
    */
   private ComponentModel copyComponentModel(ComponentModel modelToCopy) {
     ComponentModel.Builder operationReplacementModel = getComponentModelBuilderFrom(modelToCopy);
@@ -397,7 +399,8 @@ public class MacroExpansionModuleModel {
 
   /**
    * If the current {@link ExtensionModel} does have a {@link ConnectionProviderModel}, then it will check if the current XML does
-   * contain a child of it under the connection name (see {@link ModuleOperationMessageProcessorChainBuilder#MODULE_CONNECTION_GLOBAL_ELEMENT_NAME}.
+   * contain a child of it under the connection name (see
+   * {@link ModuleOperationMessageProcessorChainBuilder#MODULE_CONNECTION_GLOBAL_ELEMENT_NAME}.
    *
    * @param configRefComponentModel root element of the current XML config (global element of the parametrized operation)
    * @param configurationModel configuration model of the current element
@@ -506,8 +509,8 @@ public class MacroExpansionModuleModel {
    * be the definitive name once the Mule application has been completely macro expanded in the final XML configuration.
    *
    * @param modelToCopy original <operation/> source of truth that comes from the <module/>
-   * @param configRefName name of the configuration being used by the current <operation/>. If the operation is a TNS one, then
-   *                      it has the value of the rootest <operation/> being called from the application.
+   * @param configRefName name of the configuration being used by the current <operation/>. If the operation is a TNS one, then it
+   *        has the value of the rootest <operation/> being called from the application.
    * @param moduleGlobalElementsNames names of the <module/>s global component that will be macro expanded in the Mule application
    * @param literalsParameters {@link Map} with all he <property>s and <parameter>s that were feed with a literal value in the
    *        Mule application's code.
@@ -593,7 +596,7 @@ public class MacroExpansionModuleModel {
    *
    * @param componentModel to check whether targets a <module/>'s operation or not.
    * @return an {@link OperationModel} if the parametrized {@code componentModel} targets an <operation/> of the same module by
-   * using the {@link #TNS_PREFIX} prefix.
+   *         using the {@link #TNS_PREFIX} prefix.
    */
   private Optional<OperationModel> lookForTNSOperation(ComponentModel componentModel) {
     return lookForOperation(componentModel.getIdentifier(), TNS_PREFIX);
@@ -605,13 +608,13 @@ public class MacroExpansionModuleModel {
    *
    * @param operationIdentifier element to look for in the current {@link #extensionModel}
    * @param prefix to check if the {@code operationIdentifier} namespace targets an operation of the <module/> (usually maps to
-   *               the {@link ExtensionModel} prefix, or the {@link #TNS_PREFIX}.
+   *        the {@link ExtensionModel} prefix, or the {@link #TNS_PREFIX}.
    * @return an {@link OperationModel} if found, {@link Optional#empty()} otherwise.
    */
   private Optional<OperationModel> lookForOperation(ComponentIdentifier operationIdentifier, String prefix) {
     Optional<OperationModel> result = Optional.empty();
     if (operationIdentifier.getNamespace().equals(prefix)) {
-      //As the operation can be inside the extension or the config, it has to be looked up in both elements.
+      // As the operation can be inside the extension or the config, it has to be looked up in both elements.
       final HasOperationModels hasOperationModels =
           getConfigurationModel()
               .map(configurationModel -> (HasOperationModels) configurationModel)
@@ -630,7 +633,8 @@ public class MacroExpansionModuleModel {
     if ((moduleGlobalElementsNames.contains(originalValue))) {
       // current value is a global element reference
       if (originalValue.equals(getTestConnectionGlobalElement().orElse(null))) {
-        //and it's also a reference to a bean that will be doing test connection, which implies no renaming must be done when macro expanding.
+        // and it's also a reference to a bean that will be doing test connection, which implies no renaming must be done when
+        // macro expanding.
         result = configRefNameToAppend;
       } else {
         result = originalValue.concat("-").concat(configRefNameToAppend);
@@ -643,8 +647,8 @@ public class MacroExpansionModuleModel {
   }
 
   /**
-   * @return if present, the global element marked with {@link TestConnectionGlobalElementModelProperty} when macro expanded
-   * will hold the original value.
+   * @return if present, the global element marked with {@link TestConnectionGlobalElementModelProperty} when macro expanded will
+   *         hold the original value.
    */
   private Optional<String> getTestConnectionGlobalElement() {
     return getConfigurationModel()
