@@ -59,6 +59,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
   private Optional<ExtensionSchemaGenerator> extensionSchemaFactory;
   private Map<String, Boolean> checkedEntities; // It saves already checked entities so that if the resolution already failed
   // once, it will raise and exception and not loop failing over and over again.
+  private static boolean internalIsRunningTests = false;
 
   /**
    * Returns an instance of {@link ModuleDelegatingEntityResolver}
@@ -141,6 +142,9 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
   }
 
   private Boolean isRunningTests(StackTraceElement[] stackTrace) {
+    if (internalIsRunningTests) {
+      return true;
+    }
     for (StackTraceElement element : stackTrace) {
       if (element.getClassName().startsWith("org.junit.runners.")) {
         return true;

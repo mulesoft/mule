@@ -77,6 +77,7 @@ import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -136,6 +137,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -218,7 +220,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File pluginEcho1TestClassFile;
 
   @BeforeClass
-  public static void beforeClass() throws URISyntaxException {
+  public static void beforeClass() throws URISyntaxException, IllegalAccessException {
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
     barUtils1_0JarFile =
         new JarFileBuilder("barUtils1",
@@ -254,6 +256,13 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceCallback.java"));
     pluginEcho1TestClassFile =
         new SingleClassCompiler().dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
+
+    FieldUtils.writeDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", true, true);
+  }
+
+  @BeforeClass
+  public static void afterClass() throws IllegalAccessException {
+    FieldUtils.writeDeclaredStaticField(ModuleDelegatingEntityResolver.class, "internalIsRunningTests", false, true);
   }
 
   protected static File getResourceFile(String resource) throws URISyntaxException {
