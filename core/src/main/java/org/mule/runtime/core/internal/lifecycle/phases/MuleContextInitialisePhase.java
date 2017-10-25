@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.lifecycle.phases;
 
+import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -16,10 +17,10 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.LifecycleObject;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationUtils;
@@ -61,7 +62,7 @@ public class MuleContextInitialisePhase extends DefaultLifecyclePhase {
     orderedObjects.add(new LifecycleObject(Initialisable.class));
     setOrderedLifecycleObjects(orderedObjects);
     setIgnoredObjectTypes(new Class[] {Component.class, MessageSource.class, InterceptingMessageProcessor.class,
-        OutboundRouter.class, MuleContext.class});
+        OutboundRouter.class, MuleContext.class, ObjectProvider.class});
   }
 
 

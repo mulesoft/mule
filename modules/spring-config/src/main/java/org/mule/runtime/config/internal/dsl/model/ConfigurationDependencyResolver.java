@@ -16,12 +16,15 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.LazyComponentInitializer;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.config.internal.BeanDependencyResolver;
+import org.mule.runtime.config.internal.model.ApplicationModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -97,7 +100,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
   }
 
   protected Set<String> findComponentModelsDependencies(Set<String> componentModelNames) {
-    Set<String> componentsToSearchDependencies = componentModelNames;
+    Set<String> componentsToSearchDependencies = new HashSet<>(componentModelNames);
     Set<String> foundDependencies = new LinkedHashSet<>();
     Set<String> alreadySearchedDependencies = new HashSet<>();
     do {
@@ -177,6 +180,21 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return applicationModel;
   }
 
+  /**
+   * Enables all {@link ComponentModel}s which {@link ComponentBuildingDefinition#alwaysEnabled} is set to true.
+   */
+  public void enableEagerComponentModels() {
+    this.applicationModel.executeOnEveryComponentTree(componentModel -> {
+      Optional<ComponentBuildingDefinition<?>> buildingDefinition =
+          this.componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
+      buildingDefinition.ifPresent(definition -> {
+        if (definition.isAlwaysEnabled()) {
+          componentModel.setEnabled(true);
+        }
+      });
+    });
+  }
+
   @Override
   public Collection<Object> resolveBeanDependencies(Set<String> beanNames) {
     return null;
@@ -193,4 +211,24 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     });
     return components;
   }
+
+  /**
+   * @return the set of component names that must always be enabled.
+   */
+  public Set<String> resolveAlwaysEnabledComponents() {
+    ImmutableSet.Builder<String> namesBuilder = ImmutableSet.builder();
+    this.applicationModel.executeOnEveryComponentTree(componentModel -> {
+      Optional<ComponentBuildingDefinition<?>> buildingDefinition =
+          this.componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
+      buildingDefinition.ifPresent(definition -> {
+        if (definition.isAlwaysEnabled()) {
+          if (componentModel.getNameAttribute() != null) {
+            namesBuilder.add();
+          }
+        }
+      });
+    });
+    return namesBuilder.build();
+  }
+
 }

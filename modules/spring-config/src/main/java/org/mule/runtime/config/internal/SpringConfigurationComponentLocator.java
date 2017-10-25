@@ -47,7 +47,7 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
    * @param component the component to be added
    */
   public void addComponent(Component component) {
-    this.componentsMap.put(component.getLocation().getLocation(), component);
+    this.componentsMap.putIfAbsent(component.getLocation().getLocation(), component);
   }
 
   /**

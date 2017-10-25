@@ -341,15 +341,6 @@ public class BeanDefinitionFactory {
     }
   }
 
-  public static void checkElementNameUnique(BeanDefinitionRegistry registry, Element element) {
-    if (null != element.getAttributeNode(NAME_ATTRIBUTE)) {
-      String name = element.getAttribute(NAME_ATTRIBUTE);
-      if (registry.containsBeanDefinition(name)) {
-        throw new IllegalArgumentException("A component named " + name + " already exists.");
-      }
-    }
-  }
-
   private BeanDefinitionCreator buildComponentModelProcessorChainOfResponsability() {
     EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
     ObjectBeanDefinitionCreator objectBeanDefinitionCreator = new ObjectBeanDefinitionCreator();
