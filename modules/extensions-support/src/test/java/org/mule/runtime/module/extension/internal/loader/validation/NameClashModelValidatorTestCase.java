@@ -504,11 +504,23 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void contentParametersWithSameNameAndDifferentType() {
     exception.expect(IllegalModelDefinitionException.class);
-    ParameterModel firtParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Object.class);
-    when(firtParam.getRole()).thenReturn(PRIMARY_CONTENT);
+    ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Object.class);
+    when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
     ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, TopLevelTest.class);
     when(secondParam.getRole()).thenReturn(CONTENT);
-    when(operationModel.getAllParameterModels()).thenReturn(asList(firtParam));
+    when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
+    when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
+    validate();
+  }
+
+  @Test
+  public void contentParametersWithSameNameAndTypeButDifferentRole() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, TopLevelTest.class);
+    when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
+    ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, TopLevelTest.class);
+    when(secondParam.getRole()).thenReturn(BEHAVIOUR);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
     when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
     validate();
   }
