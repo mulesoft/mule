@@ -166,6 +166,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
       // First unregister any already initialized/started component
       unregisterBeans(alreadyCreatedApplicationComponents);
+      objectProviders.clear();
 
       ConfigurationDependencyResolver dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel,
                                                                                                componentBuildingDefinitionRegistry);
