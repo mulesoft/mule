@@ -6,12 +6,11 @@
  */
 package org.mule.test.metadata.extension;
 
-import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.test.metadata.extension.resolver.TestMetadataResolverMetadataResolvingFailure;
 import org.mule.test.metadata.extension.resolver.TestMetadataResolverRuntimeExceptionFailure;
 
@@ -21,7 +20,7 @@ public class MetadataFailureOperations extends MetadataOperationsParent {
   @OutputResolver(output = TestMetadataResolverMetadataResolvingFailure.class)
   public Object failWithResolvingException(@Connection MetadataConnection connection,
                                            @MetadataKeyId(TestMetadataResolverMetadataResolvingFailure.class) String type,
-                                           @Optional @Content @TypeResolver(TestMetadataResolverMetadataResolvingFailure.class) Object content) {
+                                           @Content @TypeResolver(TestMetadataResolverMetadataResolvingFailure.class) Object content) {
     return null;
   }
 
@@ -33,7 +32,7 @@ public class MetadataFailureOperations extends MetadataOperationsParent {
   @OutputResolver(output = TestMetadataResolverRuntimeExceptionFailure.class)
   public Object failWithRuntimeException(@Connection MetadataConnection connection,
                                          @MetadataKeyId(TestMetadataResolverRuntimeExceptionFailure.class) String type,
-                                         @Optional @TypeResolver(TestMetadataResolverRuntimeExceptionFailure.class) Object content) {
+                                         @Content @TypeResolver(TestMetadataResolverRuntimeExceptionFailure.class) Object content) {
     return null;
   }
 

@@ -58,7 +58,7 @@ public class MetadataOperations {
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
   public Object contentMetadataWithKeyId(@Config Object object, @Connection MetadataConnection connection,
                                          @MetadataKeyId(TestInputResolverWithKeyResolver.class) String type,
-                                         @Optional @Content @TypeResolver(TestInputResolverWithKeyResolver.class) Object content) {
+                                         @Content @TypeResolver(TestInputResolverWithKeyResolver.class) Object content) {
     return null;
   }
 
@@ -80,7 +80,7 @@ public class MetadataOperations {
   @OutputResolver(output = TestInputAndOutputResolverWithKeyResolver.class)
   public Object contentAndOutputMetadataWithKeyId(@Connection MetadataConnection connection,
                                                   @MetadataKeyId(TestInputAndOutputResolverWithKeyResolver.class) String type,
-                                                  @Optional @TypeResolver(TestInputAndOutputResolverWithKeyResolver.class) Object content) {
+                                                  @Content @TypeResolver(TestInputAndOutputResolverWithKeyResolver.class) Object content) {
     return null;
   }
 
@@ -101,23 +101,23 @@ public class MetadataOperations {
   }
 
   public boolean booleanMetadataKey(@Connection MetadataConnection connection, @MetadataKeyId boolean type,
-                                    @Optional @TypeResolver(TestBooleanMetadataResolver.class) Object content) {
+                                    @Content @TypeResolver(TestBooleanMetadataResolver.class) Object content) {
     return type;
   }
 
   public AnimalClade enumMetadataKey(@Connection MetadataConnection connection, @MetadataKeyId AnimalClade type,
-                                     @Optional @TypeResolver(TestEnumMetadataResolver.class) Object content) {
+                                     @Content @TypeResolver(TestEnumMetadataResolver.class) Object content) {
     return type;
   }
 
   @OutputResolver(output = TestInputAndOutputResolverWithKeyResolver.class)
   public void contentOnlyIgnoresOutput(@Connection MetadataConnection connection,
                                        @MetadataKeyId(TestInputAndOutputResolverWithKeyResolver.class) String type,
-                                       @Optional @TypeResolver(TestInputAndOutputResolverWithKeyResolver.class) Object content) {}
+                                       @Content @TypeResolver(TestInputAndOutputResolverWithKeyResolver.class) Object content) {}
 
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
   public Object contentMetadataWithoutKeyId(@Connection MetadataConnection connection,
-                                            @Optional @TypeResolver(TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam.class) Object content) {
+                                            @Content @TypeResolver(TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam.class) Object content) {
     return null;
   }
 
@@ -128,12 +128,12 @@ public class MetadataOperations {
 
   @OutputResolver(output = TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam.class)
   public Object contentAndOutputMetadataWithoutKeyId(@Connection MetadataConnection connection,
-                                                     @Optional @Content @TypeResolver(TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam.class) Object content) {
+                                                     @Content @TypeResolver(TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam.class) Object content) {
     return null;
   }
 
   public void contentMetadataWithoutKeysWithKeyId(@Connection MetadataConnection connection, @MetadataKeyId String type,
-                                                  @Optional @TypeResolver(TestInputResolverWithoutKeyResolver.class) Object content) {}
+                                                  @Content @TypeResolver(TestInputResolverWithoutKeyResolver.class) Object content) {}
 
   @OutputResolver(output = TestOutputResolverWithoutKeyResolver.class)
   public Object outputMetadataWithoutKeysWithKeyId(@Connection MetadataConnection connection, @MetadataKeyId String type) {
@@ -142,13 +142,13 @@ public class MetadataOperations {
 
   @OutputResolver(output = TestResolverWithCache.class)
   public Object contentAndOutputCacheResolver(@Connection MetadataConnection connection, @MetadataKeyId String type,
-                                              @Optional @TypeResolver(TestResolverWithCache.class) Object content) {
+                                              @Content @TypeResolver(TestResolverWithCache.class) Object content) {
     return null;
   }
 
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
   public Object contentOnlyCacheResolver(@Connection MetadataConnection connection, @MetadataKeyId String type,
-                                         @Optional @TypeResolver(TestResolverWithCache.class) Object content) {
+                                         @Content @TypeResolver(TestResolverWithCache.class) Object content) {
     return null;
   }
 
@@ -161,7 +161,7 @@ public class MetadataOperations {
   public LocationKey simpleMultiLevelKeyResolver(@Connection MetadataConnection connection,
                                                  @ParameterGroup(
                                                      name = "key") @MetadataKeyId(TestMultiLevelKeyResolver.class) LocationKey locationKey,
-                                                 @Optional @TypeResolver(TestMultiLevelKeyResolver.class) Object content) {
+                                                 @Content @TypeResolver(TestMultiLevelKeyResolver.class) Object content) {
     return locationKey;
   }
 
@@ -175,8 +175,7 @@ public class MetadataOperations {
     return null;
   }
 
-  public void resolverContentWithContextClassLoader(
-                                                    @Optional @TypeResolver(TestThreadContextClassLoaderResolver.class) Object content,
+  public void resolverContentWithContextClassLoader(@Content @TypeResolver(TestThreadContextClassLoaderResolver.class) Object content,
                                                     @MetadataKeyId(TestThreadContextClassLoaderResolver.class) String type) {}
 
   @OutputResolver(output = TestThreadContextClassLoaderResolver.class)
