@@ -351,7 +351,7 @@
                         "parent": "",
                         "genericTypes": [
                           "java.lang.String",
-                          "java.lang.String"
+                          "org.mule.runtime.api.metadata.TypedValue"
                         ],
                         "isMap": true
                       }
