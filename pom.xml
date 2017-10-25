@@ -1579,7 +1579,7 @@
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
                         <workingDirectory>${project.build.directory}</workingDirectory>
-                        <argLine>-Dfile.encoding=UTF-8</argLine>
+                        <argLine>-Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</argLine>
                         <trimStackTrace>false</trimStackTrace>
                         <excludes>
                             <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
@@ -1589,6 +1589,12 @@
                             <!-- exclude inner classes -->
                             <exclude>**/*$*</exclude>
                         </excludes>
+                        <properties>
+                            <property>
+                                <name>listener</name>
+                                <value>io.qameta.allure.junit4.AllureJunit4</value>
+                            </property>
+                        </properties>
                         <systemPropertyVariables>
                             <!-- Just propagate this variable due to surefire will not do this when forked vm for tests -->
                             <maven.multiModuleProjectDirectory>${maven.multiModuleProjectDirectory}</maven.multiModuleProjectDirectory>
