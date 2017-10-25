@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.util.Collections.emptyList;
-
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
+import com.google.common.collect.ImmutableSet;
+
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -44,19 +45,22 @@ public class MinimalApplicationModelGenerator {
   }
 
   /**
-   * Resolves the minimal set of {@link ComponentModel componentModels} for the components that pass the {@link LazyComponentInitializer.ComponentLocationFilter}.
+   * Resolves the minimal set of {@link ComponentModel componentModels} for the components that pass the
+   * {@link LazyComponentInitializer.ComponentLocationFilter}.
    *
    * @param filter to select the {@link ComponentModel componentModels} to be enabled.
    * @return the generated {@link ApplicationModel} with the minimal set of {@link ComponentModel}s required.
    */
   public ApplicationModel getMinimalModel(LazyComponentInitializer.ComponentLocationFilter filter) {
     List<ComponentModel> required = dependencyResolver.findRequiredComponentModels(filter);
+
     required.stream().forEach(componentModel -> {
       final DefaultComponentLocation componentLocation = componentModel.getComponentLocation();
       if (componentLocation != null) {
-        enableComponentDependencies(componentModel, required);
+        enableComponentDependencies(componentModel);
       }
     });
+    dependencyResolver.enableEagerComponentModels();
     return dependencyResolver.getApplicationModel();
   }
 
@@ -69,7 +73,8 @@ public class MinimalApplicationModelGenerator {
    */
   public ApplicationModel getMinimalModel(Location location) {
     ComponentModel requestedComponentModel = dependencyResolver.findRequiredComponentModel(location);
-    enableComponentDependencies(requestedComponentModel, emptyList());
+    enableComponentDependencies(requestedComponentModel);
+    dependencyResolver.enableEagerComponentModels();
     return dependencyResolver.getApplicationModel();
   }
 
@@ -78,15 +83,18 @@ public class MinimalApplicationModelGenerator {
    *
    * @param requestedComponentModel the requested {@link ComponentModel} to be enabled.
    */
-  private void enableComponentDependencies(ComponentModel requestedComponentModel, List<ComponentModel> requiredComponentModels) {
-    final Set<String> otherRequiredGlobalComponents = dependencyResolver.resolveComponentDependencies(requestedComponentModel);
-    String requestComponentModelName = requestedComponentModel.getNameAttribute();
+  private void enableComponentDependencies(ComponentModel requestedComponentModel) {
+    final String requestComponentModelName = requestedComponentModel.getNameAttribute();
+    final Set<String> componentDependencies = dependencyResolver.resolveComponentDependencies(requestedComponentModel);
+    final Set<String> alwaysEnabledComponents = dependencyResolver.resolveAlwaysEnabledComponents();
+    final ImmutableSet.Builder<String> otherRequiredGlobalComponentsSetBuilder =
+        ImmutableSet.<String>builder().addAll(componentDependencies).addAll(alwaysEnabledComponents);
     if (requestComponentModelName != null
         && dependencyResolver.getApplicationModel().findTopLevelNamedElement(requestComponentModelName).isPresent()) {
-      otherRequiredGlobalComponents.add(requestedComponentModel.getNameAttribute());
+      otherRequiredGlobalComponentsSetBuilder.add(requestComponentModelName);
     }
 
-    Set<String> allRequiredComponentModels = resolveDependencies(otherRequiredGlobalComponents);
+    Set<String> allRequiredComponentModels = resolveDependencies(otherRequiredGlobalComponentsSetBuilder.build());
 
     Iterator<ComponentModel> iterator =
         dependencyResolver.getApplicationModel().getRootComponentModel().getInnerComponents().iterator();
@@ -97,19 +105,13 @@ public class MinimalApplicationModelGenerator {
         componentModel.executedOnEveryInnerComponent(component -> component.setEnabled(true));
       }
     }
-    ComponentModel currentComponentModel = requestedComponentModel;
-    ComponentModel parentModel = currentComponentModel.getParent();
+
+    ComponentModel parentModel = requestedComponentModel.getParent();
     while (parentModel != null && parentModel.getParent() != null) {
       parentModel.setEnabled(true);
-      for (ComponentModel innerComponent : parentModel.getInnerComponents()) {
-        if (!innerComponent.equals(currentComponentModel) && !requiredComponentModels.contains(currentComponentModel)) {
-          innerComponent.setEnabled(false);
-          innerComponent.executedOnEveryInnerComponent(component -> component.setEnabled(false));
-        }
-      }
-      currentComponentModel = parentModel;
       parentModel = parentModel.getParent();
     }
+
     // Finally we set the requested componentModel as enabled as it could have been disabled when traversing dependencies
     requestedComponentModel.setEnabled(true);
     requestedComponentModel.executedOnEveryInnerComponent(componentModel -> componentModel.setEnabled(true));
@@ -125,7 +127,7 @@ public class MinimalApplicationModelGenerator {
    */
   private Set<String> resolveDependencies(Set<String> initialComponents) {
     Set<String> difference = initialComponents;
-    Set<String> allRequiredComponentModels = initialComponents;
+    Set<String> allRequiredComponentModels = new HashSet<>(initialComponents);
 
     // While there are new dependencies resolved, calculate their dependencies
     // This fixes bugs related to not resolving dependencies of dependencies, such as a config for a config

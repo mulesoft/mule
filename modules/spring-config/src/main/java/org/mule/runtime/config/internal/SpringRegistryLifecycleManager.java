@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.config.internal.MuleArtifactContext.INNER_BEAN_PREFIX;
+import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
