@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.security;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.Credentials;
 import org.mule.runtime.api.security.CredentialsBuilder;
@@ -20,6 +23,7 @@ import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -33,7 +37,9 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler {
   private SecurityManager manager;
   private final Consumer<SecurityContext> securityContextUpdater;
 
-  public DefaultAuthenticationHandler(SecurityManager manager, Consumer<SecurityContext> securityContextUpdater) {
+  public DefaultAuthenticationHandler(SecurityContext securityContext, SecurityManager manager,
+                                      Consumer<SecurityContext> securityContextUpdater) {
+    this.securityContext = securityContext;
     this.manager = manager;
     this.securityContextUpdater = securityContextUpdater;
   }
@@ -47,10 +53,12 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler {
 
     Authentication authResult = manager.authenticate(authentication);
 
-    SecurityContext context = manager.createSecurityContext(authResult);
-    context.setAuthentication(authResult);
-    this.securityContext = context;
-    this.securityContextUpdater.accept(context);
+    if (securityContext == null) {
+      securityContext = manager.createSecurityContext(authResult);
+    }
+
+    this.securityContext.setAuthentication(authResult);
+    this.securityContextUpdater.accept(securityContext);
   }
 
   /**
@@ -81,8 +89,8 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler {
    * {@inheritDoc}
    */
   @Override
-  public Authentication getAuthentication() {
-    return securityContext.getAuthentication();
+  public Optional<Authentication> getAuthentication() {
+    return securityContext != null ? ofNullable(securityContext.getAuthentication()) : empty();
   }
 
   /**
