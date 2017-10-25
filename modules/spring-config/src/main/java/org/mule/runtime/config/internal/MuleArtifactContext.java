@@ -34,7 +34,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -42,14 +41,11 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
-import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.api.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.api.dsl.processor.ConfigFile;
@@ -65,6 +61,8 @@ import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationExc
 import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
+import org.mule.runtime.config.internal.model.ApplicationModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.internal.processor.ContextExclusiveInjectorProcessor;
 import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
@@ -80,11 +78,21 @@ import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,17 +118,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
@@ -157,7 +154,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return false;
     }
   });
-  private List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
+  protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -371,9 +368,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     prepareObjectProviders();
   }
 
-
-
-  private void prepareObjectProviders() {
+  protected void prepareObjectProviders() {
     MuleArtifactObjectProvider muleArtifactObjectProvider = new MuleArtifactObjectProvider(this);
     ImmutableObjectProviderConfiguration providerConfiguration =
         new ImmutableObjectProviderConfiguration(applicationModel.getConfigurationProperties(),
@@ -389,21 +384,16 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    *
    * @param beanFactory the spring bean factory where the objects will be registered.
    */
-  private void registerObjectFromObjectProviders(ConfigurableListableBeanFactory beanFactory) {
-    this.objectProviders.addAll(lookObjectProviders());
+  protected void registerObjectFromObjectProviders(ConfigurableListableBeanFactory beanFactory) {
     ((ObjectProviderAwareBeanFactory) beanFactory).setObjectProviders(objectProviders);
-    for (ObjectProvider objectProvider : objectProviders) {
-      beanFactory
-          .registerSingleton(objectProvider instanceof NamedObject ? ((NamedObject) objectProvider).getName() : UUID.getUUID(),
-                             objectProvider);
-    }
   }
 
-  private List<ConfigurableObjectProvider> lookObjectProviders() {
-    List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
+  private List<Pair<ComponentModel, Optional<String>>> lookObjectProvidersComponentModels(ApplicationModel applicationModel) {
+    List<Pair<ComponentModel, Optional<String>>> objectProviders = new ArrayList<>();
     applicationModel.executeOnEveryRootElement(componentModel -> {
-      if (componentModel.getType() != null && ConfigurableObjectProvider.class.isAssignableFrom(componentModel.getType())) {
-        objectProviders.add((ConfigurableObjectProvider) componentModel.getObjectInstance());
+      if (componentModel.isEnabled() && componentModel.getType() != null
+          && ConfigurableObjectProvider.class.isAssignableFrom(componentModel.getType())) {
+        objectProviders.add(new Pair<>(componentModel, ofNullable(componentModel.getNameAttribute())));
       }
     });
     return objectProviders;
@@ -448,10 +438,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   @Override
   protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
-    createInitialApplicationComponents(beanFactory);
-  }
-
-  protected void createInitialApplicationComponents(DefaultListableBeanFactory beanFactory) {
     createApplicationComponents(beanFactory, applicationModel, true);
   }
 
@@ -467,8 +453,21 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   }
 
+  /**
+   * Creates te definition for all the objects to be created form the enabled components in the {@code applicationModel}.
+   * 
+   * @param beanFactory the bean factory in which definition must be created.
+   * @param applicationModel the artifact application model.
+   * @param mustBeRoot if the component must be root to be created.
+   * @return an order list of the created bean names. The order must be respected for the creation of the objects.
+   */
   protected List<String> createApplicationComponents(DefaultListableBeanFactory beanFactory, ApplicationModel applicationModel,
                                                      boolean mustBeRoot) {
+
+    // This should only be done once at the initial application model creation, called from Spring
+    List<Pair<ComponentModel, Optional<String>>> objectProvidersByName =
+        lookObjectProvidersComponentModels(applicationModel);
+
     List<String> createdComponentModels = new ArrayList<>();
     applicationModel.executeOnEveryMuleComponentTree(cm -> {
       SpringComponentModel componentModel = (SpringComponentModel) cm;
@@ -512,7 +511,19 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         componentLocator.addComponentLocation(cm.getComponentLocation());
       }
     });
+
+    this.objectProviders
+        .addAll(objectProvidersByName.stream().map(pair -> (ConfigurableObjectProvider) pair.getFirst().getObjectInstance())
+            .collect(toList()));
     registerObjectFromObjectProviders(beanFactory);
+
+    createdComponentModels.sort((beanName1, beanName2) -> {
+      if (objectProvidersByName.stream().map(Pair::getSecond).filter(Optional::isPresent)
+          .anyMatch(name -> name.equals(beanName1))) {
+        return 1;
+      }
+      return -1;
+    });
     return createdComponentModels;
   }
 

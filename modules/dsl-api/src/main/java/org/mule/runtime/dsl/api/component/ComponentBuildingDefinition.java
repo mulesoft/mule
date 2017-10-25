@@ -57,6 +57,7 @@ public class ComponentBuildingDefinition<T> {
   private ComponentIdentifier componentIdentifier;
   private Optional<TypeConverter> typeConverter = empty();
   private Optional<TypeConverter> keyTypeConverter = empty();
+  private boolean alwaysEnabled = false;
 
   private ComponentBuildingDefinition() {}
 
@@ -130,6 +131,13 @@ public class ComponentBuildingDefinition<T> {
    */
   public Optional<TypeConverter> getKeyTypeConverter() {
     return keyTypeConverter;
+  }
+
+  /**
+   * @return if the component should be enabled even if excluded when building a partial application model
+   */
+  public boolean isAlwaysEnabled() {
+    return alwaysEnabled;
   }
 
   /**
@@ -249,6 +257,19 @@ public class ComponentBuildingDefinition<T> {
     public Builder<T> withKeyTypeConverter(TypeConverter typeConverter) {
       Builder<T> next = copy();
       next.definition.keyTypeConverter = of(typeConverter);
+      return next;
+    }
+
+    /**
+     * This method configures the component as enabled even if excluded from a partial application model (for instance
+     * when building one for data sense).
+     *
+     * @param value boolean indicating if the component should be always enabled
+     * @return a copy of ${@code this} builder
+     */
+    public Builder<T> alwaysEnabled(boolean value) {
+      Builder<T> next = copy();
+      next.definition.alwaysEnabled = value;
       return next;
     }
 

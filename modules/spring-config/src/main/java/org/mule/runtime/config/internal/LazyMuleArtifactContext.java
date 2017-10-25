@@ -20,7 +20,6 @@ import static org.mule.runtime.config.internal.LazyMetadataService.NON_LAZY_META
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
-
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -32,9 +31,9 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.api.LazyComponentInitializer;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.dsl.model.MinimalApplicationModelGenerator;
+import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -42,14 +41,14 @@ import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingSer
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * Implementation of {@link MuleArtifactContext} that allows to create configuration components lazily.
@@ -167,6 +166,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
       // First unregister any already initialized/started component
       unregisterBeans(alreadyCreatedApplicationComponents);
+      objectProviders.clear();
 
       ConfigurationDependencyResolver dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel,
                                                                                                componentBuildingDefinitionRegistry);
@@ -180,6 +180,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       List<String> applicationComponents =
           createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel.get(), false);
       createdComponents.set(applicationComponents);
+
+      super.prepareObjectProviders();
+
       // This is required to force the execution of postProcessAfterInitialization() for each created component
       applicationComponents.forEach(component -> getRegistry().lookupByName(component).get());
     });
@@ -189,6 +192,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     trackingPostProcessor.intersection(createdComponentNames);
 
     return createdComponentNames;
+  }
+
+  @Override
+  protected void prepareObjectProviders() {
+    // Do not prepare object providers at this point. No components are going to be created yet. This will be done when creating
+    // lazy components
   }
 
   private void unregisterBeans(List<String> beanNames) {
@@ -207,6 +216,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       });
     }
     applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
+
     // Refresh componentLocator
     removeFromComponentLocator(beanNames);
   }
