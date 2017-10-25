@@ -949,7 +949,7 @@
           "name": "invoke",
           "description": "invokes Web Service operations",
           "modelProperties": {
-            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
+            "metadataKeyId": {
               "type": {
                 "format": "java",
                 "type": "Object",
