@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.util.Reference;
@@ -24,6 +25,9 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
@@ -33,9 +37,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ConfigurationDependencyResolver implements BeanDependencyResolver {
 
@@ -223,7 +224,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
       buildingDefinition.ifPresent(definition -> {
         if (definition.isAlwaysEnabled()) {
           if (componentModel.getNameAttribute() != null) {
-            namesBuilder.add();
+            namesBuilder.add(componentModel.getNameAttribute());
           }
         }
       });

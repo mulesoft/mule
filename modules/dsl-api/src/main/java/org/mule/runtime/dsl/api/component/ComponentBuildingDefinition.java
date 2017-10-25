@@ -15,6 +15,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -33,9 +34,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Defines the mapping between a component configuration and how the object that represents that model in runtime is created.
- * 
+ *
  * @param <T> the actual type of the runtime object to be created.
- * 
+ *
  * @since 4.0
  */
 public class ComponentBuildingDefinition<T> {
@@ -286,7 +287,7 @@ public class ComponentBuildingDefinition<T> {
 
     /**
      * Used to declare that the object to be created has a name attribute
-     * 
+     *
      * @return a copy of {@code this} builder
      */
     public Builder<T> asNamed() {
@@ -349,6 +350,7 @@ public class ComponentBuildingDefinition<T> {
       builder.definition.scope = this.definition.scope;
       builder.definition.typeDefinition = this.definition.typeDefinition;
       builder.definition.objectFactoryType = this.definition.objectFactoryType;
+      builder.definition.alwaysEnabled = this.definition.alwaysEnabled;
 
       if (definition.isNamed()) {
         builder.definition.named = true;
