@@ -10,7 +10,6 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -47,7 +46,7 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
    * @param component the component to be added
    */
   public void addComponent(Component component) {
-    this.componentsMap.putIfAbsent(component.getLocation().getLocation(), component);
+    this.componentsMap.put(component.getLocation().getLocation(), component);
   }
 
   /**
