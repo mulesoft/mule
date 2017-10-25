@@ -620,7 +620,7 @@
           "name": "booleanMetadataKey",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "Boolean",
@@ -994,7 +994,7 @@
           "name": "contentAndOutputCacheResolver",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -1365,7 +1365,7 @@
           "name": "contentAndOutputMetadataWithKeyId",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -2069,7 +2069,7 @@
           "name": "contentMetadataWithKeyId",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -2686,7 +2686,7 @@
           "name": "contentMetadataWithoutKeysWithKeyId",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -3057,7 +3057,7 @@
           "name": "contentOnlyCacheResolver",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -3341,7 +3341,7 @@
           "name": "contentOnlyIgnoresOutput",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -3715,7 +3715,7 @@
           "name": "enumMetadataKey",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String",
@@ -4097,7 +4097,7 @@
           "name": "failWithResolvingException",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -4468,7 +4468,7 @@
           "name": "failWithRuntimeException",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -4707,7 +4707,7 @@
           "name": "keyIdWithoutKeyResolver",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -5079,7 +5079,7 @@
           "name": "metadataKeyWithDefaultValue",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -5405,7 +5405,7 @@
           "name": "outputAndMetadataKeyCacheResolver",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -5821,7 +5821,7 @@
           "name": "outputAndMultipleInputWithKeyId",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -6192,7 +6192,7 @@
           "name": "outputMetadataWithKeyId",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -6851,7 +6851,7 @@
           "name": "outputMetadataWithoutKeysWithKeyId",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -7177,7 +7177,7 @@
           "name": "outputOnlyWithoutContentParam",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -8171,7 +8171,7 @@
           "name": "pagedOperationResult",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -8714,7 +8714,7 @@
           "name": "pagedOperationResultWithAttributesResolver",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -8998,7 +8998,7 @@
           "name": "shouldInheritExtensionResolvers",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -9282,7 +9282,7 @@
           "name": "shouldInheritOperationParentResolvers",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -9653,7 +9653,7 @@
           "name": "shouldInheritOperationResolvers",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -10086,7 +10086,7 @@
           "name": "simpleMultiLevelKeyResolver",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "@ref:org.mule.test.metadata.extension.LocationKey"
@@ -10705,7 +10705,7 @@
           "name": "MetadataSource",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -11204,7 +11204,7 @@
       "name": "doQuery",
       "description": "",
       "modelProperties": {
-        "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+        "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
           "type": {
             "format": "java",
             "type": "String"
@@ -11404,7 +11404,7 @@
       "name": "dynamicListOfMessages",
       "description": "",
       "modelProperties": {
-        "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+        "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
           "type": {
             "format": "java",
             "type": "String"
@@ -11600,7 +11600,7 @@
       "name": "dynamicListOfObjects",
       "description": "",
       "modelProperties": {
-        "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+        "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
           "type": {
             "format": "java",
             "type": "String"
@@ -11924,7 +11924,7 @@
       "name": "messageAttributesPersonTypeMetadata",
       "description": "",
       "modelProperties": {
-        "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+        "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
           "type": {
             "format": "java",
             "type": "String"
@@ -12289,7 +12289,7 @@
       "name": "objectListAsInput",
       "description": "",
       "modelProperties": {
-        "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+        "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
           "type": {
             "format": "java",
             "type": "String"
@@ -12571,7 +12571,7 @@
       "name": "outputAttributesWithDynamicMetadata",
       "description": "",
       "modelProperties": {
-        "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+        "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
           "type": {
             "format": "java",
             "type": "String"
@@ -12706,7 +12706,7 @@
       "name": "resolverContentWithContextClassLoader",
       "description": "",
       "modelProperties": {
-        "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+        "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
           "type": {
             "format": "java",
             "type": "String"
@@ -12883,7 +12883,7 @@
       "name": "resolverOutputWithContextClassLoader",
       "description": "",
       "modelProperties": {
-        "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+        "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
           "type": {
             "format": "java",
             "type": "String"
@@ -13047,7 +13047,7 @@
       "name": "returnQuery",
       "description": "",
       "modelProperties": {
-        "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+        "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
           "type": {
             "format": "java",
             "type": "String"
@@ -13804,7 +13804,7 @@
       "name": "MetadataSourceWithMultilevel",
       "description": "",
       "modelProperties": {
-        "org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty": {
+        "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
           "type": {
             "format": "java",
             "type": "@ref:org.mule.test.metadata.extension.LocationKey"
