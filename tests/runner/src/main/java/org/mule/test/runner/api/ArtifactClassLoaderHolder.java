@@ -50,14 +50,22 @@ public final class ArtifactClassLoaderHolder {
   }
 
   /**
-   * Loads the {@link Class} using the application {@link ArtifactClassLoader}.
+   * Loads the {@link Class} using the test runner {@link ArtifactClassLoader}.
    *
    * @param name {@link String} representing the name of the {@link Class} to be loaded.
    * @return the {@link Class} loaded with the application {@link ArtifactClassLoader}.
    * @throws ClassNotFoundException if the {@link Class} cannot be found.
    */
-  public Class<?> loadClassWithApplicationClassLoader(String name) throws ClassNotFoundException {
-    return applicationClassLoader.getClassLoader().loadClass(name);
+  public Class<?> loadClassWithATestRunnerClassLoader(String name) throws ClassNotFoundException {
+    ArtifactClassLoader classLoader = getTestRunnerPluginClassLoader();
+    return classLoader.getClassLoader().loadClass(name);
   }
 
+  /**
+   * @return the {@link ArtifactClassLoader} that corresponds to the test runner plugin
+   */
+  public ArtifactClassLoader getTestRunnerPluginClassLoader() {
+    return pluginsArtifactClassLoaders.stream().filter(cl -> cl.getArtifactId().equals("Region/plugin/test-runner")).findFirst()
+        .orElseThrow(() -> new IllegalStateException("No test runner plugin found"));
+  }
 }

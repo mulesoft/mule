@@ -10,7 +10,6 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
-
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.value.ResolvingFailure;
@@ -21,14 +20,14 @@ import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.tck.junit4.matcher.ValueMatcher;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import java.util.Set;
-
 import org.hamcrest.Matcher;
 
-@ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.mule.tests:mule-tests-unit"})
+@ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.mule.tests:mule-tests-model"})
 public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestCase {
 
   @Inject

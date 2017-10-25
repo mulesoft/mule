@@ -13,6 +13,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.core.lifecyle.AbstractLifecycleTracker;
 
 import javax.inject.Inject;
 

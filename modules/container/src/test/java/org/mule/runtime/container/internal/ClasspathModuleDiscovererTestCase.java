@@ -126,17 +126,6 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void discoversInvalidModuleWithExportedPrivilegedPackages() throws Exception {
-    List<URL> moduleProperties = new ArrayList();
-    moduleProperties.add(getClass().getClassLoader().getResource("moduleJavaPrivilegedPackages.properties"));
-    when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-        .thenReturn(new EnumerationAdapter(moduleProperties));
-
-    expectedException.expect(IllegalArgumentException.class);
-    moduleDiscoverer.discover();
-  }
-
-  @Test
   public void ignoresDuplicateModule() throws Exception {
     List<URL> moduleProperties = new ArrayList();
     moduleProperties.add(getClass().getClassLoader().getResource("moduleJavaPackages.properties"));

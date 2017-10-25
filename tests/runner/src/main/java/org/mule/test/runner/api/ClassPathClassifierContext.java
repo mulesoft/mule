@@ -42,11 +42,13 @@ public class ClassPathClassifierContext {
 
   private final List<String> extraBootPackages = newArrayList();
 
-  private final List<String> sharedPluginLibCoordinates = newArrayList();
+  private final List<String> applicationSharedLibCoordinates = newArrayList();
+  private final List<String> applicationLibCoordinates = newArrayList();
+  private final List<String> testRunnerExportedLibCoordinates = newArrayList();
   private final List<Class> exportPluginClasses = newArrayList();
   private final List<String> excludedArtifacts = newArrayList();
 
-  private final List<URL> applicationUrls = newArrayList();
+  private final List<URL> testRunnerPluginUrls = newArrayList();
 
   private boolean extensionMetadataGenerationEnabled = false;
   private File pluginResourcesFolder;
@@ -67,15 +69,17 @@ public class ClassPathClassifierContext {
    *        {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @param testInclusions {@link List} of Maven coordinates to be included in application class loader. In format
    *        {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
-   * @param sharedPluginLibCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be
+   * @param applicationSharedLibCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be
    *        added to the sharedLib {@link ArtifactClassLoader}
    * @param exportPluginClasses {@link List} of {@link Class} to be exported in addition to the ones already exported by the
    *        plugin, for testing purposes only.
-   * @param applicationUrls {@link List} of {@link URL}s to be appended to the application
+   * @param testRunnerPluginUrls {@link List} of {@link URL}s to be appended to the application
    *        {@link ArtifactClassLoader}
    * @param extensionMetadataGenerationEnabled if while building the a plugin
    *        {@link ArtifactClassLoader} for an
    *        {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
+   * @param applicationLibCoordinates
+   * @param testRunnerExportedLibCoordinates
    * @throws IOException if an error happened while reading {@link RunnerModuleUtils#EXCLUDED_PROPERTIES_FILE} file
    */
   public ClassPathClassifierContext(final Artifact rootArtifact,
@@ -86,10 +90,11 @@ public class ClassPathClassifierContext {
                                     final Set<String> providedExclusions,
                                     final Set<String> testExclusions,
                                     final Set<String> testInclusions,
-                                    final Set<String> sharedPluginLibCoordinates,
+                                    final Set<String> applicationSharedLibCoordinates,
                                     final Set<Class> exportPluginClasses,
-                                    final List<URL> applicationUrls,
-                                    final boolean extensionMetadataGenerationEnabled)
+                                    final List<URL> testRunnerPluginUrls,
+                                    final boolean extensionMetadataGenerationEnabled,
+                                    Set<String> applicationLibCoordinates, Set<String> testRunnerExportedLibCoordinates)
       throws IOException {
     checkNotNull(rootArtifact, "rootArtifact cannot be null");
     checkNotNull(classPathURLs, "classPathURLs cannot be null");
@@ -106,10 +111,12 @@ public class ClassPathClassifierContext {
     this.testExclusions.addAll(testExclusions);
     this.testInclusions.addAll(testInclusions);
 
-    this.sharedPluginLibCoordinates.addAll(sharedPluginLibCoordinates);
-    this.exportPluginClasses.addAll(exportPluginClasses);
+    this.applicationLibCoordinates.addAll(applicationLibCoordinates);
+    this.testRunnerExportedLibCoordinates.addAll(testRunnerExportedLibCoordinates);
+    this.applicationSharedLibCoordinates.addAll(applicationSharedLibCoordinates);
+    this.testRunnerPluginUrls.addAll(testRunnerPluginUrls);
 
-    this.applicationUrls.addAll(applicationUrls);
+    this.exportPluginClasses.addAll(exportPluginClasses);
 
     this.extensionMetadataGenerationEnabled = extensionMetadataGenerationEnabled;
   }
@@ -195,19 +202,35 @@ public class ClassPathClassifierContext {
   }
 
   /**
-   * @return {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be added to the sharedLib
+   * @return {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} or {@code <groupId>:<artifactId>:<classifier>} in order to be added to the sharedLib
    *         {@link ArtifactClassLoader}
    */
-  public List<String> getSharedPluginLibCoordinates() {
-    return this.sharedPluginLibCoordinates;
+  public List<String> getApplicationSharedLibCoordinates() {
+    return this.applicationSharedLibCoordinates;
+  }
+
+  /**
+   * @return {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} or {@code <groupId>:<artifactId>:<classifier>} in order to be added to the application
+   *         {@link ArtifactClassLoader}
+   */
+  public List<String> getApplicationLibCoordinates() {
+    return this.applicationLibCoordinates;
+  }
+
+  /**
+   * @return {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} or {@code <groupId>:<artifactId>:<classifier>} in order to be exported by the test runner
+   *         {@link ArtifactClassLoader}
+   */
+  public List<String> getTestRunnerExportedLibCoordinates() {
+    return testRunnerExportedLibCoordinates;
   }
 
   /**
    * @return {@link List} of {@link URL}s to be appended to the application
    *         {@link ArtifactClassLoader} in addition to the ones classified.
    */
-  public List<URL> getApplicationUrls() {
-    return this.applicationUrls;
+  public List<URL> getTestRunnerPluginUrls() {
+    return this.testRunnerPluginUrls;
   }
 
   /**

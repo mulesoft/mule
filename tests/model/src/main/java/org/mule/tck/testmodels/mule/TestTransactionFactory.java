@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.transaction.TransactionFactory;
 
 public class TestTransactionFactory implements TransactionFactory {
 
-  // for testsing properties
+  // for testing properties
   private String value;
   private Transaction mockTransaction;
 

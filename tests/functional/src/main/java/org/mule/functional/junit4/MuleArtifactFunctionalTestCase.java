@@ -46,9 +46,7 @@ import javax.inject.Inject;
         "*:*:jar:tests:*",
         "*:*:test-jar:*:*"
     },
-    sharedRuntimeLibs = {
-        "org.mule.tests:mule-tests-unit"
-    })
+    testRunnerExportedRuntimeLibs = {"org.mule.tests:mule-tests-functional"})
 public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalTestCase {
 
   @Inject

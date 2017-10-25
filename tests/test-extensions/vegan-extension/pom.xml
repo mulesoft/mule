@@ -20,4 +20,12 @@
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>

@@ -27,6 +27,7 @@ import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandler
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
+import org.mule.test.runner.ApplicationClassLoaderAware;
 import org.mule.test.runner.ArtifactClassLoaderRunner;
 import org.mule.test.runner.ContainerClassLoaderAware;
 import org.mule.test.runner.PluginClassLoadersAware;
@@ -96,6 +97,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static List<ArtifactClassLoader> pluginClassLoaders;
   private static List<ArtifactClassLoader> serviceClassLoaders;
   private static ClassLoader containerClassLoader;
+  private static ClassLoader applicationClassLoader;
   private static ServiceManager serviceRepository;
   private static ClassLoaderRepository classLoaderRepository;
   private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder extensionsManagerConfigurationBuilder;
@@ -123,7 +125,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
    */
   @Override
   protected ClassLoader getExecutionClassLoader() {
-    return Thread.currentThread().getContextClassLoader();
+    return applicationClassLoader;
   }
 
   @PluginClassLoadersAware
@@ -163,10 +165,23 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     }
 
     if (ArtifactFunctionalTestCase.containerClassLoader != null) {
-      throw new IllegalStateException("Plugin class loaders were already set, it cannot be set again");
+      throw new IllegalStateException("Container classloader was already set, it cannot be set again");
     }
 
     ArtifactFunctionalTestCase.containerClassLoader = containerClassLoader;
+  }
+
+  @ApplicationClassLoaderAware
+  private static final void setApplicationClassLoader(ClassLoader applicationClassLoader) {
+    if (applicationClassLoader == null) {
+      throw new IllegalArgumentException("A null value cannot be set as the application classLoader");
+    }
+
+    if (ArtifactFunctionalTestCase.applicationClassLoader != null) {
+      throw new IllegalStateException("Application classloader was already set, it cannot be set again");
+    }
+
+    ArtifactFunctionalTestCase.applicationClassLoader = applicationClassLoader;
   }
 
   @Override

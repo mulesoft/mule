@@ -13,7 +13,7 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.util.Optional;
 
-@ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.mule.tests:mule-tests-unit"})
+@ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.mule.tests:mule-tests-model"})
 public abstract class AbstractExtensionFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   protected Optional<ExtensionModel> getExtensionModel(String name) {
