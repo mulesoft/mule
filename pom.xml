@@ -2075,7 +2075,52 @@
                                 <configuration>
                                     <rules>
                                         <requireReleaseDeps>
-                                            <message>No Snapshots Allowed!</message>
+                                            <message>No Snapshots Allowed in Deps!</message>
+                                        </requireReleaseDeps>
+                                        <requireReleaseVersion>
+                                            <message>No Snapshots Allowed in Project Version!</message>
+                                        </requireReleaseVersion>
+                                        <requirePluginVersions>
+                                            <message>Best Practice is to always define plugin versions!</message>
+                                            <unCheckedPluginList>
+                                                org.apache.maven.plugins:maven-clean-plugin
+                                            </unCheckedPluginList>
+                                        </requirePluginVersions>
+                                    </rules>
+                                    <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>release-dry-run</id>
+            <properties>
+                <skipNoSnapshotsEnforcerPluginRule>false</skipNoSnapshotsEnforcerPluginRule>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>${maven.enforcer.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots-in-deps</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps>
+                                            <message>No Snapshots Allowed in Deps!</message>
+                                            <excludes>
+                                                <exclude>org.mule.weave:*</exclude>
+                                                <exclude>org.mule.services:*</exclude>
+                                                <exclude>org.mule.tools.maven:mule-classloader-model</exclude>
+                                            </excludes>
                                         </requireReleaseDeps>
                                     </rules>
                                     <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
