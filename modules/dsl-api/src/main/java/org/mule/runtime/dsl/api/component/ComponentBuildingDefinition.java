@@ -59,7 +59,7 @@ public class ComponentBuildingDefinition<T> {
   private Optional<TypeConverter> typeConverter = empty();
   private Optional<TypeConverter> keyTypeConverter = empty();
   private boolean alwaysEnabled = false;
-  private String gloablName;
+  private String registrationName;
 
   private ComponentBuildingDefinition() {}
 
@@ -152,8 +152,8 @@ public class ComponentBuildingDefinition<T> {
   /**
    * @return a name if the component is a global singleton, otherwise null
    */
-  public String getGloablName() {
-    return gloablName;
+  public String getRegistrationName() {
+    return registrationName;
   }
 
   /**
@@ -283,14 +283,15 @@ public class ComponentBuildingDefinition<T> {
     }
 
     /**
-     * Set the component name, intended for top level singletons without a name attribute.
+     * Set the component name that will appear in the registry. This is intended for top level singletons without
+     * a name attribute, as there will be an error if more than one element of this type is used.
      *
      * @param name the component name
      * @return a copy of ${@code this} builder
      */
-    public Builder<T> withGlobalName(String name) {
+    public Builder<T> withRegistrationName(String name) {
       Builder<T> next = copy();
-      next.definition.gloablName = name;
+      next.definition.registrationName = name;
       return next;
     }
 
@@ -371,7 +372,7 @@ public class ComponentBuildingDefinition<T> {
       builder.definition.typeDefinition = this.definition.typeDefinition;
       builder.definition.objectFactoryType = this.definition.objectFactoryType;
       builder.definition.alwaysEnabled = this.definition.alwaysEnabled;
-      builder.definition.gloablName = this.definition.gloablName;
+      builder.definition.registrationName = this.definition.registrationName;
 
       if (definition.isNamed()) {
         builder.definition.named = true;

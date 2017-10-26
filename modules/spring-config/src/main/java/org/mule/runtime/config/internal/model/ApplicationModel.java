@@ -319,7 +319,7 @@ public class ApplicationModel {
     createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
     convertConfigFileToComponentModel(artifactConfig);
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
-    resolveGlobalElementNames();
+    resolveRegistrationNames();
     validateModel(componentBuildingDefinitionRegistry);
     createEffectiveModel();
     if (runtimeMode) {
@@ -915,7 +915,7 @@ public class ApplicationModel {
     return configurationProperties;
   }
 
-  private void resolveGlobalElementNames() {
+  private void resolveRegistrationNames() {
     if (componentBuildingDefinitionRegistry.isPresent()) {
       ComponentBuildingDefinitionRegistry definitionRegistry = componentBuildingDefinitionRegistry.get();
 
@@ -923,8 +923,8 @@ public class ApplicationModel {
         Optional<ComponentBuildingDefinition<?>> buildingDefinition =
             definitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
         buildingDefinition.ifPresent(definition -> {
-          if (definition.getGloablName() != null) {
-            componentModel.setParameter(ApplicationModel.NAME_ATTRIBUTE, definition.getGloablName());
+          if (definition.getRegistrationName() != null) {
+            componentModel.setParameter(ApplicationModel.NAME_ATTRIBUTE, definition.getRegistrationName());
           }
         });
       });
