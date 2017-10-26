@@ -154,6 +154,12 @@
             <version>${activemq.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.fusesource.hawtbuf</groupId>
+            <artifactId>hawtbuf</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>

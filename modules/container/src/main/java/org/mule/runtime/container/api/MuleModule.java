@@ -20,9 +20,6 @@ import java.util.Set;
  */
 public class MuleModule {
 
-  protected static final String INVALID_PRIVILEGED_API_DEFINITION_ERROR =
-      "Invalid privileged API: both privileged packages and artifacts must be defined";
-
   private final String name;
   private final Set<String> exportedPackages;
   private final Set<String> exportedPaths;
@@ -48,8 +45,6 @@ public class MuleModule {
     checkArgument(!containsMetaInfServicesResource(exportedPaths), "exportedPaths cannot contain paths on META-INF/services");
     checkArgument(privilegedExportedPackages != null, "privilegedExportedPackages cannot be null");
     checkArgument(privilegedArtifacts != null, "privilegedArtifacts cannot be null");
-    checkArgument((privilegedArtifacts.isEmpty() && privilegedExportedPackages.isEmpty())
-        || (!privilegedArtifacts.isEmpty() && !privilegedExportedPackages.isEmpty()), INVALID_PRIVILEGED_API_DEFINITION_ERROR);
     checkArgument(exportedServices != null, "exportedServices cannot be null");
 
     this.name = name;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.functional.transformer;
+package org.mule.tck.integration.transformer;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 

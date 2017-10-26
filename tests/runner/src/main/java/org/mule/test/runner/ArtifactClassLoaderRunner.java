@@ -141,8 +141,9 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     }
 
     final Class<?> isolatedTestClass = getTestClass(clazz);
+
     final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactClassLoaderHolder
-        .loadClassWithApplicationClassLoader(RunnerDelegateTo.class.getName());
+        .loadClassWithATestRunnerClassLoader(RunnerDelegateTo.class.getName());
 
     delegate = new AnnotatedBuilder(builder)
         .buildRunner(getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"), isolatedTestClass);
@@ -150,12 +151,14 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     if (staticFieldsInjected && errorWhileSettingClassLoaders != null) {
       throw Throwables.propagate(errorWhileSettingClassLoaders);
     }
-    withContextClassLoader(artifactClassLoaderHolder.getApplicationClassLoader().getClassLoader(), () -> {
+    withContextClassLoader(artifactClassLoaderHolder.getTestRunnerPluginClassLoader().getClassLoader(), () -> {
       try {
         if (!staticFieldsInjected) {
+
           injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
           injectServicesClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
           injectContainerClassLoader(artifactClassLoaderHolder, isolatedTestClass);
+          injectApplicationClassLoader(artifactClassLoaderHolder, isolatedTestClass);
         }
       } catch (Throwable t) {
         errorWhileSettingClassLoaders = t;
@@ -199,7 +202,9 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     builder.setExportPluginClasses(runnerConfiguration.getExportPluginClasses());
 
-    builder.setSharedPluginLibCoordinates(runnerConfiguration.getSharedRuntimeLibs());
+    builder.setApplicationSharedLibCoordinates(runnerConfiguration.getSharedApplicationRuntimeLibs());
+    builder.setApplicationLibCoordinates(runnerConfiguration.getApplicationRuntimeLibs());
+    builder.setTestRunnerExportedLibCoordinates(runnerConfiguration.getTestRunnerExportedRuntimeLibs());
     builder.setExtensionMetadataGeneration(true);
 
     Properties excludedProperties;
@@ -345,6 +350,17 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     doFieldInjection(containerClassLoaderAwareClass, method, valueToInject, expectedParamType);
   }
 
+  private static void injectApplicationClassLoader(ArtifactClassLoaderHolder artifactClassLoaderHolder,
+                                                   Class<?> isolatedTestClass)
+      throws Throwable {
+    final Class<ApplicationClassLoaderAware> applicationClassLoaderAwareClass = ApplicationClassLoaderAware.class;
+    final String expectedParamType = ArtifactClassLoader.class.getName();
+    final FrameworkMethod method = getAnnotatedMethod(artifactClassLoaderHolder, isolatedTestClass,
+                                                      applicationClassLoaderAwareClass, expectedParamType);
+    final Object applicationClassLoader = artifactClassLoaderHolder.getApplicationClassLoader();
+    doFieldInjection(applicationClassLoaderAwareClass, method, applicationClassLoader, expectedParamType);
+  }
+
   private static void doFieldInjection(Class<? extends Annotation> containerClassLoaderAwareClass, FrameworkMethod method,
                                        Object value, String expectedParamType)
       throws Throwable {
@@ -365,7 +381,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
       throws ClassNotFoundException {
     TestClass testClass = new TestClass(isolatedTestClass);
     Class<? extends Annotation> artifactContextAwareAnn = (Class<? extends Annotation>) artifactClassLoaderHolder
-        .loadClassWithApplicationClassLoader(annotationClass.getName());
+        .loadClassWithATestRunnerClassLoader(annotationClass.getName());
     List<FrameworkMethod> contextAwareMethods = testClass.getAnnotatedMethods(artifactContextAwareAnn);
     if (contextAwareMethods.size() != 1) {
       throw new IllegalStateException("Isolation tests need to have one method marked with annotation "
@@ -381,7 +397,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
   private Class<?> getTestClass(Class<?> clazz) throws InitializationError {
     try {
-      return artifactClassLoaderHolder.loadClassWithApplicationClassLoader(clazz.getName());
+      return artifactClassLoaderHolder.loadClassWithATestRunnerClassLoader(clazz.getName());
     } catch (Exception e) {
       throw new InitializationError(e);
     }
@@ -403,7 +419,8 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
    */
   @Override
   public void run(RunNotifier notifier) {
-    withContextClassLoader(artifactClassLoaderHolder.getApplicationClassLoader().getClassLoader(), () -> delegate.run(notifier));
+    withContextClassLoader(artifactClassLoaderHolder.getTestRunnerPluginClassLoader().getClassLoader(),
+                           () -> delegate.run(notifier));
   }
 
   /**

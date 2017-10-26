@@ -30,41 +30,34 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
-import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.FORK_JOIN_STRATEGIES;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.processor.InternalProcessor;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
+import org.mule.runtime.core.privileged.processor.InternalProcessor;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
-import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +68,11 @@ import java.util.function.Function;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(FORK_JOIN_STRATEGIES)
 public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleContextTestCase {

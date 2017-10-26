@@ -9,7 +9,7 @@
         "org.mule.tests.parsers.api.config"
       ],
       "exportedResources": [
-        "META-INF/mule-parsers=test.xsd"
+        "META-INF/mule-parsers-test.xsd"
       ]
     }
   },

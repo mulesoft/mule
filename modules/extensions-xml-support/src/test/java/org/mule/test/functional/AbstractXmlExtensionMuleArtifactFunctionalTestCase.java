@@ -32,8 +32,8 @@ import java.util.Set;
  *
  * @since 4.0
  */
-@ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.apache.activemq:activemq-client",
-    "org.apache.activemq:activemq-broker", "org.apache.activemq:activemq-kahadb-store", "org.mule.tests:mule-tests-unit"})
+@ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.apache.activemq:activemq-client",
+    "org.apache.activemq:activemq-broker", "org.apache.activemq:activemq-kahadb-store", "org.fusesource.hawtbuf:hawtbuf"})
 public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   /**

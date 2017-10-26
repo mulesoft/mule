@@ -37,9 +37,15 @@ import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
-
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -61,13 +67,6 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ArtifactDescriptorResult.class, ArtifactResult.class})
@@ -166,9 +165,9 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
     ArtifactsUrlClassification classification = classifier.classify(context);
 
-    assertThat(classification.getApplicationUrls(), is(empty()));
+    assertThat(classification.getTestRunnerLibUrls(), is(empty()));
     assertThat(classification.getPluginUrlClassifications(), is(empty()));
-    assertThat(classification.getPluginSharedLibUrls(), is(empty()));
+    assertThat(classification.getApplicationSharedLibUrls(), is(empty()));
     assertThat(classification.getContainerUrls(), hasSize(3));
     assertThat(classification.getContainerUrls(),
                hasItems(fooCoreArtifactFile.toURI().toURL(), fooToolsArtifactFile.toURI().toURL(),
@@ -227,15 +226,15 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                     .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
 
     URL url = temporaryFolder.newFile().toURI().toURL();
-    List<URL> appUrls = newArrayList(url);
-    when(context.getApplicationUrls()).thenReturn(appUrls);
+    List<URL> testRunnerUrls = newArrayList(url);
+    when(context.getTestRunnerPluginUrls()).thenReturn(testRunnerUrls);
 
     ArtifactsUrlClassification classification = classifier.classify(context);
 
-    assertThat(classification.getApplicationUrls(), hasSize(2));
-    assertThat(classification.getApplicationUrls(), contains(rootArtifactFile.toURI().toURL(), url));
+    assertThat(classification.getTestRunnerLibUrls(), hasSize(2));
+    assertThat(classification.getTestRunnerLibUrls(), contains(rootArtifactFile.toURI().toURL(), url));
     assertThat(classification.getPluginUrlClassifications(), is(empty()));
-    assertThat(classification.getPluginSharedLibUrls(), is(empty()));
+    assertThat(classification.getApplicationSharedLibUrls(), is(empty()));
     assertThat(classification.getContainerUrls(), hasSize(2));
     assertThat(classification.getContainerUrls(),
                hasItems(fooCoreArtifactFile.toURI().toURL(), fooToolsArtifactFile.toURI().toURL()));
@@ -250,7 +249,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                    argThat(instanceOf(DependencyFilter.class)),
                                                    argThat(equalTo(emptyList())));
     verify(artifactClassificationTypeResolver).resolveArtifactClassificationType(rootArtifact);
-    verify(context, atLeastOnce()).getApplicationUrls();
+    verify(context, atLeastOnce()).getTestRunnerPluginUrls();
     verify(rootArtifactResult).getArtifact();
   }
 
@@ -263,7 +262,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     when(artifactDescriptorResult.getRepositories()).thenReturn(emptyList());
     when(dependencyResolver.readArtifactDescriptor(any(Artifact.class))).thenReturn(artifactDescriptorResult);
 
-    when(context.getSharedPluginLibCoordinates()).thenReturn(newArrayList("org.foo.tools:foo-repository"));
+    when(context.getApplicationSharedLibCoordinates()).thenReturn(newArrayList("org.foo.tools:foo-repository"));
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage(containsString("has to be declared"));
     expectedException.expectMessage(containsString(TEST));
@@ -279,7 +278,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     when(artifactDescriptorResult.getRepositories()).thenReturn(emptyList());
     when(dependencyResolver.readArtifactDescriptor(any(Artifact.class))).thenReturn(artifactDescriptorResult);
 
-    when(context.getSharedPluginLibCoordinates()).thenReturn(newArrayList("foo-repository"));
+    when(context.getApplicationSharedLibCoordinates()).thenReturn(newArrayList("foo-repository"));
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(containsString("not a valid format"));
     classifier.classify(context);
@@ -294,7 +293,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     directDependencies.add(derbyDriverDep);
     when(dependencyResolver.getDirectDependencies(rootArtifact)).thenReturn(directDependencies);
 
-    when(context.getSharedPluginLibCoordinates())
+    when(context.getApplicationSharedLibCoordinates())
         .thenReturn(newArrayList(derbyDriverDep.getArtifact().getGroupId() + ":" + derbyDriverDep.getArtifact().getArtifactId()));
 
     File rootArtifactFile = temporaryFolder.newFile();
@@ -318,11 +317,11 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
     ArtifactsUrlClassification classification = classifier.classify(context);
 
-    assertThat(classification.getApplicationUrls(), hasSize(1));
-    assertThat(classification.getApplicationUrls(), hasItem(rootArtifactFile.toURI().toURL()));
+    assertThat(classification.getTestRunnerLibUrls(), hasSize(1));
+    assertThat(classification.getTestRunnerLibUrls(), hasItem(rootArtifactFile.toURI().toURL()));
     assertThat(classification.getPluginUrlClassifications(), is(empty()));
-    assertThat(classification.getPluginSharedLibUrls(), hasSize(1));
-    assertThat(classification.getPluginSharedLibUrls(), hasItem(derbyDriverFile.toURI().toURL()));
+    assertThat(classification.getApplicationSharedLibUrls(), hasSize(1));
+    assertThat(classification.getApplicationSharedLibUrls(), hasItem(derbyDriverFile.toURI().toURL()));
     assertThat(classification.getContainerUrls(), is(empty()));
 
     verify(defaultArtifactDescriptorResult, atLeastOnce()).getManagedDependencies();
@@ -407,10 +406,10 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
     ArtifactsUrlClassification classification = classifier.classify(context);
 
-    assertThat(classification.getApplicationUrls(), hasSize(1));
-    assertThat(classification.getApplicationUrls(), hasItem(rootArtifactFile.toURI().toURL()));
+    assertThat(classification.getTestRunnerLibUrls(), hasSize(1));
+    assertThat(classification.getTestRunnerLibUrls(), hasItem(rootArtifactFile.toURI().toURL()));
     assertThat(classification.getPluginUrlClassifications(), is(empty()));
-    assertThat(classification.getPluginSharedLibUrls(), is(empty()));
+    assertThat(classification.getApplicationSharedLibUrls(), is(empty()));
     assertThat(classification.getContainerUrls(), hasSize(2));
     assertThat(classification.getServiceUrlClassifications(), hasSize(1));
     assertThat(classification.getServiceUrlClassifications().get(0).getUrls(), hasItem(fooServiceArtifactFile.toURI().toURL()));

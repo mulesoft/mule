@@ -13,6 +13,8 @@ import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.toFile;
@@ -29,24 +31,10 @@ import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
-
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
-
-import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.graph.Exclusion;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactDescriptorException;
-import org.eclipse.aether.resolution.ArtifactDescriptorResult;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -65,6 +53,19 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.Exclusion;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates the {@link ArtifactUrlClassification} based on the Maven dependencies declared by the rootArtifact using Eclipse
@@ -173,8 +174,11 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     } catch (ArtifactDescriptorException e) {
       throw new IllegalStateException("Couldn't read rootArtifact descriptor", e);
     }
+    List<URL> applicationSharedLibUrls =
+        buildApplicationSharedLibUrlClassification(context, directDependencies, remoteRepositories);
+    List<URL> applicationLibUrls = buildApplicationUrlClassification(context, directDependencies, remoteRepositories);
+    applicationLibUrls.removeAll(applicationSharedLibUrls);
 
-    List<URL> pluginSharedLibUrls = buildPluginSharedLibClassification(context, directDependencies, remoteRepositories);
     List<PluginUrlClassification> pluginUrlClassifications =
         buildPluginUrlClassifications(context, directDependencies, rootArtifactType, remoteRepositories);
 
@@ -184,11 +188,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     List<URL> containerUrls =
         buildContainerUrlClassification(context, directDependencies, serviceUrlClassifications, pluginUrlClassifications,
                                         rootArtifactType, remoteRepositories);
-    List<URL> applicationUrls =
-        buildApplicationUrlClassification(context, directDependencies, rootArtifactType, remoteRepositories);
+    List<URL> testRunnerLibUrls =
+        buildTestRunnerUrlClassification(context, directDependencies, rootArtifactType, remoteRepositories);
 
-    return new ArtifactsUrlClassification(containerUrls, serviceUrlClassifications, pluginSharedLibUrls, pluginUrlClassifications,
-                                          applicationUrls);
+    List<URL> testRunnerExportedLibUrls =
+        buildTestRunnerExportedLibUrlClassification(context, directDependencies, remoteRepositories);
+
+    return new ArtifactsUrlClassification(containerUrls, serviceUrlClassifications, testRunnerLibUrls, applicationLibUrls,
+                                          applicationSharedLibUrls, pluginUrlClassifications, testRunnerExportedLibUrls);
   }
 
   /**
@@ -233,17 +240,17 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param rootArtifactRemoteRepositories remote repositories defined at rootArtifact.
    * @return {@link List} of {@link URL}s to be added to runtime shared libraries.
    */
-  private List<URL> buildPluginSharedLibClassification(final ClassPathClassifierContext context,
-                                                       final List<Dependency> directDependencies,
-                                                       final List<RemoteRepository> rootArtifactRemoteRepositories) {
+  private List<URL> buildApplicationSharedLibUrlClassification(final ClassPathClassifierContext context,
+                                                               final List<Dependency> directDependencies,
+                                                               final List<RemoteRepository> rootArtifactRemoteRepositories) {
     List<URL> pluginSharedLibUrls = newArrayList();
 
-    List<Dependency> pluginSharedLibDependencies = context.getSharedPluginLibCoordinates().stream()
-        .map(sharedPluginLibCoords -> findPluginSharedLibArtifact(sharedPluginLibCoords, context.getRootArtifact(),
-                                                                  directDependencies))
+    List<Dependency> pluginSharedLibDependencies = context.getApplicationSharedLibCoordinates().stream()
+        .map(sharedPluginLibCoords -> findApplicationSharedLibArtifact(sharedPluginLibCoords, context.getRootArtifact(),
+                                                                       directDependencies))
         .collect(toList());
 
-    logger.debug("Plugin sharedLib artifacts matched with versions from direct dependencies declared: {}",
+    logger.debug("Plugin application shared lib artifacts matched with versions from direct dependencies declared: {}",
                  pluginSharedLibDependencies);
 
     pluginSharedLibDependencies.stream()
@@ -253,15 +260,78 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                 .getArtifact().getFile().toURI().toURL();
           } catch (Exception e) {
             throw new IllegalStateException("Error while resolving dependency '" + pluginSharedLibDependency
-                + "' as plugin sharedLibs", e);
+                + "' as application shared lib", e);
           }
         })
         .forEach(pluginSharedLibUrls::add);
 
     resolveSnapshotVersionsToTimestampedFromClassPath(pluginSharedLibUrls, context.getClassPathURLs());
 
-    logger.debug("Classified URLs as plugin runtime shared libraries: '{}", pluginSharedLibUrls);
+    logger.debug("Classified URLs as application shared libraries: '{}", pluginSharedLibUrls);
     return pluginSharedLibUrls;
+  }
+
+  private List<URL> buildTestRunnerExportedLibUrlClassification(final ClassPathClassifierContext context,
+                                                                final List<Dependency> directDependencies,
+                                                                final List<RemoteRepository> rootArtifactRemoteRepositories) {
+    List<URL> pluginSharedLibUrls = newArrayList();
+
+    List<Dependency> testRunnerExportedLibDependencies = context.getTestRunnerExportedLibCoordinates().stream()
+        .map(sharedPluginLibCoords -> findTestRunnerExportedLibArtifact(sharedPluginLibCoords, context.getRootArtifact(),
+                                                                        directDependencies))
+        .collect(toList());
+
+    logger.debug("Test runner exported lib artifacts matched with versions from direct dependencies declared: {}",
+                 testRunnerExportedLibDependencies);
+
+    testRunnerExportedLibDependencies.stream()
+        .map(testRunnerExportedLibDependency -> {
+          try {
+            return dependencyResolver
+                .resolveArtifact(testRunnerExportedLibDependency.getArtifact(), rootArtifactRemoteRepositories)
+                .getArtifact().getFile().toURI().toURL();
+          } catch (Exception e) {
+            throw new IllegalStateException("Error while resolving dependency '" + testRunnerExportedLibDependency
+                + "' as test runner exported lib", e);
+          }
+        })
+        .forEach(pluginSharedLibUrls::add);
+
+    resolveSnapshotVersionsToTimestampedFromClassPath(pluginSharedLibUrls, context.getClassPathURLs());
+
+    logger.debug("Classified URLs as test runner exported libraries: '{}", pluginSharedLibUrls);
+    return pluginSharedLibUrls;
+  }
+
+  private List<URL> buildApplicationUrlClassification(final ClassPathClassifierContext context,
+                                                      final List<Dependency> directDependencies,
+                                                      final List<RemoteRepository> rootArtifactRemoteRepositories) {
+    List<URL> applicationLibUrls = newArrayList();
+
+    List<Dependency> applicationLibDependencies = context.getApplicationLibCoordinates().stream()
+        .map(applicationLibCoords -> findApplicationLibArtifact(applicationLibCoords, context.getRootArtifact(),
+                                                                directDependencies))
+        .collect(toList());
+
+    logger.debug("Application lib artifacts matched with versions from direct dependencies declared: {}",
+                 applicationLibDependencies);
+
+    applicationLibDependencies.stream()
+        .map(pluginSharedLibDependency -> {
+          try {
+            return dependencyResolver.resolveArtifact(pluginSharedLibDependency.getArtifact(), rootArtifactRemoteRepositories)
+                .getArtifact().getFile().toURI().toURL();
+          } catch (Exception e) {
+            throw new IllegalStateException("Error while resolving dependency '" + pluginSharedLibDependency
+                + "' as application lib", e);
+          }
+        })
+        .forEach(applicationLibUrls::add);
+
+    resolveSnapshotVersionsToTimestampedFromClassPath(applicationLibUrls, context.getClassPathURLs());
+
+    logger.debug("Classified URLs as application runtime libraries: '{}", applicationLibUrls);
+    return applicationLibUrls;
   }
 
   /**
@@ -695,13 +765,20 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param groupId of the artifact to be found
    * @param artifactId of the artifact to be found
    * @param directDependencies the rootArtifact direct {@link Dependency}s
+   * @param classifier
    * @return {@link Optional} {@link Dependency} to the dependency. Could be empty it if not present in the list of direct
    *         dependencies
    */
-  private Optional<Dependency> findDirectDependency(String groupId, String artifactId, List<Dependency> directDependencies) {
+  private Optional<Dependency> findDirectDependency(String groupId, String artifactId, List<Dependency> directDependencies,
+                                                    Optional<String> classifier) {
     return directDependencies.isEmpty() ? Optional.<Dependency>empty()
-        : directDependencies.stream().filter(dependency -> dependency.getArtifact().getGroupId().equals(groupId)
-            && dependency.getArtifact().getArtifactId().equals(artifactId)).findFirst();
+        : directDependencies.stream().filter(
+                                             dependency -> dependency.getArtifact().getGroupId().equals(groupId)
+                                                 && dependency.getArtifact().getArtifactId().equals(artifactId)
+                                                 && ((classifier.isPresent()
+                                                     && dependency.getArtifact().getClassifier().equals(classifier.get())
+                                                     || !classifier.isPresent())))
+            .findFirst();
   }
 
   /**
@@ -712,11 +789,34 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @return {@link Artifact} representing the plugin shared lib artifact
    */
-  private Dependency findPluginSharedLibArtifact(String pluginSharedLibCoords, Artifact rootArtifact,
-                                                 List<Dependency> directDependencies) {
+  private Dependency findApplicationSharedLibArtifact(String pluginSharedLibCoords, Artifact rootArtifact,
+                                                      List<Dependency> directDependencies) {
     Optional<Dependency> pluginSharedLibDependency = discoverDependency(pluginSharedLibCoords, rootArtifact, directDependencies);
     if (!pluginSharedLibDependency.isPresent()) {
-      throw new IllegalStateException("Plugin shared lib artifact '" + pluginSharedLibCoords +
+      throw new IllegalStateException("Application shared lib artifact '" + pluginSharedLibCoords +
+          "' in order to be resolved has to be declared as " + TEST + " dependency of your Maven project (" + rootArtifact + ")");
+    }
+
+    return pluginSharedLibDependency.get();
+  }
+
+  private Dependency findApplicationLibArtifact(String pluginSharedLibCoords, Artifact rootArtifact,
+                                                List<Dependency> directDependencies) {
+    Optional<Dependency> pluginSharedLibDependency = discoverDependency(pluginSharedLibCoords, rootArtifact, directDependencies);
+    if (!pluginSharedLibDependency.isPresent()) {
+      throw new IllegalStateException("Application lib artifact '" + pluginSharedLibCoords +
+          "' in order to be resolved has to be declared as " + TEST + " dependency of your Maven project (" + rootArtifact + ")");
+    }
+
+    return pluginSharedLibDependency.get();
+  }
+
+  private Dependency findTestRunnerExportedLibArtifact(String testRunnerExportedLbCoords, Artifact rootArtifact,
+                                                       List<Dependency> directDependencies) {
+    Optional<Dependency> pluginSharedLibDependency =
+        discoverDependency(testRunnerExportedLbCoords, rootArtifact, directDependencies);
+    if (!pluginSharedLibDependency.isPresent()) {
+      throw new IllegalStateException("Test runner exported lib artifact '" + testRunnerExportedLbCoords +
           "' in order to be resolved has to be declared as " + TEST + " dependency of your Maven project (" + rootArtifact + ")");
     }
 
@@ -743,23 +843,25 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   public Optional<Dependency> discoverDependency(String artifactCoords, Artifact rootArtifact,
                                                  List<Dependency> directDependencies) {
     final String[] artifactCoordsSplit = artifactCoords.split(MAVEN_COORDINATES_SEPARATOR);
-    if (artifactCoordsSplit.length != 2) {
-      throw new IllegalArgumentException("Artifact coordinates should be in format of groupId:artifactId, '" + artifactCoords +
+    if (artifactCoordsSplit.length < 2 || artifactCoordsSplit.length > 3) {
+      throw new IllegalArgumentException("Artifact coordinates should be in format of groupId:artifactId or groupId:artifactId:classifier, '"
+          + artifactCoords +
           "' is not a valid format");
     }
     String groupId = artifactCoordsSplit[0];
     String artifactId = artifactCoordsSplit[1];
+    Optional<String> classifier = artifactCoordsSplit.length > 2 ? of(artifactCoordsSplit[2]) : empty();
 
     if (rootArtifact.getGroupId().equals(groupId) && rootArtifact.getArtifactId().equals(artifactId)) {
       logger.debug("'{}' artifact coordinates matched with rootArtifact '{}', resolving version from rootArtifact",
                    artifactCoords, rootArtifact);
       final DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, JAR_EXTENSION, rootArtifact.getVersion());
       logger.debug("'{}' artifact coordinates resolved to: '{}'", artifactCoords, artifact);
-      return Optional.of(new Dependency(artifact, COMPILE));
+      return of(new Dependency(artifact, COMPILE));
 
     } else {
       logger.debug("Resolving version for '{}' from direct dependencies", artifactCoords);
-      return findDirectDependency(groupId, artifactId, directDependencies);
+      return findDirectDependency(groupId, artifactId, directDependencies, classifier);
     }
 
   }
@@ -786,10 +888,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param rootArtifactType {@link ArtifactClassificationType} for rootArtifact @return {@link URL}s for application class loader
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
    */
-  private List<URL> buildApplicationUrlClassification(ClassPathClassifierContext context,
-                                                      List<Dependency> directDependencies,
-                                                      ArtifactClassificationType rootArtifactType,
-                                                      List<RemoteRepository> rootArtifactRemoteRepositories) {
+  private List<URL> buildTestRunnerUrlClassification(ClassPathClassifierContext context,
+                                                     List<Dependency> directDependencies,
+                                                     ArtifactClassificationType rootArtifactType,
+                                                     List<RemoteRepository> rootArtifactRemoteRepositories) {
     logger.debug("Building application classification");
     Artifact rootArtifact = context.getRootArtifact();
 
@@ -835,7 +937,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
             return toTransform.setScope(PROVIDED);
           }
           Artifact artifact = toTransform.getArtifact();
-          if (context.getSharedPluginLibCoordinates().contains(artifact.getGroupId() + ":" + artifact.getArtifactId())) {
+          if (context.getApplicationSharedLibCoordinates().contains(artifact.getGroupId() + ":" + artifact.getArtifactId())) {
             return toTransform.setScope(COMPILE);
           }
           return toTransform;
@@ -876,13 +978,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           + "' classification", e);
     }
 
-    List<URL> appUrls = newArrayList(toUrl(appFiles));
-    logger.debug("Appending URLs to application: {}", context.getApplicationUrls());
-    appUrls.addAll(context.getApplicationUrls());
+    List<URL> testRunnerLibUrls = newArrayList(toUrl(appFiles));
+    logger.debug("Appending URLs to test runner plugin: {}", context.getTestRunnerPluginUrls());
+    testRunnerLibUrls.addAll(context.getTestRunnerPluginUrls());
 
-    resolveSnapshotVersionsToTimestampedFromClassPath(appUrls, context.getClassPathURLs());
+    resolveSnapshotVersionsToTimestampedFromClassPath(testRunnerLibUrls, context.getClassPathURLs());
 
-    return appUrls;
+    return testRunnerLibUrls;
   }
 
   /**

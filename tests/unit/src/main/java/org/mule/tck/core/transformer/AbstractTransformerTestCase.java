@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -22,10 +21,10 @@ import org.mule.runtime.core.privileged.transformer.ExtendedTransformationServic
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 
-import org.junit.Test;
-
 import java.io.InputStream;
 import java.util.Arrays;
+
+import org.junit.Test;
 
 public abstract class AbstractTransformerTestCase extends AbstractMuleContextTestCase {
 
