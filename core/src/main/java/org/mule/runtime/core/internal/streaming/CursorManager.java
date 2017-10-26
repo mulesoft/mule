@@ -69,12 +69,12 @@ public class CursorManager {
    * Becomes aware of the given {@code provider} and returns a replacement provider which is managed by the runtime, allowing for
    * automatic resource handling
    *
-   * @param provider     the provider to be tracked
+   * @param provider the provider to be tracked
    * @param creatorEvent the event that created the provider
    * @return a {@link CursorContext}
    */
   public CursorProvider manage(CursorProvider provider, CoreEvent creatorEvent) {
-    final BaseEventContext ownerContext = getRoot(((BaseEventContext) creatorEvent.getContext()));
+    final BaseEventContext ownerContext = ((BaseEventContext) creatorEvent.getContext()).getRootContext();
     registerEventContext(ownerContext);
     registry.getUnchecked(ownerContext.getId()).addProvider(provider);
 
@@ -91,7 +91,7 @@ public class CursorManager {
   /**
    * Acknowledges that the given {@code cursor} has been opened
    *
-   * @param cursor         the opnened cursor
+   * @param cursor the opnened cursor
    * @param providerHandle the handle for the provider that generated it
    */
   public void onOpen(Cursor cursor, CursorContext providerHandle) {
@@ -130,12 +130,6 @@ public class CursorManager {
    */
   private void registerEventContext(BaseEventContext eventContext) {
     from(eventContext.getCompletionPublisher()).subscribe(null, null, () -> terminated(eventContext));
-  }
-
-  private BaseEventContext getRoot(BaseEventContext eventContext) {
-    return eventContext.getParentContext()
-        .map(this::getRoot)
-        .orElse(eventContext);
   }
 
   private class EventStreamingState {

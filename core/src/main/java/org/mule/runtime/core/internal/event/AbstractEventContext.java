@@ -12,12 +12,14 @@ import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
-
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -25,8 +27,6 @@ import org.slf4j.LoggerFactory;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoProcessor;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Base class for implementations of {@link BaseEventContext}
@@ -164,6 +164,13 @@ abstract class AbstractEventContext implements BaseEventContext {
         return empty();
       }
     }
+  }
+
+  @Override
+  public BaseEventContext getRootContext() {
+    return getParentContext()
+        .map(BaseEventContext::getRootContext)
+        .orElse(this);
   }
 
   @Override

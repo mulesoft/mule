@@ -7,11 +7,12 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.util.Optional.ofNullable;
-
+import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,9 +23,9 @@ import org.apache.commons.collections.map.MultiValueMap;
 
 public class DefaultPolicyStateHandler implements PolicyStateHandler {
 
-  private MultiValueMap policyStateIdsByExecutionIdentifier = new MultiValueMap();
-  private Map<PolicyStateId, CoreEvent> stateMap = new HashMap<>();
-  private Map<String, Processor> nextOperationMap = new HashMap<>();
+  protected MultiValueMap policyStateIdsByExecutionIdentifier = new MultiValueMap();
+  protected Map<PolicyStateId, CoreEvent> stateMap = new HashMap<>();
+  protected Map<String, Processor> nextOperationMap = new HashMap<>();
 
   public void updateNextOperation(String identifier, Processor nextOperation) {
     nextOperationMap.put(identifier, nextOperation);
@@ -38,7 +39,10 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
     return ofNullable(stateMap.get(identifier));
   }
 
+
   public void updateState(PolicyStateId identifier, CoreEvent lastStateEvent) {
+    from(((BaseEventContext) lastStateEvent.getContext()).getRootContext().getCompletionPublisher())
+        .subscribe(null, null, () -> destroyState(identifier.getExecutionIdentifier()));
     stateMap.put(identifier, lastStateEvent);
     policyStateIdsByExecutionIdentifier.put(identifier.getExecutionIdentifier(), identifier);
   }

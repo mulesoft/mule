@@ -9,13 +9,18 @@ package org.mule.runtime.core.internal.policy;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-
-import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.policy.PolicyStateId;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
 
 public class DefaultPolicyStateHandlerTestCase extends AbstractMuleTestCase {
 
@@ -25,8 +30,8 @@ public class DefaultPolicyStateHandlerTestCase extends AbstractMuleTestCase {
   private static final String TEST_POLICY_ID = "test-policy-id";
   private static final String TEST_POLICY_ID2 = "test-policy-id2";
 
-  private CoreEvent eventTestExecutionId = mock(CoreEvent.class);
-  private CoreEvent eventTestExecutionId2 = mock(CoreEvent.class);
+  private InternalEvent eventTestExecutionId = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
+  private InternalEvent eventTestExecutionId2 = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
 
   private DefaultPolicyStateHandler defaultPolicyStateHandler = new DefaultPolicyStateHandler();
 
@@ -61,6 +66,25 @@ public class DefaultPolicyStateHandlerTestCase extends AbstractMuleTestCase {
     defaultPolicyStateHandler.destroyState(policyStateExecutionId.getExecutionIdentifier());
     assertThat(defaultPolicyStateHandler.getLatestState(policyStateExecutionId).isPresent(), is(false));
     assertThat(defaultPolicyStateHandler.retrieveNextOperation(policyStateExecutionId.getExecutionIdentifier()), nullValue());
+  }
+
+  @Test
+  public void destroyStateWhenEventIsCompleted() {
+    PolicyStateId policyStateExecutionId = new PolicyStateId(TEST_EXECUTION_ID, TEST_POLICY_ID);
+    Reference<Subscriber> subscriberReference = new Reference<>();
+    Publisher<Void> completionPublisher = eventTestExecutionId.getContext().getRootContext().getCompletionPublisher();
+    Mockito.doAnswer(invocationOnMock -> {
+      subscriberReference.set((Subscriber) invocationOnMock.getArguments()[0]);
+      return null;
+    }).when(completionPublisher).subscribe(any(Subscriber.class));
+    defaultPolicyStateHandler.updateState(policyStateExecutionId, eventTestExecutionId);
+    subscriberReference.get().onComplete();
+    assertThat(defaultPolicyStateHandler.getLatestState(policyStateExecutionId).isPresent(), is(false));
+    assertThat(defaultPolicyStateHandler.policyStateIdsByExecutionIdentifier
+        .containsKey(policyStateExecutionId.getExecutionIdentifier()), is(false));
+    assertThat(defaultPolicyStateHandler.nextOperationMap.containsKey(policyStateExecutionId.getExecutionIdentifier()),
+               is(false));
+    assertThat(defaultPolicyStateHandler.stateMap.containsKey(policyStateExecutionId), is(false));
   }
 
 }
