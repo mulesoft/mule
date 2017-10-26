@@ -10,6 +10,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -23,7 +24,7 @@ public class OnceTestCase extends AbstractMuleTestCase {
   @Test
   public void runOnlyOnce() {
     CountingRunnable runnable = new CountingRunnable();
-    Once once = Once.of(runnable);
+    RunOnce once = Once.of(runnable);
 
     once.runOnce();
     once.runOnce();
@@ -34,7 +35,7 @@ public class OnceTestCase extends AbstractMuleTestCase {
   @Test
   public void runUntilSuccessful() {
     CountingRunnable runnable = new CountingRunnable();
-    Once once = Once.of(() -> {
+    RunOnce once = Once.of(() -> {
       runnable.runChecked();
       int count = runnable.getInvokationCount();
       if (count < 3) {
@@ -60,7 +61,7 @@ public class OnceTestCase extends AbstractMuleTestCase {
     Latch testLath = new Latch();
 
     CountingRunnable runnable = new CountingRunnable();
-    Once once = Once.of(runnable);
+    RunOnce once = Once.of(runnable);
 
     new Thread(() -> {
       await(controlLath);

@@ -20,6 +20,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
@@ -27,9 +28,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
-
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -54,21 +55,24 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -218,10 +222,28 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   protected void doInitialise() throws InitialisationException {
     returnDelegate = createReturnDelegate();
-    componentExecutor = getOperationExecutorFactory(componentModel).createExecutor(componentModel);
-    executionMediator = createExecutionMediator();
     initialiseIfNeeded(resolverSet, muleContext);
+    componentExecutor = createComponentExecutor();
+    executionMediator = createExecutionMediator();
     initialiseIfNeeded(componentExecutor, true, muleContext);
+  }
+
+  private ComponentExecutor<T> createComponentExecutor() {
+    Map<String, Object> params = new HashMap<>();
+    componentModel.getAllParameterModels().stream()
+        .filter(p -> p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent())
+        .forEach(p -> {
+          ValueResolver<?> resolver = resolverSet.getResolvers().get(p.getName());
+          if (resolver != null) {
+            try {
+              params.put(p.getName(), resolveValue(resolver, ValueResolvingContext.from(getInitialiserEvent())));
+            } catch (MuleException e) {
+              throw new MuleRuntimeException(e);
+            }
+          }
+        });
+
+    return getOperationExecutorFactory(componentModel).createExecutor(componentModel, params);
   }
 
   protected ReturnDelegate createReturnDelegate() {

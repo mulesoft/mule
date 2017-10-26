@@ -7,11 +7,11 @@
 package org.mule.runtime.core.internal.util.message;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.internal.util.concurrent.FunctionalReadWriteLock.readWriteLock;
+import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.internal.util.concurrent.FunctionalReadWriteLock;
+import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;

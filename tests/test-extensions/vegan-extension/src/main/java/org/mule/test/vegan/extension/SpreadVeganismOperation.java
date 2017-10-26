@@ -7,26 +7,44 @@
 package org.mule.test.vegan.extension;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.util.List;
 import java.util.Map;
 
-public class SpreadVeganismOperation {
+public class SpreadVeganismOperation implements Initialisable {
 
   public static final String ARGUMENTS_TAB = "Arguments";
 
+  @Override
+  public void initialise() throws InitialisationException {
+    if (eloquenceLevel == null || eloquenceLevel <= 0) {
+      eloquenceLevel = 1;
+    }
+  }
+
+  @Parameter
+  @Optional(defaultValue = "2")
+  private Integer eloquenceLevel;
+
   @MediaType(TEXT_PLAIN)
   public String spreadTheWord(String theWord, @Config Object config) {
-    return theWord;
+    StringBuilder message = new StringBuilder();
+    for (int i = 0; i < eloquenceLevel; i++) {
+      message.append(theWord);
+    }
+
+    return message.toString();
   }
 
   public VeganPolicy applyPolicy(@Optional @NullSafe VeganPolicy policy) {

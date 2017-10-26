@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util.concurrent;
+package org.mule.runtime.core.api.util.concurrent;
 
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 import org.mule.runtime.core.api.util.func.CheckedFunction;

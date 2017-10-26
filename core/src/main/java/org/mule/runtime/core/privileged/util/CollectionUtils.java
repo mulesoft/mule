@@ -7,9 +7,14 @@
 package org.mule.runtime.core.privileged.util;
 
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import org.mule.runtime.api.util.Pair;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.function.Predicate;
 
 // @ThreadSafe
 public class CollectionUtils {
@@ -98,5 +103,17 @@ public class CollectionUtils {
 
     buf.append(']');
     return buf.toString();
+  }
+
+  public static <T> Pair<List<T>, List<T>> split(Collection<T> col1, Collection<T> col2, Predicate<T> filter) {
+    return new Pair<>(split(col1, filter), split(col2, i -> !filter.test(i)));
+  }
+
+  private static <T> List<T> split(Collection<T> collection, Predicate<T> filter) {
+    if (collection == null || collection.isEmpty()) {
+      return emptyList();
+    }
+
+    return collection.stream().filter(filter).collect(toList());
   }
 }

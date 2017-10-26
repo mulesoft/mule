@@ -8,13 +8,18 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * An implementation of {@link ComponentExecutorFactory} which produces instances of {@link ReflectiveMethodOperationExecutor}.
@@ -37,10 +42,12 @@ public final class ReflectiveOperationExecutorFactory<T, M extends ComponentMode
   }
 
   @Override
-  public ComponentExecutor<M> createExecutor(M operationModel) {
+  public ComponentExecutor<M> createExecutor(M operationModel, Map<String, Object> parameters) {
+    DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder(implementationClass);
+    parameters.forEach((k, v) -> objectBuilder.addPropertyResolver(k, new StaticValueResolver<>(v)));
     Object delegate;
     try {
-      delegate = implementationClass.newInstance();
+      delegate = objectBuilder.build(from(getInitialiserEvent()));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class "
           + implementationClass.getName()), e);

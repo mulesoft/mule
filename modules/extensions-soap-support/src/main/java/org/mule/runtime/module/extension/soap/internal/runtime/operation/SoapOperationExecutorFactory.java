@@ -10,6 +10,8 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 
+import java.util.Map;
+
 /**
  * {@link ComponentExecutorFactory} that creates instances of {@link SoapOperationExecutor}.
  */
@@ -19,10 +21,12 @@ public final class SoapOperationExecutorFactory implements ComponentExecutorFact
    * Creates a new executor for soap operations.
    *
    * @param operationModel the model of the operation to be executed
+   * @param parameters     parameters for initializing the executor
    * @return a new {@link SoapOperationExecutor}
    */
+
   @Override
-  public ComponentExecutor createExecutor(OperationModel operationModel) {
+  public ComponentExecutor<OperationModel> createExecutor(OperationModel operationModel, Map<String, Object> parameters) {
     return new SoapOperationExecutor();
   }
 }

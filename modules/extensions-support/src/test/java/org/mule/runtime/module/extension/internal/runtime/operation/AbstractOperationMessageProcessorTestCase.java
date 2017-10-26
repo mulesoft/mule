@@ -14,8 +14,10 @@ import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -38,7 +40,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -75,14 +76,15 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
+import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
-import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
@@ -215,7 +217,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
                                                                                            .getDefault().createTypeLoader()
                                                                                            .load(String.class), "someParam")));
     setRequires(operationModel, true, true);
-    when(operationExecutorFactory.createExecutor(operationModel)).thenReturn(operationExecutor);
+    when(operationExecutorFactory.createExecutor(same(operationModel), anyMap())).thenReturn(operationExecutor);
 
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
     when(operationModel.getDisplayModel()).thenReturn(empty());
@@ -240,6 +242,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(keyParamMock.getDisplayModel()).thenReturn(empty());
     when(keyParamMock.getLayoutModel()).thenReturn(empty());
     when(keyParamMock.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
+    when(keyParamMock.getModelProperty(FieldOperationParameterModelProperty.class)).thenReturn(empty());
 
     when(contentMock.getName()).thenReturn("content");
     when(contentMock.hasDynamicType()).thenReturn(true);
@@ -249,6 +252,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(contentMock.getLayoutModel()).thenReturn(empty());
     when(contentMock.getModelProperty(MetadataKeyPartModelProperty.class)).thenReturn(empty());
     when(contentMock.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
+    when(contentMock.getModelProperty(FieldOperationParameterModelProperty.class)).thenReturn(empty());
 
     parameterGroupModel = mockParameters(operationModel, keyParamMock, contentMock);
     when(parameterGroupModel.getDisplayModel()).thenReturn(empty());
@@ -261,7 +265,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(operationModel.getOutputAttributes()).thenReturn(outputMock);
     when(operationModel.getModelProperty(InterceptorsModelProperty.class)).thenReturn(empty());
 
-    when(operationExecutorFactory.createExecutor(operationModel)).thenReturn(operationExecutor);
+    when(operationExecutorFactory.createExecutor(same(operationModel), anyMap())).thenReturn(operationExecutor);
     when(operationExecutor.execute(any())).thenReturn(just(""));
 
     when(resolverSet.resolve(from(event))).thenReturn(parameters);

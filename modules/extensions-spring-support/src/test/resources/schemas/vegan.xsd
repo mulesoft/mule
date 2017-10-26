@@ -422,6 +422,7 @@
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionString" use="required" name="theWord"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -758,6 +759,7 @@
           </xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionMap" use="optional" name="productDescription"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -785,6 +787,7 @@
           </xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="policy"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -839,6 +842,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="argument1"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="argument2"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="argument3"></xs:attribute>
@@ -918,6 +922,7 @@
           </xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="healthyFood"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -946,6 +951,7 @@
           </xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -977,6 +983,7 @@
           </xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionList" use="optional" name="products"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
