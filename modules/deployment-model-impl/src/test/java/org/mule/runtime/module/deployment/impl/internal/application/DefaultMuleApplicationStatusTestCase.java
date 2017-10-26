@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -99,7 +100,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
   @Test
   public void nullDeploymentClassLoaderAfterDispose() {
     ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
-    when(descriptor.getConfigResources()).thenReturn(emptyList());
+    when(descriptor.getConfigResources()).thenReturn(emptySet());
 
     DefaultMuleApplication application =
         new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), emptyList(), null,

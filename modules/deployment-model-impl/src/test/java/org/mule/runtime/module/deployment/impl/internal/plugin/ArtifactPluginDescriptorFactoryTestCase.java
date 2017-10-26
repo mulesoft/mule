@@ -34,7 +34,6 @@ import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
-import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -147,7 +146,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
   @Test
   public void detectsInvalidClassLoaderModelLoaderId() throws Exception {
     MulePluginModel.MulePluginModelBuilder pluginModelBuilder = new MulePluginModel.MulePluginModelBuilder().setName(PLUGIN_NAME)
-        .setMinMuleVersion(MIN_MULE_VERSION)
+        .setMinMuleVersion(MIN_MULE_VERSION).setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
     pluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(INVALID_LOADER_ID, emptyMap()));
 
@@ -168,7 +167,8 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
   @Test
   public void detectsInvalidBundleDescriptorModelLoaderId() throws Exception {
     MulePluginModel.MulePluginModelBuilder pluginModelBuilder = new MulePluginModel.MulePluginModelBuilder().setName(PLUGIN_NAME)
-        .setMinMuleVersion(MIN_MULE_VERSION).withBundleDescriptorLoader(createBundleDescriptorLoader(INVALID_LOADER_ID))
+        .setMinMuleVersion(MIN_MULE_VERSION).setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader(INVALID_LOADER_ID))
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, emptyMap()));
 
     ArtifactPluginFileBuilder pluginFileBuilder =

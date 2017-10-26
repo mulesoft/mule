@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.deployment.model.api.domain;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Represents the description of a domain.
@@ -43,7 +43,7 @@ public class DomainDescriptor extends DeployableArtifactDescriptor {
   }
 
   @Override
-  protected List<String> getDefaultConfigResources() {
-    return ImmutableList.<String>builder().add(DEFAULT_CONFIGURATION_RESOURCE).build();
+  protected Set<String> getDefaultConfigResources() {
+    return ImmutableSet.<String>builder().add(DEFAULT_CONFIGURATION_RESOURCE).build();
   }
 }

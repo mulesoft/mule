@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 
 import java.io.File;
@@ -21,6 +21,6 @@ public class EmptyDomainDescriptor extends DomainDescriptor {
     this.setArtifactLocation(domainLocation);
     setArtifactLocation(domainLocation);
     setRootFolder(domainLocation.getParentFile());
-    setConfigResources(emptyList());
+    setConfigResources(emptySet());
   }
 }

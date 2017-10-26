@@ -163,7 +163,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
     assertThat(desc.getMinMuleVersion(), is(new MuleVersion("4.0.0")));
     assertThat(desc.getConfigResources(), hasSize(1));
-    assertThat(desc.getConfigResources().get(0), is(getDefaultConfigurationResourceLocation()));
+    assertThat(desc.getConfigResources(), hasItem(getDefaultConfigurationResourceLocation()));
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
     assertThat(classLoaderModel.getDependencies().isEmpty(), is(true));
@@ -279,7 +279,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   private void requiredProductValidationExpectedException(String appName) {
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage(Matchers
-        .containsString(format("The artifact %s does not specifies a requiredProduct or the specified value is not valid. Valid values are MULE, MULE_EE",
+        .containsString(format("Invalid artifact descriptor: \"%s\". Mandatory field \"requiredProduct\" is missing or value is not allowed. Valid values are MULE, MULE_EE",
                                appName)));
   }
 

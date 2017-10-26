@@ -15,14 +15,14 @@ import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 
 public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
@@ -110,7 +110,7 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   }
 
   @Override
-  protected List<String> getDefaultConfigResources() {
-    return ImmutableList.<String>builder().add(DEFAULT_CONFIGURATION_RESOURCE).build();
+  protected Set<String> getDefaultConfigResources() {
+    return ImmutableSet.<String>builder().add(DEFAULT_CONFIGURATION_RESOURCE).build();
   }
 }

@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -18,12 +18,11 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployableModel, T extends DeployableArtifactDescriptor>
@@ -43,12 +42,12 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
   protected void doDescriptorConfig(M artifactModel, T descriptor, File artifactLocation) {
     descriptor.setArtifactLocation(artifactLocation);
     descriptor.setRedeploymentEnabled(artifactModel.isRedeploymentEnabled());
-    List<String> configs = artifactModel.getConfigs();
+    Set<String> configs = artifactModel.getConfigs();
     if (configs != null && !configs.isEmpty()) {
       descriptor.setConfigResources(configs.stream()
-          .collect(toList()));
+          .collect(toSet()));
     } else {
-      descriptor.setConfigResources(ImmutableList.<String>builder().add(getDefaultConfigurationResource()).build());
+      descriptor.setConfigResources(ImmutableSet.<String>builder().add(getDefaultConfigurationResource()).build());
     }
 
     try {
