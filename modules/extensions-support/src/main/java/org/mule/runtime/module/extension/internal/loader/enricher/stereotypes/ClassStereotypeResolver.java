@@ -16,6 +16,11 @@ import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
+/**
+ * {@link StereotypeResolver} implementation for java classes.
+ *
+ * @since 4.0
+ */
 class ClassStereotypeResolver extends StereotypeResolver<Type> {
 
   public ClassStereotypeResolver(Type annotatedElement,

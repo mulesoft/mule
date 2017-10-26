@@ -28,6 +28,11 @@ import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotatio
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
+/**
+ * Base implementation for objects that given an {@link WithAnnotations annotated element} resolves it's stereotype.
+ *
+ * @since 4.0
+ */
 abstract class StereotypeResolver<T extends WithAnnotations> {
 
   protected final T annotatedElement;

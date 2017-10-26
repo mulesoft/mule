@@ -30,6 +30,11 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * {@link StereotypeResolver} implementation for java methods.
+ *
+ * @since 4.0
+ */
 class MethodStereotypeResolver extends StereotypeResolver<MethodElement> {
 
 
