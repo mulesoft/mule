@@ -15,19 +15,26 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.transactional.connection.TestLocalTransactionalConnection;
-
-import org.junit.Test;
 
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 public class TransactionalOperationTestCase extends AbstractExtensionFunctionalTestCase {
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Override
   protected String getConfigFile() {
@@ -91,5 +98,17 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
     Integer id2 = it.next();
 
     assertThat(id1, not(equalTo(id2)));
+  }
+
+  @Test
+  public void cantNestTransactions() throws Exception {
+    expectedException.expectMessage("Non-XA transactions can't be nested.");
+    expectedException.expectCause(is(instanceOf(IllegalTransactionStateException.class)));
+    flowRunner("cantNestTransactions").run();
+  }
+
+  @Test
+  public void operationJoinsAlreadyCreatedTx() throws Exception {
+    flowRunner("operationJoinsAlreadyCreatedTx").run();
   }
 }
