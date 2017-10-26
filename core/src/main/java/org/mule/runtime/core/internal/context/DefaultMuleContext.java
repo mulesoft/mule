@@ -185,6 +185,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   private ServerNotificationManager notificationManager;
 
   private MuleConfiguration config;
+  private String id;
 
   /**
    * the date in milliseconds from when the server was started
@@ -277,6 +278,8 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
       }
 
       try {
+        id = getConfiguration().getDomainId() + "." + getClusterId() + "." + getConfiguration().getId();
+
         // Initialize the helper, this only initialises the helper class and does not call the registry lifecycle manager
         // The registry lifecycle is called below using 'getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);'
         getRegistry().initialise();
@@ -1033,8 +1036,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
   @Override
   public String getId() {
-    MuleConfiguration conf = getConfiguration();
-    return conf.getDomainId() + "." + getClusterId() + "." + conf.getId();
+    return id;
   }
 
   public void setErrorTypeLocator(ErrorTypeLocator errorTypeLocator) {

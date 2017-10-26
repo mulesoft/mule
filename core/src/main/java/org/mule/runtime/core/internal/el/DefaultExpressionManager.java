@@ -12,10 +12,12 @@ import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
@@ -41,13 +43,13 @@ import org.mule.runtime.core.internal.util.OneTimeWarning;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 
+import org.slf4j.Logger;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
 
@@ -56,7 +58,6 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public static final String PREFIX_EXPR_SEPARATOR = ":";
   public static final int DW_PREFIX_LENGTH = (DW_PREFIX + PREFIX_EXPR_SEPARATOR).length();
   private static final Logger LOGGER = getLogger(DefaultExpressionManager.class);
-  protected static final String COMPATILIBILITY_PLUGIN_INSTALLED = "_compatilibilityPluginInstalled";
 
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
                                                                  "Expression parsing is deprecated, regular expressions should be used instead.");
@@ -79,7 +80,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
           DataWeaveExpressionLanguageAdaptor.create(muleContext, registry);
 
       MVELExpressionLanguage mvelExpressionLanguage = null;
-      if (registry.lookupByName(COMPATILIBILITY_PLUGIN_INSTALLED).isPresent()) {
+      if (registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent()) {
         mvelExpressionLanguage = registry.<MVELExpressionLanguage>lookupByName(OBJECT_EXPRESSION_LANGUAGE).get();
       }
       this.expressionLanguage = new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage);

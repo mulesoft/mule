@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
@@ -13,6 +14,7 @@ import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.process;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -40,7 +42,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -138,42 +139,49 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
 
   private PolicyPointcutParameters createSourcePointcutParameters(Component source,
                                                                   CoreEvent sourceEvent) {
+    ComponentIdentifier sourceIdentifier = source.getLocation().getComponentIdentifier().getIdentifier();
+
     return createPointcutParameters(source, SourcePolicyPointcutParametersFactory.class, sourcePointcutFactories,
-                                    factory -> factory
-                                        .supportsSourceIdentifier(source.getLocation().getComponentIdentifier().getIdentifier()),
+                                    factory -> factory.supportsSourceIdentifier(sourceIdentifier),
                                     factory -> factory.createPolicyPointcutParameters(source,
                                                                                       sourceEvent.getMessage().getAttributes()));
   }
 
   private PolicyPointcutParameters createOperationPointcutParameters(Component operation,
                                                                      Map<String, Object> operationParameters) {
+    ComponentIdentifier operationIdentifier = operation.getLocation().getComponentIdentifier().getIdentifier();
+
     return createPointcutParameters(operation, OperationPolicyPointcutParametersFactory.class, operationPointcutFactories,
-                                    factory -> factory
-                                        .supportsOperationIdentifier(operation.getLocation().getComponentIdentifier()
-                                            .getIdentifier()),
+                                    factory -> factory.supportsOperationIdentifier(operationIdentifier),
                                     factory -> factory.createPolicyPointcutParameters(operation, operationParameters));
   }
 
   private <T> PolicyPointcutParameters createPointcutParameters(Component component, Class<T> factoryType,
                                                                 Collection<T> factories, Predicate<T> factoryFilter,
                                                                 Function<T, PolicyPointcutParameters> policyPointcutParametersCreationFunction) {
-    List<T> policyPointcutParametersFactories = factories.stream()
-        .filter(factoryFilter)
-        .collect(Collectors.toList());
-    if (policyPointcutParametersFactories.size() > 1) {
-      return throwMoreThanOneFactoryFoundException(component.getLocation().getComponentIdentifier().getIdentifier(), factoryType);
+    T found = null;
+
+    for (T factory : factories) {
+      if (factoryFilter.test(factory)) {
+        if (found != null) {
+          throwMoreThanOneFactoryFoundException(component.getLocation().getComponentIdentifier().getIdentifier(), factoryType);
+        }
+        found = factory;
+      }
     }
-    if (policyPointcutParametersFactories.isEmpty()) {
+
+    if (found == null) {
       return new PolicyPointcutParameters(component);
+    } else {
+      return policyPointcutParametersCreationFunction.apply(found);
     }
-    return policyPointcutParametersCreationFunction.apply(policyPointcutParametersFactories.get(0));
   }
 
   private PolicyPointcutParameters throwMoreThanOneFactoryFoundException(ComponentIdentifier sourceIdentifier,
                                                                          Class factoryClass) {
-    throw new MuleRuntimeException(createStaticMessage(String.format(
-                                                                     "More than one %s for component %s was found. There should be only one.",
-                                                                     factoryClass.getName(), sourceIdentifier)));
+    throw new MuleRuntimeException(createStaticMessage(format(
+                                                              "More than one %s for component %s was found. There should be only one.",
+                                                              factoryClass.getName(), sourceIdentifier)));
   }
 
   @Override

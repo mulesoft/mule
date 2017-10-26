@@ -12,18 +12,20 @@ import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoProcessor;
@@ -43,7 +45,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   private transient MonoProcessor<Void> completionProcessor;
   private transient Disposable completionSubscriberDisposable;
   private transient final List<BaseEventContext> childContexts = new LinkedList<>();
-  private transient Mono<Void> completionCallback = empty();
+  private transient Mono<Void> completionCallback;
   private transient FlowExceptionHandler exceptionHandler;
 
   public AbstractEventContext() {
@@ -57,10 +59,6 @@ abstract class AbstractEventContext implements BaseEventContext {
   public AbstractEventContext(FlowExceptionHandler exceptionHandler, Publisher<Void> completionCallback) {
     this.completionCallback = from(completionCallback);
     this.exceptionHandler = exceptionHandler;
-    initCompletionProcessor();
-  }
-
-  private void initCompletionProcessor() {
     beforeResponseProcessor = MonoProcessor.create();
     responseProcessor = MonoProcessor.create();
     responseProcessor.doOnEach(s -> s.accept(beforeResponseProcessor)).subscribe(requestUnbounded());
