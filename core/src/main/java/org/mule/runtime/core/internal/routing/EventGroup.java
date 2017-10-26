@@ -272,7 +272,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
   public void clear() throws ObjectStoreException {
     synchronized (this) {
       eventsObjectStore.clear(eventsPartitionKey);
-      eventsObjectStore.close(eventsPartitionKey);
+      eventsObjectStore.disposePartition(eventsPartitionKey);
     }
   }
 
