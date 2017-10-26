@@ -13,6 +13,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
@@ -26,11 +29,9 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.UUID;
 import org.mule.util.store.DefaultObjectStoreFactoryBean;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.IteratorUtils;
@@ -277,7 +278,18 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
             messageCopy.setCorrelationSequence(i);
             group.addEvent(new DefaultMuleEvent(messageCopy, testEvent, true, true));
         }
+    }
 
+    @Test
+    public void isDisposedEventGroupPartition() throws Exception
+    {
+        EventGroup eventGroup = new EventGroup(UUID.getUUID(), muleContext);
+        PartitionableObjectStore objectStore = mock(PartitionableObjectStore.class);
+        eventGroup.initEventsStore(objectStore);
+
+        eventGroup.clear();
+
+        verify(objectStore).disposePartition(anyString());
     }
 
     private static class MyEventGroup extends EventGroup
