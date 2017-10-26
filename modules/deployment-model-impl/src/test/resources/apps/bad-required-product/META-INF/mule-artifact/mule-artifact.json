@@ -1,0 +1,19 @@
+{
+  "name": "App",
+  "minMuleVersion": "4.0.0",
+  "requiredProduct": "MMC",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": []
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  },
+  "configs": [
+    "file1.xml", "file2.xml"
+  ]
+}
