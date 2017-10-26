@@ -394,7 +394,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         synchronized (this)
         {
             eventsObjectStore.clear(eventsPartitionKey);
-            eventsObjectStore.close(eventsPartitionKey);
+            eventsObjectStore.disposePartition(eventsPartitionKey);
         }
     }
 
