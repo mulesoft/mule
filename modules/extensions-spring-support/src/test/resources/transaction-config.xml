@@ -97,9 +97,9 @@
     <flow name="operationJoinsAlreadyCreatedTx">
         <try transactionalAction="ALWAYS_BEGIN">
             <tx:verify-transaction-begun config-ref="localTx1"/>
+            <tx:get-connection config-ref="localTx1"/>
             <try transactionalAction="BEGIN_OR_JOIN">
                 <tx:verify-transaction-begun config-ref="localTx1"/>
-                <tx:get-connection config-ref="localTx1"/>
                 <tx:verify-same-connection config-ref="localTx1"/>
             </try>
         </try>
