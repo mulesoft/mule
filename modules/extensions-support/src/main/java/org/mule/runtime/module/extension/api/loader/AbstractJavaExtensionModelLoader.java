@@ -40,7 +40,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.ParameterAllow
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RedeliveryPolicyDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.StereotypesDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
@@ -95,6 +95,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new DefaultEncodingDeclarationEnricher(),
                                                                                                new ConnectionDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
+                                                                                               new JavaExportedTypesDeclarationEnricher(),
                                                                                                new StereotypesDeclarationEnricher(),
                                                                                                new ExtensionsErrorsDeclarationEnricher(),
                                                                                                //TODO: MOVE TO EXT_API when https://www.mulesoft.org/jira/browse/MULE-13070
@@ -103,7 +104,6 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new DynamicMetadataDeclarationEnricher(),
                                                                                                new ImportedTypesDeclarationEnricher(),
                                                                                                new JavaConfigurationDeclarationEnricher(),
-                                                                                               new JavaExportedTypesDeclarationEnricher(),
                                                                                                new JavaPrivilegedExportedTypesDeclarationEnricher(),
                                                                                                new JavaOAuthDeclarationEnricher(),
                                                                                                new RedeliveryPolicyDeclarationEnricher(),

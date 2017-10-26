@@ -19,7 +19,7 @@ import org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate;
 import org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator;
 import org.mule.runtime.extension.internal.loader.validator.CorrectXmlNamesValidator;
 import org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator;
-import org.mule.runtime.module.extension.internal.loader.enricher.StereotypesDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
 
 import java.util.List;
 import java.util.Optional;

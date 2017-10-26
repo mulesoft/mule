@@ -15,22 +15,28 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
+import static org.mule.test.marvel.drstrange.DrStrangeStereotypeDefinition.DR_STRANGE_STEREOTYPE_NAME;
 import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
+
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.marvel.drstrange.DrStrange;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.junit.Test;
 
-public class ParameterAllowedStereotypesDeclarionEnricherTestCase extends AbstractMuleTestCase {
+public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   private final ExtensionModel extension = loadExtension(MarvelExtension.class);
   private final ConfigurationModel configuration = extension.getConfigurationModel(DrStrange.CONFIG_NAME).get();
@@ -53,6 +59,18 @@ public class ParameterAllowedStereotypesDeclarionEnricherTestCase extends Abstra
     assertThat(osParam.getAllowedStereotypes(), hasSize(1));
     StereotypeModel stereotypeModel = osParam.getAllowedStereotypes().get(0);
     assertThat(stereotypeModel, is(OBJECT_STORE));
+  }
+
+  @Test
+  public void exportedTypesWithStereotypes() {
+    Optional<ObjectType> withStereoType = extension.getTypes().stream()
+        .filter(type -> type.getAnnotation(StereotypeTypeAnnotation.class).isPresent())
+        .findFirst();
+    assertThat(withStereoType.isPresent(), is(true));
+    Optional<StereotypeTypeAnnotation> stereotype = withStereoType.get().getAnnotation(StereotypeTypeAnnotation.class);
+    List<StereotypeModel> allowedStereotypes = stereotype.get().getAllowedStereotypes();
+    assertThat(allowedStereotypes, hasSize(1));
+    assertStereotype(allowedStereotypes.get(0), MARVEL_EXTENSION, DR_STRANGE_STEREOTYPE_NAME, null);
   }
 
   @Test
