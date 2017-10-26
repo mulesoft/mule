@@ -60,7 +60,6 @@ public class MinimalApplicationModelGenerator {
         enableComponentDependencies(componentModel);
       }
     });
-    dependencyResolver.enableEagerComponentModels();
     return dependencyResolver.getApplicationModel();
   }
 
@@ -74,7 +73,6 @@ public class MinimalApplicationModelGenerator {
   public ApplicationModel getMinimalModel(Location location) {
     ComponentModel requestedComponentModel = dependencyResolver.findRequiredComponentModel(location);
     enableComponentDependencies(requestedComponentModel);
-    dependencyResolver.enableEagerComponentModels();
     return dependencyResolver.getApplicationModel();
   }
 

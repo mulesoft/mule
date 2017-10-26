@@ -60,11 +60,11 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   @Inject
   protected NotificationDispatcher notificationFirer;
 
-  protected List<Processor> messageProcessors = new CopyOnWriteArrayList<>();
+  private List<Processor> messageProcessors = new CopyOnWriteArrayList<>();
 
-  protected AtomicBoolean initialised = new AtomicBoolean(false);
+  private AtomicBoolean initialised = new AtomicBoolean(false);
 
-  protected boolean enableNotifications = true;
+  private boolean enableNotifications = true;
   protected String logException = TRUE.toString();
 
   protected FlowConstructStatistics statistics;

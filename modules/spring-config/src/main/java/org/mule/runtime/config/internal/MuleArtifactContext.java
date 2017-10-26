@@ -34,6 +34,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -89,10 +90,12 @@ import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -517,13 +520,21 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
             .collect(toList()));
     registerObjectFromObjectProviders(beanFactory);
 
-    createdComponentModels.sort((beanName1, beanName2) -> {
-      if (objectProvidersByName.stream().map(Pair::getSecond).filter(Optional::isPresent)
-          .anyMatch(name -> name.equals(beanName1))) {
+    Set<String> alwaysEnabledComponents = dependencyResolver.resolveAlwaysEnabledComponents();
+    Set<String> objectProviderNames = objectProvidersByName.stream().map(Pair::getSecond).filter(Optional::isPresent)
+        .map(Optional::get).collect(Collectors.toSet());
+
+    // Put object providers first, then always enabled components, then the rest
+    createdComponentModels.sort(Comparator.comparing(beanName -> {
+      if (objectProviderNames.contains(beanName)) {
         return 1;
+      } else if (alwaysEnabledComponents.contains(beanName)) {
+        return 2;
+      } else {
+        return 3;
       }
-      return -1;
-    });
+    }));
+
     return createdComponentModels;
   }
 
