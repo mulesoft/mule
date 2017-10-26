@@ -6,66 +6,51 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import static org.mockito.Answers.RETURNS_MOCKS;
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
-import org.mockito.Answers;
-import org.mockito.Mockito;
-
 public class TransactionTemplateTestUtils {
 
-  public static ExecutionCallback getEmptyTransactionCallback(final CoreEvent returnObject) {
-    return new ExecutionCallback<CoreEvent>() {
-
-      @Override
-      public CoreEvent process() throws Exception {
-        return returnObject;
-      }
-    };
+  public static ExecutionCallback<CoreEvent> getEmptyTransactionCallback(final CoreEvent returnObject) {
+    return () -> returnObject;
   }
 
   public static ExecutionCallback<CoreEvent> getRollbackTransactionCallback(final CoreEvent returnObject) {
-    return new ExecutionCallback() {
+    return () -> {
+      TransactionCoordination.getInstance().getTransaction().setRollbackOnly();
+      return returnObject;
+    };
+  }
 
-      @Override
-      public CoreEvent process() throws Exception {
-        TransactionCoordination.getInstance().getTransaction().setRollbackOnly();
-        return returnObject;
-      }
+  public static ExecutionCallback<CoreEvent> getCommitTransactionCallback(final CoreEvent returnObject) {
+    return () -> {
+      TransactionCoordination.getInstance().getTransaction().commit();
+      return returnObject;
     };
   }
 
   public static ExecutionCallback<CoreEvent> getFailureTransactionCallback() throws Exception {
-    return new ExecutionCallback<CoreEvent>() {
-
-      @Override
-      public CoreEvent process() throws Exception {
-        throw Mockito.mock(MessagingException.class, Answers.RETURNS_MOCKS.get());
-      }
+    return () -> {
+      throw mock(MessagingException.class, RETURNS_MOCKS.get());
     };
   }
 
   public static ExecutionCallback<CoreEvent> getFailureTransactionCallback(final MessagingException mockMessagingException)
       throws Exception {
-    return new ExecutionCallback<CoreEvent>() {
-
-      @Override
-      public CoreEvent process() throws Exception {
-        throw mockMessagingException;
-      }
+    return () -> {
+      throw mockMessagingException;
     };
   }
 
   public static ExecutionCallback<CoreEvent> getFailureTransactionCallbackStartsTransaction(final MessagingException mockMessagingException,
                                                                                             final Transaction mockTransaction) {
-    return new ExecutionCallback<CoreEvent>() {
-
-      @Override
-      public CoreEvent process() throws Exception {
-        TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-        throw mockMessagingException;
-      }
+    return () -> {
+      TransactionCoordination.getInstance().bindTransaction(mockTransaction);
+      throw mockMessagingException;
     };
   }
 
