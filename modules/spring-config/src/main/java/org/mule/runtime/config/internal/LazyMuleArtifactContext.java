@@ -36,15 +36,13 @@ import org.mule.runtime.config.internal.dsl.model.MinimalApplicationModelGenerat
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
+import org.mule.runtime.core.api.config.MuleDeploymentProperties;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -79,8 +77,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
                                  List<ClassLoader> pluginsClassLoaders,
                                  Optional<ConfigurationProperties> parentConfigurationProperties, boolean disableXmlValidations)
       throws BeansException {
-    super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController, artifactProperties,
-          artifactType, pluginsClassLoaders, parentConfigurationProperties, disableXmlValidations);
+    super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
+          extendArtifactProperties(artifactProperties), artifactType, pluginsClassLoaders, parentConfigurationProperties,
+          disableXmlValidations);
     this.applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
 
     muleContext.getCustomizationService().overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
@@ -104,6 +103,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
 
 
     muleContext.getCustomizationService().overrideDefaultServiceImpl(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, this);
+  }
+
+  private static Map<String, String> extendArtifactProperties(Map<String, String> artifactProperties) {
+    Map<String, String> extendedArtifactProperties = new HashMap<>(artifactProperties);
+    extendedArtifactProperties.put(MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "true");
+    return extendedArtifactProperties;
   }
 
   @Override
