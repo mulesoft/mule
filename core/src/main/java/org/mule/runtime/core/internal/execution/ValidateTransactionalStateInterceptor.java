@@ -25,7 +25,6 @@ public class ValidateTransactionalStateInterceptor<T> implements ExecutionInterc
     this.transactionConfig = transactionConfig;
   }
 
-  //TODO ADD VALIDATION
   @Override
   public T execute(ExecutionCallback<T> callback, ExecutionContext executionContext) throws Exception {
     Transaction tx = TransactionCoordination.getInstance().getTransaction();
