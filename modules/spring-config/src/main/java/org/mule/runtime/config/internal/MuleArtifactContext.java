@@ -521,7 +521,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     registerObjectFromObjectProviders(beanFactory);
 
     Set<String> alwaysEnabledComponents = dependencyResolver.resolveAlwaysEnabledComponents();
-    Set<String> objectProviderNames = objectProvidersByName.stream().map(Pair::getSecond).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+    Set<String> objectProviderNames = objectProvidersByName.stream().map(Pair::getSecond).filter(Optional::isPresent)
+        .map(Optional::get).collect(Collectors.toSet());
 
     // Put object providers first, then always enabled components, then the rest
     createdComponentModels.sort(Comparator.comparing(beanName -> {

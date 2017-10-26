@@ -59,6 +59,7 @@ public class ComponentBuildingDefinition<T> {
   private Optional<TypeConverter> typeConverter = empty();
   private Optional<TypeConverter> keyTypeConverter = empty();
   private boolean alwaysEnabled = false;
+  private String gloablName;
 
   private ComponentBuildingDefinition() {}
 
@@ -146,6 +147,13 @@ public class ComponentBuildingDefinition<T> {
    */
   public boolean isNamed() {
     return named;
+  }
+
+  /**
+   * @return a name if the component is a global singleton, otherwise null
+   */
+  public String getGloablName() {
+    return gloablName;
   }
 
   /**
@@ -275,6 +283,18 @@ public class ComponentBuildingDefinition<T> {
     }
 
     /**
+     * Set the component name, intended for top level singletons without a name attribute.
+     *
+     * @param name the component name
+     * @return a copy of ${@code this} builder
+     */
+    public Builder<T> withGlobalName(String name) {
+      Builder<T> next = copy();
+      next.definition.gloablName = name;
+      return next;
+    }
+
+    /**
      * Used to declare that the object to be created is an scope.
      *
      * @return a copy of {@code this} builder
@@ -351,6 +371,7 @@ public class ComponentBuildingDefinition<T> {
       builder.definition.typeDefinition = this.definition.typeDefinition;
       builder.definition.objectFactoryType = this.definition.objectFactoryType;
       builder.definition.alwaysEnabled = this.definition.alwaysEnabled;
+      builder.definition.gloablName = this.definition.gloablName;
 
       if (definition.isNamed()) {
         builder.definition.named = true;
