@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.contains;
@@ -48,6 +49,7 @@ import java.net.URISyntaxException;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -253,11 +255,32 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   @Test
+  public void missingRequiredProduct() throws Exception {
+    String artifactName = "no-required-product";
+    requiredProductValidationExpectedException(artifactName);
+    createArtifactDescriptor(getArtifactRootFolder() + artifactName);
+  }
+
+  @Test
+  public void wrongRequiredProductValue() throws Exception {
+    String artifactName = "bad-required-product";
+    requiredProductValidationExpectedException(artifactName);
+    createArtifactDescriptor(getArtifactRootFolder() + artifactName);
+  }
+
+  @Test
   public void descriptorWithNoRevisionVersion() throws Exception {
     expectedException.expect(IllegalStateException.class);
     expectedException
         .expectMessage("Artifact no-revision-artifact version 1.0 must contain a revision number. The version format must be x.y.z and the z part is missing");
     createArtifactDescriptor(getArtifactRootFolder() + "no-revision-artifact");
+  }
+
+  private void requiredProductValidationExpectedException(String appName) {
+    expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage(Matchers
+        .containsString(format("The artifact %s does not specifies a requiredProduct or the specified value is not valid. Valid values are MULE, MULE_EE",
+                               appName)));
   }
 
   protected abstract String getArtifactRootFolder();
