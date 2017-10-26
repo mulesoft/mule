@@ -80,6 +80,11 @@ public interface BaseEventContext extends EventContext {
   Optional<BaseEventContext> getParentContext();
 
   /**
+   * @return {@code this} context's root context or the same instance if the root is itself.
+   */
+  BaseEventContext getRootContext();
+
+  /**
    * A {@link Publisher} that completes when a response is ready or an error was produced for this {@link BaseEventContext} but
    * importantly before the Response {@link Publisher} obtained via {@link #getResponsePublisher()} completes. This allows for
    * response subscribers that are executed before the source, client or parent flow receives to be registered. In order to
