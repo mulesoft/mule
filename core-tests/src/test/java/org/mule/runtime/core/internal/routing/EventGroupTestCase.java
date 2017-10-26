@@ -14,6 +14,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.message.Message;
@@ -254,6 +257,15 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     assertThat(messages.get(0).getPayload().getValue(), is("foo0"));
     assertThat(messages.get(1).getPayload().getValue(), is("foo1"));
     assertThat(messages.get(2).getPayload().getValue(), is("foo2"));
+  }
+
+  @Test
+  public void isDisposedEventGroupPartition() throws Exception {
+    EventGroup eventGroup = new EventGroup(UUID.getUUID(), muleContext);
+    PartitionableObjectStore objectStore = mock(PartitionableObjectStore.class);
+    eventGroup.initEventsStore(objectStore);
+    eventGroup.clear();
+    verify(objectStore).disposePartition(anyString());
   }
 
   private static class MyEventGroup extends EventGroup {
