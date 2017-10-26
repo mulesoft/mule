@@ -3781,6 +3781,52 @@
       "format": "java",
       "type": "Object",
       "annotations": {
+        "typeId": "org.mule.test.marvel.drstrange.DrStrangeTypeWithCustomStereotype",
+        "classInformation": {
+          "classname": "org.mule.test.marvel.drstrange.DrStrangeTypeWithCustomStereotype",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "DrStrangeTypeWithCustomStereotype"
+        },
+        "stereotype": {
+          "allowedStereotypes": [
+            {
+              "type": "DR_STRANGE_STEREOTYPE",
+              "namespace": "MARVEL"
+            }
+          ]
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "storeName",
+            "required": "true"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
         "typeId": "org.mule.test.marvel.ironman.IronMan",
         "classInformation": {
           "classname": "org.mule.test.marvel.ironman.IronMan",
