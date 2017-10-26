@@ -20,6 +20,7 @@ import static org.mule.runtime.config.internal.LazyMetadataService.NON_LAZY_META
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -179,6 +180,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
 
       List<String> applicationComponents =
           createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel.get(), false);
+
       createdComponents.set(applicationComponents);
 
       super.prepareObjectProviders();

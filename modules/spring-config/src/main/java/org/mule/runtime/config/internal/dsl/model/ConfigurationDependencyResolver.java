@@ -25,9 +25,6 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
@@ -37,6 +34,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConfigurationDependencyResolver implements BeanDependencyResolver {
 
@@ -93,10 +93,13 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
       }
     }
 
-    // Just case for flow-ref
-    if (isFlowRef(requestedComponentModel.getIdentifier())) {
+    // Special cases for flow-ref and configuration
+    if (isCoreComponent(requestedComponentModel.getIdentifier(), "flow-ref")) {
       appendDependency(otherDependencies, requestedComponentModel, "name");
+    } else if (isCoreComponent(requestedComponentModel.getIdentifier(), "configuration")) {
+      appendDependency(otherDependencies, requestedComponentModel, "defaultErrorHandler-ref");
     }
+
     return otherDependencies;
   }
 
@@ -130,8 +133,8 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     }
   }
 
-  private boolean isFlowRef(ComponentIdentifier componentIdentifier) {
-    return componentIdentifier.getNamespace().equals(CORE_PREFIX) && componentIdentifier.getName().equals("flow-ref");
+  private boolean isCoreComponent(ComponentIdentifier componentIdentifier, String name) {
+    return componentIdentifier.getNamespace().equals(CORE_PREFIX) && componentIdentifier.getName().equals(name);
   }
 
   private ComponentModel findRequiredComponentModel(String name) {
@@ -181,21 +184,6 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return applicationModel;
   }
 
-  /**
-   * Enables all {@link ComponentModel}s which {@link ComponentBuildingDefinition#alwaysEnabled} is set to true.
-   */
-  public void enableEagerComponentModels() {
-    this.applicationModel.executeOnEveryComponentTree(componentModel -> {
-      Optional<ComponentBuildingDefinition<?>> buildingDefinition =
-          this.componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
-      buildingDefinition.ifPresent(definition -> {
-        if (definition.isAlwaysEnabled()) {
-          componentModel.setEnabled(true);
-        }
-      });
-    });
-  }
-
   @Override
   public Collection<Object> resolveBeanDependencies(Set<String> beanNames) {
     return null;
@@ -218,7 +206,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
    */
   public Set<String> resolveAlwaysEnabledComponents() {
     ImmutableSet.Builder<String> namesBuilder = ImmutableSet.builder();
-    this.applicationModel.executeOnEveryComponentTree(componentModel -> {
+    this.applicationModel.executeOnEveryRootElement(componentModel -> {
       Optional<ComponentBuildingDefinition<?>> buildingDefinition =
           this.componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
       buildingDefinition.ifPresent(definition -> {
