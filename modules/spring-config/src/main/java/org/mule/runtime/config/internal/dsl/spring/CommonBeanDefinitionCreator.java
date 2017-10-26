@@ -91,7 +91,6 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         }
       } catch (Exception | ServiceConfigurationError e) {
         // Nothing to do, we just don't have compatibility plugin in the app
-        System.out.println("");
       }
     }
     return (componentModel, helper) -> {
@@ -164,13 +163,13 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
    * correct {@link ProcessingStrategy} will be picked up. Without that, all the streams managed by the runtime
    * ({@link CursorStreamProvider} won't be properly handled, ending up in closed streams or even deadlocks.
    * <p/>
-   * Any alteration on this method should be tightly coupled with {@link ModuleOperationMessageProcessorChainFactoryBean#doGetObject()},
-   * which internally relies on
+   * Any alteration on this method should be tightly coupled with
+   * {@link ModuleOperationMessageProcessorChainFactoryBean#doGetObject()}, which internally relies on
    * {@link DefaultMessageProcessorChainBuilder#newLazyProcessorChainBuilder(org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder, org.mule.runtime.core.api.MuleContext, java.util.function.Supplier)}
    *
    * @param componentModel that might contain the <flow/>'s name attribute as a custom attribute
    * @param annotations to alter by adding the {@link AbstractComponent#ROOT_CONTAINER_NAME_KEY} if the component model has the
-   *                    name of the flow.
+   *        name of the flow.
    */
   private void processMacroExpandedAnnotations(ComponentModel componentModel, Map<QName, Object> annotations) {
     if (componentModel.getCustomAttributes().containsKey(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME)) {
