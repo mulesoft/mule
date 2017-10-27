@@ -17,7 +17,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.newCh
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -31,10 +30,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.privileged.processor.Router;
+import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-
-import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.function.Function;
@@ -42,13 +39,14 @@ import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
  * UntilSuccessful attempts to route a message to the message processor it contains. Routing is considered successful if no
  * exception has been raised and, optionally, if the response matches an expression.
  */
-public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
+public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
       "'until-successful' retries exhausted. Last exception message was: %s";

@@ -138,24 +138,15 @@ public class ExtensionModelHelper {
             List<HasSourceModels> sourceModelsProviders = ImmutableList.<HasSourceModels>builder()
                 .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
             List<HasConstructModels> constructModelsProviders = singletonList(extensionModel);
-            for (HasOperationModels operationModelsProvider : operationModelsProviders) {
-              Optional<OperationModel> operationModel = operationModelsProvider.getOperationModel(componentName);
-              if (operationModel.isPresent()) {
-                return operationModel;
-              }
+
+            Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> componentModel =
+                resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName);
+            //TODO MULE-13894 remove this once unified extensionModel names to use camelCase (see smart connectors and crafted declared extesion models)
+            if (!componentModel.isPresent()) {
+              componentModel = resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
+                                            componentIdentifier.getName());
             }
-            for (HasSourceModels sourceModelsProvider : sourceModelsProviders) {
-              Optional<SourceModel> sourceModel = sourceModelsProvider.getSourceModel(componentName);
-              if (sourceModel.isPresent()) {
-                return sourceModel;
-              }
-            }
-            for (HasConstructModels constructModelsProvider : constructModelsProviders) {
-              Optional<ConstructModel> constructModel = constructModelsProvider.getConstructModel(componentName);
-              if (constructModel.isPresent()) {
-                return constructModel;
-              }
-            }
+            return componentModel;
           }
         }
         return empty();
@@ -163,6 +154,31 @@ public class ExtensionModelHelper {
     } catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  private Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> resolveModel(List<HasOperationModels> operationModelsProviders,
+                                                                                          List<HasSourceModels> sourceModelsProviders,
+                                                                                          List<HasConstructModels> constructModelsProviders,
+                                                                                          String componentName) {
+    for (HasOperationModels operationModelsProvider : operationModelsProviders) {
+      Optional<OperationModel> operationModel = operationModelsProvider.getOperationModel(componentName);
+      if (operationModel.isPresent()) {
+        return operationModel;
+      }
+    }
+    for (HasSourceModels sourceModelsProvider : sourceModelsProviders) {
+      Optional<SourceModel> sourceModel = sourceModelsProvider.getSourceModel(componentName);
+      if (sourceModel.isPresent()) {
+        return sourceModel;
+      }
+    }
+    for (HasConstructModels constructModelsProvider : constructModelsProviders) {
+      Optional<ConstructModel> constructModel = constructModelsProvider.getConstructModel(componentName);
+      if (constructModel.isPresent()) {
+        return constructModel;
+      }
+    }
+    return empty();
   }
 
   /**

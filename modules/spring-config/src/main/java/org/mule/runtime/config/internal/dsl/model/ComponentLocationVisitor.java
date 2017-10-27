@@ -24,7 +24,6 @@ import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.i
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isProcessor;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isRouter;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
-import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
 import static org.mule.runtime.config.internal.model.ApplicationModel.HTTP_PROXY_OPERATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.HTTP_PROXY_POLICY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.HTTP_PROXY_SOURCE_POLICY_IDENTIFIER;
@@ -92,8 +91,9 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
     }
     DefaultComponentLocation componentLocation;
     Optional<TypedComponentIdentifier> typedComponentIdentifier =
-        of(builder().identifier(componentModel.getIdentifier()).type(resolveComponentType(componentModel, extensionModelHelper))
+        of(builder().identifier(componentModel.getIdentifier()).type(componentModel.getComponentType().orElse(UNKNOWN))
             .build());
+
     if (componentModel.isRoot()) {
       String componentModelNameAttribute = componentModel.getNameAttribute();
       ImmutableList<DefaultLocationPart> parts =
