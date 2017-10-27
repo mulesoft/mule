@@ -85,7 +85,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
    */
   protected final T loadFromJsonDescriptor(File artifactLocation, M artifactModel, Optional<Properties> deploymentProperties) {
 
-    artifactModel.validateMandatoryFieldsSet(artifactLocation.getName());
+    artifactModel.validateModel(artifactLocation.getName());
 
     final T descriptor = createArtifactDescriptor(artifactLocation, artifactModel.getName(), deploymentProperties);
     if (artifactLocation.isDirectory()) {
