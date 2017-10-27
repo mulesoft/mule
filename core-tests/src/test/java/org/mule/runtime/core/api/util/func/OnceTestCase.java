@@ -10,6 +10,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.func.Once.ConsumeOnce;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -56,7 +57,7 @@ public class OnceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void concurrentOnce() {
+  public void concurrentRun() {
     Latch controlLath = new Latch();
     Latch testLath = new Latch();
 
@@ -79,6 +80,64 @@ public class OnceTestCase extends AbstractMuleTestCase {
     assertThat(runnable.getInvokationCount(), is(1));
   }
 
+  @Test
+  public void consumeOnlyOnce() {
+    CountingConsumer consumer = new CountingConsumer();
+    ConsumeOnce<String> once = Once.of(consumer);
+
+    once.consumeOnce("chu chu");
+    once.consumeOnce("ua ua ua");
+
+    assertThat(consumer.getInvokationCount(), is(1));
+  }
+
+  @Test
+  public void consumeUntilSuccessful() {
+    CountingConsumer consumer = new CountingConsumer();
+    ConsumeOnce<String> once = Once.of(value -> {
+      consumer.accept(value);
+      int count = consumer.getInvokationCount();
+      if (count < 3) {
+        throw new RuntimeException();
+      }
+    });
+
+    for (int i = 0; i < 5; i++) {
+      try {
+        once.consumeOnce("value");
+        break;
+      } catch (Exception e) {
+
+      }
+    }
+
+    assertThat(consumer.getInvokationCount(), is(3));
+  }
+
+  @Test
+  public void concurrentConsume() {
+    Latch controlLath = new Latch();
+    Latch testLath = new Latch();
+
+    CountingConsumer consumer = new CountingConsumer();
+    ConsumeOnce<String> once = Once.of(consumer);
+
+    new Thread(() -> {
+      await(controlLath);
+      once.consumeOnce("s");
+    }).start();
+
+    new Thread(() -> {
+      controlLath.release();
+      once.consumeOnce("s");
+      testLath.release();
+    }).start();
+
+    await(testLath);
+
+    assertThat(consumer.getInvokationCount(), is(1));
+  }
+
   private void await(Latch latch) {
     try {
       assertThat(latch.await(5, SECONDS), is(true));
@@ -93,6 +152,19 @@ public class OnceTestCase extends AbstractMuleTestCase {
 
     @Override
     public void runChecked() throws Exception {
+      invokationCount.addAndGet(1);
+    }
+
+    public int getInvokationCount() {
+      return invokationCount.get();
+    }
+  }
+
+  private class CountingConsumer implements CheckedConsumer<String> {
+    private AtomicInteger invokationCount = new AtomicInteger(0);
+
+    @Override
+    public void acceptChecked(String s) throws Throwable {
       invokationCount.addAndGet(1);
     }
 

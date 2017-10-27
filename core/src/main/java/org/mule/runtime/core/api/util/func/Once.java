@@ -57,8 +57,9 @@ public class Once {
 
     private ConsumeOnce(CheckedConsumer<T> delegate) {
       consumer = v -> withLock(lock, () -> {
-        if (done.compareAndSet(false, true)) {
+        if (!done) {
           delegate.accept(v);
+          done = true;
           consumer = x -> {
           };
         }
@@ -88,8 +89,9 @@ public class Once {
 
     private RunOnce(CheckedRunnable delegate) {
       runner = () -> withLock(lock, () -> {
-        if (done.compareAndSet(false, true)) {
+        if (!done) {
           delegate.run();
+          done = true;
           runner = () -> {
           };
         }
@@ -107,6 +109,6 @@ public class Once {
   private static abstract class AbstractOnce {
 
     protected final ReentrantLock lock = new ReentrantLock();
-    protected AtomicBoolean done = new AtomicBoolean(false);
+    protected volatile boolean done = false;
   }
 }
