@@ -161,6 +161,7 @@ public class OnceTestCase extends AbstractMuleTestCase {
   }
 
   private class CountingConsumer implements CheckedConsumer<String> {
+
     private AtomicInteger invokationCount = new AtomicInteger(0);
 
     @Override
