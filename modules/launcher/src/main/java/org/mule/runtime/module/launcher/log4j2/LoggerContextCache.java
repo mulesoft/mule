@@ -7,16 +7,19 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import static java.util.concurrent.Executors.newScheduledThreadPool;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.config.MuleProperties;
+
+import org.apache.logging.log4j.core.LifeCycle;
+import org.apache.logging.log4j.core.LoggerContext;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
@@ -25,10 +28,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.logging.log4j.core.LifeCycle;
-import org.apache.logging.log4j.core.LoggerContext;
 
 /**
  * A cache which relates {@link ClassLoader} instances with {@link LoggerContext}s
@@ -54,7 +53,7 @@ final class LoggerContextCache implements Disposable {
   private static final long DEFAULT_DISPOSE_DELAY_IN_MILLIS = 15000;
 
   private final ArtifactAwareContextSelector artifactAwareContextSelector;
-  // Extra cache layer to avid some nasty implications for using guava cache at this point. See the comments in
+  // Extra cache layer to avid some nasty implications for using Guava cache at this point. See the comments in
   // #doGetLoggerContext(final ClassLoader classLoader) for details.
   private final Map<Integer, LoggerContext> builtContexts = new ConcurrentHashMap<>();
   private final Cache<Integer, LoggerContext> activeContexts;
@@ -67,15 +66,11 @@ final class LoggerContextCache implements Disposable {
     this.artifactAwareContextSelector = artifactAwareContextSelector;
     activeContexts = CacheBuilder.newBuilder().build();
 
-    disposedContexts = CacheBuilder.newBuilder().expireAfterWrite(disposeDelayInMillis, TimeUnit.MILLISECONDS)
-        .removalListener(new RemovalListener<Integer, LoggerContext>() {
-
-          @Override
-          public void onRemoval(RemovalNotification<Integer, LoggerContext> notification) {
-            stop(notification.getValue());
-            activeContexts.invalidate(notification.getKey());
-            builtContexts.remove(notification.getKey());
-          }
+    disposedContexts = CacheBuilder.newBuilder().expireAfterWrite(disposeDelayInMillis, MILLISECONDS)
+        .removalListener(notification -> {
+          stop((LoggerContext) notification.getValue());
+          activeContexts.invalidate(notification.getKey());
+          builtContexts.remove(notification.getKey());
         }).build();
 
     executorService = newScheduledThreadPool(1, new LoggerContextReaperThreadFactory(reaperContextClassLoader));
@@ -89,7 +84,7 @@ final class LoggerContextCache implements Disposable {
 
   private void acquireContextDisposeDelay() {
     try {
-      disposeDelayInMillis = Long.valueOf(System.getProperty(MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS));
+      disposeDelayInMillis = Long.valueOf(System.getProperty(MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS));
     } catch (Exception e) {
       // value not set... ignore and use default
     }
@@ -100,17 +95,16 @@ final class LoggerContextCache implements Disposable {
   }
 
   LoggerContext getLoggerContext(final ClassLoader classLoader) {
-    final LoggerContext ctx;
+    LoggerContext ctx;
     try {
       final Integer key = computeKey(classLoader);
-      // If possible, avoid using guava cache since the callable puts unwanted pressure on the garbage collector.
-      if (builtContexts.containsKey(key)) {
-        ctx = builtContexts.get(key);
-      } else {
+      // If possible, avoid using Guava cache since the callable puts unwanted pressure on the garbage collector.
+      ctx = builtContexts.get(key);
+
+      if (ctx == null) {
         synchronized (this) {
-          if (builtContexts.containsKey(key)) {
-            ctx = builtContexts.get(key);
-          } else {
+          ctx = builtContexts.get(key);
+          if (ctx == null) {
             ctx = doGetLoggerContext(classLoader, key);
           }
         }
@@ -131,31 +125,27 @@ final class LoggerContextCache implements Disposable {
   }
 
   /**
-   * The {@link Callable} passed to the guasa cache, because
-   * 
+   * The {@link Callable} passed to the Guava cache, because
+   *
    * Guava cache will use its logging framework to log something, and that logger will end up calling here.
    * <p>
-   * With the check in the {@link Callable} passed to the guava cache, we avoid building an extra context. We cannot just use a
-   * map, because it may result in an eternal recurrent call, guava does a good job at handling that situation. It is just the
-   * logging that guava tries to do that may disrupt thing when initializing the logging infrastructure.
-   * 
+   * With the check in the {@link Callable} passed to the Guava cache, we avoid building an extra context. We cannot just use a
+   * map, because it may result in an eternal recurrent call, Guava does a good job at handling that situation. It is just the
+   * logging that Guava tries to do that may disrupt thing when initializing the logging infrastructure.
+   *
    * @param classLoader
    * @param key
    * @return
    * @throws ExecutionException
    */
   protected LoggerContext doGetLoggerContext(final ClassLoader classLoader, final Integer key) throws ExecutionException {
-    return activeContexts.get(key, new Callable<LoggerContext>() {
-
-      @Override
-      public LoggerContext call() throws Exception {
-        if (builtContexts.containsKey(key)) {
-          return builtContexts.get(key);
-        } else {
-          LoggerContext context = artifactAwareContextSelector.buildContext(classLoader);
-          builtContexts.put(key, context);
-          return context;
-        }
+    return activeContexts.get(key, () -> {
+      if (builtContexts.containsKey(key)) {
+        return builtContexts.get(key);
+      } else {
+        LoggerContext context = artifactAwareContextSelector.buildContext(classLoader);
+        builtContexts.put(key, context);
+        return context;
       }
     });
   }
@@ -189,14 +179,8 @@ final class LoggerContextCache implements Disposable {
     disposedContexts.put(key, loggerContext);
     synchronized (executorService) {
       if (!executorService.isShutdown()) {
-        executorService.schedule(new Runnable() {
-
-          @Override
-          public void run() {
-            disposedContexts.cleanUp();
-          }
-        }, disposeDelayInMillis + 1, TimeUnit.MILLISECONDS); // add one millisecond to make sure entries will be
-                                                             // expired
+        // add one millisecond to make sure entries will be expired
+        executorService.schedule(() -> disposedContexts.cleanUp(), disposeDelayInMillis + 1, MILLISECONDS);
       }
     }
   }

@@ -17,6 +17,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -29,20 +30,21 @@ import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
+import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.privileged.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,14 +63,14 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private BaseEventContext context;
   private Message message;
   private Map<String, TypedValue<?>> flowVariables = new HashMap<>();
-  private Map<String, Object> internalParameters = new HashMap<>();
+  private Map<String, Object> internalParameters = new HashMap<>(4);
   private Error error;
   private Optional<GroupCorrelation> groupCorrelation = empty();
   private String legacyCorrelationId;
-  private FlowCallStack flowCallStack = new DefaultFlowCallStack();
+  private FlowCallStack flowCallStack;
   private ReplyToHandler replyToHandler;
   private Object replyToDestination;
-  private MuleSession session = new DefaultMuleSession();
+  private MuleSession session;
   private SecurityContext securityContext;
   private InternalEvent originalEvent;
   private boolean modified;
@@ -76,13 +78,15 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   public DefaultEventBuilder(BaseEventContext messageContext) {
     this.context = messageContext;
+    this.flowCallStack = new DefaultFlowCallStack();
+    this.session = new DefaultMuleSession();
   }
 
   public DefaultEventBuilder(InternalEvent event) {
     this.context = event.getContext();
     this.originalEvent = event;
     this.message = event.getMessage();
-    this.groupCorrelation = event.getGroupCorrelation() != null ? event.getGroupCorrelation() : empty();
+    this.groupCorrelation = event.getGroupCorrelation();
     this.legacyCorrelationId = event.getLegacyCorrelationId();
     this.flowCallStack = event.getFlowCallStack().clone();
     this.replyToHandler = event.getReplyToHandler();
@@ -263,7 +267,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     private final boolean notificationsEnabled;
 
-    private final CopyOnWriteCaseInsensitiveMap<String, TypedValue<?>> variables = new CopyOnWriteCaseInsensitiveMap<>();
+    private final CaseInsensitiveHashMap<String, TypedValue<?>> variables;
     private final Map<String, ?> internalParameters;
 
     private FlowCallStack flowCallStack = new DefaultFlowCallStack();
@@ -280,7 +284,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.session = session;
       this.securityContext = securityContext;
       this.message = message;
-      variables.forEach((s, value) -> this.variables.put(s, new TypedValue<>(value.getValue(), value.getDataType())));
+      this.variables = new CaseInsensitiveHashMap<>(variables);
       this.internalParameters = internalParameters;
 
       this.replyToHandler = replyToHandler;

@@ -7,28 +7,30 @@
 package org.mule.runtime.core.internal.event;
 
 import static java.lang.System.identityHashCode;
-import static java.time.OffsetTime.now;
+import static java.time.Instant.now;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.notification.DefaultProcessorsTrace;
 import org.mule.runtime.core.internal.exception.MessagingException;
-
-import java.io.Serializable;
-import java.time.OffsetTime;
-import java.util.Optional;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.Optional;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -45,7 +47,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * has it's own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is
    * typically used in {@code flow-ref} type scenarios where a the referenced Flow should complete the child context, but should
    * not complete the parent context
-   * 
+   *
    * @param parent the parent context
    * @param componentLocation he location of the component that creates the child context and operates on result if available.
    * @return a new child context
@@ -77,7 +79,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   private final String id;
   private final String correlationId;
-  private final OffsetTime receivedDate = now();
+  private final Instant receivedDate = now();
 
   private final String serverId;
   private final ComponentLocation location;
@@ -96,7 +98,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
-  public OffsetTime getReceivedTime() {
+  public Instant getReceivedTime() {
     return receivedDate;
   }
 
@@ -200,7 +202,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     }
 
     @Override
-    public OffsetTime getReceivedTime() {
+    public Instant getReceivedTime() {
       return parent.getReceivedTime();
     }
 
@@ -237,5 +239,4 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     }
 
   }
-
 }

@@ -12,6 +12,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
@@ -23,34 +24,35 @@ import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
+
+import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -196,6 +198,7 @@ public class DefaultFlowBuilder implements Builder {
     flow = new DefaultFlow(name, muleContext, source, processors,
                            ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState, maxConcurrency,
                            flowStatistics);
+
     return flow;
   }
 
@@ -212,12 +215,23 @@ public class DefaultFlowBuilder implements Builder {
 
     private final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(this);
 
+    private boolean handleReplyTo = false;
+
     protected DefaultFlow(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
                           int maxConcurrency, FlowConstructStatistics flowConstructStatistics) {
       super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
             flowConstructStatistics);
+    }
+
+    @Override
+    protected void doInitialise() throws MuleException {
+      super.doInitialise();
+
+      if (((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(COMPATIBILITY_PLUGIN_INSTALLED) != null) {
+        handleReplyTo = true;
+      }
     }
 
     @Override
@@ -254,32 +268,32 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     private PrivilegedEvent createMuleEventForCurrentFlow(PrivilegedEvent event) {
-      // Create new event with replyToHandler etc.
-      event = InternalEvent.builder(event)
-          // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
-          // referenced flows. If it is passed on they two replyTo responses are sent.
-          .replyToHandler(null)
-          .replyToDestination(event.getReplyToDestination()).build();
-      resetRequestContextEvent(event);
+      if (handleReplyTo) {
+        // Create new event with replyToHandler etc.
+        event = InternalEvent.builder(event)
+            // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
+            // referenced flows. If it is passed on they two replyTo responses are sent.
+            .replyToHandler(null)
+            .replyToDestination(event.getReplyToDestination()).build();
+        // Update RequestContext ThreadLocal for backwards compatibility
+        setCurrentEvent(event);
+      }
       return event;
     }
 
     private PrivilegedEvent createReturnEventForParentFlowConstruct(PrivilegedEvent result, InternalEvent original) {
-      if (result != null) {
-        Optional<Error> errorOptional = result.getError();
-        // Create new event with ReplyToHandler and synchronous
-        result = InternalEvent.builder(result)
-            .replyToHandler(original.getReplyToHandler())
-            .replyToDestination(original.getReplyToDestination())
-            .error(errorOptional.orElse(null)).build();
+      if (handleReplyTo) {
+        if (result != null) {
+          // Create new event with ReplyToHandler and synchronous
+          result = InternalEvent.builder(result)
+              .replyToHandler(original.getReplyToHandler())
+              .replyToDestination(original.getReplyToDestination())
+              .build();
+        }
+        // Update RequestContext ThreadLocal for backwards compatibility
+        setCurrentEvent(result);
       }
-      resetRequestContextEvent(result);
       return result;
-    }
-
-    private void resetRequestContextEvent(PrivilegedEvent event) {
-      // Update RequestContext ThreadLocal for backwards compatibility
-      setCurrentEvent(event);
     }
 
     @Override

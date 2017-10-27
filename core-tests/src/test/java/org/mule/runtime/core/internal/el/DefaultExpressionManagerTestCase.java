@@ -33,12 +33,13 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.XML;
+import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.el.DefaultExpressionManager.COMPATILIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
@@ -60,6 +61,14 @@ import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.util.MuleContextUtils;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
@@ -68,13 +77,6 @@ import java.util.Optional;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_MVEL_DW)
@@ -306,7 +308,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     when(registry.lookupByType(DefaultExpressionLanguageFactoryService.class)).thenReturn(of(mockFactory));
     when(registry.lookupByName(OBJECT_EXPRESSION_LANGUAGE))
         .thenReturn(of(mock(MVELExpressionLanguage.class, RETURNS_DEEP_STUBS)));
-    when(registry.lookupByName(COMPATILIBILITY_PLUGIN_INSTALLED)).thenReturn(empty());
+    when(registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED)).thenReturn(empty());
 
     TypedValue value = new TypedValue(cursorProvider, BYTE_ARRAY);
     when(expressionLanguage.evaluate(anyString(), any())).thenReturn(value);
@@ -330,7 +332,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     Registry registry = mock(Registry.class);
     when(registry.lookupByType(DefaultExpressionLanguageFactoryService.class))
         .thenReturn(of(mock(DefaultExpressionLanguageFactoryService.class, RETURNS_DEEP_STUBS)));
-    when(registry.lookupByName(COMPATILIBILITY_PLUGIN_INSTALLED)).thenReturn(empty());
+    when(registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED)).thenReturn(empty());
 
     final MuleContextWithRegistries mockMuleContext = MuleContextUtils.mockMuleContext();
     MuleConfiguration config = mockMuleContext.getConfiguration();

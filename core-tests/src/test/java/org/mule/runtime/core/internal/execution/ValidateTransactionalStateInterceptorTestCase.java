@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -18,19 +21,15 @@ import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateEx
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsInstanceOf;
-import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.Mockito;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -52,11 +51,11 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
       new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
 
   private static final Map<Boolean, Map<MuleTransactionConfig, Boolean>> resultMap =
-      new HashMap<Boolean, Map<MuleTransactionConfig, Boolean>>();
+      new HashMap<>();
   private boolean hasTransactionInContext;
   private TransactionConfig transactionConfig;
-  private CoreEvent mockMuleEvent = Mockito.mock(CoreEvent.class);
-  private Transaction mockTransaction = Mockito.mock(Transaction.class);
+  private CoreEvent mockMuleEvent = mock(CoreEvent.class);
+  private Transaction mockTransaction = mock(Transaction.class);
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
@@ -71,8 +70,8 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
   }
 
   static {
-    HashMap<MuleTransactionConfig, Boolean> falseResultMap = new HashMap<MuleTransactionConfig, Boolean>();
-    HashMap<MuleTransactionConfig, Boolean> trueResultMap = new HashMap<MuleTransactionConfig, Boolean>();
+    Map<MuleTransactionConfig, Boolean> falseResultMap = new HashMap<>();
+    Map<MuleTransactionConfig, Boolean> trueResultMap = new HashMap<>();
     resultMap.put(false, falseResultMap);
     resultMap.put(true, trueResultMap);
     falseResultMap.put(MULE_TRANSACTION_CONFIG_ALWAYS_BEGIN, false);
@@ -111,24 +110,18 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
       TransactionCoordination.getInstance().bindTransaction(mockTransaction);
     }
     ValidateTransactionalStateInterceptor<CoreEvent> interceptor =
-        new ValidateTransactionalStateInterceptor<CoreEvent>(new ExecuteCallbackInterceptor<CoreEvent>(),
-                                                             transactionConfig);
+        new ValidateTransactionalStateInterceptor<>(new ExecuteCallbackInterceptor<CoreEvent>(),
+                                                    transactionConfig);
     try {
-      result = interceptor.execute(new ExecutionCallback<CoreEvent>() {
-
-        @Override
-        public CoreEvent process() throws Exception {
-          return mockMuleEvent;
-        }
-      }, new ExecutionContext());
+      result = interceptor.execute(() -> mockMuleEvent, new ExecutionContext());
     } catch (IllegalTransactionStateException e) {
       thrownException = e;
     }
     if (shouldThrowException) {
-      assertThat(thrownException, IsNull.<Object>notNullValue());
-      assertThat(thrownException, IsInstanceOf.instanceOf(IllegalTransactionStateException.class));
+      assertThat(thrownException, notNullValue());
+      assertThat(thrownException, instanceOf(IllegalTransactionStateException.class));
     } else {
-      assertThat(result, Is.is(mockMuleEvent));
+      assertThat(result, is(mockMuleEvent));
     }
   }
 }
