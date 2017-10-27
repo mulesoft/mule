@@ -87,6 +87,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
@@ -598,6 +599,7 @@ public class ApplicationModel {
     }
     // TODO MULE-9692 all this validations will be moved to an entity that does the validation and allows to aggregate all
     // validations instead of failing fast.
+    validateSingletonsAreNotRepeated();
     validateNameIsNotRepeated();
     validateNameHasValidCharacters();
     validateErrorMappings();
@@ -638,6 +640,35 @@ public class ApplicationModel {
       }
     }
     return empty();
+  }
+
+  private void validateSingletonsAreNotRepeated() {
+    Map<String, ComponentModel> existingObjectsWithName = new HashMap<>();
+    executeOnEveryRootElementWithBuildingDefinition(((componentModel, componentBuildingDefinition) -> {
+      if (componentBuildingDefinition.getRegistrationName() != null) {
+        String nameAttributeValue = componentModel.getNameAttribute();
+
+        if (existingObjectsWithName.containsKey(nameAttributeValue)) {
+          ComponentModel otherComponentModel = existingObjectsWithName.get(nameAttributeValue);
+          if (componentModel.getConfigFileName().isPresent() && componentModel.getLineNumber().isPresent() &&
+              otherComponentModel.getConfigFileName().isPresent() && otherComponentModel.getLineNumber().isPresent()) {
+            throw new MuleRuntimeException(createStaticMessage(
+                                                               "The configuration element [%s] can only appear once, but was present in both [%s:%d] and [%s:%d]",
+                                                               componentModel.getIdentifier(),
+                                                               otherComponentModel.getConfigFileName().get(),
+                                                               otherComponentModel.getLineNumber().get(),
+                                                               componentModel.getConfigFileName().get(),
+                                                               componentModel.getLineNumber().get()));
+          } else {
+            throw new MuleRuntimeException(createStaticMessage(
+                                                               "The configuration element [%s] can only appear once, but was present multiple times",
+                                                               componentModel.getIdentifier()));
+          }
+        }
+        existingObjectsWithName.put(nameAttributeValue, componentModel);
+        componentModel.setParameter(ApplicationModel.NAME_ATTRIBUTE, componentBuildingDefinition.getRegistrationName());
+      }
+    }));
   }
 
   private void validateNameIsNotRepeated() {
@@ -916,16 +947,22 @@ public class ApplicationModel {
   }
 
   private void resolveRegistrationNames() {
+    executeOnEveryRootElementWithBuildingDefinition((componentModel, componentBuildingDefinition) -> {
+      if (componentBuildingDefinition.getRegistrationName() != null) {
+        componentModel.setParameter(ApplicationModel.NAME_ATTRIBUTE, componentBuildingDefinition.getRegistrationName());
+      }
+    });
+  }
+
+  private void executeOnEveryRootElementWithBuildingDefinition(BiConsumer<ComponentModel, ComponentBuildingDefinition> action) {
     if (componentBuildingDefinitionRegistry.isPresent()) {
       ComponentBuildingDefinitionRegistry definitionRegistry = componentBuildingDefinitionRegistry.get();
 
       this.executeOnEveryRootElement(componentModel -> {
         Optional<ComponentBuildingDefinition<?>> buildingDefinition =
             definitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
-        buildingDefinition.ifPresent(definition -> {
-          if (definition.getRegistrationName() != null) {
-            componentModel.setParameter(ApplicationModel.NAME_ATTRIBUTE, definition.getRegistrationName());
-          }
+        buildingDefinition.ifPresent(componentBuildingDefinition -> {
+          action.accept(componentModel, componentBuildingDefinition);
         });
       });
     }
