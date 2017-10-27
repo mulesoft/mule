@@ -13,6 +13,7 @@ import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.BaseHttpMessage;
 
+import java.net.URI;
 import java.util.Collection;
 
 /**
@@ -20,7 +21,7 @@ import java.util.Collection;
  */
 class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
 
-  private final String uri;
+  private final URI uri;
   private final String path;
   private final String method;
   private HttpProtocol version;
@@ -28,7 +29,7 @@ class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
   private MultiMap<String, String> queryParams;
   private HttpEntity entity;
 
-  DefaultHttpRequest(String uri, String path, String method, MultiMap<String, String> headers,
+  DefaultHttpRequest(URI uri, String path, String method, MultiMap<String, String> headers,
                      MultiMap<String, String> queryParams, HttpEntity entity) {
     this.uri = uri;
     this.path = path;
@@ -75,7 +76,7 @@ class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
   }
 
   @Override
-  public String getUri() {
+  public URI getUri() {
     return uri;
   }
 
@@ -87,7 +88,7 @@ class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
   @Override
   public String toString() {
     return "DefaultHttpRequest {" + lineSeparator()
-        + "  uri: " + uri + "," + lineSeparator()
+        + "  uri: " + uri.toString() + "," + lineSeparator()
         + "  path: " + path + "," + lineSeparator()
         + "  method: " + method + "," + lineSeparator()
         + "  headers: " + headers.toString() + "," + lineSeparator()

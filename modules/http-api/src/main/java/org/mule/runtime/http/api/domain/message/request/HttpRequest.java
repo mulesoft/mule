@@ -10,6 +10,8 @@ import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.HttpMessage;
 
+import java.net.URI;
+
 /**
  * Representation of an HTTP request message.
  *
@@ -42,7 +44,7 @@ public interface HttpRequest extends HttpMessage {
   /**
    * @return the request URI
    */
-  String getUri();
+  URI getUri();
 
   /**
    * @return the query parameters
