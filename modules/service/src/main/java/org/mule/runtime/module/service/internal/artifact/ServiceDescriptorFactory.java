@@ -7,23 +7,17 @@
 
 package org.mule.runtime.module.service.internal.artifact;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
-import static org.mule.runtime.module.service.internal.artifact.ServiceDescriptor.SERVICE_PROPERTIES;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -31,8 +25,6 @@ import java.util.Properties;
  * Creates {@link ServiceDescriptor} instances.
  */
 public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<MuleServiceModel, ServiceDescriptor> {
-
-  private static final String SERVICE_PROVIDER_CLASS_NAME = "service.className";
 
   /**
    * Creates a new factory
@@ -53,27 +45,6 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
     if (!artifactFolder.exists()) {
       throw new IllegalArgumentException("Service folder does not exists: " + artifactFolder.getAbsolutePath());
     }
-    // TODO(pablo.kraan): MULE-13281 - remove properties descriptor support once all the services are migrated to the new file
-    // format
-    final File servicePropsFile = new File(artifactFolder, SERVICE_PROPERTIES);
-    if (servicePropsFile.exists()) {
-      final String serviceName = artifactFolder.getName();
-      final ServiceDescriptor descriptor = new ServiceDescriptor(serviceName);
-      descriptor.setRootFolder(artifactFolder);
-
-      Properties props = new Properties();
-      try {
-        props.load(new FileReader(servicePropsFile));
-      } catch (IOException e) {
-        throw new ArtifactDescriptorCreateException("Cannot read service.properties file", e);
-      }
-
-      descriptor.setClassLoaderModel(createClassLoaderModel(artifactFolder));
-
-      descriptor.setServiceProviderClassName(props.getProperty(SERVICE_PROVIDER_CLASS_NAME));
-
-      return descriptor;
-    }
 
     return super.create(artifactFolder, properties);
   }
@@ -82,14 +53,6 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
   protected void validateVersion(ServiceDescriptor descriptor) {
     if (descriptor.getBundleDescriptor() != null) {
       super.validateVersion(descriptor);
-    }
-  }
-
-  private ClassLoaderModel createClassLoaderModel(File artifactFolder) {
-    try {
-      return new LibFolderClassLoaderModelLoader().load(artifactFolder, emptyMap(), ArtifactType.SERVICE);
-    } catch (InvalidDescriptorLoaderException e) {
-      throw new IllegalStateException("Cannot load classloader model for service", e);
     }
   }
 
