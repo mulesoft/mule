@@ -95,7 +95,8 @@ public class ServiceResourcesResolver {
               .getOrDefault(PRIVILEGED_ARTIFACTS_IDS,
                             new ArrayList<>()));
 
-      return new ArtifactUrlClassification(serviceUrlClassification.getName(), muleServiceModel.getServiceProviderClassName(),
+      return new ArtifactUrlClassification(serviceUrlClassification.getArtifactId(),
+                                           muleServiceModel.getServiceProviderClassName(),
                                            serviceUrlClassification.getUrls());
     } catch (IOException e) {
       throw new UncheckedIOException(e);

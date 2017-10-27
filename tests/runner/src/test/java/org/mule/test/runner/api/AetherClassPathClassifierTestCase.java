@@ -9,6 +9,7 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 import static org.eclipse.aether.util.artifact.JavaScopes.COMPILE;
 import static org.eclipse.aether.util.artifact.JavaScopes.PROVIDED;
@@ -31,22 +32,28 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import static org.mule.test.runner.api.AetherClassPathClassifier.getMuleVersion;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleServiceModel;
+import org.mule.runtime.api.deployment.meta.MuleServiceModel.MuleServiceModelBuilder;
+import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
@@ -73,9 +80,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PowerMockIgnore("javax.management.*")
 @SmallTest
 public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
-
-  private static final String SERVICE_PROPERTIES = "service.properties";
-  private static final String SERVICE_PROVIDER_CLASS_NAME = "service.className";
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -354,14 +358,20 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     when(artifactClassificationTypeResolver.resolveArtifactClassificationType(rootArtifact))
         .thenReturn(APPLICATION);
 
-    File fooServiceArtifactFile = temporaryFolder.newFile();
-    File metaInfFolder = temporaryFolder.newFolder("META-INF");
-    File fooServicePropertyFile = new File(metaInfFolder, SERVICE_PROPERTIES);
-    Properties fooServiceProperties = new Properties();
-    fooServiceProperties.put(SERVICE_PROVIDER_CLASS_NAME, "org.foo.ServiceProvider");
-    fooServiceProperties.store(new FileWriter(fooServicePropertyFile), "Writing " + SERVICE_PROPERTIES);
+    File fooServiceArtifactFile = temporaryFolder.newFolder();
+    File metaInfFolder = new File(fooServiceArtifactFile, META_INF);
+    metaInfFolder.delete();
+    metaInfFolder.mkdir();
+    File descriptor = new File(metaInfFolder, MULE_ARTIFACT_JSON_DESCRIPTOR);
+    MuleServiceModel muleServiceModel = new MuleServiceModelBuilder().setName("Foo").setMinMuleVersion("4.0.0")
+        .withServiceProviderClassName("org.foo.ServiceProvider")
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+        .withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+        .build();
+    String model = new MuleServiceModelJsonSerializer().serialize(muleServiceModel);
+    FileUtils.write(descriptor, model);
 
-    List<File> fooServiceUrls = newArrayList(fooServiceArtifactFile, metaInfFolder);
+    List<File> fooServiceUrls = newArrayList(fooServiceArtifactFile);
     when(dependencyResolver.resolveDependencies(argThat(equalTo(new Dependency(fooServiceDep.getArtifact(), COMPILE))),
                                                 argThat(equalTo(emptyList())),
                                                 argThat(equalTo(emptyList())),
