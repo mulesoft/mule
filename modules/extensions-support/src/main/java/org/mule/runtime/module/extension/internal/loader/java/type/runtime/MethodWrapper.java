@@ -15,6 +15,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -53,8 +54,8 @@ public final class MethodWrapper implements MethodElement {
    */
   @Override
   public List<ExtensionParameter> getParameters() {
-    List<ExtensionParameter> extensionParameters = new LinkedList<>();
     final Parameter[] parameters = method.getParameters();
+    List<ExtensionParameter> extensionParameters = new ArrayList<>(parameters.length);
     for (int i = 0; i < parameters.length; i++) {
       extensionParameters.add(new ParameterWrapper(method, i));
     }

@@ -44,9 +44,10 @@ public final class OperationExecutorFactoryWrapper<T extends ComponentModel>
    * @return a {@link InterceptableOperationExecutorWrapper} which decorates the result of propagating this invocation to the
    *         {@link #delegate}
    */
+
   @Override
-  public ComponentExecutor<T> createExecutor(T operationModel) {
-    ComponentExecutor executor = delegate.createExecutor(operationModel);
+  public ComponentExecutor<T> createExecutor(T operationModel, Map<String, Object> parameters) {
+    ComponentExecutor executor = delegate.createExecutor(operationModel, parameters);
     executor = new ReactiveOperationExecutionWrapper(executor);
     executor = new InterceptableOperationExecutorWrapper(executor, interceptors);
 

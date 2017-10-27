@@ -160,7 +160,7 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
       operation.setRequiresConnection(false);
       operation.setSupportsStreaming(false);
       operation.setTransactional(false);
-      operation.addModelProperty(new ComponentExecutorModelProperty(model -> new UnauthorizeOperationExecutor()));
+      operation.addModelProperty(new ComponentExecutorModelProperty((model, params) -> new UnauthorizeOperationExecutor()));
 
       ParameterGroupDeclaration group = operation.getParameterGroup(DEFAULT_GROUP_NAME);
       group.showInDsl(false);

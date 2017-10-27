@@ -17,7 +17,7 @@ public class CollectionUtils {
   /**
    * Creates a String representation of the given Collection, with optional newlines between elements. Class objects are
    * represented by their full names.
-   * 
+   *
    * @param c the Collection to format
    * @param newline indicates whether elements are to be split across lines
    * @return the formatted String
@@ -41,7 +41,7 @@ public class CollectionUtils {
    * Creates a String representation of the given Collection, with optional newlines between elements. Class objects are
    * represented by their full names. Considers at most <code>maxElements</code> values; overflow is indicated by an appended
    * "[..]" ellipsis.
-   * 
+   *
    * @param c the Collection to format
    * @param maxElements the maximum number of elements to take into account
    * @param newline indicates whether elements are to be split across lines

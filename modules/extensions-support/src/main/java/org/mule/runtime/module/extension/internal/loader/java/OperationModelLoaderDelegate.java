@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.handleByteStreaming;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isAutoPaging;
@@ -32,11 +33,13 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithOperationContainers;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
 
@@ -124,14 +127,17 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       loader.addExceptionEnricher(operationMethod, operationDeclarer);
 
-      declareOperation(operationDeclarer, supportsConfig, operationMethod, method);
-
+      final List<ExtensionParameter> fieldParameters = new ParameterizableTypeWrapper(declaringClass).getParameters();
+      declareParameters(operationDeclarer, supportsConfig, operationMethod, fieldParameters, method);
       operationDeclarers.put(operationMethod, operationDeclarer);
     }
   }
 
-  private void declareOperation(OperationDeclarer operation, boolean supportsConfig, MethodElement operationMethod,
-                                Method method) {
+  private void declareParameters(OperationDeclarer operation,
+                                 boolean supportsConfig,
+                                 MethodElement operationMethod,
+                                 List<ExtensionParameter> fieldParameters,
+                                 Method method) {
     processComponentConnectivity(operation, operationMethod, operationMethod);
 
     if (isNonBlocking(operationMethod)) {
@@ -144,6 +150,10 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
     addExecutionType(operation, operationMethod);
     ParameterDeclarationContext declarationContext = new ParameterDeclarationContext(OPERATION, operation.getDeclaration());
     loader.getMethodParametersLoader().declare(operation, operationMethod.getParameters(), declarationContext);
+    loader.getFieldParametersLoader().declare(operation, fieldParameters, declarationContext).forEach(p -> {
+      p.withExpressionSupport(NOT_SUPPORTED);
+      p.withModelProperty(new FieldOperationParameterModelProperty());
+    });
   }
 
   private void processBlockingOperation(boolean supportsConfig, MethodElement operationMethod, Method method,
