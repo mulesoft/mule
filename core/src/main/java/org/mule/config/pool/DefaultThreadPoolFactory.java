@@ -6,6 +6,10 @@
  */
 package org.mule.config.pool;
 
+import static java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
+import static java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
+import static java.util.concurrent.ThreadPoolExecutor.DiscardOldestPolicy;
+import static java.util.concurrent.ThreadPoolExecutor.DiscardPolicy;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
@@ -13,6 +17,7 @@ import org.mule.util.concurrent.WaitPolicy;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -60,16 +65,16 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
             switch (tp.getPoolExhaustedAction())
             {
                 case ThreadingProfile.WHEN_EXHAUSTED_DISCARD_OLDEST :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
+                    pool.setRejectedExecutionHandler(retrieveDiscardOldestPolicyOf(pool.getQueue()));
                     break;
                 case ThreadingProfile.WHEN_EXHAUSTED_RUN :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+                    pool.setRejectedExecutionHandler(new CallerRunsPolicy());
                     break;
                 case ThreadingProfile.WHEN_EXHAUSTED_ABORT :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+                    pool.setRejectedExecutionHandler(new AbortPolicy());
                     break;
                 case ThreadingProfile.WHEN_EXHAUSTED_DISCARD :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+                    pool.setRejectedExecutionHandler(new DiscardPolicy());
                     break;
                 default :
                     // WHEN_EXHAUSTED_WAIT
@@ -77,6 +82,27 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
                     break;
             }
         }
+    }
+
+    /**
+     * DiscardOldestPolicy handler must discard the oldest task in the buffer queue. 
+     * When used with a LinkedBlockingQueue or ArrayBlockingQueue, the oldest task
+     * is the one that is first in line to execute when a thread becomes idle.
+     * When used with a SynchronousQueue, there are never waiting task, so the submitted
+     * task must be discarded, which is the same as using a DiscardPolicy.
+     * 
+     * @param queue buffer queue
+     * 
+     * @return appropriate rejection handler
+     */
+    private RejectedExecutionHandler retrieveDiscardOldestPolicyOf(BlockingQueue<Runnable> queue)
+    {
+        if (queue instanceof SynchronousQueue<?>)
+        {
+            return new DiscardPolicy();
+        }
+
+        return new DiscardOldestPolicy();
     }
 
     @Override
