@@ -7,14 +7,9 @@
 package org.mule.runtime.core.privileged.util;
 
 import static java.lang.System.lineSeparator;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import org.mule.runtime.api.util.Pair;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.function.Predicate;
 
 // @ThreadSafe
 public class CollectionUtils {
@@ -22,7 +17,7 @@ public class CollectionUtils {
   /**
    * Creates a String representation of the given Collection, with optional newlines between elements. Class objects are
    * represented by their full names.
-   * 
+   *
    * @param c the Collection to format
    * @param newline indicates whether elements are to be split across lines
    * @return the formatted String
@@ -46,7 +41,7 @@ public class CollectionUtils {
    * Creates a String representation of the given Collection, with optional newlines between elements. Class objects are
    * represented by their full names. Considers at most <code>maxElements</code> values; overflow is indicated by an appended
    * "[..]" ellipsis.
-   * 
+   *
    * @param c the Collection to format
    * @param maxElements the maximum number of elements to take into account
    * @param newline indicates whether elements are to be split across lines
@@ -103,17 +98,5 @@ public class CollectionUtils {
 
     buf.append(']');
     return buf.toString();
-  }
-
-  public static <T> Pair<List<T>, List<T>> split(Collection<T> col1, Collection<T> col2, Predicate<T> filter) {
-    return new Pair<>(split(col1, filter), split(col2, i -> !filter.test(i)));
-  }
-
-  private static <T> List<T> split(Collection<T> collection, Predicate<T> filter) {
-    if (collection == null || collection.isEmpty()) {
-      return emptyList();
-    }
-
-    return collection.stream().filter(filter).collect(toList());
   }
 }
