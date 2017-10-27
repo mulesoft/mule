@@ -184,7 +184,8 @@
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <muleMvelVersion>2.1.9-MULE-012</muleMvelVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
-        <projectReactorVersion>3.1.0.RELEASE</projectReactorVersion>
+        <projectReactorVersion>3.1.1.RELEASE</projectReactorVersion>
+        <projectReactorExtraVersion>3.1.2.RELEASE</projectReactorExtraVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
         <typesafeConfigVersion>1.3.1</typesafeConfigVersion>
         <quartzVersion>2.2.3</quartzVersion>
@@ -1325,7 +1326,7 @@
             <dependency>
                 <groupId>io.projectreactor.addons</groupId>
                 <artifactId>reactor-extra</artifactId>
-                <version>${projectReactorVersion}</version>
+                <version>${projectReactorExtraVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
