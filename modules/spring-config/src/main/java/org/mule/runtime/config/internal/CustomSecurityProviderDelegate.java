@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.security.Authentication;
@@ -19,7 +21,7 @@ import org.mule.runtime.core.api.security.SecurityProvider;
  *
  * @since 4.0
  */
-public class CustomSecurityProviderDelegate extends AbstractComponent implements SecurityProvider {
+public class CustomSecurityProviderDelegate extends AbstractComponent implements SecurityProvider, Initialisable {
 
   private SecurityProvider delegate;
 
@@ -40,7 +42,7 @@ public class CustomSecurityProviderDelegate extends AbstractComponent implements
 
   @Override
   public void initialise() throws InitialisationException {
-    delegate.initialise();
+    initialiseIfNeeded(delegate);
   }
 
   @Override
