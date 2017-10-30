@@ -115,11 +115,6 @@ public class MuleExtensionUtils {
       }
 
       @Override
-      public String getRootContainerName() {
-        return null;
-      }
-
-      @Override
       public Location getRootContainerLocation() {
         return null;
       }

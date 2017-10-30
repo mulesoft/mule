@@ -489,8 +489,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
       return (ComponentLocation) getAnnotation(LOCATION_KEY);
     }
 
-    @Override
-    public String getRootContainerName() {
+    private String getRootContainerName() {
       String rootContainerName = (String) getAnnotation(ROOT_CONTAINER_NAME_KEY);
       if (rootContainerName == null) {
         rootContainerName = getLocation().getRootContainerName();

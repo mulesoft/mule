@@ -129,11 +129,6 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
     }
 
     @Override
-    public String getRootContainerName() {
-      return null;
-    }
-
-    @Override
     public Location getRootContainerLocation() {
       return null;
     }

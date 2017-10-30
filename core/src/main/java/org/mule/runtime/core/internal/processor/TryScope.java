@@ -137,7 +137,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   public void initialise() throws InitialisationException {
     this.nestedChain = newChain(getProcessingStrategy(locator, getRootContainerLocation()), processors);
     if (messagingExceptionHandler == null) {
-      messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerName()));
+      messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerLocation().toString()));
     }
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     super.initialise();

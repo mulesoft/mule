@@ -68,7 +68,6 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() {
     String flowName = "root";
-    when(completeMessageProcessTemplateAndContext.getMessageSource().getRootContainerName()).thenReturn(flowName);
     when(completeMessageProcessTemplateAndContext.getMessageSource().getRootContainerLocation())
         .thenReturn(Location.builder().globalName(flowName).build());
     when(registry.lookupByName(flowName)).thenReturn(of(flowConstruct));

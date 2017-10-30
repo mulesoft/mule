@@ -41,7 +41,7 @@ public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implemen
   public CoreEvent process(CoreEvent event) throws MuleException {
     event = CoreEvent.builder(event)
         .addVariable(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY, getTracker().toString())
-        .addVariable(FLOW_CONSRUCT_PROPERTY, registry.lookupByName(getRootContainerName()).orElse(null)).build();
+        .addVariable(FLOW_CONSRUCT_PROPERTY, registry.lookupByName(getRootContainerLocation().toString()).orElse(null)).build();
     return event;
   }
 }

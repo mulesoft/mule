@@ -467,7 +467,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
   public static FunctionalTestProcessor getFromFlow(ConfigurationComponentLocator locator, String flowName) throws Exception {
     return locator.find(ComponentIdentifier.builder().namespace("test").name("processor").build())
         .stream()
-        .filter(c -> flowName.equals(c.getRootContainerName()))
+        .filter(c -> flowName.equals(c.getRootContainerLocation().toString()))
         .map(c -> (FunctionalTestProcessor) c)
         .findAny().get();
   }

@@ -55,7 +55,8 @@ public interface ComponentUtils {
     return getFromAnnotatedObject(componentLocator, component)
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(
                                                                                "Couldn't find FlowConstruct with global name %s or it was not an instance of FlowConstruct",
-                                                                               component.getRootContainerName()))));
+                                                                               component.getRootContainerLocation()
+                                                                                   .toString()))));
   }
 
 }

@@ -30,7 +30,7 @@ public class OnErrorCheckLogHandler extends AbstractExceptionListener
   public void start() throws MuleException {
     super.start();
     errors = new StringBuilder();
-    addAssertion(getRootContainerName(), this);
+    addAssertion(getRootContainerLocation().toString(), this);
   }
 
   @Override

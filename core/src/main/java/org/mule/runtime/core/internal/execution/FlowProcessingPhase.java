@@ -44,7 +44,7 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
 
   /**
    * Creates a new FlowProcessingPhase with the provided {@link Registry}.
-   * 
+   *
    * @param registry the registry to perform flow lookups.
    */
   public FlowProcessingPhase(Registry registry) {
@@ -62,7 +62,8 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
     Runnable flowExecutionWork = () -> {
       try {
         FlowConstruct flowConstruct =
-            registry.<FlowConstruct>lookupByName(messageProcessContext.getMessageSource().getRootContainerName()).get();
+            registry.<FlowConstruct>lookupByName(messageProcessContext.getMessageSource().getRootContainerLocation().toString())
+                .get();
         try {
           final AtomicReference exceptionThrownDuringFlowProcessing = new AtomicReference();
           TransactionalExecutionTemplate<CoreEvent> transactionTemplate =

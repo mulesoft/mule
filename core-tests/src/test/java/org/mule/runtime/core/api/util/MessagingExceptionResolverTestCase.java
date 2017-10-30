@@ -245,11 +245,6 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     }
 
     @Override
-    public String getRootContainerName() {
-      return null;
-    }
-
-    @Override
     public Location getRootContainerLocation() {
       return null;
     }

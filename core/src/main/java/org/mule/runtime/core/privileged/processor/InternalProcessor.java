@@ -38,11 +38,6 @@ public interface InternalProcessor extends Component {
   }
 
   @Override
-  default String getRootContainerName() {
-    return null;
-  }
-
-  @Override
   default Location getRootContainerLocation() {
     return null;
   }
