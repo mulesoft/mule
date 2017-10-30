@@ -59,6 +59,14 @@ public class FileUtils {
 
   public static String DEFAULT_ENCODING = "UTF-8";
 
+  static {
+    if (!TEMP_DIR.exists()) {
+      throw new MuleRuntimeException(createStaticMessage("Temp directory '" + TEMP_DIR.getAbsolutePath() + "' does not exist. "
+          + "Please check the value of the '" + TEMP_DIR_SYSTEM_PROPERTY
+          + "' system property."));
+    }
+  }
+
   public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException {
     if (destination.exists() && !destination.canWrite()) {
       throw new IOException("Destination file does not exist or is not writeable");
@@ -755,13 +763,6 @@ public class FileUtils {
    * @throws RuntimeException
    */
   public static File createTempFile(String prefix, String suffix) {
-    long n = TEMP_FILE_INDEX.addAndGet(1);
-
-    if (!TEMP_DIR.exists()) {
-      throw new MuleRuntimeException(createStaticMessage("Temp directory '" + TEMP_DIR.getAbsolutePath() + "' does not exist. "
-          + "Please check the value of the '" + TEMP_DIR_SYSTEM_PROPERTY
-          + "' system property."));
-    }
-    return new File(TEMP_DIR, prefix + n + suffix);
+    return new File(TEMP_DIR, prefix + TEMP_FILE_INDEX.addAndGet(1) + suffix);
   }
 }
