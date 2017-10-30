@@ -19,6 +19,7 @@ import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -28,14 +29,16 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerList;
+import org.mule.runtime.core.privileged.processor.Scope;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+
+import org.reactivestreams.Publisher;
 
 import com.google.common.collect.Iterators;
 
@@ -47,7 +50,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 /**
@@ -223,7 +225,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   @Override
   public void initialise() throws InitialisationException {
-    Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(muleContext, getRootContainerName());
+    Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, getRootContainerLocation());
     nestedChain = newChain(processingStrategy, messageProcessors);
     splittingStrategy = new ExpressionSplittingStrategy(muleContext.getExpressionManager(), expression);
     super.initialise();

@@ -63,6 +63,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
     super(verbose);
   }
 
+  @Override
   @Before
   public void before() throws Exception {
     super.before();
@@ -98,8 +99,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   public void testHandleExceptionWithConfiguredMessageProcessors() throws Exception {
     onErrorContinueHandler
         .setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
-    onErrorContinueHandler.setMuleContext(muleContext);
-    onErrorContinueHandler.initialise();
+    initialiseIfNeeded(onErrorContinueHandler, muleContext);
     when(mockException.handled()).thenReturn(true);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
@@ -118,7 +118,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
             .build()),
                                      createChagingEventMessageProcessor(lastEventCreated)));
     onErrorContinueHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
-    initialiseIfNeeded(onErrorContinueHandler, true, muleContext);
+    initialiseIfNeeded(onErrorContinueHandler, muleContext);
     when(mockException.handled()).thenReturn(true);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
@@ -144,7 +144,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
         .setMessageProcessors(asList(createFailingEventMessageProcessor(InternalEvent.builder(context).message(of(""))
             .build()),
                                      createFailingEventMessageProcessor(lastEventCreated)));
-    onErrorContinueHandler.initialise();
+    initialiseIfNeeded(onErrorContinueHandler, muleContext);
     when(muleEvent.getMessage().toString()).thenThrow(new RuntimeException("Message.toString() should not be called"));
 
     expectedException.expect(Exception.class);

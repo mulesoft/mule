@@ -8,10 +8,12 @@ package org.mule.runtime.config.internal.factories;
 
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
+
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
+import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
@@ -23,6 +25,9 @@ public class ResponseMessageProcessorsFactoryBean extends AbstractComponentFacto
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  protected ConfigurationComponentLocator locator;
 
   protected List messageProcessors;
 
@@ -45,7 +50,7 @@ public class ResponseMessageProcessorsFactoryBean extends AbstractComponentFacto
     }
     ResponseMessageProcessorAdapter responseAdapter = new ResponseMessageProcessorAdapter();
     responseAdapter.setProcessor(newLazyProcessorChainBuilder(builder, muleContext,
-                                                              () -> getProcessingStrategy(muleContext, getRootContainerName())
+                                                              () -> getProcessingStrategy(locator, getRootContainerLocation())
                                                                   .orElse(null)));
     responseAdapter.setMuleContext(muleContext);
     return responseAdapter;

@@ -12,6 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.error;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -23,11 +24,11 @@ import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
+import org.reactivestreams.Publisher;
+
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error
@@ -115,7 +116,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
             .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");
       }
       OnErrorPropagateHandler acceptsAllOnErrorPropagate = new OnErrorPropagateHandler();
-      acceptsAllOnErrorPropagate.setRootContainerName(getRootContainerName());
+      acceptsAllOnErrorPropagate.setRootContainerName(getRootContainerLocation().toString());
       acceptsAllOnErrorPropagate.setNotificationFirer(notificationDispatcher);
       initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
       this.exceptionListeners.add(acceptsAllOnErrorPropagate);

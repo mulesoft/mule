@@ -12,19 +12,20 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An object that owns Mule objects and delegates startup/shutdown events to them.
@@ -37,6 +38,9 @@ public abstract class AbstractMuleObjectOwner<T> extends AbstractComponent
   // TODO MULE-10332: Review MuleContextAware vs @Inject usage
   @Inject
   protected MuleContext muleContext;
+
+  @Inject
+  protected ConfigurationComponentLocator locator;
 
   @Override
   public void setMuleContext(MuleContext muleContext) {

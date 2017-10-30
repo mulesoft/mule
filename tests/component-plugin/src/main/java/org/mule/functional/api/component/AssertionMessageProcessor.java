@@ -12,11 +12,11 @@ import static org.junit.Assert.fail;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import static org.mule.tck.processor.FlowAssert.addAssertion;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
@@ -52,7 +52,7 @@ public class AssertionMessageProcessor extends AbstractComponent implements Flow
       throw new InvalidExpressionException(expression, result.errorMessage().orElse("Invalid exception"));
     }
     latch = new CountDownLatch(count);
-    addAssertion(getRootContainerName(), this);
+    addAssertion(getRootContainerLocation().toString(), this);
   }
 
   @Override
@@ -120,7 +120,7 @@ public class AssertionMessageProcessor extends AbstractComponent implements Flow
   /**
    * The semantics of the count are as follows: - count was set & count processes were done => ok - count was set & count
    * processes were not done => fail - count was not set & at least one processing were done => ok
-   * 
+   *
    * @return
    * @throws InterruptedException
    */

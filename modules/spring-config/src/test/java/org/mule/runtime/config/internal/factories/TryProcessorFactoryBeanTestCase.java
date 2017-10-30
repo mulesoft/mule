@@ -9,8 +9,10 @@ package org.mule.runtime.config.internal.factories;
 import static java.util.Collections.singletonMap;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.processor.TryScope;
@@ -33,8 +35,7 @@ public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws RegistrationException {
-    registry =
-        new SimpleRegistry(muleContextMock, new MuleLifecycleInterceptor());
+    registry = new SimpleRegistry(muleContextMock, new MuleLifecycleInterceptor());
     registry.registerObject("txFactory", new TransactionFactoryLocator());
   }
 
@@ -47,8 +48,7 @@ public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
     registry.inject(tryProcessorFactoryBean);
 
     TryScope tryMessageProcessor = (TryScope) tryProcessorFactoryBean.getObject();
-    tryMessageProcessor.setMuleContext(muleContextMock);
-    tryMessageProcessor.initialise();
+    initialiseIfNeeded(tryMessageProcessor, muleContextMock);
     tryMessageProcessor.start();
   }
 

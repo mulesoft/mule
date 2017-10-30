@@ -95,7 +95,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
     // for subflows, we create a new one so it must be initialised manually
     if (!(referencedFlow instanceof Flow)) {
       Map<QName, Object> annotations = new HashMap<>(((Component) referencedFlow).getAnnotations());
-      annotations.put(ROOT_CONTAINER_NAME_KEY, getRootContainerName());
+      annotations.put(ROOT_CONTAINER_NAME_KEY, getRootContainerLocation().toString());
       ((Component) referencedFlow).setAnnotations(annotations);
 
       if (referencedFlow instanceof Initialisable) {
@@ -118,7 +118,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
 
       try {
         if (muleArtifactContext.getBeanFactory().getBeanDefinition(name).isPrototype()) {
-          muleArtifactContext.getPrototypeBeanWithRootContainer(name, getRootContainerName());
+          muleArtifactContext.getPrototypeBeanWithRootContainer(name, getRootContainerLocation().toString());
         }
       } catch (NoSuchBeanDefinitionException e) {
         // Null is handled by the caller method

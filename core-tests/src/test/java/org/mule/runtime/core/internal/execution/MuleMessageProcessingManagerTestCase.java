@@ -23,6 +23,7 @@ import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactor
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -67,7 +68,8 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() {
     String flowName = "root";
-    when(completeMessageProcessTemplateAndContext.getMessageSource().getRootContainerName()).thenReturn(flowName);
+    when(completeMessageProcessTemplateAndContext.getMessageSource().getRootContainerLocation())
+        .thenReturn(Location.builder().globalName(flowName).build());
     when(registry.lookupByName(flowName)).thenReturn(of(flowConstruct));
     when(mockMuleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
 

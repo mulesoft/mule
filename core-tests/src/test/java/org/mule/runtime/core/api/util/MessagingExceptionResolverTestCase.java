@@ -20,6 +20,7 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -244,7 +245,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     }
 
     @Override
-    public String getRootContainerName() {
+    public Location getRootContainerLocation() {
       return null;
     }
   }

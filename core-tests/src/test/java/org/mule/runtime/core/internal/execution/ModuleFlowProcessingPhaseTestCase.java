@@ -150,7 +150,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     context = mock(MessageProcessContext.class);
     final MessageSource source = mock(MessageSource.class);
-    when(source.getRootContainerName()).thenReturn("root");
+    when(source.getRootContainerLocation()).thenReturn(Location.builder().globalName("root").build());
     when(source.getLocation()).thenReturn(mock(ComponentLocation.class));
     when(context.getMessageSource()).thenReturn(source);
     when(context.getTransactionConfig()).thenReturn(empty());

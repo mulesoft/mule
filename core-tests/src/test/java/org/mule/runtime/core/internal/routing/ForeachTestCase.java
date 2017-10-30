@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
@@ -106,8 +107,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   private Foreach createForeach(List<Processor> mps) throws MuleException {
     Foreach foreachMp = createForeach();
     foreachMp.setMessageProcessors(mps);
-    foreachMp.setMuleContext(muleContext);
-    foreachMp.initialise();
+    initialiseIfNeeded(foreachMp, muleContext);
     return foreachMp;
   }
 
@@ -252,12 +252,11 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   public void failingNestedProcessor() throws Exception {
     RuntimeException throwable = new BufferOverflowException();
     Foreach foreach = createForeach();
-    foreach.setMuleContext(muleContext);
     InternalTestProcessor failingProcessor = event -> {
       throw throwable;
     };
     foreach.setMessageProcessors(singletonList(failingProcessor));
-    foreach.initialise();
+    initialiseIfNeeded(foreach, muleContext);
     expectedException.expect(is(MessagingException.class));
     expectedException.expect(new FailingProcessorMatcher(failingProcessor));
     expectedException.expectCause(is(throwable));
@@ -273,10 +272,9 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void failingExpression() throws Exception {
     Foreach foreach = createForeach();
-    foreach.setMuleContext(muleContext);
     foreach.setCollectionExpression("!@INVALID");
     foreach.setMessageProcessors(getSimpleMessageProcessors(new TestMessageProcessor("zas")));
-    foreach.initialise();
+    initialiseIfNeeded(foreach, muleContext);
 
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expect(new FailingProcessorMatcher(foreach));
@@ -288,11 +286,10 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void batchSize() throws Exception {
     Foreach foreachMp = createForeach();
-    foreachMp.setMuleContext(muleContext);
     List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
     foreachMp.setMessageProcessors(processors);
     foreachMp.setBatchSize(2);
-    foreachMp.initialise();
+    initialiseIfNeeded(foreachMp, muleContext);
 
     foreachMp.process(eventBuilder(muleContext).message(of(asList(1, 2, 3))).build());
 
@@ -304,12 +301,11 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void batchSizeWithCollectionAttributes() throws Exception {
     Foreach foreachMp = createForeach();
-    foreachMp.setMuleContext(muleContext);
     List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
     foreachMp.setMessageProcessors(processors);
     foreachMp.setBatchSize(2);
     foreachMp.setCollectionExpression("vars.collection");
-    foreachMp.initialise();
+    initialiseIfNeeded(foreachMp, muleContext);
     foreachMp.process(eventBuilder(muleContext).addVariable("collection", asList(1, 2, 3)).message(of(null)).build());
 
     assertThat(processedEvents, hasSize(2));

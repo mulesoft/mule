@@ -8,7 +8,6 @@ package org.mule.runtime.core.privileged.processor;
 
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
@@ -17,6 +16,8 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -26,9 +27,7 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -268,17 +267,13 @@ public class MessageProcessors {
   /**
    * Helper method to get the {@link ProcessingStrategy} from a component.
    *
-   * @param muleContext the context
-   * @param rootContainerName the component root container element
+   * @param locator the locator
+   * @param rootContainerLocation the component root container element
    * @return the processing strategy of the root component if it was an instance of {@link FlowConstruct}, empty otherwise.
    */
-  public static Optional<ProcessingStrategy> getProcessingStrategy(MuleContext muleContext, String rootContainerName) {
-    Optional<ProcessingStrategy> processingStrategy = empty();
-    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
-    Object object = registry.get(rootContainerName);
-    if (object instanceof FlowConstruct) {
-      processingStrategy = of(registry.lookupFlowConstruct(rootContainerName).getProcessingStrategy());
-    }
-    return processingStrategy;
+  public static Optional<ProcessingStrategy> getProcessingStrategy(ConfigurationComponentLocator locator,
+                                                                   Location rootContainerLocation) {
+    return locator.find(rootContainerLocation).filter(loc -> loc instanceof FlowConstruct)
+        .map(loc -> ((FlowConstruct) loc).getProcessingStrategy());
   }
 }

@@ -8,8 +8,9 @@ package org.mule.runtime.core.privileged.processor;
 
 import static java.util.Collections.emptyMap;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Map;
@@ -37,7 +38,7 @@ public interface InternalProcessor extends Component {
   }
 
   @Override
-  default String getRootContainerName() {
+  default Location getRootContainerLocation() {
     return null;
   }
 

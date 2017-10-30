@@ -9,6 +9,8 @@ package org.mule.runtime.config.internal.factories;
 import static java.lang.String.format;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
+
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
@@ -19,10 +21,11 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
 
-import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProcessorChainObjectFactory {
 
@@ -32,6 +35,9 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
   private String moduleOperation;
   @Inject
   private ExtensionManager extensionManager;
+
+  @Inject
+  protected ConfigurationComponentLocator locator;
 
   @Override
   public MessageProcessorChain doGetObject() throws Exception {
@@ -47,7 +53,7 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
     final MessageProcessorChain messageProcessorChain =
         newLazyProcessorChainBuilder((ModuleOperationMessageProcessorChainBuilder) builder,
                                      muleContext,
-                                     () -> getProcessingStrategy(muleContext, getRootContainerName()).orElse(null));
+                                     () -> getProcessingStrategy(locator, getRootContainerLocation()).orElse(null));
     messageProcessorChain.setAnnotations(getAnnotations());
     messageProcessorChain.setMuleContext(muleContext);
     return messageProcessorChain;

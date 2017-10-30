@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.api.component;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 
 import java.util.Map;
 
@@ -34,7 +35,7 @@ public interface InternalComponent extends Component {
   }
 
   @Override
-  default String getRootContainerName() {
+  default Location getRootContainerLocation() {
     return null;
   }
 

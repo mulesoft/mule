@@ -19,6 +19,7 @@ import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtension
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -114,7 +115,7 @@ public class MuleExtensionUtils {
       }
 
       @Override
-      public String getRootContainerName() {
+      public Location getRootContainerLocation() {
         return null;
       }
       // TODO MULE-9076: This is only needed because the muleContext is get from the given flow.
