@@ -21,15 +21,15 @@ import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateEx
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -57,13 +57,13 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
   private CoreEvent mockMuleEvent = mock(CoreEvent.class);
   private Transaction mockTransaction = mock(Transaction.class);
 
-  @Parameterized.Parameters
+  @Parameterized.Parameters(name = "TX in Contex: {0}. TX Config: {1}")
   public static Collection<Object[]> parameters() {
     return Arrays
         .asList(new Object[][] {{false, MULE_TRANSACTION_CONFIG_ALWAYS_BEGIN}, {false, MULE_TRANSACTION_CONFIG_ALWAYS_JOIN},
             {false, MULE_TRANSACTION_CONFIG_BEGIN_OR_JOIN}, {false, MULE_TRANSACTION_CONFIG_INDIFFERENT},
             {false, MULE_TRANSACTION_CONFIG_JOIN_IF_POSSIBLE}, {false, MULE_TRANSACTION_CONFIG_NEVER},
-            {false, MULE_TRANSACTION_CONFIG_NONE}, {true, MULE_TRANSACTION_CONFIG_ALWAYS_BEGIN},
+            {false, MULE_TRANSACTION_CONFIG_NONE},
             {true, MULE_TRANSACTION_CONFIG_ALWAYS_JOIN}, {true, MULE_TRANSACTION_CONFIG_BEGIN_OR_JOIN},
             {true, MULE_TRANSACTION_CONFIG_INDIFFERENT}, {true, MULE_TRANSACTION_CONFIG_JOIN_IF_POSSIBLE},
             {true, MULE_TRANSACTION_CONFIG_NEVER}, {true, MULE_TRANSACTION_CONFIG_NONE}});
@@ -111,7 +111,7 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
     }
     ValidateTransactionalStateInterceptor<CoreEvent> interceptor =
         new ValidateTransactionalStateInterceptor<>(new ExecuteCallbackInterceptor<CoreEvent>(),
-                                                    transactionConfig);
+                                                    transactionConfig, false);
     try {
       result = interceptor.execute(() -> mockMuleEvent, new ExecutionContext());
     } catch (IllegalTransactionStateException e) {
