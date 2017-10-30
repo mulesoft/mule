@@ -18,4 +18,8 @@ public class Event2 extends AbstractServerNotification {
     super("", 0, id);
   }
 
+  @Override
+  public String getEventName() {
+    return "Event2";
+  }
 }

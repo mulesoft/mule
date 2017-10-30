@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.config;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
@@ -35,11 +37,16 @@ public class ConfigurationInstanceNotification extends CustomNotification {
 
   @Override
   public String toString() {
-    return String.format("%s {action=%s, resourceId=%s, timestamp=%s}", EVENT_NAME, getActionName(action), resourceIdentifier,
-                         timestamp);
+    return format("%s {action=%s, resourceId=%s, timestamp=%s}", getEventName(), getActionName(action), resourceIdentifier,
+                  timestamp);
   }
 
   public ConfigurationInstance getConfigurationInstance() {
     return configurationInstance;
+  }
+
+  @Override
+  public String getEventName() {
+    return "ConfigurationInstanceNotification";
   }
 }

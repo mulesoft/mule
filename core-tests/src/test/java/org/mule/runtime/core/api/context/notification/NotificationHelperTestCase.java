@@ -149,5 +149,10 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
     public TestServerNotification() {
       super("", 0);
     }
+
+    @Override
+    public String getEventName() {
+      return "TestServerNotification";
+    }
   }
 }
