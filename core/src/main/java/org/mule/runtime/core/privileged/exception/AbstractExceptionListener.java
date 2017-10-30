@@ -130,7 +130,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
               .map(e -> CORE_NAMESPACE_NAME.equals(e.getErrorType().getNamespace())
                   && UNKNOWN_ERROR_IDENTIFIER.equals(e.getErrorType().getIdentifier()))
               .orElse(false)) {
-        return ((MuleException) sanitize(muleException)).getVerboseMessage();
+        return ((MuleException) sanitize(muleException)).getDetailedMessage(true);
       } else {
         return muleException.getDetailedMessage();
       }
