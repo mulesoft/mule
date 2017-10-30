@@ -196,6 +196,30 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestC
             }
         });
     }
+    
+    @Test
+    public void testDiscardOldestExhaustedWithBufferQueueAction() throws Exception
+    {
+        // The second job is silently discarded as a Synchronized queue is used
+        // with DISCARD_OLDEST
+        latch = new CountDownLatch(1);
+
+        // A Synchronous queue will be used.
+        createTestConnectorWithSingleDispatcherThread(1, ThreadingProfile.WHEN_EXHAUSTED_DISCARD_OLDEST,
+            ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT, 0);
+
+        dispatchTwoAsyncEvents();
+
+        new PollingProber(LONGER_WAIT_TIME, 50).check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                assertEquals(0L, latch.getCount());
+                return true;
+            }
+        });
+    }
 
     protected void createTestConnectorWithSingleDispatcherThread(int exhaustedAction) throws MuleException
     {
