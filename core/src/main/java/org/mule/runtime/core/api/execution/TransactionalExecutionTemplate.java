@@ -16,6 +16,7 @@ import org.mule.runtime.core.internal.execution.ExecutionContext;
 import org.mule.runtime.core.internal.execution.ExecutionInterceptor;
 import org.mule.runtime.core.internal.execution.ExternalTransactionInterceptor;
 import org.mule.runtime.core.internal.execution.IsolateCurrentTransactionInterceptor;
+import org.mule.runtime.core.internal.execution.compatibility.ResolvePreviousTransactionInterceptor;
 import org.mule.runtime.core.internal.execution.SuspendXaTransactionInterceptor;
 import org.mule.runtime.core.internal.execution.ValidateTransactionalStateInterceptor;
 
@@ -42,11 +43,11 @@ public class TransactionalExecutionTemplate<T> implements ExecutionTemplate<T> {
 
 
   private TransactionalExecutionTemplate(MuleContext muleContext, TransactionConfig transactionConfig) {
-    this(muleContext, transactionConfig, true);
+    this(muleContext, transactionConfig, true, false);
   }
 
   private TransactionalExecutionTemplate(MuleContext muleContext, TransactionConfig transactionConfig,
-                                         boolean resolveAnyTransaction) {
+                                         boolean resolveAnyTransaction, boolean resolvePreviousTx) {
     if (transactionConfig == null) {
       transactionConfig = new MuleTransactionConfig();
     }
@@ -55,9 +56,13 @@ public class TransactionalExecutionTemplate<T> implements ExecutionTemplate<T> {
     tempExecutionInterceptor =
         new BeginAndResolveTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig, muleContext,
                                                     processTransactionOnException, resolveAnyTransaction);
+    if (resolvePreviousTx) {
+      tempExecutionInterceptor = new ResolvePreviousTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig);
+    }
     tempExecutionInterceptor = new SuspendXaTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig,
                                                                      processTransactionOnException);
-    tempExecutionInterceptor = new ValidateTransactionalStateInterceptor<>(tempExecutionInterceptor, transactionConfig);
+    tempExecutionInterceptor =
+        new ValidateTransactionalStateInterceptor<>(tempExecutionInterceptor, transactionConfig, resolvePreviousTx);
     tempExecutionInterceptor = new IsolateCurrentTransactionInterceptor(tempExecutionInterceptor, transactionConfig);
     this.executionInterceptor = new ExternalTransactionInterceptor(tempExecutionInterceptor, transactionConfig, muleContext);
   }
@@ -75,6 +80,18 @@ public class TransactionalExecutionTemplate<T> implements ExecutionTemplate<T> {
   }
 
   /**
+   * Creates a ExecutionTemplate that will manage transactional context according to configured TransactionConfig.
+   * This is a template which maintains the TX logic for compatibility components.
+   *
+   * @param muleContext MuleContext for this application
+   * @param transactionConfig transaction config for the execution context
+   */
+  public static <T> TransactionalExecutionTemplate<T> createCompatibilityExecutionTemplate(MuleContext muleContext,
+                                                                                           TransactionConfig transactionConfig) {
+    return new TransactionalExecutionTemplate<>(muleContext, transactionConfig, true, true);
+  }
+
+  /**
    * Creates a TransactionalExecutionTemplate for inner scopes within a flow
    *
    * @param muleContext
@@ -83,7 +100,7 @@ public class TransactionalExecutionTemplate<T> implements ExecutionTemplate<T> {
    */
   public static TransactionalExecutionTemplate createScopeTransactionalExecutionTemplate(MuleContext muleContext,
                                                                                          TransactionConfig transactionConfig) {
-    return new TransactionalExecutionTemplate(muleContext, transactionConfig, false);
+    return new TransactionalExecutionTemplate(muleContext, transactionConfig, false, false);
   }
 
   @Override

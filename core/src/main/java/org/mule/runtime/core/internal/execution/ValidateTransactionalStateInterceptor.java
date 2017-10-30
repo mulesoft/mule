@@ -19,10 +19,13 @@ public class ValidateTransactionalStateInterceptor<T> implements ExecutionInterc
 
   private final ExecutionInterceptor<T> next;
   private final TransactionConfig transactionConfig;
+  private boolean isCompatibility;
 
-  public ValidateTransactionalStateInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig) {
+  public ValidateTransactionalStateInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig,
+                                               boolean isCompatibility) {
     this.next = next;
     this.transactionConfig = transactionConfig;
+    this.isCompatibility = isCompatibility;
   }
 
   @Override
@@ -32,7 +35,8 @@ public class ValidateTransactionalStateInterceptor<T> implements ExecutionInterc
       throw new IllegalTransactionStateException(CoreMessages.transactionAvailableButActionIs("Never"));
     } else if (transactionConfig.getAction() == TransactionConfig.ACTION_ALWAYS_JOIN && tx == null) {
       throw new IllegalTransactionStateException(CoreMessages.transactionNotAvailableButActionIs("Always Join"));
-    } else if (transactionConfig.getAction() == TransactionConfig.ACTION_ALWAYS_BEGIN && tx != null && !tx.isXA()) {
+    } else if (!isCompatibility && transactionConfig.getAction() == TransactionConfig.ACTION_ALWAYS_BEGIN && tx != null
+        && !tx.isXA()) {
       throw new IllegalTransactionStateException(CoreMessages.transactionAvailableButActionIs("Always Begin")
           .setNextMessage(createStaticMessage("Non-XA transactions can't be nested.")));
     }
