@@ -33,7 +33,7 @@ import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Random;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -55,7 +55,7 @@ public class FileUtils {
   private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
   private static final String TEMP_DIR_SYSTEM_PROPERTY = "java.io.tmpdir";
   private static final File TEMP_DIR = new File(getProperty(TEMP_DIR_SYSTEM_PROPERTY));
-  private static final AtomicLong TEMP_FILE_INDEX = new AtomicLong(-1);
+  private static final Random random = new Random();
 
   public static String DEFAULT_ENCODING = "UTF-8";
 
@@ -763,6 +763,6 @@ public class FileUtils {
    * @throws RuntimeException
    */
   public static File createTempFile(String prefix, String suffix) {
-    return new File(TEMP_DIR, prefix + TEMP_FILE_INDEX.addAndGet(1) + suffix);
+    return new File(TEMP_DIR, prefix + random.nextLong() + suffix);
   }
 }

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static java.lang.System.currentTimeMillis;
 import static org.mule.runtime.core.api.util.FileUtils.createTempFile;
 
 import java.io.File;
@@ -26,7 +25,7 @@ public final class TempBufferFileUtils {
    * @return a {@link File}
    */
   public static File createBufferFile(String name) {
-    return createTempFile("mule-buffer-${" + name + "}-", currentTimeMillis() + ".tmp");
+    return createTempFile("mule-buffer-${" + name + "}-", ".tmp");
   }
 
   private TempBufferFileUtils() {}
