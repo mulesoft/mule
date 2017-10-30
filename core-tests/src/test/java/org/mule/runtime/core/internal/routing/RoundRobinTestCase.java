@@ -6,18 +6,26 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -34,6 +42,7 @@ import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RoundRobinTestCase extends AbstractMuleContextTestCase {
@@ -46,17 +55,27 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     setStartContext(true);
   }
 
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    ConfigurationComponentLocator configurationComponentLocator = mock(ConfigurationComponentLocator.class);
+    when(configurationComponentLocator.find(any(Location.class))).thenReturn(empty());
+    when(configurationComponentLocator.find(any(ComponentIdentifier.class))).thenReturn(emptyList());
+
+    return singletonMap(REGISTRY_KEY, configurationComponentLocator);
+  }
+
   @Test
   public void testRoundRobin() throws Exception {
     RoundRobin rr = new RoundRobin();
     rr.setAnnotations(getAppleFlowComponentLocationAnnotations());
-    rr.setMuleContext(muleContext);
     MuleSession session = new DefaultMuleSession();
     List<TestProcessor> routes = new ArrayList<>(NUMBER_OF_ROUTES);
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
       routes.add(new TestProcessor());
     }
     rr.setRoutes(new ArrayList<Processor>(routes));
+    initialiseIfNeeded(rr, muleContext);
+
     List<Thread> threads = new ArrayList<>(NUMBER_OF_ROUTES);
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
       threads.add(new Thread(new TestDriver(session, rr, NUMBER_OF_MESSAGES, getTestFlow(muleContext))));
@@ -76,7 +95,6 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
   public void usesFirstRouteOnFirstRequest() throws Exception {
     RoundRobin roundRobin = new RoundRobin();
     roundRobin.setAnnotations(getAppleFlowComponentLocationAnnotations());
-    roundRobin.setMuleContext(muleContext);
     List<Processor> routes = new ArrayList<>(2);
     Processor route1 = mock(Processor.class, "route1");
     when(route1.apply(any(Publisher.class))).then(invocation -> invocation.getArguments()[0]);
@@ -85,6 +103,8 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     when(route2.apply(any(Publisher.class))).then(invocation -> invocation.getArguments()[0]);
     routes.add(route2);
     roundRobin.setRoutes(new ArrayList<>(routes));
+
+    initialiseIfNeeded(roundRobin, muleContext);
 
     Message message = of(singletonList(TEST_MESSAGE));
 

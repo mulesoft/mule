@@ -55,6 +55,7 @@ import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.Exp
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
@@ -495,6 +496,11 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
         rootContainerName = getLocation().getRootContainerName();
       }
       return rootContainerName;
+    }
+
+    @Override
+    public Location getRootContainerLocation() {
+      return Location.builder().globalName(getRootContainerName()).build();
     }
   }
 

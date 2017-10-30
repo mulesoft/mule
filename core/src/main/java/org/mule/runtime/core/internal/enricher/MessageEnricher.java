@@ -26,10 +26,10 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.processor.Scope;
 
 import org.reactivestreams.Publisher;
 
@@ -123,7 +123,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Sc
 
   @Override
   public void initialise() throws InitialisationException {
-    enrichmentProcessor = newChain(getProcessingStrategy(muleContext, getRootContainerName()),
+    enrichmentProcessor = newChain(getProcessingStrategy(locator, getRootContainerLocation()),
                                    enrichmentProcessor);
     initialiseIfNeeded(this.enrichmentProcessor, muleContext);
   }

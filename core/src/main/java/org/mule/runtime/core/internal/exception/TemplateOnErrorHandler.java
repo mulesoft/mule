@@ -25,6 +25,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -53,8 +54,13 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.inject.Inject;
+
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     implements MessagingExceptionHandlerAcceptor {
+
+  @Inject
+  protected ConfigurationComponentLocator locator;
 
   private MessageProcessorChain configuredMessageProcessors;
   private Processor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
@@ -189,7 +195,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
     Optional<ProcessingStrategy> processingStrategy = empty();
     if (getLocation() != null) {
-      processingStrategy = getProcessingStrategy(muleContext, getRootContainerName());
+      processingStrategy = getProcessingStrategy(locator, getRootContainerLocation());
     }
     configuredMessageProcessors =
         newChain(processingStrategy,

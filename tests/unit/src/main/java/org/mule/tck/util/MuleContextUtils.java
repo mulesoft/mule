@@ -7,6 +7,7 @@
 package org.mule.tck.util;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mockito.Matchers.any;
@@ -25,6 +26,8 @@ import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -187,6 +190,10 @@ public class MuleContextUtils {
     final MuleRegistry registry = muleContext.getRegistry();
 
     NotificationListenerRegistry notificationListenerRegistry = mock(NotificationListenerRegistry.class);
+    ConfigurationComponentLocator configurationComponentLocator = mock(ConfigurationComponentLocator.class);
+    when(configurationComponentLocator.find(any(Location.class))).thenReturn(empty());
+    when(configurationComponentLocator.find(any(ComponentIdentifier.class))).thenReturn(emptyList());
+
     try {
       when(registry.lookupObject(NotificationListenerRegistry.class)).thenReturn(notificationListenerRegistry);
 
@@ -199,6 +206,7 @@ public class MuleContextUtils {
       injectableObjects.put(ObjectStoreManager.class, muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER));
       injectableObjects.put(NotificationDispatcher.class, muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
       injectableObjects.put(NotificationListenerRegistry.class, notificationListenerRegistry);
+      injectableObjects.put(ConfigurationComponentLocator.class, configurationComponentLocator);
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));

@@ -10,16 +10,19 @@ import static java.lang.String.format;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
 
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 public class MessageProcessorChainFactoryBean extends AbstractComponentFactory<MessageProcessorChain>
     implements MuleContextAware {
@@ -27,6 +30,9 @@ public class MessageProcessorChainFactoryBean extends AbstractComponentFactory<M
   protected List processors;
   protected String name;
   protected MuleContext muleContext;
+
+  @Inject
+  protected ConfigurationComponentLocator locator;
 
   public void setMessageProcessors(List processors) {
     this.processors = processors;
@@ -47,7 +53,7 @@ public class MessageProcessorChainFactoryBean extends AbstractComponentFactory<M
     }
     return newLazyProcessorChainBuilder((DefaultMessageProcessorChainBuilder) builder,
                                         muleContext,
-                                        () -> getProcessingStrategy(muleContext, getRootContainerName()).orElse(null));
+                                        () -> getProcessingStrategy(locator, getRootContainerLocation()).orElse(null));
   }
 
   protected MessageProcessorChainBuilder getBuilderInstance() {

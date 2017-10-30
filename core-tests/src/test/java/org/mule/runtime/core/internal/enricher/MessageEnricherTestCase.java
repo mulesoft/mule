@@ -17,6 +17,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
@@ -51,7 +52,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor((InternalTestProcessor) event -> CoreEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).value(TEST_PAYLOAD).build()).build());
-    enricher.initialise();
+    initialiseIfNeeded(enricher, muleContext);
 
     Message result = process(enricher, testEvent()).getMessage();
     assertEquals(TEST_PAYLOAD, ((InternalMessage) result).getOutboundProperty("myHeader"));
