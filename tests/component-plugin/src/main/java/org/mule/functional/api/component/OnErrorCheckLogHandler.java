@@ -11,6 +11,7 @@ import static org.mule.runtime.core.privileged.exception.MessagingExceptionUtils
 import static org.mule.tck.processor.FlowAssert.addAssertion;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
@@ -36,10 +37,10 @@ public class OnErrorCheckLogHandler extends AbstractExceptionListener
   @Override
   public CoreEvent handleException(Exception exception, CoreEvent event) {
     markAsHandled(exception);
-    String messageToLog = createMessageToLog(exception);
+    Pair<MuleException, String> exceptionToLog = resolveExceptionAndMessageToLog(exception);
     for (LogChecker checker : this.checkers) {
       try {
-        checker.check(messageToLog);
+        checker.check(exceptionToLog.getSecond());
       } catch (AssertionError e) {
         errors.append(e.getMessage());
       }
