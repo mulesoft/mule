@@ -119,7 +119,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
   }
 
-  private Throwable getCause(Exception ex) q{
+  private Throwable getCause(Exception ex) {
     return ex.getCause() instanceof TypedException ? ex.getCause().getCause() : ex.getCause();
   }
 
