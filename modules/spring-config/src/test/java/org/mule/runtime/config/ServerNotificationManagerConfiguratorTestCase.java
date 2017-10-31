@@ -157,6 +157,11 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
     public CompliantNotification(Object message, int action) {
       super(message, action);
     }
+
+    @Override
+    public String getEventName() {
+      return "CompliantNotification";
+    }
   }
 
   public static class CompliantNotificationListener implements NotificationListener<CompliantNotification> {

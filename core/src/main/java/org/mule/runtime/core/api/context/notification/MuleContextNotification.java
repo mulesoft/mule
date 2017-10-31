@@ -70,12 +70,17 @@ public class MuleContextNotification extends AbstractServerNotification {
 
   @Override
   public String toString() {
-    return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier + ", timestamp="
+    return getEventName() + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier + ", timestamp="
         + timestamp + "}";
   }
 
   @Override
   public boolean isSynchronous() {
     return true;
+  }
+
+  @Override
+  public String getEventName() {
+    return "MuleContextNotification";
   }
 }
