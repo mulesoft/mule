@@ -64,21 +64,21 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     MuleDeployableArtifactClassLoader policyClassLoader;
     Set<ArtifactPlugin> plugins = new HashSet<>(application.getArtifactPlugins());
     plugins.addAll(application.getDomain().getArtifactPlugins());
-    List<ArtifactPluginDescriptor> artifactPluginDescriptors =
-        getArtifactPluginDescriptors(plugins, descriptor);
-    List<ArtifactPluginDescriptor> resolveArtifactPluginDescriptors =
-        pluginDependenciesResolver.resolve(artifactPluginDescriptors);
+    List<ArtifactPluginDescriptor> resolvedPolicyPluginsDescriptors =
+        pluginDependenciesResolver.resolve(new ArrayList<>(descriptor.getPlugins()));
+    List<ArtifactPluginDescriptor> policyClassLoaderPluginDescriptors =
+        filterPolicyPluginsBasedOnApplicationPlugins(plugins, resolvedPolicyPluginsDescriptors);
     try {
       policyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
-          .addArtifactPluginDescriptors(resolveArtifactPluginDescriptors
-              .toArray(new ArtifactPluginDescriptor[resolveArtifactPluginDescriptors.size()]))
+          .addArtifactPluginDescriptors(policyClassLoaderPluginDescriptors
+              .toArray(new ArtifactPluginDescriptor[policyClassLoaderPluginDescriptors.size()]))
           .setParentClassLoader(application.getRegionClassLoader()).setArtifactDescriptor(descriptor).build();
     } catch (IOException e) {
       throw new PolicyTemplateCreationException(createPolicyTemplateCreationErrorMessage(descriptor.getName()), e);
     }
     application.getRegionClassLoader().addClassLoader(policyClassLoader, NULL_CLASSLOADER_FILTER);
 
-    List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(policyClassLoader, artifactPluginDescriptors);
+    List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(policyClassLoader, policyClassLoaderPluginDescriptors);
 
     validateArtifactLicense(policyClassLoader.getClassLoader(), artifactPlugins, licenseValidator);
 
@@ -88,10 +88,10 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     return policy;
   }
 
-  private List<ArtifactPluginDescriptor> getArtifactPluginDescriptors(Set<ArtifactPlugin> appPlugins,
-                                                                      PolicyTemplateDescriptor descriptor) {
+  private List<ArtifactPluginDescriptor> filterPolicyPluginsBasedOnApplicationPlugins(Set<ArtifactPlugin> appPlugins,
+                                                                                      List<ArtifactPluginDescriptor> policyPlugins) {
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
-    for (ArtifactPluginDescriptor policyPluginDescriptor : descriptor.getPlugins()) {
+    for (ArtifactPluginDescriptor policyPluginDescriptor : policyPlugins) {
       Optional<ArtifactPlugin> appPluginDescriptor =
           findPlugin(appPlugins, policyPluginDescriptor.getBundleDescriptor());
 
