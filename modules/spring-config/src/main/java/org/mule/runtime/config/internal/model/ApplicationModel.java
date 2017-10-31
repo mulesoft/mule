@@ -604,7 +604,7 @@ public class ApplicationModel {
     validateSingletonsAreNotRepeated();
     validateNameIsNotRepeated();
     validateNameHasValidCharacters();
-    validateFlowRefPointsToExistentFlow();
+    validateFlowRefPointsToExistingFlow();
     validateErrorMappings();
     validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice();
     validateErrorHandlerStructure();
@@ -615,14 +615,14 @@ public class ApplicationModel {
     validateSingleElementsExistence();
   }
 
-  private void validateFlowRefPointsToExistentFlow() {
+  private void validateFlowRefPointsToExistingFlow() {
     executeOnEveryMuleComponentTree(componentModel -> {
       if (componentModel.getIdentifier().equals(FLOW_REF_IDENTIFIER)) {
         String nameAttribute = componentModel.getNameAttribute();
         if (nameAttribute != null && !nameAttribute.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
           Optional<ComponentModel> referencedFlow = findTopLevelNamedComponent(nameAttribute);
           referencedFlow
-              .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("flow-ref at %s:%s is pointing to %s which does not exists",
+              .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("flow-ref at %s:%s is pointing to %s which does not exist",
                                                                               componentModel.getConfigFileName()
                                                                                   .orElse("unknown"),
                                                                               componentModel.getLineNumber().orElse(-1),
