@@ -24,6 +24,7 @@ public interface CoreDslConstants {
   String IMPORT_ELEMENT = "import";
   String RAISE_ERROR = "raise-error";
   String FLOW_ELEMENT = "flow";
+  String FLOW_REF_ELEMENT = "flow-ref";
   String SUBFLOW_ELEMENT = "sub-flow";
   String ERROR_HANDLER = "error-handler";
   String ON_ERROR_CONTINUE = "on-error-continue";
@@ -46,6 +47,8 @@ public interface CoreDslConstants {
       builder().namespace(EE_DOMAIN_PREFIX).name(MULE_DOMAIN_ROOT_ELEMENT).build();
   ComponentIdentifier FLOW_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(FLOW_ELEMENT).build();
+  ComponentIdentifier FLOW_REF_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(FLOW_REF_ELEMENT).build();
   ComponentIdentifier SUBFLOW_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(SUBFLOW_ELEMENT).build();
   ComponentIdentifier CONFIGURATION_IDENTIFIER =

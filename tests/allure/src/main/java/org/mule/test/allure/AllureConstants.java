@@ -145,6 +145,8 @@ public interface AllureConstants {
 
   interface ComponentsFeature {
 
+    String CORE_COMPONENTS = "Core Components";
+
     interface FlowReferenceStory {
 
       String FLOW_REFERENCE = "Flow Reference";

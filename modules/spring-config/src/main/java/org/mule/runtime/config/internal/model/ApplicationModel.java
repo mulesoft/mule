@@ -24,11 +24,13 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_REF_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_EE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
@@ -602,6 +604,7 @@ public class ApplicationModel {
     validateSingletonsAreNotRepeated();
     validateNameIsNotRepeated();
     validateNameHasValidCharacters();
+    validateFlowRefPointsToExistingFlow();
     validateErrorMappings();
     validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice();
     validateErrorHandlerStructure();
@@ -610,6 +613,23 @@ public class ApplicationModel {
       validateNamedTopLevelElementsHaveName(componentBuildingDefinitionRegistry.get());
     }
     validateSingleElementsExistence();
+  }
+
+  private void validateFlowRefPointsToExistingFlow() {
+    executeOnEveryMuleComponentTree(componentModel -> {
+      if (componentModel.getIdentifier().equals(FLOW_REF_IDENTIFIER)) {
+        String nameAttribute = componentModel.getNameAttribute();
+        if (nameAttribute != null && !nameAttribute.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
+          Optional<ComponentModel> referencedFlow = findTopLevelNamedComponent(nameAttribute);
+          referencedFlow
+              .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("flow-ref at %s:%s is pointing to %s which does not exist",
+                                                                              componentModel.getConfigFileName()
+                                                                                  .orElse("unknown"),
+                                                                              componentModel.getLineNumber().orElse(-1),
+                                                                              nameAttribute)));
+        }
+      }
+    });
   }
 
   private void validateParameterAndChildForSameAttributeAreNotDefinedTogether() {

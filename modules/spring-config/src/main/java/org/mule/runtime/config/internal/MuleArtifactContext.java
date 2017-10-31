@@ -34,7 +34,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -259,6 +258,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                               artifactProperties, parentConfigurationProperties,
                                               of(componentBuildingDefinitionRegistry),
                                               true, externalResourceProvider);
+    } catch (MuleRuntimeException e) {
+      throw e;
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
