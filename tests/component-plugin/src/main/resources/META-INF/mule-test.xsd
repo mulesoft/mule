@@ -404,6 +404,7 @@
                 <xsd:sequence minOccurs="1" maxOccurs="unbounded">
                     <xsd:element ref="abstract-log-checker"/>
                 </xsd:sequence>
+                <xsd:attribute name="propagate" type="xsd:boolean" default="false"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

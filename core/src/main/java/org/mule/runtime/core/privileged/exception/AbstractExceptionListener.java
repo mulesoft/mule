@@ -119,7 +119,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
   }
 
-  private Throwable getCause(Exception ex) {
+  private Throwable getCause(Exception ex) q{
     return ex.getCause() instanceof TypedException ? ex.getCause().getCause() : ex.getCause();
   }
 
@@ -140,17 +140,26 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     return new Pair<>(muleException, logMessage);
   }
 
-  protected void doLogException(Throwable t) {
+  protected void resolveAndLogException(Throwable t) {
     Pair<MuleException, String> resolvedException = resolveExceptionAndMessageToLog(t);
+    //First check if exception was not logged already
     if (resolvedException.getSecond() != null) {
       if (!(boolean) resolvedException.getFirst().getInfo().getOrDefault(ALREADY_LOGGED_KEY, false)) {
-        logger.error(resolvedException.getSecond());
-        resolvedException.getFirst().addInfo(ALREADY_LOGGED_KEY, true);
+        doLogException(resolvedException.getSecond(), null);
       } else {
-        return;
+        return; //Don't log anything, error while getting root or exception already logged.
       }
     } else {
-      logger.error("Caught exception in Exception Strategy: " + t.getMessage(), t);
+      doLogException("Caught exception in Exception Strategy: " + t.getMessage(), t);
+    }
+    resolvedException.getFirst().addInfo(ALREADY_LOGGED_KEY, true);
+  }
+
+  protected void doLogException(String message, Throwable t) {
+    if (t == null) {
+      logger.error(message);
+    } else {
+      logger.error(message, t);
     }
   }
 

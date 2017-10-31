@@ -34,7 +34,7 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
   public void handleException(Exception ex, RollbackSourceCallback rollbackMethod) {
     fireNotification(ex, getCurrentEvent());
 
-    doLogException(ex);
+    resolveAndLogException(ex);
 
     logger.debug("Rolling back transaction");
     rollback(ex, rollbackMethod);

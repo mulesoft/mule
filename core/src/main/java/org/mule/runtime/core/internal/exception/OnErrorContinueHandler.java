@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 /**
  * Handler that will consume errors and finally commit transactions. Replaces the catch-exception-strategy from Mule 3.

@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import org.reactivestreams.Publisher;
 

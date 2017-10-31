@@ -11,6 +11,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import org.reactivestreams.Publisher;
 
