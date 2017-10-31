@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import static org.mule.runtime.http.api.utils.UriCache.getUriFromString;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.REQUEST_BUILDER;
 
@@ -28,6 +29,7 @@ import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.mule.runtime.http.api.utils.UriCache;
 
 import java.net.URI;
 
@@ -46,9 +48,10 @@ public class HttpRequestBuilderTestCase {
 
   @Test
   public void defaultRequest() {
-    HttpRequest request = builder.uri("someUri").build();
+    URI uri = getUriFromString("someUri");
+    HttpRequest request = builder.uri(uri).build();
     assertThat(request.getMethod(), is("GET"));
-    assertThat(request.getUri(), is(URI.create("someUri")));
+    assertThat(request.getUri(), is(uri));
     assertThat(request.getEntity(), is(instanceOf(EmptyHttpEntity.class)));
     assertThat(request.getHeaderNames(), empty());
     assertThat(request.getQueryParams().keySet(), empty());
