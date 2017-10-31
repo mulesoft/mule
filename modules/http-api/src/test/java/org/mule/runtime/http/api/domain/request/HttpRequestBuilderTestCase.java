@@ -29,6 +29,8 @@ import org.junit.rules.ExpectedException;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
+import java.net.URI;
+
 @Feature(HTTP_SERVICE)
 @Story(REQUEST_BUILDER)
 public class HttpRequestBuilderTestCase {
@@ -46,7 +48,7 @@ public class HttpRequestBuilderTestCase {
   public void defaultRequest() {
     HttpRequest request = builder.uri("someUri").build();
     assertThat(request.getMethod(), is("GET"));
-    assertThat(request.getUri(), is("someUri"));
+    assertThat(request.getUri(), is(URI.create("someUri")));
     assertThat(request.getEntity(), is(instanceOf(EmptyHttpEntity.class)));
     assertThat(request.getHeaderNames(), empty());
     assertThat(request.getQueryParams().keySet(), empty());
@@ -72,7 +74,7 @@ public class HttpRequestBuilderTestCase {
         .addHeader(name.toUpperCase(), value.toUpperCase())
         .build();
 
-    assertThat(request.getUri(), is(URI_VALUE));
+    assertThat(request.getUri(), is(URI.create(URI_VALUE)));
     assertThat(request.getMethod(), is(POST.name()));
     assertThat(request.getEntity(), is(instanceOf(ByteArrayHttpEntity.class)));
     assertThat(request.getHeaderNames(), hasItems(name));
