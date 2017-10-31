@@ -1,0 +1,27 @@
+package mule
+import org.mule.module.drools.Data;
+global org.mule.module.bpm.MessageService mule;
+
+dialect "mvel"
+
+declare Data
+@role('event')
+end
+
+rule "category 0"
+	lock-on-active true
+	no-loop true
+when
+	$fact: Data(value < 50)
+then
+    modify($fact) {category = 0}
+end
+
+rule "category 1"
+	lock-on-active true
+	no-loop true
+when
+	$fact: Data(value >= 50)
+then
+    modify($fact) {category = 1}
+end
