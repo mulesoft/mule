@@ -8,14 +8,16 @@ package org.mule.runtime.core.api;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectNotOfSpecifiedType;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -105,7 +107,7 @@ public class DefaultTransformationService implements TransformationService {
   protected <T> T getPayload(Message message, DataType resultType, Charset encoding) throws MessageTransformerException {
     // Handle null by ignoring the request
     if (resultType == null) {
-      throw new IllegalArgumentException(CoreMessages.objectIsNull("resultType").getMessage());
+      throw new IllegalArgumentException(objectIsNull("resultType").getMessage());
     }
 
     DataType dataType = DataType.builder(resultType).type(message.getPayload().getDataType().getType()).build();
@@ -120,7 +122,7 @@ public class DefaultTransformationService implements TransformationService {
     try {
       transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(dataType, resultType);
       if (transformer == null) {
-        throw new MessageTransformerException(CoreMessages.noTransformerFoundForMessage(dataType, resultType), null, message);
+        throw new MessageTransformerException(noTransformerFoundForMessage(dataType, resultType), null, message);
       }
 
       // Pass in the message itself

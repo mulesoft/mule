@@ -12,6 +12,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.metadata.java.api.utils.ClassUtils.getInnerClassName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import com.google.common.primitives.Primitives;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 /**
  * Extend the Apache Commons ClassUtils to provide additional functionality.
@@ -846,6 +848,17 @@ public class ClassUtils {
     } finally {
       currentThread.setContextClassLoader(currentClassLoader);
     }
+  }
+
+  /**
+   * Wraps the given function {@code f} so that results for a given input are cached in the given Map.
+   * 
+   * @param f the function to memoize
+   * @param cache the map where cached values are stored
+   * @return the memoized function
+   */
+  public static <I, O> Function<I, O> memoize(Function<I, O> f, Map<I, O> cache) {
+    return input -> cache.computeIfAbsent(input, f);
   }
 
   /**

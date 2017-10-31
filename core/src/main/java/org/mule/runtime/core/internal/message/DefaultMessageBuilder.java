@@ -28,7 +28,6 @@ import static org.mule.runtime.core.api.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.api.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.api.util.ObjectUtils.getString;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
-import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
@@ -40,7 +39,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
@@ -72,8 +70,10 @@ public class DefaultMessageBuilder
   private static final String INBOUND_NAME = "INBOUND";
   private static final String OUTBOUND_NAME = "OUTBOUND";
 
-  private TypedValue payload = of(null);
-  private TypedValue attributes = of(null);
+  private static final TypedValue NULL_TYPED_VALUE = of(null);
+
+  private TypedValue payload = of(NULL_TYPED_VALUE);
+  private TypedValue attributes = of(NULL_TYPED_VALUE);
 
   private ExceptionPayload exceptionPayload;
 

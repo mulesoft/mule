@@ -9,25 +9,28 @@ package org.mule.runtime.core.api.streaming;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
+import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
 import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
 import org.mule.runtime.core.internal.streaming.object.DefaultObjectStreamingManager;
-import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
-import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
-
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
+
+import javax.inject.Inject;
 
 public class DefaultStreamingManager implements StreamingManager, Initialisable, Disposable {
 
@@ -40,8 +43,13 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   private MutableStreamingStatistics statistics;
   private boolean initialised = false;
 
+  private Scheduler disposalScheduler;
+
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private SchedulerService schedulerService;
 
   /**
    * {@inheritDoc}
@@ -50,7 +58,9 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   public void initialise() throws InitialisationException {
     if (!initialised) {
       statistics = new MutableStreamingStatistics();
-      cursorManager = new CursorManager(statistics);
+      disposalScheduler =
+          schedulerService.cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig().withName("StreamingManager-dispose"));
+      cursorManager = new CursorManager(statistics, disposalScheduler);
       bufferManager = new PoolingByteBufferManager();
       byteStreamingManager = createByteStreamingManager();
       objectStreamingManager = createObjectStreamingManager();
@@ -78,6 +88,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     disposeIfNeeded(objectStreamingManager, LOGGER);
     disposeIfNeeded(bufferManager, LOGGER);
     disposeIfNeeded(cursorManager, LOGGER);
+    disposalScheduler.stop();
 
     initialised = false;
   }
