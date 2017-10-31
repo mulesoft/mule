@@ -178,10 +178,10 @@ public class DefaultResourceReleaser implements ResourceReleaser {
       }
     } catch (Throwable e) {
       Throwable cause = e.getCause();
-      if(cause instanceof SQLException){
+      if (cause instanceof SQLException) {
         // A successful shutdown always results in an SQLException to indicate that Derby has shut down and that
         // there is no other exception.
-        if(logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
           logger.debug("Expected exception when unregister Derby's embedded driver", e);
         }
       } else {
