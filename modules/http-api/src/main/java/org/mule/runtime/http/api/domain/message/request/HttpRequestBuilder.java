@@ -8,6 +8,7 @@ package org.mule.runtime.http.api.domain.message.request;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
+import static org.mule.runtime.http.api.utils.UriCache.getUriFromString;
 
 import org.mule.runtime.http.api.HttpConstants.Method;
 import org.mule.runtime.api.util.MultiMap;
@@ -41,7 +42,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   public HttpRequestBuilder uri(String uri) {
     int queryPos = uri.indexOf("?");
     this.path = queryPos > -1 ? uri.substring(0, queryPos) : uri;
-    this.uri = UriCache.getInstance().createUriFromString(uri);
+    this.uri = getUriFromString(uri);
     return this;
   }
 

@@ -11,12 +11,13 @@ import com.google.common.cache.CacheBuilder;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.net.URI;
-import java.util.concurrent.ExecutionException;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 /**
  * Cache to avoid recalculating URIs more than once
+ *
+ * @since 4.0
  */
 public class UriCache {
 
@@ -29,16 +30,20 @@ public class UriCache {
 
   public static UriCache getInstance() {
     if (instance == null) {
-      instance = new UriCache();
+      synchronized (UriCache.class) {
+        if (instance == null) {
+          instance = new UriCache();
+        }
+      }
     }
     return instance;
   }
 
-  public URI createUriFromString(String uri) {
+  public static URI getUriFromString(String uri) {
     try {
-      return this.cache.get(uri, () -> URI.create(uri));
+      return getInstance().cache.get(uri, () -> URI.create(uri));
     } catch (Exception e) {
-      if (e.getCause() instanceof RuntimeException) {
+      if (e.getCause() != null && e.getCause() instanceof RuntimeException) {
         throw (RuntimeException) e.getCause();
       } else {
         throw new MuleRuntimeException(createStaticMessage("Could not create URI for " + uri, e));
