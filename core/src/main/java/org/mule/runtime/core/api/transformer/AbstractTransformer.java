@@ -6,35 +6,37 @@
  */
 package org.mule.runtime.core.api.transformer;
 
+import static java.lang.String.format;
+import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.hash;
 import static org.mule.runtime.api.metadata.DataType.builder;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.privileged.transformer.TransformerUtils.checkTransformerReturnClass;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformerUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.transform.stream.StreamSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <code>AbstractTransformer</code> is a base class for all transformers. Transformations transform one object into another.
@@ -225,33 +227,37 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
   @Override
   public Object transform(Object src, Charset enc) throws TransformerException {
     Object payload = src;
+    DataType sourceType;
     if (src instanceof Message) {
       Message message = (Message) src;
       if ((!isSourceDataTypeSupported(DataType.MULE_MESSAGE, true) && !(this instanceof AbstractMessageTransformer))) {
         payload = message.getPayload().getValue();
+        sourceType = message.getPayload().getDataType();
+      } else {
+        sourceType = DataType.fromObject(payload);
       }
+    } else {
+      sourceType = DataType.fromObject(payload);
     }
 
-    DataType sourceType = DataType.fromObject(payload);
-
     if (!isSourceDataTypeSupported(sourceType)) {
-      I18nMessage msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(), payload.getClass());
+      I18nMessage msg = transformOnObjectUnsupportedTypeOfEndpoint(getName(), payload.getClass());
       /// FIXME
       throw new TransformerException(msg, this);
     }
 
     if (logger.isDebugEnabled()) {
-      logger.debug(String.format("Applying transformer %s (%s)", getName(), getClass().getName()));
-      logger.debug(String.format("Object before transform: %s", StringMessageUtils.toString(payload)));
+      logger.debug(format("Applying transformer %s (%s)", getName(), getClass().getName()));
+      logger.debug(format("Object before transform: %s", StringMessageUtils.toString(payload)));
     }
 
     Object result = doTransform(payload, enc);
 
     if (logger.isDebugEnabled()) {
-      logger.debug(String.format("Object after transform: %s", StringMessageUtils.toString(result)));
+      logger.debug(format("Object after transform: %s", StringMessageUtils.toString(result)));
     }
 
-    TransformerUtils.checkTransformerReturnClass(this, result);
+    checkTransformerReturnClass(this, result);
 
     return result;
   }
@@ -286,7 +292,7 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
 
   @Override
   public List<DataType> getSourceDataTypes() {
-    return Collections.unmodifiableList(sourceTypes);
+    return unmodifiableList(sourceTypes);
   }
 
   @Override

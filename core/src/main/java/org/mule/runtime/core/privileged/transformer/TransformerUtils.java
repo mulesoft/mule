@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.privileged.transformer;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.mule.runtime.api.metadata.DataType.builder;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotRegistered;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformUnexpectedType;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -30,6 +30,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 
 public class TransformerUtils {
 
@@ -86,7 +89,7 @@ public class TransformerUtils {
         Transformer transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(key);
 
         if (transformer == null) {
-          throw new DefaultMuleException(CoreMessages.objectNotRegistered("Transformer", key));
+          throw new DefaultMuleException(objectNotRegistered("Transformer", key));
         }
         transformers.add(transformer);
       }
@@ -110,12 +113,16 @@ public class TransformerUtils {
     }
 
     if (transformer.getReturnDataType() != null) {
-      DataType dt = DataType.fromObject(value);
-      if (ANY.matches(dt.getMediaType())) { //To avoid getting an error because the DataType was constructed with a default mediaType
-        dt = builder(dt).mediaType(transformer.getReturnDataType().getMediaType()).build();
+      DataTypeParamsBuilder dtBuilder = DataType.builder().fromObject(value);
+
+      if (!(value instanceof DataHandler) && !(value instanceof DataSource)) {
+        // To avoid getting an error because the DataType was constructed with a default mediaType
+        dtBuilder = dtBuilder.mediaType(transformer.getReturnDataType().getMediaType());
       }
+
+      DataType dt = dtBuilder.build();
       if (!transformer.getReturnDataType().isCompatibleWith(dt)) {
-        throw new TransformerException(CoreMessages.transformUnexpectedType(dt, transformer.getReturnDataType()), transformer);
+        throw new TransformerException(transformUnexpectedType(dt, transformer.getReturnDataType()), transformer);
       }
     }
 
@@ -157,8 +164,8 @@ public class TransformerUtils {
     } catch (TransformerException e) {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(
-                     String.format("Transformer %s threw exception while trying to transform an object of type %s into a %s",
-                                   transformer.getName(), sourceDataType.getType().getName(), resultDataType.getType().getName()),
+                     format("Transformer %s threw exception while trying to transform an object of type %s into a %s",
+                            transformer.getName(), sourceDataType.getType().getName(), resultDataType.getType().getName()),
                      e);
       }
 

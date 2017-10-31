@@ -10,6 +10,8 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.api.util.ClassUtils.memoize;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
@@ -37,7 +40,7 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
   private final Set<ComponentLocation> componentLocations = new HashSet<>();
 
   public SpringConfigurationComponentLocator(Function<String, Boolean> isTemplateComponentFunction) {
-    this.isTemplateLocationFunction = isTemplateComponentFunction;
+    this.isTemplateLocationFunction = memoize(isTemplateComponentFunction, new ConcurrentHashMap<>());
   }
 
   /**

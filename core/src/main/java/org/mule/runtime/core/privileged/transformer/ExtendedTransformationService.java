@@ -9,6 +9,8 @@ package org.mule.runtime.core.privileged.transformer;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.privileged.transformer.TransformerUtils.checkTransformerReturnClass;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -22,13 +24,13 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ExtendedTransformationService extends DefaultTransformationService {
 
@@ -170,7 +172,7 @@ public class ExtendedTransformationService extends DefaultTransformationService 
     if (transformer instanceof Converter) {
       if (index == transformers.size() - 1) {
         try {
-          TransformerUtils.checkTransformerReturnClass(transformer, message.getPayload().getValue());
+          checkTransformerReturnClass(transformer, message.getPayload().getValue());
           skipConverter = true;
         } catch (TransformerException e) {
           // Converter cannot be skipped

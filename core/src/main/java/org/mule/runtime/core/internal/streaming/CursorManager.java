@@ -9,7 +9,9 @@ package org.mule.runtime.core.internal.streaming;
 import static java.util.Collections.newSetFromMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -18,6 +20,9 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProvider;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -28,11 +33,9 @@ import com.google.common.cache.RemovalNotification;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Keeps track of active {@link Cursor cursors} and their {@link CursorProvider providers}
@@ -54,15 +57,18 @@ public class CursorManager {
             }
           });
 
-  private MutableStreamingStatistics statistics;
+  private final MutableStreamingStatistics statistics;
+  private final Scheduler disposalScheduler;
 
   /**
    * Creates a new instance
    *
    * @param statistics statistics which values should be kept updated
+   * @param disposalScheduler where to run the disposal
    */
-  public CursorManager(MutableStreamingStatistics statistics) {
+  public CursorManager(MutableStreamingStatistics statistics, Scheduler disposalScheduler) {
     this.statistics = statistics;
+    this.disposalScheduler = disposalScheduler;
   }
 
   /**
@@ -179,7 +185,14 @@ public class CursorManager {
 
     private void dispose() {
       if (disposed.compareAndSet(false, true)) {
-        cursors.invalidateAll();
+        try {
+          disposalScheduler.execute(() -> {
+            cursors.invalidateAll();
+          });
+        } catch (RejectedExecutionException e) {
+          // If the Scheduler is busy and can't accept the task, we perform it in the current thread.
+          cursors.invalidateAll();
+        }
       }
     }
 
