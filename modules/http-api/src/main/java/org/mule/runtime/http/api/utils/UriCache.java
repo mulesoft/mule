@@ -34,11 +34,15 @@ public class UriCache {
     return instance;
   }
 
-  public URI getUriFromString(String uri) {
+  public URI createUriFromString(String uri) {
     try {
       return this.cache.get(uri, () -> URI.create(uri));
-    } catch (ExecutionException e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not create URI for " + uri, e));
+    } catch (Exception e) {
+      if (e.getCause() instanceof RuntimeException) {
+        throw (RuntimeException) e.getCause();
+      } else {
+        throw new MuleRuntimeException(createStaticMessage("Could not create URI for " + uri, e));
+      }
     }
   }
 }
