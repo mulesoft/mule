@@ -22,7 +22,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 public class UriCache {
 
   private static final int MAX_CACHE_SIZE = 2000;
-  private static UriCache instance;
+  private static volatile UriCache instance;
 
   private Cache<String, URI> cache = CacheBuilder.<String, String>newBuilder().maximumSize(MAX_CACHE_SIZE).build();
 
