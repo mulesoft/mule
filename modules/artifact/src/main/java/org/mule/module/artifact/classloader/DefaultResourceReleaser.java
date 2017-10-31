@@ -14,16 +14,17 @@ import static java.sql.DriverManager.getDrivers;
 
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Driver;
+import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.ResourceBundle;
-
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,7 +177,16 @@ public class DefaultResourceReleaser implements ResourceReleaser {
         m.invoke(driverObject, "jdbc:derby:;shutdown=true", null);
       }
     } catch (Throwable e) {
-      logger.warn("Unable to unregister Derby's embedded driver", e);
+      Throwable cause = e.getCause();
+      if (cause instanceof SQLException) {
+        // A successful shutdown always results in an SQLException to indicate that Derby has shut down and that
+        // there is no other exception.
+        if (logger.isDebugEnabled()) {
+          logger.debug("Expected exception when unregister Derby's embedded driver", e);
+        }
+      } else {
+        logger.warn("Unable to unregister Derby's embedded driver", e);
+      }
     }
   }
 
