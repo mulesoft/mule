@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+
+
+    <http:request-config name="HTTP_Request_Configuration"
+                         protocol="HTTPS" host="localhost" port="${port}">
+        <tls:context>
+            <tls:trust-store insecure="true"/>
+        </tls:context>
+    </http:request-config>
+
+    <ws:consumer-config name="Web_Service_Consumer"
+                        service="TestService" port="TestPort" serviceAddress="Test.xsd"
+                        wsdlLocation="https://localhost:${port}/services/Test?wsdl" connectorConfig="HTTP_Request_Configuration"
+                        useConnectorToRetrieveWsdl="true"/>
+
+    <flow name="client">
+        <ws:consumer config-ref="Web_Service_Consumer" operation="noParamsWithHeader"/>
+    </flow>
+</mule>

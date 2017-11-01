@@ -19,7 +19,7 @@
     </http:request-config>
 
     <ws:consumer-config name="Web_Service_Consumer"
-                        service="TestService" port="TestPort" serviceAddress="https://localhost:${port}/service/Test"
+                        service="TestService" port="TestPort" serviceAddress="https://localhost:${port}/service/Test.xsd"
                         wsdlLocation="https://localhost:${port}/services/Test?wsdl" connectorConfig="HTTP_Request_Configuration"
                         useConnectorToRetrieveWsdl="true"/>
 
