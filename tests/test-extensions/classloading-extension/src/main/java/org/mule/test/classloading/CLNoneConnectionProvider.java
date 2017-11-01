@@ -6,15 +6,13 @@
  */
 package org.mule.test.classloading;
 
-import static org.mule.test.classloading.ClassLoadingExtension.addClassLoader;
-
+import static org.mule.test.classloading.api.ClassLoadingHelper.addClassLoader;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 @Alias("none")
-public class CLNoneConnectionProvider implements ConnectionProvider<String> {
+public class CLNoneConnectionProvider implements ClassLoadingConnectionProvider<String> {
 
   public static final String CONNECT = "Connect";
   public static final String DISCONNECT = "Disconnect";

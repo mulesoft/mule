@@ -17,9 +17,8 @@ import static org.mule.test.classloading.CLNoneConnectionProvider.CONNECT;
 import static org.mule.test.classloading.CLNoneConnectionProvider.DISCONNECT;
 import static org.mule.test.classloading.CLPoolingConnectionProvider.ON_BORROW;
 import static org.mule.test.classloading.CLPoolingConnectionProvider.ON_RETURN;
-
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.classloading.ClassLoadingExtension;
+import org.mule.test.classloading.api.ClassLoadingHelper;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.util.List;
@@ -39,7 +38,7 @@ public class ClassLoadingOnConnectionsTestCase extends AbstractExtensionFunction
 
   @Before
   public void setUp() {
-    ClassLoadingExtension.createdClassLoaders.clear();
+    ClassLoadingHelper.createdClassLoaders.clear();
   }
 
   @Override
@@ -66,7 +65,7 @@ public class ClassLoadingOnConnectionsTestCase extends AbstractExtensionFunction
   }
 
   void verifyUsedClassLoaders(String... phasesToExecute) {
-    Map<String, ClassLoader> createdClassLoaders = ClassLoadingExtension.createdClassLoaders;
+    Map<String, ClassLoader> createdClassLoaders = ClassLoadingHelper.createdClassLoaders;
     List<ClassLoader> collect = createdClassLoaders.values().stream().distinct().collect(toList());
     assertThat(collect.size(), is(1));
     ClassLoader classLoader = collect.get(0);
