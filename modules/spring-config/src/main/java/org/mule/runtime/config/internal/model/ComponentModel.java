@@ -13,6 +13,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
@@ -58,6 +59,7 @@ public abstract class ComponentModel {
   private List<ComponentModel> innerComponents = new ArrayList<>();
   private String textContent;
   private DefaultComponentLocation componentLocation;
+  private TypedComponentIdentifier.ComponentType componentType;
 
   private Object objectInstance;
   private Class<?> type;
@@ -142,6 +144,20 @@ public abstract class ComponentModel {
    */
   public void setType(Class<?> type) {
     this.type = type;
+  }
+
+  /**
+   * @return the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} of the object to be created when processing this {@code ComponentModel}.
+   */
+  public Optional<TypedComponentIdentifier.ComponentType> getComponentType() {
+    return ofNullable(componentType);
+  }
+
+  /**
+   * @param componentType the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} of the object to be created when processing this {@code ComponentModel}.
+   */
+  public void setComponentType(TypedComponentIdentifier.ComponentType componentType) {
+    this.componentType = componentType;
   }
 
   /**

@@ -20,7 +20,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
@@ -30,6 +29,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_EE_DOMAIN_ID
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
+import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
@@ -73,7 +73,6 @@ import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
@@ -325,11 +324,25 @@ public class ApplicationModel {
     resolveRegistrationNames();
     validateModel(componentBuildingDefinitionRegistry);
     createEffectiveModel();
+    ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
     if (runtimeMode) {
       expandModules(extensionModels);
     }
+    //TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors and crafted declared extesion models)
     resolveComponentTypes();
-    executeOnEveryMuleComponentTree(new ComponentLocationVisitor(new ExtensionModelHelper(extensionModels)));
+    resolveTypedComponentIdentifier(extensionModelHelper);
+    executeOnEveryMuleComponentTree(new ComponentLocationVisitor(extensionModelHelper));
+  }
+
+  private void resolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper) {
+    executeOnEveryComponentTree(componentModel -> {
+      Optional<TypedComponentIdentifier> typedComponentIdentifier =
+          of(TypedComponentIdentifier.builder().identifier(componentModel.getIdentifier())
+              .type(resolveComponentType(componentModel, extensionModelHelper))
+              .build());
+      componentModel.setComponentType(typedComponentIdentifier.map(typedIdentifier -> typedIdentifier.getType())
+          .orElse(TypedComponentIdentifier.ComponentType.UNKNOWN));
+    });
   }
 
   private void createConfigurationAttributeResolver(ArtifactConfig artifactConfig,
@@ -434,28 +447,31 @@ public class ApplicationModel {
    * Resolves the types of each component model when possible.
    */
   public void resolveComponentTypes() {
-    checkState(componentBuildingDefinitionRegistry.isPresent(),
-               "ApplicationModel was created without a " + ComponentBuildingDefinitionProvider.class.getName());
-    executeOnEveryComponentTree(componentModel -> {
-      Optional<ComponentBuildingDefinition<?>> buildingDefinition =
-          componentBuildingDefinitionRegistry.get().getBuildingDefinition(componentModel.getIdentifier());
-      buildingDefinition.map(definition -> {
-        ObjectTypeVisitor typeDefinitionVisitor = new ObjectTypeVisitor(componentModel);
-        definition.getTypeDefinition().visit(typeDefinitionVisitor);
-        componentModel.setType(typeDefinitionVisitor.getType());
-        return definition;
-      }).orElseGet(() -> {
-        String classParameter = componentModel.getParameters().get(CLASS_ATTRIBUTE);
-        if (classParameter != null) {
-          try {
-            componentModel.setType(ClassUtils.getClass(classParameter));
-          } catch (ClassNotFoundException e) {
-            throw new RuntimeConfigurationException(I18nMessageFactory.createStaticMessage(String
-                .format("Could not resolve class '%s' for component '%s'", classParameter,
-                        componentModel.getComponentLocation())));
+    //TODO MULE-13894 enable this once changes are completed and no componentBuildingDefinition is needed
+    //checkState(componentBuildingDefinitionRegistry.isPresent(),
+    //           "ApplicationModel was created without a " + ComponentBuildingDefinitionProvider.class.getName());
+    componentBuildingDefinitionRegistry.ifPresent(buildingDefinitionRegistry -> {
+      executeOnEveryComponentTree(componentModel -> {
+        Optional<ComponentBuildingDefinition<?>> buildingDefinition =
+            buildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
+        buildingDefinition.map(definition -> {
+          ObjectTypeVisitor typeDefinitionVisitor = new ObjectTypeVisitor(componentModel);
+          definition.getTypeDefinition().visit(typeDefinitionVisitor);
+          componentModel.setType(typeDefinitionVisitor.getType());
+          return definition;
+        }).orElseGet(() -> {
+          String classParameter = componentModel.getParameters().get(CLASS_ATTRIBUTE);
+          if (classParameter != null) {
+            try {
+              componentModel.setType(ClassUtils.getClass(classParameter));
+            } catch (ClassNotFoundException e) {
+              throw new RuntimeConfigurationException(I18nMessageFactory.createStaticMessage(String
+                  .format("Could not resolve class '%s' for component '%s'", classParameter,
+                          componentModel.getComponentLocation())));
+            }
           }
-        }
-        return null;
+          return null;
+        });
       });
     });
   }
