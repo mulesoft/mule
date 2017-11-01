@@ -9,7 +9,6 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static java.util.Arrays.stream;
 import static org.mule.runtime.api.deployment.meta.Product.getProductByName;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.MuleVersion.NO_REVISION;
@@ -34,7 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 /**
  * Base class to create artifact descriptors
@@ -86,6 +84,9 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
    * @return a descriptor matching the provided model.
    */
   protected final T loadFromJsonDescriptor(File artifactLocation, M artifactModel, Optional<Properties> deploymentProperties) {
+
+    artifactModel.validateModel(artifactLocation.getName());
+
     final T descriptor = createArtifactDescriptor(artifactLocation, artifactModel.getName(), deploymentProperties);
     if (artifactLocation.isDirectory()) {
       descriptor.setRootFolder(artifactLocation);
@@ -106,8 +107,6 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
   private void validate(T descriptor) {
     MuleVersion minMuleVersion = descriptor.getMinMuleVersion();
-    checkState(minMuleVersion != null,
-               format("The artifact %s does not specifies a minMuleVersion", descriptor.getName()));
     MuleVersion runtimeVersion = new MuleVersion(getProductVersion());
     runtimeVersion = new MuleVersion(runtimeVersion.toCompleteNumericVersion().replace("-" + runtimeVersion.getSuffix(), ""));
     if (runtimeVersion.priorTo(minMuleVersion)) {
@@ -118,10 +117,6 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
                                                          runtimeVersion.toCompleteNumericVersion()));
     }
     Product requiredProduct = descriptor.getRequiredProduct();
-    checkState(requiredProduct != null,
-               format("The artifact %s does not specifies a requiredProduct or the specified value is not valid. Valid values are %s",
-                      descriptor.getName(),
-                      String.join(", ", stream(Product.values()).map(Product::name).collect(Collectors.toList()))));
     Product runtimeProduct = getProductByName(getProductName());
     if (!runtimeProduct.supports(requiredProduct)) {
       throw new MuleRuntimeException(createStaticMessage("The artifact %s requires a different runtime. The artifact required runtime is %s and the runtime is %s",

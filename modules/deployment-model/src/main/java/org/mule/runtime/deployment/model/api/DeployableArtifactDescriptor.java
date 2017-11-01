@@ -7,11 +7,10 @@
 package org.mule.runtime.deployment.model.api;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 
 import java.io.File;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -32,7 +31,7 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
   private boolean redeploymentEnabled = true;
   private File location;
-  private List<String> configResources;
+  private Set<String> configResources;
   private Set<ArtifactPluginDescriptor> plugins = new HashSet<>(0);
 
   /**
@@ -72,11 +71,11 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
     return this.location;
   }
 
-  public List<String> getConfigResources() {
+  public Set<String> getConfigResources() {
     return configResources;
   }
 
-  public void setConfigResources(List<String> configResources) {
+  public void setConfigResources(Set<String> configResources) {
     this.configResources = configResources;
   }
 
@@ -116,7 +115,7 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
     return new File(getRootFolder(), MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
   }
 
-  protected List<String> getDefaultConfigResources() {
-    return emptyList();
+  protected Set<String> getDefaultConfigResources() {
+    return emptySet();
   }
 }

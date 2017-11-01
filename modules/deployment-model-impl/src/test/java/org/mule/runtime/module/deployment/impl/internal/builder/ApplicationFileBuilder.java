@@ -32,6 +32,7 @@ import org.mule.tck.ZipUtils.ZipResource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -169,7 +170,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
     redeploymentEnabled.ifPresent(muleApplicationModelBuilder::setRedeploymentEnabled);
     configResources.ifPresent(configs -> {
       String[] configFiles = configs.split(",");
-      muleApplicationModelBuilder.setConfigs(asList(configFiles));
+      muleApplicationModelBuilder.setConfigs(new HashSet<>(asList(configFiles)));
     });
     MuleArtifactLoaderDescriptorBuilder muleArtifactLoaderDescriptorBuilder =
         new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID);

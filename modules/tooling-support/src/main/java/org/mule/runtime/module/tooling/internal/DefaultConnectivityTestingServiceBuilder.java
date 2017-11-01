@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -94,7 +94,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
       File applicationFolder = new File(getExecutionFolder(), applicationName);
       ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(applicationName);
       applicationDescriptor.setArtifactDeclaration(artifactDeclaration);
-      applicationDescriptor.setConfigResources(emptyList());
+      applicationDescriptor.setConfigResources(emptySet());
       applicationDescriptor.setArtifactLocation(applicationFolder);
       createDeployablePomFile(applicationFolder, model);
       updateArtifactPom(applicationFolder, model);

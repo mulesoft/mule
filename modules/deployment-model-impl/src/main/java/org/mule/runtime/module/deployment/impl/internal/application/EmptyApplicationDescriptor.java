@@ -8,7 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.File;
 
@@ -25,7 +25,7 @@ public class EmptyApplicationDescriptor extends ApplicationDescriptor {
   public EmptyApplicationDescriptor(File appLocation) {
     super(appLocation.getName());
     String configLocation = DEFAULT_CONFIGURATION_RESOURCE;
-    setConfigResources(ImmutableList.<String>builder().add(configLocation).build());
+    setConfigResources(ImmutableSet.<String>builder().add(configLocation).build());
     setArtifactLocation(appLocation);
     setRootFolder(appLocation.getParentFile());
   }
