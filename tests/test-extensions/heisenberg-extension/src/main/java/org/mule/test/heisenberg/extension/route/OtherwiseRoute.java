@@ -8,11 +8,8 @@ package org.mule.test.heisenberg.extension.route;
 
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
 import org.mule.runtime.extension.api.runtime.route.Route;
-import org.mule.test.heisenberg.extension.stereotypes.DrugKillingStereotype;
 
-@AllowedStereotypes(DrugKillingStereotype.class)
 public class OtherwiseRoute extends Route {
 
   @Parameter

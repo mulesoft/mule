@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.module.extension;
+package org.mule.test.module.extension.scopes;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -12,10 +12,12 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,7 +35,7 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
 
   @Override
   protected String[] getConfigFiles() {
-    return new String[] {"heisenberg-scope-config.xml"};
+    return new String[] {"scopes/heisenberg-scope-config.xml"};
   }
 
   @Override

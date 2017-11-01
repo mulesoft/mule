@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.module.extension;
+package org.mule.test.module.extension.scopes;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -17,10 +17,12 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -42,7 +44,7 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
 
   @Override
   protected String[] getConfigFiles() {
-    return new String[] {"heisenberg-router-config.xml"};
+    return new String[] {"scopes/heisenberg-router-config.xml"};
   }
 
   @Override
@@ -138,6 +140,12 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
     expectedException.expectCause(instanceOf(ConnectionException.class));
     expectedException.expectMessage("No route executed");
     runFlow("twoRoutesRouterNone");
+  }
+
+  @Test
+  public void stereotypedRoutes() throws Exception {
+    Event routeEvent = flowRunner("stereotypedRoutes").run();
+    assertThat(routeEvent.getMessage().getPayload().getValue(), is("bye bye, someName"));
   }
 
   @Test

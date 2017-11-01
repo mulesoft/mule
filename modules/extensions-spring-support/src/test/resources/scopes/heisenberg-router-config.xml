@@ -74,6 +74,15 @@
         </heisenberg:two-routes-router>
     </flow>
 
+    <flow name="stereotypedRoutes">
+        <set-payload value="someName"/>
+        <heisenberg:stereotyped-routes>
+            <heisenberg:killing-route message="myString" execute="true">
+                <heisenberg:kill goodbyeMessage="bye bye"/>
+            </heisenberg:killing-route>
+        </heisenberg:stereotyped-routes>
+    </flow>
+
     <flow name="munitSpy">
         <heisenberg:spy processor="mule:set-payload*">
             <heisenberg:with-attributes>
