@@ -25,6 +25,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.a
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
+
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
@@ -40,6 +41,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -63,6 +65,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.junit.Test;
+import org.springframework.core.ResolvableType;
 
 @SmallTest
 public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
@@ -225,6 +228,15 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     DataType dataType = toDataType(typeBuilder.build());
 
     assertThat(dataType.getType(), is(equalTo(String.class)));
+  }
+
+  @Test
+  public void getPagingProviderImplementationTypes() {
+    ResolvableType pagingProvider = ResolvableType.forClass(TestPagingProvider.class);
+    Pair<ResolvableType, ResolvableType> pagingProviderTypes = IntrospectionUtils.getPagingProviderTypes(pagingProvider);
+
+    assertThat(pagingProviderTypes.getFirst().getRawClass(), equalTo(Object.class));
+    assertThat(pagingProviderTypes.getSecond().getRawClass(), equalTo((Banana.class)));
   }
 
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {
