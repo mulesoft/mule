@@ -15895,8 +15895,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "DRUG_KILLING",
-        "namespace": "HEISENBERG"
+        "type": "KILLING_OPERATION",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "HEISENBERG-EMPIRE",
+          "namespace": "HEISENBERG",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -18656,16 +18664,8 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "KILLING_OPERATION",
-                  "namespace": "HEISENBERG",
-                  "parent": {
-                    "type": "HEISENBERG-EMPIRE",
-                    "namespace": "HEISENBERG",
-                    "parent": {
-                      "type": "PROCESSOR",
-                      "namespace": "MULE"
-                    }
-                  }
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
                 }
               ],
               "name": "processors",
@@ -18765,16 +18765,8 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "KILLING_OPERATION",
-                  "namespace": "HEISENBERG",
-                  "parent": {
-                    "type": "HEISENBERG-EMPIRE",
-                    "namespace": "HEISENBERG",
-                    "parent": {
-                      "type": "PROCESSOR",
-                      "namespace": "MULE"
-                    }
-                  }
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
                 }
               ],
               "name": "processors",
@@ -19096,7 +19088,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "first",
+          "name": "killingRoute",
           "description": "",
           "modelProperties": {},
           "kind": "route"
@@ -19157,7 +19149,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "then",
+          "name": "drugeKillingRoute",
           "description": "",
           "modelProperties": {},
           "kind": "route"
@@ -19184,16 +19176,8 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "KILLING_OPERATION",
-                  "namespace": "HEISENBERG",
-                  "parent": {
-                    "type": "HEISENBERG-EMPIRE",
-                    "namespace": "HEISENBERG",
-                    "parent": {
-                      "type": "PROCESSOR",
-                      "namespace": "MULE"
-                    }
-                  }
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
                 }
               ],
               "name": "processors",
@@ -19278,8 +19262,8 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "DRUG_KILLING",
-                  "namespace": "HEISENBERG"
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
                 }
               ],
               "name": "processors",
