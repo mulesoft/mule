@@ -18,8 +18,10 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPagingProviderTypes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
@@ -250,7 +252,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private void processPagingTx(OperationDeclarer operation, Method method) {
     checkArgument(method != null, "Can't introspect a null method");
-    ResolvableType connectionType = forMethodReturnType(method).getGeneric(0);
+    ResolvableType connectionType = getPagingProviderTypes(forMethodReturnType(method)).getFirst();
     operation.transactional(TransactionalConnection.class.isAssignableFrom(connectionType.getRawClass()));
   }
 

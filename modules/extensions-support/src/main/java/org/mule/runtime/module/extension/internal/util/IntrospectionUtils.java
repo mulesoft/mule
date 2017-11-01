@@ -30,6 +30,7 @@ import static org.reflections.ReflectionUtils.getAllSuperTypes;
 import static org.reflections.ReflectionUtils.withName;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
 import static org.springframework.core.ResolvableType.forType;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -64,6 +65,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -94,8 +96,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
-import com.google.common.collect.ImmutableList;
-
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -121,6 +121,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import com.google.common.collect.ImmutableList;
 import org.springframework.core.ResolvableType;
 
 /**
@@ -250,7 +251,7 @@ public final class IntrospectionUtils {
     }
 
     if (isPagingProvider(returnType)) {
-      ResolvableType itemType = returnType.getGenerics()[1];
+      ResolvableType itemType = getPagingProviderTypes(returnType).getSecond();
       if (Result.class.equals(itemType.getRawClass())) {
         return returnListOfMessagesType(returnType, typeLoader, itemType);
       } else {
@@ -333,7 +334,7 @@ public final class IntrospectionUtils {
     }
 
     if (isPagingProvider(outputType)) {
-      ResolvableType itemType = outputType.getGenerics()[1];
+      ResolvableType itemType = getPagingProviderTypes(outputType).getSecond();
       if (Result.class.equals(itemType.getRawClass())) {
         type = null;
       }
@@ -1139,5 +1140,34 @@ public final class IntrospectionUtils {
 
   private static void set(Optional<FieldSetter> setter, Object target, Object value) {
     setter.ifPresent(s -> s.set(target, value));
+  }
+
+  /**
+   * Introspects a {@link PagingProvider} type and returns their generics.
+   *
+   * @param pagingProvider {@link PagingProvider} to introspect
+   * @return The {@link PagingProvider} generics.
+   */
+  public static Pair<ResolvableType, ResolvableType> getPagingProviderTypes(ResolvableType pagingProvider) {
+    if (!PagingProvider.class.isAssignableFrom(pagingProvider.getRawClass())) {
+      throw new IllegalArgumentException("The given OutputType is not a PagingProvider");
+    }
+
+    ResolvableType[] generics = pagingProvider.getGenerics();
+    ResolvableType connectionType = null;
+    ResolvableType returnType = null;
+
+    if (generics.length == 0) {
+      for (ResolvableType resolvableType : pagingProvider.getInterfaces()) {
+        if (resolvableType.getRawClass().equals(PagingProvider.class)) {
+          connectionType = resolvableType.getGeneric(0);
+          returnType = resolvableType.getGeneric(1);
+        }
+      }
+    } else {
+      connectionType = generics[0];
+      returnType = generics[1];
+    }
+    return new Pair<>(connectionType, returnType);
   }
 }
