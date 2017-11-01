@@ -49,12 +49,6 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private ConfigurationProvider instance;
   private boolean requiresConnection = false;
 
-  @Inject
-  private MuleContext muleContext;
-
-  @Inject
-  private TimeSupplier timeSupplier;
-
   ConfigurationProviderObjectFactory(String name,
                                      ExtensionModel extensionModel,
                                      ConfigurationModel configurationModel,
@@ -78,7 +72,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
       expirationPolicy = muleContext.getConfiguration().getDynamicConfigExpiration().getExpirationPolicy();
     }
 
-    ResolverSet resolverSet = parametersResolver.getParametersAsHashedResolverSet(configurationModel, muleContext);
+    ResolverSet resolverSet = getParametersResolver().getParametersAsHashedResolverSet(configurationModel, muleContext);
     final ConnectionProviderValueResolver connectionProviderResolver = getConnectionProviderResolver();
     connectionProviderResolver.getResolverSet()
         .ifPresent((CheckedConsumer) resolver -> initialiseIfNeeded(resolver, true, muleContext));

@@ -42,11 +42,6 @@ import javax.inject.Inject;
  */
 public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel, P extends ExtensionComponent> {
 
-  @Inject
-  private ConfigurationProperties properties;
-
-  private final boolean lazyModeEnabled;
-
   protected final ExtensionModel extensionModel;
   protected final M operationModel;
   protected final PolicyManager policyManager;
@@ -54,13 +49,14 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected Registry registry;
   protected final ExtensionConnectionSupplier extensionConnectionSupplier;
   protected final ExtensionsOAuthManager oauthManager;
-
   protected ConfigurationProvider configurationProvider;
+
   protected Map<String, ?> parameters;
   protected String target;
   protected String targetValue;
   protected CursorProviderFactory cursorProviderFactory;
   protected RetryPolicyTemplate retryPolicyTemplate;
+  protected boolean lazyModeEnabled;
 
   public ComponentMessageProcessorBuilder(ExtensionModel extensionModel,
                                           M operationModel,
@@ -73,7 +69,6 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     checkArgument(policyManager != null, "PolicyManager cannot be null");
     checkArgument(muleContext != null, "muleContext cannot be null");
 
-    inject(muleContext);
     this.muleContext = muleContext;
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
@@ -81,15 +76,6 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     this.registry = registry;
     this.extensionConnectionSupplier = registry.lookupByType(ExtensionConnectionSupplier.class).get();
     this.oauthManager = registry.lookupByType(ExtensionsOAuthManager.class).get();
-    this.lazyModeEnabled = properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
-  }
-
-  private void inject(MuleContext muleContext) {
-    try {
-      muleContext.getInjector().inject(this);
-    } catch (MuleException e) {
-      throw new IllegalStateException("Could not inject Object Factory instance.", e);
-    }
   }
 
   public P build() {
@@ -143,6 +129,11 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
 
   public ComponentMessageProcessorBuilder<M, P> setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {
     this.cursorProviderFactory = cursorProviderFactory;
+    return this;
+  }
+
+  public ComponentMessageProcessorBuilder<M, P> setLazyMode(boolean lazyModeEnabled) {
+    this.lazyModeEnabled = lazyModeEnabled;
     return this;
   }
 

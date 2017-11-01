@@ -71,6 +71,7 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
         .setParameters(parameters)
         .setTarget(target)
         .setTargetValue(targetValue)
+        .setLazyMode(isLazyModeEnabled())
         .setCursorProviderFactory(cursorProviderFactory)
         .setRetryPolicyTemplate(retryPolicyTemplate)
         .build();

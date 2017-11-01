@@ -16,7 +16,7 @@ import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDef
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -43,18 +43,15 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
     implements ObjectTypeParametersResolver {
 
   @Inject
-  private ConfigurationProperties props;
+  private ConfigurationProperties properties;
 
   protected final MuleContext muleContext;
   protected Map<String, Object> parameters = new HashMap<>();
-  protected ParametersResolver parametersResolver;
-  protected final boolean lazyInitEnabled;
+  private LazyValue<ParametersResolver> parametersResolver;
 
   public AbstractExtensionObjectFactory(MuleContext muleContext) {
-    inject(muleContext);
     this.muleContext = muleContext;
-    this.lazyInitEnabled = props.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
-    this.parametersResolver = getParametersResolver(muleContext);
+    this.parametersResolver = new LazyValue<>(() -> parametersResolverFromValues(muleContext));
   }
 
   @Override
@@ -82,8 +79,16 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
     return new ConfigurationException(createStaticMessage(description), e);
   }
 
-  protected ParametersResolver getParametersResolver(MuleContext muleContext) {
-    return ParametersResolver.fromValues(parameters, muleContext, lazyInitEnabled);
+  protected ParametersResolver getParametersResolver() {
+    return parametersResolver.get();
+  }
+
+  private ParametersResolver parametersResolverFromValues(MuleContext muleContext) {
+    return ParametersResolver.fromValues(parameters, muleContext, isLazyModeEnabled());
+  }
+
+  protected boolean isLazyModeEnabled() {
+    return properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
   }
 
   public Map<String, Object> getParameters() {
@@ -92,17 +97,17 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
 
   public void setParameters(Map<String, Object> parameters) {
     this.parameters = normalize(parameters);
-    this.parametersResolver = getParametersResolver(muleContext);
+    this.parametersResolver = new LazyValue<ParametersResolver>(parametersResolverFromValues(muleContext));
   }
 
   @Override
   public void resolveParameterGroups(ObjectType objectType, DefaultObjectBuilder builder) {
-    parametersResolver.resolveParameterGroups(objectType, builder);
+    parametersResolver.get().resolveParameterGroups(objectType, builder);
   }
 
   @Override
   public void resolveParameters(ObjectType objectType, DefaultObjectBuilder builder) {
-    parametersResolver.resolveParameters(objectType, builder);
+    parametersResolver.get().resolveParameters(objectType, builder);
   }
 
   private Map<String, Object> normalize(Map<String, Object> parameters) {
@@ -129,13 +134,5 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
 
   private String unwrapChildKey(String key) {
     return key.replaceAll(CHILD_ELEMENT_KEY_PREFIX, "").replaceAll(CHILD_ELEMENT_KEY_SUFFIX, "");
-  }
-
-  private void inject(MuleContext muleContext) {
-    try {
-      muleContext.getInjector().inject(this);
-    } catch (MuleException e) {
-      throw new IllegalStateException("Could not inject Object Factory instance.", e);
-    }
   }
 }

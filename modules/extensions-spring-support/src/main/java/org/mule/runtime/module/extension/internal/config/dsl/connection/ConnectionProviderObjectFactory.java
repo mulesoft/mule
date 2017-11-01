@@ -50,7 +50,6 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
   @Inject
   private MuleContext muleContext;
 
-
   public ConnectionProviderObjectFactory(ConnectionProviderModel providerModel,
                                          ExtensionModel extensionModel,
                                          ExtensionsOAuthManager oauthManager,
@@ -63,7 +62,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
 
   @Override
   public ConnectionProviderResolver doGetObject() throws Exception {
-    Callable<ResolverSet> callable = () -> parametersResolver.getParametersAsHashedResolverSet(providerModel, muleContext);
+    Callable<ResolverSet> callable = () -> getParametersResolver().getParametersAsHashedResolverSet(providerModel, muleContext);
     ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel), callable);
 
     ConnectionProviderObjectBuilder builder;
