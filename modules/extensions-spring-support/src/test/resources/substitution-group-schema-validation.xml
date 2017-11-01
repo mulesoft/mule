@@ -7,6 +7,7 @@ http://www.mulesoft.org/schema/mule/sg http://www.mulesoft.org/schema/mule/sg/cu
 
     <sg:config name="sgConfig">
         <sg:some-pojo/>
+        <sg:mule-sg-pojo/>
     </sg:config>
 
     <flow name="doNothing">

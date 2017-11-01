@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+
+    <tls:context name="globalTlsContext">
+        <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
+        <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+    </tls:context>
+    
+    <heisenberg:config name="inlineTls"
+                       myName="wally"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="100000"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER">
+        <heisenberg:secure-connection saulPhoneNumber="123-12-3">
+            <tls:context>
+                <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
+                <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+            </tls:context>
+        </heisenberg:secure-connection>
+        <heisenberg:enemies>
+            <heisenberg:enemy value="Gustavo Fring"/>
+            <heisenberg:enemy value="Hank"/>
+        </heisenberg:enemies>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
+    </heisenberg:config>
+
+    <heisenberg:config name="globalTls"
+                       myName="wally"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="100000"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER">
+        <heisenberg:secure-connection saulPhoneNumber="123-12-3" tlsContext="globalTlsContext" />
+        <heisenberg:enemies>
+            <heisenberg:enemy value="Gustavo Fring"/>
+            <heisenberg:enemy value="Hank"/>
+        </heisenberg:enemies>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
+    </heisenberg:config>
+
+    <flow name="getInlineTls">
+        <heisenberg:get-connection config-ref="inlineTls" />
+    </flow>
+
+    <flow name="getGlobalTls">
+        <heisenberg:get-connection config-ref="globalTls" />
+    </flow>
+
+</mule>

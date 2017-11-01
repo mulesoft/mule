@@ -6,18 +6,30 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
+import static java.lang.String.copyValueOf;
+import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
+import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectTypeParametersResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 /**
  * Base class for {@link ObjectFactory} implementation which create extension components.
@@ -30,17 +42,53 @@ import java.util.Map;
 public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponentFactory<T>
     implements ObjectTypeParametersResolver {
 
+  @Inject
+  private ConfigurationProperties properties;
+
   protected final MuleContext muleContext;
   protected Map<String, Object> parameters = new HashMap<>();
-  protected ParametersResolver parametersResolver;
+  private LazyValue<ParametersResolver> parametersResolver;
 
   public AbstractExtensionObjectFactory(MuleContext muleContext) {
     this.muleContext = muleContext;
-    this.parametersResolver = getParametersResolver(muleContext);
+    this.parametersResolver = new LazyValue<>(() -> parametersResolverFromValues(muleContext));
   }
 
-  protected ParametersResolver getParametersResolver(MuleContext muleContext) {
-    return ParametersResolver.fromValues(parameters, muleContext);
+  @Override
+  public T getObject() throws Exception {
+    try {
+      return super.getObject();
+    } catch (RequiredParameterNotSetException e) {
+      throw handleMissingRequiredParameter(e);
+    }
+  }
+
+  private Exception handleMissingRequiredParameter(RequiredParameterNotSetException e) {
+    String description = getAnnotations().values().stream()
+        .filter(v -> v instanceof ComponentLocation)
+        .map(v -> (ComponentLocation) v)
+        .findFirst()
+        .map(v -> format("Element <%s:%s> in line %s of file %s is missing required parameter '%s'",
+                         v.getComponentIdentifier().getIdentifier().getNamespace(),
+                         v.getComponentIdentifier().getIdentifier().getName(),
+                         v.getLineInFile().map(n -> "" + n).orElse("<UNKNOWN>"),
+                         v.getFileName().orElse("<UNKNOWN>"),
+                         hyphenize(e.getParameterName())))
+        .orElse(e.getMessage());
+
+    return new ConfigurationException(createStaticMessage(description), e);
+  }
+
+  protected ParametersResolver getParametersResolver() {
+    return parametersResolver.get();
+  }
+
+  private ParametersResolver parametersResolverFromValues(MuleContext muleContext) {
+    return ParametersResolver.fromValues(parameters, muleContext, isLazyModeEnabled());
+  }
+
+  protected boolean isLazyModeEnabled() {
+    return properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
   }
 
   public Map<String, Object> getParameters() {
@@ -49,17 +97,17 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
 
   public void setParameters(Map<String, Object> parameters) {
     this.parameters = normalize(parameters);
-    this.parametersResolver = getParametersResolver(muleContext);
+    this.parametersResolver = new LazyValue<ParametersResolver>(parametersResolverFromValues(muleContext));
   }
 
   @Override
   public void resolveParameterGroups(ObjectType objectType, DefaultObjectBuilder builder) {
-    parametersResolver.resolveParameterGroups(objectType, builder);
+    parametersResolver.get().resolveParameterGroups(objectType, builder);
   }
 
   @Override
   public void resolveParameters(ObjectType objectType, DefaultObjectBuilder builder) {
-    parametersResolver.resolveParameters(objectType, builder);
+    parametersResolver.get().resolveParameters(objectType, builder);
   }
 
   private Map<String, Object> normalize(Map<String, Object> parameters) {

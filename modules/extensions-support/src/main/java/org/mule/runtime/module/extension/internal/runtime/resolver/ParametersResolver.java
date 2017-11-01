@@ -51,6 +51,7 @@ import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ExclusiveParameterGroupObjectBuilder;
 
@@ -73,26 +74,27 @@ import java.util.stream.Collectors;
  */
 public final class ParametersResolver implements ObjectTypeParametersResolver {
 
+  private final Boolean lazyInitEnabled;
   private final MuleContext muleContext;
   private final Map<String, ?> parameters;
 
-  private ParametersResolver(MuleContext muleContext, Map<String, ?> parameters) {
+  private ParametersResolver(MuleContext muleContext, Map<String, ?> parameters, boolean lazyInitEnabled) {
     this.muleContext = muleContext;
     this.parameters = parameters;
+    this.lazyInitEnabled = lazyInitEnabled;
   }
 
-  public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext) {
-    return new ParametersResolver(muleContext, parameters);
+  public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext, boolean lazyInitEnabled) {
+    return new ParametersResolver(muleContext, parameters, lazyInitEnabled);
   }
 
-  public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel,
-                                                     MuleContext muleContext) {
+  public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel, MuleContext muleContext) {
     Map<String, Object> parameterValues = new HashMap<>();
     for (ParameterModel model : parameterizedModel.getAllParameterModels()) {
       parameterValues.put(model.getName(), model.getDefaultValue());
     }
 
-    return new ParametersResolver(muleContext, parameterValues);
+    return new ParametersResolver(muleContext, parameterValues, false);
   }
 
   /**
@@ -101,7 +103,6 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
    * @return a {@link ResolverSet}
    */
   public ResolverSet getParametersAsResolverSet(ParameterizedModel model, MuleContext muleContext) throws ConfigurationException {
-
     List<ParameterGroupModel> inlineGroups = getInlineGroups(model.getParameterGroupModels());
     List<ParameterModel> flatParameters = getFlatParameters(inlineGroups, model.getAllParameterModels());
     ResolverSet resolverSet = getParametersAsResolverSet(model, flatParameters, muleContext);
@@ -214,6 +215,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
 
       if (resolver != null) {
         resolverSet.add(parameterName, resolver);
+      } else if (p.isRequired() && !lazyInitEnabled) {
+        throw new RequiredParameterNotSetException(p);
       }
     });
 
@@ -306,9 +309,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         } catch (InitialisationException e) {
           throw new MuleRuntimeException(e);
         }
-      } else if (field.isRequired() && !isFlattenedParameterGroup(field)) {
-        throw new IllegalStateException(format("The object '%s' requires the parameter '%s' but is not set",
-                                               objectClass.getSimpleName(), objectField.getName()));
+      } else if (field.isRequired() && !isFlattenedParameterGroup(field) && !lazyInitEnabled) {
+        throw new RequiredParameterNotSetException(objectField.getName());
       }
     });
   }

@@ -56,7 +56,7 @@ import javax.inject.Inject;
 @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class,
     KillingOperations.class, HeisenbergScopes.class, HeisenbergRouters.class})
 @OnException(HeisenbergConnectionExceptionEnricher.class)
-@ConnectionProviders(HeisenbergConnectionProvider.class)
+@ConnectionProviders({HeisenbergConnectionProvider.class, SecureHeisenbergConnectionProvider.class})
 @Sources({HeisenbergSource.class, DEARadioSource.class, AsyncHeisenbergSource.class, ReconnectableHeisenbergSource.class})
 @Export(classes = {HeisenbergExtension.class, HeisenbergException.class}, resources = "methRecipe.json")
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})

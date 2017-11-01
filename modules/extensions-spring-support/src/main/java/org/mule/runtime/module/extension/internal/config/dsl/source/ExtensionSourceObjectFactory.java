@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
@@ -34,7 +33,6 @@ import com.google.common.base.Joiner;
 import java.util.List;
 import java.util.Optional;
 
-import javax.inject.Inject;
 
 /**
  * An {@link AbstractExtensionObjectFactory} that produces instances of {@link ExtensionMessageSource}
@@ -50,9 +48,6 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   private RetryPolicyTemplate retryPolicyTemplate;
   private CursorProviderFactory cursorProviderFactory;
 
-  @Inject
-  private ConnectionManagerAdapter connectionManager;
-
   public ExtensionSourceObjectFactory(ExtensionModel extensionModel, SourceModel sourceModel, MuleContext muleContext) {
     super(muleContext);
     this.extensionModel = extensionModel;
@@ -60,13 +55,13 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   }
 
   protected ParametersResolver getParametersResolver(MuleContext muleContext) {
-    return ParametersResolver.fromValues(parameters, muleContext);
+    return ParametersResolver.fromValues(parameters, muleContext, isLazyModeEnabled());
   }
 
   @Override
   public ExtensionMessageSource doGetObject() throws ConfigurationException, InitialisationException {
     return withContextClassLoader(getClassLoader(extensionModel), () -> {
-      parametersResolver.checkParameterGroupExclusiveness(sourceModel, parameters.keySet());
+      getParametersResolver().checkParameterGroupExclusiveness(sourceModel, parameters.keySet());
       ResolverSet nonCallbackParameters = getNonCallbackParameters();
 
       if (nonCallbackParameters.isDynamic()) {
@@ -93,12 +88,12 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   }
 
   private ResolverSet getNonCallbackParameters() throws ConfigurationException {
-    return parametersResolver.getParametersAsResolverSet(muleContext, sourceModel, sourceModel.getParameterGroupModels());
+    return getParametersResolver().getParametersAsResolverSet(muleContext, sourceModel, sourceModel.getParameterGroupModels());
   }
 
   private ResolverSet getCallbackParameters(Optional<SourceCallbackModel> callbackModel) throws ConfigurationException {
     if (callbackModel.isPresent()) {
-      return parametersResolver.getParametersAsResolverSet(callbackModel.get(), muleContext);
+      return getParametersResolver().getParametersAsResolverSet(callbackModel.get(), muleContext);
     }
 
     return new ResolverSet(muleContext);

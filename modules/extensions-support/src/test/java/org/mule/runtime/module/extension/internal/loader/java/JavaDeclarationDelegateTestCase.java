@@ -92,6 +92,7 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.heisenberg.extension.MoneyLaunderingOperation;
+import org.mule.test.heisenberg.extension.SecureHeisenbergConnectionProvider;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
@@ -467,7 +468,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(extensionDeclaration.getOperations(), hasSize(40));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(14));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(15));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(withOperationsDeclaration, NAME_AS_STREAM, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
@@ -725,18 +726,20 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleConnectionProviders(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getConnectionProviders(), hasSize(1));
+    assertThat(extensionDeclaration.getConnectionProviders(), hasSize(2));
     ConnectionProviderDeclaration connectionProvider = extensionDeclaration.getConnectionProviders().get(0);
     assertThat(connectionProvider.getName(), is(DEFAULT_CONNECTION_PROVIDER_NAME));
 
     List<ParameterDeclaration> parameters = connectionProvider.getAllParameters();
-    assertThat(parameters, hasSize(4));
+    assertThat(parameters, hasSize(3));
 
     assertParameter(parameters, "saulPhoneNumber", "", STRING_TYPE, false, SUPPORTED, SAUL_OFFICE_NUMBER);
-    assertParameter(parameters, TLS_PARAMETER_NAME, "", toMetadataType(TlsContextFactory.class), false, NOT_SUPPORTED, null);
     ImplementingTypeModelProperty typeModelProperty =
         connectionProvider.getModelProperty(ImplementingTypeModelProperty.class).get();
     assertThat(typeModelProperty.getType(), equalTo(HeisenbergConnectionProvider.class));
+
+    parameters = extensionDeclaration.getConnectionProviders().get(1).getAllParameters();
+    assertParameter(parameters, TLS_PARAMETER_NAME, "", toMetadataType(TlsContextFactory.class), true, NOT_SUPPORTED, null);
   }
 
   private void assertTestModuleMessageSource(ExtensionDeclaration extensionDeclaration) throws Exception {
@@ -827,7 +830,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
   @Extension(name = OTHER_HEISENBERG)
   @Configurations(HeisenbergExtension.class)
-  @ConnectionProviders(HeisenbergConnectionProvider.class)
+  @ConnectionProviders({HeisenbergConnectionProvider.class, SecureHeisenbergConnectionProvider.class})
   public static class HeisenbergPointer extends HeisenbergExtension {
 
   }

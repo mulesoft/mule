@@ -2982,6 +2982,264 @@
         },
         {
           "blocking": true,
+          "executionType": "BLOCKING",
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "@ref:org.mule.test.heisenberg.extension.HeisenbergConnection"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [
+            "HEISENBERG:RETRY_EXHAUSTED",
+            "HEISENBERG:CONNECTIVITY"
+          ],
+          "stereotype": {
+            "type": "HEISENBERG-EMPIRE",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          },
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "target",
+                  "displayModel": {
+                    "displayName": "Target Variable"
+                  },
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "REQUIRED",
+                  "defaultValue": "#[payload]",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "targetValue",
+                  "displayModel": {
+                    "displayName": "Target Value"
+                  },
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "ReconnectionStrategy"
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "reconnect"
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "classInformation": {
+                                  "classname": "java.lang.Long",
+                                  "hasDefaultConstructor": false,
+                                  "isInterface": false,
+                                  "isInstantiable": false,
+                                  "isAbstract": false,
+                                  "isFinal": true,
+                                  "implementedInterfaces": [
+                                    "java.lang.Comparable"
+                                  ],
+                                  "parent": "java.lang.Number",
+                                  "genericTypes": [],
+                                  "isMap": false
+                                },
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "reconnect-forever"
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "classInformation": {
+                                  "classname": "java.lang.Long",
+                                  "hasDefaultConstructor": false,
+                                  "isInterface": false,
+                                  "isInstantiable": false,
+                                  "isAbstract": false,
+                                  "isFinal": true,
+                                  "implementedInterfaces": [
+                                    "java.lang.Comparable"
+                                  ],
+                                  "parent": "java.lang.Number",
+                                  "genericTypes": [],
+                                  "isMap": false
+                                },
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "getConnection",
+          "description": "",
+          "modelProperties": {},
+          "kind": "operation"
+        },
+        {
+          "blocking": true,
           "executionType": "CPU_LITE",
           "output": {
             "type": {
@@ -5714,6 +5972,337 @@
                   "name": "saulPhoneNumber",
                   "description": "",
                   "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": "false",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "fullyBald",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "GOATIE",
+                          "MUSTACHE"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": "GOATIE",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "beardTrimming",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "showInDsl": true,
+              "name": "look",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "Reconnection"
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "failsDeployment"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "default": "false"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "reconnectionStrategy"
+                        },
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "ReconnectionStrategy"
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "reconnect"
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "classInformation": {
+                                        "classname": "java.lang.Long",
+                                        "hasDefaultConstructor": false,
+                                        "isInterface": false,
+                                        "isInstantiable": false,
+                                        "isAbstract": false,
+                                        "isFinal": true,
+                                        "implementedInterfaces": [
+                                          "java.lang.Comparable"
+                                        ],
+                                        "parent": "java.lang.Number",
+                                        "genericTypes": [],
+                                        "isMap": false
+                                      },
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "count"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "default": "2"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How many reconnection attempts to make"
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "reconnect-forever"
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "classInformation": {
+                                        "classname": "java.lang.Long",
+                                        "hasDefaultConstructor": false,
+                                        "isInterface": false,
+                                        "isInstantiable": false,
+                                        "isAbstract": false,
+                                        "isFinal": true,
+                                        "implementedInterfaces": [
+                                          "java.lang.Comparable"
+                                        ],
+                                        "parent": "java.lang.Number",
+                                        "genericTypes": [],
+                                        "isMap": false
+                                      },
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The reconnection strategy to use"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "reconnection",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "reconnection",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "connection",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "connectionManagementType": "NONE",
+          "externalLibraryModels": [
+            {
+              "name": "Heisenberg.so",
+              "description": "Native Heisenberg support",
+              "regexMatcher": "heisenberg.so",
+              "requiredClassName": "org.heisenberg.HeisenbergJNI",
+              "type": "NATIVE",
+              "optional": false
+            }
+          ],
+          "supportsConnectivityTesting": true,
+          "stereotype": {
+            "type": "SECURE",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": "505-503-4455",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "saulPhoneNumber",
+                  "description": "",
+                  "modelProperties": {}
                 },
                 {
                   "type": {
@@ -6015,7 +6604,7 @@
                     ]
                   },
                   "hasDynamicType": false,
-                  "required": false,
+                  "required": true,
                   "isConfigOverride": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -6322,7 +6911,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "connection",
+          "name": "secure",
           "description": "",
           "modelProperties": {}
         }
@@ -18842,6 +19431,337 @@
               "name": "saulPhoneNumber",
               "description": "",
               "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean",
+                "annotations": {
+                  "typeId": "boolean"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "false",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "allowedStereotypeModels": [],
+              "name": "fullyBald",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "GOATIE",
+                      "MUSTACHE"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "GOATIE",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "allowedStereotypeModels": [],
+              "name": "beardTrimming",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
+          "showInDsl": true,
+          "name": "look",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "Reconnection"
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "failsDeployment"
+                    },
+                    "model": {
+                      "type": "Boolean",
+                      "annotations": {
+                        "default": "false"
+                      }
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "reconnectionStrategy"
+                    },
+                    "model": {
+                      "type": "Union",
+                      "annotations": {
+                        "typeId": "ReconnectionStrategy"
+                      },
+                      "of": [
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "reconnect"
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "frequency"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "classInformation": {
+                                    "classname": "java.lang.Long",
+                                    "hasDefaultConstructor": false,
+                                    "isInterface": false,
+                                    "isInstantiable": false,
+                                    "isAbstract": false,
+                                    "isFinal": true,
+                                    "implementedInterfaces": [
+                                      "java.lang.Comparable"
+                                    ],
+                                    "parent": "java.lang.Number",
+                                    "genericTypes": [],
+                                    "isMap": false
+                                  },
+                                  "default": "2000"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "count"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "default": "2"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How many reconnection attempts to make"
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "reconnect-forever"
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "frequency"
+                              },
+                              "model": {
+                                "type": "Number",
+                                "annotations": {
+                                  "int": {},
+                                  "classInformation": {
+                                    "classname": "java.lang.Long",
+                                    "hasDefaultConstructor": false,
+                                    "isInterface": false,
+                                    "isInstantiable": false,
+                                    "isAbstract": false,
+                                    "isFinal": true,
+                                    "implementedInterfaces": [
+                                      "java.lang.Comparable"
+                                    ],
+                                    "parent": "java.lang.Number",
+                                    "genericTypes": [],
+                                    "isMap": false
+                                  },
+                                  "default": "2000"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "How often (in ms) to reconnect"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The reconnection strategy to use"
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "reconnection",
+              "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "reconnection",
+                    "prefix": "mule"
+                  }
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 3
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Connection",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "connection",
+      "description": "",
+      "modelProperties": {}
+    },
+    {
+      "connectionManagementType": "NONE",
+      "externalLibraryModels": [
+        {
+          "name": "Heisenberg.so",
+          "description": "Native Heisenberg support",
+          "regexMatcher": "heisenberg.so",
+          "requiredClassName": "org.heisenberg.HeisenbergJNI",
+          "type": "NATIVE",
+          "optional": false
+        }
+      ],
+      "supportsConnectivityTesting": true,
+      "stereotype": {
+        "type": "SECURE",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "505-503-4455",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [],
+              "name": "saulPhoneNumber",
+              "description": "",
+              "modelProperties": {}
             },
             {
               "type": {
@@ -19143,7 +20063,7 @@
                 ]
               },
               "hasDynamicType": false,
-              "required": false,
+              "required": true,
               "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
@@ -19450,7 +20370,7 @@
           "modelProperties": {}
         }
       ],
-      "name": "connection",
+      "name": "secure",
       "description": "",
       "modelProperties": {}
     }
@@ -19786,6 +20706,357 @@
   ],
   "modelProperties": {},
   "types": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.HeisenbergConnection",
+        "classInformation": {
+          "classname": "org.mule.test.heisenberg.extension.HeisenbergConnection",
+          "hasDefaultConstructor": false,
+          "isInterface": false,
+          "isInstantiable": false,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "HeisenbergConnection"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "connected"
+          },
+          "model": {
+            "type": "Boolean",
+            "annotations": {
+              "typeId": "boolean"
+            }
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "saulPhoneNumber"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "tlsContextFactory"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
+              "typeAlias": {
+                "value": "Tls"
+              },
+              "typeDsl": {
+                "allowInlineDefinition": true,
+                "allowTopLevelDefinition": true
+              },
+              "QName": {
+                "value": {
+                  "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                  "localPart": "context",
+                  "prefix": "tls"
+                }
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "enabledProtocols"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "description": {
+                    "value": "A comma separated list of protocols enabled for this context."
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "enabledCipherSuites"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "description": {
+                    "value": "A comma separated list of cipher suites enabled for this context."
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "trust-store"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "TrustStore",
+                    "description": {
+                      "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
+                    }
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "path"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store."
+                        },
+                        "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                          "displayModel": {
+                            "pathModel": {
+                              "type": "FILE",
+                              "fileExtensions": [],
+                              "acceptsUrls": false
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "password"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The password used to protect the trust store."
+                        },
+                        "layout": {
+                          "layoutModel": {
+                            "password": true,
+                            "text": false,
+                            "query": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "type"
+                      },
+                      "model": {
+                        "type": "String",
+                        "annotations": {
+                          "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                            "displayModel": {
+                              "example": "jks, jceks, pkcs12 or other store type"
+                            }
+                          }
+                        }
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The type of store used."
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "algorithm"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The algorithm used by the trust store."
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "insecure"
+                      },
+                      "model": {
+                        "type": "Boolean",
+                        "annotations": {
+                          "default": "false"
+                        }
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "If true, no certificate validations will be performed, rendering connections vulnerable to attacks. Use at your own risk."
+                        }
+                      }
+                    }
+                  ]
+                },
+                "annotations": {
+                  "parameterDsl": {
+                    "allowInlineDefinition": true,
+                    "allowReferences": false
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "key-store"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "KeyStore",
+                    "description": {
+                      "value": "Key store configuration. The key store contains the keys of this server/client."
+                    }
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "path"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the key store."
+                        },
+                        "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                          "displayModel": {
+                            "pathModel": {
+                              "type": "FILE",
+                              "fileExtensions": [],
+                              "acceptsUrls": false
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "type"
+                      },
+                      "model": {
+                        "type": "String",
+                        "annotations": {
+                          "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                            "displayModel": {
+                              "example": "jks, jceks, pkcs12 or other store type"
+                            }
+                          }
+                        }
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The type of store used."
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "alias"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "When the key store contains many private keys, this attribute indicates the alias of the key that should be used. If not defined, the first key in the file will be used by default."
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "keyPassword"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The password used to protect the private key."
+                        },
+                        "layout": {
+                          "layoutModel": {
+                            "password": true,
+                            "text": false,
+                            "query": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "password"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The password used to protect the key store."
+                        },
+                        "layout": {
+                          "layoutModel": {
+                            "password": true,
+                            "text": false,
+                            "query": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "algorithm"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The algorithm used by the key store."
+                        }
+                      }
+                    }
+                  ]
+                },
+                "annotations": {
+                  "parameterDsl": {
+                    "allowInlineDefinition": true,
+                    "allowReferences": false
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
     {
       "format": "java",
       "type": "Object",

@@ -26,6 +26,7 @@ import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -190,6 +191,9 @@ public class MuleContextUtils {
     final MuleRegistry registry = muleContext.getRegistry();
 
     NotificationListenerRegistry notificationListenerRegistry = mock(NotificationListenerRegistry.class);
+    ConfigurationProperties configProps = mock(ConfigurationProperties.class);
+    when(configProps.resolveBooleanProperty(any())).thenReturn(empty());
+
     ConfigurationComponentLocator configurationComponentLocator = mock(ConfigurationComponentLocator.class);
     when(configurationComponentLocator.find(any(Location.class))).thenReturn(empty());
     when(configurationComponentLocator.find(any(ComponentIdentifier.class))).thenReturn(emptyList());
@@ -198,15 +202,16 @@ public class MuleContextUtils {
       when(registry.lookupObject(NotificationListenerRegistry.class)).thenReturn(notificationListenerRegistry);
 
       Map<Class, Object> injectableObjects = new HashMap<>();
-
       injectableObjects.put(MuleContext.class, muleContext);
       injectableObjects.put(SchedulerService.class, schedulerService);
       injectableObjects.put(ErrorTypeRepository.class, errorTypeRepository);
       injectableObjects.put(StreamingManager.class, muleContext.getRegistry().lookupObject(StreamingManager.class));
       injectableObjects.put(ObjectStoreManager.class, muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER));
-      injectableObjects.put(NotificationDispatcher.class, muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
+      injectableObjects.put(NotificationDispatcher.class,
+                                    muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
       injectableObjects.put(NotificationListenerRegistry.class, notificationListenerRegistry);
       injectableObjects.put(ConfigurationComponentLocator.class, configurationComponentLocator);
+      injectableObjects.put(ConfigurationProperties.class, configProps);
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));
