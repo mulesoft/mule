@@ -36,7 +36,7 @@ import org.junit.Test;
  * of the ws consumer involved in the test app should be routed through the http requester configured with an insecure
  * TLS context. If an URLConnection is used instead of the http requester, the TLS context will not be used.
  */
-public class WSConsumerImportedNamespaceTlsTestCase extends AbstractWSDLHttpImportedSchemaServerTlsTestCase
+public abstract class AbstractWSConsumerImportedNamespaceTlsTestCase extends AbstractWSDLHttpImportedSchemaServerTlsTestCase
 {
 
     @Rule
@@ -46,12 +46,6 @@ public class WSConsumerImportedNamespaceTlsTestCase extends AbstractWSDLHttpImpo
     private static final String TEST_PORT = "TestPort";
     private static final String TEST_SERVICE = "TestService";
     private static final String EXPECTED_BODY_PATTERN = "<ns:noParamsWithHeader xmlns:ns=\"http://consumer.ws.module.mule.org/\" />";
-
-    @Override
-    protected String getConfigFile()
-    {
-        return "ws-consumer-wsdl-insecure-tls-imported-namespaces-success.xml";
-    }
 
     @Test
     public void consumerPresentInRegistry() throws Exception
