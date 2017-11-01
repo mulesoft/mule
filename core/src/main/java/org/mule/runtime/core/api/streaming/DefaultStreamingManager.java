@@ -8,13 +8,15 @@ package org.mule.runtime.core.api.streaming;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
-
+import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -27,10 +29,13 @@ import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
 import org.mule.runtime.core.internal.streaming.object.DefaultObjectStreamingManager;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import org.slf4j.Logger;
+import java.io.InputStream;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 public class DefaultStreamingManager implements StreamingManager, Initialisable, Disposable {
 
@@ -118,6 +123,19 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
       return provider;
     }
     return cursorManager.manage(provider, creatorEvent);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void manage(InputStream stream, CoreEvent creatorEvent) {
+    if (stream instanceof Cursor) {
+      return;
+    }
+
+    final BaseEventContext ctx = ((BaseEventContext) creatorEvent.getContext()).getRootContext();
+    from(ctx.getCompletionPublisher()).subscribe(null, null, () -> closeQuietly(stream));
   }
 
   /**

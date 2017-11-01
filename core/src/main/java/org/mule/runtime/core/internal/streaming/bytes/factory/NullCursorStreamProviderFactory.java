@@ -36,6 +36,7 @@ public class NullCursorStreamProviderFactory extends AbstractCursorStreamProvide
    */
   @Override
   protected Object resolve(InputStream inputStream, CoreEvent event) {
+    streamingManager.manage(inputStream, event);
     return inputStream;
   }
 }

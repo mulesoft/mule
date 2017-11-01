@@ -46,6 +46,12 @@
         <marvel:to-stream />
     </flow>
 
+    <flow name="toNonRepeatableStream">
+        <marvel:to-stream>
+            <non-repeatable-stream />
+        </marvel:to-stream>
+    </flow>
+
     <flow name="bufferExceeded">
         <try>
             <marvel:to-stream config-ref="drStrange" >

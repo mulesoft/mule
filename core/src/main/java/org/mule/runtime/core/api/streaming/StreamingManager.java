@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.api.streaming;
 
+import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.internal.streaming.CursorContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
 import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
+import org.mule.runtime.core.internal.streaming.CursorContext;
+
+import java.io.InputStream;
 
 /**
  * Manages resources dedicated to perform streaming of bytes or objects, so that the runtime can keep track of them,
@@ -44,5 +47,17 @@ public interface StreamingManager {
    * @return a {@link CursorContext}
    */
   CursorProvider manage(CursorProvider provider, CoreEvent creatorEvent);
+
+  /**
+   * Becomes aware of the given {@code inputStream} and makes sure it is closed
+   * by the time the given {@code creatorEvent} (and all its parent events) are completed.
+   * <p>
+   * If {@code inputStream} is a {@link Cursor} then nothing happens. Use
+   * {@link #manage(CursorProvider, CoreEvent)} for those cases.
+   *
+   * @param inputStream  the stream to track
+   * @param creatorEvent the event on which the stream was created
+   */
+  void manage(InputStream inputStream, CoreEvent creatorEvent);
 
 }
