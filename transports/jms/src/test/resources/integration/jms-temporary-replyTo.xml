@@ -83,4 +83,10 @@
         <test:component appendString=" #[context:serviceName]" logMessageDetails="true" waitTime="50"/>
     </flow>
 
+    <flow name="replyToFlow">
+        <set-variable variableName="MULE_REPLYTO_STOP" value="true"/>
+        <jms:outbound-endpoint address="${outbound.destination}" exchange-pattern="request-response" connector-ref="jmsConnector1"/>
+        <test:assert count="0"/>
+    </flow>
+
 </mule>

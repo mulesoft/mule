@@ -8,11 +8,14 @@ package org.mule.transport.jms;
 
 import static javax.jms.Message.DEFAULT_PRIORITY;
 import static javax.jms.Message.DEFAULT_TIME_TO_LIVE;
+import static org.apache.commons.lang.BooleanUtils.toBoolean;
 import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.transport.jms.JmsConstants.PERSISTENT_DELIVERY_PROPERTY;
 import static org.mule.transport.jms.JmsConstants.PRIORITY_PROPERTY;
 import static org.mule.transport.jms.JmsConstants.TIME_TO_LIVE_PROPERTY;
 import static org.mule.util.NumberUtils.toInt;
+
+
 import org.mule.api.CompletionHandler;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -623,7 +626,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         Destination replyTo = null;
 
         // Some JMS implementations might not support the ReplyTo property.
-        if (isHandleReplyTo(message, event))
+        if (isHandleReplyTo(message, event) && !isMuleReplyToStop(event))
         {
 
             Object tempReplyTo = event.getMessage().getOutboundProperty(JmsConstants.JMS_REPLY_TO);
@@ -681,6 +684,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
         return replyTo;
 
+    }
+
+    private boolean isMuleReplyToStop(MuleEvent event)
+    {
+        String replyToStop = event.getMessage().getInvocationProperty(
+                MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
+        return toBoolean(replyToStop);
     }
 
     protected class LatchReplyToListener implements MessageListener

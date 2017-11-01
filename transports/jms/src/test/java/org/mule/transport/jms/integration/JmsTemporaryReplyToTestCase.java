@@ -119,6 +119,13 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
         // We get the original message back, not the result from the remote component
         assertEchoResponse(response);
     }
+    
+    @Test
+    public void testJMSSetMuleReplyToStop() throws Exception
+    {
+        runFlow("replyToFlow", TEST_MESSAGE);
+        verify("replyToFlow");
+    }
 
     private void assertEchoResponse(MuleMessage response) throws Exception
     {
