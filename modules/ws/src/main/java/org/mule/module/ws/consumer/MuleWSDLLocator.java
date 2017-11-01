@@ -92,7 +92,8 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
                 }
                 else
                 {
-                    latestImportedURL = normalize((getBasePath(url.toString()) + importLocation));
+                    latestImportedURL = normalizeBasePathURL(getBasePath(url.toString()), importLocation);
+
                 }
 
             }
@@ -103,6 +104,16 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
         {
             throw new RuntimeException("There has been an error retrieving the following wsdl resource: " + latestImportedURL, e);
         }
+    }
+
+    private String normalizeBasePathURL(String basePath, String importLocation)
+    {
+        if (isHttpAddress(basePath))
+        {
+            return basePath + importLocation;
+        }
+        
+        return normalize(basePath + importLocation);
     }
 
     private boolean mustResolveRelativePaths(URL url)
