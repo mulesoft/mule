@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.KILL_WITH_GROUP;
+
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -18,7 +19,6 @@ import org.mule.test.heisenberg.extension.model.KillParameters;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
-import org.mule.test.heisenberg.extension.stereotypes.DrugKillingStereotype;
 import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
 
 import java.util.List;
@@ -49,7 +49,8 @@ public class KillingOperations {
     return id;
   }
 
-  @Stereotype(DrugKillingStereotype.class)
+  //TODO MULE-13920: THIS SHOULD WORK, BUT DOESN'T
+  //  @Stereotype(DrugKillingStereotype.class)
   public List<Ricin> killWithRicins(@Optional(defaultValue = PAYLOAD) List<Ricin> ricins) {
     return ricins;
   }

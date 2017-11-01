@@ -2354,7 +2354,7 @@
                 <xs:extension base="mule:abstractExtensionType">
                   <xs:sequence minOccurs="1">
                     <xs:choice minOccurs="1" maxOccurs="unbounded">
-                      <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="killing_operation"></xs:element>
+                      <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
                     </xs:choice>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionBoolean" use="optional" name="execute"></xs:attribute>
@@ -2378,7 +2378,7 @@
                 <xs:extension base="mule:abstractExtensionType">
                   <xs:sequence minOccurs="1">
                     <xs:choice minOccurs="1" maxOccurs="unbounded">
-                      <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="killing_operation"></xs:element>
+                      <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
                     </xs:choice>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionBoolean" use="optional" name="execute"></xs:attribute>
@@ -2456,7 +2456,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="1" maxOccurs="1">
-          <xs:element minOccurs="1" maxOccurs="1" name="first">
+          <xs:element minOccurs="1" maxOccurs="1" name="killing-route">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
@@ -2471,7 +2471,7 @@
               </xs:complexContent>
             </xs:complexType>
           </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="then">
+          <xs:element minOccurs="0" maxOccurs="1" name="druge-killing-route">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
@@ -2500,7 +2500,7 @@
                 <xs:extension base="mule:abstractExtensionType">
                   <xs:sequence minOccurs="1">
                     <xs:choice minOccurs="1" maxOccurs="unbounded">
-                      <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="killing_operation"></xs:element>
+                      <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
                     </xs:choice>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionBoolean" use="optional" name="execute"></xs:attribute>
@@ -2515,7 +2515,7 @@
                 <xs:extension base="mule:abstractExtensionType">
                   <xs:sequence minOccurs="1">
                     <xs:choice minOccurs="1" maxOccurs="unbounded">
-                      <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="drug_killing"></xs:element>
+                      <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
                     </xs:choice>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionBoolean" use="optional" name="execute"></xs:attribute>
