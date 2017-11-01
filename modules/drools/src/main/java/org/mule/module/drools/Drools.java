@@ -118,15 +118,18 @@ public class Drools implements RulesEngine
     {
         StatefulKnowledgeSession session = ((DroolsSessionData) rules.getSessionData()).getSession();
         FactHandle handle = session.getFactHandle(fact);
-        if (handle != null)
+        synchronized(session)
         {
-            session.update(handle, fact);
-            session.fireAllRules();
-        }
-        else
-        {
-            handle = session.insert(fact);
-            session.fireAllRules();
+            if (handle != null)
+            {
+                session.update(handle, fact);
+                session.fireAllRules();
+            }
+            else
+            {
+                handle = session.insert(fact);
+                session.fireAllRules();
+            }
         }
         return handle;
     }
@@ -135,14 +138,17 @@ public class Drools implements RulesEngine
     {
         StatefulKnowledgeSession session = ((DroolsSessionData) rules.getSessionData()).getSession();
         FactHandle handle = session.getFactHandle(fact);
-        if (handle != null)
+        synchronized(session)
         {
-            session.retract(handle);
-            session.fireAllRules();
-        }
-        else
-        {
-            logger.warn("Unable to retract fact " + fact + " because it is not in the knowledge base");
+            if (handle != null)
+            {
+                session.retract(handle);
+                session.fireAllRules();
+            }
+            else
+            {
+                logger.warn("Unable to retract fact " + fact + " because it is not in the knowledge base");
+            }
         }
     }
     
@@ -165,15 +171,18 @@ public class Drools implements RulesEngine
         }
         
         FactHandle handle = session.getFactHandle(event);
-        if (handle != null)
+        synchronized (session)
         {
-            wmEntryPoint.update(handle, event);
+            if (handle != null)
+            {
+                wmEntryPoint.update(handle, event);
+            }
+            else
+            {
+                handle = wmEntryPoint.insert(event);
+            }
+            session.fireAllRules();
         }
-        else
-        {
-            handle = wmEntryPoint.insert(event);
-        }
-        session.fireAllRules();
         return handle;
     }
     
