@@ -8,10 +8,14 @@ package org.mule.runtime.http.api.domain.message.request;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
+import static org.mule.runtime.http.api.utils.UriCache.getUriFromString;
 
 import org.mule.runtime.http.api.HttpConstants.Method;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.HttpMessageBuilder;
+import org.mule.runtime.http.api.utils.UriCache;
+
+import java.net.URI;
 
 /**
  * Builder of {@link HttpRequest}s. Instances can only be obtained using {@link HttpRequest#builder()}. At the very least, the
@@ -23,7 +27,7 @@ import org.mule.runtime.http.api.domain.message.HttpMessageBuilder;
 public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuilder, HttpRequest> {
 
   private String path;
-  private String uri;
+  private URI uri;
   private String method = GET.name();
   private MultiMap<String, String> queryParams = new MultiMap<>();
 
@@ -32,12 +36,23 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   /**
    * Declares the URI where this {@link HttpRequest} will be sent. Minimum required configuration.
    *
-   * @param uri the URI of the {@link HttpRequest} desired. Non null.
+   * @param uri the URI (as a String) of the {@link HttpRequest} desired. Non null.
    * @return this builder
    */
   public HttpRequestBuilder uri(String uri) {
     int queryPos = uri.indexOf("?");
     this.path = queryPos > -1 ? uri.substring(0, queryPos) : uri;
+    this.uri = getUriFromString(uri);
+    return this;
+  }
+
+  /**
+   * Declares the URI where this {@link HttpRequest} will be sent. Minimum required configuration.
+   *
+   * @param uri the URI of the {@link HttpRequest} desired. Non null.
+   * @return this builder
+   */
+  public HttpRequestBuilder uri(URI uri) {
     this.uri = uri;
     return this;
   }
@@ -74,7 +89,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   /**
    * @return the current URI configured in the builder.
    */
-  public String getUri() {
+  public URI getUri() {
     return uri;
   }
 
