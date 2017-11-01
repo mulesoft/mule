@@ -658,7 +658,7 @@
           "name": "eatApple",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
+            "metadataKeyId": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -2433,7 +2433,7 @@
           "name": "harvest-apples",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
+            "metadataKeyId": {
               "type": {
                 "format": "java",
                 "type": "String"
@@ -7548,7 +7548,7 @@
       "name": "getAllApples",
       "description": "",
       "modelProperties": {
-        "org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty": {
+        "metadataKeyId": {
           "type": {
             "format": "java",
             "type": "String"
