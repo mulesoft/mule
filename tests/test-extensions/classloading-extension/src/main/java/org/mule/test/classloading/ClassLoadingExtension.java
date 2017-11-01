@@ -11,20 +11,13 @@ import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.mule.test.classloading.api.ClassLoadingHelper;
 
 @Extension(name = "ClassLoading")
 @Xml(prefix = "classloading")
 @ConnectionProviders({CLPoolingConnectionProvider.class, CLCachedConnectionProvider.class, CLNoneConnectionProvider.class})
 @Configurations(CLConfiguration.class)
-@Export(classes = ClassLoadingExtension.class)
+@Export(classes = ClassLoadingHelper.class)
 public class ClassLoadingExtension {
 
-  public static Map<String, ClassLoader> createdClassLoaders = new HashMap<>();
-
-  public static void addClassLoader(String element) {
-    createdClassLoaders.put(element, Thread.currentThread().getContextClassLoader());
-  }
 }

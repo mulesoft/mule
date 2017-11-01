@@ -8,13 +8,12 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import static org.springframework.util.ClassUtils.getAllInterfaces;
-
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -31,9 +30,11 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
+import org.apache.commons.lang3.ClassUtils;
 
 
 /**
@@ -88,14 +89,13 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   }
 
   /**
-   * Wraps the {@link ConnectionProvider} inside of a dynamic proxy which changes the current {@link ClassLoader} to the
-   * the extension's {@link ClassLoader} when executing any method of this wrapped {@link ConnectionProvider}
+   * Wraps the {@link ConnectionProvider} inside of a dynamic proxy which changes the current {@link ClassLoader} to the the
+   * extension's {@link ClassLoader} when executing any method of this wrapped {@link ConnectionProvider}
    * <p>
    * This ensures that every time that the {@link ConnectionProvider} is used, it will work in the correct classloader.
    * <p>
-   * Although if the {@link ConnectionProvider} is created with the correct classloader and then used with an incorrect
-   * one this may work, due that static class references were loaded correctly, logic loading class in a dynamic way
-   * will fail.
+   * Although if the {@link ConnectionProvider} is created with the correct classloader and then used with an incorrect one this
+   * may work, due that static class references were loaded correctly, logic loading class in a dynamic way will fail.
    *
    * @param provider The {@link ConnectionProvider} to wrap
    * @return The wrapped {@link ConnectionProvider}
@@ -104,7 +104,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     Enhancer enhancer = new Enhancer();
     ClassLoader classLoader = getClassLoader(extensionModel);
 
-    enhancer.setInterfaces(getInterfaces(provider));
+    enhancer.setInterfaces(getProxyInterfaces(provider));
     enhancer.setCallback((MethodInterceptor) (o, method, objects, methodProxy) -> {
       Reference<Object> resultReference = new Reference<>();
       Reference<Throwable> errorReference = new Reference<>();
@@ -130,18 +130,28 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
       }
     });
 
-    return (ConnectionProvider<C>) enhancer.create();
+    try {
+      return (ConnectionProvider<C>) enhancer.create();
+    } catch (ClassCastException e) {
+      throw e;
+    }
   }
 
-  private Class[] getInterfaces(ConnectionProvider provider) {
-    Class<?>[] originalInterfaces = getAllInterfaces(provider);
-    int length = originalInterfaces.length;
+  /**
+   * @param provider the provider implementation
+   * @return the interfaces that must be proxied by the runtime. Only runtime interfaces are considered since are the only ones
+   *         that the runtime will invoke.
+   */
+  private Class[] getProxyInterfaces(ConnectionProvider provider) {
+    List<Class<?>> originalInterfaces = ClassUtils.getAllInterfaces(provider.getClass());
+    Class<?>[] runtimeInterfaces = filterNonRuntimeInterfaces(originalInterfaces);
+    int length = runtimeInterfaces.length;
     Class[] newInterfaces = new Class[length + 1];
 
     boolean alreadyExists = false;
 
     for (int i = 0; i < length; i++) {
-      Class<?> anInterface = originalInterfaces[i];
+      Class<?> anInterface = runtimeInterfaces[i];
       if (anInterface.equals(HasDelegate.class)) {
         alreadyExists = true;
       }
@@ -152,7 +162,18 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
       newInterfaces[length] = HasDelegate.class;
       return newInterfaces;
     } else {
-      return originalInterfaces;
+      return runtimeInterfaces;
     }
+  }
+
+  private Class<?>[] filterNonRuntimeInterfaces(List<Class<?>> interfaces) {
+    return interfaces.stream().filter(clazz -> {
+      try {
+        Initialisable.class.getClassLoader().loadClass(clazz.getName());
+        return true;
+      } catch (ClassNotFoundException e) {
+        return false;
+      }
+    }).toArray(Class[]::new);
   }
 }
