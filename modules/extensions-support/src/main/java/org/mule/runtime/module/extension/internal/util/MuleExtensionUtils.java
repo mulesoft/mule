@@ -38,7 +38,6 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -67,8 +66,6 @@ import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecu
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
@@ -81,12 +78,10 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -239,27 +234,6 @@ public class MuleExtensionUtils {
     }
 
     return interceptorFactories.stream().map(InterceptorFactory::createInterceptor).collect(toImmutableList());
-  }
-
-  /**
-   * Returns the {@link Method} that was used to declare the given {@code operationDeclaration}.
-   *
-   * @param operationDeclaration a {@link OperationDeclaration}
-   * @return A {@link Method} or {@code null} if the {@code operationDeclaration} was defined by other means
-   */
-  public static java.util.Optional<Method> getImplementingMethod(OperationDeclaration operationDeclaration) {
-    return operationDeclaration.getModelProperty(ImplementingMethodModelProperty.class)
-        .map(ImplementingMethodModelProperty::getMethod);
-  }
-
-  /**
-   * Returns the {@link Class} that was used to declare the given {@code declaration}.
-   *
-   * @param declaration a {@link BaseDeclaration} implementation.
-   * @return A {@link Class} where the element was defined or {@link Optional#empty()} if the element was defined by other means.
-   */
-  public static java.util.Optional<? extends Class<?>> getImplementingType(BaseDeclaration<?> declaration) {
-    return declaration.getModelProperty(ImplementingTypeModelProperty.class).map(ImplementingTypeModelProperty::getType);
   }
 
   /**

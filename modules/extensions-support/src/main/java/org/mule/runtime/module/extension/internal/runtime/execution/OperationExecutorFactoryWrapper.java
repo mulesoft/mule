@@ -8,10 +8,13 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static java.util.Collections.emptyMap;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -46,18 +49,32 @@ public final class OperationExecutorFactoryWrapper<T extends ComponentModel>
    */
 
   @Override
-  public ComponentExecutor<T> createExecutor(T operationModel, Map<String, Object> parameters) {
-    ComponentExecutor executor = delegate.createExecutor(operationModel, parameters);
-    executor = new ReactiveOperationExecutionWrapper(executor);
-    executor = new InterceptableOperationExecutorWrapper(executor, interceptors);
+  public ComponentExecutor<T> createExecutor(T componentModel, Map<String, Object> parameters) {
+    ComponentExecutor executor = delegate.createExecutor(componentModel, parameters);
+    if (isJavaNonBlocking(componentModel)) {
+      executor = new ReactiveOperationExecutionWrapper(executor);
+    }
 
+    executor = new InterceptableOperationExecutorWrapper(executor, interceptors);
     return executor;
   }
 
+  private boolean isJavaNonBlocking(T componentModel) {
+    if (componentModel.getModelProperty(ImplementingMethodModelProperty.class).isPresent()) {
+      if (componentModel instanceof OperationModel && !((OperationModel) componentModel).isBlocking()) {
+        return true;
+      } else {
+        return componentModel instanceof ConstructModel;
+      }
+    }
+
+    return false;
+  }
+
   @Override
-  public Function<ExecutionContext<T>, Map<String, Object>> createArgumentResolver(T operationModel) {
+  public Function<ExecutionContext<T>, Map<String, Object>> createArgumentResolver(T componentModel) {
     return delegate instanceof OperationArgumentResolverFactory
-        ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(operationModel)
+        ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(componentModel)
         : ec -> emptyMap();
   }
 }
