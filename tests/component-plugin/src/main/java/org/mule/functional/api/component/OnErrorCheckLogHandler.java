@@ -28,7 +28,7 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
 
   //Flag to check if doLogException() was actually called. Since all the logic of the checkers is executed in that method,
   //if it's not called, we will never fail, even if we should've.
-  private boolean exceptionLogged = false; //Flag to check if doLog
+  private boolean exceptionLogged = false;
 
   @Override
   public void start() throws MuleException {

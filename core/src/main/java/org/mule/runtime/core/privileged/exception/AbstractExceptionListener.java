@@ -12,7 +12,7 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.exception.ExceptionHelper.sanitize;
-import static org.mule.runtime.api.exception.MuleException.ALREADY_LOGGED_KEY;
+import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
 import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
@@ -142,17 +142,18 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   protected void resolveAndLogException(Throwable t) {
     Pair<MuleException, String> resolvedException = resolveExceptionAndMessageToLog(t);
-    //First check if exception was not logged already
     if (resolvedException.getSecond() != null) {
-      if (!(boolean) resolvedException.getFirst().getInfo().getOrDefault(ALREADY_LOGGED_KEY, false)) {
+      //First check if exception was not logged already
+      if (!(boolean) resolvedException.getFirst().getInfo().getOrDefault(INFO_ALREADY_LOGGED_KEY, false)) {
         doLogException(resolvedException.getSecond(), null);
       } else {
-        return; //Don't log anything, error while getting root or exception already logged.
+        //Don't log anything, error while getting root or exception already logged.
+        return;
       }
     } else {
       doLogException("Caught exception in Exception Strategy: " + t.getMessage(), t);
     }
-    resolvedException.getFirst().addInfo(ALREADY_LOGGED_KEY, true);
+    resolvedException.getFirst().addInfo(INFO_ALREADY_LOGGED_KEY, true);
   }
 
   protected void doLogException(String message, Throwable t) {
