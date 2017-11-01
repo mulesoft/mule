@@ -9,6 +9,7 @@ package org.mule.test.heisenberg.extension;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
@@ -20,6 +21,8 @@ import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.test.heisenberg.extension.model.Attribute;
 import org.mule.test.heisenberg.extension.route.AfterCall;
 import org.mule.test.heisenberg.extension.route.BeforeCall;
+import org.mule.test.heisenberg.extension.route.DrugKillingRoute;
+import org.mule.test.heisenberg.extension.route.KillingRoute;
 import org.mule.test.heisenberg.extension.route.OtherwiseRoute;
 import org.mule.test.heisenberg.extension.route.WhenRoute;
 
@@ -76,12 +79,12 @@ public class HeisenbergRouters {
     }
   }
 
-  public void stereotypedRoutes(WhenRoute first,
-                                @Optional OtherwiseRoute then,
+  public void stereotypedRoutes(KillingRoute killingRoute,
+                                @Optional DrugKillingRoute drugeKillingRoute,
                                 RouterCompletionCallback callback) {
-    first.getChain().process(result -> {
-      if (then != null) {
-        then.getChain().process(result, callback::success, (e, r) -> callback.error(e));
+    killingRoute.getChain().process(result -> {
+      if (drugeKillingRoute != null) {
+        drugeKillingRoute.getChain().process(result, callback::success, (e, r) -> callback.error(e));
       } else {
         callback.success(result);
       }
