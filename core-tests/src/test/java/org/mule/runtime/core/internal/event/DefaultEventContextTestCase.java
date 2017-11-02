@@ -153,49 +153,6 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  @Description("EventContext beforeResponsePublisher subscribers are notified before responsePublisher subscribers (assuming " +
-      "both are subscribed before response is completed)")
-  public void beforeResponse() throws Exception {
-    BaseEventContext parent = context.get();
-
-    CoreEvent event = testEvent();
-
-    Latch latch = new Latch();
-    Latch lock = new Latch();
-    Latch responseSubscriberFired = new Latch();
-    from(parent.getBeforeResponsePublisher()).doOnNext(checkedConsumer(e -> {
-      lock.countDown();
-      latch.await();
-    })).subscribe();
-    from(parent.getResponsePublisher()).doOnNext(checkedConsumer(e -> {
-      responseSubscriberFired.countDown();
-    })).subscribe();
-
-    Scheduler testScheduler = muleContext.getSchedulerService().ioScheduler();
-
-    try {
-      testScheduler.submit(() -> parent.success(event));
-
-      // Wait until 'before response' publisher subscriber is fired
-      lock.await();
-
-      // Assert that `response` publisher subscriber is not fired until `before response` subscriber finishes
-      assertThat(responseSubscriberFired.await(BLOCK_TIMEOUT, MILLISECONDS), is(false));
-
-      // Unblock `before response` publisher
-      latch.countDown();
-
-      // Assert that `response` publisher subscriber is now fired
-      assertThat(responseSubscriberFired.await(BLOCK_TIMEOUT, MILLISECONDS), is(true));
-
-      awaitAndAssertResponse(parent, event);
-      awaitCompletion(parent);
-    } finally {
-      testScheduler.stop();
-    }
-  }
-
-  @Test
   @Description("Parent EventContext only completes once response publisher completes with a value and all child contexts are " +
       "complete.")
   public void childSuccessWithResult() throws Exception {
