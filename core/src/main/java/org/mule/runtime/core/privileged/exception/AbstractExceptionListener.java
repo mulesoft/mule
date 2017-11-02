@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.exception.ExceptionHelper.sanitize;
+import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
 import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
@@ -28,6 +29,7 @@ import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.SecurityNotification;
 import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
@@ -121,29 +123,44 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     return ex.getCause() instanceof TypedException ? ex.getCause().getCause() : ex.getCause();
   }
 
-  protected String createMessageToLog(Throwable t) {
+  protected Pair<MuleException, String> resolveExceptionAndMessageToLog(Throwable t) {
     MuleException muleException = getRootMuleException(t);
-
+    String logMessage = null;
     if (muleException != null) {
       if (!isVerboseExceptions() && t instanceof EventProcessingException
           && ((EventProcessingException) t).getEvent().getError()
               .map(e -> CORE_NAMESPACE_NAME.equals(e.getErrorType().getNamespace())
                   && UNKNOWN_ERROR_IDENTIFIER.equals(e.getErrorType().getIdentifier()))
               .orElse(false)) {
-        return ((MuleException) sanitize(muleException)).getVerboseMessage();
+        logMessage = ((MuleException) sanitize(muleException)).getVerboseMessage();
       } else {
-        return muleException.getDetailedMessage();
+        logMessage = muleException.getDetailedMessage();
       }
     }
-    return null;
+    return new Pair<>(muleException, logMessage);
   }
 
-  protected void doLogException(Throwable t) {
-    String logMessage = createMessageToLog(t);
-    if (logMessage != null) {
-      logger.error(logMessage);
+  protected void resolveAndLogException(Throwable t) {
+    Pair<MuleException, String> resolvedException = resolveExceptionAndMessageToLog(t);
+    if (resolvedException.getSecond() != null) {
+      //First check if exception was not logged already
+      if (!(boolean) resolvedException.getFirst().getInfo().getOrDefault(INFO_ALREADY_LOGGED_KEY, false)) {
+        doLogException(resolvedException.getSecond(), null);
+      } else {
+        //Don't log anything, error while getting root or exception already logged.
+        return;
+      }
     } else {
-      logger.error("Caught exception in Exception Strategy: " + t.getMessage(), t);
+      doLogException("Caught exception in Exception Strategy: " + t.getMessage(), t);
+    }
+    resolvedException.getFirst().addInfo(INFO_ALREADY_LOGGED_KEY, true);
+  }
+
+  protected void doLogException(String message, Throwable t) {
+    if (t == null) {
+      logger.error(message);
+    } else {
+      logger.error(message, t);
     }
   }
 

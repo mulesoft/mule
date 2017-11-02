@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
-import org.mule.runtime.core.internal.exception.TemplateOnErrorHandler;
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.internal.routing.AbstractSelectiveRouter;
 import org.mule.runtime.core.privileged.processor.Router;
 

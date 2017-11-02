@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.exception;
+package org.mule.runtime.core.privileged.exception;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
@@ -39,10 +39,10 @@ import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.exception.MessagingExceptionHandlerToSystemAdapter;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
-import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 
@@ -111,7 +111,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       try {
         me.setInErrorHandler(true);
         logger.error("Exception during exception strategy execution");
-        doLogException(me);
+        resolveAndLogException(me);
         TransactionCoordination.getInstance().rollbackCurrentTransaction();
       } catch (Exception ex) {
         // Do nothing
@@ -272,7 +272,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   protected void logException(Throwable t, CoreEvent event) {
     if (TRUE.toString().equals(logException)
         || this.muleContext.getExpressionManager().evaluateBoolean(logException, event, getLocation(), true, true)) {
-      doLogException(t);
+      resolveAndLogException(t);
     }
   }
 
@@ -287,4 +287,5 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   public void setRootContainerName(String rootContainerName) {
     updateRootContainerName(rootContainerName, this);
   }
+
 }

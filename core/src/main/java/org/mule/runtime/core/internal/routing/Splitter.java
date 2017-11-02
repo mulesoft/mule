@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
-import static org.mule.runtime.core.internal.exception.TemplateOnErrorHandler.createErrorType;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.createErrorType;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;

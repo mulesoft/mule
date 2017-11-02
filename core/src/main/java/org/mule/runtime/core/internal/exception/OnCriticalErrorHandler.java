@@ -54,7 +54,7 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
   }
 
   public void logException(Throwable exception) {
-    doLogException(exception);
+    resolveAndLogException(exception);
   }
 
 }
