@@ -117,6 +117,24 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   }
 
   @Test(expected = Exception.class)
+  @Description("If the flow fails, all non repeatable streams should be closed")
+  public void nonRepeatableStreamsClosedInCaseOfException() throws Exception {
+    flowRunner("nonRepeatableCrashCar").withPayload(data).run();
+  }
+
+  @Test
+  @Description("If the flow fails, all non repeatable streams should be closed")
+  public void allStreamsClosedInCaseOfHandledException() throws Exception {
+    flowRunner("handledCrashCar").withPayload(data).run();
+  }
+
+  @Test
+  @Description("If the flow fails, all non repeatable streams should be closed")
+  public void nonRepeatableStreamsClosedInCaseOfHandledException() throws Exception {
+    flowRunner("nonRepeatableHandledCrashCar").withPayload(data).run();
+  }
+
+  @Test(expected = Exception.class)
   @Description("If a cursor is open in a transaction, it should be closed if the flow fails")
   public void allStreamsClosedInCaseOfExceptionInTx() throws Exception {
     flowRunner("crashCarTx").withPayload(data).run();

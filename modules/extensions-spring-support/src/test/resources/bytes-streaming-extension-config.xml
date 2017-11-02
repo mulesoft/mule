@@ -119,6 +119,39 @@
         <flow-ref name="doCrash" />
     </flow>
 
+    <flow name="handledCrashCar">
+        <try>
+            <marvel:to-stream />
+            <flow-ref name="doCrash" />
+            <error-handler>
+                <on-error-continue>
+                    <logger message="Good thing I have airbags..." />
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </flow>
+
+    <flow name="nonRepeatableHandledCrashCar">
+        <try>
+            <marvel:to-stream>
+                <non-repeatable-stream />
+            </marvel:to-stream>
+            <flow-ref name="doCrash" />
+            <error-handler>
+                <on-error-continue>
+                    <logger message="Good thing I have airbags..." />
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </flow>
+
+    <flow name="nonRepeatableCrashCar">
+        <marvel:to-stream>
+            <non-repeatable-stream />
+        </marvel:to-stream>
+        <flow-ref name="doCrash" />
+    </flow>
+
     <flow name="crashCarTx">
         <try transactionalAction="BEGIN_OR_JOIN">
             <flow-ref name="crashCar" />
