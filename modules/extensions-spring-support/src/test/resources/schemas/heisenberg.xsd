@@ -1519,6 +1519,34 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element abstract="true" name="drug_killing"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="DrugKillingType" substitutionGroup="drug_killing" name="drug-killing"></xs:element>
+  <xs:complexType name="DrugKillingType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="ricins">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-ricin"></xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionList" use="optional" default="#[payload]" name="ricins"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="EchoType" substitutionGroup="heisenberg-empire" name="echo"></xs:element>
   <xs:complexType name="EchoType">
     <xs:complexContent>
@@ -1888,8 +1916,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element abstract="true" name="drug_killing"></xs:element>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithRicinsType" substitutionGroup="drug_killing" name="kill-with-ricins"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithRicinsType" substitutionGroup="killing_operation" name="kill-with-ricins"></xs:element>
   <xs:complexType name="KillWithRicinsType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
@@ -2471,7 +2498,7 @@
               </xs:complexContent>
             </xs:complexType>
           </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="druge-killing-route">
+          <xs:element minOccurs="0" maxOccurs="1" name="drug-killing-route">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">

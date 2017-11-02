@@ -80,11 +80,11 @@ public class HeisenbergRouters {
   }
 
   public void stereotypedRoutes(KillingRoute killingRoute,
-                                @Optional DrugKillingRoute drugeKillingRoute,
+                                @Optional DrugKillingRoute drugKillingRoute,
                                 RouterCompletionCallback callback) {
     killingRoute.getChain().process(result -> {
-      if (drugeKillingRoute != null) {
-        drugeKillingRoute.getChain().process(result, callback::success, (e, r) -> callback.error(e));
+      if (drugKillingRoute != null) {
+        drugKillingRoute.getChain().process(result, callback::success, (e, r) -> callback.error(e));
       } else {
         callback.success(result);
       }

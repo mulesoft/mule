@@ -9,7 +9,7 @@ package org.mule.test.module.extension.scopes;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
 
-public class ScopeStereotypeValidationTestCase extends InvalidExtensionConfigTestCase {
+public class RouterStereotypeValidationTestCase extends InvalidExtensionConfigTestCase {
 
   @Override
   protected String[] getConfigFiles() {

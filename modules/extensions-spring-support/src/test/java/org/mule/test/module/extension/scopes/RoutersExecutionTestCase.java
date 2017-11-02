@@ -16,14 +16,17 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
@@ -145,7 +148,8 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
   @Test
   public void stereotypedRoutes() throws Exception {
     Event routeEvent = flowRunner("stereotypedRoutes").run();
-    assertThat(routeEvent.getMessage().getPayload().getValue(), is("bye bye, someName"));
+    Ricin ricin = ((List<Ricin>) routeEvent.getMessage().getPayload().getValue()).get(0);
+    assertThat(ricin.getDestination().getVictim(), is("bye bye, someName"));
   }
 
   @Test

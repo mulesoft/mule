@@ -80,6 +80,9 @@
             <heisenberg:killing-route message="myString" execute="true">
                 <heisenberg:kill goodbyeMessage="bye bye"/>
             </heisenberg:killing-route>
+            <heisenberg:drug-killing-route>
+                <heisenberg:drug-killing ricins="#[[{ destination : { victim : payload}}]]"/>
+            </heisenberg:drug-killing-route>
         </heisenberg:stereotyped-routes>
     </flow>
 

@@ -12,8 +12,9 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -103,7 +104,7 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
   @Test
   public void strictMimeType() throws Exception {
     CoreEvent response = runFlow("strictMimeType");
-    assertThat(response.getMessage().getPayload().getDataType().getMediaType().matches(APPLICATION_JSON), is(true));
+    assertThat(response.getMessage().getPayload().getDataType().getMediaType().matches(TEXT), is(true));
   }
 
   private void assertCustomMimeType(DataType dataType) {

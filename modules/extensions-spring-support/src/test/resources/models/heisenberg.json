@@ -13199,6 +13199,191 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
+          "format": "java",
+          "type": "Array",
+          "annotations": {
+            "classInformation": {
+              "classname": "java.util.List",
+              "hasDefaultConstructor": false,
+              "isInterface": true,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [
+                "java.util.Collection"
+              ],
+              "parent": "",
+              "genericTypes": [],
+              "isMap": false
+            }
+          },
+          "item": {
+            "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
+          }
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "DRUG_KILLING",
+        "namespace": "HEISENBERG"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.util.List",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.util.Collection"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
+                },
+                "item": {
+                  "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [],
+              "name": "ricins",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "drugKilling",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
           "format": {
             "id": "text/plain",
             "label": "text/plain",
@@ -14915,7 +15100,13 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "json",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -19149,7 +19340,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "drugeKillingRoute",
+          "name": "drugKillingRoute",
           "description": "",
           "modelProperties": {},
           "kind": "route"
