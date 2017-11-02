@@ -19,6 +19,7 @@ import org.mule.test.heisenberg.extension.model.KillParameters;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
+import org.mule.test.heisenberg.extension.stereotypes.DrugKillingStereotype;
 import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
 
 import java.util.List;
@@ -49,10 +50,12 @@ public class KillingOperations {
     return id;
   }
 
-  //TODO MULE-13920: THIS SHOULD WORK, BUT DOESN'T
-  //  @Stereotype(DrugKillingStereotype.class)
-  public List<Ricin> killWithRicins(@Optional(defaultValue = PAYLOAD) List<Ricin> ricins) {
+  @Stereotype(DrugKillingStereotype.class)
+  public List<Ricin> drugKilling(@Optional(defaultValue = PAYLOAD) List<Ricin> ricins) {
     return ricins;
   }
 
+  public List<Ricin> killWithRicins(@Optional(defaultValue = PAYLOAD) List<Ricin> ricins) {
+    return ricins;
+  }
 }

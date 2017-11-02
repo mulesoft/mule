@@ -10,9 +10,9 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
-import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -55,7 +55,7 @@ import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
 
-import com.google.common.collect.ImmutableMap;
+import javax.inject.Inject;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -64,7 +64,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableMap;
 
 
 @Stereotype(EmpireStereotype.class)
@@ -123,7 +123,7 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @Stereotype(KillingStereotype.class)
-  @MediaType(APPLICATION_JSON)
+  @MediaType(TEXT_PLAIN)
   public String kill(@Optional(defaultValue = PAYLOAD) String victim, String goodbyeMessage) throws Exception {
     KillParameters killParameters = new KillParameters(victim, goodbyeMessage);
     return format("%s, %s", killParameters.getGoodbyeMessage(), killParameters.getVictim());
