@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
 public class DefaultMessageProcessorPathElement implements MessageProcessorPathElement
 {
 
@@ -41,7 +43,7 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
     @Override
     public List<MessageProcessorPathElement> getChildren()
     {
-        return Collections.unmodifiableList(children);
+        return ImmutableList.copyOf(children);
     }
 
     @Override
