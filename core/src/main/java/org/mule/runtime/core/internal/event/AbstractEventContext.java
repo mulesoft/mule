@@ -40,7 +40,6 @@ abstract class AbstractEventContext implements BaseEventContext {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
   protected static final FlowExceptionHandler NULL_EXCEPTION_HANDLER = NullExceptionHandler.getInstance();
 
-  private transient MonoProcessor<CoreEvent> beforeResponseProcessor;
   private transient MonoProcessor<CoreEvent> responseProcessor;
   private transient MonoProcessor<Void> completionProcessor;
   private transient Disposable completionSubscriberDisposable;
@@ -59,9 +58,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   public AbstractEventContext(FlowExceptionHandler exceptionHandler, Publisher<Void> completionCallback) {
     this.completionCallback = from(completionCallback);
     this.exceptionHandler = exceptionHandler;
-    beforeResponseProcessor = MonoProcessor.create();
     responseProcessor = MonoProcessor.create();
-    responseProcessor.doOnEach(s -> s.accept(beforeResponseProcessor)).subscribe(requestUnbounded());
     completionProcessor = MonoProcessor.create();
     completionProcessor.doFinally(e -> {
       if (LOGGER.isDebugEnabled()) {
@@ -99,17 +96,18 @@ abstract class AbstractEventContext implements BaseEventContext {
    * {@inheritDoc}
    */
   @Override
-  public final void success() {
+  public final Publisher<Void> success() {
     synchronized (this) {
       if (responseProcessor.isTerminated()) {
         LOGGER.debug(this + " empty response was already completed, ignoring.");
-        return;
+        return empty();
       }
 
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(this + " response completed with no result.");
       }
       responseProcessor.onComplete();
+      return empty();
     }
   }
 
@@ -117,17 +115,18 @@ abstract class AbstractEventContext implements BaseEventContext {
    * {@inheritDoc}
    */
   @Override
-  public final void success(CoreEvent event) {
+  public final Publisher<Void> success(CoreEvent event) {
     synchronized (this) {
       if (responseProcessor.isTerminated()) {
         LOGGER.debug(this + " response was already completed, ignoring.");
-        return;
+        return empty();
       }
 
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(this + " response completed with result.");
       }
       responseProcessor.onNext(event);
+      return empty();
     }
   }
 
@@ -172,17 +171,18 @@ abstract class AbstractEventContext implements BaseEventContext {
   }
 
   @Override
-  public Publisher<CoreEvent> getBeforeResponsePublisher() {
-    return beforeResponseProcessor;
-  }
-
-  @Override
   public Publisher<CoreEvent> getResponsePublisher() {
+    if (responseProcessor.isTerminated()) {
+      throw new IllegalStateException("ResponsePublisher cannot be obtained after context completion.");
+    }
     return responseProcessor;
   }
 
   @Override
   public Publisher<Void> getCompletionPublisher() {
+    if (responseProcessor.isTerminated()) {
+      throw new IllegalStateException("CompletionPublisher cannot be obtained after context completion");
+    }
     return completionProcessor;
   }
 

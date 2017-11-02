@@ -15,13 +15,15 @@ import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.reactivestreams.Publisher;
 
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Context representing a message that is received by a Mule Runtime via a connector source. This context is immutable and
- * maintained during all execution originating from a given source message and all instances of {@link CoreEvent} created as part of
- * the processing of the source message will maintain a reference to this instance. Wherever a Flow references another Flow this
- * {@link BaseEventContext} will be maintained, while whenever there is a connector boundary a new instance will be created by the
- * receiving source.
+ * maintained during all execution originating from a given source message and all instances of {@link CoreEvent} created as part
+ * of the processing of the source message will maintain a reference to this instance. Wherever a Flow references another Flow
+ * this {@link BaseEventContext} will be maintained, while whenever there is a connector boundary a new instance will be created
+ * by the receiving source.
  *
  * @see CoreEvent
  * @since 4.0
@@ -31,14 +33,14 @@ public interface BaseEventContext extends EventContext {
   /**
    * Complete this {@link BaseEventContext} successfully with no result {@link CoreEvent}.
    */
-  void success();
+  Publisher<Void> success();
 
   /**
    * Complete this {@link BaseEventContext} successfully with a result {@link CoreEvent}.
    *
    * @param event the result event.
    */
-  void success(CoreEvent event);
+  Publisher<Void> success(CoreEvent event);
 
   /**
    * Complete this {@link BaseEventContext} unsuccessfully with an error.
@@ -85,22 +87,6 @@ public interface BaseEventContext extends EventContext {
   BaseEventContext getRootContext();
 
   /**
-   * A {@link Publisher} that completes when a response is ready or an error was produced for this {@link BaseEventContext} but
-   * importantly before the Response {@link Publisher} obtained via {@link #getResponsePublisher()} completes. This allows for
-   * response subscribers that are executed before the source, client or parent flow receives to be registered. In order to
-   * subscribe after response processing you can use the response {@link Publisher}.
-   * <p/>
-   * Any asynchronous processing initiated as part of processing the request {@link CoreEvent} maybe still be in process when this
-   * {@link Publisher} completes. The completion {@link Publisher} can be used to perform an action after all processing is
-   * complete.
-   *
-   * @return publisher that completes when this {@link BaseEventContext} instance has a response of error.
-   * @see #getResponsePublisher()
-   * @see #getCompletionPublisher()
-   */
-  Publisher<CoreEvent> getBeforeResponsePublisher();
-
-  /**
    * A {@link Publisher} that completes when a response is ready or an error was produced for this {@link BaseEventContext}. Any
    * subscribers registered before the response completes will be executed after the response has been processed by the source,
    * client or parent flow. In order to subscribe before response processing you can use the before response {@link Publisher}.
@@ -110,17 +96,18 @@ public interface BaseEventContext extends EventContext {
    * complete.
    *
    * @return publisher that completes when this {@link BaseEventContext} instance has a response of error.
-   * @see #getBeforeResponsePublisher() ()
    * @see #getCompletionPublisher()
+   * @throws {@link IllegalStateException} if this {@link BaseEventContext} response has already completed.
    */
   Publisher<CoreEvent> getResponsePublisher();
 
   /**
-   * A {@link Publisher} that completes when a this {@link BaseEventContext} and all child {@link BaseEventContext}'s have completed. In
-   * practice this means that this {@link Publisher} completes once all branches of execution have completed regardless of is they
-   * are synchronous or asynchronous. This {@link Publisher} will never complete with an error.
+   * A {@link Publisher} that completes when a this {@link BaseEventContext} and all child {@link BaseEventContext}'s have
+   * completed. In practice this means that this {@link Publisher} completes once all branches of execution have completed
+   * regardless of is they are synchronous or asynchronous. This {@link Publisher} will never complete with an error.
    *
    * @return publisher that completes when this {@link BaseEventContext} and all child context have completed.
+   * @throws {@link IllegalStateException} if this {@link BaseEventContext} has already completed.
    */
   Publisher<Void> getCompletionPublisher();
 
