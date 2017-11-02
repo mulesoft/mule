@@ -18,6 +18,7 @@ public class TestNonBlockingOperationDeclarationEnricher implements DeclarationE
         .filter(o -> o.getName().equals("doSomethingAsync"))
         .findFirst()
         .ifPresent(operation -> operation.addModelProperty(
-            new ComponentExecutorModelProperty((model, params) -> new PrivilegedNonBlockingComponentExecutor())));
+                                                           new ComponentExecutorModelProperty((model,
+                                                                                               params) -> new PrivilegedNonBlockingComponentExecutor())));
   }
 }
