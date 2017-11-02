@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.transformer.expression;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Objects.hash;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -83,4 +84,15 @@ public abstract class AbstractExpressionTransformer extends AbstractMessageTrans
   public void setArguments(List<ExpressionArgument> arguments) {
     this.arguments = arguments;
   }
+
+  @Override
+  public int hashCode() {
+    return hash(super.hashCode(), getArguments());
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj) && this.getArguments().equals(((AbstractExpressionTransformer) obj).getArguments());
+  }
+
 }
