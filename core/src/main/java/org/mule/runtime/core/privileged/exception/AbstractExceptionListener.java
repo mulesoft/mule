@@ -150,10 +150,10 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         //Don't log anything, error while getting root or exception already logged.
         return;
       }
+      resolvedException.getFirst().addInfo(INFO_ALREADY_LOGGED_KEY, true);
     } else {
       doLogException("Caught exception in Exception Strategy: " + t.getMessage(), t);
     }
-    resolvedException.getFirst().addInfo(INFO_ALREADY_LOGGED_KEY, true);
   }
 
   protected void doLogException(String message, Throwable t) {
