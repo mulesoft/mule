@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -38,6 +37,7 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
+import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -56,7 +56,7 @@ import reactor.core.publisher.Mono;
 public class OperationExecutorFactoryWrapperTestCase extends AbstractMuleTestCase {
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private ComponentExecutorFactory delegate;
+  private ComponentExecutorFactory executorFactory;
 
   @Mock
   private ComponentExecutor executor;
@@ -67,7 +67,7 @@ public class OperationExecutorFactoryWrapperTestCase extends AbstractMuleTestCas
   @Before
   public void before() {
     when(executor.execute(any())).thenReturn(Mono.empty());
-    when(delegate.createExecutor(any(), any())).thenReturn(executor);
+    setupExecutorFactory();
     ctx = spy(new DefaultExecutionContext(mock(ExtensionModel.class),
                                           empty(),
                                           emptyMap(),
@@ -79,16 +79,18 @@ public class OperationExecutorFactoryWrapperTestCase extends AbstractMuleTestCas
                                           mock(RetryPolicyTemplate.class),
                                           mock(MuleContext.class)));
 
-    wrapper = new OperationExecutorFactoryWrapper(delegate, emptyList());
+    wrapper = new OperationExecutorFactoryWrapper(executorFactory, emptyList());
   }
 
   @Test
   public void javaBlockingOperation() throws Exception {
+    setupJava();
     assertOperation(true, true);
   }
 
   @Test
   public void javaNonBlockingOperation() throws Exception {
+    setupJava();
     when(executor.execute(any())).thenAnswer((Answer<Publisher<Object>>) invocationOnMock -> {
       ExecutionContextAdapter ctx = (ExecutionContextAdapter) invocationOnMock.getArguments()[0];
       ((CompletionCallback) ctx.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM)).success(mock(Result.class));
@@ -116,18 +118,26 @@ public class OperationExecutorFactoryWrapperTestCase extends AbstractMuleTestCas
   }
 
   private void assertOperation(boolean java, boolean blocking) {
-    from(wrapper.createExecutor(mockOperation(java, blocking), emptyMap()).execute(ctx)).block();
+    from(wrapper.createExecutor(mockOperation(blocking), emptyMap()).execute(ctx)).block();
     verify(executor).execute(ctx);
     VerificationMode verificationMode = java && !blocking ? times(1) : never();
     verify(ctx, verificationMode).setVariable(eq(COMPLETION_CALLBACK_CONTEXT_PARAM), any());
   }
 
-  private OperationModel mockOperation(boolean java, boolean blocking) {
+  private OperationModel mockOperation(boolean blocking) {
     OperationModel operationModel = mock(OperationModel.class);
     when(operationModel.isBlocking()).thenReturn(blocking);
-    when(operationModel.getModelProperty(ImplementingMethodModelProperty.class))
-        .thenReturn(java ? of(mock(ImplementingMethodModelProperty.class)) : empty());
 
     return operationModel;
+  }
+
+  private void setupExecutorFactory() {
+    when(executorFactory.createExecutor(any(), any())).thenReturn(executor);
+  }
+
+  private void setupJava() {
+    executor = mock(ReflectiveMethodOperationExecutor.class);
+    when(executor.execute(any())).thenReturn(Mono.empty());
+    setupExecutorFactory();
   }
 }

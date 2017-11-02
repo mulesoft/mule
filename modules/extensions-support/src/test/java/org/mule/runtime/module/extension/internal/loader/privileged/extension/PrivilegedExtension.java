@@ -10,7 +10,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
 
-@DeclarationEnrichers(ChangeNameDeclarationEnricher.class)
+@DeclarationEnrichers({ChangeNameDeclarationEnricher.class, TestNonBlockingOperationDeclarationEnricher.class})
 @Extension(name = "privileged")
 @Operations(PrivilegedOperations.class)
 public class PrivilegedExtension {
