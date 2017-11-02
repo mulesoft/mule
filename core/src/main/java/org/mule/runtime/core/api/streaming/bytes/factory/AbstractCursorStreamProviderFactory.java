@@ -28,7 +28,7 @@ import java.io.InputStream;
 public abstract class AbstractCursorStreamProviderFactory extends AbstractComponent implements CursorStreamProviderFactory {
 
   private final ByteBufferManager bufferManager;
-  private final StreamingManager streamingManager;
+  protected final StreamingManager streamingManager;
 
   /**
    * Creates a new instance

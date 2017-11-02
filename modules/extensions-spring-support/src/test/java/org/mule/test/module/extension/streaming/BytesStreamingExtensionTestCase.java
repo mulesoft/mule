@@ -16,7 +16,6 @@ import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATE
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
-
 import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -28,8 +27,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-
-import org.junit.Test;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -44,6 +41,7 @@ import javax.inject.Named;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Test;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
@@ -75,6 +73,10 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   @Named("bytesCasterWithoutStreaming")
   private Flow bytesCasterWithoutStreaming;
 
+  @Inject
+  @Named("toNonRepeatableStream")
+  private Flow toNonRepeatableStream;
+
   private String data = randomAlphabetic(2048);
 
   @Override
@@ -103,7 +105,7 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   @Test
   @Description("Operation with disabled streaming")
   public void operationWithDisabledStreaming() throws Exception {
-    Object value = flowRunner("toSimpleStream").withPayload(data).run().getMessage().getPayload().getValue();
+    Object value = flowRunner("toSimpleStream").withPayload(data).keepStreamsOpen().run().getMessage().getPayload().getValue();
     assertThat(value, is(instanceOf(InputStream.class)));
     assertThat(IOUtils.toString((InputStream) value), is(data));
   }
@@ -112,6 +114,24 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   @Description("If the flow fails, all cursors should be closed")
   public void allStreamsClosedInCaseOfException() throws Exception {
     flowRunner("crashCar").withPayload(data).run();
+  }
+
+  @Test(expected = Exception.class)
+  @Description("If the flow fails, all non repeatable streams should be closed")
+  public void nonRepeatableStreamsClosedInCaseOfException() throws Exception {
+    flowRunner("nonRepeatableCrashCar").withPayload(data).run();
+  }
+
+  @Test
+  @Description("If the flow fails, all non repeatable streams should be closed")
+  public void allStreamsClosedInCaseOfHandledException() throws Exception {
+    flowRunner("handledCrashCar").withPayload(data).run();
+  }
+
+  @Test
+  @Description("If the flow fails, all non repeatable streams should be closed")
+  public void nonRepeatableStreamsClosedInCaseOfHandledException() throws Exception {
+    flowRunner("nonRepeatableHandledCrashCar").withPayload(data).run();
   }
 
   @Test(expected = Exception.class)
@@ -196,6 +216,26 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
     byte[] bytes = muleContext.getObjectSerializer().getInternalProtocol().serialize(provider);
     bytes = muleContext.getObjectSerializer().getInternalProtocol().deserialize(bytes);
     assertThat(new String(bytes, Charset.defaultCharset()), equalTo(data));
+  }
+
+  @Test
+  @Description("A non repeatable stream is closed automatically when flow completes")
+  public void nonRepeatableStreamIsAutomaticallyClosed() throws Exception {
+    InputStream stream = (InputStream) flowRunner("toNonRepeatableStream")
+        .withPayload(data).run().getMessage().getPayload().getValue();
+    assertThat(stream.read(), is(-1));
+  }
+
+  @Test
+  @Description("A non repeatable stream is not automatically closed when event completes async")
+  public void nonRepeatableStreamClosesAsync() throws Exception {
+    InputStream stream = (InputStream) flowRunner("toNonRepeatableStream").keepStreamsOpen()
+        .withPayload(data).run().getMessage().getPayload().getValue();
+
+    byte[] bytes = new byte[data.length()];
+    assertThat(stream.read(bytes), is(data.length()));
+    assertThat(stream.read(), is(-1));
+    assertThat(new String(bytes), equalTo(data));
   }
 
   @Test

@@ -46,6 +46,12 @@
         <marvel:to-stream />
     </flow>
 
+    <flow name="toNonRepeatableStream">
+        <marvel:to-stream>
+            <non-repeatable-stream />
+        </marvel:to-stream>
+    </flow>
+
     <flow name="bufferExceeded">
         <try>
             <marvel:to-stream config-ref="drStrange" >
@@ -110,6 +116,39 @@
 
     <flow name="crashCar">
         <marvel:to-stream />
+        <flow-ref name="doCrash" />
+    </flow>
+
+    <flow name="handledCrashCar">
+        <try>
+            <marvel:to-stream />
+            <flow-ref name="doCrash" />
+            <error-handler>
+                <on-error-continue>
+                    <logger message="Good thing I have airbags..." />
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </flow>
+
+    <flow name="nonRepeatableHandledCrashCar">
+        <try>
+            <marvel:to-stream>
+                <non-repeatable-stream />
+            </marvel:to-stream>
+            <flow-ref name="doCrash" />
+            <error-handler>
+                <on-error-continue>
+                    <logger message="Good thing I have airbags..." />
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </flow>
+
+    <flow name="nonRepeatableCrashCar">
+        <marvel:to-stream>
+            <non-repeatable-stream />
+        </marvel:to-stream>
         <flow-ref name="doCrash" />
     </flow>
 
