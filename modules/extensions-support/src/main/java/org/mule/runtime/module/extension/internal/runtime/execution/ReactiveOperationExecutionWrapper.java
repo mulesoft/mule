@@ -18,11 +18,10 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
@@ -57,11 +56,6 @@ public final class ReactiveOperationExecutionWrapper<M extends ComponentModel>
 
   @Override
   public Publisher<Object> execute(ExecutionContext<M> executionContext) {
-    M componentModel = executionContext.getComponentModel();
-    if (componentModel instanceof OperationModel && ((OperationModel) componentModel).isBlocking()) {
-      return delegate.execute(executionContext);
-    }
-
     ExecutionContextAdapter<M> context = (ExecutionContextAdapter<M>) executionContext;
     return Mono.create(sink -> {
       ReactorCompletionCallback callback = new ReactorCompletionCallback(sink);

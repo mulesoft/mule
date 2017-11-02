@@ -42,7 +42,7 @@ import org.slf4j.Logger;
  *
  * @since 3.7.0
  */
-public final class ReflectiveMethodOperationExecutor<M extends ComponentModel>
+public class ReflectiveMethodOperationExecutor<M extends ComponentModel>
     implements ComponentExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ReflectiveMethodOperationExecutor.class);

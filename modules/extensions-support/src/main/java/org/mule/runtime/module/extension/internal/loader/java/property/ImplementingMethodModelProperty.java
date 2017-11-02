@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
  *
  * @since 4.0
  */
-public final class ImplementingMethodModelProperty implements ModelProperty {
+public class ImplementingMethodModelProperty implements ModelProperty {
 
   private final Method method;
 
