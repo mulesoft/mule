@@ -279,7 +279,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   private void requiredProductValidationExpectedException(String appName) {
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage(Matchers
-        .containsString(format("Invalid artifact descriptor: \"%s\". Mandatory field \"requiredProduct\" is missing or value is not allowed. Valid values are MULE, MULE_EE",
+        .containsString(format("Invalid artifact descriptor: \"%s\". Mandatory field \"requiredProduct\" is missing or has an invalid value. Valid values are MULE, MULE_EE",
                                appName)));
   }
 
