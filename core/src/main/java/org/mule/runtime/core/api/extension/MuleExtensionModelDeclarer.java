@@ -41,7 +41,9 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.CRITICAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -59,7 +61,6 @@ import static org.mule.runtime.extension.internal.loader.util.InfrastructurePara
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.SUBFLOW_ELEMENT_IDENTIFIER;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -76,13 +77,11 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
-import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
-import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
@@ -111,8 +110,8 @@ class MuleExtensionModelDeclarer {
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
         .named(MULE_NAME)
         .describedAs("Mule Runtime and Integration Platform: Core components")
-        .onVersion(MuleExtensionModelProvider.MULE_VERSION)
-        .fromVendor("MuleSoft, Inc.")
+        .onVersion(MULE_VERSION)
+        .fromVendor(MULESOFT_VENDOR)
         .withCategory(COMMUNITY)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
@@ -545,7 +544,9 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter(TARGET_PARAMETER_NAME)
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs(TARGET_PARAMETER_DESCRIPTION);
+        .describedAs(TARGET_PARAMETER_DESCRIPTION)
+        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
+
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
         .ofType(typeLoader.load(String.class))
