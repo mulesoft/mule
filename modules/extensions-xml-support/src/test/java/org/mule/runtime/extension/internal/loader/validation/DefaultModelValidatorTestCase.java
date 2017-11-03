@@ -20,11 +20,11 @@ import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.EMPTY_TYPE_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.TYPE_RAISE_ERROR_ATTRIBUTE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.WRONG_VALUE_FORMAT_MESSAGE;
-import static org.mule.runtime.extension.internal.loader.validator.CorrectXmlNamesValidator.WRONG_XML_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator.ILLEGAL_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator.REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -36,12 +36,11 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
 import org.apache.maven.model.validation.ModelValidator;
 import org.junit.Before;
 import org.junit.Rule;
@@ -91,15 +90,9 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void wrongNamingForXmlThrowsException() {
     exception.expectMessage(allOf(
-                                  containsString(format(
-                                                        WRONG_XML_NAME_FORMAT_MESSAGE,
-                                                        "operation with spaces")),
-                                  containsString(format(
-                                                        WRONG_XML_NAME_FORMAT_MESSAGE,
-                                                        "parameters with spaces")),
-                                  containsString(format(
-                                                        WRONG_XML_NAME_FORMAT_MESSAGE,
-                                                        "property with spaces"))));
+                                  containsString("[operation with spaces] is not a valid one"),
+                                  containsString("[parameters with spaces] is not a valid one"),
+                                  containsString("[property with spaces] is not a valid one")));
     getExtensionModelFrom("validation/module-not-xml-valid-names.xml");
   }
 
