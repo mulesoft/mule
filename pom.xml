@@ -1598,7 +1598,7 @@
                         </properties>
                         <systemPropertyVariables>
                             <!-- Just propagate this variable due to surefire will not do this when forked vm for tests -->
-                            <maven.multiModuleProjectDirectory>${maven.multiModuleProjectDirectory}</maven.multiModuleProjectDirectory>
+                            <mule.freePortFinder.lockPath>${java.io.tmpdir}/mule/freePortFinder</mule.freePortFinder.lockPath>
                             <maven.projectVersion>${project.version}</maven.projectVersion>
                         </systemPropertyVariables>
                         <systemProperties>
