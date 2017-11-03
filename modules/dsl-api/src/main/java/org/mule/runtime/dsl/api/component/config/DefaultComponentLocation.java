@@ -104,7 +104,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
 
   @Override
   public TypedComponentIdentifier getComponentIdentifier() {
-    return parts.get(parts.size() - 1).getPartIdentifier().get();
+    return parts.get(parts.size() - 1).getPartIdentifier().orElse(null);
   }
 
   /**
