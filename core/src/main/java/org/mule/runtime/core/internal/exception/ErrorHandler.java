@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.exception;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.error;
@@ -19,6 +20,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -106,7 +108,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   private void addCriticalErrorHandler() {
-    exceptionListeners.add(0, new OnCriticalErrorHandler());
+    exceptionListeners.add(0, new OnCriticalErrorHandler(new SingleErrorTypeMatcher(muleContext.getErrorTypeRepository()
+        .getErrorType(OVERLOAD).get())));
   }
 
   private void addDefaultErrorHandlerIfRequired() throws InitialisationException {

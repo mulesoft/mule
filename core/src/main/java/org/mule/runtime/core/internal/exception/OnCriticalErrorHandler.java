@@ -10,9 +10,11 @@ import static org.mule.runtime.core.internal.exception.DefaultErrorTypeRepositor
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
@@ -28,7 +30,12 @@ import java.util.Optional;
  */
 public class OnCriticalErrorHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor {
 
-  private ErrorTypeMatcher criticalMatcher = new SingleErrorTypeMatcher(CRITICAL_ERROR_TYPE);
+  private final ErrorTypeMatcher criticalMatcher = new SingleErrorTypeMatcher(CRITICAL_ERROR_TYPE);
+  private final ErrorTypeMatcher overloadMatcher;
+
+  public OnCriticalErrorHandler(ErrorTypeMatcher overloadMatcher) {
+    this.overloadMatcher = overloadMatcher;
+  }
 
   @Override
   public boolean accept(CoreEvent event) {
@@ -54,6 +61,17 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
   }
 
   public void logException(Throwable exception) {
+    if (exception instanceof MessagingException && ((MessagingException) exception).getEvent().getError().isPresent()) {
+      ErrorType errorType = ((MessagingException) exception).getEvent().getError().get().getErrorType();
+      // Only suppress overload error if the flow rejects events, not if an RejectedExecutionException happens later in the flow.
+      if (overloadMatcher.match(errorType)
+          && ((MessagingException) exception).getFailingComponent() instanceof AbstractPipeline) {
+        if (logger.isDebugEnabled()) {
+          logger.debug(resolveExceptionAndMessageToLog(exception).toString());
+        }
+        return;
+      }
+    }
     resolveAndLogException(exception);
   }
 
