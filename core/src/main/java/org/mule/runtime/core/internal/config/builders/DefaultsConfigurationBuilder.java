@@ -104,6 +104,12 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
 
     registerLocalObjectStoreManager(muleContext, registry);
 
+    registerObject(OBJECT_SCHEDULER_POOLS_CONFIG, SchedulerContainerPoolsConfig.getInstance(), muleContext);
+    registerObject(OBJECT_SCHEDULER_BASE_CONFIG,
+                   config().withPrefix(muleContext.getConfiguration().getId())
+                       .withShutdownTimeout(() -> muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
+                   muleContext);
+
     registerObject(OBJECT_STORE_MANAGER, new MuleObjectStoreManager(), muleContext);
     registerObject(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, new MuleMessageProcessingManager(), muleContext);
 
@@ -126,11 +132,6 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);
     registerObject(METADATA_SERVICE_KEY, new MuleMetadataService(), muleContext);
     registerObject(VALUE_PROVIDER_SERVICE_KEY, new MuleValueProviderService(), muleContext);
-    registerObject(OBJECT_SCHEDULER_POOLS_CONFIG, SchedulerContainerPoolsConfig.getInstance(), muleContext);
-    registerObject(OBJECT_SCHEDULER_BASE_CONFIG,
-                   config().withPrefix(muleContext.getConfiguration().getId())
-                       .withShutdownTimeout(() -> muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
-                   muleContext);
     registerObject(PROCESSOR_INTERCEPTOR_MANAGER_REGISTRY_KEY, new DefaultProcessorInterceptorManager(), muleContext);
     registerObject(OBJECT_NOTIFICATION_DISPATCHER, new DefaultNotificationDispatcher(), muleContext);
     registerObject(NotificationListenerRegistry.REGISTRY_KEY, new DefaultNotificationListenerRegistry(), muleContext);
