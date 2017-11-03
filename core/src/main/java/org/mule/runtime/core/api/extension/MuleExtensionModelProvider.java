@@ -23,6 +23,7 @@ public class MuleExtensionModelProvider {
 
   public static final String MULE_NAME = CORE_PREFIX;
   public static final String MULE_VERSION = getProductVersion();
+  public static final String MULESOFT_VENDOR = "MuleSoft, Inc.";
 
   private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
       .create(new DefaultExtensionLoadingContext(new MuleExtensionModelDeclarer().createExtensionModel(),
