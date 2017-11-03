@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.routing.DefaultRouterResultsHandler;
+import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionCoordination;
 
 import java.util.LinkedList;
@@ -185,7 +186,18 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
                         return defaultRouterResultsHandler.aggregateResults(results, results.getLast(), endpoint.getMuleContext());
                     }
                 };
-                pt.execute(cb);
+                try
+                {
+                  pt.execute(cb);
+                }
+                catch (IllegalTransactionStateException e)
+                {
+                    if (NO_MESSAGES_SLEEP_TIME > 0)
+                    {
+                        Thread.sleep(NO_MESSAGES_SLEEP_TIME);
+                    }
+                    throw e;
+                }
             }
             else
             {
