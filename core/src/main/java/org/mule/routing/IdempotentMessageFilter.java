@@ -71,6 +71,10 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
         {
             this.store = createMessageIdStore();
         }
+        if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof Initialisable)
+        {
+            ((Initialisable) unacceptedMessageProcessor).initialise();
+        }
 
         LifecycleUtils.initialiseIfNeeded(store);
     }
