@@ -6,16 +6,13 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static reactor.core.publisher.Mono.error;
 
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
@@ -32,7 +29,12 @@ import java.util.Optional;
  */
 public class OnCriticalErrorHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor {
 
-  private ErrorTypeMatcher criticalMatcher = new SingleErrorTypeMatcher(CRITICAL_ERROR_TYPE);
+  private final ErrorTypeMatcher criticalMatcher = new SingleErrorTypeMatcher(CRITICAL_ERROR_TYPE);
+  private final ErrorTypeMatcher overloadMatcher;
+
+  public OnCriticalErrorHandler(ErrorTypeMatcher overloadMatcher) {
+    this.overloadMatcher = overloadMatcher;
+  }
 
   @Override
   public boolean accept(CoreEvent event) {
@@ -58,15 +60,16 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
   }
 
   public void logException(Throwable exception) {
-    if (exception instanceof MessagingException
-        && OVERLOAD.getName()
-            .equals(((MessagingException) exception).getEvent().getError().get().getErrorType().getIdentifier())) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(resolveExceptionAndMessageToLog(exception).toString());
+    if (exception instanceof MessagingException && ((MessagingException) exception).getEvent().getError().isPresent()) {
+      ErrorType errorType = ((MessagingException) exception).getEvent().getError().get().getErrorType();
+      if (overloadMatcher.match(errorType)) {
+        if (logger.isDebugEnabled()) {
+          logger.debug(resolveExceptionAndMessageToLog(exception).toString());
+        }
+        return;
       }
-    } else {
-      resolveAndLogException(exception);
     }
+    resolveAndLogException(exception);
   }
 
 }
