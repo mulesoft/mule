@@ -62,7 +62,7 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
         && OVERLOAD.getName()
             .equals(((MessagingException) exception).getEvent().getError().get().getErrorType().getIdentifier())) {
       if (logger.isDebugEnabled()) {
-        logger.error(resolveExceptionAndMessageToLog(exception).toString());
+        logger.debug(resolveExceptionAndMessageToLog(exception).toString());
       }
     } else {
       resolveAndLogException(exception);
