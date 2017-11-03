@@ -14,6 +14,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
@@ -62,7 +63,9 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
   public void logException(Throwable exception) {
     if (exception instanceof MessagingException && ((MessagingException) exception).getEvent().getError().isPresent()) {
       ErrorType errorType = ((MessagingException) exception).getEvent().getError().get().getErrorType();
-      if (overloadMatcher.match(errorType)) {
+      // Only suppress overload error if the flow rejects events, not if an RejectedExecutionException happens later in the flow.
+      if (overloadMatcher.match(errorType)
+          && ((MessagingException) exception).getFailingComponent() instanceof AbstractPipeline) {
         if (logger.isDebugEnabled()) {
           logger.debug(resolveExceptionAndMessageToLog(exception).toString());
         }
