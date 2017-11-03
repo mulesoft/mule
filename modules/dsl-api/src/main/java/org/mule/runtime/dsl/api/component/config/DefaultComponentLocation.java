@@ -104,6 +104,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
 
   @Override
   public TypedComponentIdentifier getComponentIdentifier() {
+    # TODO (MTS-3): revert this when MTS-3 is fixed
     return parts.get(parts.size() - 1).getPartIdentifier().orElse(null);
   }
 
