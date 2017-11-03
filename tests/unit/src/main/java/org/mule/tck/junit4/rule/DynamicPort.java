@@ -6,21 +6,23 @@
  */
 package org.mule.tck.junit4.rule;
 
+import static java.lang.String.format;
+
 /**
  * Defines a socket port number that will be dynamically assigned as an external resource. The instance will check that the port
  * has been released on test shutdown. To use an instance dynamic socket port:
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;Rule
  * public DynamicPort serverPort = new DynamicPort("server_port");
  * </pre>
  * <p/>
  * In order to use static dynamic ports:
  * <p/>
- * 
+ *
  * <pre>
- * 
+ *
  * &#64;ClassRule
  * public static DynamicPort dynamicPort = new DynamicPort("server_port");
  * </pre>
@@ -50,7 +52,7 @@ public class DynamicPort extends SystemProperty {
     }
 
     if (minPort > maxPort) {
-      throw new IllegalArgumentException(String.format("Min port '%s' must be less than max port '%s'", minPort, maxPort));
+      throw new IllegalArgumentException(format("Min port '%s' must be less than max port '%s'", minPort, maxPort));
     }
 
     freePortFinder = new FreePortFinder(minPort, maxPort);

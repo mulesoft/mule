@@ -84,7 +84,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       appClClass = (Class<ClassLoader>) AbstractMessageProcessorChain.class.getClassLoader()
           .loadClass("org.mule.runtime.deployment.model.api.application.ApplicationClassLoader");
     } catch (ClassNotFoundException e) {
-      LOGGER.warn("ApplicationClassLoader interfac not avialable in current context", e);
+      LOGGER.debug("ApplicationClassLoader interface not avialable in current context", e);
     }
 
   }

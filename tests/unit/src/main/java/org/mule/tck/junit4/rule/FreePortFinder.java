@@ -6,15 +6,16 @@
  */
 package org.mule.tck.junit4.rule;
 
+import static java.io.File.separator;
+import static java.lang.String.format;
 import static java.nio.channels.FileChannel.open;
 import static java.nio.file.Paths.get;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
 import static java.nio.file.StandardOpenOption.WRITE;
-import static org.apache.commons.lang3.SystemUtils.PATH_SEPARATOR;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -30,7 +31,7 @@ import java.util.Random;
  */
 public class FreePortFinder {
 
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = getLogger(FreePortFinder.class);
 
   private final int minPortNumber;
   private final int portRange;
@@ -50,7 +51,7 @@ public class FreePortFinder {
       int port = minPortNumber + random.nextInt(portRange);
       String portFile = port + LOCK_FILE_EXTENSION;
       try {
-        FileChannel channel = open(get(basePath + PATH_SEPARATOR + portFile), CREATE, WRITE, DELETE_ON_CLOSE);
+        FileChannel channel = open(get(basePath + separator + portFile), CREATE, WRITE, DELETE_ON_CLOSE);
         FileLock lock = channel.tryLock();
         if (lock == null) {
           // If the lock couldn't be acquired and tryLock didn't throw the exception, we throw it here
@@ -106,7 +107,7 @@ public class FreePortFinder {
       }
     } else {
       if (logger.isInfoEnabled()) {
-        logger.info(String.format("Port %d was not correctly released", port));
+        logger.info(format("Port %d was not correctly released", port));
       }
     }
   }
