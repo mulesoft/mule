@@ -9,7 +9,6 @@ package org.mule.functional.junit4.rules;
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
 import static org.mule.functional.util.http.SimpleHttpServer.createServer;
-
 import org.mule.functional.util.http.SimpleHttpServer;
 import org.mule.tck.junit4.rule.FreePortFinder;
 
@@ -17,7 +16,7 @@ import org.junit.rules.ExternalResource;
 
 /**
  * JUnit rule to create an HTTP server
- *
+ * 
  * @since 4.0
  */
 public class HttpServerRule extends ExternalResource {
@@ -34,7 +33,7 @@ public class HttpServerRule extends ExternalResource {
 
   @Override
   protected void before() throws Throwable {
-    Integer port = new FreePortFinder(7000, 9999).find();
+    Integer port = new FreePortFinder(0, 7000).find();
     simpleHttpServer = createServer(port).start();
     setProperty(portSystemPropertyKey, String.valueOf(port));
   }
