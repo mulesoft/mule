@@ -32,6 +32,7 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
@@ -187,7 +188,7 @@ public class MuleContextUtils {
 
     ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class);
     when(muleContext.getErrorTypeRepository()).thenReturn(errorTypeRepository);
-    when(errorTypeRepository.getErrorType(any(ComponentIdentifier.class))).thenReturn(empty());
+    when(errorTypeRepository.getErrorType(any(ComponentIdentifier.class))).thenReturn(of(mock(ErrorType.class)));
     final MuleRegistry registry = muleContext.getRegistry();
 
     NotificationListenerRegistry notificationListenerRegistry = mock(NotificationListenerRegistry.class);

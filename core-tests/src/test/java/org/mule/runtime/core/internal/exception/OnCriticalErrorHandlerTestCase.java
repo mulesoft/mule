@@ -20,6 +20,7 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HA
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -31,7 +32,7 @@ import io.qameta.allure.Feature;
 @Feature(ERROR_HANDLING)
 public class OnCriticalErrorHandlerTestCase extends AbstractErrorHandlerTestCase {
 
-  private OnCriticalErrorHandler handler = spy(new OnCriticalErrorHandler());
+  private OnCriticalErrorHandler handler = spy(new OnCriticalErrorHandler(mock(ErrorTypeMatcher.class)));
 
   private Error error;
 
