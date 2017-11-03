@@ -14,6 +14,8 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.store.ObjectStore;
 import org.mule.construct.Flow;
+import org.mule.lifecycle.LifecycleTrackerProcessor;
+import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.routing.IdempotentMessageFilter;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
@@ -83,7 +85,7 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
     {
         testPojoObjectStore("customObjectStore");
     }
-    
+
     @Test
     public void testOnUnaccepted() throws Exception
     {
@@ -92,6 +94,15 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
         assertEquals(StringAppendTransformer.class, filter.getUnacceptedMessageProcessor().getClass());
     }
 
+    @Test
+    public void testInitialisesOnUnacceptedSubFlow() throws Exception
+    {
+        final IdempotentMessageFilter filter = idempotentMessageFilterFromFlow("idempotentFilterWithOnUnacceptedMPToSubFlow");
+        assertNotNull(filter.getUnacceptedMessageProcessor());
+        SubflowInterceptingChainLifecycleWrapper subflow = (SubflowInterceptingChainLifecycleWrapper) filter.getUnacceptedMessageProcessor();
+        LifecycleTrackerProcessor lifecycleTrackerProcessor = (LifecycleTrackerProcessor) subflow.getMessageProcessors().get(0);
+        assertTrue(lifecycleTrackerProcessor.getTracker().contains("initialise"));
+    }
 
     public void testBeanObjectStore() throws Exception
     {
