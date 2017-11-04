@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.el.mvel.function;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_MAP;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.el.BindingContextUtils.ERROR;
 import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
@@ -18,9 +17,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
-import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
-import static reactor.core.publisher.Mono.from;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
@@ -28,7 +25,6 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
-import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -37,8 +33,6 @@ import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.List;
@@ -78,7 +72,7 @@ public class LookupFunction implements ExpressionFunction {
         Map<String, ?> incomingVariables = lookupValue(context, VARS, EMPTY_MAP);
         Error incomingError = lookupValue(context, ERROR, null);
 
-        Message message = Message.builder(incomingMessage).value(payload).build();
+        Message message = Message.builder(incomingMessage).value(payload).mediaType(APPLICATION_JAVA).build();
         CoreEvent event = CoreEvent.builder(PrivilegedEvent.getCurrentEvent().getContext())
             .variables(incomingVariables)
             .error(incomingError)
