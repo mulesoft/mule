@@ -7,9 +7,11 @@
 package org.mule.runtime.core.api.util;
 
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUFFER_SIZE;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.api.message.ds.InputStreamDataSource;
@@ -34,17 +36,16 @@ import java.security.PrivilegedAction;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
 
 /**
  * Mule input/output utilities.
  */
 public class IOUtils {
 
-  private static final Log logger = LogFactory.getLog(IOUtils.class);
+  private static final Logger logger = getLogger(IOUtils.class);
 
-  protected static int bufferSize = toInt(System.getProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE), 4 * 1024);
+  protected static int bufferSize = toInt(System.getProperty(MULE_STREAMING_BUFFER_SIZE), 4 * 1024);
 
   /**
    * Attempts to load a resource from the file system, from a URL, or from the classpath, in that order.

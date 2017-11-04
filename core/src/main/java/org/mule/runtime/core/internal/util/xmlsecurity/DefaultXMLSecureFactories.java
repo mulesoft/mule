@@ -11,6 +11,7 @@ import static javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD;
 import static javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET;
 import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
 import static javax.xml.stream.XMLInputFactory.SUPPORT_DTD;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
@@ -20,8 +21,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
 
 /**
  * Create different XML factories configured through the same interface for disabling vulnerabilities.
@@ -47,7 +47,7 @@ public class DefaultXMLSecureFactories {
   private Boolean externalEntities;
   private Boolean expandEntities;
 
-  private final static Log logger = LogFactory.getLog(DefaultXMLSecureFactories.class);
+  private final static Logger logger = getLogger(DefaultXMLSecureFactories.class);
 
   public DefaultXMLSecureFactories(Boolean externalEntities, Boolean expandEntities) {
     this.externalEntities = externalEntities;

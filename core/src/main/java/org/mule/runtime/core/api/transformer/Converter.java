@@ -37,8 +37,7 @@ public interface Converter extends Transformer {
 
   @Override
   default ProcessingType getProcessingType() {
-    if (getReturnDataType().isStreamType()
-        || getSourceDataTypes().stream().filter(dataType -> !dataType.isStreamType()).count() > 0) {
+    if (getReturnDataType().isStreamType() || getSourceDataTypes().stream().anyMatch(dataType -> !dataType.isStreamType())) {
       return IO_RW;
     } else {
       return CPU_LITE;

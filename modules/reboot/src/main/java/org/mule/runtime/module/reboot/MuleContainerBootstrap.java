@@ -21,6 +21,7 @@ import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.tanukisoftware.wrapper.WrapperManager;
 
 /**
@@ -39,6 +40,13 @@ public class MuleContainerBootstrap {
       {"version", "false", "Show product and version information"}};
 
   public static void main(String[] args) throws Exception {
+    // Optionally remove existing handlers attached to j.u.l root logger
+    SLF4JBridgeHandler.removeHandlersForRootLogger(); // (since SLF4J 1.6.5)
+
+    // add SLF4JBridgeHandler to j.u.l's root logger, should be done once during
+    // the initialization phase of your application
+    SLF4JBridgeHandler.install();
+
     // Parse any command line options based on the list above.
     CommandLine commandLine = parseCommandLine(args);
     // Any unrecognized arguments get passed through to the next class (e.g., to the OSGi Framework).
