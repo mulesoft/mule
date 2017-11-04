@@ -6,15 +6,18 @@
  */
 package org.mule.tck.junit4.rule;
 
+import static java.io.File.separator;
+import static java.lang.String.format;
 import static java.nio.channels.FileChannel.open;
 import static java.nio.file.Paths.get;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
 import static java.nio.file.StandardOpenOption.WRITE;
-import static org.apache.commons.lang3.SystemUtils.PATH_SEPARATOR;
+import static org.apache.commons.io.FileUtils.forceMkdir;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -30,7 +33,7 @@ import java.util.Random;
  */
 public class FreePortFinder {
 
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = getLogger(FreePortFinder.class);
 
   private final int minPortNumber;
   private final int portRange;
@@ -38,19 +41,30 @@ public class FreePortFinder {
   private final String LOCK_FILE_EXTENSION = ".lock";
   private final Map<Integer, FileLock> locks = new HashMap<>();
   private final Map<Integer, FileChannel> files = new HashMap<>();
-  private final String basePath = System.getProperty("maven.multiModuleProjectDirectory", ".");
+  private final String basePath = System.getProperty("mule.freePortFinder.lockPath", ".");
 
   public FreePortFinder(int minPortNumber, int maxPortNumber) {
     this.minPortNumber = minPortNumber;
     this.portRange = maxPortNumber - minPortNumber;
+
+    logger.debug("Building FreePortFinder {basePath='" + basePath + "', minPortNumber=" + minPortNumber + ", maxPortNumber="
+        + maxPortNumber + "}");
   }
 
   public synchronized Integer find() {
+    try {
+      forceMkdir(get(basePath).toFile());
+    } catch (IOException e) {
+      throw new IllegalStateException("Unable to find an available port", e);
+    }
+
     for (int i = 0; i < portRange; i++) {
       int port = minPortNumber + random.nextInt(portRange);
+      logger.debug("Trying port " + port + "...");
       String portFile = port + LOCK_FILE_EXTENSION;
       try {
-        FileChannel channel = open(get(basePath + PATH_SEPARATOR + portFile), CREATE, WRITE, DELETE_ON_CLOSE);
+
+        FileChannel channel = open(get(basePath + separator + portFile), CREATE, WRITE, DELETE_ON_CLOSE);
         FileLock lock = channel.tryLock();
         if (lock == null) {
           // If the lock couldn't be acquired and tryLock didn't throw the exception, we throw it here
@@ -88,8 +102,8 @@ public class FreePortFinder {
   /**
    * Indicates that the port is free from the point of view of the caller.
    * <p/>
-   * Checks that the port was released, if it was not, then it would be
-   * marked as in use, so no other client receives the same port again.
+   * Checks that the port was released, if it was not, then it would be marked as in use, so no other client receives the same
+   * port again.
    *
    * @param port the port number to release.
    */
@@ -106,7 +120,7 @@ public class FreePortFinder {
       }
     } else {
       if (logger.isInfoEnabled()) {
-        logger.info(String.format("Port %d was not correctly released", port));
+        logger.info(format("Port %d was not correctly released", port));
       }
     }
   }
