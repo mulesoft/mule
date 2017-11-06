@@ -108,8 +108,10 @@ public class CompositeSourcePolicy extends
               new FlowExecutionException(CoreEvent.builder(event).message(message).build(),
                                          messagingException.getCause(),
                                          messagingException.getFailingComponent());
-          flowExecutionException.addInfo(INFO_ALREADY_LOGGED_KEY,
-                                         messagingException.getInfo().getOrDefault(INFO_ALREADY_LOGGED_KEY, false));
+          if (messagingException.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
+            flowExecutionException.addInfo(INFO_ALREADY_LOGGED_KEY,
+                                           messagingException.getInfo().get(INFO_ALREADY_LOGGED_KEY));
+          }
           return flowExecutionException;
         });
   }
