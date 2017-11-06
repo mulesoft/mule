@@ -188,7 +188,8 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("on-error-check-log")
         .withTypeDefinition(fromType(OnErrorCheckLogHandler.class))
-        .withSetterParameterDefinition("propagate", fromSimpleParameter("propagate").build()).withSetterParameterDefinition("succeedIfNoLog", fromSimpleParameter("succeedIfNoLog").build())
+        .withSetterParameterDefinition("propagate", fromSimpleParameter("propagate").build())
+        .withSetterParameterDefinition("succeedIfNoLog", fromSimpleParameter("succeedIfNoLog").build())
         .withSetterParameterDefinition("checkers", fromChildCollectionConfiguration(LogChecker.class).build()).build());
 
     componentBuildingDefinitions
