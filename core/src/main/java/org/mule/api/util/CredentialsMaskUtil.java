@@ -99,7 +99,7 @@ public class CredentialsMaskUtil
         Matcher matcher = pattern.matcher(input);
         if (matcher.find() && matcher.groupCount() > 0)
         {
-            input = input.replaceAll(prefix + matcher.group(1), prefix + mask);
+            input = input.replace(prefix + matcher.group(1), prefix + mask);
         }
         return input;
 

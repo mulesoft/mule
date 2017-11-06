@@ -52,6 +52,15 @@ public class LocationExecutionContextProviderTestCase extends AbstractMuleTestCa
         assertThat(sanitized, equalTo("<sftp:config username=\"user\" password=\"<<credentials>>\" />"));
 
     }
+    
+    @Test
+    public void sanitizedPasswordAttributeWhenUsingRegExpCharactersInPassword()
+    {
+        withXmlElement(annotatedObject, "<sftp:config username=\"user\" password=\"pass^word\" />");
+        String sanitized = getSourceXML(annotatedObject);
+        assertThat(sanitized, equalTo("<sftp:config username=\"user\" password=\"<<credentials>>\" />"));
+
+    }
 
     private void withXmlElement(AnnotatedObject annotatedObject, String value)
     {
