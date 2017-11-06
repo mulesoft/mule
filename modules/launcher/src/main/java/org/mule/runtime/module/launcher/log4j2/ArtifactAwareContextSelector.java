@@ -9,6 +9,7 @@ package org.mule.runtime.module.launcher.log4j2;
 import static java.lang.ClassLoader.getSystemClassLoader;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -52,9 +53,9 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
   static final StatusLogger LOGGER = StatusLogger.getLogger();
   private static final ClassLoader SYSTEM_CLASSLOADER = getSystemClassLoader();
 
-  private LoggerContextCache cache = new LoggerContextCache(this, getClass().getClassLoader());
-
   private final MuleLoggerContextFactory loggerContextFactory = new MuleLoggerContextFactory();
+
+  private LoggerContextCache cache = new LoggerContextCache(this, getClass().getClassLoader());
 
   ArtifactAwareContextSelector() {}
 
@@ -100,15 +101,21 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
       loggerClassLoader = loggerClassLoader.getParent();
     }
 
-    if (!(loggerClassLoader instanceof ArtifactClassLoader)) {
+    if (loggerClassLoader == null) {
       return SYSTEM_CLASSLOADER;
     } else if (isRegionClassLoaderMember(loggerClassLoader)) {
-      loggerClassLoader = loggerClassLoader.getParent();
+      loggerClassLoader =
+          isPolicyClassLoader(loggerClassLoader.getParent()) ? loggerClassLoader.getParent().getParent()
+              : loggerClassLoader.getParent();
     } else if (!(loggerClassLoader instanceof RegionClassLoader) && !(loggerClassLoader instanceof MuleSharedDomainClassLoader)) {
       return SYSTEM_CLASSLOADER;
     }
 
     return loggerClassLoader;
+  }
+
+  private static boolean isPolicyClassLoader(ClassLoader loggerClassLoader) {
+    return ((ArtifactClassLoader) loggerClassLoader).getArtifactDescriptor() instanceof PolicyTemplateDescriptor;
   }
 
   private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
