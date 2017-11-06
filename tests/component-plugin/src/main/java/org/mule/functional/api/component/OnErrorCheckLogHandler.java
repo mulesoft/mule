@@ -25,6 +25,7 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
   private List<LogChecker> checkers = new ArrayList<>();
   private StringBuilder errors;
   private boolean propagate = false;
+  private boolean succeedIfNoLog = false;
 
   //Flag to check if doLogException() was actually called. Since all the logic of the checkers is executed in that method,
   //if it's not called, we will never fail, even if we should've.
@@ -56,7 +57,7 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
     if (!StringUtils.isBlank(errorMessage)) {
       fail(errorMessage);
     }
-    if (!exceptionLogged) {
+    if (!exceptionLogged && !succeedIfNoLog) {
       fail("Could not check exception because it was never logged");
     }
   }
@@ -81,6 +82,10 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
 
   public void setPropagate(boolean propagate) {
     this.propagate = propagate;
+  }
+
+  public void setSucceedIfNoLog(boolean succeedIfNoLog) {
+    this.succeedIfNoLog = succeedIfNoLog;
   }
 
 }
