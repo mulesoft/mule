@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static com.google.common.collect.Multimaps.synchronizedMultimap;
 import static java.util.Optional.ofNullable;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -14,16 +15,18 @@ import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.collections.map.MultiValueMap;
-
 public class DefaultPolicyStateHandler implements PolicyStateHandler {
 
-  protected MultiValueMap policyStateIdsByExecutionIdentifier = new MultiValueMap();
+  protected Multimap<String, PolicyStateId> policyStateIdsByExecutionIdentifier =
+      synchronizedMultimap(HashMultimap.<String, PolicyStateId>create());
   protected Map<PolicyStateId, CoreEvent> stateMap = new ConcurrentHashMap<>();
   protected Map<String, Processor> nextOperationMap = new ConcurrentHashMap<>();
 
@@ -48,11 +51,11 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
   }
 
   public void destroyState(String identifier) {
-    Collection<PolicyStateId> policyStateIds = policyStateIdsByExecutionIdentifier.getCollection(identifier);
+    Collection<PolicyStateId> policyStateIds = policyStateIdsByExecutionIdentifier.get(identifier);
     if (policyStateIds != null) {
       policyStateIds.stream().forEach(stateMap::remove);
     }
-    policyStateIdsByExecutionIdentifier.remove(identifier);
+    policyStateIdsByExecutionIdentifier.removeAll(identifier);
     nextOperationMap.remove(identifier);
   }
 
