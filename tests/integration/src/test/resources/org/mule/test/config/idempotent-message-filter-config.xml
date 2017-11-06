@@ -31,7 +31,7 @@
             </custom-object-store>
         </idempotent-message-filter>
     </flow>
-    
+
     <spring:bean id="objectStore" class="org.mule.test.config.IdempotentMessageFilterNamespaceHandlerTestCase$CustomObjectStore">
         <spring:property name="customProperty" value="the-value:beanObjectStore"/>
     </spring:bean>
@@ -45,5 +45,13 @@
     <flow name="idempotentFilterWithOnUnacceptedMP">
         <idempotent-message-filter onUnaccepted="appendStringTransformer"/>
     </flow>
+
+    <flow name="idempotentFilterWithOnUnacceptedMPToSubFlow">
+        <idempotent-message-filter onUnaccepted="logDuplicateMessageSubFlow"/>
+    </flow>
+
+    <sub-flow name="logDuplicateMessageSubFlow">
+        <custom-processor class="org.mule.lifecycle.LifecycleTrackerProcessor" />
+    </sub-flow>
 
  </mule>
