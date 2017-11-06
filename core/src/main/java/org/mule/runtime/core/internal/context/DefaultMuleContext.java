@@ -42,6 +42,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -830,7 +831,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
   @Override
   public String getUniqueIdString() {
-    return clusterConfiguration.getClusterNodeId() + "-" + UUID.getUUID();
+    return getClusterUUID(clusterConfiguration.getClusterNodeId());
   }
 
   @Override
