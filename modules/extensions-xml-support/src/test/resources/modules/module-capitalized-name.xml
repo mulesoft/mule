@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module name="Capitalized with spaces in the name"
-        minMuleVersion="4.1.0"
-
         namespace="http://www.mulesoft.org/schema/mule/capitalized"
 
         xmlns="http://www.mulesoft.org/schema/mule/module"
