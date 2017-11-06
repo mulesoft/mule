@@ -15,17 +15,17 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.map.MultiValueMap;
 
 public class DefaultPolicyStateHandler implements PolicyStateHandler {
 
   protected MultiValueMap policyStateIdsByExecutionIdentifier = new MultiValueMap();
-  protected Map<PolicyStateId, CoreEvent> stateMap = new HashMap<>();
-  protected Map<String, Processor> nextOperationMap = new HashMap<>();
+  protected Map<PolicyStateId, CoreEvent> stateMap = new ConcurrentHashMap<>();
+  protected Map<String, Processor> nextOperationMap = new ConcurrentHashMap<>();
 
   public void updateNextOperation(String identifier, Processor nextOperation) {
     nextOperationMap.put(identifier, nextOperation);
