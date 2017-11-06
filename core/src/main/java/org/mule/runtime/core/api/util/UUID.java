@@ -18,7 +18,21 @@ public final class UUID {
     // no go
   }
 
+  /**
+   * @return time-based UUID.
+   */
   public static String getUUID() {
     return new com.eaio.uuid.UUID().toString();
   }
+
+  /**
+   * @param clusterId cluster id
+   * @return time-based UUID prefixed with the cluster id so as to ensure uniqueness within cluster.
+   */
+  public static String getClusterUUID(int clusterId) {
+    return new com.eaio.uuid.UUID()
+        .toAppendable(new StringBuilder(38).append(clusterId).append('-')).toString();
+  }
+
+
 }
