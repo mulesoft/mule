@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.util;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
+import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
@@ -95,6 +96,9 @@ public class MessagingExceptionResolver {
     } else {
       result = me instanceof FlowExecutionException ? new FlowExecutionException(event, root, failingComponent)
           : new MessagingException(event, root, failingComponent);
+    }
+    if (me.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
+      result.addInfo(INFO_ALREADY_LOGGED_KEY, me.getInfo().get(INFO_ALREADY_LOGGED_KEY));
     }
     return enrich(result, failingComponent, event, context);
   }

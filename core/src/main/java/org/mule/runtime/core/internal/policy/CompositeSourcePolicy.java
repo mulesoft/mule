@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
@@ -14,6 +15,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
@@ -102,9 +104,15 @@ public class CompositeSourcePolicy extends
               .map(parametersTransformer -> parametersTransformer
                   .fromFailureResponseParametersToMessage(originalFailureResponseParameters))
               .orElse(messagingException.getEvent().getMessage());
-          return new FlowExecutionException(CoreEvent.builder(event).message(message).build(),
-                                            messagingException.getCause(),
-                                            messagingException.getFailingComponent());
+          MessagingException flowExecutionException =
+              new FlowExecutionException(CoreEvent.builder(event).message(message).build(),
+                                         messagingException.getCause(),
+                                         messagingException.getFailingComponent());
+          if (messagingException.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
+            flowExecutionException.addInfo(INFO_ALREADY_LOGGED_KEY,
+                                           messagingException.getInfo().get(INFO_ALREADY_LOGGED_KEY));
+          }
+          return flowExecutionException;
         });
   }
 
