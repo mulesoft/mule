@@ -6,8 +6,12 @@
  */
 package org.mule.transport.jms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,6 +21,8 @@ import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transformer.TransformerWeighting;
+import org.mule.transformer.simple.ObjectToString;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
 
 import javax.jms.Message;
@@ -57,7 +63,7 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase
         // The AbstractJMSTransformer will only apply JMS properties to the
         // underlying message when a "current event" is available, so we need to set
         // one.
-        assertNotNull("The test hasn't been configured properly, no muleContext available", muleContext);
+        assertThat(muleContext, is(not(nullValue())));
         RequestContext.setEvent(new DefaultMuleEvent(msg, MuleTestUtils.getTestEvent("previous", muleContext)));
 
         // The transformer we are going to use is ObjectToJMSMessage, which will
@@ -68,6 +74,19 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase
 
         // Finally we can assert that the setProperty done to the MuleMessage actually
         // made it through to the wrapped JMS Message. Yay!
-        assertEquals("customValue", transformed.getObjectProperty("JMS_CUSTOM_PROPERTY"));
+        assertThat((String) transformed.getObjectProperty("JMS_CUSTOM_PROPERTY"), equalTo("customValue"));
+    }
+    
+    @Test
+    public void testObjectToStringHasHigherPriorityWhenSameSourceAndTarget() throws Exception
+    {
+        ObjectToJMSMessage objectToJmsMessageTransformer = createObject(ObjectToJMSMessage.class);
+        ObjectToString objectToStringTransformer = createObject(ObjectToString.class);
+        TransformerWeighting weightingJmsMessageTransformer = new TransformerWeighting(Object.class, byte[].class, objectToJmsMessageTransformer);
+        TransformerWeighting weightingObjectToStringTransformer = new TransformerWeighting(Object.class, byte[].class, objectToStringTransformer);
+        assertThat(weightingJmsMessageTransformer.getInputWeighting(), equalTo(weightingObjectToStringTransformer.getInputWeighting()));
+        assertThat(weightingJmsMessageTransformer.getOutputWeighting(), equalTo(weightingObjectToStringTransformer.getOutputWeighting()));
+        assertThat(objectToStringTransformer.getPriorityWeighting(), greaterThan(objectToJmsMessageTransformer.getPriorityWeighting()));
+        assertThat(weightingJmsMessageTransformer.compareTo(weightingObjectToStringTransformer), equalTo(-1));
     }
 }
