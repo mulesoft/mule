@@ -222,6 +222,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     protected java.net.URLConnection openConnection(URL u) throws IOException {
       JarURLConnection c = new sun.net.www.protocol.jar.JarURLConnection(u, this);
       c.setUseCaches(false);
+      c.setDefaultUseCaches(false);
       return c;
     }
   }
