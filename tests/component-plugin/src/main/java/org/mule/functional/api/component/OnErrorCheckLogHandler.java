@@ -18,6 +18,9 @@ import org.mule.tck.processor.FlowAssertion;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
     implements MessagingExceptionHandlerAcceptor, FlowAssertion {
@@ -25,10 +28,14 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
   private List<LogChecker> checkers = new ArrayList<>();
   private StringBuilder errors;
   private boolean propagate = false;
+  private boolean succeedIfNoLog = false;
 
   //Flag to check if doLogException() was actually called. Since all the logic of the checkers is executed in that method,
   //if it's not called, we will never fail, even if we should've.
   private boolean exceptionLogged = false;
+
+  //Flag to check if there was actually and exception handled.
+  private boolean handledException = false;
 
   @Override
   public void start() throws MuleException {
@@ -36,6 +43,12 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
     errors = new StringBuilder();
     addAssertion(getRootContainerLocation().toString(), this);
     setHandleException(!propagate);
+  }
+
+  @Override
+  protected Function<CoreEvent, Publisher<CoreEvent>> route(Exception exception) {
+    handledException = true;
+    return super.route(exception);
   }
 
   @Override
@@ -52,23 +65,21 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
 
   @Override
   public void verify() {
+    if (!handledException) {
+      fail("Handler could not check any exception log because no exception was raised");
+    }
     String errorMessage = errors.toString();
     if (!StringUtils.isBlank(errorMessage)) {
       fail(errorMessage);
     }
-    if (!exceptionLogged) {
+    if (!exceptionLogged && !succeedIfNoLog) {
       fail("Could not check exception because it was never logged");
     }
   }
 
   @Override
-  public boolean accept(CoreEvent event) {
-    return true;
-  }
-
-  @Override
   public boolean acceptsAll() {
-    return false;
+    return true;
   }
 
   public void setCheckers(List<LogChecker> logCheckers) {
@@ -81,6 +92,10 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
 
   public void setPropagate(boolean propagate) {
     this.propagate = propagate;
+  }
+
+  public void setSucceedIfNoLog(boolean succeedIfNoLog) {
+    this.succeedIfNoLog = succeedIfNoLog;
   }
 
 }
