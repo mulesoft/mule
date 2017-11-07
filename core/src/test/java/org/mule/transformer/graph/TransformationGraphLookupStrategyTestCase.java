@@ -8,6 +8,9 @@ package org.mule.transformer.graph;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
 import org.mule.api.transformer.Converter;
@@ -31,7 +34,7 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractMuleTestC
     private static final DataType INPUT_STREAM_DATA_TYPE = mock(DataType.class, "INPUT_STREAM_DATA_TYPE");
     private static final DataType STRING_DATA_TYPE = mock(DataType.class, "STRING_DATA_TYPE");
 
-    private TransformationGraph graph = new TransformationGraph();
+    private SynchronizedTransformationGraph graph = new SynchronizedTransformationGraph();
     private TransformationGraphLookupStrategy lookupStrategyTransformation = new TransformationGraphLookupStrategy(graph);
 
     @Test
@@ -74,13 +77,11 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractMuleTestC
         Converter inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
         graph.addConverter(inputStreamToXml);
 
-        
         List<Converter> converters = lookupStrategyTransformation.lookupConverters(INPUT_STREAM_DATA_TYPE, XML_DATA_TYPE);
 
-        assertEquals(1, converters.size());
-        assertEquals(inputStreamToXml, converters.get(0));
+        assertThat(converters, hasSize(1));
+        assertThat(converters.get(0), is(inputStreamToXml));
     }
-
 
     @Test
     public void findsMultipleDirectTransformations() throws Exception
