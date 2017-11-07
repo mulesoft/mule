@@ -18,13 +18,16 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextReaperThreadFactory.THREAD_NAME;
 import static org.mule.tck.MuleTestUtils.getRunningThreadByName;
+
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
@@ -40,6 +43,7 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -57,6 +61,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
+
+  private static final String POLICY_TEMPLATE_NAME = "policyTemplate";
+  private static final String POLICY_TEMPLATE_ARTIFACT_ID = "domain/app/anApp/policy/aPolicy";
 
   private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
   private static final int PROBER_TIMEOUT = 5000;
@@ -164,6 +171,19 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
     assertThat(serviceCtx, sameInstance(systemContext));
   }
 
+  @Test
+  public void returnsParentContextForPolicyClassloader() throws MalformedURLException {
+    ClassLoader childClassLoader = new URLClassLoader(new URL[0], regionClassLoader);
+    PolicyTemplateDescriptor policyTemplateDescriptor = new PolicyTemplateDescriptor(POLICY_TEMPLATE_NAME, empty());
+    RegionClassLoader policyRegionClassLoader = spy(getPolicyRegionClassLoader(policyTemplateDescriptor));
+    MuleArtifactClassLoader policyClassLoader = getPolicyArtifactClassLoader(policyTemplateDescriptor, policyRegionClassLoader);
+
+    LoggerContext appCtx = selector.getContext("", childClassLoader, true);
+    LoggerContext policyCtx = selector.getContext("", policyClassLoader, true);
+
+    assertThat(policyCtx, sameInstance(appCtx));
+  }
+
   private void assertReaperThreadNotRunning() {
     PollingProber prober = new PollingProber(PROBER_TIMEOUT, PROBER_FREQ);
     prober.check(new Probe() {
@@ -190,6 +210,17 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
 
   private void assertConfigurationLocation(LoggerContext ctx) {
     assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
+  }
+
+  private RegionClassLoader getPolicyRegionClassLoader(PolicyTemplateDescriptor policyTemplateDescriptor) {
+    return new RegionClassLoader(POLICY_TEMPLATE_ARTIFACT_ID, policyTemplateDescriptor, regionClassLoader,
+                                 mock(ClassLoaderLookupPolicy.class));
+  }
+
+  private MuleArtifactClassLoader getPolicyArtifactClassLoader(PolicyTemplateDescriptor policyTemplateDescriptor,
+                                                               RegionClassLoader policyRegionClassLoader) {
+    return new MuleArtifactClassLoader(POLICY_TEMPLATE_ARTIFACT_ID, policyTemplateDescriptor, new URL[0], policyRegionClassLoader,
+                                       mock(ClassLoaderLookupPolicy.class));
   }
 
   private void assertStopped(final MuleLoggerContext context) {
