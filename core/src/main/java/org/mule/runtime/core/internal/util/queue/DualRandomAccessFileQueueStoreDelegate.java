@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.api.MuleContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Serializable;
@@ -19,9 +22,6 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@link TransactionalQueueStoreDelegate} implementation using two files for storing the queue data.
@@ -43,7 +43,6 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
   private static final Object QUEUE_DATA_CONTROL_SUFFIX = "-crl";
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-  private final MuleContext muleContext;
   private final ObjectSerializer serializer;
   private final ReadWriteLock filesLock;
   private final QueueControlDataFile queueControlDataFile;
@@ -55,7 +54,6 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
   public DualRandomAccessFileQueueStoreDelegate(String queueName, String workingDirectory, MuleContext muleContext,
                                                 int capacity) {
     super(capacity);
-    this.muleContext = muleContext;
     serializer = muleContext.getObjectSerializer();
     File queuesDirectory = getQueuesDirectory(workingDirectory);
     if (!queuesDirectory.exists()) {
@@ -186,15 +184,15 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
     return true;
   }
 
-  public Collection<Serializable> allElements() {
-    List<Serializable> elements = new LinkedList<Serializable>();
+  public Collection<Serializable> allElements() throws InterruptedException {
+    List<Serializable> elements = new LinkedList<>();
     elements.addAll(deserializeValues(randomAccessFileQueueStore1.allElements()));
     elements.addAll(deserializeValues(randomAccessFileQueueStore2.allElements()));
     return elements;
   }
 
   private Collection<Serializable> deserializeValues(Collection<byte[]> valuesAsBytes) {
-    List<Serializable> values = new ArrayList<Serializable>(valuesAsBytes.size());
+    List<Serializable> values = new ArrayList<>(valuesAsBytes.size());
     for (byte[] valueAsByte : valuesAsBytes) {
       try {
         values.add(deserialize(valueAsByte));
@@ -212,6 +210,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
     return serializer.getInternalProtocol().deserialize(valuesAsBytes);
   }
 
+  @Override
   public void remove(Serializable value) {
     RawDataSelector rawDataSelector = createDataSelector(value);
     if (!randomAccessFileQueueStore1.remove(rawDataSelector)) {
@@ -220,13 +219,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
   }
 
   private RawDataSelector createDataSelector(final Serializable value) {
-    return new RawDataSelector() {
-
-      @Override
-      public boolean isSelectedData(byte[] data) {
-        return deserialize(data).equals(value);
-      }
-    };
+    return data -> deserialize(data).equals(value);
   }
 
   @Override

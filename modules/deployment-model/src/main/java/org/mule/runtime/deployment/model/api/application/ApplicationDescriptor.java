@@ -10,6 +10,7 @@ package org.mule.runtime.deployment.model.api.application;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
+
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -31,10 +32,10 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   public static final String MULE_APPLICATION_CLASSIFIER = "mule-application";
 
   private String encoding;
-  private Map<String, String> appProperties = new HashMap<String, String>();
+  private Map<String, String> appProperties = new HashMap<>();
   private File logConfigFile;
   private ArtifactDeclaration artifactDeclaration;
-  private Optional<BundleDescriptor> domainDescriptor;
+  private volatile Optional<BundleDescriptor> domainDescriptor;
 
   /**
    * Creates a new application descriptor

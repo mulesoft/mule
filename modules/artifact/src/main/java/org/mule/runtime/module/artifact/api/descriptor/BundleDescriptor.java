@@ -25,7 +25,7 @@ public class BundleDescriptor {
   private String version;
   private String type = "jar";
   private Optional<String> classifier = empty();
-  private String artifactFileName;
+  private volatile String artifactFileName;
 
   private BundleDescriptor() {}
 
