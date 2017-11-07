@@ -7,8 +7,10 @@
 package org.mule.runtime.core.api.transformer;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.privileged.transformer.TransformerUtils.checkTransformerReturnClass;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -18,7 +20,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.privileged.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -132,7 +133,6 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     if (logger.isDebugEnabled()) {
       logger.debug(format("Object after transform: %s", StringMessageUtils.toString(result)));
     }
-
     result = checkReturnClass(result, event);
     return result;
   }
@@ -142,21 +142,10 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
    */
   protected Object checkReturnClass(Object object, CoreEvent event) throws MessageTransformerException {
 
-    // Null is a valid return type
-    if (object == null && isAllowNullReturn()) {
-      return object;
-    }
-
-    if (getReturnDataType() != null) {
-      DataType dt = DataType.fromObject(object);
-      if (!getReturnDataType().isCompatibleWith(dt)) {
-        throw new MessageTransformerException(CoreMessages.transformUnexpectedType(dt, getReturnDataType()), this,
-                                              event.getMessage());
-      }
-    }
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("The transformed object is of expected type. Type is: " + ClassUtils.getSimpleName(object.getClass()));
+    try {
+      checkTransformerReturnClass(this, object);
+    } catch (TransformerException e) {
+      throw new MessageTransformerException(createStaticMessage(e.getMessage()), this, event.getMessage());
     }
 
     return object;
