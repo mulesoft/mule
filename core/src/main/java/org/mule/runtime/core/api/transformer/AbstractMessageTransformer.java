@@ -144,7 +144,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
 
     try {
       checkTransformerReturnClass(this, object);
-    }catch (TransformerException e) {
+    } catch (TransformerException e) {
       throw new MessageTransformerException(createStaticMessage(e.getMessage()), this, event.getMessage());
     }
 
