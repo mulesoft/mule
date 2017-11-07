@@ -10,10 +10,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -24,15 +22,14 @@ import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.internal.config.builders.AutoConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation that uses {@link DefaultMuleContextBuilder} to build new {@link MuleContext} instances.
@@ -67,7 +64,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
         for (ConfigurationBuilder configBuilder : configurationBuilders) {
           configBuilder.configure(muleContext);
         }
-        notifyMuleContextConfiguration(muleContext);
       }
     });
   }
@@ -83,8 +79,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
       @Override
       public void configure(MuleContext muleContext) throws ConfigurationException {
         configurationBuilder.configure(muleContext);
-
-        notifyMuleContextConfiguration(muleContext);
       }
     });
   }
@@ -124,8 +118,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
         // Automatically resolve Configuration to be used and delegate configuration
         // to it.
         new AutoConfigurationBuilder(configResources, emptyMap(), APP).configure(muleContext);
-
-        notifyMuleContextConfiguration(muleContext);
       }
     });
   }
@@ -182,8 +174,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
         for (ConfigurationBuilder configurationBuilder : configurationBuilders) {
           configurationBuilder.configure(muleContext);
         }
-
-        notifyMuleContextConfiguration(muleContext);
       }
     });
   }
@@ -191,16 +181,11 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
   private MuleContext doCreateMuleContext(MuleContextBuilder muleContextBuilder, ContextConfigurator configurator)
       throws InitialisationException, ConfigurationException {
     MuleContext muleContext = buildMuleContext(muleContextBuilder);
-
-    notifyMuleContextCreation(muleContext);
+    listeners.forEach(l -> l.onCreation(muleContext));
 
     try {
       configurator.configure(muleContext);
-
-      // Initialiase MuleContext
       muleContext.initialise();
-
-      notifyMuleContextInitialized(muleContext);
     } catch (ConfigurationException e) {
       if (muleContext != null && !muleContext.isDisposed()) {
         try {
@@ -218,6 +203,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
   }
 
   protected MuleContext buildMuleContext(MuleContextBuilder muleContextBuilder) {
+    muleContextBuilder.setListeners(listeners);
     return muleContextBuilder.buildMuleContext();
   }
 
@@ -229,25 +215,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
   @Override
   public boolean removeListener(MuleContextListener listener) {
     return listeners.remove(listener);
-  }
-
-  private void notifyMuleContextCreation(MuleContext context) {
-    for (MuleContextListener listener : listeners) {
-      listener.onCreation(context);
-    }
-  }
-
-  private void notifyMuleContextInitialized(MuleContext context) {
-    for (MuleContextListener listener : listeners) {
-      listener.onInitialization(context,
-                                ((MuleContextWithRegistries) context).getRegistry().<Registry>lookupObject(OBJECT_REGISTRY));
-    }
-  }
-
-  private void notifyMuleContextConfiguration(MuleContext context) {
-    for (MuleContextListener listener : listeners) {
-      listener.onConfiguration(context);
-    }
   }
 
   private abstract class ContextConfigurator {

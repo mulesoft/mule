@@ -10,7 +10,7 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
- * Listens to events raised during the creation of a {@link MuleContext}
+ * Listens to public events raised from {@link MuleContext}
  */
 public interface MuleContextListener {
 
@@ -26,14 +26,20 @@ public interface MuleContextListener {
    *
    * @param context initialized context
    * @param registry the registry of the initialized context
-   * @param object
    */
   void onInitialization(MuleContext context, Registry registry);
 
   /**
-   * Notifies the configuration of a {@link MuleContext} instance, after this notification, the context is ready to be used.
+   * Notifies the stopping of a {@link MuleContext} instance.
    *
    * @param context configured context
    */
-  void onConfiguration(MuleContext context);
+  void onStart(MuleContext context, Registry registry);
+
+  /**
+   * Notifies the stopping of a {@link MuleContext} instance.
+   *
+   * @param context configured context
+   */
+  void onStop(MuleContext context, Registry registry);
 }

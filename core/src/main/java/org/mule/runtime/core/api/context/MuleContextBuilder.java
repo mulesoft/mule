@@ -7,15 +7,18 @@
 package org.mule.runtime.core.api.context;
 
 import org.mule.runtime.api.exception.ErrorTypeRepository;
-import java.util.Optional;
-import java.util.Properties;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Builder that is used to build instances of {@link MuleContext}. Implementing classes are stateful and should provide public
@@ -62,4 +65,6 @@ public interface MuleContextBuilder {
   }
 
   void setDeploymentProperties(Optional<Properties> properties);
+
+  void setListeners(List<MuleContextListener> listeners);
 }
