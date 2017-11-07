@@ -181,7 +181,6 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
     LoggerContext appCtx = selector.getContext("", childClassLoader, true);
     LoggerContext policyCtx = selector.getContext("", policyClassLoader, true);
 
-    assertThat(policyCtx, instanceOf(MuleLoggerContext.class));
     assertThat(policyCtx, sameInstance(appCtx));
   }
 
