@@ -401,10 +401,11 @@
     <xsd:complexType name="onErrorCheckLogType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractOnErrorType">
-                <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:element ref="abstract-log-checker"/>
                 </xsd:sequence>
                 <xsd:attribute name="propagate" type="xsd:boolean" default="false"/>
+                <xsd:attribute name="succeedIfNoLog" type="xsd:boolean" default="false"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
