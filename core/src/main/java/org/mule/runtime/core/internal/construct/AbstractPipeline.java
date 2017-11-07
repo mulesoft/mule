@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Un
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
-import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.empty;
@@ -31,6 +30,8 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
+import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -38,6 +39,7 @@ import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -53,6 +55,7 @@ import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrateg
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
@@ -63,6 +66,7 @@ import org.reactivestreams.Publisher;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import reactor.core.publisher.Mono;
@@ -213,15 +217,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     if (source.getBackPressureStrategy() == WAIT) {
       // If back-pressure strategy is WAIT then use blocking `accept(Event event)` to dispatch Event
       return publisher -> from(publisher)
-          .doOnNext(event -> {
+          .flatMap(event -> {
             try {
               sink.accept(event);
             } catch (RejectedExecutionException ree) {
               MessagingException me = new MessagingException(event, ree, this);
               ((BaseEventContext) event.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
             }
-          })
-          .flatMap(event -> Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher()));
+            return ((BaseEventContext) event.getContext()).getResponsePublisher();
+          });
     } else {
       // If back-pressure strategy is FAIL/DROP then using back-pressure aware `accept(Event event)` to dispatch Event
       return publisher -> from(publisher).flatMap(event -> {
@@ -267,18 +271,25 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
       long startTime = currentTimeMillis();
 
-      // Fire COMPLETE notification on async response
-      Mono.from(((BaseEventContext) event.getContext()).getBeforeResponsePublisher())
-          .doOnSuccess(result -> fireCompleteNotification(result, null))
-          .doOnError(MessagingException.class, messagingException -> fireCompleteNotification(null, messagingException))
-          .doOnError(throwable -> !(throwable instanceof MessagingException),
-                     throwable -> fireCompleteNotification(null, new MessagingException(event, throwable,
-                                                                                        AbstractPipeline.this))
+      BaseEventContext baseEventContext = ((BaseEventContext) event.getContext());
+      Reference<Pair<CoreEvent, Throwable>> result = new Reference<>();
+      baseEventContext.onResponse((response, throwable) -> {
+        result.set(new Pair<>(response, throwable));
+      });
 
-          )
-          .doOnSuccessOrError((result, throwable) -> ((BaseEventContext) event.getContext()).getProcessingTime()
-              .ifPresent(time -> time.addFlowExecutionBranchTime(startTime)))
-          .subscribe(requestUnbounded());
+      baseEventContext.onComplete((a, b) -> {
+        MessagingException messagingException = null;
+        Throwable throwable = result.get().getSecond();
+        if (throwable != null) {
+          if (throwable instanceof MessagingException) {
+            messagingException = (MessagingException) throwable;
+          } else {
+            messagingException = new MessagingException(event, throwable, AbstractPipeline.this);
+          }
+        }
+        fireCompleteNotification(result.get().getFirst(), messagingException);
+        baseEventContext.getProcessingTime().ifPresent(time -> time.addFlowExecutionBranchTime(startTime));
+      });
     };
   }
 

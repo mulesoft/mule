@@ -41,7 +41,7 @@ public interface EventContextFactory {
    * @param correlationId See {@link EventContext#getCorrelationId()}.
    */
   static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId) {
-    return create(flow, location, correlationId, Mono.empty());
+    return create(flow, location, correlationId, null);
   }
 
   /**
@@ -66,7 +66,7 @@ public interface EventContextFactory {
    */
   static EventContext create(String id, String serverId, ComponentLocation location, String correlationId,
                              FlowExceptionHandler exceptionHandler) {
-    return create(id, serverId, location, correlationId, Mono.empty(), exceptionHandler);
+    return create(id, serverId, location, correlationId, null, exceptionHandler);
   }
 
   /**

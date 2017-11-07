@@ -6,12 +6,9 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-import static reactor.core.publisher.Mono.when;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
@@ -22,13 +19,12 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.MonoProcessor;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import reactor.core.Disposable;
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoProcessor;
+import java.util.function.BiConsumer;
 
 /**
  * Base class for implementations of {@link BaseEventContext}
@@ -37,62 +33,46 @@ import reactor.core.publisher.MonoProcessor;
  */
 abstract class AbstractEventContext implements BaseEventContext {
 
+  final static int STATE_READY = 0;
+  final static int STATE_DONE = 1;
+  final static int STATE_COMPLETE = 2;
+  final static int STATE_TERMINATED = 3;
+
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
   protected static final FlowExceptionHandler NULL_EXCEPTION_HANDLER = NullExceptionHandler.getInstance();
 
-  private transient MonoProcessor<CoreEvent> beforeResponseProcessor;
-  private transient MonoProcessor<CoreEvent> responseProcessor;
-  private transient MonoProcessor<Void> completionProcessor;
-  private transient Disposable completionSubscriberDisposable;
   private transient final List<BaseEventContext> childContexts = new LinkedList<>();
-  private transient Mono<Void> completionCallback;
-  private transient FlowExceptionHandler exceptionHandler;
+  private transient final FlowExceptionHandler exceptionHandler;
+  private final MonoProcessor<CoreEvent> responseProcessor = MonoProcessor.create();
+  private volatile int state = STATE_READY;
+  private volatile boolean externalCompletion = true;
+  private final List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
+  private final List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>();
+  private final List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
 
   public AbstractEventContext() {
-    this(NULL_EXCEPTION_HANDLER, empty());
+    this(NULL_EXCEPTION_HANDLER, null);
   }
 
   public AbstractEventContext(FlowExceptionHandler exceptionHandler) {
-    this(exceptionHandler, empty());
+    this(exceptionHandler, null);
   }
 
   public AbstractEventContext(FlowExceptionHandler exceptionHandler, Publisher<Void> completionCallback) {
-    this.completionCallback = from(completionCallback);
+    if (completionCallback != null) {
+      externalCompletion = false;
+      from(completionCallback).doOnSuccessOrError((aVoid, throwable) -> {
+        externalCompletion = true;
+        tryTerminate();
+      }).subscribe();
+    }
     this.exceptionHandler = exceptionHandler;
-    beforeResponseProcessor = MonoProcessor.create();
-    responseProcessor = MonoProcessor.create();
-    responseProcessor.doOnEach(s -> s.accept(beforeResponseProcessor)).subscribe(requestUnbounded());
-    completionProcessor = MonoProcessor.create();
-    completionProcessor.doFinally(e -> {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(this + " execution completed.");
-      }
-    }).subscribe();
-    // When there are no child contexts response triggers completion directly.
-    completionSubscriberDisposable = Mono.<Void>whenDelayError(completionCallback,
-                                                               responseProcessor.materialize().then())
-        .doOnEach(s -> s.accept(completionProcessor)).subscribe();
   }
 
   void addChildContext(BaseEventContext childContext) {
     synchronized (this) {
       childContexts.add(childContext);
-      updateCompletionPublisher();
     }
-  }
-
-  private void updateCompletionPublisher() {
-    // When a new child is added dispose existing subscription that triggers completion processor and re-subscribe adding child
-    // completion condition.
-    completionSubscriberDisposable.dispose();
-    completionSubscriberDisposable =
-        responseProcessor.onErrorResume(throwable -> empty()).and(completionCallback).and(getChildCompletionPublisher())
-            .materialize().then()
-            .doOnEach(s -> s.accept(completionProcessor)).subscribe();
-  }
-
-  private Mono<Void> getChildCompletionPublisher() {
-    return when(childContexts.stream().map(eventContext -> from(eventContext.getCompletionPublisher())).collect(toList()));
   }
 
   /**
@@ -100,17 +80,15 @@ abstract class AbstractEventContext implements BaseEventContext {
    */
   @Override
   public final void success() {
-    synchronized (this) {
-      if (responseProcessor.isTerminated()) {
-        LOGGER.debug(this + " empty response was already completed, ignoring.");
-        return;
-      }
-
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(this + " response completed with no result.");
-      }
-      responseProcessor.onComplete();
+    if (state > 0) {
+      LOGGER.debug(this + " empty responseDone was already completed, ignoring.");
+      return;
     }
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(this + " responseDone completed with no result.");
+    }
+    responseDone(null, null);
   }
 
   /**
@@ -118,17 +96,15 @@ abstract class AbstractEventContext implements BaseEventContext {
    */
   @Override
   public final void success(CoreEvent event) {
-    synchronized (this) {
-      if (responseProcessor.isTerminated()) {
-        LOGGER.debug(this + " response was already completed, ignoring.");
-        return;
-      }
-
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(this + " response completed with result.");
-      }
-      responseProcessor.onNext(event);
+    if (state > 0) {
+      LOGGER.debug(this + " responseDone was already completed, ignoring.");
+      return;
     }
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(this + " responseDone completed with result.");
+    }
+    responseDone(event, null);
   }
 
   /**
@@ -137,13 +113,13 @@ abstract class AbstractEventContext implements BaseEventContext {
   @Override
   public final Publisher<Void> error(Throwable throwable) {
     synchronized (this) {
-      if (responseProcessor.isTerminated()) {
-        LOGGER.debug(this + " error response was already completed, ignoring.");
+      if (state > 0) {
+        LOGGER.debug(this + " error responseDone was already completed, ignoring.");
         return empty();
       }
 
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(this + " response completed with error.");
+        LOGGER.debug(this + " responseDone completed with error.");
       }
 
       if (throwable instanceof MessagingException) {
@@ -153,13 +129,59 @@ abstract class AbstractEventContext implements BaseEventContext {
         return just((MessagingException) throwable)
             .flatMapMany(exceptionHandler)
             .doOnNext(handled -> success(handled))
-            .doOnError(rethrown -> responseProcessor.onError(rethrown))
+            .doOnError(rethrown -> responseDone(null, rethrown))
             .materialize()
             .then()
             .toProcessor();
       } else {
-        responseProcessor.onError(throwable);
+        responseDone(null, throwable);
         return empty();
+      }
+    }
+  }
+
+  private synchronized void responseDone(CoreEvent event, Throwable throwable) {
+    this.state = STATE_DONE;
+    onResponseConsumerList.stream().forEach(consumer -> consumer.accept(event, throwable));
+    tryComplete();
+    if (throwable != null) {
+      responseProcessor.onError(throwable);
+    } else {
+      responseProcessor.onNext(event);
+    }
+    tryTerminate();
+  }
+
+  protected synchronized void tryComplete() {
+    if (this.state == STATE_DONE && childContexts.stream().filter(context -> !context.isComplete()).count() == 0) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(this + " completed.");
+      }
+      this.state = STATE_COMPLETE;
+      if (responseProcessor.isError()) {
+        onCompletionConsumerList.forEach(runnable -> runnable.accept(null, responseProcessor.getError()));
+      } else {
+        onCompletionConsumerList.forEach(consumer -> consumer.accept(responseProcessor.peek(), null));
+      }
+      getParentContext().ifPresent(context -> {
+        if (context instanceof AbstractEventContext) {
+          ((AbstractEventContext) context).tryComplete();
+        }
+      });
+      tryTerminate();
+    }
+  }
+
+  protected synchronized void tryTerminate() {
+    if (this.state == STATE_COMPLETE && externalCompletion) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(this + " terminated.");
+      }
+      this.state = STATE_TERMINATED;
+      if (responseProcessor.isError()) {
+        onTerminatedConsumerList.forEach(runnable -> runnable.accept(null, responseProcessor.getError()));
+      } else {
+        onTerminatedConsumerList.forEach(consumer -> consumer.accept(responseProcessor.peek(), null));
       }
     }
   }
@@ -171,22 +193,37 @@ abstract class AbstractEventContext implements BaseEventContext {
         .orElse(this);
   }
 
+  protected FlowExceptionHandler getExceptionHandler() {
+    return exceptionHandler;
+  }
+
   @Override
-  public Publisher<CoreEvent> getBeforeResponsePublisher() {
-    return beforeResponseProcessor;
+  public boolean isComplete() {
+    return this.state >= STATE_COMPLETE;
+  }
+
+  @Override
+  public boolean isTerminated() {
+    return this.state == STATE_TERMINATED;
+  }
+
+  @Override
+  public synchronized void onTerminated(BiConsumer<CoreEvent, Throwable> consumer) {
+    onTerminatedConsumerList.add(consumer);
+  }
+
+  @Override
+  public synchronized void onComplete(BiConsumer<CoreEvent, Throwable> consumer) {
+    onCompletionConsumerList.add(consumer);
+  }
+
+  @Override
+  public synchronized void onResponse(BiConsumer<CoreEvent, Throwable> consumer) {
+    onResponseConsumerList.add(consumer);
   }
 
   @Override
   public Publisher<CoreEvent> getResponsePublisher() {
     return responseProcessor;
-  }
-
-  @Override
-  public Publisher<Void> getCompletionPublisher() {
-    return completionProcessor;
-  }
-
-  protected FlowExceptionHandler getExceptionHandler() {
-    return exceptionHandler;
   }
 }

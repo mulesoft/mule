@@ -49,9 +49,7 @@ public class DefaultFlowListener implements FlowListener {
   public DefaultFlowListener(ExtensionModel extensionModel, OperationModel operationModel, CoreEvent event) {
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
-    from(((BaseEventContext) event.getContext()).getResponsePublisher())
-        .doOnSuccessOrError((responseEvent, t) -> onTerminate(responseEvent, t))
-        .subscribe();
+    ((BaseEventContext) event.getContext()).onResponse((responseEvent, t) -> onTerminate(responseEvent, t));
   }
 
   /**
@@ -105,7 +103,7 @@ public class DefaultFlowListener implements FlowListener {
           onComplete.run();
         } catch (Exception e) {
           LOGGER.warn("Operation " + operationModel.getName() + " from extension " + extensionModel.getName()
-              + " threw exception while executing the onComplete FlowListener", e);
+              + " threw exception while executing the onTerminated FlowListener", e);
         }
       }
     }

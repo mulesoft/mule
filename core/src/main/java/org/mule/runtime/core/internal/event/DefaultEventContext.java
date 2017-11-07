@@ -185,7 +185,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
                               FlowExceptionHandler messagingExceptionHandler) {
-      super(messagingExceptionHandler, Mono.empty());
+      super(messagingExceptionHandler, null);
       this.parent = parent;
       this.componentLocation = componentLocation;
       this.id = parent.getId() + identityHashCode(this);

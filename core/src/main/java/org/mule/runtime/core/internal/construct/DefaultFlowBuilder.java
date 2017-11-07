@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
@@ -45,6 +46,7 @@ import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 
 import org.reactivestreams.Publisher;
@@ -253,7 +255,7 @@ public class DefaultFlowBuilder implements Builder {
               MessagingException me = new MessagingException(event, ree, this);
               ((BaseEventContext) request.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
             }
-            return Mono.from(((BaseEventContext) request.getContext()).getResponsePublisher())
+            return Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher())
                 .cast(PrivilegedEvent.class)
                 .map(r -> {
                   CoreEvent result = createReturnEventForParentFlowConstruct(r, (InternalEvent) event);

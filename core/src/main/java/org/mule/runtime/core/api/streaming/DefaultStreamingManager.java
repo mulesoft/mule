@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -135,7 +135,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     }
 
     final BaseEventContext ctx = ((BaseEventContext) creatorEvent.getContext()).getRootContext();
-    from(ctx.getCompletionPublisher()).subscribe(null, null, () -> closeQuietly(stream));
+    ctx.onTerminated((response, throwable) -> closeQuietly(stream));
   }
 
   /**
