@@ -13,6 +13,7 @@ import static javax.tools.Diagnostic.Kind.ERROR;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 
@@ -94,13 +95,10 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
 
       return false;
     } catch (MuleRuntimeException e) {
-      if (e.getCause() instanceof IllegalModelDefinitionException) {
-        throw (IllegalModelDefinitionException) e.getCause();
-      } else {
-        processingEnv.getMessager().printMessage(ERROR, format("%s\n%s", e.getMessage(), getStackTrace(e)));
-        throw e;
+      Optional<IllegalModelDefinitionException> exception = extractOfType(e, IllegalModelDefinitionException.class);
+      if (exception.isPresent()) {
+        throw exception.get();
       }
-    } catch (Exception e) {
       processingEnv.getMessager().printMessage(ERROR, format("%s\n%s", e.getMessage(), getStackTrace(e)));
       throw e;
     }
