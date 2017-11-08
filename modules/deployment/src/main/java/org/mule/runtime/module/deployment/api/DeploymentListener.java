@@ -89,4 +89,24 @@ public interface DeploymentListener {
   default void onArtifactInitialised(String artifactName, Registry registry) {
 
   }
+
+  /**
+   * Notifies artifact start for a given app.
+   *
+   * @param artifactName name of the application that owns the mule context
+   * @param registry mule registry for the application being deployed
+   */
+  default void onArtifactStarted(String artifactName, Registry registry) {
+
+  }
+
+  /**
+   * Notifies artifact stop for a given app.
+   *
+   * @param artifactName name of the application that owns the mule context
+   * @param registry mule registry for the application being deployed
+   */
+  default void onArtifactStopped(String artifactName, Registry registry) {
+
+  }
 }

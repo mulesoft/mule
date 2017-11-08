@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -45,17 +46,17 @@ import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.InOrder;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.InOrder;
 
 public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
@@ -201,6 +202,11 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     MuleContextListener listener = mock(MuleContextListener.class);
     ConfigurationBuilder configurationBuilder = mock(ConfigurationBuilder.class);
     context = mockMuleContext();
+    context = mockMuleContext();
+    doAnswer(invocation -> {
+      listener.onInitialization(context, null);
+      return null;
+    }).when(context).initialise();
     MuleContextBuilder contextBuilder = mock(MuleContextBuilder.class);
     when(contextBuilder.buildMuleContext()).thenReturn(context);
 
@@ -210,8 +216,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
     InOrder inOrder = inOrder(listener);
     inOrder.verify(listener, times(1)).onCreation(context);
-    inOrder.verify(listener, times(1)).onConfiguration(context);
-    // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
     inOrder.verify(listener, times(1)).onInitialization(eq(context), any(Registry.class));
   }
 

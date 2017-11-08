@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -23,18 +24,20 @@ import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
-import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.RegistryDelegatingInjector;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -64,6 +67,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   private ErrorTypeRepository errorTypeRepository;
 
   private Optional<Properties> deploymentProperties = empty();
+
+  private List<MuleContextListener> listeners = new ArrayList<>();
 
   /**
    * Creates a new builder
@@ -98,6 +103,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext
         .setBootstrapServiceDiscoverer(injectMuleContextIfRequired(createBootstrapDiscoverer(), muleContext));
     muleContext.setDeploymentProperties(getDeploymentProperties());
+    muleContext.setListeners(listeners);
     getObjectSerializer(muleContext);
 
     if (errorTypeRepository == null) {
@@ -244,5 +250,9 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
   public void setDeploymentProperties(Optional<Properties> deploymentProperties) {
     this.deploymentProperties = deploymentProperties;
+  }
+
+  public void setListeners(List<MuleContextListener> listeners) {
+    this.listeners = listeners;
   }
 }
