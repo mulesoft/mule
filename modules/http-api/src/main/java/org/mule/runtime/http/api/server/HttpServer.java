@@ -28,6 +28,8 @@ public interface HttpServer {
 
   /**
    * Unbinds the ServerSocket to the network interface and stops listening for requests.
+   * <p>
+   * Inflight requests are not affected and may proceed normally until {@link #dispose()} is called.
    *
    * @return this server
    */
