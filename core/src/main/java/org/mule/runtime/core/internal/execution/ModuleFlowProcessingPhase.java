@@ -72,11 +72,11 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoProcessor;
 
 /**
  * This phase routes the message through the flow.
@@ -129,7 +129,7 @@ public class ModuleFlowProcessingPhase
       final FlowConstruct flowConstruct = (FlowConstruct) componentLocator.find(messageSource.getRootContainerLocation()).get();
       final ComponentLocation sourceLocation = messageSource.getLocation();
       final Consumer<Either<MessagingException, CoreEvent>> terminateConsumer = getTerminateConsumer(messageSource, template);
-      final MonoProcessor<Void> responseCompletion = MonoProcessor.create();
+      final CompletableFuture<Void> responseCompletion = new CompletableFuture<>();
       final CoreEvent templateEvent = createEvent(template, sourceLocation, responseCompletion, flowConstruct);
 
       try {
@@ -152,7 +152,7 @@ public class ModuleFlowProcessingPhase
             .doOnSuccess(aVoid -> phaseResultNotifier.phaseSuccessfully())
             .doOnError(onFailure(phaseResultNotifier, terminateConsumer))
             // Complete EventContext via responseCompletion Mono once everything is done.
-            .doAfterTerminate(() -> responseCompletion.onComplete())
+            .doAfterTerminate(() -> responseCompletion.complete(null))
             .subscribe();
       } catch (Exception e) {
         from(template.sendFailureResponseToClient(new MessagingExceptionResolver(messageProcessContext.getMessageSource())
@@ -271,10 +271,11 @@ public class ModuleFlowProcessingPhase
   }
 
   private CoreEvent createEvent(ModuleFlowProcessingPhaseTemplate template, ComponentLocation sourceLocation,
-                                Publisher<Void> responseCompletion, FlowConstruct flowConstruct) {
+                                CompletableFuture responseCompletion, FlowConstruct flowConstruct) {
     Message message = template.getMessage();
     CoreEvent templateEvent = InternalEvent
-        .builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null, responseCompletion,
+        .builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null,
+                        Optional.of(responseCompletion),
                         NullExceptionHandler.getInstance()))
         .message(message)
         .build();

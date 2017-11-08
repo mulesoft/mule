@@ -15,13 +15,14 @@ import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.reactivestreams.Publisher;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 /**
  * Context representing a message that is received by a Mule Runtime via a connector source. This context is immutable and
- * maintained during all execution originating from a given source message and all instances of {@link CoreEvent} created as part of
- * the processing of the source message will maintain a reference to this instance. Wherever a Flow references another Flow this
- * {@link BaseEventContext} will be maintained, while whenever there is a connector boundary a new instance will be created by the
- * receiving source.
+ * maintained during all execution originating from a given source message and all instances of {@link CoreEvent} created as part
+ * of the processing of the source message will maintain a reference to this instance. Wherever a Flow references another Flow
+ * this {@link BaseEventContext} will be maintained, while whenever there is a connector boundary a new instance will be created
+ * by the receiving source.
  *
  * @see CoreEvent
  * @since 4.0
@@ -30,6 +31,8 @@ public interface BaseEventContext extends EventContext {
 
   /**
    * Complete this {@link BaseEventContext} successfully with no result {@link CoreEvent}.
+   *
+   * @return {@link Publisher<Void>} that completes when response processing is complete.
    */
   void success();
 
@@ -37,6 +40,7 @@ public interface BaseEventContext extends EventContext {
    * Complete this {@link BaseEventContext} successfully with a result {@link CoreEvent}.
    *
    * @param event the result event.
+   * @return {@link Publisher<Void>} that completes when response processing is complete.
    */
   void success(CoreEvent event);
 
@@ -44,6 +48,7 @@ public interface BaseEventContext extends EventContext {
    * Complete this {@link BaseEventContext} unsuccessfully with an error.
    *
    * @param throwable the throwable.
+   * @return {@link Publisher<Void>} that completes when error processing is complete.
    */
   Publisher<Void> error(Throwable throwable);
 
@@ -85,43 +90,75 @@ public interface BaseEventContext extends EventContext {
   BaseEventContext getRootContext();
 
   /**
-   * A {@link Publisher} that completes when a response is ready or an error was produced for this {@link BaseEventContext} but
-   * importantly before the Response {@link Publisher} obtained via {@link #getResponsePublisher()} completes. This allows for
-   * response subscribers that are executed before the source, client or parent flow receives to be registered. In order to
-   * subscribe after response processing you can use the response {@link Publisher}.
-   * <p/>
-   * Any asynchronous processing initiated as part of processing the request {@link CoreEvent} maybe still be in process when this
-   * {@link Publisher} completes. The completion {@link Publisher} can be used to perform an action after all processing is
-   * complete.
-   *
-   * @return publisher that completes when this {@link BaseEventContext} instance has a response of error.
-   * @see #getResponsePublisher()
-   * @see #getCompletionPublisher()
+   * Use to determine if the event context is complete. A {@link EventContext} is considered terminated once:
+   * <ul>
+   * <li>The event context is complete</li>
+   * <li>Response consumer callbacks have been executed and response publisher subscribers signalled.</li>
+   * <li>The external completion publisher, if provided, is completed.</li>
+   * </ul>
+   * 
+   * Completion callback consumers are executed after event context completeness status is updated.
+   * 
+   * @return {@code true} if {@code this} context is complete.
    */
-  Publisher<CoreEvent> getBeforeResponsePublisher();
+  boolean isTerminated();
 
   /**
-   * A {@link Publisher} that completes when a response is ready or an error was produced for this {@link BaseEventContext}. Any
-   * subscribers registered before the response completes will be executed after the response has been processed by the source,
-   * client or parent flow. In order to subscribe before response processing you can use the before response {@link Publisher}.
+   * Use to determine if the event context is complete. A {@link EventContext} is considered complete once:
+   * <ul>
+   * <li>A response event/error is available.</li>
+   * <li>All child event contexts have completed.</li>
+   * </ul>
+   *
+   * @return {@code true} if {@code this} context is complete.
+   */
+  boolean isComplete();
+
+  /**
+   * Register a {@link BiConsumer} callback that will be executed, in order of registration, when this {@link EventContext}
+   * terminates.
+   * <p/>
+   * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
+   * 
+   * @param consumer callback to execute on event context completion.
+   * @throws NullPointerException if consumer is {@code null}
+   */
+  void onTerminated(BiConsumer<CoreEvent, Throwable> consumer);
+
+  /**
+   * Register a {@link BiConsumer} callback that will be executed, in order of registration, when this {@link EventContext}
+   * completes.
+   * <p/>
+   * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
+   * 
+   * @param consumer callback to execute on event context completion.
+   * @throws NullPointerException if consumer is {@code null}
+   */
+  void onComplete(BiConsumer<CoreEvent, Throwable> consumer);
+
+  /**
+   * Register a {@link BiConsumer} callback that will be executed, in order of registration, when a response event or error is
+   * available for this {@link EventContext}.
+   * <p/>
+   * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
+   *
+   * @param consumer callback to execute on event context response.
+   * @throws NullPointerException if consumer is {@code null}
+   */
+  void onResponse(BiConsumer<CoreEvent, Throwable> consumer);
+
+  /**
+   * A {@link Publisher} that completes when a response is ready or an error was produced for this {@link BaseEventContext}.
    * <p/>
    * Any asynchronous processing initiated as part of processing the request {@link CoreEvent} maybe still be in process when this
-   * {@link Publisher} completes. The completion {@link Publisher} can be used to perform an action after all processing is
-   * complete.
+   * {@link Publisher} completes. In order to be notified when all processing is complete use a {@link #onTerminated(BiConsumer)}
+   * callback.
+   * <p/>
+   * Response publisher subscribers are notified after execution of response callbacks registered via
+   * {@link #onResponse(BiConsumer)}.
    *
    * @return publisher that completes when this {@link BaseEventContext} instance has a response of error.
-   * @see #getBeforeResponsePublisher() ()
-   * @see #getCompletionPublisher()
    */
   Publisher<CoreEvent> getResponsePublisher();
-
-  /**
-   * A {@link Publisher} that completes when a this {@link BaseEventContext} and all child {@link BaseEventContext}'s have completed. In
-   * practice this means that this {@link Publisher} completes once all branches of execution have completed regardless of is they
-   * are synchronous or asynchronous. This {@link Publisher} will never complete with an error.
-   *
-   * @return publisher that completes when this {@link BaseEventContext} and all child context have completed.
-   */
-  Publisher<Void> getCompletionPublisher();
 
 }

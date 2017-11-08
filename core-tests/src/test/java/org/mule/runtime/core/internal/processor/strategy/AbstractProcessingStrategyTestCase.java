@@ -450,13 +450,18 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     setMuleContextIfNeeded(flow, muleContext);
     switch (mode) {
       case FLOW:
+        ((BaseEventContext) event.getContext()).onResponse((response, throwable) -> {
+          onSuccess.accept(response);
+          onError.accept(throwable);
+        });
         just(event).transform(flow).subscribe(requestUnbounded());
-        Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher()).doOnNext(onSuccess).doOnError(onError)
-            .subscribe();
+        break;
       case SOURCE:
+        ((BaseEventContext) event.getContext()).onResponse((response, throwable) -> {
+          onSuccess.accept(response);
+          onError.accept(throwable);
+        });
         just(event).transform(triggerableMessageSource.getListener()).subscribe(requestUnbounded());
-        Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher()).doOnNext(onSuccess).doOnError(onError)
-            .subscribe();
     }
   }
 
@@ -733,7 +738,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   public enum Mode {
     /**
-     * Test using {@link Flow#process(InternalEvent)}.
+     * Test using {@link Flow#process(CoreEvent)}.
      */
     FLOW,
     /**

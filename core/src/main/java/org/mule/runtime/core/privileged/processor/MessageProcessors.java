@@ -197,6 +197,7 @@ public class MessageProcessors {
 
   /**
    * Creates a new {@link BaseEventContext} which is child of the one in the given {@code event}
+   * 
    * @param event the parent event
    * @param componentLocation the location of the component creating the child context
    * @return a child {@link BaseEventContext}
@@ -250,7 +251,7 @@ public class MessageProcessors {
 
   private static Consumer<CoreEvent> completeSuccessIfNeeded(EventContext child, boolean complete) {
     return result -> {
-      if (!(from(((BaseEventContext) child).getResponsePublisher()).toFuture().isDone()) && complete) {
+      if (!((BaseEventContext) child).isComplete() && complete) {
         ((BaseEventContext) child).success(result);
       }
     };
@@ -258,7 +259,7 @@ public class MessageProcessors {
 
   private static Consumer<Throwable> completeErrorIfNeeded(EventContext child, boolean complete) {
     return throwable -> {
-      if (!(from(((BaseEventContext) child).getResponsePublisher()).toFuture().isDone()) && complete) {
+      if (!((BaseEventContext) child).isComplete() && complete) {
         ((BaseEventContext) child).error(throwable);
       }
     };
@@ -276,4 +277,5 @@ public class MessageProcessors {
     return locator.find(rootContainerLocation).filter(loc -> loc instanceof FlowConstruct)
         .map(loc -> ((FlowConstruct) loc).getProcessingStrategy());
   }
+
 }

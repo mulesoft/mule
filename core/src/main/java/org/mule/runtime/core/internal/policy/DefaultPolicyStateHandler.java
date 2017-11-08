@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static com.google.common.collect.Multimaps.synchronizedMultimap;
 import static java.util.Optional.ofNullable;
-import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
@@ -42,10 +42,9 @@ public class DefaultPolicyStateHandler implements PolicyStateHandler {
     return ofNullable(stateMap.get(identifier));
   }
 
-
   public void updateState(PolicyStateId identifier, CoreEvent lastStateEvent) {
-    from(((BaseEventContext) lastStateEvent.getContext()).getRootContext().getCompletionPublisher())
-        .subscribe(null, null, () -> destroyState(identifier.getExecutionIdentifier()));
+    ((BaseEventContext) lastStateEvent.getContext()).getRootContext()
+        .onTerminated((response, throwable) -> destroyState(identifier.getExecutionIdentifier()));
     stateMap.put(identifier, lastStateEvent);
     policyStateIdsByExecutionIdentifier.put(identifier.getExecutionIdentifier(), identifier);
   }
