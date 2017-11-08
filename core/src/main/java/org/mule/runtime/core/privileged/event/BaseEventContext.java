@@ -117,16 +117,22 @@ public interface BaseEventContext extends EventContext {
   /**
    * Register a {@link BiConsumer} callback that will be executed, in order of registration, when this {@link EventContext}
    * terminates.
+   * <p/>
+   * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
    * 
    * @param consumer callback to execute on event context completion.
+   * @throws NullPointerException if consumer is {@code null}
    */
   void onTerminated(BiConsumer<CoreEvent, Throwable> consumer);
 
   /**
    * Register a {@link BiConsumer} callback that will be executed, in order of registration, when this {@link EventContext}
    * completes.
-   *
+   * <p/>
+   * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
+   * 
    * @param consumer callback to execute on event context completion.
+   * @throws NullPointerException if consumer is {@code null}
    */
   void onComplete(BiConsumer<CoreEvent, Throwable> consumer);
 
@@ -134,9 +140,10 @@ public interface BaseEventContext extends EventContext {
    * Register a {@link BiConsumer} callback that will be executed, in order of registration, when a response event or error is
    * available for this {@link EventContext}.
    * <p/>
-   * These callbacks are executed before notifying response publisher subscribers.
-   * 
+   * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
+   *
    * @param consumer callback to execute on event context response.
+   * @throws NullPointerException if consumer is {@code null}
    */
   void onResponse(BiConsumer<CoreEvent, Throwable> consumer);
 

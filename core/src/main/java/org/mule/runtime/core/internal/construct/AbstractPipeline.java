@@ -30,8 +30,6 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -39,7 +37,6 @@ import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -55,7 +52,6 @@ import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrateg
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
-import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
@@ -272,14 +268,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       long startTime = currentTimeMillis();
 
       BaseEventContext baseEventContext = ((BaseEventContext) event.getContext());
-      Reference<Pair<CoreEvent, Throwable>> result = new Reference<>();
-      baseEventContext.onResponse((response, throwable) -> {
-        result.set(new Pair<>(response, throwable));
-      });
-
-      baseEventContext.onComplete((a, b) -> {
+      baseEventContext.onComplete((response, throwable) -> {
         MessagingException messagingException = null;
-        Throwable throwable = result.get().getSecond();
         if (throwable != null) {
           if (throwable instanceof MessagingException) {
             messagingException = (MessagingException) throwable;
@@ -287,7 +277,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             messagingException = new MessagingException(event, throwable, AbstractPipeline.this);
           }
         }
-        fireCompleteNotification(result.get().getFirst(), messagingException);
+        fireCompleteNotification(response, messagingException);
         baseEventContext.getProcessingTime().ifPresent(time -> time.addFlowExecutionBranchTime(startTime));
       });
     };

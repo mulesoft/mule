@@ -18,6 +18,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -25,15 +26,18 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Warmup;
+import reactor.core.publisher.MonoProcessor;
 
 @Warmup(iterations = 10)
 @Measurement(iterations = 10)
@@ -66,11 +70,6 @@ public class EventContextBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
-  public String createEventContextUUID() {
-    return flow.getUniqueIdString();
-  }
-
-  @Benchmark
   public EventContext createEventContext() {
     return create(id, severId, CONNECTOR_LOCATION, getInstance());
   }
@@ -81,7 +80,7 @@ public class EventContextBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
-  public Object[] createEventContextWithFlowSubscribeAndComplete() {
+  public Object[] createEventContextWithFlowAndComplete() {
     AtomicReference<CoreEvent> result = new AtomicReference();
     AtomicBoolean complete = new AtomicBoolean();
     BaseEventContext eventContext = (BaseEventContext) create(flow, CONNECTOR_LOCATION);
@@ -90,5 +89,20 @@ public class EventContextBenchmark extends AbstractBenchmark {
     eventContext.success(event);
     return new Object[] {result, complete};
   }
+
+  @Benchmark
+  public Object[] createEventContextWithFlowAndCompleteWithExternalCompletion() {
+    CompletableFuture<Void> completableFuture = new CompletableFuture<>();
+    AtomicReference<CoreEvent> result = new AtomicReference();
+    AtomicBoolean complete = new AtomicBoolean();
+    BaseEventContext eventContext = (BaseEventContext) create(flow, CONNECTOR_LOCATION, null, completableFuture);
+    from(from(eventContext.getResponsePublisher())).doOnSuccess(response -> result.set(response)).subscribe();
+    eventContext.onTerminated((response, throwable) -> complete.set(true));
+    eventContext.success(event);
+    completableFuture.complete(null);
+    return new Object[] {result, complete};
+  }
+
+
 
 }

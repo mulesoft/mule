@@ -12,7 +12,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
-import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -37,7 +36,6 @@ import java.util.function.Function;
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.MonoProcessor;
 
 /**
  * Abstract implementation of {@link ExecutableComponent}.
@@ -51,8 +49,8 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   @Override
   public final CompletableFuture<ExecutionResult> execute(InputEvent inputEvent) {
-    MonoProcessor monoProcessor = MonoProcessor.create();
-    CoreEvent.Builder builder = CoreEvent.builder(createEventContext(monoProcessor));
+    CompletableFuture completableFuture = new CompletableFuture();
+    CoreEvent.Builder builder = CoreEvent.builder(createEventContext(completableFuture));
     CoreEvent event = builder.message(inputEvent.getMessage())
         .error(inputEvent.getError().orElse(null))
         .variables(inputEvent.getVariables())
@@ -64,7 +62,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
           return new ComponentExecutionException(messagingExceptionEvent.getError().get().getCause(),
                                                  messagingExceptionEvent);
         })
-        .<ExecutionResult>map(result -> new ExecutionResultImplementation(result, monoProcessor))
+        .<ExecutionResult>map(result -> new ExecutionResultImplementation(result, completableFuture))
         .toFuture();
   }
 
@@ -75,7 +73,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
     if (event instanceof CoreEvent) {
       internalEvent = builder(child, (CoreEvent) event).build();
     } else {
-      internalEvent = CoreEvent.builder(createEventContext(empty()))
+      internalEvent = CoreEvent.builder(createEventContext(null))
           .message(event.getMessage())
           .error(event.getError().orElse(null))
           .variables(event.getVariables())
@@ -92,7 +90,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
         .toFuture();
   }
 
-  protected EventContext createEventContext(Publisher<Void> externalCompletionPublisher) {
+  protected EventContext createEventContext(CompletableFuture<Void> externalCompletionPublisher) {
     return create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation(), null, externalCompletionPublisher,
                   NullExceptionHandler.getInstance());
   }
@@ -103,7 +101,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   /**
    * Template method that allows to return a function to execute for this component. It may not be redefine by implementation of
-   * this class if they are already instances of {@link Function<Publisher<BaseEvent>, Publisher<InternalEvent>>}
+   * this class if they are already instances of {@link Function<Publisher<CoreEvent>, Publisher<InternalEvent>>}
    * 
    * @return an executable function. It must not be null.
    */
@@ -122,9 +120,9 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
   private static class ExecutionResultImplementation implements ExecutionResult {
 
     private Event result;
-    private MonoProcessor complete;
+    private CompletableFuture<Void> complete;
 
-    private ExecutionResultImplementation(Event result, MonoProcessor complete) {
+    private ExecutionResultImplementation(Event result, CompletableFuture<Void> complete) {
       this.result = result;
       this.complete = complete;
     }
@@ -135,7 +133,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
     @Override
     public void complete() {
-      complete.onComplete();
+      complete.complete(null);
     }
   }
 

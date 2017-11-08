@@ -12,9 +12,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.internal.event.DefaultEventContext;
 
-import org.reactivestreams.Publisher;
-
-import reactor.core.publisher.Mono;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Factory interface for creating a new {@link EventContext}
@@ -46,6 +44,7 @@ public interface EventContextFactory {
 
   /**
    * Builds a new execution context with the given parameters.
+   * 
    * @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
@@ -58,6 +57,7 @@ public interface EventContextFactory {
 
   /**
    * Builds a new execution context with the given parameters and an empty publisher.
+   * 
    * @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
@@ -79,12 +79,13 @@ public interface EventContextFactory {
    *        {@link EventContext} to depend on completion of source.
    */
   static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId,
-                             Publisher<Void> externalCompletionPublisher) {
+                             CompletableFuture<Void> externalCompletionPublisher) {
     return new DefaultEventContext(flow, location, correlationId, externalCompletionPublisher);
   }
 
   /**
    * Builds a new execution context with the given parameters.
+   * 
    * @param id the unique id for this event context.
    * @param location the location of the component that received the first message for this context.
    * @param correlationId See {@link EventContext#getCorrelationId()}.
@@ -93,7 +94,7 @@ public interface EventContextFactory {
    * @param exceptionHandler the exception handler that will deal with an error context
    */
   static EventContext create(String id, String serverId, ComponentLocation location, String correlationId,
-                             Publisher<Void> externalCompletionPublisher,
+                             CompletableFuture<Void> externalCompletionPublisher,
                              FlowExceptionHandler exceptionHandler) {
     return new DefaultEventContext(id, serverId, location, correlationId, externalCompletionPublisher, exceptionHandler);
   }

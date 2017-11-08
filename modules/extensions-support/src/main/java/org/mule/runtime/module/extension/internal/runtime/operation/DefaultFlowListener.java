@@ -103,7 +103,7 @@ public class DefaultFlowListener implements FlowListener {
           onComplete.run();
         } catch (Exception e) {
           LOGGER.warn("Operation " + operationModel.getName() + " from extension " + extensionModel.getName()
-              + " threw exception while executing the onTerminated FlowListener", e);
+              + " threw exception while executing the onComplete FlowListener", e);
         }
       }
     }

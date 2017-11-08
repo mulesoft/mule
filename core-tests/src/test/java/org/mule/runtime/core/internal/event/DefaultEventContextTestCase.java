@@ -36,6 +36,7 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.Defaul
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -52,7 +53,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import reactor.core.publisher.MonoProcessor;
 
 @Feature(EVENT_CONTEXT)
 @Story(RESPONSE_AND_COMPLETION_PUBLISHERS)
@@ -63,7 +63,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   public ExpectedException expectedException = ExpectedException.none();
 
   private Supplier<DefaultEventContext> context;
-  private Function<MonoProcessor<Void>, BaseEventContext> contextWithCompletion;
+  private Function<CompletableFuture<Void>, BaseEventContext> contextWithCompletion;
   private Function<ComponentLocation, BaseEventContext> contextWithComponentLocation;
 
   private BaseEventContext parent;
@@ -80,7 +80,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
 
   public DefaultEventContextTestCase(Supplier<DefaultEventContext> context,
-                                     Function<MonoProcessor<Void>, BaseEventContext> contextWithCompletion,
+                                     Function<CompletableFuture<Void>, BaseEventContext> contextWithCompletion,
                                      Function<ComponentLocation, BaseEventContext> contextWithComponentLocation) {
     this.context = context;
     this.contextWithCompletion = contextWithCompletion;
@@ -121,23 +121,23 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     return asList(new Object[][] {
         {
             (CheckedSupplier<EventContext>) () -> create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION),
-            (CheckedFunction<MonoProcessor<Void>, EventContext>) externalCompletion -> create(getTestFlow(muleContext),
-                                                                                              TEST_CONNECTOR_LOCATION,
-                                                                                              null,
-                                                                                              externalCompletion),
+            (CheckedFunction<CompletableFuture<Void>, EventContext>) externalCompletion -> create(getTestFlow(muleContext),
+                                                                                                  TEST_CONNECTOR_LOCATION,
+                                                                                                  null,
+                                                                                                  externalCompletion),
             (CheckedFunction<ComponentLocation, EventContext>) location -> create(getTestFlow(muleContext), location)
         },
         {
             (CheckedSupplier<EventContext>) () -> create("id", DefaultEventContextTestCase.class.getName(),
                                                          TEST_CONNECTOR_LOCATION, NullExceptionHandler.getInstance()),
-            (CheckedFunction<MonoProcessor<Void>, EventContext>) externalCompletion -> create("id",
-                                                                                              DefaultEventContextTestCase.class
-                                                                                                  .getName(),
-                                                                                              TEST_CONNECTOR_LOCATION,
-                                                                                              null,
-                                                                                              externalCompletion,
-                                                                                              NullExceptionHandler
-                                                                                                  .getInstance()),
+            (CheckedFunction<CompletableFuture<Void>, EventContext>) externalCompletion -> create("id",
+                                                                                                  DefaultEventContextTestCase.class
+                                                                                                      .getName(),
+                                                                                                  TEST_CONNECTOR_LOCATION,
+                                                                                                  null,
+                                                                                                  externalCompletion,
+                                                                                                  NullExceptionHandler
+                                                                                                      .getInstance()),
             (CheckedFunction<ComponentLocation, EventContext>) location -> create("id",
                                                                                   DefaultEventContextTestCase.class
                                                                                       .getName(),
@@ -279,15 +279,13 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
         return null;
       });
 
+      assertParent(is(nullValue()), is(nullValue()), false, false);
+
       parent.success(event);
-
-      assertParent(is(event), is(nullValue()), false, false);
-
       latch1.await();
 
       assertChild(is(event), is(nullValue()), true);
       assertParent(is(event), is(nullValue()), true, true);
-
     } finally {
       testScheduler.stop();
     }
@@ -380,7 +378,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Test
   @Description("EventContext response publisher completes with value of result but the completion publisher only completes once the external publisher completes.")
   public void externalCompletionSuccess() throws Exception {
-    MonoProcessor<Void> externalCompletion = MonoProcessor.create();
+    CompletableFuture<Void> externalCompletion = new CompletableFuture<>();
     parent = contextWithCompletion.apply(externalCompletion);
     setupParentListeners(parent);
 
@@ -390,14 +388,14 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
     assertParent(is(event), is(nullValue()), true, false);
 
-    externalCompletion.onComplete();
+    externalCompletion.complete(null);
     assertThat(parent.isTerminated(), is(true));
   }
 
   @Test
   @Description("EventContext response publisher completes with error but the completion publisher only completes once the external publisher completes.")
   public void externalCompletionError() throws Exception {
-    MonoProcessor<Void> externalCompletion = MonoProcessor.create();
+    CompletableFuture<Void> externalCompletion = new CompletableFuture<>();
     parent = contextWithCompletion.apply(externalCompletion);
     setupParentListeners(parent);
 
@@ -407,14 +405,14 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
     assertParent(is(nullValue()), is(exception), true, false);
 
-    externalCompletion.onComplete();
+    externalCompletion.complete(null);
     assertThat(parent.isTerminated(), is(true));
   }
 
   @Test
   @Description("Parent EventContext only completes once response publisher completes with a value and all child contexts are complete and external completion completes.")
   public void externalCompletionWithChild() throws Exception {
-    MonoProcessor<Void> externalCompletion = MonoProcessor.create();
+    CompletableFuture<Void> externalCompletion = new CompletableFuture<>();
     parent = contextWithCompletion.apply(externalCompletion);
     setupParentListeners(parent);
     child = addChild(parent);
@@ -430,7 +428,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
     assertParent(is(event), is(nullValue()), true, false);
 
-    externalCompletion.onComplete();
+    externalCompletion.complete(null);
     assertThat(parent.isTerminated(), is(true));
   }
 

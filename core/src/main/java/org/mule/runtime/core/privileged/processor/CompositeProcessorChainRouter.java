@@ -8,6 +8,7 @@ package org.mule.runtime.core.privileged.processor;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
@@ -25,6 +26,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -63,13 +65,14 @@ public class CompositeProcessorChainRouter extends AbstractExecutableComponent i
     return (event, processorChain) -> {
       Latch completionLatch = new Latch();
       BaseEventContext childContext = child((BaseEventContext) event.getContext(), ofNullable(getLocation()));
-      childContext.onTerminated((response, throwable) -> completionLatch.countDown());
+      childContext.onComplete((response, throwable) -> completionLatch.countDown());
       CoreEvent result = from(processWithChildContext(event, processorChain, childContext)).block();
       // Block until all child contexts are complete
       try {
         completionLatch.await();
       } catch (InterruptedException e) {
-        throw new MuleRuntimeException(e);
+        throw new MuleRuntimeException(createStaticMessage("Thread interrupted waiting for child processor chains to complete.",
+                                                           e));
       }
       return result;
     };
