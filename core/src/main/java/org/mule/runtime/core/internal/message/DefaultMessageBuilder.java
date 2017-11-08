@@ -368,9 +368,6 @@ public class DefaultMessageBuilder
 
     private transient TypedValue typedValue;
     private TypedValue typedAttributes;
-
-    private String privateField = "PRIVATE FIELD";
-
     private Map<String, TypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>();
     private Map<String, TypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>();
 
