@@ -24,7 +24,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-import static reactor.core.publisher.Mono.subscriberContext;
+import static reactor.core.publisher.Operators.lift;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
@@ -49,6 +49,7 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -63,8 +64,10 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
@@ -150,20 +153,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     // #1 Update TCCL with the one from the Region of the processor to execute
     interceptors.add((processor, next) -> stream -> from(stream)
-        .zipWith(subscriberContext()
-            .map(ctx -> ctx.getOrEmpty(TCCL_REACTOR_CTX_KEY)))
-        .doOnNext(t -> {
-          t.getT2().ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl));
-        })
-        .map(t -> t.getT1())
+        .transform(doOnNextOrErrorWithContext(context -> context.getOrEmpty(TCCL_REACTOR_CTX_KEY)
+            .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl))))
         .transform(next)
-
-        .doOnEach(signal -> {
-          if (signal.isOnError() || signal.isOnNext()) {
-            subscriberContext().map(ctx -> ctx.getOrEmpty(TCCL_ORIGINAL_REACTOR_CTX_KEY))
-                .doOnNext(cl -> cl.ifPresent(cl2 -> currentThread().setContextClassLoader((ClassLoader) cl2)));
-          }
-        }));
+        .transform(doOnNextOrErrorWithContext(context -> context.getOrEmpty(TCCL_ORIGINAL_REACTOR_CTX_KEY)
+            .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl)))));
 
     // #2 Update MessagingException with failing processor if required, create Error and set error context.
     interceptors.add((processor, next) -> stream -> from(stream)
@@ -248,6 +242,38 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                 .then(Mono.empty()))));
 
     return interceptors;
+  }
+
+  private Function<? super Publisher<CoreEvent>, ? extends Publisher<CoreEvent>> doOnNextOrErrorWithContext(Consumer<Context> contextConsumer) {
+    return lift((scannable, subscriber) -> new CoreSubscriber<CoreEvent>() {
+
+      @Override
+      public void onNext(CoreEvent event) {
+        contextConsumer.accept(subscriber.currentContext());
+        subscriber.onNext(event);
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        contextConsumer.accept(subscriber.currentContext());
+        subscriber.onError(throwable);
+      }
+
+      @Override
+      public void onComplete() {
+        subscriber.onComplete();
+      }
+
+      @Override
+      public Context currentContext() {
+        return subscriber.currentContext();
+      }
+
+      @Override
+      public void onSubscribe(Subscription s) {
+        subscriber.onSubscribe(s);
+      }
+    });
   }
 
   private MessagingException resolveException(Component processor, CoreEvent event, Throwable throwable) {
