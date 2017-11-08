@@ -46,7 +46,6 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   public static final String SERVER = "server";
   public static final String MULE = "mule";
   public static final String APP = "app";
-  private static final String REGISTRY = "registry";
 
   private ExpressionLanguage expressionExecutor;
   private MuleContext muleContext;
@@ -72,7 +71,6 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     contextBuilder
         .addBinding(APP, new TypedValue<>(new DataWeaveArtifactContext(muleContext, registry),
                                           fromType(DataWeaveArtifactContext.class)));
-    contextBuilder.addBinding(REGISTRY, TypedValue.of(registry));
     addGlobalBindings(contextBuilder.build());
   }
 
