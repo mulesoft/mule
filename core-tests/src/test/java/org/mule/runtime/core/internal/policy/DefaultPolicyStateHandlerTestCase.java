@@ -12,15 +12,17 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.function.BiConsumer;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
 
 public class DefaultPolicyStateHandlerTestCase extends AbstractMuleTestCase {
 
@@ -71,14 +73,14 @@ public class DefaultPolicyStateHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void destroyStateWhenEventIsCompleted() {
     PolicyStateId policyStateExecutionId = new PolicyStateId(TEST_EXECUTION_ID, TEST_POLICY_ID);
-    Reference<Subscriber> subscriberReference = new Reference<>();
-    Publisher<Void> completionPublisher = eventTestExecutionId.getContext().getRootContext().getCompletionPublisher();
+    Reference<BiConsumer> subscriberReference = new Reference<>();
+    BaseEventContext rootEventContext = eventTestExecutionId.getContext().getRootContext();
     Mockito.doAnswer(invocationOnMock -> {
-      subscriberReference.set((Subscriber) invocationOnMock.getArguments()[0]);
+      subscriberReference.set((BiConsumer) invocationOnMock.getArguments()[0]);
       return null;
-    }).when(completionPublisher).subscribe(any(Subscriber.class));
+    }).when(rootEventContext).onTerminated(any(BiConsumer.class));
     defaultPolicyStateHandler.updateState(policyStateExecutionId, eventTestExecutionId);
-    subscriberReference.get().onComplete();
+    subscriberReference.get().accept(null, null);
     assertThat(defaultPolicyStateHandler.getLatestState(policyStateExecutionId).isPresent(), is(false));
     assertThat(defaultPolicyStateHandler.policyStateIdsByExecutionIdentifier
         .containsKey(policyStateExecutionId.getExecutionIdentifier()), is(false));

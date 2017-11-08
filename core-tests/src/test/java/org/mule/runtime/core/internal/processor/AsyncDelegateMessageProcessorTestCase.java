@@ -7,10 +7,10 @@
 package org.mule.runtime.core.internal.processor;
 
 import static java.lang.Thread.currentThread;
-import static java.time.Duration.ofMillis;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.locks.LockSupport.parkNanos;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -25,7 +25,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
-import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -95,7 +94,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     // Complete parent context so we can assert event context completion based on async completion.
     ((BaseEventContext) request.getContext()).success(result);
 
-    assertCompletionNotDone((BaseEventContext) request.getContext());
+    assertThat(((BaseEventContext) request.getContext()).isTerminated(), is(false));
 
     // Permit async processing now we have already asserted that response alone is not enough to complete event context.
     asyncEntryLatch.countDown();
@@ -103,17 +102,25 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
 
     // Block until async completes, not just target processor.
-    from(((BaseEventContext) target.sensedEvent.getContext()).getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
+    while (!((BaseEventContext) target.sensedEvent.getContext()).isTerminated()) {
+      park100ns();
+    }
     assertThat(target.sensedEvent, notNullValue());
 
     // Block to ensure async fully completes before testing state
-    from(((BaseEventContext) request.getContext()).getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
+    while (!((BaseEventContext) request.getContext()).isTerminated()) {
+      park100ns();
+    }
 
-    assertCompletionDone((BaseEventContext) target.sensedEvent.getContext());
-    assertCompletionDone((BaseEventContext) request.getContext());
+    assertThat(((BaseEventContext) target.sensedEvent.getContext()).isTerminated(), is(true));
+    assertThat(((BaseEventContext) request.getContext()).isTerminated(), is(true));
 
     assertTargetEvent(request);
     assertResponse(result);
+  }
+
+  private void park100ns() {
+    parkNanos(100);
   }
 
   @Test
@@ -178,14 +185,6 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     mp.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(mp, true, muleContext);
     return mp;
-  }
-
-  private void assertCompletionDone(BaseEventContext parent) {
-    assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
-  }
-
-  private void assertCompletionNotDone(BaseEventContext child1) {
-    assertThat(from(child1.getCompletionPublisher()).toFuture().isDone(), is(false));
   }
 
   class TestListener implements Processor {

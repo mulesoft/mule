@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.streaming;
 
 import static java.util.Collections.newSetFromMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -135,7 +134,7 @@ public class CursorManager {
    * cursors concurrently.
    */
   private void registerEventContext(BaseEventContext eventContext) {
-    from(eventContext.getCompletionPublisher()).subscribe(null, null, () -> terminated(eventContext));
+    eventContext.onTerminated((response, throwable) -> terminated(eventContext));
   }
 
   private class EventStreamingState {

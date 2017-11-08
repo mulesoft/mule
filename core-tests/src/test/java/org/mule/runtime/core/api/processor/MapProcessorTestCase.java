@@ -149,6 +149,6 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
 
       // If there are no assertion errors, the actual throwable will be ignored
       return Mono.empty();
-    }).toProcessor().block();
+    }).block();
   }
 }

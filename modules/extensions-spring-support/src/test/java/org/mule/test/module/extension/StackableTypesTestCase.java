@@ -96,7 +96,8 @@ public class StackableTypesTestCase extends AbstractParameterResolverTestCase {
   @Test
   public void parameterResolverOfTypedValueOnOperation() throws Exception {
     ParameterResolver<TypedValue<InputStream>> lazyValue =
-        (ParameterResolver<TypedValue<InputStream>>) flowRunner("parameterResolverOfTypedValueOnOperation").run().getMessage()
+        (ParameterResolver<TypedValue<InputStream>>) flowRunner("parameterResolverOfTypedValueOnOperation")
+            .run().getMessage()
             .getPayload().getValue();
     TypedValue<InputStream> resolve = lazyValue.resolve();
     InputStream jsonValue = resolve.getValue();

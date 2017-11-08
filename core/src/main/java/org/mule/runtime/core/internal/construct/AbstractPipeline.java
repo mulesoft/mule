@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Un
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
-import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.empty;
@@ -63,6 +62,7 @@ import org.reactivestreams.Publisher;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import reactor.core.publisher.Mono;
@@ -213,15 +213,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     if (source.getBackPressureStrategy() == WAIT) {
       // If back-pressure strategy is WAIT then use blocking `accept(Event event)` to dispatch Event
       return publisher -> from(publisher)
-          .doOnNext(event -> {
+          .flatMap(event -> {
             try {
               sink.accept(event);
             } catch (RejectedExecutionException ree) {
               MessagingException me = new MessagingException(event, ree, this);
               ((BaseEventContext) event.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
             }
-          })
-          .flatMap(event -> Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher()));
+            return ((BaseEventContext) event.getContext()).getResponsePublisher();
+          });
     } else {
       // If back-pressure strategy is FAIL/DROP then using back-pressure aware `accept(Event event)` to dispatch Event
       return publisher -> from(publisher).flatMap(event -> {
@@ -267,18 +267,19 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
       long startTime = currentTimeMillis();
 
-      // Fire COMPLETE notification on async response
-      Mono.from(((BaseEventContext) event.getContext()).getBeforeResponsePublisher())
-          .doOnSuccess(result -> fireCompleteNotification(result, null))
-          .doOnError(MessagingException.class, messagingException -> fireCompleteNotification(null, messagingException))
-          .doOnError(throwable -> !(throwable instanceof MessagingException),
-                     throwable -> fireCompleteNotification(null, new MessagingException(event, throwable,
-                                                                                        AbstractPipeline.this))
-
-          )
-          .doOnSuccessOrError((result, throwable) -> ((BaseEventContext) event.getContext()).getProcessingTime()
-              .ifPresent(time -> time.addFlowExecutionBranchTime(startTime)))
-          .subscribe(requestUnbounded());
+      BaseEventContext baseEventContext = ((BaseEventContext) event.getContext());
+      baseEventContext.onComplete((response, throwable) -> {
+        MessagingException messagingException = null;
+        if (throwable != null) {
+          if (throwable instanceof MessagingException) {
+            messagingException = (MessagingException) throwable;
+          } else {
+            messagingException = new MessagingException(event, throwable, AbstractPipeline.this);
+          }
+        }
+        fireCompleteNotification(response, messagingException);
+        baseEventContext.getProcessingTime().ifPresent(time -> time.addFlowExecutionBranchTime(startTime));
+      });
     };
   }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.functional.api.flow;
 
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -24,13 +25,13 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.mockito.Mockito;
-import org.reactivestreams.Publisher;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import javax.activation.DataHandler;
@@ -59,7 +60,7 @@ public class TestEventBuilder {
   private Function<Message, Message> spyMessage = input -> input;
   private Function<CoreEvent, CoreEvent> spyEvent = input -> input;
 
-  private Publisher<Void> externalCompletionCallback = null;
+  private CompletableFuture<Void> externalCompletionCallback;
 
   /**
    * Prepares the given data to be sent as the payload of the product.
@@ -245,7 +246,7 @@ public class TestEventBuilder {
     return this;
   }
 
-  public TestEventBuilder setExternalCompletionCallback(Publisher<Void> externalCompletionCallback) {
+  public TestEventBuilder setExternalCompletionCallback(CompletableFuture<Void> externalCompletionCallback) {
     this.externalCompletionCallback = externalCompletionCallback;
     return this;
   }
@@ -271,7 +272,7 @@ public class TestEventBuilder {
 
     EventContext eventContext;
     if (externalCompletionCallback != null) {
-      eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId, externalCompletionCallback);
+      eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId, of(externalCompletionCallback));
     } else {
       eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId);
     }

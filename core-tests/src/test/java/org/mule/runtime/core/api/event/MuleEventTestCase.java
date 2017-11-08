@@ -6,23 +6,17 @@
  */
 package org.mule.runtime.core.api.event;
 
-import static java.time.Duration.ofMillis;
 import static java.util.Collections.singletonMap;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
-import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.security.Authentication;
@@ -34,17 +28,10 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
-import org.mule.runtime.core.internal.util.SerializationUtils;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
@@ -52,10 +39,13 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 
 public class MuleEventTestCase extends AbstractMuleContextTestCase {
-
-  private static String TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE = "Timeout on Mono blocking read";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -190,30 +180,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertEquals("bar", event.getVariables().get("foo").getValue());
 
     assertEquals("bar2", copy.getVariables().get("foo").getValue());
-  }
-
-  @Test
-  public void eventContextSerializationNoPipelinePublisherLost() throws Exception {
-
-    CoreEvent result = testEvent();
-    CoreEvent before = testEvent();
-
-    // Remove Flow to simulate deserialization when Flow is not available
-    ((MuleContextWithRegistries) muleContext).getRegistry().unregisterObject(APPLE_FLOW);
-
-    CoreEvent after =
-        (CoreEvent) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before),
-                                                   muleContext);
-
-    ((BaseEventContext) after.getContext()).success(result);
-
-    assertThat(before.getContext().getId(), equalTo(after.getContext().getId()));
-
-    // Publisher is not conserved after serialization due to null FlowConstruct so attempting to obtain result via before event
-    // fails with timeout.
-    expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage(startsWith(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
-    from(((BaseEventContext) before.getContext()).getResponsePublisher()).block(ofMillis(BLOCK_TIMEOUT));
   }
 
   @Test

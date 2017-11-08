@@ -30,10 +30,9 @@ import org.mule.tck.processor.FlowAssert;
 
 import org.hamcrest.Matcher;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
-
-import reactor.core.publisher.MonoProcessor;
 
 /**
  * Provides a fluent API for running events through flows.
@@ -50,7 +49,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
 
   private Scheduler scheduler;
 
-  private MonoProcessor externalCompletionCallback = MonoProcessor.create();
+  private CompletableFuture<Void> externalCompletionCallback = new CompletableFuture<>();
 
   /**
    * Initializes this flow runner.
@@ -333,6 +332,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
       scheduler.stop();
     }
 
-    externalCompletionCallback.onComplete();
+    externalCompletionCallback.complete(null);
   }
 }

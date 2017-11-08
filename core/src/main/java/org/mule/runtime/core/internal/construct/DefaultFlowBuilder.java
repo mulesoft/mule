@@ -51,6 +51,7 @@ import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.RejectedExecutionException;
 
 import reactor.core.publisher.Mono;
@@ -326,8 +327,8 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     @Override
-    protected EventContext createEventContext(Publisher<Void> externalCompletionPublisher) {
-      return create(this, getLocation(), null, externalCompletionPublisher);
+    protected EventContext createEventContext(Optional<CompletableFuture<Void>> externalCompletion) {
+      return create(this, getLocation(), null, externalCompletion);
     }
 
     @Override

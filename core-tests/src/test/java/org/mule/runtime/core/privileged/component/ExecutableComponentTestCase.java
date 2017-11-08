@@ -54,11 +54,10 @@ public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
     assertThat(componentInEvent.get().getContext(), equalTo(response.getContext()));
 
     BaseEventContext eventContext = (BaseEventContext) componentInEvent.get().getContext();
-    assertThat(from(eventContext.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(eventContext.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertThat(eventContext.isTerminated(), is(false));
 
     executionResult.complete();
-    assertThat(from(eventContext.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertThat(eventContext.isTerminated(), is(true));
   }
 
   @Test
@@ -69,21 +68,17 @@ public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
     assertThat(response.getMessage(), equalTo(responseMessage));
 
     assertThat(componentInEvent.get().getContext(), not(equalTo(response.getContext())));
-    assertThat(from(((BaseEventContext) componentInEvent.get().getContext()).getResponsePublisher()).toFuture().isDone(),
-               is(true));
-    assertThat(from(((BaseEventContext) response.getContext()).getResponsePublisher()).toFuture().isDone(), is(false));
+    assertThat(((BaseEventContext) componentInEvent.get().getContext()).isTerminated(), is(true));
+    assertThat(((BaseEventContext) response.getContext()).isTerminated(), is(false));
 
     BaseEventContext childContext = (BaseEventContext) componentInEvent.get().getContext();
-    assertThat(from(childContext.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(childContext.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertThat(childContext.isTerminated(), is(true));
 
     BaseEventContext parentContext = (BaseEventContext) testEvent().getContext();
-    assertThat(from(parentContext.getResponsePublisher()).toFuture().isDone(), is(false));
-    assertThat(from(parentContext.getCompletionPublisher()).toFuture().isDone(), is(false));
+    assertThat(parentContext.isTerminated(), is(false));
 
     ((BaseEventContext) testEvent().getContext()).success();
-    assertThat(from(parentContext.getResponsePublisher()).toFuture().isDone(), is(true));
-    assertThat(from(parentContext.getCompletionPublisher()).toFuture().isDone(), is(true));
+    assertThat(parentContext.isTerminated(), is(true));
   }
 
 
