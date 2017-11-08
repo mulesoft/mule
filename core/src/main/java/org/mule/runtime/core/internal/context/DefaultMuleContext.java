@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATIO
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
@@ -80,6 +81,7 @@ import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
+import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -95,7 +97,6 @@ import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
-import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.config.ClusterConfiguration;
@@ -123,9 +124,9 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 
-import org.slf4j.Logger;
-
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -133,6 +134,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
+import org.slf4j.Logger;
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistries, PrivilegedMuleContext {
@@ -238,6 +240,8 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
   private Properties deploymentProperties;
 
+  private List<MuleContextListener> listeners = new ArrayList<>();
+
   private LifecycleInterceptor lifecycleInterceptor = new MuleLifecycleInterceptor();
 
   @Inject
@@ -288,6 +292,8 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
         fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISING));
         getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
         fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISED));
+        listeners.forEach(l -> l.onInitialization(this, getApiRegistry()));
+
 
         initialiseIfNeeded(getExceptionListener(), true, this);
 
@@ -325,6 +331,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
       startMessageSources();
 
       fireNotification(new MuleContextNotification(this, CONTEXT_STARTED));
+      listeners.forEach(l -> l.onStart(this, getApiRegistry()));
 
       startLatch.release();
 
@@ -377,6 +384,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
       fireNotification(new MuleContextNotification(this, CONTEXT_STOPPING));
       getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
       fireNotification(new MuleContextNotification(this, CONTEXT_STOPPED));
+      listeners.forEach(l -> l.onStop(this, getApiRegistry()));
     }
   }
 
@@ -1074,5 +1082,13 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
    */
   public void setDeploymentProperties(Properties deploymentProperties) {
     this.deploymentProperties = deploymentProperties;
+  }
+
+  public void setListeners(List<MuleContextListener> listeners) {
+    this.listeners = listeners;
+  }
+
+  private org.mule.runtime.api.artifact.Registry getApiRegistry() {
+    return getRegistry().lookupObject(OBJECT_REGISTRY);
   }
 }

@@ -35,5 +35,12 @@ public class MuleContextDeploymentListener implements MuleContextListener {
   }
 
   @Override
-  public void onConfiguration(MuleContext context) {}
+  public void onStart(MuleContext context, Registry registry) {
+    deploymentListener.onArtifactStarted(appName, registry);
+  }
+
+  @Override
+  public void onStop(MuleContext context, Registry registry) {
+    deploymentListener.onArtifactStopped(appName, registry);
+  }
 }
