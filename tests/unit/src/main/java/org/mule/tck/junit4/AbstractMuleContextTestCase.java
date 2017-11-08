@@ -28,7 +28,6 @@ import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -59,12 +58,6 @@ import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
-
 import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
@@ -76,6 +69,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
@@ -316,23 +315,25 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   @After
   public final void disposeContextPerTest() throws Exception {
-    doTearDown();
+    try {
+      doTearDown();
+    } finally {
+      if (!isDisposeContextPerClass()) {
+        if (isStartContext() && muleContext != null && muleContext.isStarted()) {
+          muleContext.stop();
+        }
 
-    if (!isDisposeContextPerClass()) {
-      if (isStartContext() && muleContext != null && muleContext.isStarted()) {
-        muleContext.stop();
+        disposeContext();
+        if (testServicesConfigurationBuilder != null) {
+          testServicesConfigurationBuilder.stopServices();
+        }
+        doTearDownAfterMuleContextDispose();
       }
 
-      disposeContext();
-      if (testServicesConfigurationBuilder != null) {
-        testServicesConfigurationBuilder.stopServices();
-      }
-      doTearDownAfterMuleContextDispose();
+      // When an Assumption fails then junit doesn't call @Before methods so we need to avoid
+      // executing delete if there's no root folder.
+      workingDirectory.delete();
     }
-
-    // When an Assumption fails then junit doesn't call @Before methods so we need to avoid
-    // executing delete if there's no root folder.
-    workingDirectory.delete();
   }
 
   protected void doTearDownAfterMuleContextDispose() throws Exception {}
