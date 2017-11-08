@@ -79,6 +79,30 @@
             <id>mbuchwald</id>
             <name>Martin Buchwald</name>
         </developer>
+        <developer>
+            <id>alegmarra</id>
+            <name>Alejandro Garcia Marra</name>
+        </developer>
+        <developer>
+            <id>estebanwasinger</id>
+            <name>Esteban Wasinger</name>
+        </developer>
+        <developer>
+            <id>juandesi</id>
+            <name>Juan Desimoni</name>
+        </developer>
+        <developer>
+            <id>ndinu</id>
+            <name>Nicolas Di Nucci</name>
+        </developer>
+        <developer>
+            <id>fsgonz</id>
+            <name>Fabian Gonzalez</name>
+        </developer>
+        <developer>
+            <id>lucianoRM</id>
+            <name>Luciano Raineri Marchina</name>
+        </developer>
     </developers>
     <contributors>
         <!-- Refer to https://github.com/mulesoft/mule/graphs/contributors -->
