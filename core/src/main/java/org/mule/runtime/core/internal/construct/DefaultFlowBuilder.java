@@ -254,7 +254,7 @@ public class DefaultFlowBuilder implements Builder {
               MessagingException me = new MessagingException(event, ree, this);
               ((BaseEventContext) request.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
             }
-            return Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher())
+            return Mono.from(((BaseEventContext) request.getContext()).getResponsePublisher())
                 .cast(PrivilegedEvent.class)
                 .map(r -> {
                   CoreEvent result = createReturnEventForParentFlowConstruct(r, (InternalEvent) event);
@@ -327,8 +327,8 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     @Override
-    protected EventContext createEventContext(CompletableFuture<Void> externalCompletionPublisher) {
-      return create(this, getLocation(), null, externalCompletionPublisher);
+    protected EventContext createEventContext(Optional<CompletableFuture<Void>> externalCompletion) {
+      return create(this, getLocation(), null, externalCompletion);
     }
 
     @Override

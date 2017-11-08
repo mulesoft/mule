@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.event;
 
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -54,6 +55,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+/**
+ * TODO MULE-14000 Create hamcrest matchers to assert EventContext state
+ */
 @Feature(EVENT_CONTEXT)
 @Story(RESPONSE_AND_COMPLETION_PUBLISHERS)
 @RunWith(Parameterized.class)
@@ -124,7 +128,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
             (CheckedFunction<CompletableFuture<Void>, EventContext>) externalCompletion -> create(getTestFlow(muleContext),
                                                                                                   TEST_CONNECTOR_LOCATION,
                                                                                                   null,
-                                                                                                  externalCompletion),
+                                                                                                  of(externalCompletion)),
             (CheckedFunction<ComponentLocation, EventContext>) location -> create(getTestFlow(muleContext), location)
         },
         {
@@ -135,7 +139,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
                                                                                                       .getName(),
                                                                                                   TEST_CONNECTOR_LOCATION,
                                                                                                   null,
-                                                                                                  externalCompletion,
+                                                                                                  of(externalCompletion),
                                                                                                   NullExceptionHandler
                                                                                                       .getInstance()),
             (CheckedFunction<ComponentLocation, EventContext>) location -> create("id",

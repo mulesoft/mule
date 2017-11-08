@@ -67,11 +67,11 @@ public class CompositeProcessorChainRouter extends AbstractExecutableComponent i
       BaseEventContext childContext = child((BaseEventContext) event.getContext(), ofNullable(getLocation()));
       childContext.onComplete((response, throwable) -> completionLatch.countDown());
       CoreEvent result = from(processWithChildContext(event, processorChain, childContext)).block();
-      // Block until all child contexts are complete
       try {
+        // Block until all child contexts are complete
         completionLatch.await();
       } catch (InterruptedException e) {
-        throw new MuleRuntimeException(createStaticMessage("Thread interrupted waiting for child processor chains to complete.",
+        throw new MuleRuntimeException(createStaticMessage("Thread interrupted waiting for child processor chain to complete.",
                                                            e));
       }
       return result;

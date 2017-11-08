@@ -103,13 +103,13 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
     // Block until async completes, not just target processor.
     while (!((BaseEventContext) target.sensedEvent.getContext()).isTerminated()) {
-      parkNanos(100);
+      park100ns();
     }
     assertThat(target.sensedEvent, notNullValue());
 
     // Block to ensure async fully completes before testing state
     while (!((BaseEventContext) request.getContext()).isTerminated()) {
-      parkNanos(100);
+      park100ns();
     }
 
     assertThat(((BaseEventContext) target.sensedEvent.getContext()).isTerminated(), is(true));
@@ -117,6 +117,10 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
     assertTargetEvent(request);
     assertResponse(result);
+  }
+
+  private void park100ns() {
+    parkNanos(100);
   }
 
   @Test

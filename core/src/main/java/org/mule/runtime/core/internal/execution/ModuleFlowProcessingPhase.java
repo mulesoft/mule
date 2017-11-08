@@ -274,7 +274,7 @@ public class ModuleFlowProcessingPhase
                                 CompletableFuture responseCompletion, FlowConstruct flowConstruct) {
     Message message = template.getMessage();
     CoreEvent templateEvent = InternalEvent
-        .builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null, responseCompletion,
+        .builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null, Optional.of(responseCompletion),
                         NullExceptionHandler.getInstance()))
         .message(message)
         .build();

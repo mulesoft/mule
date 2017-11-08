@@ -131,13 +131,13 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param location the location of the component that received the first message for this context.
    * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
    *        context, if available.
-   * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
-   *        {@link BaseEventContext} to depend on completion of source.
+   * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
+   *        depend on completion of source.
    */
   public DefaultEventContext(FlowConstruct flow, ComponentLocation location,
                              String correlationId,
-                             CompletableFuture externalCompletionPublisher) {
-    super(flow.getExceptionListener(), externalCompletionPublisher);
+                             Optional<CompletableFuture<Void>> externalCompletion) {
+    super(flow.getExceptionListener(), externalCompletion);
     this.id = flow.getUniqueIdString();
     this.serverId = flow.getServerId();
     this.location = location;
@@ -153,13 +153,13 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param location the location of the component that received the first message for this context.
    * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
    *        context, if available.
-   * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
-   *        {@link BaseEventContext} to depend on completion of source.
+   * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
+   *        depend on completion of source.
    * @param exceptionHandler the exception handler that will deal with an error context
    */
   public DefaultEventContext(String id, String serverId, ComponentLocation location, String correlationId,
-                             CompletableFuture<Void> externalCompletionPublisher, FlowExceptionHandler exceptionHandler) {
-    super(exceptionHandler, externalCompletionPublisher);
+                             Optional<CompletableFuture<Void>> externalCompletion, FlowExceptionHandler exceptionHandler) {
+    super(exceptionHandler, externalCompletion);
     this.id = id;
     this.serverId = serverId;
     this.location = location;
@@ -183,7 +183,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
                               FlowExceptionHandler messagingExceptionHandler) {
-      super(messagingExceptionHandler, null);
+      super(messagingExceptionHandler, empty());
       this.parent = parent;
       this.componentLocation = componentLocation;
       this.id = parent.getId() + identityHashCode(this);

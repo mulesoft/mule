@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.component;
 
 import static java.lang.String.format;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
@@ -30,6 +31,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -50,7 +52,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
   @Override
   public final CompletableFuture<ExecutionResult> execute(InputEvent inputEvent) {
     CompletableFuture completableFuture = new CompletableFuture();
-    CoreEvent.Builder builder = CoreEvent.builder(createEventContext(completableFuture));
+    CoreEvent.Builder builder = CoreEvent.builder(createEventContext(of(completableFuture)));
     CoreEvent event = builder.message(inputEvent.getMessage())
         .error(inputEvent.getError().orElse(null))
         .variables(inputEvent.getVariables())
@@ -90,8 +92,8 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
         .toFuture();
   }
 
-  protected EventContext createEventContext(CompletableFuture<Void> externalCompletionPublisher) {
-    return create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation(), null, externalCompletionPublisher,
+  protected EventContext createEventContext(Optional<CompletableFuture<Void>> externalCompletion) {
+    return create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation(), null, externalCompletion,
                   NullExceptionHandler.getInstance());
   }
 

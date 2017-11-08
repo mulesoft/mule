@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.exception.NullExceptionHandler.getInstance;
@@ -18,7 +19,6 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -31,13 +31,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Warmup;
-import reactor.core.publisher.MonoProcessor;
 
 @Warmup(iterations = 10)
 @Measurement(iterations = 10)
@@ -95,14 +93,12 @@ public class EventContextBenchmark extends AbstractBenchmark {
     CompletableFuture<Void> completableFuture = new CompletableFuture<>();
     AtomicReference<CoreEvent> result = new AtomicReference();
     AtomicBoolean complete = new AtomicBoolean();
-    BaseEventContext eventContext = (BaseEventContext) create(flow, CONNECTOR_LOCATION, null, completableFuture);
+    BaseEventContext eventContext = (BaseEventContext) create(flow, CONNECTOR_LOCATION, null, of(completableFuture));
     from(from(eventContext.getResponsePublisher())).doOnSuccess(response -> result.set(response)).subscribe();
     eventContext.onTerminated((response, throwable) -> complete.set(true));
     eventContext.success(event);
     completableFuture.complete(null);
     return new Object[] {result, complete};
   }
-
-
 
 }

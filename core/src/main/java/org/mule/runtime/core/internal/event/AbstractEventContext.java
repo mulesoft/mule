@@ -27,6 +27,7 @@ import reactor.core.publisher.MonoSink;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
@@ -47,7 +48,7 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   private transient final List<BaseEventContext> childContexts = new ArrayList<>();
   private transient final FlowExceptionHandler exceptionHandler;
-  private transient final CompletableFuture externalCompletionFuture;
+  private transient final CompletableFuture externalCompletion;
   private transient final List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
   private transient final List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>();
   private transient final List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
@@ -56,18 +57,22 @@ abstract class AbstractEventContext implements BaseEventContext {
   private volatile Either<Throwable, CoreEvent> result;
 
   public AbstractEventContext() {
-    this(NULL_EXCEPTION_HANDLER, null);
+    this(NULL_EXCEPTION_HANDLER, Optional.empty());
   }
 
   public AbstractEventContext(FlowExceptionHandler exceptionHandler) {
-    this(exceptionHandler, null);
+    this(exceptionHandler, Optional.empty());
   }
 
-  public AbstractEventContext(FlowExceptionHandler exceptionHandler, CompletableFuture completableFuture) {
-    this.externalCompletionFuture = completableFuture;
-    if (completableFuture != null) {
-      completableFuture.thenAccept((aVoid) -> tryTerminate());
-    }
+  /**
+   * 
+   * @param exceptionHandler exception handler to to handle errors before propagation of errors to response listeners.
+   * @param externalCompletion optional future that allows an external entity (e.g. a source) to signal completion of response
+   *        processing and delay termination.
+   */
+  public AbstractEventContext(FlowExceptionHandler exceptionHandler, Optional<CompletableFuture<Void>> externalCompletion) {
+    this.externalCompletion = externalCompletion.orElse(null);
+    externalCompletion.ifPresent(completableFuture -> completableFuture.thenAccept((aVoid) -> tryTerminate()));
     this.exceptionHandler = exceptionHandler;
   }
 
@@ -83,7 +88,9 @@ abstract class AbstractEventContext implements BaseEventContext {
   @Override
   public final void success() {
     if (isResponseDone()) {
-      LOGGER.debug(this + " empty response was already completed, ignoring.");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(this + " empty response was already completed, ignoring.");
+      }
       return;
     }
 
@@ -99,7 +106,9 @@ abstract class AbstractEventContext implements BaseEventContext {
   @Override
   public final void success(CoreEvent event) {
     if (isResponseDone()) {
-      LOGGER.debug(this + " response was already completed, ignoring.");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(this + " response was already completed, ignoring.");
+      }
       return;
     }
 
@@ -115,7 +124,9 @@ abstract class AbstractEventContext implements BaseEventContext {
   @Override
   public final Publisher<Void> error(Throwable throwable) {
     if (isResponseDone()) {
-      LOGGER.debug(this + " error response was already completed, ignoring.");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(this + " error response was already completed, ignoring.");
+      }
       return empty();
     }
 
@@ -131,8 +142,8 @@ abstract class AbstractEventContext implements BaseEventContext {
           .flatMapMany(exceptionHandler)
           .doOnNext(handled -> success(handled))
           .doOnError(rethrown -> responseDone(left(rethrown)))
-          .materialize()
-          .then()
+          // This ensures that both handled and rethrown outcome both result in a Publisher<Void>
+          .materialize().then()
           .toProcessor();
     } else {
       responseDone(left(throwable));
@@ -148,7 +159,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   }
 
   protected synchronized void tryComplete() {
-    if (state == STATE_RESPONSE && !childContexts.stream().anyMatch(context -> !context.isComplete())) {
+    if (state == STATE_RESPONSE && childContexts.stream().noneMatch(context -> !context.isComplete())) {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(this + " completed.");
       }
@@ -164,7 +175,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   }
 
   protected synchronized void tryTerminate() {
-    if (this.state == STATE_COMPLETE && (externalCompletionFuture == null || externalCompletionFuture.isDone())) {
+    if (this.state == STATE_COMPLETE && (externalCompletion == null || externalCompletion.isDone())) {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(this + " terminated.");
       }
@@ -177,7 +188,7 @@ abstract class AbstractEventContext implements BaseEventContext {
     try {
       consumer.accept(result.getRight(), result.getLeft());
     } catch (Throwable t) {
-      LOGGER.warn("The event consumer {}, of EventContext {} failed with exception: {} ", consumer, this, t);
+      LOGGER.error("The event consumer {}, of EventContext {} failed with exception: {} ", consumer, this, t);
     }
   }
 

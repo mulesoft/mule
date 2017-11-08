@@ -33,7 +33,7 @@ public class DefaultProcessorsTrace implements ProcessorsTrace {
   }
 
   @Override
-  public List<String> getExecutedProcessors() {
+  public synchronized List<String> getExecutedProcessors() {
     return unmodifiableList(executedProcessors);
   }
 
