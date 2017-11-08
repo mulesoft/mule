@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+
+    <heisenberg:config name="heisenberg"
+                       myName="Heisenberg"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       dateOfConception="1959-01-07T00:00:00"
+                       money="1000000"
+                       initialHealth="CANCER"
+                       finalHealth="DEAD"
+                       labAddress="Pollos Hermanos">
+        <heisenberg:enemies>
+            <heisenberg:enemy value="Gustavo Fring"/>
+            <heisenberg:enemy value="Hank"/>
+        </heisenberg:enemies>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:recipes>
+            <heisenberg:recipe key="methylamine" value="75"/>
+            <heisenberg:recipe key="pseudoephedrine" value="0"/>
+            <heisenberg:recipe key="P2P" value="25"/>
+        </heisenberg:recipes>
+        <heisenberg:deaths-by-seasons>
+            <heisenberg:deaths-by-season key="s01">
+                <heisenberg:deaths-by-season-item value="emilio"/>
+                <heisenberg:deaths-by-season-item value="domingo"/>
+            </heisenberg:deaths-by-season>
+        </heisenberg:deaths-by-seasons>
+        <heisenberg:weapon-value-maps>
+            <heisenberg:weapon-value-map key="first">
+                <heisenberg:ricin microgramsPerKilo="22">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+            </heisenberg:weapon-value-map>
+        </heisenberg:weapon-value-maps>
+        <heisenberg:first-endevour><![CDATA[
+        endeavour
+                        verb [ I + to infinitive ] uk us endeavor UK ​ /enˈdev.ər/ US ​ /enˈdev.ɚ/
+                        ​
+                        C1 to try to do something:
+                        Engineers are endeavouring to locate Gray Matter Technologies.
+        ]]></heisenberg:first-endevour>
+        <heisenberg:health-progressions>
+            <heisenberg:health-progression value="HEALTHY"/>
+            <heisenberg:health-progression value="CANCER"/>
+            <heisenberg:health-progression value="DEAD"/>
+        </heisenberg:health-progressions>
+        <heisenberg:labeled-ricins>
+            <heisenberg:labeled-ricin key="pojo">
+                <heisenberg:ricin microgramsPerKilo="22">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+            </heisenberg:labeled-ricin>
+        </heisenberg:labeled-ricins>
+        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        </heisenberg:next-door>
+        <heisenberg:ricin-packs>
+            <heisenberg:ricin microgramsPerKilo="22">
+                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+            </heisenberg:ricin>
+        </heisenberg:ricin-packs>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="The house with the pizza on the roof" />
+        </heisenberg:known-addresses>
+    </heisenberg:config>
+
+</mule>

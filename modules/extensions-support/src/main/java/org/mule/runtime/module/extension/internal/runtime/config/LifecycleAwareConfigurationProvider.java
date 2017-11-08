@@ -14,6 +14,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -21,27 +24,25 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.privileged.lifecycle.SimpleLifecycleManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
-import org.slf4j.Logger;
-
 import java.util.LinkedList;
 import java.util.List;
+
+import org.slf4j.Logger;
 
 /**
  * Base class for implementations of {@link ConfigurationProvider} which keep track of the {@link ConfigurationInstance} they
  * generate and propagate lifecycle and IoC into them.
  * <p/>
  * It also implements the other common concerns of every {@link ConfigurationProvider}, leaving implementations with the need to
- * &quot;just&quot; implement {@link #get(Object)}
+ * &quot;just&quot; implement {@link #get(Event)}
  *
  * @since 4.0
  */
