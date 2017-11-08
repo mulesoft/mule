@@ -6,21 +6,15 @@
  */
 package org.mule.tck.junit4;
 
-import static org.mule.util.TestsLogConfigurationHelper.configureLoggingForTest;
-
-import static org.slf4j.LoggerFactory.getLogger;
-
-
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.rules.TemporaryFolder;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.NonBlockingVoidMuleEvent;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
+import org.mule.api.*;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.construct.FlowConstruct;
@@ -44,17 +38,14 @@ import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.tck.MuleTestUtils;
-import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.SensingNullReplyToHandler;
-import org.mule.tck.TestingWorkListener;
-import org.mule.tck.TriggerableMessageSource;
+import org.mule.tck.*;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.TestsLogConfigurationHelper;
 import org.mule.util.concurrent.Latch;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,11 +55,8 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
+import static org.mule.util.TestsLogConfigurationHelper.configureLoggingForTest;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext}
@@ -302,20 +290,25 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     @After
     public final void disposeContextPerTest() throws Exception
     {
-        doTearDown();
-
-        if (!isDisposeContextPerClass())
+        try
         {
-            if (isStartContext() && muleContext != null && muleContext.isStarted())
-            {
-                muleContext.stop();
-            }
-            disposeContext();
-            doTearDownAfterMuleContextDispose();
+            doTearDown();
         }
+        finally
+        {
+            if (!isDisposeContextPerClass())
+            {
+                if (isStartContext() && muleContext != null && muleContext.isStarted())
+                {
+                    muleContext.stop();
+                }
+                disposeContext();
+                doTearDownAfterMuleContextDispose();
+            }
 
-        //When an Assumption fails then junit doesn't call @Before methods so we need to avoid executing delete if there's no root folder.
-        workingDirectory.delete();
+            //When an Assumption fails then junit doesn't call @Before methods so we need to avoid executing delete if there's no root folder.
+            workingDirectory.delete();
+        }
     }
 
     protected void doTearDownAfterMuleContextDispose() throws Exception
