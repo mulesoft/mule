@@ -294,20 +294,25 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
     @After
     public final void disposeContextPerTest() throws Exception
     {
-        doTearDown();
-
-        if (!isDisposeContextPerClass())
+        try
         {
-            if (isStartContext() && muleContext != null && muleContext.isStarted())
-            {
-                muleContext.stop();
-            }
-            disposeContext();
-            doTearDownAfterMuleContextDispose();
+            doTearDown();
         }
+        finally
+        {
+            if (!isDisposeContextPerClass())
+            {
+                if (isStartContext() && muleContext != null && muleContext.isStarted())
+                {
+                    muleContext.stop();
+                }
+                disposeContext();
+                doTearDownAfterMuleContextDispose();
+            }
 
-        //When an Assumption fails then junit doesn't call @Before methods so we need to avoid executing delete if there's no root folder.
-        workingDirectory.delete();
+            //When an Assumption fails then junit doesn't call @Before methods so we need to avoid executing delete if there's no root folder.
+            workingDirectory.delete();
+        }
     }
 
     protected void doTearDownAfterMuleContextDispose() throws Exception
