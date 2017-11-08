@@ -90,7 +90,7 @@ public interface BaseEventContext extends EventContext {
   BaseEventContext getRootContext();
 
   /**
-   * Use to determine if the event ontext is complete. A {@link EventContext} is considered terminated once:
+   * Use to determine if the event context is complete. A {@link EventContext} is considered terminated once:
    * <ul>
    * <li>The event context is complete</li>
    * <li>Response consumer callbacks have been executed and response publisher subscribers signalled.</li>
