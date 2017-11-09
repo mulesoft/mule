@@ -192,6 +192,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -380,6 +381,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -410,6 +412,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -422,6 +425,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -713,6 +722,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -765,6 +775,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -795,6 +806,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -807,6 +819,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -933,6 +951,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 6,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -953,6 +972,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -1121,6 +1146,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1151,6 +1177,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1163,6 +1190,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -1424,6 +1457,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1476,6 +1510,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1506,6 +1541,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1518,6 +1554,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -1840,6 +1882,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1860,6 +1903,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -2038,148 +2087,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "RedeliveryPolicy"
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "maxRedeliveryCount"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "default": "5"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "useSecureHash"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "messageDigestAlgorithm"
-                        },
-                        "model": {
-                          "type": "String"
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "idExpression"
-                        },
-                        "model": {
-                          "type": "String"
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "objectStore"
-                        },
-                        "model": {
-                          "type": "Object",
-                          "annotations": {
-                            "typeId": "org.mule.runtime.api.store.ObjectStore",
-                            "classInformation": {
-                              "classname": "org.mule.runtime.api.store.ObjectStore",
-                              "hasDefaultConstructor": false,
-                              "isInterface": true,
-                              "isInstantiable": false,
-                              "isAbstract": true,
-                              "isFinal": false,
-                              "implementedInterfaces": [],
-                              "parent": "",
-                              "genericTypes": [],
-                              "isMap": false
-                            },
-                            "typeAlias": {
-                              "value": "ObjectStore"
-                            }
-                          },
-                          "fields": []
-                        },
-                        "annotations": {
-                          "stereotype": {
-                            "allowedStereotypes": [
-                              {
-                                "type": "OBJECT_STORE",
-                                "namespace": "OS"
-                              }
-                            ]
-                          },
-                          "description": {
-                            "value": "The object store where the redelivery counter for each message is going to be stored."
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 4,
-                    "tabName": "Redelivery"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "redeliveryPolicy",
-                  "description": "Defines a policy for processing the redelivery of the same message",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                      "value": {
-                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-redelivery-policy",
-                        "prefix": "mule"
-                      }
-                    },
-                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                      "sequence": 1
-                    }
-                  }
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "Union",
                     "annotations": {
                       "typeId": "ByteStreamingStrategy"
@@ -2345,6 +2252,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2360,6 +2268,148 @@
                     },
                     "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 2
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "RedeliveryPolicy"
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "maxRedeliveryCount"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "5"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "useSecureHash"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "default": "true"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "messageDigestAlgorithm"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "idExpression"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "objectStore"
+                        },
+                        "model": {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "classInformation": {
+                              "classname": "org.mule.runtime.api.store.ObjectStore",
+                              "hasDefaultConstructor": false,
+                              "isInterface": true,
+                              "isInstantiable": false,
+                              "isAbstract": true,
+                              "isFinal": false,
+                              "implementedInterfaces": [],
+                              "parent": "",
+                              "genericTypes": [],
+                              "isMap": false
+                            },
+                            "typeAlias": {
+                              "value": "ObjectStore"
+                            }
+                          },
+                          "fields": []
+                        },
+                        "annotations": {
+                          "stereotype": {
+                            "allowedStereotypes": [
+                              {
+                                "type": "OBJECT_STORE",
+                                "namespace": "OS"
+                              }
+                            ]
+                          },
+                          "description": {
+                            "value": "The object store where the redelivery counter for each message is going to be stored."
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 5,
+                    "tabName": "Redelivery"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "redeliveryPolicy",
+                  "description": "Defines a policy for processing the redelivery of the same message",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-redelivery-policy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
                     }
                   }
                 }
@@ -2529,6 +2579,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -2701,6 +2752,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2731,6 +2783,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2743,6 +2796,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -2869,6 +2928,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2889,6 +2949,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -3119,6 +3185,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3139,6 +3206,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -3366,6 +3439,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3386,6 +3460,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -3513,6 +3593,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -3543,6 +3624,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -3555,6 +3637,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -3696,6 +3784,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -3726,6 +3815,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -3738,6 +3828,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",

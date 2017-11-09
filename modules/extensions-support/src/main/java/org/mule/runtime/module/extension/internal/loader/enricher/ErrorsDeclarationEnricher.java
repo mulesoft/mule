@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.INITIALIZE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -25,6 +26,7 @@ import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
+import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
@@ -50,6 +52,11 @@ import java.util.stream.Stream;
  * @since 4.0
  */
 public class ErrorsDeclarationEnricher implements DeclarationEnricher {
+
+  @Override
+  public DeclarationEnricherPhase getExecutionPhase() {
+    return INITIALIZE;
+  }
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {

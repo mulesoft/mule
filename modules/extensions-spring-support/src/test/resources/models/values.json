@@ -215,6 +215,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -459,6 +460,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -479,6 +481,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -639,6 +647,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -699,7 +708,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2
+                "order": 3
               },
               "allowedStereotypeModels": [],
               "name": "channels",
@@ -725,7 +734,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3
+                "order": 4
               },
               "allowedStereotypeModels": [],
               "name": "anyParameter",
@@ -958,6 +967,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -978,6 +988,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -1138,6 +1154,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -1198,7 +1215,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2
+                "order": 3
               },
               "allowedStereotypeModels": [],
               "name": "channels",
@@ -1224,7 +1241,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3
+                "order": 4
               },
               "allowedStereotypeModels": [],
               "name": "anyParameter",
@@ -1457,6 +1474,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1477,6 +1495,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -1673,6 +1697,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -1911,6 +1936,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1931,6 +1957,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -2146,6 +2178,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2166,6 +2199,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -2451,6 +2490,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2471,6 +2511,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -2775,6 +2821,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2795,6 +2842,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -3099,6 +3152,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3119,6 +3173,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -3338,6 +3398,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3358,6 +3419,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -3585,6 +3652,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3605,6 +3673,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -4198,6 +4272,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4218,6 +4293,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -4376,6 +4457,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -4620,6 +4702,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4640,6 +4723,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",

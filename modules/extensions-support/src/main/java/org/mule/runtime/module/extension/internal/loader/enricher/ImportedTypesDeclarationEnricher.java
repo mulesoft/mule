@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.INITIALIZE;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -19,6 +20,7 @@ import org.mule.runtime.extension.api.annotation.Import;
 import org.mule.runtime.extension.api.annotation.ImportedTypes;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 
@@ -32,6 +34,11 @@ import java.util.Optional;
  * @since 4.0
  */
 public final class ImportedTypesDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
+
+  @Override
+  public DeclarationEnricherPhase getExecutionPhase() {
+    return INITIALIZE;
+  }
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {

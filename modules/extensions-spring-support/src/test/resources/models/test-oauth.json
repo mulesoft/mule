@@ -126,6 +126,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 1,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -146,6 +147,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -351,6 +358,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -381,6 +389,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -393,6 +402,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -519,6 +534,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -539,6 +555,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -705,6 +727,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -725,6 +748,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -1128,6 +1157,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1148,6 +1178,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -1170,6 +1206,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 6
+                  },
                   "allowedStereotypeModels": [],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
@@ -1189,6 +1231,12 @@
                     "allowsInlineDefinition": true,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 7
                   },
                   "allowedStereotypeModels": [],
                   "name": "consumerSecret",
@@ -1211,6 +1259,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 8
+                  },
                   "allowedStereotypeModels": [],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
@@ -1231,6 +1285,12 @@
                     "allowsInlineDefinition": true,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 9
                   },
                   "allowedStereotypeModels": [],
                   "name": "accessTokenUrl",
@@ -1253,6 +1313,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 10
+                  },
                   "allowedStereotypeModels": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
@@ -1272,6 +1338,12 @@
                     "allowsInlineDefinition": true,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 11
                   },
                   "allowedStereotypeModels": [],
                   "name": "resourceOwnerId",
@@ -1293,6 +1365,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 12
+                  },
                   "allowedStereotypeModels": [],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
@@ -1313,6 +1391,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 13
+                  },
                   "allowedStereotypeModels": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
@@ -1320,6 +1404,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
               "showInDsl": true,
               "name": "oauthAuthorizationCode",
               "displayModel": {
@@ -1344,6 +1434,12 @@
                     "allowsInlineDefinition": true,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -1374,6 +1470,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 15
+                  },
                   "allowedStereotypeModels": [],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
@@ -1393,6 +1495,12 @@
                     "allowsInlineDefinition": true,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "name": "authorizePath",
@@ -1414,6 +1522,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
                   "allowedStereotypeModels": [],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
@@ -1421,6 +1535,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
               "showInDsl": true,
               "name": "oauthCallbackConfig",
               "displayModel": {
@@ -1446,6 +1566,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
                   "allowedStereotypeModels": [
                     {
                       "type": "OBJECT_STORE",
@@ -1458,6 +1584,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
               "showInDsl": true,
               "name": "oauthStoreConfig",
               "displayModel": {
@@ -1796,6 +1928,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1816,6 +1949,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -1838,6 +1977,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 6
+                  },
                   "allowedStereotypeModels": [],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
@@ -1857,6 +2002,12 @@
                     "allowsInlineDefinition": true,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 7
                   },
                   "allowedStereotypeModels": [],
                   "name": "consumerSecret",
@@ -1879,6 +2030,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 8
+                  },
                   "allowedStereotypeModels": [],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
@@ -1900,6 +2057,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 9
+                  },
                   "allowedStereotypeModels": [],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
@@ -1919,6 +2082,12 @@
                     "allowsInlineDefinition": true,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 10
                   },
                   "allowedStereotypeModels": [],
                   "name": "scopes",
@@ -1940,6 +2109,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 11
+                  },
                   "allowedStereotypeModels": [],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
@@ -1959,6 +2134,12 @@
                     "allowsInlineDefinition": true,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 12
                   },
                   "allowedStereotypeModels": [],
                   "name": "before",
@@ -1980,6 +2161,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 13
+                  },
                   "allowedStereotypeModels": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
@@ -1987,6 +2174,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
               "showInDsl": true,
               "name": "oauthAuthorizationCode",
               "displayModel": {
@@ -2011,6 +2204,12 @@
                     "allowsInlineDefinition": true,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 14
                   },
                   "allowedStereotypeModels": [
                     {
@@ -2041,6 +2240,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 15
+                  },
                   "allowedStereotypeModels": [],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
@@ -2060,6 +2265,12 @@
                     "allowsInlineDefinition": true,
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 16
                   },
                   "allowedStereotypeModels": [],
                   "name": "authorizePath",
@@ -2081,6 +2292,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 17
+                  },
                   "allowedStereotypeModels": [],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
@@ -2088,6 +2305,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
               "showInDsl": true,
               "name": "oauthCallbackConfig",
               "displayModel": {
@@ -2113,6 +2336,12 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 18
+                  },
                   "allowedStereotypeModels": [
                     {
                       "type": "OBJECT_STORE",
@@ -2125,6 +2354,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
               "showInDsl": true,
               "name": "oauthStoreConfig",
               "displayModel": {
@@ -2473,6 +2708,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 5,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -2493,6 +2729,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Connection",
           "description": "",
@@ -2515,6 +2757,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 6
+              },
               "allowedStereotypeModels": [],
               "name": "consumerKey",
               "description": "The OAuth consumerKey as registered with the service provider",
@@ -2534,6 +2782,12 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 7
               },
               "allowedStereotypeModels": [],
               "name": "consumerSecret",
@@ -2556,6 +2810,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 8
+              },
               "allowedStereotypeModels": [],
               "name": "authorizationUrl",
               "description": "The service provider\u0027s authorization endpoint URL",
@@ -2576,6 +2836,12 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 9
               },
               "allowedStereotypeModels": [],
               "name": "accessTokenUrl",
@@ -2598,6 +2864,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 10
+              },
               "allowedStereotypeModels": [],
               "name": "scopes",
               "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
@@ -2617,6 +2889,12 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 11
               },
               "allowedStereotypeModels": [],
               "name": "resourceOwnerId",
@@ -2638,6 +2916,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 12
+              },
               "allowedStereotypeModels": [],
               "name": "before",
               "description": "The name of a flow to be executed right before starting the OAuth dance",
@@ -2658,6 +2942,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 13
+              },
               "allowedStereotypeModels": [],
               "name": "after",
               "description": "The name of a flow to be executed right after an accessToken has been received",
@@ -2665,6 +2955,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 3
+          },
           "showInDsl": true,
           "name": "oauthAuthorizationCode",
           "displayModel": {
@@ -2689,6 +2985,12 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 14
               },
               "allowedStereotypeModels": [
                 {
@@ -2719,6 +3021,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 15
+              },
               "allowedStereotypeModels": [],
               "name": "callbackPath",
               "description": "The path of the access token callback endpoint",
@@ -2738,6 +3046,12 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 16
               },
               "allowedStereotypeModels": [],
               "name": "authorizePath",
@@ -2759,6 +3073,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 17
+              },
               "allowedStereotypeModels": [],
               "name": "externalCallbackUrl",
               "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
@@ -2766,6 +3086,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 4
+          },
           "showInDsl": true,
           "name": "oauthCallbackConfig",
           "displayModel": {
@@ -2791,6 +3117,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 18
+              },
               "allowedStereotypeModels": [
                 {
                   "type": "OBJECT_STORE",
@@ -2803,6 +3135,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 5
+          },
           "showInDsl": true,
           "name": "oauthStoreConfig",
           "displayModel": {
@@ -3141,6 +3479,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 5,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -3161,6 +3500,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Connection",
           "description": "",
@@ -3183,6 +3528,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 6
+              },
               "allowedStereotypeModels": [],
               "name": "consumerKey",
               "description": "The OAuth consumerKey as registered with the service provider",
@@ -3202,6 +3553,12 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 7
               },
               "allowedStereotypeModels": [],
               "name": "consumerSecret",
@@ -3224,6 +3581,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 8
+              },
               "allowedStereotypeModels": [],
               "name": "authorizationUrl",
               "description": "The service provider\u0027s authorization endpoint URL",
@@ -3245,6 +3608,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 9
+              },
               "allowedStereotypeModels": [],
               "name": "accessTokenUrl",
               "description": "The service provider\u0027s accessToken endpoint URL",
@@ -3264,6 +3633,12 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 10
               },
               "allowedStereotypeModels": [],
               "name": "scopes",
@@ -3285,6 +3660,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 11
+              },
               "allowedStereotypeModels": [],
               "name": "resourceOwnerId",
               "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
@@ -3304,6 +3685,12 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 12
               },
               "allowedStereotypeModels": [],
               "name": "before",
@@ -3325,6 +3712,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 13
+              },
               "allowedStereotypeModels": [],
               "name": "after",
               "description": "The name of a flow to be executed right after an accessToken has been received",
@@ -3332,6 +3725,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 3
+          },
           "showInDsl": true,
           "name": "oauthAuthorizationCode",
           "displayModel": {
@@ -3356,6 +3755,12 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 14
               },
               "allowedStereotypeModels": [
                 {
@@ -3386,6 +3791,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 15
+              },
               "allowedStereotypeModels": [],
               "name": "callbackPath",
               "description": "The path of the access token callback endpoint",
@@ -3405,6 +3816,12 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 16
               },
               "allowedStereotypeModels": [],
               "name": "authorizePath",
@@ -3426,6 +3843,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 17
+              },
               "allowedStereotypeModels": [],
               "name": "externalCallbackUrl",
               "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
@@ -3433,6 +3856,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 4
+          },
           "showInDsl": true,
           "name": "oauthCallbackConfig",
           "displayModel": {
@@ -3458,6 +3887,12 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 18
+              },
               "allowedStereotypeModels": [
                 {
                   "type": "OBJECT_STORE",
@@ -3470,6 +3905,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 5
+          },
           "showInDsl": true,
           "name": "oauthStoreConfig",
           "displayModel": {

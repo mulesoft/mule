@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toMetadataFormat;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADVANCED_TAB_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
@@ -37,6 +38,7 @@ import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarat
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
+import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
@@ -55,6 +57,11 @@ import java.util.function.Function;
  * @since 4.0
  */
 public final class MimeTypeParametersDeclarationEnricher implements DeclarationEnricher {
+
+  @Override
+  public DeclarationEnricherPhase getExecutionPhase() {
+    return STRUCTURE;
+  }
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
