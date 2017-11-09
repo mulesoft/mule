@@ -59,7 +59,6 @@ public class PersonalInfo {
 
   @Parameter
   @Placement(order = 7)
-  //@Optional
   private List<String> knownAddresses;
 
   public List<String> getKnownAddresses() {
