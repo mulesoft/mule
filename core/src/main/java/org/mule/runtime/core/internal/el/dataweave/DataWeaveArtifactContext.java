@@ -53,7 +53,7 @@ public class DataWeaveArtifactContext extends AbstractArtifactContext {
 
     @Override
     public Object doGet(String key) {
-      return registry.lookupByName(key);
+      return registry.lookupByName(key).orElse(null);
     }
 
     @Override
