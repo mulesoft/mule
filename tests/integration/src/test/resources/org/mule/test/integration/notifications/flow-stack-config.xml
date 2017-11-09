@@ -315,7 +315,7 @@
     <flow name="flowChainedFilterManyProcessors">
         <vm:inbound-endpoint path="in-flowChainedFilterManyProcessors" exchange-pattern="request-response"/>
         <processor-chain>
-            <expression-filter expression="#[true]" />
+            <expression-filter expression="#[true]"/>
             <test:component/>
             <flow-ref name="flow"/>
         </processor-chain>

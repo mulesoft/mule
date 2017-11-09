@@ -46,6 +46,7 @@ public class MessageFilterNotificationsTestCase extends FunctionalTestCase
             }
         });
     }
+
     @Override
     protected String getConfigFile()
     {
