@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
@@ -82,7 +83,15 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   private List<Processor> getSimpleMessageProcessors(Processor innerProcessor) {
     List<Processor> lmp = new ArrayList<>();
     lmp.add(event -> {
-      String payload = event.getMessage().getPayload().getValue().toString();
+      String payload;
+      if (event.getMessage().getPayload().getValue() instanceof List) {
+        // With batch size a simple list is not used, rather a list of typed values. This appears inconsistent but is transparent
+        // to the user.
+        payload = ((List<TypedValue>) event.getMessage().getPayload().getValue()).stream().map(typeValue -> typeValue.getValue())
+            .collect(toList()).toString();
+      } else {
+        payload = event.getMessage().getPayload().getValue().toString();
+      }
       event = CoreEvent.builder(event).message(InternalMessage.builder(event.getMessage()).value(payload + ":foo").build())
           .build();
       return event;
