@@ -8,6 +8,8 @@ package org.mule.runtime.core.privileged.processor.simple;
 
 import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 
@@ -15,6 +17,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
@@ -25,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
+import java.util.Optional;
 
 public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMessageProcessor {
 
@@ -33,7 +37,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   private AttributeEvaluator identifierEvaluator;
   private String value;
   private AttributeEvaluator valueEvaluator;
-  private DataType returnType = DataType.OBJECT;
+  private Optional<DataType> returnType = empty();
 
   @Override
   public void initialise() throws InitialisationException {
@@ -62,8 +66,16 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
       } else {
         return addProperty((PrivilegedEvent) event, key, typedValue
             .getValue(), DataType.builder().type(typedValue.getDataType().getType())
-                .mediaType(getReturnDataType().getMediaType()).charset(resolveEncoding(typedValue)).build());
+                .mediaType(getMediaType(typedValue)).charset(resolveEncoding(typedValue)).build());
       }
+    }
+  }
+
+  private MediaType getMediaType(TypedValue<T> typedValue) {
+    if (returnType.isPresent()) {
+      return getReturnDataType().getMediaType();
+    } else {
+      return typedValue.getDataType().getMediaType();
     }
   }
 
@@ -111,10 +123,10 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   }
 
   public void setReturnDataType(DataType type) {
-    this.returnType = type;
+    this.returnType = of(type);
   }
 
   public DataType getReturnDataType() {
-    return returnType;
+    return returnType.orElse(DataType.OBJECT);
   }
 }
