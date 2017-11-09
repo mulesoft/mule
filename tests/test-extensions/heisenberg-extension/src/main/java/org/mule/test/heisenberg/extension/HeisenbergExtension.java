@@ -13,6 +13,7 @@ import static org.mule.runtime.api.meta.ExternalLibraryType.NATIVE;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Export;
@@ -92,6 +93,9 @@ public class HeisenbergExtension implements Lifecycle {
 
   @Inject
   private ExtensionManager extensionManager;
+
+  @Inject
+  private ObjectStoreManager objectStoreManager;
 
   @RefName
   private String configName;
@@ -306,5 +310,9 @@ public class HeisenbergExtension implements Lifecycle {
 
   public List<? extends Weapon> getWildCardWeapons() {
     return wildCardWeapons;
+  }
+
+  public ObjectStoreManager getObjectStoreManager() {
+    return objectStoreManager;
   }
 }

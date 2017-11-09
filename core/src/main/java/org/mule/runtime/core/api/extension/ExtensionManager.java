@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.extension;
 
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -59,7 +60,7 @@ public interface ExtensionManager {
    * {@code configurationProvider}
    * <p>
    * After the {@link ConfigurationProvider} has been located, an instance is returned by invoking its
-   * {@link ConfigurationProvider#get(Object)} with the {@code muleEvent} as the argument.
+   * {@link ConfigurationProvider#get(Event)} with the {@code muleEvent} as the argument.
    * <p>
    * By the mere fact of this configuration being returned, the value of {@link ConfigurationStats#getLastUsedMillis()} will be
    * updated for the returned {@link ConfigurationInstance}
