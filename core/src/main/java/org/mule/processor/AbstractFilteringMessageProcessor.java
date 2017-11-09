@@ -6,15 +6,25 @@
  */
 package org.mule.processor;
 
+import static java.util.Arrays.asList;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.processor.DefaultMessageProcessorPathElement;
 import org.mule.api.processor.InterceptingMessageProcessor;
+import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.processor.chain.InterceptingChainLifecycleWrapper;
+import org.mule.processor.chain.SubflowInterceptingChainLifecycleWrapper;
+import org.mule.util.NotificationUtils;
+
+import java.util.Arrays;
 
 /**
  * Abstract {@link InterceptingMessageProcessor} that can be easily be extended and
@@ -97,6 +107,17 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
         {
             onUnacceptedFlowConstruct = true;
         }
+    }
+
+    @Override
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
+    {
+        if (unacceptedMessageProcessor instanceof InterceptingChainLifecycleWrapper)
+        {
+            NotificationUtils.addMessageProcessorPathElements(asList(unacceptedMessageProcessor), pathElement);
+        }
+
+        super.addMessageProcessorPathElements(pathElement);
     }
 
     public boolean isThrowOnUnaccepted()

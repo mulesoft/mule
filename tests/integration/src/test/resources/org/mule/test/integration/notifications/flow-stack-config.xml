@@ -315,11 +315,26 @@
     <flow name="flowChainedFilterManyProcessors">
         <vm:inbound-endpoint path="in-flowChainedFilterManyProcessors" exchange-pattern="request-response"/>
         <processor-chain>
-            <expression-filter expression="#[true]"/>
+            <expression-filter expression="#[true]" />
             <test:component/>
             <flow-ref name="flow"/>
         </processor-chain>
     </flow>
+
+    <flow name="subFlowStaticWithMessageFilterUnaccepted">
+        <vm:inbound-endpoint path="in-subFlowStaticWithMessageFilterUnaccepted" exchange-pattern="request-response"/>
+        <message-filter  onUnaccepted="subFlow">
+            <payload-type-filter expectedType="java.lang.String"/>
+        </message-filter>
+    </flow>
+
+    <flow name="flowStaticWithMessageFilterUnaccepted">
+        <vm:inbound-endpoint path="in-flowStaticWithMessageFilterUnaccepted" exchange-pattern="request-response"/>
+        <message-filter  onUnaccepted="flow">
+            <payload-type-filter expectedType="java.lang.String"/>
+        </message-filter>
+    </flow>
+
 
     <!-- For Each -->
 
