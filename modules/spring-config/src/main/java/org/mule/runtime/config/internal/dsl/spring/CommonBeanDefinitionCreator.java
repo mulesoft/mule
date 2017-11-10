@@ -11,7 +11,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
-import static org.apache.commons.beanutils.BeanUtils.getSimpleProperty;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME;
 import static org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler.from;
