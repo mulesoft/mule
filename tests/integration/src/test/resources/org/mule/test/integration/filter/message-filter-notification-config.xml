@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+    <flow name="unacceptedCaseSubFlow">
+        <message-filter  onUnaccepted="unacceptedSubFlow">
+            <payload-type-filter expectedType="java.lang.String"/>
+        </message-filter>
+        <logger message="OK"/>
+    </flow>
+
+    <flow name="unacceptedCaseFlow">
+        <message-filter  onUnaccepted="unacceptedFlow">
+            <payload-type-filter expectedType="java.lang.String"/>
+        </message-filter>
+    </flow>
+
+    <sub-flow name="unacceptedSubFlow">
+        <echo-component/>
+    </sub-flow>
+
+    <flow name="unacceptedFlow">
+        <echo-component/>
+    </flow>
+
+</mule>
