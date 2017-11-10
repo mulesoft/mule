@@ -6376,7 +6376,7 @@
                                 "description": {
                                   "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store."
                                 },
-                                "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "display": {
                                   "displayModel": {
                                     "pathModel": {
                                       "type": "FILE",
@@ -6415,7 +6415,7 @@
                               "model": {
                                 "type": "String",
                                 "annotations": {
-                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                  "display": {
                                     "displayModel": {
                                       "example": "jks, jceks, pkcs12 or other store type"
                                     }
@@ -6493,7 +6493,7 @@
                                 "description": {
                                   "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the key store."
                                 },
-                                "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "display": {
                                   "displayModel": {
                                     "pathModel": {
                                       "type": "FILE",
@@ -6512,7 +6512,7 @@
                               "model": {
                                 "type": "String",
                                 "annotations": {
-                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                  "display": {
                                     "displayModel": {
                                       "example": "jks, jceks, pkcs12 or other store type"
                                     }
@@ -20012,7 +20012,7 @@
                             "description": {
                               "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store."
                             },
-                            "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                            "display": {
                               "displayModel": {
                                 "pathModel": {
                                   "type": "FILE",
@@ -20051,7 +20051,7 @@
                           "model": {
                             "type": "String",
                             "annotations": {
-                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                              "display": {
                                 "displayModel": {
                                   "example": "jks, jceks, pkcs12 or other store type"
                                 }
@@ -20129,7 +20129,7 @@
                             "description": {
                               "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the key store."
                             },
-                            "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                            "display": {
                               "displayModel": {
                                 "pathModel": {
                                   "type": "FILE",
@@ -20148,7 +20148,7 @@
                           "model": {
                             "type": "String",
                             "annotations": {
-                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                              "display": {
                                 "displayModel": {
                                   "example": "jks, jceks, pkcs12 or other store type"
                                 }
@@ -21006,7 +21006,7 @@
                         "description": {
                           "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store."
                         },
-                        "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                        "display": {
                           "displayModel": {
                             "pathModel": {
                               "type": "FILE",
@@ -21045,7 +21045,7 @@
                       "model": {
                         "type": "String",
                         "annotations": {
-                          "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                          "display": {
                             "displayModel": {
                               "example": "jks, jceks, pkcs12 or other store type"
                             }
@@ -21123,7 +21123,7 @@
                         "description": {
                           "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the key store."
                         },
-                        "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                        "display": {
                           "displayModel": {
                             "pathModel": {
                               "type": "FILE",
@@ -21142,7 +21142,7 @@
                       "model": {
                         "type": "String",
                         "annotations": {
-                          "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                          "display": {
                             "displayModel": {
                               "example": "jks, jceks, pkcs12 or other store type"
                             }
@@ -21440,7 +21440,7 @@
                         "tabName": "General"
                       }
                     },
-                    "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                    "display": {
                       "displayModel": {
                         "displayName": "Date of decease"
                       }
@@ -22175,7 +22175,7 @@
                       "tabName": "General"
                     }
                   },
-                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                  "display": {
                     "displayModel": {
                       "summary": "A set of ricin packs"
                     }
@@ -22352,7 +22352,7 @@
                       "tabName": "General"
                     }
                   },
-                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                  "display": {
                     "displayModel": {
                       "displayName": "Date of decease"
                     }
@@ -22653,7 +22653,7 @@
             "expressionSupport": {
               "value": "SUPPORTED"
             },
-            "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+            "display": {
               "displayModel": {
                 "displayName": "Parameter Custom Display Name"
               }
@@ -22818,7 +22818,7 @@
             "expressionSupport": {
               "value": "REQUIRED"
             },
-            "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+            "display": {
               "displayModel": {
                 "example": "308 Negra Arroyo Lane, Albuquerque, New Mexico, 87104"
               }
@@ -25460,7 +25460,7 @@
                 "tabName": "General"
               }
             },
-            "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+            "display": {
               "displayModel": {
                 "displayName": "Date of decease"
               }
