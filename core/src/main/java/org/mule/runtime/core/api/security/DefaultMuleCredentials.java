@@ -25,6 +25,8 @@ public class DefaultMuleCredentials implements Credentials, Serializable {
 
   private static final String TOKEN_DELIM = "::";
 
+  private static final long serialVersionUID = 6841073031207301664L;
+
   private final String username;
   private final char[] password;
   private Object roles;

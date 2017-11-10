@@ -41,9 +41,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.inject.Provider;
 
 import org.springframework.beans.BeansException;
@@ -97,6 +97,8 @@ import org.springframework.util.StringUtils;
 @SuppressWarnings("serial")
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
     implements ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable {
+
+  private static final long serialVersionUID = 7110590944074180546L;
 
   private static Class<?> javaUtilOptionalClass = null;
 
@@ -1290,6 +1292,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
    */
   private static class SerializedBeanFactoryReference implements Serializable {
 
+    private static final long serialVersionUID = 4249718040866211582L;
+
     private final String id;
 
     public SerializedBeanFactoryReference(String id) {
@@ -1336,6 +1340,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
    * Serializable ObjectFactory for lazy resolution of a dependency.
    */
   private class DependencyObjectFactory implements ObjectFactory<Object>, Serializable {
+
+    private static final long serialVersionUID = 7415140309822800609L;
 
     private final DependencyDescriptor descriptor;
 
