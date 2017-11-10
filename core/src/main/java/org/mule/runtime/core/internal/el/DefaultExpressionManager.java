@@ -379,4 +379,9 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public void setRegistry(Registry registry) {
     this.registry = registry;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getName() + "[" + (expressionLanguage != null ? expressionLanguage.toString() : "null") + "]";
+  }
 }
