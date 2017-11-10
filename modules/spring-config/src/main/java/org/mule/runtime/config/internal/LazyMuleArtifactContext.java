@@ -31,7 +31,6 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.dsl.model.MinimalApplicationModelGenerator;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -60,7 +59,8 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
  *
  * @since 4.0
  */
-public class LazyMuleArtifactContext extends MuleArtifactContext implements LazyComponentInitializer, LazyComponentCreator {
+public class LazyMuleArtifactContext extends MuleArtifactContext
+    implements LazyComponentInitializerAdapter, LazyComponentCreator {
 
   private TrackingPostProcessor trackingPostProcessor = new TrackingPostProcessor();
 
