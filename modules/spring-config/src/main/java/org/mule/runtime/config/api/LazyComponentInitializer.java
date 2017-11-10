@@ -35,6 +35,18 @@ public interface LazyComponentInitializer {
   void initializeComponents(ComponentLocationFilter componentLocationFilter);
 
   /**
+   * Calling this method guarantees that the components accepted by the filter from the configuration will be created and
+   * initialized.
+   * <p/>
+   * If there were any component already initialized it will be unregistered in order to initialize the ones selected by this filter.
+   *
+   * @param componentLocationFilter {@link ComponentLocationFilter} to select the {@link Component} to be initialized and they dependent ones.
+   * @param applyStartPhase boolean indicating if the Start phase should be applied to the created components
+   * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.
+   */
+  void initializeComponents(ComponentLocationFilter componentLocationFilter, boolean applyStartPhase);
+
+  /**
    * Calling this method guarantees that the requested component from the configuration will be created and
    * initialized.
    * <p/>
@@ -45,6 +57,19 @@ public interface LazyComponentInitializer {
    * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.
    */
   void initializeComponent(Location location);
+
+  /**
+   * Calling this method guarantees that the requested component from the configuration will be created and
+   * initialized.
+   * <p/>
+   * The requested component must exists in the configuration. If there was a component already initialized it will be unregistered
+   * in order to initialize the requested component and its dependencies.
+   *
+   * @param location the location of the configuration component.
+   * @param applyStartPhase boolean indicating if the Start phase should be applied to the created components
+   * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.
+   */
+  void initializeComponent(Location location, boolean applyStartPhase);
 
   /**
    * Defines which {@link Component components} should be initialized by accepting it by {@link ComponentLocation}.

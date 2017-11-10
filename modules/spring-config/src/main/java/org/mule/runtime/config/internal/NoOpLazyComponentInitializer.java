@@ -20,7 +20,17 @@ public class NoOpLazyComponentInitializer implements LazyComponentInitializer {
   }
 
   @Override
+  public void initializeComponents(ComponentLocationFilter componentLocationFilter, boolean applyStartPhase) {
+    // Nothing to do...
+  }
+
+  @Override
   public void initializeComponent(Location location) {
+    // Nothing to do...
+  }
+
+  @Override
+  public void initializeComponent(Location location, boolean applyStartPhase) {
     // Nothing to do...
   }
 

@@ -82,7 +82,7 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
     Location locationWithOutConnection = locationWithOutConnection(location);
 
     try {
-      lazyComponentInitializer.initializeComponent(locationWithOutConnection);
+      lazyComponentInitializer.initializeComponent(locationWithOutConnection, false);
     } catch (Exception e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof NoSuchComponentModelException) {

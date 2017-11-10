@@ -55,4 +55,8 @@
         </values:source-with-required-parameter-inside-show-in-dsl-group>
     </flow>
 
+    <flow name="source-must-not-start">
+        <values:source-must-not-start/>
+    </flow>
+
 </mule>
