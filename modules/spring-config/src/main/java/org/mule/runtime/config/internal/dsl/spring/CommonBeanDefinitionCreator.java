@@ -7,8 +7,11 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
+import static org.apache.commons.beanutils.BeanUtils.getSimpleProperty;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME;
 import static org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler.from;
@@ -49,6 +52,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -211,16 +215,18 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
     Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
 
-    Consumer<Object> instanceCustomizationFunction = object -> {
-      Map<String, Object> customProperties = getTransformerCustomProperties(componentModel);
-      if (!customProperties.isEmpty()) {
-        injectSpringProperties(customProperties, object);
-      }
-    };
+    Optional<Consumer<Object>> instanceCustomizationFunctionOptional;
+
+    Map<String, Object> customProperties = getTransformerCustomProperties(componentModel);
+    if (customProperties.isEmpty()) {
+      instanceCustomizationFunctionOptional = empty();
+    } else {
+      instanceCustomizationFunctionOptional = of(object -> injectSpringProperties(customProperties, object));
+    }
 
     return rootBeanDefinition(objectFactoryClassRepository
         .getObjectFactoryClass(componentBuildingDefinition, objectFactoryType, objectTypeVisitor.getType(),
-                               () -> componentModel.getBeanDefinition().isLazyInit(), instanceCustomizationFunction));
+                               () -> componentModel.getBeanDefinition().isLazyInit(), instanceCustomizationFunctionOptional));
   }
 
   private void injectSpringProperties(Map<String, Object> customProperties, Object createdInstance) {
