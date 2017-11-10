@@ -2426,7 +2426,8 @@
                 "pathModel": {
                   "type": "ANY",
                   "fileExtensions": [],
-                  "acceptsUrls": true
+                  "acceptsUrls": true,
+                  "location": "ANY"
                 }
               },
               "description": "",
@@ -2943,7 +2944,8 @@
                     "pathModel": {
                       "type": "DIRECTORY",
                       "fileExtensions": [],
-                      "acceptsUrls": false
+                      "acceptsUrls": false,
+                      "location": "ANY"
                     }
                   },
                   "description": "",
@@ -3189,7 +3191,8 @@
                     "pathModel": {
                       "type": "DIRECTORY",
                       "fileExtensions": [],
-                      "acceptsUrls": false
+                      "acceptsUrls": false,
+                      "location": "ANY"
                     }
                   },
                   "description": "",
@@ -3469,7 +3472,8 @@
                   "fileExtensions": [
                     "xml"
                   ],
-                  "acceptsUrls": false
+                  "acceptsUrls": false,
+                  "location": "EMBEDDED"
                 }
               },
               "description": "",
@@ -3861,7 +3865,8 @@
                 "pathModel": {
                   "type": "ANY",
                   "fileExtensions": [],
-                  "acceptsUrls": true
+                  "acceptsUrls": true,
+                  "location": "ANY"
                 }
               }
             }

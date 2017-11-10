@@ -12,6 +12,7 @@ import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
@@ -768,7 +769,7 @@ class MuleExtensionModelDeclarer {
         .withRequiredParameter("file")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, new String[] {"properties"})).build())
+        .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, EMBEDDED, new String[] {"properties"})).build())
         .describedAs(" The location of the file with the configuration properties to use. "
             + "It may be a location in the classpath or an absolute location. The file location\n"
             + " value may also contains references to properties that will only be resolved based on "

@@ -6381,7 +6381,8 @@
                                     "pathModel": {
                                       "type": "FILE",
                                       "fileExtensions": [],
-                                      "acceptsUrls": false
+                                      "acceptsUrls": false,
+                                      "location": "EMBEDDED"
                                     }
                                   }
                                 }
@@ -6497,7 +6498,8 @@
                                     "pathModel": {
                                       "type": "FILE",
                                       "fileExtensions": [],
-                                      "acceptsUrls": false
+                                      "acceptsUrls": false,
+                                      "location": "EMBEDDED"
                                     }
                                   }
                                 }
@@ -20015,7 +20017,8 @@
                                 "pathModel": {
                                   "type": "FILE",
                                   "fileExtensions": [],
-                                  "acceptsUrls": false
+                                  "acceptsUrls": false,
+                                  "location": "EMBEDDED"
                                 }
                               }
                             }
@@ -20131,7 +20134,8 @@
                                 "pathModel": {
                                   "type": "FILE",
                                   "fileExtensions": [],
-                                  "acceptsUrls": false
+                                  "acceptsUrls": false,
+                                  "location": "EMBEDDED"
                                 }
                               }
                             }
@@ -21007,7 +21011,8 @@
                             "pathModel": {
                               "type": "FILE",
                               "fileExtensions": [],
-                              "acceptsUrls": false
+                              "acceptsUrls": false,
+                              "location": "EMBEDDED"
                             }
                           }
                         }
@@ -21123,7 +21128,8 @@
                             "pathModel": {
                               "type": "FILE",
                               "fileExtensions": [],
-                              "acceptsUrls": false
+                              "acceptsUrls": false,
+                              "location": "EMBEDDED"
                             }
                           }
                         }
