@@ -91,7 +91,7 @@ public class HttpClientConfiguration {
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = 30000;
     private boolean streaming = true;
-    private int responseBufferSize = 10240;
+    private int responseBufferSize = -1;
     private String name;
 
     /**
