@@ -137,6 +137,7 @@ public final class DisplayDeclarationEnricher extends AbstractAnnotatedDeclarati
     if (pathAnnotation != null) {
       pathModel = new PathModel(pathAnnotation.type(),
                                 pathAnnotation.acceptsUrls(),
+                                pathAnnotation.location(),
                                 pathAnnotation.acceptedFileExtensions());
     }
 

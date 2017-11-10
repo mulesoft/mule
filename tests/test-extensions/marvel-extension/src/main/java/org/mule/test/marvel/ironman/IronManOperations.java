@@ -8,6 +8,7 @@ package org.mule.test.marvel.ironman;
 
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDED;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -65,7 +66,7 @@ public class IronManOperations implements Initialisable, Disposable {
   }
 
   @MediaType(TEXT_PLAIN)
-  public String findInstructions(@Optional @Path(acceptedFileExtensions = {"xml"}) String instructionsFile) {
+  public String findInstructions(@Optional @Path(acceptedFileExtensions = {"xml"}, location = EMBEDDED) String instructionsFile) {
     return instructionsFile;
   }
 
