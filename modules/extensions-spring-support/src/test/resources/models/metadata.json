@@ -13948,7 +13948,7 @@
             "expressionSupport": {
               "value": "SUPPORTED"
             },
-            "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+            "display": {
               "displayModel": {
                 "displayName": "State | City"
               }
