@@ -11,7 +11,9 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.util.compression.InvalidZipFileException;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -31,6 +33,8 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Random;
@@ -273,6 +277,9 @@ public class FileUtils {
     }
     try {
       zip = new ZipFile(archive);
+
+      verifyZipFilePaths(zip);
+
       for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
         ZipEntry entry = (ZipEntry) entries.nextElement();
         File f = FileUtils.newFile(directory, entry.getName());
@@ -296,6 +303,21 @@ public class FileUtils {
     } finally {
       if (zip != null) {
         zip.close();
+      }
+    }
+  }
+
+  public static void verifyZipFilePaths(ZipFile zip) throws InvalidZipFileException {
+    for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
+      ZipEntry entry = (ZipEntry) entries.nextElement();
+
+      Path namePath = Paths.get(entry.getName());
+      if (namePath.getRoot() != null) {
+        // According to .ZIP File Format Specification (Section 4.4.17), the path can not be absolute
+        throw new InvalidZipFileException("Absolute paths are not allowed: " + namePath.toString());
+      } else if (namePath.normalize().toString().startsWith("..")) {
+        // Not specified, but presents a security risk (allows overwriting external files)
+        throw new InvalidZipFileException("External paths are not allowed: " + namePath.toString());
       }
     }
   }
