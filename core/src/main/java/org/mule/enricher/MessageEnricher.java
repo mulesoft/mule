@@ -6,6 +6,8 @@
  */
 package org.mule.enricher;
 
+import static org.mule.api.config.MuleProperties.MULE_PASS_COPY_TO_ENRICHER_EXCEPTION_HANDLING;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.NonBlockingVoidMuleEvent;
 import org.mule.OptimizedRequestContext;
@@ -236,9 +238,12 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
         @Override
         protected MuleEvent processCatch(MuleEvent event, MessagingException exception) throws MessagingException
         {
-            ((ThreadSafeAccess) eventToEnrich).resetAccessControl();
-            OptimizedRequestContext.unsafeSetEvent(eventToEnrich);
-            exception.setProcessedEvent(eventToEnrich);
+            if (!mustPassCopyToExceptionHandling())
+            {
+                ((ThreadSafeAccess) eventToEnrich).resetAccessControl();
+                OptimizedRequestContext.unsafeSetEvent(eventToEnrich);
+                exception.setProcessedEvent(eventToEnrich);
+            }
             return super.processCatch(event, exception);
         }
 
@@ -268,5 +273,11 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
             return OptimizedRequestContext.unsafeSetEvent(eventToEnrich);
         }
 
+    }
+    
+    private boolean mustPassCopyToExceptionHandling()
+    {
+        String mustPassCopyToExceptionHandling = System.getProperty(MULE_PASS_COPY_TO_ENRICHER_EXCEPTION_HANDLING, "false");
+        return Boolean.parseBoolean(mustPassCopyToExceptionHandling);
     }
 }
