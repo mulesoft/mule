@@ -469,6 +469,28 @@ public class FlowStackTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void flowUnacceptedMessageFilterUnaccepted() throws Exception
+    {
+        muleContext.getClient().send("vm://in-flowStaticWithMessageFilterUnaccepted", new DefaultMuleMessage(null, muleContext));
+        assertThat(stackToAssert, not(nullValue()));
+
+        assertStackElements(stackToAssert,
+                            isFlowStackElement("flow", "/flow/processors/0"),
+                            isFlowStackElement("flowStaticWithMessageFilterUnaccepted", "/flowStaticWithMessageFilterUnaccepted/processors/0"));
+    }
+
+    @Test
+    public void subFlowUnacceptedMessageFilterUnaccepted() throws Exception
+    {
+        muleContext.getClient().send("vm://in-subFlowStaticWithMessageFilterUnaccepted", new DefaultMuleMessage(null, muleContext));
+        assertThat(stackToAssert, not(nullValue()));
+
+        assertStackElements(stackToAssert,
+                            isFlowStackElement("subFlow", "/subFlowStaticWithMessageFilterUnaccepted/processors/0/0/subFlow/subprocessors/0"),
+                            isFlowStackElement("subFlowStaticWithMessageFilterUnaccepted", "/subFlowStaticWithMessageFilterUnaccepted/processors/0"));
+    }
+
+    @Test
     public void flowForEach() throws Exception
     {
         muleContext.getClient().send("vm://in-flowForEach", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
@@ -503,4 +525,5 @@ public class FlowStackTestCase extends FunctionalTestCase
                 isFlowStackElement("flow", "/flow/processors/0"),
                 isFlowStackElement("flowForEachFilter", "/flowForEachFilter/processors/0/1"));
     }
+
 }
