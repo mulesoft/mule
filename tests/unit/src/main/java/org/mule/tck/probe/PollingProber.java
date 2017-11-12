@@ -6,10 +6,17 @@
  */
 package org.mule.tck.probe;
 
+import static org.mule.tck.report.ThreadDumper.logThreadDump;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
+import org.slf4j.Logger;
+
 public class PollingProber implements Prober {
+
+  private static final Logger LOGGER = getLogger(PollingProber.class);
 
   public static final long DEFAULT_TIMEOUT = 1000;
   public static final long DEFAULT_POLLING_INTERVAL = 100;
@@ -59,6 +66,8 @@ public class PollingProber implements Prober {
   @Override
   public void check(Probe probe) {
     if (!poll(probe)) {
+      LOGGER.error("test timed out. Maybe due to a deadlock?");
+      logThreadDump();
       throw new AssertionError(probe.describeFailure());
     }
   }
