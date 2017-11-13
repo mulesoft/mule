@@ -16,16 +16,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import org.junit.Test;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.junit.Test;
 
 public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
 
@@ -41,7 +42,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
     Apple apple = new Apple(true);
     properties.put("apple", apple);
     InternalMessage message =
-        (InternalMessage) InternalMessage.builder().value(TEST_MESSAGE).outboundProperties(properties).build();
+        InternalMessage.builder().value(TEST_MESSAGE).outboundProperties(properties).build();
     assertTrue(message.getOutboundProperty("boolean", false));
     assertEquals(new Integer(24), message.getOutboundProperty("number", 0));
     assertEquals(new Byte((byte) 24), message.getOutboundProperty("number", (byte) 0));
@@ -72,12 +73,12 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testClearProperties() {
     InternalMessage payload =
-        (InternalMessage) InternalMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, "fooValue").build();
+        InternalMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, "fooValue").build();
 
     assertThat(payload.getOutboundPropertyNames(), hasSize(2));
     assertThat(payload.getInboundPropertyNames(), empty());
 
-    payload = (InternalMessage) InternalMessage.builder(payload).outboundProperties(emptyMap()).build();
+    payload = InternalMessage.builder(payload).outboundProperties(emptyMap()).build();
     assertThat(payload.getOutboundPropertyNames(), empty());
 
     // See http://www.mulesoft.org/jira/browse/MULE-4968 for additional test needed here

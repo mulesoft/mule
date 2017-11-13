@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static java.lang.Thread.currentThread;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.EOFException;
 import java.io.File;
@@ -15,9 +20,6 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Basic queueing functionality with file storage.
@@ -136,12 +138,17 @@ class RandomAccessFileQueueStore {
    * Use this method carefully since it required bit amount of IO.
    *
    * @return all the elements from the queue.
+   * @throws InterruptedException
    */
-  public synchronized Collection<byte[]> allElements() {
+  public synchronized Collection<byte[]> allElements() throws InterruptedException {
     List<byte[]> elements = new LinkedList<>();
     try {
       queueFileProvider.getRandomAccessFile().seek(0);
       while (true) {
+        if (currentThread().isInterrupted()) {
+          throw new InterruptedException();
+        }
+
         boolean removed = queueFileProvider.getRandomAccessFile().readBoolean();
         if (!removed) {
           elements.add(readDataInCurrentPosition());
@@ -255,6 +262,10 @@ class RandomAccessFileQueueStore {
     try {
       queueFileProvider.getRandomAccessFile().seek(0);
       while (true) {
+        if (currentThread().isInterrupted()) {
+          throw new InterruptedException();
+        }
+
         long position = queueFileProvider.getRandomAccessFile().getFilePointer();
         byte removed = queueFileProvider.getRandomAccessFile().readByte();
         if (removed == NOT_REMOVED) {
