@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.getPropertyValueFromPropertiesComponent;
@@ -91,8 +93,7 @@ class SpringPostProcessorIocHelper implements PostProcessorIocHelper {
           .withIdentifier(propertyName)
           .build();
       builder = genericBeanDefinition(objectFactoryClassRepository.getObjectFactoryClass(definition, beanClass, Object.class,
-                                                                                         () -> true, b -> {
-                                                                                         }));
+                                                                                         () -> true, empty()));
     } else {
       builder = genericBeanDefinition(beanClass);
     }
