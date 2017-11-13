@@ -228,8 +228,8 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
                 {
                     throw new InitialisationException(CoreMessages.failedToLoad(loc), this);
                 }
-                
-                schemas[i] = new StreamSource(schemaStream);
+
+                schemas[i] = new StreamSource(schemaStream, IOUtils.getResourceAsUrl(split[i], getClass()).toString());
             }
             
             SchemaFactory schemaFactory = XMLSecureFactories.createDefault().getSchemaFactory(getSchemaLanguage());
