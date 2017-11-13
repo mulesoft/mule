@@ -30,6 +30,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.tck.junit4.rule.WarningTimeout;
+import org.mule.tck.report.ThreadDumpOnTimeOut;
+import org.mule.tck.report.ThreadDumper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +46,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.DisableOnDebug;
+import org.junit.rules.RuleChain;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
@@ -98,7 +101,9 @@ public abstract class AbstractMuleTestCase {
   public TestName name = new TestName();
 
   @Rule
-  public TestRule globalTimeout = createTestTimeoutRule();
+  public final TestRule chain = RuleChain
+      .outerRule(new ThreadDumpOnTimeOut())
+      .around(createTestTimeoutRule());
 
   /**
    * Creates the timeout rule that will be used to run the test.
@@ -278,8 +283,8 @@ public abstract class AbstractMuleTestCase {
   }
 
   /**
-   * Create a new {@link CoreEvent} for each invocation. Useful if multiple distinct event instances are needed in a single
-   * test method.
+   * Create a new {@link CoreEvent} for each invocation. Useful if multiple distinct event instances are needed in a single test
+   * method.
    *
    * @return new test event.
    * @throws MuleException
