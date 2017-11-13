@@ -15,6 +15,7 @@ import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.MEL_PREFIX;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
@@ -174,5 +175,10 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
     } else {
       return null;
     }
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getName() + "[" + expressionLanguages.toString() + "]";
   }
 }
