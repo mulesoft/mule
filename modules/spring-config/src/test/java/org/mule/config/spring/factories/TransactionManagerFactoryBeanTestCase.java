@@ -6,14 +6,16 @@
  */
 package org.mule.config.spring.factories;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mule.config.spring.factories.TransactionManagerFactoryBean.WRONG_DEFINITION_ERROR;
 
 import org.mule.DefaultMuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
@@ -21,10 +23,14 @@ import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
 import javax.transaction.TransactionManager;
 
 import org.hamcrest.core.IsNull;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class TransactionManagerFactoryBeanTestCase extends AbstractMuleTestCase
 {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void registerTransactionManager() throws Exception
@@ -52,18 +58,17 @@ public class TransactionManagerFactoryBeanTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void ignoreCustomTransactionManager() throws Exception
+    public void errorWhenTransactionManagerAndTransactionManagerFactoryDefined() throws Exception
     {
+        expectedException.expect(MuleRuntimeException.class);
+        expectedException.expectMessage(containsString(WRONG_DEFINITION_ERROR));
         DefaultMuleContext context = (DefaultMuleContext) new DefaultMuleContextFactory().createMuleContext();
-
         TransactionManagerFactoryBean txMgrFB = new TransactionManagerFactoryBean();
         txMgrFB.setMuleContext(context);
         txMgrFB.setTxManagerFactory(new TestTransactionManagerFactory());
         TransactionManager txMgr = mock(TransactionManager.class);
         txMgrFB.setCustomTxManager(txMgr);
-        TransactionManager transactionManager = txMgrFB.getObject();
-        assertThat(transactionManager, not(nullValue()));
-        assertThat(transactionManager, not(sameInstance(txMgr)));
+        txMgrFB.getObject();
     }
 
 }

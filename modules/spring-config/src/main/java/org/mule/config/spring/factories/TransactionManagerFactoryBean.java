@@ -7,6 +7,7 @@
 package org.mule.config.spring.factories;
 
 import static org.mule.config.i18n.CoreMessages.failedToCreate;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
@@ -34,6 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class TransactionManagerFactoryBean implements FactoryBean<TransactionManager>, MuleContextAware
 {
 
+    static String WRONG_DEFINITION_ERROR = "It is not possible to define both TransactionManager and TransactionManagerFactory";
+
     @Autowired(required = false)
     private TransactionManagerFactory txManagerFactory;
 
@@ -51,6 +54,10 @@ public class TransactionManagerFactoryBean implements FactoryBean<TransactionMan
             // muleContext is disposed.
             // At that point, there is no need to create the txManager.
             return null;
+        }
+        if (txManagerFactory != null && customTxManager != null)
+        {
+            throw new MuleRuntimeException(createStaticMessage(WRONG_DEFINITION_ERROR));
         }
         else if (txManagerFactory != null)
         {
