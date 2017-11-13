@@ -275,8 +275,10 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
    */
   @Override
   public synchronized void dispose() {
+    System.out.println(format("initialized: %s",initialized));
     if (initialized) {
       initialized = false;
+      System.out.println(format("retryScheduler: %s",retryScheduler));
       if (retryScheduler != null) {
         retryScheduler.stop();
       }
