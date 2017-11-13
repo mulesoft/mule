@@ -252,6 +252,17 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceMustNotStartType" substitutionGroup="mule:abstract-message-source" name="source-must-not-start"></xs:element>
+  <xs:complexType name="SourceMustNotStartType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="hasBeenStarted"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SourceWithMultiLevelValueType" substitutionGroup="mule:abstract-message-source" name="source-with-multi-level-value"></xs:element>
   <xs:complexType name="SourceWithMultiLevelValueType">
     <xs:complexContent>
