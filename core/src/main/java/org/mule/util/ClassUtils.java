@@ -235,6 +235,27 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     {
         return loadClass(className, callingClass, Object.class);
     }
+    
+    /**
+     * Load a primitive wrapper class if exists
+     * @param className The name of the class to load
+     * 
+     * @return the wrapper or null
+     */
+    public static <T extends Class> T loadPrimitiveWrapperClassIfExists(final String className)
+    {
+        if (className.length() <= 8)
+        {
+            // Could be a primitive - likely.
+            if (primitiveTypeNameMap.containsKey(className))
+            {
+                return (T) primitiveTypeNameMap.get(className);
+            }
+        }
+
+        return null;
+    }
+    
     /**
      * Load a class with a given name. <p/> It will try to load the class in the
      * following order:
@@ -255,16 +276,14 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      */
     public static <T extends Class> T loadClass(final String className, final Class<?> callingClass, T type) throws ClassNotFoundException
     {
-        if (className.length() <= 8)
+        Class<?> clazz = loadPrimitiveWrapperClassIfExists(className);
+        
+        if (clazz != null)
         {
-            // Could be a primitive - likely.
-            if (primitiveTypeNameMap.containsKey(className))
-            {
-                return (T) primitiveTypeNameMap.get(className);
-            }
+            return (T) clazz;
         }
 
-        Class<?> clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
+        clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
         {
             public Class<?> run()
             {
