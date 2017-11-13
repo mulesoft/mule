@@ -29,7 +29,7 @@ public interface HttpServer {
   /**
    * Unbinds the ServerSocket to the network interface and stops listening for requests.
    * <p>
-   * Inflight requests are not affected and may proceed normally until {@link #dispose()} is called.
+   * Currently executing requests are not affected and may proceed normally until {@link #dispose()} is called.
    *
    * @return this server
    */
@@ -37,6 +37,9 @@ public interface HttpServer {
 
   /**
    * Removes all secondary data to get rid of the server. Cannot be undone.
+   * <p>
+   * If there are any currently running requests, this method will block until either those requests are finished or a timeout
+   * elapses. The requests that were received but didn't start processing, will be finished returning a 503 status code.
    */
   void dispose();
 
