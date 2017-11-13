@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.0.0</version>
     </parent>
     <artifactId>mule-ce-sources</artifactId>
     <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the

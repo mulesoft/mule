@@ -5,13 +5,13 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule-module-global-config</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0</version>
     <name>Mule Global Configuration Module</name>
     <description>This module handles the global configuration of the Mule Runtime</description>
 
