@@ -12,9 +12,17 @@ public interface AllureConstants {
 
     String DB_EXTENSION = "DB Extension";
 
-    interface DbStory {
+  }
 
+  interface SpringModuleFeature {
+
+    String SPRING_EXTENSION = "Spring Extension";
+
+    interface SpringModuleStory {
+
+      String SPRING_MODULE = "Spring Module";
     }
+
   }
 
   interface ConfigurationComponentLocatorFeature {
