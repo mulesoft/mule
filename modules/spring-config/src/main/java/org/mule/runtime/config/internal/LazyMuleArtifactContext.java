@@ -31,7 +31,6 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.dsl.model.MinimalApplicationModelGenerator;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -60,7 +59,8 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
  *
  * @since 4.0
  */
-public class LazyMuleArtifactContext extends MuleArtifactContext implements LazyComponentInitializer, LazyComponentCreator {
+public class LazyMuleArtifactContext extends MuleArtifactContext
+    implements LazyComponentInitializerAdapter, LazyComponentCreator {
 
   private TrackingPostProcessor trackingPostProcessor = new TrackingPostProcessor();
 
@@ -123,7 +123,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     addBeanPostProcessors(beanFactory, trackingPostProcessor);
   }
 
-  private void applyLifecycle(List<String> createdComponentModels) {
+  private void applyLifecycle(List<String> createdComponentModels, boolean applyStartPhase) {
     muleContext.withLifecycleLock(() -> {
       if (muleContext.isInitialised()) {
         for (String createdComponentModelName : createdComponentModels) {
@@ -135,7 +135,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
           }
         }
       }
-      if (muleContext.isStarted()) {
+      if (applyStartPhase && muleContext.isStarted()) {
         for (String createdComponentModelName : createdComponentModels) {
           Object object = getRegistry().lookupByName(createdComponentModelName).get();
           try {
@@ -150,12 +150,22 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
 
   @Override
   public void initializeComponent(Location location) {
-    applyLifecycle(createComponents(empty(), of(location)));
+    initializeComponent(location, true);
   }
 
   @Override
   public void initializeComponents(ComponentLocationFilter filter) {
-    applyLifecycle(createComponents(of(filter), empty()));
+    initializeComponents(filter, true);
+  }
+
+  @Override
+  public void initializeComponent(Location location, boolean applyStartPhase) {
+    applyLifecycle(createComponents(empty(), of(location)), applyStartPhase);
+  }
+
+  @Override
+  public void initializeComponents(ComponentLocationFilter filter, boolean applyStartPhase) {
+    applyLifecycle(createComponents(of(filter), empty()), applyStartPhase);
   }
 
   @Override

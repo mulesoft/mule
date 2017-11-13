@@ -24,8 +24,8 @@ public interface LazyComponentInitializer {
   String LAZY_COMPONENT_INITIALIZER_SERVICE_KEY = "_muleLazyComponentInitializer";
 
   /**
-   * Calling this method guarantees that the components accepted by the filter from the configuration will be created and
-   * initialized.
+   * Calling this method guarantees that the components accepted by the filter from the configuration will be created,
+   * initialized and started.
    * <p/>
    * If there were any component already initialized it will be unregistered in order to initialize the ones selected by this filter.
    *
@@ -35,8 +35,8 @@ public interface LazyComponentInitializer {
   void initializeComponents(ComponentLocationFilter componentLocationFilter);
 
   /**
-   * Calling this method guarantees that the requested component from the configuration will be created and
-   * initialized.
+   * Calling this method guarantees that the requested component from the configuration will be created, initialized and
+   * started.
    * <p/>
    * The requested component must exists in the configuration. If there was a component already initialized it will be unregistered
    * in order to initialize the requested component and its dependencies.

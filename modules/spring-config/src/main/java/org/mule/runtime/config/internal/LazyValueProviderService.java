@@ -26,7 +26,6 @@ import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.api.value.ValueResult;
-import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
@@ -53,7 +52,7 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
   private final Supplier<ValueProviderService> valueProviderServiceSupplier;
   private Supplier<ConfigurationComponentLocator> componentLocatorSupplier;
 
-  private LazyComponentInitializer lazyComponentInitializer;
+  private LazyComponentInitializerAdapter lazyComponentInitializer;
 
   @Inject
   @Named(NON_LAZY_VALUE_PROVIDER_SERVICE)
@@ -61,7 +60,7 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
 
   private ConfigurationComponentLocator componentLocator;
 
-  LazyValueProviderService(LazyComponentInitializer lazyComponentInitializer,
+  LazyValueProviderService(LazyComponentInitializerAdapter lazyComponentInitializer,
                            Supplier<ValueProviderService> valueProviderServiceSupplier,
                            Supplier<ConfigurationComponentLocator> componentLocatorSupplier) {
     this.lazyComponentInitializer = lazyComponentInitializer;
@@ -82,7 +81,7 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
     Location locationWithOutConnection = locationWithOutConnection(location);
 
     try {
-      lazyComponentInitializer.initializeComponent(locationWithOutConnection);
+      lazyComponentInitializer.initializeComponent(locationWithOutConnection, false);
     } catch (Exception e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof NoSuchComponentModelException) {

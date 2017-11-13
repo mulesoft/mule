@@ -13,7 +13,6 @@ import org.mule.runtime.api.value.Value;
 
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ConfigurationValuesTestCase extends AbstractValuesTestCase {
@@ -45,7 +44,6 @@ public class ConfigurationValuesTestCase extends AbstractValuesTestCase {
   }
 
   @Test
-  @Ignore("MULE-13786")
   public void configWithValuesWithRequiredParamsFromShowInDslGroup() throws Exception {
     Set<Value> channels = getValuesFromConfig("values-with-required-params-from-show-in-dsl-group", "valueParam");
     assertThat(channels, hasSize(1));

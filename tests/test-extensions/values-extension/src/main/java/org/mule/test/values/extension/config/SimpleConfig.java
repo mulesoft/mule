@@ -18,6 +18,7 @@ import org.mule.test.values.extension.connection.ConnectionWithValueWithRequired
 import org.mule.test.values.extension.connection.ConnectionWithValuesWithRequiredParamsFromParamGroup;
 import org.mule.test.values.extension.connection.ConnectionWithValuesWithRequiredParamsFromShowInDslGroup;
 import org.mule.test.values.extension.connection.ValuesConnectionProvider;
+import org.mule.test.values.extension.source.SourceMustNotStart;
 import org.mule.test.values.extension.source.SourceWithConfiguration;
 import org.mule.test.values.extension.source.SourceWithConnection;
 import org.mule.test.values.extension.source.SourceWithMultiLevelValue;
@@ -36,7 +37,7 @@ import java.util.List;
 @Sources({SourceWithConfiguration.class, SourceWithConnection.class, SourceWithValuesWithRequiredParameters.class,
     SourceWithValuesWithRequiredParameterInsideParamGroup.class,
     SourceWithRequiredParameterWithAlias.class, SourceWithRequiredParameterInsideShowInDslGroup.class,
-    SourceWithMultiLevelValue.class})
+    SourceWithMultiLevelValue.class, SourceMustNotStart.class})
 public class SimpleConfig {
 
   @Parameter
