@@ -45,6 +45,6 @@
     <spring:bean name="errorHandler" class="org.mule.module.xml.config.XmlNamespaceTestCase$MockErrorHandler"/>
     
     <mulexml:schema-validation-filter name="SchemaValidationWithResourceResolver" 
-        schemaLocations="schema1.xsd" resourceResolver-ref="resourceResolver" 
+        schemaLocations="schema/schema1.xsd" resourceResolver-ref="resourceResolver"
         errorHandler-ref="errorHandler" returnResult="false"/>
 </mule>

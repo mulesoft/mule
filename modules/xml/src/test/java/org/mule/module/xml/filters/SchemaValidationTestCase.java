@@ -40,9 +40,9 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
     @Rule
     public SystemProperty externalEntities = new SystemProperty(EXTERNAL_ENTITIES_PROPERTY, "true");
 
-    private static final String SIMPLE_SCHEMA = "schema1.xsd";
+    private static final String SIMPLE_SCHEMA = "schema/schema1.xsd";
 
-    private static final String INCLUDE_SCHEMA = "schema-with-include.xsd";
+    private static final String INCLUDE_SCHEMA = "schema/schema-with-include.xsd";
 
     private static final String VALID_XML_FILE = "/validation1.xml";
 

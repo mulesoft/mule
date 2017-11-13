@@ -109,7 +109,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
     public void testSchemaValidationFilterWithCustomResourceResolver()
     {
         SchemaValidationFilter filter = (SchemaValidationFilter) lookupFilter("SchemaValidationWithResourceResolver");
-        assertEquals("schema1.xsd", filter.getSchemaLocations());
+        assertEquals("schema/schema1.xsd", filter.getSchemaLocations());
         assertTrue(filter.getResourceResolver() instanceof MockResourceResolver);
         assertTrue(filter.getErrorHandler() instanceof MockErrorHandler);
         assertFalse(filter.isReturnResult());
