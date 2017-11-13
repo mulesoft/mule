@@ -4,13 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.requester;
+package org.mule.module.http.internal.request;
 
-import static org.mule.module.http.internal.request.DefaultHttpRequester.RETRY_ATTEMPTS_PROPERTY;
+import static java.lang.reflect.Modifier.FINAL;
 import static org.junit.runners.Parameterized.Parameters;
 
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.junit.Rule;
+import java.lang.reflect.Field;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -18,9 +19,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class HttpRetryRequestAttemptsTestCase extends AbstractHttpRetryRequestTestCase
 {
-
-    @Rule
-    public SystemProperty retryAttemptsProperty;
 
     private int numberOfRetries;
 
@@ -34,8 +32,19 @@ public class HttpRetryRequestAttemptsTestCase extends AbstractHttpRetryRequestTe
 
     public HttpRetryRequestAttemptsTestCase(Integer numberOfRetries)
     {
-        this.retryAttemptsProperty = new SystemProperty(RETRY_ATTEMPTS_PROPERTY, numberOfRetries.toString());
         this.numberOfRetries = numberOfRetries;
+    }
+
+    @Before
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        Field retryAttemptsField = DefaultHttpRequester.class.getDeclaredField("RETRY_ATTEMPTS");
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(retryAttemptsField, retryAttemptsField.getModifiers() & ~FINAL);
+        retryAttemptsField.setAccessible(true);
+        retryAttemptsField.setInt(null, numberOfRetries);
     }
 
     @Test

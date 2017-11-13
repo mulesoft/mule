@@ -13,7 +13,6 @@ import org.mule.util.concurrent.Latch;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Server used for testing purposes.
@@ -63,11 +62,11 @@ public class TestServerSocket extends Thread
                 {
                     Socket socket = server.accept();
                     connectionCounter++;
+                    sleep(50);
                     socket.close();
                 }
-                catch (IOException e)
+                catch (IOException | InterruptedException e)
                 {
-
                     // Ignoring exception.
                 }
             }

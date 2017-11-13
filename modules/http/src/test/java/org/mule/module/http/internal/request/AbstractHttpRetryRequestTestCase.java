@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.functional.requester;
+package org.mule.module.http.internal.request;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -65,7 +65,7 @@ public abstract class AbstractHttpRetryRequestTestCase extends FunctionalTestCas
     void runNonIdempotentFlow() throws Exception
     {
         TestServerSocket testServerSocket = new TestServerSocket(port.getNumber(), 1);
-        assertThat("Http server can't be initialized.",testServerSocket.startServer(5000), is(true));
+        assertThat("Http server can't be initialized.", testServerSocket.startServer(5000), is(true));
         try
         {
             runFlow("retryNonIdempotentMethod");

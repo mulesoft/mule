@@ -86,10 +86,10 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     static final String WORKSTATION_DEBUG = "Workstation";
     static final String AUTHENTICATION_TYPE_DEBUG = "Authentication Type";
     static final String QUERY_PARAMS_DEBUG = "Query Params";
-    public static String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.requestAttempts";
-    public static final String REMOTELY_CLOSED = "Remotely closed";
-    public static final int DEFAULT_RETRY_ATTEMPTS = 3;
-    private static int RETRY_ATTEMPTS ;
+    static String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.requestAttempts";
+    static final String REMOTELY_CLOSED = "Remotely closed";
+    static final int DEFAULT_RETRY_ATTEMPTS = 3;
+    private static final int RETRY_ATTEMPTS  = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
 
     private DefaultHttpRequesterConfig requestConfig;
     private HttpRequesterRequestBuilder requestBuilder;
@@ -145,7 +145,6 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                       requestStreamingMode, sendBodyMode, parseResponse, responseTimeout);
 
         notificationHelper = new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false );
-        setRetryAttempts();
     }
 
     private void setEmptyAttributesFromConfig()  throws InitialisationException
@@ -775,8 +774,4 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         return securityFieldDebugInfo;
     }
 
-    private void setRetryAttempts ()
-    {
-        RETRY_ATTEMPTS = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
-    }
 }
