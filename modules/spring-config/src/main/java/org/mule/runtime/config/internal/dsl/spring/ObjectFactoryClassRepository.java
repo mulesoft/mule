@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static java.util.Objects.hash;
 import static org.springframework.cglib.proxy.Enhancer.registerStaticCallbacks;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -54,7 +55,7 @@ public class ObjectFactoryClassRepository {
    * @param objectFactoryType the {@link ObjectFactory} of the component
    * @param createdObjectType the type of object created by the {@code ObjectFactory}
    * @param isLazyInitFunction function that defines if the object created by the component can be created lazily
-   * @param instancePostCreationFunction function to do custom processing of the created instance by the {@code ObjectFactory}.
+   * @param instancePostCreationFunctionOptional function to do custom processing of the created instance by the {@code ObjectFactory}.
    *        When there's no need for post processing this value must be {@link Optional#empty()}
    * @return the {@code FactoryBean} class to be used by spring for the provided configuration.
    */
@@ -62,13 +63,18 @@ public class ObjectFactoryClassRepository {
                                                     Class objectFactoryType,
                                                     Class createdObjectType,
                                                     Supplier<Boolean> isLazyInitFunction,
-                                                    Consumer<Object> instancePostCreationFunction) {
+                                                    Optional<Consumer<Object>> instancePostCreationFunctionOptional) {
     try {
-      return objectFactoryClassCache.get(componentBuildingDefinition,
-                                         () -> getObjectFactoryDynamicClass(componentBuildingDefinition,
-                                                                            objectFactoryType,
-                                                                            createdObjectType, isLazyInitFunction,
-                                                                            instancePostCreationFunction));
+      if (instancePostCreationFunctionOptional.isPresent()) {
+        return getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType, createdObjectType, isLazyInitFunction,
+                                            instancePostCreationFunctionOptional.get());
+      } else {
+        // instancePostCreationFunctionOptional is used within the intercepted method so we can't use a cache.
+        return objectFactoryClassCache.get(componentBuildingDefinition,
+                                           () -> getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType,
+                                                                              createdObjectType, isLazyInitFunction, object -> {
+                                                                              }));
+      }
     } catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
     }
