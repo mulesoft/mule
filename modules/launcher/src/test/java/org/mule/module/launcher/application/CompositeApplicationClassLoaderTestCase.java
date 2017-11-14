@@ -67,44 +67,6 @@ public class CompositeApplicationClassLoaderTestCase extends AbstractMuleTestCas
         Class<?> aClass = compositeApplicationClassLoader.loadClass(CLASS_NAME);
         assertThat(aClass, equalTo(APP_LOADED_CLASS));
     }
-    
-    @Test
-    public void loadPrimitiveWrapperClass() throws Exception
-    {
-        appClassLoader.addClass(CLASS_NAME, APP_LOADED_CLASS);
-        pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
-
-        List<ClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
-
-        CompositeApplicationClassLoader compositeApplicationClassLoader = new CompositeApplicationClassLoader(APP_NAME, classLoaders);
-
-        Class<?> aClass = compositeApplicationClassLoader.loadClass("int");
-        assertThat(aClass.getName(), equalTo("int"));
-
-        aClass = compositeApplicationClassLoader.loadClass("float");
-        assertThat(aClass.getName(), equalTo("float"));
-
-        aClass = compositeApplicationClassLoader.loadClass("char");
-        assertThat(aClass.getName(), equalTo("char"));
-
-        aClass = compositeApplicationClassLoader.loadClass("short");
-        assertThat(aClass.getName(), equalTo("short"));
-
-        aClass = compositeApplicationClassLoader.loadClass("boolean");
-        assertThat(aClass.getName(), equalTo("boolean"));
-
-        aClass = compositeApplicationClassLoader.loadClass("byte");
-        assertThat(aClass.getName(), equalTo("byte"));
-
-        aClass = compositeApplicationClassLoader.loadClass("double");
-        assertThat(aClass.getName(), equalTo("double"));
-
-        aClass = compositeApplicationClassLoader.loadClass("long");
-        assertThat(aClass.getName(), equalTo("long"));
-
-        aClass = compositeApplicationClassLoader.loadClass("void");
-        assertThat(aClass.getName(), equalTo("void"));
-    }
 
     @Test
     public void loadsClassFromPluginWhenIsNotDefinedInApp() throws Exception
