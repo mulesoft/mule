@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.net.URL;
 
 /**
- * Checks that a connection can be established to a provided Url. If not, the test case is ignored.
+ * Checks that a connection can be established to a provided URL. If not, the test case is ignored.
  *
  * @since 4.1
  */
@@ -23,9 +23,9 @@ public class RequiresConnectivity extends ExternalResource {
   private String connectivityUrl;
 
   /**
-   * Constructs a JUnit Rule to assume connectivity to a provided url.
+   * Constructs a JUnit Rule to assume connectivity to a provided URL.
    *
-   * @param connectivityUrl the url to check connectivity to.
+   * @param connectivityUrl the URL to check connectivity to.
    */
   public RequiresConnectivity(String connectivityUrl) {
     this.connectivityUrl = connectivityUrl;
