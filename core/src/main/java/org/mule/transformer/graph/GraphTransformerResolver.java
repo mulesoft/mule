@@ -22,7 +22,7 @@ public class GraphTransformerResolver implements TransformerResolver
 {
 
     private ReentrantReadWriteLock readWriteLock;
-    private TransformationGraph graph;
+    private SynchronizedTransformationGraph graph;
     private CompositeConverterFilter converterFilter;
     private LRUMap cache;
     private TransformationGraphLookupStrategy lookupStrategyTransformation;
@@ -30,7 +30,7 @@ public class GraphTransformerResolver implements TransformerResolver
     public GraphTransformerResolver()
     {
         this.readWriteLock = new ReentrantReadWriteLock();
-        this.graph = new TransformationGraph();
+        this.graph = new SynchronizedTransformationGraph();
         lookupStrategyTransformation = new TransformationGraphLookupStrategy(graph);
         converterFilter = new CompositeConverterFilter(new TransformationLengthConverterFilter(), new PriorityWeightingConverterFilter(), new NameConverterFilter());
         cache = new LRUMap();
@@ -55,7 +55,7 @@ public class GraphTransformerResolver implements TransformerResolver
         }
 
         List<Converter> converters = converterFilter.filter(lookupStrategyTransformation.lookupConverters(source, result), source, result);
-
+        
         if (converters.size() > 1)
         {
             throw new ResolverException(CoreMessages.transformHasMultipleMatches(source.getType(), result.getType(), converters));

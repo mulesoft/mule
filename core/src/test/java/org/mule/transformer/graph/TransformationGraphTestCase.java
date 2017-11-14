@@ -29,15 +29,15 @@ import org.junit.Test;
 public class TransformationGraphTestCase extends AbstractMuleTestCase
 {
 
-    private static final DataType XML_DATA_TYPE = mock(DataType.class, "XML_DATA_TYPE");
-    private static final DataType JSON_DATA_TYPE = mock(DataType.class, "JSON_DATA_TYPE");
-    private static final DataType INPUT_STREAM_DATA_TYPE = mock(DataType.class, "INPUT_STREAM_DATA_TYPE");
-    private static final DataType STRING_DATA_TYPE = mock(DataType.class, "STRING_DATA_TYPE");
+    protected static final DataType XML_DATA_TYPE = mock(DataType.class, "XML_DATA_TYPE");
+    protected static final DataType JSON_DATA_TYPE = mock(DataType.class, "JSON_DATA_TYPE");
+    protected static final DataType INPUT_STREAM_DATA_TYPE = mock(DataType.class, "INPUT_STREAM_DATA_TYPE");
+    protected static final DataType STRING_DATA_TYPE = mock(DataType.class, "STRING_DATA_TYPE");
 
-    private static class XML_CLASS {}
-    private static class JSON_CLASS {}
-    private static class INPUT_STREAM_CLASS{}
-    private static class STRING_CLASS{}
+    protected static class XML_CLASS {}
+    protected static class JSON_CLASS {}
+    protected static class INPUT_STREAM_CLASS{}
+    protected static class STRING_CLASS{}
 
     @BeforeClass
     public static void setupDataTypes()
@@ -280,7 +280,6 @@ public class TransformationGraphTestCase extends AbstractMuleTestCase
         assertFalse(graph.containsEdge(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE));
         assertFalse(graph.containsEdge(JSON_DATA_TYPE, INPUT_STREAM_DATA_TYPE));
     }
-
 
     private void assertContainsTransformer(Set<TransformationEdge> transformationEdges, Transformer transformer)
     {
