@@ -937,6 +937,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 25,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -1037,7 +1038,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 25
+                "order": 26
               },
               "allowedStereotypeModels": [],
               "name": "nextDoor",
@@ -1387,7 +1388,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 26
+                "order": 27
               },
               "allowedStereotypeModels": [],
               "name": "fullyBald",
@@ -1424,7 +1425,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 27
+                "order": 28
               },
               "allowedStereotypeModels": [],
               "name": "beardTrimming",
@@ -1469,7 +1470,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 28
+                "order": 29
               },
               "allowedStereotypeModels": [],
               "name": "worksAtDEA",
@@ -1499,7 +1500,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 29
+                "order": 30
               },
               "allowedStereotypeModels": [],
               "name": "lovesMinerals",
@@ -1597,6 +1598,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1627,6 +1629,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1639,6 +1642,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -1765,6 +1774,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1785,6 +1795,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -2033,6 +2049,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2053,6 +2070,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 0
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -2079,6 +2102,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2109,6 +2133,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2121,6 +2146,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -2247,6 +2278,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2267,6 +2299,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -2475,6 +2513,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2495,6 +2534,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 0
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -2521,6 +2566,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2551,6 +2597,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2563,6 +2610,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -2689,6 +2742,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2709,6 +2763,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -2818,6 +2878,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2848,6 +2909,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2860,6 +2922,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -2927,6 +2995,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2957,6 +3026,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -2969,6 +3039,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -3039,6 +3115,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3069,6 +3146,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3081,6 +3159,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -3207,6 +3291,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3227,6 +3312,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -3357,6 +3448,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3387,6 +3479,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3399,6 +3492,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -3607,6 +3706,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3627,6 +3727,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 0
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -3653,6 +3759,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3683,6 +3790,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3695,6 +3803,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -3821,6 +3935,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3841,6 +3956,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -3917,6 +4038,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3947,6 +4069,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3959,6 +4082,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -4085,6 +4214,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4105,6 +4235,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -4244,6 +4380,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4274,6 +4411,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4286,6 +4424,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -4578,6 +4722,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4630,6 +4775,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4660,6 +4806,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4672,6 +4819,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -4880,6 +5033,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4900,6 +5054,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 0
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -4926,6 +5086,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4956,6 +5117,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -4968,6 +5130,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -5094,6 +5262,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5114,6 +5283,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -5357,6 +5532,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5409,6 +5585,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5439,6 +5616,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5451,6 +5629,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -5675,6 +5859,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5695,6 +5880,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 0
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -5721,6 +5912,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 1,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5751,6 +5943,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5763,6 +5956,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "Output",
               "description": "",
@@ -5889,6 +6088,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 3,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -5909,6 +6109,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -6223,6 +6429,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -6243,6 +6450,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -6887,6 +7100,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -6907,6 +7121,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -6961,7 +7181,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 11
+                      "order": 13
                     },
                     "allowedStereotypeModels": [],
                     "name": "payment",
@@ -6987,7 +7207,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 12
+                      "order": 14
                     },
                     "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
@@ -7017,7 +7237,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 13
+                      "order": 15
                     },
                     "allowedStereotypeModels": [],
                     "name": "fail",
@@ -7100,7 +7320,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 14
+                      "order": 16
                     },
                     "allowedStereotypeModels": [],
                     "name": "nextDoor",
@@ -7451,7 +7671,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 15
+                      "order": 17
                     },
                     "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
@@ -7477,7 +7697,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 16
+                      "order": 18
                     },
                     "allowedStereotypeModels": [],
                     "name": "methylamine",
@@ -7507,7 +7727,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 17
+                      "order": 19
                     },
                     "allowedStereotypeModels": [],
                     "name": "propagateError",
@@ -7590,7 +7810,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 18
+                      "order": 20
                     },
                     "allowedStereotypeModels": [],
                     "name": "nextDoor",
@@ -8069,148 +8289,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "RedeliveryPolicy"
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "maxRedeliveryCount"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "default": "5"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "useSecureHash"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "messageDigestAlgorithm"
-                        },
-                        "model": {
-                          "type": "String"
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "idExpression"
-                        },
-                        "model": {
-                          "type": "String"
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "objectStore"
-                        },
-                        "model": {
-                          "type": "Object",
-                          "annotations": {
-                            "typeId": "org.mule.runtime.api.store.ObjectStore",
-                            "classInformation": {
-                              "classname": "org.mule.runtime.api.store.ObjectStore",
-                              "hasDefaultConstructor": false,
-                              "isInterface": true,
-                              "isInstantiable": false,
-                              "isAbstract": true,
-                              "isFinal": false,
-                              "implementedInterfaces": [],
-                              "parent": "",
-                              "genericTypes": [],
-                              "isMap": false
-                            },
-                            "typeAlias": {
-                              "value": "ObjectStore"
-                            }
-                          },
-                          "fields": []
-                        },
-                        "annotations": {
-                          "stereotype": {
-                            "allowedStereotypes": [
-                              {
-                                "type": "OBJECT_STORE",
-                                "namespace": "OS"
-                              }
-                            ]
-                          },
-                          "description": {
-                            "value": "The object store where the redelivery counter for each message is going to be stored."
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 10,
-                    "tabName": "Redelivery"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "redeliveryPolicy",
-                  "description": "Defines a policy for processing the redelivery of the same message",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                      "value": {
-                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-redelivery-policy",
-                        "prefix": "mule"
-                      }
-                    },
-                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                      "sequence": 1
-                    }
-                  }
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "Union",
                     "annotations": {
                       "typeId": "ByteStreamingStrategy"
@@ -8376,6 +8454,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 10,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -8391,6 +8470,148 @@
                     },
                     "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 2
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "RedeliveryPolicy"
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "maxRedeliveryCount"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "5"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "useSecureHash"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "default": "true"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "messageDigestAlgorithm"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "idExpression"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "objectStore"
+                        },
+                        "model": {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "classInformation": {
+                              "classname": "org.mule.runtime.api.store.ObjectStore",
+                              "hasDefaultConstructor": false,
+                              "isInterface": true,
+                              "isInstantiable": false,
+                              "isAbstract": true,
+                              "isFinal": false,
+                              "implementedInterfaces": [],
+                              "parent": "",
+                              "genericTypes": [],
+                              "isMap": false
+                            },
+                            "typeAlias": {
+                              "value": "ObjectStore"
+                            }
+                          },
+                          "fields": []
+                        },
+                        "annotations": {
+                          "stereotype": {
+                            "allowedStereotypes": [
+                              {
+                                "type": "OBJECT_STORE",
+                                "namespace": "OS"
+                              }
+                            ]
+                          },
+                          "description": {
+                            "value": "The object store where the redelivery counter for each message is going to be stored."
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 11,
+                    "tabName": "Redelivery"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "redeliveryPolicy",
+                  "description": "Defines a policy for processing the redelivery of the same message",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-redelivery-policy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
                     }
                   }
                 }
@@ -8528,6 +8749,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 12,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -8548,6 +8770,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -8601,7 +8829,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 11
+                      "order": 13
                     },
                     "allowedStereotypeModels": [],
                     "name": "payment",
@@ -8627,7 +8855,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 12
+                      "order": 14
                     },
                     "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
@@ -8657,7 +8885,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 13
+                      "order": 15
                     },
                     "allowedStereotypeModels": [],
                     "name": "fail",
@@ -8740,7 +8968,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 14
+                      "order": 16
                     },
                     "allowedStereotypeModels": [],
                     "name": "nextDoor",
@@ -9091,7 +9319,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 15
+                      "order": 17
                     },
                     "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
@@ -9117,7 +9345,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 16
+                      "order": 18
                     },
                     "allowedStereotypeModels": [],
                     "name": "methylamine",
@@ -9147,7 +9375,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 17
+                      "order": 19
                     },
                     "allowedStereotypeModels": [],
                     "name": "propagateError",
@@ -9230,7 +9458,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 18
+                      "order": 20
                     },
                     "allowedStereotypeModels": [],
                     "name": "nextDoor",
@@ -9705,148 +9933,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "RedeliveryPolicy"
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "maxRedeliveryCount"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "default": "5"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "useSecureHash"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "messageDigestAlgorithm"
-                        },
-                        "model": {
-                          "type": "String"
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "idExpression"
-                        },
-                        "model": {
-                          "type": "String"
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "objectStore"
-                        },
-                        "model": {
-                          "type": "Object",
-                          "annotations": {
-                            "typeId": "org.mule.runtime.api.store.ObjectStore",
-                            "classInformation": {
-                              "classname": "org.mule.runtime.api.store.ObjectStore",
-                              "hasDefaultConstructor": false,
-                              "isInterface": true,
-                              "isInstantiable": false,
-                              "isAbstract": true,
-                              "isFinal": false,
-                              "implementedInterfaces": [],
-                              "parent": "",
-                              "genericTypes": [],
-                              "isMap": false
-                            },
-                            "typeAlias": {
-                              "value": "ObjectStore"
-                            }
-                          },
-                          "fields": []
-                        },
-                        "annotations": {
-                          "stereotype": {
-                            "allowedStereotypes": [
-                              {
-                                "type": "OBJECT_STORE",
-                                "namespace": "OS"
-                              }
-                            ]
-                          },
-                          "description": {
-                            "value": "The object store where the redelivery counter for each message is going to be stored."
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 10,
-                    "tabName": "Redelivery"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "redeliveryPolicy",
-                  "description": "Defines a policy for processing the redelivery of the same message",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                      "value": {
-                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-redelivery-policy",
-                        "prefix": "mule"
-                      }
-                    },
-                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                      "sequence": 1
-                    }
-                  }
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "Union",
                     "annotations": {
                       "typeId": "ByteStreamingStrategy"
@@ -10012,6 +10098,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 10,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -10027,6 +10114,148 @@
                     },
                     "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 2
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "RedeliveryPolicy"
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "maxRedeliveryCount"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "5"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "useSecureHash"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "default": "true"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "messageDigestAlgorithm"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "idExpression"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "objectStore"
+                        },
+                        "model": {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "classInformation": {
+                              "classname": "org.mule.runtime.api.store.ObjectStore",
+                              "hasDefaultConstructor": false,
+                              "isInterface": true,
+                              "isInstantiable": false,
+                              "isAbstract": true,
+                              "isFinal": false,
+                              "implementedInterfaces": [],
+                              "parent": "",
+                              "genericTypes": [],
+                              "isMap": false
+                            },
+                            "typeAlias": {
+                              "value": "ObjectStore"
+                            }
+                          },
+                          "fields": []
+                        },
+                        "annotations": {
+                          "stereotype": {
+                            "allowedStereotypes": [
+                              {
+                                "type": "OBJECT_STORE",
+                                "namespace": "OS"
+                              }
+                            ]
+                          },
+                          "description": {
+                            "value": "The object store where the redelivery counter for each message is going to be stored."
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 11,
+                    "tabName": "Redelivery"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "redeliveryPolicy",
+                  "description": "Defines a policy for processing the redelivery of the same message",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-redelivery-policy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
                     }
                   }
                 }
@@ -10164,6 +10393,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 12,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -10184,6 +10414,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -10237,7 +10473,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 12
+                      "order": 14
                     },
                     "allowedStereotypeModels": [],
                     "name": "payment",
@@ -10263,7 +10499,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 13
+                      "order": 15
                     },
                     "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
@@ -10293,7 +10529,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 14
+                      "order": 16
                     },
                     "allowedStereotypeModels": [],
                     "name": "fail",
@@ -10376,7 +10612,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 15
+                      "order": 17
                     },
                     "allowedStereotypeModels": [],
                     "name": "nextDoor",
@@ -10727,7 +10963,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 16
+                      "order": 18
                     },
                     "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
@@ -10753,7 +10989,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 17
+                      "order": 19
                     },
                     "allowedStereotypeModels": [],
                     "name": "methylamine",
@@ -10783,7 +11019,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 18
+                      "order": 20
                     },
                     "allowedStereotypeModels": [],
                     "name": "propagateError",
@@ -10866,7 +11102,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 19
+                      "order": 21
                     },
                     "allowedStereotypeModels": [],
                     "name": "nextDoor",
@@ -11371,148 +11607,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "RedeliveryPolicy"
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "maxRedeliveryCount"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "default": "5"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "useSecureHash"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "messageDigestAlgorithm"
-                        },
-                        "model": {
-                          "type": "String"
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "idExpression"
-                        },
-                        "model": {
-                          "type": "String"
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "objectStore"
-                        },
-                        "model": {
-                          "type": "Object",
-                          "annotations": {
-                            "typeId": "org.mule.runtime.api.store.ObjectStore",
-                            "classInformation": {
-                              "classname": "org.mule.runtime.api.store.ObjectStore",
-                              "hasDefaultConstructor": false,
-                              "isInterface": true,
-                              "isInstantiable": false,
-                              "isAbstract": true,
-                              "isFinal": false,
-                              "implementedInterfaces": [],
-                              "parent": "",
-                              "genericTypes": [],
-                              "isMap": false
-                            },
-                            "typeAlias": {
-                              "value": "ObjectStore"
-                            }
-                          },
-                          "fields": []
-                        },
-                        "annotations": {
-                          "stereotype": {
-                            "allowedStereotypes": [
-                              {
-                                "type": "OBJECT_STORE",
-                                "namespace": "OS"
-                              }
-                            ]
-                          },
-                          "description": {
-                            "value": "The object store where the redelivery counter for each message is going to be stored."
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 11,
-                    "tabName": "Redelivery"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "redeliveryPolicy",
-                  "description": "Defines a policy for processing the redelivery of the same message",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                      "value": {
-                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-redelivery-policy",
-                        "prefix": "mule"
-                      }
-                    },
-                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                      "sequence": 1
-                    }
-                  }
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "Union",
                     "annotations": {
                       "typeId": "ByteStreamingStrategy"
@@ -11678,6 +11772,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 11,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -11693,6 +11788,148 @@
                     },
                     "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 2
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "RedeliveryPolicy"
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "maxRedeliveryCount"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "5"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "useSecureHash"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "default": "true"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "messageDigestAlgorithm"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "idExpression"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "objectStore"
+                        },
+                        "model": {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "classInformation": {
+                              "classname": "org.mule.runtime.api.store.ObjectStore",
+                              "hasDefaultConstructor": false,
+                              "isInterface": true,
+                              "isInstantiable": false,
+                              "isAbstract": true,
+                              "isFinal": false,
+                              "implementedInterfaces": [],
+                              "parent": "",
+                              "genericTypes": [],
+                              "isMap": false
+                            },
+                            "typeAlias": {
+                              "value": "ObjectStore"
+                            }
+                          },
+                          "fields": []
+                        },
+                        "annotations": {
+                          "stereotype": {
+                            "allowedStereotypes": [
+                              {
+                                "type": "OBJECT_STORE",
+                                "namespace": "OS"
+                              }
+                            ]
+                          },
+                          "description": {
+                            "value": "The object store where the redelivery counter for each message is going to be stored."
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 12,
+                    "tabName": "Redelivery"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "redeliveryPolicy",
+                  "description": "Defines a policy for processing the redelivery of the same message",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-redelivery-policy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
                     }
                   }
                 }
@@ -11830,6 +12067,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
+                    "order": 13,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -11850,6 +12088,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
               "name": "Connection",
               "description": "",
@@ -12230,6 +12474,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 9,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -12260,6 +12505,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 10,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -12272,6 +12518,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 3
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -12508,6 +12760,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 5,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -12538,6 +12791,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 6,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -12550,6 +12804,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -12705,6 +12965,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -12735,6 +12996,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -12747,6 +13009,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -12820,6 +13088,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 1,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -12850,6 +13119,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -12862,6 +13132,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -12938,6 +13214,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 1,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -12968,6 +13245,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -12980,6 +13258,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -13328,6 +13612,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -13358,6 +13643,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -13370,6 +13656,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -13487,6 +13779,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -13517,6 +13810,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -13529,6 +13823,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -13765,6 +14065,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 1,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -13795,6 +14096,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -13807,6 +14109,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -13885,6 +14193,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 1,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -13915,6 +14224,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -13927,6 +14237,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -14146,6 +14462,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -14176,6 +14493,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -14188,6 +14506,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -14274,6 +14598,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 1,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -14304,6 +14629,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -14316,6 +14642,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -14465,6 +14797,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -14495,6 +14828,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -14507,6 +14841,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -14830,6 +15170,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 8,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -14860,6 +15201,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 9,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -14872,6 +15214,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -15044,6 +15392,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -15074,6 +15423,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -15086,6 +15436,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -15231,6 +15587,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -15261,6 +15618,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -15273,6 +15631,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -15420,6 +15784,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -15450,6 +15815,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -15462,6 +15828,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -15604,6 +15976,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -15634,6 +16007,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -15646,6 +16020,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -15796,6 +16176,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -15826,6 +16207,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -15838,6 +16220,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -15989,6 +16377,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -16019,6 +16408,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -16031,6 +16421,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -16182,6 +16578,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -16212,6 +16609,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -16224,6 +16622,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -16404,6 +16808,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -16434,6 +16839,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 5,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -16446,6 +16852,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -16560,6 +16972,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -16590,6 +17003,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -16602,6 +17016,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -16751,6 +17171,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -16781,6 +17202,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -16793,6 +17215,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -16907,6 +17335,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -16937,6 +17366,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -16949,6 +17379,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -17051,6 +17487,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 1,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -17081,6 +17518,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -17093,6 +17531,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -17224,6 +17668,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -17254,6 +17699,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -17266,6 +17712,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -17488,6 +17940,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -17518,6 +17971,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -17530,6 +17984,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -17676,6 +18136,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -17706,6 +18167,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -17718,6 +18180,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -17868,6 +18336,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -17898,6 +18367,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -17910,6 +18380,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -18018,6 +18494,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -18048,6 +18525,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -18060,6 +18538,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -18206,6 +18690,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -18236,6 +18721,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -18248,6 +18734,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -18395,6 +18887,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -18425,6 +18918,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -18437,6 +18931,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -18546,6 +19046,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -18576,6 +19077,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -18588,6 +19090,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -18705,6 +19213,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -18735,6 +19244,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -18747,6 +19257,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
           "name": "Output",
           "description": "",
@@ -19859,6 +20375,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -19879,6 +20396,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 3
+          },
           "showInDsl": false,
           "name": "Connection",
           "description": "",
@@ -20523,6 +21046,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
+                "order": 5,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -20543,6 +21067,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 3
+          },
           "showInDsl": false,
           "name": "Connection",
           "description": "",

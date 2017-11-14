@@ -57,6 +57,7 @@ import java.util.Set;
  */
 public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
 
+
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     new EnricherDelegate().enrich(extensionLoadingContext);

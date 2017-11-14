@@ -9,11 +9,13 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.INITIALIZE;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 
 import java.util.Optional;
@@ -28,6 +30,11 @@ import java.util.Optional;
  * @since 4.0
  */
 public final class JavaXmlDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
+
+  @Override
+  public DeclarationEnricherPhase getExecutionPhase() {
+    return INITIALIZE;
+  }
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {

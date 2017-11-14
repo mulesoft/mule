@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.addInterceptorFactory;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
+import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
@@ -21,6 +23,11 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.Connectio
  * @since 4.0
  */
 public final class ConnectionDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
+
+  @Override
+  public DeclarationEnricherPhase getExecutionPhase() {
+    return POST_STRUCTURE;
+  }
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {

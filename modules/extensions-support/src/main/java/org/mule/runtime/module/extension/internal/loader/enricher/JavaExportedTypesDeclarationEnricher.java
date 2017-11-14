@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.util.Arrays.stream;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.INITIALIZE;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.IntersectionType;
@@ -18,6 +20,7 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 
 /**
@@ -26,6 +29,11 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
  * @since 4.0
  */
 public final class JavaExportedTypesDeclarationEnricher extends AbstractAnnotatedDeclarationEnricher {
+
+  @Override
+  public DeclarationEnricherPhase getExecutionPhase() {
+    return INITIALIZE;
+  }
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
