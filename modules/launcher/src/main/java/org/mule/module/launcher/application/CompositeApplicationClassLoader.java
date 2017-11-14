@@ -6,8 +6,6 @@
  */
 package org.mule.module.launcher.application;
 
-import static org.mule.util.ClassUtils.loadPrimitiveWrapperClassIfExists;
-
 import org.mule.module.launcher.DisposableClassLoader;
 import org.mule.module.launcher.MuleApplicationClassLoader;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
@@ -59,13 +57,6 @@ public class CompositeApplicationClassLoader extends ClassLoader implements Appl
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException
     {
-        Class<?> clazz = loadPrimitiveWrapperClassIfExists(name);
-        
-        if (clazz != null)
-        {
-            return clazz;
-        }
-        
         for (ClassLoader classLoader : classLoaders)
         {
             try
