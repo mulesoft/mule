@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jgrapht.DirectedGraph;
 
 /**
  * Looks for available conversion paths inside a transformation graph.
@@ -26,9 +25,9 @@ public class TransformationGraphLookupStrategy
 {
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private DirectedGraph<DataType<?>, TransformationEdge> graph;
+    private SynchronizedTransformationGraph graph;
 
-    public TransformationGraphLookupStrategy(DirectedGraph<DataType<?>, TransformationEdge> graph)
+    public TransformationGraphLookupStrategy(SynchronizedTransformationGraph graph)
     {
         this.graph = graph;
     }
