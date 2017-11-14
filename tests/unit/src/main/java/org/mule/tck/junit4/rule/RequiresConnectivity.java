@@ -35,11 +35,7 @@ public class RequiresConnectivity extends ExternalResource {
   protected void before() throws Throwable {
     super.before();
 
-    try {
-      new URL(connectivityUrl).openConnection().getContent();
-    } catch (IOException e) {
-      assumeTrue("No connectivity to " + connectivityUrl + ". Ignoring test.", false);
-    }
+    assumeTrue("No connectivity to " + connectivityUrl + ". Ignoring test.", checkConnectivity(connectivityUrl));
   }
 
   /**
