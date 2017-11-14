@@ -96,7 +96,6 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private ConnectionManagerAdapter connectionManager;
 
   private volatile Lock testConnectivityLock;
-  private Scheduler retryScheduler;
 
   private volatile boolean initialized = false;
   private volatile boolean started = false;
@@ -184,6 +183,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
       return;
     }
 
+    Scheduler retryScheduler = schedulerService.ioScheduler();
     RetryPolicyTemplate retryTemplate = connectionManager.getRetryTemplateFor(provider);
     ReconnectionConfig reconnectionConfig = connectionManager.getReconnectionConfigFor(provider);
     RetryCallback retryCallback = new RetryCallback() {
@@ -239,6 +239,8 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
       throw new DefaultMuleException(createStaticMessage(format("Could not perform connectivity testing for config '%s'",
                                                                 getName())),
                                      e);
+    }finally {
+      retryScheduler.stop();
     }
   }
 
@@ -275,13 +277,8 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
    */
   @Override
   public synchronized void dispose() {
-    System.out.println(format("initialized: %s",initialized));
     if (initialized) {
       initialized = false;
-      System.out.println(format("retryScheduler: %s",retryScheduler));
-      if (retryScheduler != null) {
-        retryScheduler.stop();
-      }
       disposeIfNeeded(value, LOGGER);
       disposeIfNeeded(connectionProvider, LOGGER);
       configurationStats = null;
@@ -297,7 +294,6 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     }
 
     initialiseIfNeeded(value, true, muleContext);
-    retryScheduler = schedulerService.ioScheduler();
   }
 
   /**
