@@ -41,4 +41,20 @@ public class RequiresConnectivity extends ExternalResource {
       assumeTrue("No connectivity to " + connectivityUrl + ". Ignoring test.", false);
     }
   }
+
+  /**
+   * Checks that a connection can be established to a provided URL.
+   *
+   * @param connectivityUrl the URL to check connectivity to.
+   * @return {@code true} if there is connectivity to the provided url, {@code false} otherwise.
+   */
+  public static boolean checkConnectivity(String connectivityUrl) {
+    try {
+      new URL(connectivityUrl).openConnection().getContent();
+      return true;
+    } catch (IOException e) {
+      return false;
+    }
+
+  }
 }
