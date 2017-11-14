@@ -147,7 +147,6 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         catch (Exception e)
         {
             logger.error("Error in poll", e);
-            getEndpoint().getMuleContext().getExceptionListener().handleException(e);
             throw e;
         }
     }
