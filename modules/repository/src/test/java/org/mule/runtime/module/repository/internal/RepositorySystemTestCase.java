@@ -9,10 +9,13 @@ package org.mule.runtime.module.repository.internal;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeTrue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
 import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REPOSITORY_FOLDER_PROPERTY;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.tck.junit4.rule.RequiresConnectivity.checkConnectivity;
+
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
@@ -21,12 +24,12 @@ import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceDisabledException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.io.File;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
 
 public class RepositorySystemTestCase extends AbstractMuleTestCase {
 
@@ -82,6 +85,7 @@ public class RepositorySystemTestCase extends AbstractMuleTestCase {
   }
 
   private void executeTestWithDefaultRemoteRepo(TestTask test) throws Exception {
+    assumeTrue("No connectivity to http://central.maven.org. Ignoring test.", checkConnectivity("http://central.maven.org"));
 
     testWithSystemProperty(MULE_REPOSITORY_FOLDER_PROPERTY, temporaryFolder.getRoot().getAbsolutePath(), () -> {
       testWithSystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, "http://central.maven.org/maven2/", () -> {
