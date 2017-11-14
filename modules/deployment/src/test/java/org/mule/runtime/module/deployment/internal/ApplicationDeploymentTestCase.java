@@ -33,10 +33,12 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_ARTIFACTS_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
@@ -47,6 +49,7 @@ import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -70,8 +73,12 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainMana
 import org.mule.tck.util.CompilerUtils;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -84,9 +91,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * Contains test for application deployment on the default domain
@@ -154,7 +158,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
 
     // Checks that the configuration's ID was properly configured
-    assertThat(app.getRegistry().<MuleConfiguration>lookupByName(MuleProperties.OBJECT_MULE_CONFIGURATION).get().getId(),
+    assertThat(app.getRegistry().<MuleConfiguration>lookupByName(OBJECT_MULE_CONFIGURATION).get().getId(),
                equalTo(dummyAppDescriptorFileBuilder.getId()));
   }
 
@@ -1597,7 +1601,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  @Ignore("MULE-13395: depending plugin is not found in maven repo when package is light")
   public void deploysLightApplicationWithPluginDependingOnPlugin() throws Exception {
 
     ArtifactPluginFileBuilder dependantPlugin =
@@ -1605,8 +1608,31 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
             .containingClass(pluginEcho3TestClassFile, "org/foo/echo/Plugin3Echo.class")
             .dependingOn(echoPlugin);
 
+    File mavenRepoFolder = Paths.get(getMuleBaseFolder().getAbsolutePath(), "repository").toFile();
+    File testGroupIdRepoFolder = Paths.get(mavenRepoFolder.getAbsolutePath(), "org", "mule", "test").toFile();
+
+    JarFileBuilder testJarFileDependency = new JarFileBuilder("echoTestJar", echoTestJarFile);
+    copyFile(testJarFileDependency.getArtifactPomFile(),
+             Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoTestJar", "1.0.0", "echoTestJar-1.0.0.pom").toFile());
+    copyFile(testJarFileDependency.getArtifactFile(),
+             Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoTestJar", "1.0.0", "echoTestJar-1.0.0.jar").toFile());
+
+    copyFile(echoPlugin.getArtifactPomFile(),
+             Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoPlugin", "1.0.0", "echoPlugin-1.0.0.pom").toFile());
+    copyFile(echoPlugin.getArtifactFile(),
+             Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoPlugin", "1.0.0", "echoPlugin-1.0.0-mule-plugin.jar")
+                 .toFile());
+
+    copyFile(dependantPlugin.getArtifactPomFile(),
+             Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "dependantPlugin", "1.0.0", "dependantPlugin-1.0.0.pom")
+                 .toFile());
+    copyFile(dependantPlugin.getArtifactFile(),
+             Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "dependantPlugin", "1.0.0",
+                       "dependantPlugin-1.0.0-mule-plugin.jar")
+                 .toFile());
+
     final TestArtifactDescriptor artifactFileBuilder = new ApplicationFileBuilder("plugin-depending-on-plugin-app")
-        .definedBy("plugin-depending-on-plugin-app-config.xml").dependingOn(dependantPlugin).usingLightwayPackage();
+        .definedBy("plugin-depending-on-plugin-app-config.xml").dependingOn(dependantPlugin).usingLightWeightPackage();
     addPackedAppFromBuilder(artifactFileBuilder);
 
     startDeployment();

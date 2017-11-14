@@ -14,9 +14,10 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
+import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
+import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.serializeToFile;
+
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.runtime.module.artifact.builder.AbstractDependencyFileBuilder;
@@ -57,7 +58,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
   /**
    * Adds a property into the application deployment properties file.
    *
-   * @param propertyName name fo the property to add. Non empty
+   * @param propertyName name of the property to add. Non empty
    * @param propertyValue value of the property to add. Non null.
    * @return the same builder instance
    */
@@ -69,7 +70,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
     return getThis();
   }
 
-  public T usingLightwayPackage() {
+  public T usingLightWeightPackage() {
     useHeavyPackage = false;
     return getThis();
   }
