@@ -6,18 +6,28 @@
  */
 package org.mule.transport.sftp;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
 import com.jcraft.jsch.SftpException;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.context.notification.ConnectionNotification;
+import org.mule.exception.AbstractSystemExceptionStrategy;
 import org.mule.tck.listener.ConnectionListener;
 import org.mule.tck.listener.FlowExecutionListener;
+import org.mule.transport.ConnectException;
 
 public class SftpReconnectionTestCase extends AbstractSftpTestCase
 {
@@ -29,10 +39,18 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
     private static final String SFTP_RECEIVING_FLOW_NAME = "receiving";
     //SFTP seems to be very slow in CI. Long timeout provided to avoid flakyness.
     private static final int TIMEOUT = 15000;
+    private TestExceptionStrategy testExceptionHandler;
 
     public SftpReconnectionTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
+    }
+
+    @Before
+    public void setUp() throws Exception
+    {
+        testExceptionHandler = new TestExceptionStrategy(muleContext);
+        muleContext.setExceptionListener(testExceptionHandler);
     }
 
     @Parameterized.Parameters
@@ -63,6 +81,7 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
         startUpSftpEndpoint();
         connectionSuccessfulListener.waitUntilNotificationsAreReceived();
         verifySftpFlowIsRunning();
+        assertThat(testExceptionHandler.numberOfExceptionsHandled, is(1));
     }
 
     private void verifySftpFlowIsRunning() throws Exception
@@ -93,5 +112,22 @@ public class SftpReconnectionTestCase extends AbstractSftpTestCase
     protected boolean startServerOnStartUp()
     {
         return false;
+    }
+
+    private static class TestExceptionStrategy extends AbstractSystemExceptionStrategy {
+
+        private int numberOfExceptionsHandled = 0;
+
+        public TestExceptionStrategy(MuleContext muleContext)
+        {
+            super(muleContext);
+        }
+
+        @Override
+        protected void handleReconnection(ConnectException ex)
+        {
+            numberOfExceptionsHandled++;
+            super.handleReconnection(ex);
+        }
     }
 }
