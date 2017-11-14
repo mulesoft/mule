@@ -7,12 +7,12 @@
 package org.mule.test.marvel.ironman;
 
 import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
-
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.ClassValue;
 import org.mule.runtime.extension.api.annotation.param.display.Path;
 import org.mule.test.marvel.MissileProvider;
 import org.mule.test.marvel.OddMissileProvider;
@@ -29,6 +29,11 @@ public class IronMan {
   @Parameter
   @Optional
   private String ironManConfigFile;
+
+  @ClassValue(extendsOrImplements = "com.starkindustries.AIEngine")
+  @Parameter
+  @Optional(defaultValue = "com.starkindustries.Jarvis")
+  private String aiType;
 
   private String flightPlan = null;
   private int missilesFired = 0;

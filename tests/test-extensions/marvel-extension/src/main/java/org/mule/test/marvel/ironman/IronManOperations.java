@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.ClassValue;
 import org.mule.runtime.extension.api.annotation.param.display.Path;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -66,7 +67,8 @@ public class IronManOperations implements Initialisable, Disposable {
   }
 
   @MediaType(TEXT_PLAIN)
-  public String findInstructions(@Optional @Path(acceptedFileExtensions = {"xml"}, location = EMBEDDED) String instructionsFile) {
+  public String findInstructions(@Optional @Path(acceptedFileExtensions = {"xml"}, location = EMBEDDED) String instructionsFile,
+                                 @Optional @ClassValue(extendsOrImplements = {"com.starkindustries.Reader"}) String readerClass) {
     return instructionsFile;
   }
 
