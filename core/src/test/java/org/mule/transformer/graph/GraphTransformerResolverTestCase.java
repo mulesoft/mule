@@ -6,6 +6,11 @@
  */
 package org.mule.transformer.graph;
 
+import static java.util.Collections.synchronizedList;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -26,12 +31,20 @@ import org.mule.transformer.CompositeConverter;
 import org.mule.transformer.builder.MockConverterBuilder;
 import org.mule.transformer.builder.MockTransformerBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 @SmallTest
 public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
 {
+    private static final int CONCURRENCY_TEST_SIZE = 400;
+    private static final int MAX_TIMEOUT_SECONDS = 20;
     private static final DataType XML_DATA_TYPE = mock(DataType.class, "XML_DATA_TYPE");
     private static final DataType JSON_DATA_TYPE = mock(DataType.class, "JSON_DATA_TYPE");
     private static final DataType INPUT_STREAM_DATA_TYPE = mock(DataType.class, "INPUT_STREAM_DATA_TYPE");
@@ -233,5 +246,87 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
         graphResolver.transformerChange(xmlToInputStream2, TransformerResolver.RegistryAction.ADDED);
 
         graphResolver.resolve(XML_DATA_TYPE, INPUT_STREAM_DATA_TYPE);
+    }
+
+    @Test
+    public void modifyGraphWhileResolvingTransformer() throws ResolverException, InterruptedException
+    {
+        final Converter xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        final Converter inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
+
+        Runnable addTransformer = new Runnable()
+        {
+            @Override
+            public void run() {
+                graphResolver.transformerChange(xmlToJson, TransformerResolver.RegistryAction.ADDED);
+                graphResolver.transformerChange(inputStreamToXml, TransformerResolver.RegistryAction.ADDED);
+            }
+        };
+        Runnable resolveTransformer = new Runnable()
+        {
+            @Override
+            public void run() {
+                try {
+                    graphResolver.resolve(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
+                } catch (ResolverException e) {
+                    throw new RuntimeException("Error while getting transformer", e);
+                }
+            }
+        };
+
+        List<Runnable> runnables = new ArrayList<>();
+        for (int i = 0 ; i < CONCURRENCY_TEST_SIZE ; i++)
+        {
+            runnables.add(addTransformer);
+            runnables.add(resolveTransformer);
+        }
+
+        assertConcurrent("Modify transformers while resolving it", runnables, MAX_TIMEOUT_SECONDS);
+    }
+
+    public static void assertConcurrent(final String message, final List<? extends Runnable> runnables, final int maxTimeoutSeconds) throws InterruptedException
+    {
+        final int numThreads = runnables.size();
+        final List<Throwable> exceptions = synchronizedList(new ArrayList<Throwable>());
+        final ExecutorService threadPool = Executors.newFixedThreadPool(numThreads);
+        try
+        {
+            final CountDownLatch allExecutorThreadsReady = new CountDownLatch(numThreads);
+            final CountDownLatch afterInitBlocker = new CountDownLatch(1);
+            final CountDownLatch allDone = new CountDownLatch(numThreads);
+            for (final Runnable submittedTestRunnable : runnables)
+            {
+                threadPool.submit(new Runnable()
+                {
+                    public void run()
+                    {
+                        allExecutorThreadsReady.countDown();
+                        try
+                        {
+                            afterInitBlocker.await();
+                            submittedTestRunnable.run();
+                        }
+                        catch (final Throwable e)
+                        {
+                            exceptions.add(e);
+                        }
+                        finally
+                        {
+                            allDone.countDown();
+                        }
+                    }
+                });
+            }
+            // wait until all threads are ready
+            assertTrue("Timeout initializing threads! Perform long lasting initializations before passing runnables to assertConcurrent", allExecutorThreadsReady.await(runnables.size() * 10, MILLISECONDS));
+            // start all test runners
+            afterInitBlocker.countDown();
+            assertTrue(message + " timeout! More than" + maxTimeoutSeconds + "seconds", allDone.await(maxTimeoutSeconds, SECONDS));
+        }
+        finally
+        {
+            threadPool.shutdownNow();
+        }
+        assertThat(exceptions, empty());
     }
 }
