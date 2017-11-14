@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
+import static java.util.Arrays.sort;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -312,6 +313,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
         apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
       }
 
+      // Sorts apps to ensure they are always deployed in the same order
+      sort(apps);
       deployExplodedApps(apps);
     } catch (Exception e) {
       // preserve the flag for the thread

@@ -10,11 +10,11 @@ package org.mule.runtime.module.deployment.internal;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.reset;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -73,13 +73,17 @@ public class PatchDeploymentTestCase extends AbstractDeploymentTestCase {
 
     ApplicationFileBuilder patchedApp = new ApplicationFileBuilder("app")
         .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
-        .definedBy("dummy-app-config.xml").withVersion(patchedVersion);
+        .usingResource("dummy-app-config.xml", "dummy-app-config.xml")
+        .deployedWith(PROPERTY_CONFIG_RESOURCES, "dummy-app-config.xml")
+        .withVersion(patchedVersion);
 
     addPackedAppFromBuilder(patchedApp);
     assertUndeploymentSuccess(applicationDeploymentListener, deployedApp.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, patchedApp.getId());
     assertThat(deploymentService.getApplications(), hasSize(1));
     assertAppsDir(NONE, new String[] {patchedApp.getId()}, true);
+    // Checks that previous deployed application was completely removed
+    assertApplicationFiles(patchedApp.getId(), new String[] {"dummy-app-config.xml"});
   }
 
   @Test
@@ -111,6 +115,51 @@ public class PatchDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(domainDeploymentListener, newMinorVersionDomain.getId());
     assertThat(deploymentService.getDomains(), hasSize(3));
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, deployedDomain.getId(), newMinorVersionDomain.getId()}, true);
+  }
+
+  @Test
+  public void deploysPackagedPatchedAppWhenPreviousAppIsExplodedOnStartup() throws Exception {
+    ApplicationFileBuilder deployedApp = new ApplicationFileBuilder("app")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .definedBy("dummy-app-config.xml").withVersion("1.0.0");
+
+    addExplodedAppFromBuilder(deployedApp);
+
+    ApplicationFileBuilder patchedApp = new ApplicationFileBuilder("app")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .usingResource("dummy-app-config.xml", "dummy-app-config.xml")
+        .deployedWith(PROPERTY_CONFIG_RESOURCES, "dummy-app-config.xml")
+        .withVersion("1.0.1");
+
+    addPackedAppFromBuilder(patchedApp);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, patchedApp.getId());
+    assertThat(deploymentService.getApplications(), hasSize(1));
+    assertAppsDir(NONE, new String[] {patchedApp.getId()}, true);
+    assertApplicationFiles(patchedApp.getId(), new String[] {"dummy-app-config.xml"});
+  }
+
+  @Test
+  public void deploysFirstApplicationWhenMultipleExplodedVerionsAreFoundOnStartup() throws Exception {
+    ApplicationFileBuilder originalApp = new ApplicationFileBuilder("app")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .definedBy("dummy-app-config.xml").withVersion("1.0.0");
+    addExplodedAppFromBuilder(originalApp);
+
+    ApplicationFileBuilder patchedApp = new ApplicationFileBuilder("app")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .usingResource("dummy-app-config.xml", "dummy-app-config.xml")
+        .deployedWith(PROPERTY_CONFIG_RESOURCES, "dummy-app-config.xml")
+        .withVersion("1.0.1");
+    addExplodedAppFromBuilder(patchedApp);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, originalApp.getId());
+    assertThat(deploymentService.getApplications(), hasSize(1));
+    assertAppsDir(NONE, new String[] {originalApp.getId()}, true);
   }
 
   private void testDomainWithSameMinorVersionCausesRedeploy(String deployedVersion, String patchedVersion) throws Exception {

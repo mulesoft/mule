@@ -16,6 +16,7 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleAppsDir;
@@ -121,14 +122,20 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private void undeployArtifactIfItsAPatch(T artifact) {
-    Optional<T> foundMatchingArtifact = artifacts.stream()
+    Optional<T> foundMatchingArtifact = isPatchedArtifact(artifact);
+    foundMatchingArtifact.ifPresent(this::undeployArtifactWithoutRemovingData);
+  }
+
+  private Optional<T> isPatchedArtifact(T artifact) {
+    return artifacts.stream()
         .filter(deployedArtifact -> deployedArtifact.getDescriptor().getBundleDescriptor() != null)
         .filter(deployedArtifact -> !artifactZombieMap.containsKey(artifact.getArtifactName()))
         .filter(deployedArtifact -> {
           BundleDescriptor deployedBundleDescriptor = deployedArtifact.getDescriptor().getBundleDescriptor();
           BundleDescriptor artifactBundleDescriptor = artifact.getDescriptor().getBundleDescriptor();
-          if (deployedBundleDescriptor.getGroupId().equals(artifactBundleDescriptor.getGroupId()) &&
-              deployedBundleDescriptor.getArtifactId().equals(artifactBundleDescriptor.getArtifactId())) {
+          if (artifactBundleDescriptor != null
+              && deployedBundleDescriptor.getGroupId().equals(artifactBundleDescriptor.getGroupId())
+              && deployedBundleDescriptor.getArtifactId().equals(artifactBundleDescriptor.getArtifactId())) {
             MuleVersion deployedVersion = new MuleVersion(deployedBundleDescriptor.getVersion());
             MuleVersion artifactVersion = new MuleVersion(artifactBundleDescriptor.getVersion());
             if (artifactVersion.sameBaseVersion(deployedVersion)) {
@@ -137,7 +144,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
           }
           return false;
         }).findAny();
-    foundMatchingArtifact.ifPresent(this::undeployArtifactWithoutRemovingData);
   }
 
   private File installArtifact(URI artifactAchivedUri) throws IOException {
@@ -223,9 +229,9 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       undeployArtifact(artifactName);
     }
 
-    T deployedAtifact = deployPackagedArtifact(artifactUri, deploymentProperties);
-    deploymentTemplate.postRedeploy(deployedAtifact);
-    return deployedAtifact;
+    T deployedArtifact = deployPackagedArtifact(artifactUri, deploymentProperties);
+    deploymentTemplate.postRedeploy(deployedArtifact);
+    return deployedArtifact;
   }
 
   private T deployExplodedApp(String addedApp, Optional<Properties> deploymentProperties) throws DeploymentException {
@@ -235,7 +241,17 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     T artifact;
     try {
-      artifact = createArtifact(new File(getMuleAppsDir(), addedApp), deploymentProperties);
+      File artifactLocation = new File(getMuleAppsDir(), addedApp);
+      artifact = createArtifact(artifactLocation, deploymentProperties);
+
+      // Skips the exploded artifact if it corresponds to an already deployed packaged one
+      if (isPatchedArtifact(artifact).isPresent()) {
+
+        if (artifactLocation.exists() && !deleteTree(artifactLocation)) {
+          throw new IOException("Cannot delete existing folder " + artifactLocation);
+        }
+        return null;
+      }
 
       // add to the list of known artifacts first to avoid deployment loop on failure
       trackArtifact(artifact);

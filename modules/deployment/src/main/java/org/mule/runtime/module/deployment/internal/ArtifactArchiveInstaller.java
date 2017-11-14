@@ -10,6 +10,7 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -74,6 +75,12 @@ public class ArtifactArchiveInstaller {
 
       artifactName = getBaseName(fullPath);
       artifactDir = new File(artifactParentDir, artifactName);
+
+      // Removes previous deployed artifact
+      if (artifactDir.exists() && !deleteTree(artifactDir)) {
+        throw new IOException("Cannot delete existing folder " + artifactDir);
+      }
+
       // normalize the full path + protocol to make unzip happy
       final File source = artifactFile;
 
@@ -91,7 +98,7 @@ public class ArtifactArchiveInstaller {
     } finally {
       // delete an artifact dir, as it's broken
       if (errorEncountered && artifactDir != null && artifactDir.exists()) {
-        FileUtils.deleteTree(artifactDir);
+        deleteTree(artifactDir);
       }
     }
     return artifactDir;

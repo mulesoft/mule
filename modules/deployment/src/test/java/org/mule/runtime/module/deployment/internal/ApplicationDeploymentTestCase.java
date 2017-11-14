@@ -38,6 +38,7 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_ARTIFACTS_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
@@ -318,6 +319,50 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
     assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+  }
+
+  @Test
+  public void removesPreviousAppFolderOnRedeploy() throws Exception {
+    startDeployment();
+
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+
+    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+    assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+
+    reset(applicationDeploymentListener);
+
+    ApplicationFileBuilder emptyAppFileBuilder =
+        new ApplicationFileBuilder("empty-app").usingResource("empty-config.xml", "empty-config.xml")
+            .deployedWith(PROPERTY_CONFIG_RESOURCES, "empty-config.xml");
+
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
+
+    assertApplicationFiles(emptyAppFileBuilder.getId(), new String[] {"empty-config.xml"});
+  }
+
+  @Test
+  public void removesPreviousAppFolderOnStart() throws Exception {
+    addExplodedAppFromBuilder(emptyAppFileBuilder);
+
+    ApplicationFileBuilder emptyAppFileBuilder =
+        new ApplicationFileBuilder("empty-app").usingResource("empty-config.xml", "empty-config.xml")
+            .deployedWith(PROPERTY_CONFIG_RESOURCES, "empty-config.xml");
+
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+
+    assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+
+    assertApplicationFiles(emptyAppFileBuilder.getId(), new String[] {"empty-config.xml"});
   }
 
   @Test
@@ -782,29 +827,33 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   public void deploysExplodedAppsInOrderWhenAppArgumentIsUsed() throws Exception {
     assumeThat(parallelDeployment, is(false));
 
-    addExplodedAppFromBuilder(emptyAppFileBuilder, "1");
-    addExplodedAppFromBuilder(emptyAppFileBuilder, "2");
-    addExplodedAppFromBuilder(emptyAppFileBuilder, "3");
+    ApplicationFileBuilder appFileBuilder1 = new ApplicationFileBuilder("1").definedBy("empty-config.xml");
+    addExplodedAppFromBuilder(appFileBuilder1);
+    ApplicationFileBuilder appFileBuilder2 = new ApplicationFileBuilder("2").definedBy("empty-config.xml");
+    addExplodedAppFromBuilder(appFileBuilder2);
+    ApplicationFileBuilder appFileBuilder3 = new ApplicationFileBuilder("3").definedBy("empty-config.xml");
+    addExplodedAppFromBuilder(appFileBuilder3);
 
     Map<String, Object> startupOptions = new HashMap<>();
-    startupOptions.put("app", "3:1:2");
+    startupOptions.put("app", format("%s:%s:%s", appFileBuilder3.getId(), appFileBuilder1.getId(), appFileBuilder2.getId()));
     StartupContext.get().setStartupOptions(startupOptions);
 
     startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, "1");
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, "2");
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, "3");
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, appFileBuilder3.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, appFileBuilder1.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, appFileBuilder2.getId());
 
-    assertAppsDir(NONE, new String[] {"1", "2", "3"}, true);
+    assertAppsDir(NONE, new String[] {appFileBuilder1.getId(), appFileBuilder2.getId(), appFileBuilder3.getId()},
+                  true);
 
     // When apps are passed as -app app1:app2:app3 the startup order matters
     List<Application> applications = deploymentService.getApplications();
     assertNotNull(applications);
     assertEquals(3, applications.size());
-    assertEquals("3", applications.get(0).getArtifactName());
-    assertEquals("1", applications.get(1).getArtifactName());
-    assertEquals("2", applications.get(2).getArtifactName());
+    assertEquals(appFileBuilder3.getId(), applications.get(0).getArtifactName());
+    assertEquals(appFileBuilder1.getId(), applications.get(1).getArtifactName());
+    assertEquals(appFileBuilder2.getId(), applications.get(2).getArtifactName());
   }
 
   @Test
@@ -1741,13 +1790,14 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     final int totalApps = 20;
 
     for (int i = 1; i <= totalApps; i++) {
-      addExplodedAppFromBuilder(emptyAppFileBuilder, Integer.toString(i));
+      addExplodedAppFromBuilder(new ApplicationFileBuilder(Integer.toString(i), emptyAppFileBuilder));
     }
 
     startDeployment();
 
     for (int i = 1; i <= totalApps; i++) {
-      assertDeploymentSuccess(applicationDeploymentListener, Integer.toString(i));
+      assertDeploymentSuccess(applicationDeploymentListener,
+                              new ApplicationFileBuilder(Integer.toString(i), emptyAppFileBuilder).getId());
     }
   }
 
