@@ -85,7 +85,9 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
   @Override
   public synchronized void reconfigure() {
     loggerContextConfigurer.configure(this);
-    super.reconfigure();
+    if (loggerContextConfigurer.shouldConfigureContext(this)) {
+      super.reconfigure();
+    }
   }
 
   @Override

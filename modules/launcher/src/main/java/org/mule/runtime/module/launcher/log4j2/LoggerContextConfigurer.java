@@ -106,7 +106,7 @@ final class LoggerContextConfigurer {
     }
   }
 
-  private boolean shouldConfigureContext(MuleLoggerContext context) {
+  public boolean shouldConfigureContext(MuleLoggerContext context) {
     if (!context.isApplicationClassloader()) {
       return true;
     }
