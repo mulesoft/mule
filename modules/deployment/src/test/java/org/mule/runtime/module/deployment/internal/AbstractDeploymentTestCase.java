@@ -27,6 +27,7 @@ import static org.apache.commons.lang.reflect.FieldUtils.writeDeclaredStaticFiel
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertArrayEquals;
@@ -124,15 +125,6 @@ import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.test.runner.classloader.TestModuleDiscoverer;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -149,6 +141,15 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 /**
@@ -896,7 +897,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private void assertArtifactConfigs(File artifactDir, String[] expectedFiles) {
     final String[] artifactFiles = artifactDir.list(FILE);
 
-    assertArrayEquals(expectedFiles, artifactFiles);
+    assertThat(expectedFiles, arrayContainingInAnyOrder(artifactFiles));
   }
 
   protected void addPackedAppFromBuilder(TestArtifactDescriptor artifactFileBuilder) throws Exception {
