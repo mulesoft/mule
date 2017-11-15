@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher;
 
+import static org.apache.commons.io.filefilter.FileFileFilter.FILE;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.Matchers.equalTo;
@@ -32,6 +33,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mule.module.launcher.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
+import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 
 import org.mule.api.MuleContext;
@@ -430,6 +432,51 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
         assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+    }
+
+    @Test
+    public void removesPreviousAppFolderOnRedeploy() throws Exception {
+        deploymentService.start();
+
+        addPackedAppFromBuilder(emptyAppFileBuilder);
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+
+        assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+        assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+
+        reset(applicationDeploymentListener);
+
+        ApplicationFileBuilder emptyAppFileBuilder =
+          new ApplicationFileBuilder("empty-app").usingResource("empty-config.xml", "empty-config.xml")
+            .deployedWith(PROPERTY_CONFIG_RESOURCES, "empty-config.xml");
+
+        addPackedAppFromBuilder(emptyAppFileBuilder);
+
+        assertUndeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+
+        assertApplicationFiles(emptyAppFileBuilder.getId(), new String[] {"empty-config.xml", "mule-deploy.properties"});
+    }
+
+    @Test
+    public void removesPreviousAppFolderOnStart() throws Exception {
+        addExplodedAppFromBuilder(emptyAppFileBuilder);
+
+        ApplicationFileBuilder emptyAppFileBuilder =
+          new ApplicationFileBuilder("empty-app").usingResource("empty-config.xml", "empty-config.xml")
+            .deployedWith(PROPERTY_CONFIG_RESOURCES, "empty-config.xml");
+
+        addPackedAppFromBuilder(emptyAppFileBuilder);
+
+        deploymentService.start();
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+
+        assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+        assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+
+        assertApplicationFiles(emptyAppFileBuilder.getId(), new String[] {"empty-config.xml", "mule-deploy.properties"});
     }
 
     @Test
@@ -3594,6 +3641,16 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         File appFolder = new File(artifactDir, artifactName);
         prober.check(new FileExists(appFolder));
+    }
+
+    private void assertApplicationFiles(String appName, String[] expectedFiles) {
+        assertArtifactConfigs(new File(appsDir, appName), expectedFiles);
+    }
+
+    private void assertArtifactConfigs(File artifactDir, String[] expectedFiles) {
+        final String[] artifactFiles = artifactDir.list(FILE);
+
+        assertArrayEquals(expectedFiles, artifactFiles);
     }
 
     /**
