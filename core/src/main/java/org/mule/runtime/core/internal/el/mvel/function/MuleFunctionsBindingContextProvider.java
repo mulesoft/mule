@@ -12,6 +12,7 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 
@@ -33,6 +34,8 @@ public class MuleFunctionsBindingContextProvider implements GlobalBindingContext
   @Named(ConfigurationComponentLocator.REGISTRY_KEY)
   private ConfigurationComponentLocator componentLocator;
 
+  @Inject
+  private ErrorTypeRepository errorTypeRepository;
 
   @Override
   public BindingContext getBindingContext() {
@@ -43,6 +46,9 @@ public class MuleFunctionsBindingContextProvider implements GlobalBindingContext
 
     ExpressionFunction lookupFunction = new LookupFunction(componentLocator);
     builder.addBinding("lookup", new TypedValue(lookupFunction, fromFunction(lookupFunction)));
+
+    ExpressionFunction causedByFunction = new CausedByFunction(errorTypeRepository);
+    builder.addBinding("causedBy", new TypedValue(causedByFunction, fromFunction(causedByFunction)));
 
     return builder.build();
   }
