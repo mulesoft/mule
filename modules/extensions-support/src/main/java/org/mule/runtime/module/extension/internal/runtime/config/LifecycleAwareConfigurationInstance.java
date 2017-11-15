@@ -240,7 +240,9 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
                                                                 getName())),
                                      e);
     } finally {
-      retryScheduler.stop();
+      if (retryScheduler != null) {
+        retryScheduler.stop();
+      }
     }
   }
 
