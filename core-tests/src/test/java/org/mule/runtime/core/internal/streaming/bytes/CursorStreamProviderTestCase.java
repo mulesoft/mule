@@ -277,6 +277,21 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     withCursor(cursor -> assertThat(IOUtils.toString(cursor), equalTo(data)));
   }
 
+  @Test
+  public void mark() throws Exception {
+    withCursor(cursor -> {
+      final int mark = 10;
+      assertThat(cursor.read(new byte[mark], 0, mark), is(mark));
+
+      final long position = cursor.getPosition();
+      cursor.mark(100);
+      assertThat(cursor.read(new byte[100], 0, 100), is(100));
+
+      cursor.reset();
+      assertThat(toString(cursor), equalTo(data.substring(toIntExact(position))));
+    });
+  }
+
   @Test(expected = IOException.class)
   public void ioExceptionIfClosed() throws Exception {
     CursorStream cursor = streamProvider.openCursor();
