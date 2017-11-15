@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.util.Collections.emptySet;
 import static org.apache.commons.collections.CollectionUtils.find;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -28,7 +29,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergOperations.KNOCKEABLE
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_EXAMPLE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME;
-
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
@@ -38,6 +38,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
+import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
@@ -48,10 +49,12 @@ import org.mule.test.heisenberg.extension.HeisenbergOperations;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.marvel.MissileProvider;
 import org.mule.test.marvel.ironman.IronMan;
-import org.junit.Before;
-import org.junit.Test;
+
 import java.util.List;
 import java.util.Optional;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
@@ -146,11 +149,25 @@ public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void parseClassParameterInOperation() {
+    ExtensionDeclaration declaration = marvelDeclarer.getDeclaration();
+    OperationDeclaration findInstructionsOperation = getOperation(declaration, "findInstructions");
+    List<ParameterDeclaration> params = findInstructionsOperation.getAllParameters();
+    assertThat(params, hasSize(2));
+
+    ParameterDeclaration pathParam = params.get(1);
+    Optional<ClassValueModel> classValueModel = pathParam.getDisplayModel().getClassValueModel();
+    assertThat(classValueModel.isPresent(), is(true));
+    assertThat(classValueModel.get().getAssignableFrom(), hasSize(1));
+    assertThat(classValueModel.get().getAssignableFrom().get(0), equalTo("com.starkindustries.Reader"));
+  }
+
+  @Test
   public void parsePathParameterWithFileExtensions() {
     ExtensionDeclaration declaration = marvelDeclarer.getDeclaration();
     OperationDeclaration findInstructionsOperation = getOperation(declaration, "findInstructions");
     List<ParameterDeclaration> params = findInstructionsOperation.getAllParameters();
-    assertThat(params, hasSize(1));
+    assertThat(params, hasSize(2));
 
     ParameterDeclaration pathParam = params.get(0);
     Optional<PathModel> pathModel = pathParam.getDisplayModel().getPathModel();
@@ -183,7 +200,7 @@ public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
     ConfigurationDeclaration config = findConfigByName(declaration, IronMan.CONFIG_NAME);
 
     List<ParameterDeclaration> params = config.getAllParameters();
-    assertThat(params, hasSize(1));
+    assertThat(params, hasSize(2));
 
     ParameterDeclaration pathParam = params.get(0);
     Optional<PathModel> pathModel = pathParam.getDisplayModel().getPathModel();
@@ -191,6 +208,21 @@ public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
     assertThat(pathModel.get().getType(), is(ANY));
     assertThat(pathModel.get().acceptsUrls(), is(true));
     assertThat(pathModel.get().getFileExtensions(), empty());
+  }
+
+  @Test
+  public void parseClassParameter() {
+    ExtensionDeclaration declaration = marvelDeclarer.getDeclaration();
+    ConfigurationDeclaration config = findConfigByName(declaration, IronMan.CONFIG_NAME);
+
+    List<ParameterDeclaration> params = config.getAllParameters();
+    assertThat(params, hasSize(2));
+
+    ParameterDeclaration pathParam = params.get(1);
+    Optional<ClassValueModel> classValueModel = pathParam.getDisplayModel().getClassValueModel();
+    assertThat(classValueModel.isPresent(), is(true));
+    assertThat(classValueModel.get().getAssignableFrom(), hasSize(1));
+    assertThat(classValueModel.get().getAssignableFrom().get(0), equalTo("com.starkindustries.AIEngine"));
   }
 
   private ConfigurationDeclaration findConfigByName(ExtensionDeclaration declaration, String name) {
