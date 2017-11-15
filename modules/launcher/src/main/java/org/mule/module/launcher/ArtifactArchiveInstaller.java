@@ -7,9 +7,8 @@
 package org.mule.module.launcher;
 
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
-
+import static org.mule.util.FileUtils.deleteTree;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.FilenameUtils;
 
@@ -76,6 +75,12 @@ public class ArtifactArchiveInstaller
 
             artifactName = FilenameUtils.getBaseName(fullPath);
             artifactDir = new File(artifactParentDir, artifactName);
+
+            // Removes previous deployed artifact
+            if (artifactDir.exists() && !deleteTree(artifactDir)) {
+                throw new IOException("Cannot delete existing folder " + artifactDir);
+            }
+
             // normalize the full path + protocol to make unzip happy
             final File source = new File(artifactUrl.toURI());
 
@@ -108,7 +113,7 @@ public class ArtifactArchiveInstaller
             // delete an artifact dir, as it's broken
             if (errorEncountered && artifactDir != null && artifactDir.exists())
             {
-                FileUtils.deleteTree(artifactDir);
+                deleteTree(artifactDir);
             }
         }
         return artifactName;

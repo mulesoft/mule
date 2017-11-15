@@ -8,6 +8,7 @@
 package org.mule.module.launcher.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import static org.mule.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
@@ -140,6 +141,21 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
         String alias = classFile.replace(".clazz", ".class");
         resources.add(new ZipResource(classFile, "classes/" + alias));
         return this;
+    }
+
+    /**
+     * Adds a resource file to the artifact folder.
+     *
+     * @param resourceFile class file from a external file or test resource. Non empty.
+     * @param targetFile name to use on the added resource. Non empty.
+     * @return the same builder instance
+     */
+    public ApplicationFileBuilder usingResource(String resourceFile, String targetFile) {
+        checkImmutable();
+        checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
+        resources.add(new ZipResource(resourceFile, targetFile));
+
+        return getThis();
     }
 
     /**
