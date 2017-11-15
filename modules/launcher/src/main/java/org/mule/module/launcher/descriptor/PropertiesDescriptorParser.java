@@ -24,11 +24,12 @@ public class PropertiesDescriptorParser implements DescriptorParser
 {
     public static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
     public static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
+    public static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
+
     protected static final String PROPERTY_ENCODING = "encoding";
     protected static final String PROPERTY_CONFIG_BUILDER = "config.builder";
     protected static final String PROPERTY_DOMAIN = "domain";
     // support not yet implemented for CL reversal
-    protected static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
     protected static final String PROPERTY_LOG_CONFIG_FILE = "log.configFile";
     protected static final String PROPERTY_SCAN_PACKAGES = "scan.packages";
 
