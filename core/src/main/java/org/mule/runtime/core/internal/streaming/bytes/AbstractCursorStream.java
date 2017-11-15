@@ -143,7 +143,7 @@ abstract class AbstractCursorStream extends CursorStream {
    */
   @Override
   public synchronized void mark(int readlimit) {
-    mark = readlimit;
+    mark = position;
   }
 
   /**
