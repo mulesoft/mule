@@ -7,9 +7,10 @@
 package org.mule.module.launcher;
 
 import static org.apache.commons.io.filefilter.FileFileFilter.FILE;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -25,17 +26,16 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mule.module.launcher.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
-
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Initialisable;
@@ -3419,7 +3419,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private void assertArtifactConfigs(File artifactDir, String[] expectedFiles) {
         final String[] artifactFiles = artifactDir.list(FILE);
 
-        assertArrayEquals(expectedFiles, artifactFiles);
+        assertThat(expectedFiles, arrayContainingInAnyOrder(artifactFiles));
     }
 
     /**
