@@ -8,6 +8,8 @@ package org.mule.runtime.module.launcher.coreextension;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.container.api.ArtifactClassLoaderManagerAware;
@@ -25,15 +27,14 @@ import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.ToolingServiceAware;
 
+import org.slf4j.Logger;
+
 import java.util.LinkedList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionManagerServer {
 
-  protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleCoreExtensionManagerServer.class);
+  private static final Logger LOGGER = getLogger(DefaultMuleCoreExtensionManagerServer.class);
 
   private final MuleCoreExtensionDiscoverer coreExtensionDiscoverer;
   private final MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver;
@@ -52,11 +53,13 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
 
   @Override
   public void dispose() {
+    LOGGER.info("Disposing core extensions");
     for (MuleCoreExtension extension : coreExtensions) {
       try {
         extension.dispose();
+        LOGGER.info("Core extension '{}' disposed", extension.toString());
       } catch (Exception ex) {
-        logger.error("Error disposing core extension " + extension.getName(), ex);
+        LOGGER.error("Error disposing core extension " + extension.getName(), ex);
       }
     }
   }
@@ -77,9 +80,10 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
 
   @Override
   public void start() throws MuleException {
-    logger.info("Starting core extensions");
+    LOGGER.info("Starting core extensions");
     for (MuleCoreExtension extension : orderedCoreExtensions) {
       extension.start();
+      LOGGER.info("Core extension '{}' started", extension.toString());
     }
   }
 
@@ -89,19 +93,21 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
       return;
     }
 
+    LOGGER.info("Stopping core extensions");
     for (int i = orderedCoreExtensions.size() - 1; i >= 0; i--) {
       MuleCoreExtension extension = orderedCoreExtensions.get(i);
 
       try {
         extension.stop();
+        LOGGER.info("Core extension '{}' stopped", extension.toString());
       } catch (Throwable e) {
-        logger.warn("Error stopping core extension: " + extension.getName(), e);
+        LOGGER.warn("Error stopping core extension: " + extension.getName(), e);
       }
     }
   }
 
   private void initializeCoreExtensions() throws MuleException {
-    logger.info("Initializing core extensions");
+    LOGGER.info("Initializing core extensions");
 
     for (MuleCoreExtension extension : orderedCoreExtensions) {
       if (extension instanceof DeploymentServiceAware) {
@@ -135,6 +141,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
       }
 
       extension.initialise();
+      LOGGER.info("Core extension '{}' initialized", extension.toString());
     }
   }
 
@@ -148,6 +155,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     this.repositoryService = repositoryService;
   }
 
+  @Override
   public void setToolingService(ToolingService toolingService) {
     this.toolingService = toolingService;
   }
