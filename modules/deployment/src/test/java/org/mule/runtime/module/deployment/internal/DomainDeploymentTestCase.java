@@ -702,8 +702,9 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     addExplodedDomainFromBuilder(emptyDomainFileBuilder);
     assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-    addExplodedDomainFromBuilder(emptyDomainFileBuilder, "empty2-domain");
-    assertDeploymentSuccess(domainDeploymentListener, "empty2-domain");
+    DomainFileBuilder updatedDomainFileBuilder = new DomainFileBuilder("empty2-domain", emptyDomainFileBuilder);
+    addExplodedDomainFromBuilder(updatedDomainFileBuilder);
+    assertDeploymentSuccess(domainDeploymentListener, updatedDomainFileBuilder.getId());
 
     // After three update cycles should have only one deployment failure notification for the broken app
     assertDeploymentFailure(domainDeploymentListener, "domain with spaces");

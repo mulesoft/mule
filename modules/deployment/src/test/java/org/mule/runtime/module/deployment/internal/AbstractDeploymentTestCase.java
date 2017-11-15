@@ -21,6 +21,7 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
+import static org.apache.commons.io.filefilter.FileFileFilter.FILE;
 import static org.apache.commons.lang.reflect.FieldUtils.readDeclaredStaticField;
 import static org.apache.commons.lang.reflect.FieldUtils.writeDeclaredStaticField;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
@@ -68,7 +69,6 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.in
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -887,6 +887,16 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       assertTrue("Invalid Mule exploded artifact set",
                  isEqualCollection(asList(expectedArtifacts), asList(actualArtifacts)));
     }
+  }
+
+  protected void assertApplicationFiles(String appName, String[] expectedFiles) {
+    assertArtifactConfigs(new File(appsDir, appName), expectedFiles);
+  }
+
+  private void assertArtifactConfigs(File artifactDir, String[] expectedFiles) {
+    final String[] artifactFiles = artifactDir.list(FILE);
+
+    assertArrayEquals(expectedFiles, artifactFiles);
   }
 
   protected void addPackedAppFromBuilder(TestArtifactDescriptor artifactFileBuilder) throws Exception {
