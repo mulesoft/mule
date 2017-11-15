@@ -11,6 +11,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -30,6 +31,10 @@ public abstract class AbstractByteStreamingTestCase extends AbstractMuleTestCase
 
   protected String toString(byte[] dest) throws IOException {
     return IOUtils.toString(dest, Charset.defaultCharset().name());
+  }
+
+  protected String toString(InputStream inputStream) throws IOException {
+    return IOUtils.toString(inputStream);
   }
 
   protected String toString(ByteBuffer buffer) throws IOException {
