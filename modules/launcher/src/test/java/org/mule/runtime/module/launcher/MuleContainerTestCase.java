@@ -12,6 +12,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
+
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
@@ -93,13 +94,13 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void stopsCoreExtensionsBeforeDeploymentService() throws Exception {
+  public void stopsCoreExtensionsAfterDeploymentService() throws Exception {
     container.start(false);
     container.stop();
 
     InOrder inOrder = inOrder(coreExtensionManager, deploymentService);
-    inOrder.verify(coreExtensionManager).stop();
     inOrder.verify(deploymentService).stop();
+    inOrder.verify(coreExtensionManager).stop();
   }
 
   @Test
