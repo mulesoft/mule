@@ -21,14 +21,14 @@ import org.apache.commons.collections.map.LRUMap;
 public class GraphTransformerResolver implements TransformerResolver {
 
   private ReentrantReadWriteLock readWriteLock;
-  private TransformationGraph graph;
+  private SynchronizedTransformationGraph graph;
   private CompositeConverterFilter converterFilter;
   private LRUMap cache;
   private TransformationGraphLookupStrategy lookupStrategyTransformation;
 
   public GraphTransformerResolver() {
     this.readWriteLock = new ReentrantReadWriteLock();
-    this.graph = new TransformationGraph();
+    this.graph = new SynchronizedTransformationGraph();
     lookupStrategyTransformation = new TransformationGraphLookupStrategy(graph);
     converterFilter = new CompositeConverterFilter(new TypeMatchingVertexesFilter(),
                                                    new TransformationLengthConverterFilter(),
