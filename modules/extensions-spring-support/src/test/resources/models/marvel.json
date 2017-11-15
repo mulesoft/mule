@@ -2486,6 +2486,40 @@
             {
               "type": {
                 "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "com.starkindustries.Jarvis",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "allowedStereotypeModels": [],
+              "name": "aiType",
+              "displayModel": {
+                "classValueModel": {
+                  "assignableFrom": [
+                    "com.starkindustries.AIEngine"
+                  ]
+                }
+              },
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.extension.api.runtime.ExpirationPolicy",
@@ -2579,7 +2613,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -3558,6 +3592,39 @@
               },
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "allowedStereotypeModels": [],
+              "name": "readerClass",
+              "displayModel": {
+                "classValueModel": {
+                  "assignableFrom": [
+                    "com.starkindustries.Reader"
+                  ]
+                }
+              },
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
@@ -3593,7 +3660,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -3624,7 +3691,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 4,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -3963,6 +4030,29 @@
                   "fileExtensions": [],
                   "acceptsUrls": true,
                   "location": "ANY"
+                }
+              }
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "aiType"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "default": "com.starkindustries.Jarvis",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            },
+            "display": {
+              "displayModel": {
+                "classValueModel": {
+                  "assignableFrom": [
+                    "com.starkindustries.AIEngine"
+                  ]
                 }
               }
             }

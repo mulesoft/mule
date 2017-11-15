@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.LAYOUT;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.toClassValueModel;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
@@ -20,8 +20,10 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarat
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
+import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
+import org.mule.runtime.extension.api.annotation.param.display.ClassValue;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Path;
@@ -33,6 +35,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Declaring
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+
 import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
 
@@ -108,19 +111,17 @@ public final class DisplayDeclarationEnricher extends AbstractAnnotatedDeclarati
       final DisplayName displayNameAnnotation = getAnnotation(annotatedType, DisplayName.class);
       final Example exampleAnnotation = getAnnotation(annotatedType, Example.class);
       final Path pathAnnotation = getAnnotation(annotatedType, Path.class);
-      createDisplayModelProperty(declaration, summaryAnnotation, displayNameAnnotation, exampleAnnotation, pathAnnotation);
+      final ClassValue classAnnotation = getAnnotation(annotatedType, ClassValue.class);
+
+      createDisplayModelProperty(declaration, summaryAnnotation, displayNameAnnotation, exampleAnnotation, pathAnnotation,
+                                 classAnnotation);
     }
   }
 
   private void enrichOperation(OperationDeclaration declaration) {
-    final Optional<ImplementingMethodModelProperty> modelProperty =
-        declaration.getModelProperty(ImplementingMethodModelProperty.class);
-    AnnotatedElement annotatedElement = null;
-
-    if (modelProperty.isPresent()) {
-      annotatedElement = modelProperty.get().getMethod();
-    }
-    enrichDeclaration(declaration, annotatedElement);
+    declaration.getModelProperty(ImplementingMethodModelProperty.class)
+        .map(ImplementingMethodModelProperty::getMethod)
+        .ifPresent(annotatedElement -> enrichDeclaration(declaration, annotatedElement));
   }
 
   private void enrichDeclaration(BaseDeclaration declaration, AnnotatedElement annotatedElement) {
@@ -129,7 +130,10 @@ public final class DisplayDeclarationEnricher extends AbstractAnnotatedDeclarati
       final DisplayName displayNameAnnotation = annotatedElement.getAnnotation(DisplayName.class);
       final Example exampleAnnotation = annotatedElement.getAnnotation(Example.class);
       final Path pathAnnotation = annotatedElement.getAnnotation(Path.class);
-      createDisplayModelProperty(declaration, summaryAnnotation, displayNameAnnotation, exampleAnnotation, pathAnnotation);
+      final ClassValue classValue = annotatedElement.getAnnotation(ClassValue.class);
+
+      createDisplayModelProperty(declaration, summaryAnnotation, displayNameAnnotation, exampleAnnotation, pathAnnotation,
+                                 classValue);
     }
   }
 
@@ -137,11 +141,14 @@ public final class DisplayDeclarationEnricher extends AbstractAnnotatedDeclarati
                                           Summary summaryAnnotation,
                                           DisplayName displayNameAnnotation,
                                           Example exampleAnnotation,
-                                          Path pathAnnotation) {
+                                          Path pathAnnotation,
+                                          ClassValue classValue) {
     String summary = summaryAnnotation != null ? summaryAnnotation.value() : null;
     String displayName = displayNameAnnotation != null ? displayNameAnnotation.value() : null;
     String example = exampleAnnotation != null ? exampleAnnotation.value() : null;
     PathModel pathModel = null;
+    ClassValueModel classValueModel = null;
+
     if (pathAnnotation != null) {
       pathModel = new PathModel(pathAnnotation.type(),
                                 pathAnnotation.acceptsUrls(),
@@ -149,12 +156,17 @@ public final class DisplayDeclarationEnricher extends AbstractAnnotatedDeclarati
                                 pathAnnotation.acceptedFileExtensions());
     }
 
-    if (summary != null || displayName != null || example != null || pathModel != null) {
+    if (classValue != null) {
+      classValueModel = toClassValueModel(classValue);
+    }
+
+    if (summary != null || displayName != null || example != null || pathModel != null || classValueModel != null) {
       declaration.setDisplayModel(DisplayModel.builder()
           .displayName(displayName)
           .summary(summary)
           .example(example)
           .path(pathModel)
+          .classValue(classValueModel)
           .build());
     }
   }
