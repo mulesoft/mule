@@ -239,7 +239,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
       throw new DefaultMuleException(createStaticMessage(format("Could not perform connectivity testing for config '%s'",
                                                                 getName())),
                                      e);
-    }finally {
+    } finally {
       retryScheduler.stop();
     }
   }
