@@ -31,7 +31,7 @@ import org.junit.Test;
 public class TransformationGraphLookupStrategyTestCase extends AbstractTransformationGraphTestCase {
 
 
-  private TransformationGraph graph = new TransformationGraph();
+  private SynchronizedTransformationGraph graph = new SynchronizedTransformationGraph();
   private TransformationGraphLookupStrategy lookupStrategyTransformation = new TransformationGraphLookupStrategy(graph);
 
 
@@ -64,6 +64,17 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractTransform
 
     assertEquals(1, converters.size());
     assertEquals(inputStreamToXml, converters.get(0));
+  }
+
+  @Test
+  public void findsDirectTransformationWhileChangingGraph() throws Exception {
+    Converter inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
+    graph.addConverter(inputStreamToXml);
+
+    List<Converter> converters = lookupStrategyTransformation.lookupConverters(INPUT_STREAM_DATA_TYPE, XML_DATA_TYPE);
+
+    assertThat(converters, hasSize(1));
+    assertThat(converters.get(0), is(inputStreamToXml));
   }
 
   @Test

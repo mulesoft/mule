@@ -26,9 +26,9 @@ public class TransformationGraphLookupStrategy {
 
   protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private TransformationGraph graph;
+  private SynchronizedTransformationGraph graph;
 
-  public TransformationGraphLookupStrategy(TransformationGraph graph) {
+  public TransformationGraphLookupStrategy(SynchronizedTransformationGraph graph) {
     this.graph = graph;
   }
 
