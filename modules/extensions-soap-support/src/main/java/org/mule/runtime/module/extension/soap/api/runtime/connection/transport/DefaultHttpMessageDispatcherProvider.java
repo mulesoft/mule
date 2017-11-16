@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.soap.api.runtime.connection.transport;
 
-import static java.util.Objects.isNull;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -14,16 +13,12 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.client.ExtensionsClient;
-import org.mule.runtime.extension.api.soap.HttpMessageDispatcherProvider;
+import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.soap.api.message.dispatcher.DefaultHttpMessageDispatcher;
-import org.mule.runtime.soap.api.message.dispatcher.HttpConfigBasedMessageDispatcher;
 
 import javax.inject.Inject;
 
@@ -31,31 +26,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default implementation of {@link HttpMessageDispatcherProvider} sends a soap message over http using a default configuration or
- * using an http requester configuration if configured.
+ * Default implementation of {@link MessageDispatcherProvider} sends a soap message over http using a default configuration.
  *
  * @since 4.0
  */
-public class DefaultHttpMessageDispatcherProvider implements HttpMessageDispatcherProvider, Lifecycle {
+public class DefaultHttpMessageDispatcherProvider implements MessageDispatcherProvider<MessageDispatcher>, Lifecycle {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHttpMessageDispatcher.class);
 
   @Inject
   private HttpService httpService;
 
-  @Inject
-  private ExtensionsClient extensionsClient;
-
-  @Parameter
-  @Optional
-  private String requesterConfig;
-
   private HttpClient httpClient;
 
   @Override
   public MessageDispatcher connect() throws ConnectionException {
-    return isNull(requesterConfig) ? new DefaultHttpMessageDispatcher(httpClient)
-        : new HttpConfigBasedMessageDispatcher(requesterConfig, extensionsClient);
+    return new DefaultHttpMessageDispatcher(httpClient);
   }
 
   @Override
@@ -77,7 +63,7 @@ public class DefaultHttpMessageDispatcherProvider implements HttpMessageDispatch
   @Override
   public void initialise() throws InitialisationException {
     httpClient = httpService.getClientFactory().create(new HttpClientConfiguration.Builder()
-        .setName("soap-ext-dispatcher")
+        .setName("soap-extension")
         .build());
   }
 

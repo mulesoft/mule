@@ -39,18 +39,16 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:complexType name="org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider">
+  <xs:complexType name="org.mule.test.ram.TestHttpMessageDispatcherProvider">
     <xs:complexContent>
-      <xs:extension xmlns:ram="http://www.mulesoft.org/schema/mule/ram" base="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider">
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" name="requesterConfig"></xs:attribute>
-      </xs:extension>
+      <xs:extension xmlns:ram="http://www.mulesoft.org/schema/mule/ram" base="ram:org.mule.runtime.extension.api.soap.MessageDispatcherProvider"></xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider" substitutionGroup="ram:abstract-message-dispatcher-provider" abstract="true" name="abstract-default-http-message-dispatcher-provider"></xs:element>
-  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" substitutionGroup="ram:abstract-default-http-message-dispatcher-provider" name="default-http-message-dispatcher-provider">
+  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" type="ram:org.mule.test.ram.TestHttpMessageDispatcherProvider" substitutionGroup="ram:abstract-message-dispatcher-provider" abstract="true" name="abstract-test-http-message-dispatcher-provider"></xs:element>
+  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" substitutionGroup="ram:abstract-test-http-message-dispatcher-provider" name="test-http-message-dispatcher-provider">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="ram:org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider"></xs:extension>
+        <xs:extension base="ram:org.mule.test.ram.TestHttpMessageDispatcherProvider"></xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>

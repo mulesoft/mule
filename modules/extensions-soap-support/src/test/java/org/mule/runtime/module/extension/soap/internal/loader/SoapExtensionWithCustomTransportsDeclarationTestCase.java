@@ -29,6 +29,7 @@ import org.mule.runtime.module.extension.soap.api.runtime.connection.transport.D
 import org.mule.test.ram.DefaultPortalGunDispatcherProvider;
 import org.mule.test.ram.MiniverseDispatcherProvider;
 import org.mule.test.ram.RickAndMortyExtension;
+import org.mule.test.ram.TestHttpMessageDispatcherProvider;
 
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +66,7 @@ public class SoapExtensionWithCustomTransportsDeclarationTestCase extends Abstra
     SubTypesModel subtypes = model.getSubTypes().iterator().next();
     assertThat(getId(subtypes.getBaseType()).get(), is(MessageDispatcherProvider.class.getName()));
     subtypes.getSubTypes()
-        .forEach(subtype -> assertThat(getId(subtype).get(), isOneOf(DefaultHttpMessageDispatcherProvider.class.getName(),
+        .forEach(subtype -> assertThat(getId(subtype).get(), isOneOf(TestHttpMessageDispatcherProvider.class.getName(),
                                                                      DefaultPortalGunDispatcherProvider.class.getName(),
                                                                      MiniverseDispatcherProvider.class.getName())));
   }
