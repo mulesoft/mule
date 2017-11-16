@@ -7,10 +7,8 @@
 package org.mule.runtime.module.extension.soap.internal.loader.type.runtime;
 
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-import org.mule.runtime.extension.api.soap.HttpMessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
-import org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider;
 
 /**
  * {@link TypeWrapper} implementation for classes that implements the {@link MessageDispatcherProvider} interface.
@@ -24,7 +22,7 @@ public class MessageDispatcherProviderTypeWrapper extends TypeWrapper {
   private static final String DISPATCHER = "-dispatcher";
 
   MessageDispatcherProviderTypeWrapper(Class<?> clazz) {
-    super(clazz.equals(HttpMessageDispatcherProvider.class) ? DefaultHttpMessageDispatcherProvider.class : clazz);
+    super(clazz);
   }
 
   /**
