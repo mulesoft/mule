@@ -88,12 +88,11 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
                 URL url = IOUtils.getResourceAsUrl(parentLocation, getClass());
                 if (mustResolveRelativePaths(url))
                 {
-                    latestImportedURL = resolveRelativePathInArchives(normalize(getBasePath(url.toString())) + importLocation);
+                    latestImportedURL = resolveRelativePathInArchives(normalize(getBasePath(url.toString()), true) + importLocation);
                 }
                 else
                 {
                     latestImportedURL = normalizeBasePathURL(getBasePath(url.toString()), importLocation);
-
                 }
 
             }
