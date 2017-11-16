@@ -50,43 +50,7 @@
         },
         {
           "format": "java",
-          "type": "Object",
-          "annotations": {
-            "typeId": "org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider",
-            "classInformation": {
-              "classname": "org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider",
-              "hasDefaultConstructor": true,
-              "isInterface": false,
-              "isInstantiable": true,
-              "isAbstract": false,
-              "isFinal": false,
-              "implementedInterfaces": [
-                "org.mule.runtime.extension.api.soap.HttpMessageDispatcherProvider",
-                "org.mule.runtime.api.lifecycle.Lifecycle"
-              ],
-              "parent": "",
-              "genericTypes": [],
-              "isMap": false
-            },
-            "typeAlias": {
-              "value": "DefaultHttpMessageDispatcherProvider"
-            }
-          },
-          "fields": [
-            {
-              "key": {
-                "name": "requesterConfig"
-              },
-              "model": {
-                "type": "String"
-              },
-              "annotations": {
-                "expressionSupport": {
-                  "value": "SUPPORTED"
-                }
-              }
-            }
-          ]
+          "type": "@ref:org.mule.test.ram.TestHttpMessageDispatcherProvider"
         }
       ]
     }
@@ -1688,6 +1652,31 @@
         },
         "typeAlias": {
           "value": "MiniverseDispatcherProvider"
+        }
+      },
+      "fields": []
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.ram.TestHttpMessageDispatcherProvider",
+        "classInformation": {
+          "classname": "org.mule.test.ram.TestHttpMessageDispatcherProvider",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "org.mule.runtime.extension.api.soap.MessageDispatcherProvider"
+          ],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "TestHttpMessageDispatcherProvider"
         }
       },
       "fields": []
