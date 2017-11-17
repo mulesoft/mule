@@ -86,7 +86,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     static final String WORKSTATION_DEBUG = "Workstation";
     static final String AUTHENTICATION_TYPE_DEBUG = "Authentication Type";
     static final String QUERY_PARAMS_DEBUG = "Query Params";
-    static String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.requestAttempts";
+    static String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.maxRetry";
     static final String REMOTELY_CLOSED = "Remotely closed";
     static final int DEFAULT_RETRY_ATTEMPTS = 3;
     private static final int RETRY_ATTEMPTS  = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
