@@ -17,8 +17,8 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfiguratio
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.functional.api.component.AssertionMessageProcessor;
-import org.mule.functional.api.component.EqualsLogChecker;
 import org.mule.functional.api.component.DependencyInjectionObject;
+import org.mule.functional.api.component.EqualsLogChecker;
 import org.mule.functional.api.component.EventCallback;
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.component.InvocationCountMessageProcessor;
@@ -77,6 +77,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     ComponentBuildingDefinition.Builder baseComponentDefinition = baseDefinition
+        .withSetterParameterDefinition("processingType", fromSimpleParameter("processingType").build())
         .withSetterParameterDefinition("eventCallback", fromChildConfiguration(EventCallback.class).build())
         .withSetterParameterDefinition("returnData", fromChildConfiguration(Object.class).build())
         .withSetterParameterDefinition("throwException", fromSimpleParameter("throwException").build())

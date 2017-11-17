@@ -56,6 +56,13 @@
                         </xsd:complexType>
                     </xsd:element>
                 </xsd:sequence>
+                <xsd:attribute name="processingType" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The kind of work this component will report to do, in order to affect the behavior of the Processing Strategy.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="class" type="mule:substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>

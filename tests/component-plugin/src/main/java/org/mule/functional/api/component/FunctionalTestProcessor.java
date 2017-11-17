@@ -72,6 +72,8 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
   @Inject
   private NotificationDispatcher notificationFirer;
 
+  private ProcessingType processingType;
+
   private EventCallback eventCallback;
   private Object returnData = null;
   private boolean throwException = false;
@@ -87,13 +89,11 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
   private Processor processor;
   private static List<LifecycleCallback> lifecycleCallbacks = new ArrayList<>();
 
-
   /**
    * Keeps a list of any messages received on this service. Note that only references to the messages (objects) are stored, so any
    * subsequent changes to the objects will change the history.
    */
   private List<CoreEvent> messageHistory;
-
 
   @Override
   public void initialise() throws InitialisationException {
@@ -474,5 +474,14 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
 
   public void setProcessorClass(String processorClass) {
     this.processorClass = processorClass;
+  }
+
+  @Override
+  public ProcessingType getProcessingType() {
+    return processingType;
+  }
+
+  public void setProcessingType(ProcessingType processingType) {
+    this.processingType = processingType;
   }
 }
