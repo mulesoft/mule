@@ -7,6 +7,7 @@
 package org.mule.functional.config;
 
 import static org.mule.functional.config.TestXmlNamespaceInfoProvider.TEST_NAMESPACE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
@@ -77,7 +78,8 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     ComponentBuildingDefinition.Builder baseComponentDefinition = baseDefinition
-        .withSetterParameterDefinition("processingType", fromSimpleParameter("processingType").build())
+        .withSetterParameterDefinition("processingType",
+                                       fromSimpleParameter("processingType").withDefaultValue(CPU_LITE.name()).build())
         .withSetterParameterDefinition("eventCallback", fromChildConfiguration(EventCallback.class).build())
         .withSetterParameterDefinition("returnData", fromChildConfiguration(Object.class).build())
         .withSetterParameterDefinition("throwException", fromSimpleParameter("throwException").build())

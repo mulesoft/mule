@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.policy;
 
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -15,6 +16,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.scheduler.Schedulers.fromExecutor;
 import static reactor.core.scheduler.Schedulers.immediate;
 
@@ -37,16 +39,15 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
+import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
-import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.privileged.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.reactivestreams.Publisher;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -84,9 +85,8 @@ public class PolicyChain extends AbstractComponent
   public final void initialise() throws InitialisationException {
     DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder().chain(processors);
 
-    Set<ProcessingType> beforeNext = new HashSet<>();
-    Set<ProcessingType> afterNext = new HashSet<>();
-    Processor followingNext = null;
+    List<Processor> beforeNext = new ArrayList<>();
+    List<Processor> afterNext = new ArrayList<>();
 
     boolean seenNext = false;
     for (Processor processor : processors) {
@@ -96,17 +96,14 @@ public class PolicyChain extends AbstractComponent
       }
 
       if (seenNext) {
-        if (followingNext == null) {
-          followingNext = processor;
-        }
-        afterNext.add(processor.getProcessingType());
+        afterNext.add(processor);
       } else {
-        beforeNext.add(processor.getProcessingType());
+        beforeNext.add(processor);
       }
     }
 
     processingStrategy = new SourcePolicyProcessingStrategy(schedulerService, muleContext.getSchedulerBaseConfig(),
-                                                            beforeNext, afterNext, followingNext);
+                                                            getLocation().getLocation(), beforeNext, afterNext);
 
     chainBuilder.setProcessingStrategy(processingStrategy);
     processorChain = chainBuilder.build();
@@ -142,7 +139,7 @@ public class PolicyChain extends AbstractComponent
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
-    return MessageProcessors.processToApply(event, chainWithPs);
+    return processToApply(event, chainWithPs);
   }
 
   @Override
@@ -154,46 +151,53 @@ public class PolicyChain extends AbstractComponent
         .doOnError(MessagingException.class, notificationHelper.errorNotification(PROCESS_END));
   }
 
+  /**
+   * Will execute each of the 2 segments of a policy chain (the before and after segments relative to the {@code execute-next}
+   * component) in its own scheduler, based on the 'heaviest' {@link ProcessingType} of its processors.
+   */
   private static final class SourcePolicyProcessingStrategy extends AbstractProcessingStrategy
       implements ProcessingStrategy, Startable, Stoppable {
 
     private SchedulerService schedulerService;
     private SchedulerConfig schedulerBaseConfig;
-    private Set<ProcessingType> beforeNext;
-    private Set<ProcessingType> afterNext;
-    private Processor followingNext;
+    private String schedulersNamePrefix;
+    private List<Processor> beforeNext;
+    private List<Processor> afterNext;
 
     private Scheduler beforeScheduler;
     private Scheduler afterScheduler;
+    private Scheduler cpuLiteBeforeScheduler;
+    private Scheduler cpuLiteAfterScheduler;
 
     public SourcePolicyProcessingStrategy(SchedulerService schedulerService, SchedulerConfig schedulerBaseConfig,
-                                          Set<ProcessingType> beforeNext, Set<ProcessingType> afterNext,
-                                          Processor followingNext) {
+                                          String schedulersNamePrefix, List<Processor> beforeNext, List<Processor> afterNext) {
       this.schedulerService = schedulerService;
       this.schedulerBaseConfig = schedulerBaseConfig;
+      this.schedulersNamePrefix = schedulersNamePrefix;
       this.beforeNext = beforeNext;
       this.afterNext = afterNext;
-      this.followingNext = followingNext;
     }
 
     @Override
     public void start() throws MuleException {
-      SchedulerConfig beforeConfig = schedulerBaseConfig.withName("policy-source-before");
-      if (beforeNext.stream().allMatch(p -> CPU_LITE_ASYNC.equals(p))) {
-        beforeScheduler = schedulerService.cpuLightScheduler(beforeConfig);
-      } else if (beforeNext.stream().anyMatch(p -> BLOCKING.equals(p) || IO_RW.equals(p))) {
-        beforeScheduler = schedulerService.ioScheduler(beforeConfig);
-      } else if (beforeNext.stream().anyMatch(p -> CPU_INTENSIVE.equals(p))) {
-        beforeScheduler = schedulerService.cpuIntensiveScheduler(beforeConfig);
-      }
+      beforeScheduler = schedulerBasedOnProcessingTypes(beforeNext, schedulersNamePrefix + "-before");
+      afterScheduler = schedulerBasedOnProcessingTypes(afterNext, schedulersNamePrefix + "-after");
+      cpuLiteBeforeScheduler =
+          schedulerService.cpuLightScheduler(schedulerBaseConfig.withName(schedulersNamePrefix + "-cpuLite-before"));
+      cpuLiteAfterScheduler =
+          schedulerService.cpuLightScheduler(schedulerBaseConfig.withName(schedulersNamePrefix + "-cpuLite-after"));
+    }
 
-      SchedulerConfig afterConfig = schedulerBaseConfig.withName("policy-source-after");
-      if (afterNext.stream().allMatch(p -> CPU_LITE_ASYNC.equals(p))) {
-        afterScheduler = schedulerService.cpuLightScheduler(afterConfig);
-      } else if (afterNext.stream().anyMatch(p -> BLOCKING.equals(p) || IO_RW.equals(p))) {
-        afterScheduler = schedulerService.ioScheduler(afterConfig);
-      } else if (afterNext.stream().anyMatch(p -> CPU_INTENSIVE.equals(p))) {
-        afterScheduler = schedulerService.cpuIntensiveScheduler(afterConfig);
+    private Scheduler schedulerBasedOnProcessingTypes(List<Processor> processors, String schedulerName) {
+      Set<ProcessingType> types = processors.stream().map(p -> p.getProcessingType()).collect(toSet());
+
+      SchedulerConfig config = schedulerBaseConfig.withName(schedulerName);
+      if (types.stream().anyMatch(p -> BLOCKING.equals(p) || IO_RW.equals(p))) {
+        return schedulerService.ioScheduler(config);
+      } else if (types.stream().anyMatch(p -> CPU_INTENSIVE.equals(p))) {
+        return schedulerService.cpuIntensiveScheduler(config);
+      } else {
+        return null;
       }
     }
 
@@ -204,6 +208,12 @@ public class PolicyChain extends AbstractComponent
       }
       if (afterScheduler != null) {
         afterScheduler.stop();
+      }
+      if (cpuLiteBeforeScheduler != null) {
+        cpuLiteBeforeScheduler.stop();
+      }
+      if (cpuLiteAfterScheduler != null) {
+        cpuLiteAfterScheduler.stop();
       }
     }
 
@@ -222,11 +232,35 @@ public class PolicyChain extends AbstractComponent
 
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-      if (processor.equals(followingNext) || (processor instanceof InterceptedReactiveProcessor
-          && ((InterceptedReactiveProcessor) processor).getProcessor().equals(followingNext))) {
+      ReactiveProcessor reactiveProcessor = handleCpuLiteAsync(processor);
+
+      if (!afterNext.isEmpty()
+          && (processor.equals(afterNext.get(0))
+              || (processor instanceof InterceptedReactiveProcessor
+                  && ((InterceptedReactiveProcessor) processor).getProcessor().equals(afterNext.get(0))))) {
         return publisher -> Flux.from(publisher)
             .publishOn(afterScheduler != null ? fromExecutor(afterScheduler) : immediate())
-            .transform(processor);
+            .transform(reactiveProcessor);
+      }
+
+      return reactiveProcessor;
+    }
+
+    private ReactiveProcessor handleCpuLiteAsync(ReactiveProcessor processor) {
+      if (processor.getProcessingType() == CPU_LITE_ASYNC) {
+
+        Scheduler scheduler;
+        if (beforeNext.contains(processor instanceof InterceptedReactiveProcessor
+            ? ((InterceptedReactiveProcessor) processor).getProcessor()
+            : processor)) {
+          scheduler = beforeScheduler != null ? beforeScheduler : cpuLiteBeforeScheduler;
+        } else {
+          scheduler = afterScheduler != null ? afterScheduler : cpuLiteAfterScheduler;
+        }
+
+        return publisher -> Flux.from(publisher)
+            .transform(processor)
+            .publishOn(fromExecutor(scheduler));
       } else {
         return processor;
       }
