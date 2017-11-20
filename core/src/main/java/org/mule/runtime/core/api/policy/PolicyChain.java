@@ -234,10 +234,7 @@ public class PolicyChain extends AbstractComponent
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       ReactiveProcessor reactiveProcessor = handleCpuLiteAsync(processor);
 
-      if (!afterNext.isEmpty()
-          && (processor.equals(afterNext.get(0))
-              || (processor instanceof InterceptedReactiveProcessor
-                  && ((InterceptedReactiveProcessor) processor).getProcessor().equals(afterNext.get(0))))) {
+      if (isRightAfterExecuteNext(processor)) {
         return publisher -> Flux.from(publisher)
             .publishOn(afterScheduler != null ? fromExecutor(afterScheduler) : immediate())
             .transform(reactiveProcessor);
@@ -246,10 +243,18 @@ public class PolicyChain extends AbstractComponent
       return reactiveProcessor;
     }
 
+    private boolean isRightAfterExecuteNext(ReactiveProcessor processor) {
+      return !afterNext.isEmpty()
+          && (processor.equals(afterNext.get(0))
+              || (processor instanceof InterceptedReactiveProcessor
+                  && ((InterceptedReactiveProcessor) processor).getProcessor().equals(afterNext.get(0))));
+    }
+
     private ReactiveProcessor handleCpuLiteAsync(ReactiveProcessor processor) {
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
 
         Scheduler scheduler;
+
         if (beforeNext.contains(processor instanceof InterceptedReactiveProcessor
             ? ((InterceptedReactiveProcessor) processor).getProcessor()
             : processor)) {
