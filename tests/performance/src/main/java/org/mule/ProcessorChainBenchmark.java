@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -28,7 +29,7 @@ import org.openjdk.jmh.annotations.Warmup;
 import reactor.core.publisher.FluxProcessor;
 import reactor.core.publisher.FluxSink;
 
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(MILLISECONDS)
 @Warmup(iterations = 10)
 @Measurement(iterations = 10)
 public class ProcessorChainBenchmark extends AbstractBenchmark {
