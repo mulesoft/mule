@@ -41,6 +41,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
+import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveAroundInterceptorAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
@@ -177,22 +178,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     // #4 Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
-    // Use anonymous ReactiveProcessor to apply processing strategy to processor + previous interceptors
-    // while using the processing type of the processor itself.
     if (processingStrategy != null) {
-      interceptors
-          .add((processor, next) -> processingStrategy.onProcessor(new ReactiveProcessor() {
-
-            @Override
-            public Publisher<CoreEvent> apply(Publisher<CoreEvent> eventPublisher) {
-              return next.apply(eventPublisher);
-            }
-
-            @Override
-            public ProcessingType getProcessingType() {
-              return processor.getProcessingType();
-            }
-          }));
+      interceptors.add((processor, next) -> processingStrategy.onProcessor(new InterceptedReactiveProcessor(processor, next)));
     }
 
     // #5 Update ThreadLocal event after processor execution once back on flow thread.

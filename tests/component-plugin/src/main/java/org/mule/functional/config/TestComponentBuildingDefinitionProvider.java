@@ -7,6 +7,7 @@
 package org.mule.functional.config;
 
 import static org.mule.functional.config.TestXmlNamespaceInfoProvider.TEST_NAMESPACE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
@@ -17,8 +18,8 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfiguratio
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.functional.api.component.AssertionMessageProcessor;
-import org.mule.functional.api.component.EqualsLogChecker;
 import org.mule.functional.api.component.DependencyInjectionObject;
+import org.mule.functional.api.component.EqualsLogChecker;
 import org.mule.functional.api.component.EventCallback;
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.component.InvocationCountMessageProcessor;
@@ -77,6 +78,8 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     ComponentBuildingDefinition.Builder baseComponentDefinition = baseDefinition
+        .withSetterParameterDefinition("processingType",
+                                       fromSimpleParameter("processingType").withDefaultValue(CPU_LITE.name()).build())
         .withSetterParameterDefinition("eventCallback", fromChildConfiguration(EventCallback.class).build())
         .withSetterParameterDefinition("returnData", fromChildConfiguration(Object.class).build())
         .withSetterParameterDefinition("throwException", fromSimpleParameter("throwException").build())
