@@ -597,6 +597,24 @@ class MuleExtensionModelDeclarer {
         .describedAs("Allows the definition of internal selective handlers. It will route the error to the first handler that matches it."
             + " If there's no match, then a default error handler will be executed.");
 
+    errorHandler.onDefaultParameterGroup()
+        .withOptionalParameter("ref")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The name of the error handler to reuse.");
+
+    NestedRouteDeclarer onError = errorHandler.withRoute("onError")
+        .describedAs("Error handler used to reference other ones.");
+
+    //TODO: MULE-14110 - Add support for chainless routes in extension model
+    onError.withChain();
+
+    onError.onDefaultParameterGroup()
+        .withRequiredParameter("ref")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The name of the error handler to reuse.");
+
     NestedRouteDeclarer onErrorContinue = errorHandler.withRoute("onErrorContinue")
         .describedAs(
                      "Error handler used to handle exceptions. It will commit any transaction as if the message was consumed successfully.");

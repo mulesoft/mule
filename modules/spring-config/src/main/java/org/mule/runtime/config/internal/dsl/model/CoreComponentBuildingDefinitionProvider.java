@@ -85,10 +85,12 @@ import org.mule.runtime.config.internal.factories.AsyncMessageProcessorsFactoryB
 import org.mule.runtime.config.internal.factories.ChoiceRouterObjectFactory;
 import org.mule.runtime.config.internal.factories.DefaultFlowFactoryBean;
 import org.mule.runtime.config.internal.factories.DynamicConfigExpirationObjectFactory;
+import org.mule.runtime.config.internal.factories.ErrorHandlerFactoryBean;
 import org.mule.runtime.config.internal.factories.ExpirationPolicyObjectFactory;
 import org.mule.runtime.config.internal.factories.FlowRefFactoryBean;
 import org.mule.runtime.config.internal.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
+import org.mule.runtime.config.internal.factories.OnErrorFactoryBean;
 import org.mule.runtime.config.internal.factories.ResponseMessageProcessorsFactoryBean;
 import org.mule.runtime.config.internal.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.internal.factories.SubflowMessageProcessorChainFactoryBean;
@@ -181,6 +183,7 @@ import org.mule.runtime.core.internal.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -217,11 +220,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private static final String MESSAGE_PROCESSORS = "messageProcessors";
   private static final String NAME = "name";
-  private static final String EXCEPTION_STRATEGY = "exception-strategy";
-  private static final String ON_ERROR_CONTINUE = "on-error-continue";
   private static final String WHEN = "when";
-  private static final String ON_ERROR_PROPAGATE = "on-error-propagate";
   private static final String ERROR_HANDLER = "error-handler";
+  private static final String ON_ERROR = "on-error";
+  private static final String ON_ERROR_CONTINUE = "on-error-continue";
+  private static final String ON_ERROR_PROPAGATE = "on-error-propagate";
   private static final String SET_PAYLOAD = "set-payload";
   private static final String LOGGER = "logger";
   private static final String PROCESSOR_CHAIN = "processor-chain";
@@ -281,7 +284,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE).build())
         .withSetterParameterDefinition(LOG_EXCEPTION, fromSimpleParameter(LOG_EXCEPTION).withDefaultValue("true").build());
     componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier(EXCEPTION_STRATEGY).withTypeDefinition(fromType(Object.class))
+        .add(baseDefinition.withIdentifier(ON_ERROR).withTypeDefinition(fromType(TemplateOnErrorHandler.class))
+            .withObjectFactoryType(OnErrorFactoryBean.class)
             .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build()).build());
     componentBuildingDefinitions.add(onErrorBaseBuilder.withIdentifier(ON_ERROR_CONTINUE)
         .withTypeDefinition(fromType(OnErrorContinueHandler.class))
@@ -291,6 +295,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ERROR_HANDLER)
         .withTypeDefinition(fromType(ErrorHandler.class))
+        .withObjectFactoryType(ErrorHandlerFactoryBean.class)
+        .withSetterParameterDefinition("delegate", fromSimpleReferenceParameter("ref").build())
         .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
         .withSetterParameterDefinition("exceptionListeners",
                                        fromChildCollectionConfiguration(FlowExceptionHandler.class).build())
