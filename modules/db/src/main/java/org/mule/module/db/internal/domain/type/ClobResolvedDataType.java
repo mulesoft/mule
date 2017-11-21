@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
+import java.io.StringReader;
 import java.sql.Clob;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -30,20 +31,21 @@ public class ClobResolvedDataType extends ResolvedDbType
     {
         if (value != null && !(value instanceof Clob))
         {
-            Clob clob = statement.getConnection().createClob();
             if (value instanceof String)
             {
-                clob.setString(1, (String) value);
+                statement.setCharacterStream(index, new StringReader((String) value), ((String) value).length());
             }
             else if (value instanceof InputStream)
             {
-                clob.setString(1,  IOUtils.toString((InputStream) value));
+                String stringValue = IOUtils.toString((InputStream) value);
+                statement.setCharacterStream(index, new StringReader(stringValue), stringValue.length());
             }
             else
             {
                 throw new IllegalArgumentException(createUnsupportedTypeErrorMessage(value));
             }
-            value = clob;
+
+            return;
         }
 
         super.setParameterValue(statement, index, value);
