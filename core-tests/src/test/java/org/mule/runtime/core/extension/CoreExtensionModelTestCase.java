@@ -466,11 +466,28 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(errorHandlerModel.allowsTopLevelDeclaration(), is(true));
     assertThat(errorHandlerModel.getStereotype().getType(), is(ERROR_HANDLER.getType()));
 
-    assertThat(errorHandlerModel.getAllParameterModels(), hasSize(0));
+    assertThat(errorHandlerModel.getAllParameterModels(), hasSize(1));
 
-    assertThat(errorHandlerModel.getNestedComponents(), hasSize(2));
-    NestedRouteModel onErrorContinue = (NestedRouteModel) errorHandlerModel.getNestedComponents().get(0);
-    NestedRouteModel onErrorPropagate = (NestedRouteModel) errorHandlerModel.getNestedComponents().get(1);
+    ParameterModel ref = errorHandlerModel.getAllParameterModels().get(0);
+    assertThat(ref.getName(), is("ref"));
+    assertThat(ref.getType(), is(instanceOf(StringType.class)));
+    assertThat(ref.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(ref.isRequired(), is(false));
+
+    assertThat(errorHandlerModel.getNestedComponents(), hasSize(3));
+    NestedRouteModel onError = (NestedRouteModel) errorHandlerModel.getNestedComponents().get(0);
+
+    List<ParameterModel> allParameterModels = onError.getAllParameterModels();
+    assertThat(allParameterModels, hasSize(1));
+
+    ParameterModel onErrorRef = allParameterModels.get(0);
+    assertThat(onErrorRef.getName(), is("ref"));
+    assertThat(onErrorRef.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(onErrorRef.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(onErrorRef.isRequired(), is(true));
+
+    NestedRouteModel onErrorContinue = (NestedRouteModel) errorHandlerModel.getNestedComponents().get(1);
+    NestedRouteModel onErrorPropagate = (NestedRouteModel) errorHandlerModel.getNestedComponents().get(2);
 
     verifyOnError(onErrorContinue);
     verifyOnError(onErrorPropagate);

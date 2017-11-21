@@ -114,6 +114,7 @@ public class ApplicationModel {
   // TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
   public static final String POLICY_ROOT_ELEMENT = "policy";
   public static final String ERROR_MAPPING = "error-mapping";
+  public static final String ON_ERROR = "on-error";
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
   public static final String WHEN_CHOICE_ES_ATTRIBUTE = "when";
   public static final String TYPE_ES_ATTRIBUTE = "type";
@@ -156,6 +157,8 @@ public class ApplicationModel {
           .build();
   public static final ComponentIdentifier ERROR_MAPPING_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ERROR_MAPPING).build();
+  public static final ComponentIdentifier ON_ERROR_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(ON_ERROR).build();
   public static final ComponentIdentifier MULE_PROPERTY_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(PROPERTY_ELEMENT).build();
   public static final ComponentIdentifier MULE_PROPERTIES_IDENTIFIER =
@@ -769,29 +772,47 @@ public class ApplicationModel {
   private void validateErrorHandlerStructure() {
     executeOnEveryMuleComponentTree(component -> {
       if (component.getIdentifier().equals(ERROR_HANDLER_IDENTIFIER)) {
-        validateExceptionStrategiesHaveWhenAttribute(component);
-        validateNoMoreThanOneRollbackExceptionStrategyWithRedelivery(component);
+        validateRefOrOnErrorsExclusiveness(component);
+        validateOnErrorsHaveTypeOrWhenAttribute(component);
+        validateNoMoreThanOneOnErrorPropagateWithRedelivery(component);
       }
     });
   }
 
-  private void validateNoMoreThanOneRollbackExceptionStrategyWithRedelivery(ComponentModel component) {
-    if (component.getInnerComponents().stream().filter(exceptionStrategyComponent -> {
-      return exceptionStrategyComponent.getParameters().get(MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE) != null;
-    }).count() > 1) {
+  private void validateRefOrOnErrorsExclusiveness(ComponentModel component) {
+    if (component.getParameters().get(REFERENCE_ATTRIBUTE) != null && !component.getInnerComponents().isEmpty()) {
+      throw new MuleRuntimeException(createStaticMessage("A reference error-handler cannot have on-errors."));
+    }
+  }
+
+  private void validateNoMoreThanOneOnErrorPropagateWithRedelivery(ComponentModel component) {
+    if (component.getInnerComponents().stream().filter(exceptionStrategyComponent -> exceptionStrategyComponent.getParameters()
+        .get(MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE) != null).count() > 1) {
       throw new MuleRuntimeException(createStaticMessage(
                                                          "Only one on-error-propagate within a error-handler can handle message redelivery. Remove one of the maxRedeliveryAttempts attributes"));
     }
   }
 
-  private void validateExceptionStrategiesHaveWhenAttribute(ComponentModel component) {
+  private void validateOnErrorsHaveTypeOrWhenAttribute(ComponentModel component) {
     List<ComponentModel> innerComponents = component.getInnerComponents();
     for (int i = 0; i < innerComponents.size() - 1; i++) {
-      Map<String, String> parameters = innerComponents.get(i).getParameters();
+      ComponentModel componentModel = getOnErrorComponentModel(innerComponents.get(i));
+      Map<String, String> parameters = componentModel.getParameters();
       if (parameters.get(WHEN_CHOICE_ES_ATTRIBUTE) == null && parameters.get(TYPE_ES_ATTRIBUTE) == null) {
         throw new MuleRuntimeException(createStaticMessage(
                                                            "Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));
       }
+    }
+  }
+
+  private ComponentModel getOnErrorComponentModel(ComponentModel onErrorModel) {
+    if (ON_ERROR_IDENTIFIER.equals(onErrorModel.getIdentifier())) {
+      String sharedOnErrorName = onErrorModel.getParameters().get(REFERENCE_ATTRIBUTE);
+      return findTopLevelNamedComponent(sharedOnErrorName).orElseThrow(
+                                                                       () -> new MuleRuntimeException(createStaticMessage(format("Could not find on-error reference named '%s'",
+                                                                                                                                 sharedOnErrorName))));
+    } else {
+      return onErrorModel;
     }
   }
 

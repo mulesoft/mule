@@ -87,6 +87,7 @@
             <xsd:element ref="abstract-shared-connector"/>
             <xsd:element ref="abstract-global-endpoint"/>
             <xsd:element ref="abstract-exception-strategy"/>
+            <xsd:element ref="abstract-on-error"/>
             <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="flow" />
             <xsd:element ref="sub-flow" />
@@ -2016,20 +2017,29 @@
     <!--   Exception strategies                                       -->
     <!--==============================================================-->
 
-    <xsd:element name="on-error-continue" type="onErrorContinueType"
-                 substitutionGroup="abstract-on-error">
-        <xsd:annotation>
-            <xsd:documentation>
-                Error handler used to handle exceptions. It will commit any transaction as if the message was consumed successfully.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
     <xsd:element name="error-handler" type="errorHandlerType"
                  substitutionGroup="abstract-exception-strategy">
         <xsd:annotation>
             <xsd:documentation>
                 Allows the definition of internal selective handlers. It will route the error to the first handler that matches it. If there's no match, then a default error handler will be executed.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="on-error" type="onErrorType"
+                 substitutionGroup="abstract-on-error">
+        <xsd:annotation>
+            <xsd:documentation>
+                Error handler used to reference other ones.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="on-error-continue" type="onErrorContinueType"
+                 substitutionGroup="abstract-on-error">
+        <xsd:annotation>
+            <xsd:documentation>
+                Error handler used to handle exceptions. It will commit any transaction as if the message was consumed successfully.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2043,6 +2053,44 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:complexType name="errorHandlerType">
+        <xsd:complexContent>
+            <xsd:extension base="exceptionStrategyType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-on-error" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="substitutableName" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Name of the error handler that will be used in ref attribute of other 'error-handler' elements.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ref" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the error handler to reuse.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="onErrorType">
+        <xsd:complexContent>
+            <xsd:extension base="exceptionStrategyType">
+                <xsd:attribute name="ref" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the 'on-error' to reuse.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:complexType name="onErrorContinueType">
         <xsd:complexContent>
             <xsd:extension base="abstractOnErrorType">
@@ -2054,24 +2102,6 @@
                         </xsd:annotation>
                     </xsd:group>
                 </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-
-    <xsd:complexType name="errorHandlerType">
-        <xsd:complexContent>
-            <xsd:extension base="exceptionStrategyType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-on-error" minOccurs="1" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="name" type="substitutableName" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Name of the exception strategy that will be used in ref attribute of 'exception-strategy' element
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
