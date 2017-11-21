@@ -16,16 +16,19 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.tck.ZipUtils.compress;
 
+import org.mule.runtime.core.api.util.compression.InvalidZipFileException;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 public class FileUtilsTestCase extends AbstractMuleTestCase {
@@ -39,6 +42,9 @@ public class FileUtilsTestCase extends AbstractMuleTestCase {
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   private File toDir;
+
+  @Rule
+  public ExpectedException thrownException = ExpectedException.none();
 
   @Before
   public void setupDir() {
@@ -352,6 +358,42 @@ public class FileUtilsTestCase extends AbstractMuleTestCase {
     unzip(compressedFile, toDir);
 
     assertThat(new File(new File(toDir, "folder"), resourceName).exists(), is(true));
+  }
+
+  @Test
+  public void doesNotUnzipAbsolutePaths() throws Exception {
+    final String resourceName = "dummy.xml";
+    final String resourceAlias = new File(resourceName).getAbsolutePath();
+    final File compressedFile = new File(toDir, "test.zip");
+    compress(compressedFile, new ZipResource[] {
+        new ZipResource(resourceName, resourceName),
+        new ZipResource(resourceName, resourceAlias)
+    });
+
+    thrownException.expect(InvalidZipFileException.class);
+    thrownException.expectMessage("Absolute paths are not allowed: " + resourceAlias);
+    unzip(compressedFile, toDir);
+
+    // make sure it did not extract other archive files
+    assertThat(new File(toDir, resourceName).exists(), is(false));
+  }
+
+  @Test
+  public void doesNotUnzipExternalPaths() throws Exception {
+    final String resourceName = "dummy.xml";
+    final String resourceAlias = Paths.get("folder", "..", "..", resourceName).toString();
+    final File compressedFile = new File(toDir, "test.zip");
+    compress(compressedFile, new ZipResource[] {
+        new ZipResource(resourceName, resourceName),
+        new ZipResource(resourceName, resourceAlias)
+    });
+
+    thrownException.expect(InvalidZipFileException.class);
+    thrownException.expectMessage("External paths are not allowed: " + resourceAlias);
+    unzip(compressedFile, toDir);
+
+    // make sure it did not extract other archive files
+    assertThat(new File(toDir, resourceName).exists(), is(false));
   }
 
   private File createTestFile(String filePath) throws IOException {
