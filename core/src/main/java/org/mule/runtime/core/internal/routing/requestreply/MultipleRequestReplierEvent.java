@@ -15,6 +15,8 @@ import java.util.List;
 
 public class MultipleRequestReplierEvent implements Serializable {
 
+  private static final long serialVersionUID = 9027542946303372537L;
+
   private final List<PrivilegedEvent> muleEvents = new ArrayList<>();
 
   protected synchronized void addEvent(PrivilegedEvent event) {
