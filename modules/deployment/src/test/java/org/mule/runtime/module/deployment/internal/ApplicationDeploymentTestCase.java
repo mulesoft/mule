@@ -1212,8 +1212,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
         .configuredWith(EXPORTED_PACKAGES, "org.bar1")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
-        .containingClass(barUtils1ClassFile, "/org/bar1/BarUtils.class")
-        .containingClass(barUtils2ClassFile, "/org/bar2/BarUtils.class")
+        .containingClass(barUtils1ClassFile, "org/bar1/BarUtils.class")
+        .containingClass(barUtils2ClassFile, "org/bar2/BarUtils.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt")
         .dependingOn(loadsAppResourcePlugin);
@@ -1236,8 +1236,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-loads-app-resource-plugin-config.xml")
         .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class")
-        .containingClass(barUtils1ClassFile, "/org/bar1/BarUtils.class")
-        .containingClass(barUtils2ClassFile, "/org/bar2/BarUtils.class")
+        .containingClass(barUtils1ClassFile, "org/bar1/BarUtils.class")
+        .containingClass(barUtils2ClassFile, "org/bar2/BarUtils.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt");
 
@@ -1271,8 +1271,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
         .configuredWith(EXPORTED_PACKAGES, "org.bar1")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
         .definedBy("app-with-plugin-bootstrap.xml")
-        .containingClass(barUtils1ClassFile, "/org/bar1/BarUtils.class")
-        .containingClass(barUtils2ClassFile, "/org/bar2/BarUtils.class")
+        .containingClass(barUtils1ClassFile, "org/bar1/BarUtils.class")
+        .containingClass(barUtils2ClassFile, "org/bar2/BarUtils.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt")
         .dependingOn(loadsAppResourceInterceptorPlugin);
@@ -1301,8 +1301,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
         .definedBy("app-with-interceptor.xml")
         .containingClass(loadsOwnResourceInterceptorFactoryClassFile, "org/foo/LoadsOwnResourceInterceptorFactory.class")
         .containingClass(loadsOwnResourceInterceptorClassFile, "org/foo/LoadsOwnResourceInterceptor.class")
-        .containingClass(barUtils1ClassFile, "/org/bar1/BarUtils.class")
-        .containingClass(barUtils2ClassFile, "/org/bar2/BarUtils.class")
+        .containingClass(barUtils1ClassFile, "org/bar1/BarUtils.class")
+        .containingClass(barUtils2ClassFile, "org/bar2/BarUtils.class")
         .containingResource("test-resource.txt", "test-resource.txt")
         .containingResource("test-resource.txt", "test-resource-not-exported.txt");
 
