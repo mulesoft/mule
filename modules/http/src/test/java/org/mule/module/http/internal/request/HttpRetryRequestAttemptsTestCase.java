@@ -6,12 +6,8 @@
  */
 package org.mule.module.http.internal.request;
 
-import static java.lang.reflect.Modifier.FINAL;
 import static org.junit.runners.Parameterized.Parameters;
 
-import java.lang.reflect.Field;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -35,18 +31,6 @@ public class HttpRetryRequestAttemptsTestCase extends AbstractHttpRetryRequestTe
         this.numberOfRetries = numberOfRetries;
     }
 
-    @Before
-    public void setUp() throws Exception
-    {
-        super.setUp();
-        Field retryAttemptsField = DefaultHttpRequester.class.getDeclaredField("RETRY_ATTEMPTS");
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(retryAttemptsField, retryAttemptsField.getModifiers() & ~FINAL);
-        retryAttemptsField.setAccessible(true);
-        retryAttemptsField.setInt(null, numberOfRetries);
-    }
-
     @Test
     public void customRetryRequestAttemptsIdempotentMethod() throws Exception
     {
@@ -59,4 +43,9 @@ public class HttpRetryRequestAttemptsTestCase extends AbstractHttpRetryRequestTe
         runNonIdempotentFlow();
     }
 
+    @Override
+    public int getNumberOfRetries()
+    {
+        return numberOfRetries;
+    }
 }

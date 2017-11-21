@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.request;
 
+import static java.lang.reflect.Modifier.FINAL;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -14,6 +15,8 @@ import static org.mule.module.http.internal.request.DefaultHttpRequester.REMOTEL
 import org.mule.module.http.utils.TestServerSocket;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import java.lang.reflect.Field;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -41,6 +44,12 @@ public abstract class AbstractHttpRetryRequestTestCase extends FunctionalTestCas
     public void setUp() throws Exception
     {
         expectedException.expectCause(REMOTELY_CLOSE_CAUSE_MATCHER);
+        Field retryAttemptsField = DefaultHttpRequester.class.getDeclaredField("RETRY_ATTEMPTS");
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(retryAttemptsField, retryAttemptsField.getModifiers() & ~FINAL);
+        retryAttemptsField.setAccessible(true);
+        retryAttemptsField.setInt(null, getNumberOfRetries());
     }
 
     void runIdempotentFlow() throws Exception
@@ -74,6 +83,11 @@ public abstract class AbstractHttpRetryRequestTestCase extends FunctionalTestCas
         {
             assertThat(testServerSocket.getConnectionCounter() - 1, is(0));
         }
+    }
+
+    protected int getNumberOfRetries ()
+    {
+        return DEFAULT_RETRY_ATTEMPTS;
     }
 
 }
