@@ -6,7 +6,8 @@
  */
 package org.mule.module.http.internal.request;
 
-import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
+import static java.lang.Integer.getInteger;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
@@ -16,6 +17,12 @@ import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.api.CompletionHandler;
+import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
+import static org.mule.module.http.api.HttpConstants.IDEMPOTENT_METHODS;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -55,8 +62,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor implements Initialisable, MuleContextAware, FlowConstructAware, DebugInfoProvider
@@ -82,8 +87,10 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     static final String WORKSTATION_DEBUG = "Workstation";
     static final String AUTHENTICATION_TYPE_DEBUG = "Authentication Type";
     static final String QUERY_PARAMS_DEBUG = "Query Params";
+    static String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.maxRetries";
     static final String REMOTELY_CLOSED = "Remotely closed";
-    private static final int DEFAULT_RETRY_ATTEMPTS = 3;
+    static final int DEFAULT_RETRY_ATTEMPTS = 3;
+    private static final int RETRY_ATTEMPTS  = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
 
     private DefaultHttpRequesterConfig requestConfig;
     private HttpRequesterRequestBuilder requestBuilder;
@@ -219,14 +226,14 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     @Override
     protected MuleEvent processBlocking(final MuleEvent muleEvent) throws MuleException
     {
-        return innerProcess(muleEvent, DEFAULT_RETRY_ATTEMPTS);
+        return innerProcess(muleEvent, RETRY_ATTEMPTS);
     }
 
     @Override
     protected void processNonBlocking(final MuleEvent muleEvent, final CompletionHandler completionHandler) throws
                                                                                                             MuleException
     {
-        innerProcessNonBlocking(muleEvent, completionHandler, DEFAULT_RETRY_ATTEMPTS);
+        innerProcessNonBlocking(muleEvent, completionHandler, RETRY_ATTEMPTS);
     }
 
     protected void innerProcessNonBlocking(final MuleEvent muleEvent, final CompletionHandler originalCompletionHandler,
@@ -264,7 +271,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                     checkIfRemotelyClosed(exception);
                     // Only retry request in case of race condition where connection is closed after it is obtained from pool causing
                     // a "IOException: Remotely Closed"
-                    if(shouldRetryRemotelyClosed(exception, retryCount))
+                    if(shouldRetryRemotelyClosed(exception, retryCount, httpRequest.getMethod()))
                     {
                         try
                         {
@@ -337,9 +344,9 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         };
     }
 
-    private boolean shouldRetryRemotelyClosed(Exception exception, int retryCount)
+    private boolean shouldRetryRemotelyClosed(Exception exception, int retryCount, String httpMethod)
     {
-        boolean shouldRetry = exception instanceof IOException && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED) && retryCount > 0;
+        boolean shouldRetry = IDEMPOTENT_METHODS.contains(httpMethod) && exception instanceof IOException && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED) && retryCount > 0;
         if(shouldRetry)
         {
             logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
@@ -384,7 +391,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
             checkIfRemotelyClosed(e);
             // Only retry request in case of race condition where connection is closed after it is obtained from pool causing
             // a "IOException: Remotely Closed"
-            if(shouldRetryRemotelyClosed(e, retryCount))
+            if(shouldRetryRemotelyClosed(e, retryCount, httpRequest.getMethod()))
             {
                 return innerProcess(muleEvent, retryCount - 1);
             }
