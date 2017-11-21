@@ -7,6 +7,7 @@
 
 package org.mule.module.db.integration.insert;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.db.integration.TestDbConfig.getResources;
 import org.mule.api.MuleEvent;
@@ -51,9 +52,11 @@ public class InsertClobInputParamTestCase extends AbstractDbIntegrationTestCase
     @Test
     public void usesStringOnExplicitParam() throws Exception
     {
-        MuleEvent response = runFlow("usesStringOnExplicitParam", TEST_MESSAGE);
+        String hugeClobValue = randomAlphabetic(555555);
 
-        assertThat(response.getMessage().getPayload(), Matchers.<Object>equalTo(TEST_MESSAGE));
+        MuleEvent response = runFlow("usesStringOnExplicitParam", hugeClobValue);
+
+        assertThat(response.getMessage().getPayload(), Matchers.<Object>equalTo(hugeClobValue));
     }
 
     @Before
