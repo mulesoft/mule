@@ -11,15 +11,17 @@ import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
+
+import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -36,7 +38,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
   /**
    * Generates message processor identifiers specific for subflows.
    */
-  static class SubFlowMessageProcessorChain extends DefaultMessageProcessorChain {
+  static class SubFlowMessageProcessorChain extends DefaultMessageProcessorChain implements ProcessorChainPrototype {
 
     private String subFlowName;
 
@@ -58,6 +60,16 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher).concatMap(event -> Mono.just(event).doOnNext(pushSubFlowFlowStackElement())
           .transform(s -> super.apply(s)).doOnSuccessOrError((result, throwable) -> popSubFlowFlowStackElement().accept(event)));
+    }
+
+    @Override
+    public MessageProcessorChainBuilder toChainBuilder() {
+      SubflowMessageProcessorChainBuilder chainBuilder = new SubflowMessageProcessorChainBuilder();
+
+      chainBuilder.setName(subFlowName);
+      chainBuilder.chain(getMessageProcessors());
+
+      return chainBuilder;
     }
   }
 }

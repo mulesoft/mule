@@ -15,11 +15,11 @@ import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
-import java.util.concurrent.CountDownLatch;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+
+import java.util.concurrent.CountDownLatch;
 
 public class FlowTraceUtils {
 
@@ -48,10 +48,10 @@ public class FlowTraceUtils {
 
 
   public static void assertStackElements(FlowCallStack flowStack, Matcher<FlowStackElement>... flowStackElementMatchers) {
-    assertThat(flowStack.getElements(), hasSize(flowStackElementMatchers.length));
+    assertThat(flowStack.toString(), flowStack.getElements(), hasSize(flowStackElementMatchers.length));
     int i = 0;
     for (Matcher<FlowStackElement> flowStackElementMatcher : flowStackElementMatchers) {
-      assertThat(flowStack.getElements().get(i), flowStackElementMatcher);
+      assertThat(flowStack.toString(), flowStack.getElements().get(i), flowStackElementMatcher);
       ++i;
     }
   }
