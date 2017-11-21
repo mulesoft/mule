@@ -98,8 +98,6 @@ import org.springframework.util.StringUtils;
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
     implements ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable {
 
-  private static final long serialVersionUID = 7110590944074180546L;
-
   private static Class<?> javaUtilOptionalClass = null;
 
   private static Class<?> javaxInjectProviderClass = null;
@@ -171,7 +169,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
   /**
    * Create a new DefaultListableBeanFactory with the given parent.
-   * 
+   *
    * @param parentBeanFactory the parent BeanFactory
    */
   public DefaultListableBeanFactory(BeanFactory parentBeanFactory) {
@@ -195,7 +193,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
   /**
    * Return an id for serialization purposes, if specified, allowing this BeanFactory to be deserialized from this id back into
    * the BeanFactory object, if needed.
-   * 
+   *
    * @since 4.1.2
    */
   public String getSerializationId() {
@@ -207,7 +205,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
    * automatically replacing the former. If not, an exception will be thrown. This also applies to overriding aliases.
    * <p>
    * Default is "true".
-   * 
+   *
    * @see #registerBeanDefinition
    */
   public void setAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
@@ -217,7 +215,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
   /**
    * Return whether it should be allowed to override bean definitions by registering a different definition with the same name,
    * automatically replacing the former.
-   * 
+   *
    * @since 4.1.2
    */
   public boolean isAllowBeanDefinitionOverriding() {
@@ -230,7 +228,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
    * Default is "true". Turn this flag off to suppress class loading for lazy-init beans unless such a bean is explicitly
    * requested. In particular, by-type lookups will then simply ignore bean definitions without resolved class name, instead of
    * loading the bean classes on demand just to perform a type check.
-   * 
+   *
    * @see AbstractBeanDefinition#setLazyInit
    */
   public void setAllowEagerClassLoading(boolean allowEagerClassLoading) {
@@ -239,7 +237,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
   /**
    * Return whether the factory is allowed to eagerly load bean classes even for bean definitions that are marked as "lazy-init".
-   * 
+   *
    * @since 4.1.2
    */
   public boolean isAllowEagerClassLoading() {
@@ -248,7 +246,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
   /**
    * Set a {@link java.util.Comparator} for dependency Lists and arrays.
-   * 
+   *
    * @see org.springframework.core.OrderComparator
    * @see org.springframework.core.annotation.AnnotationAwareOrderComparator
    */
@@ -477,7 +475,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
   /**
    * Check whether the specified bean would need to be eagerly initialized in order to determine its type.
-   * 
+   *
    * @param factoryBeanName a factory-bean reference that the bean definition defines a factory method for
    * @return whether eager initialization is necessary
    */
@@ -600,7 +598,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
   /**
    * Determine whether the specified bean definition qualifies as an autowire candidate, to be injected into other beans which
    * declare a dependency of matching type.
-   * 
+   *
    * @param beanName the name of the bean definition to check
    * @param descriptor the descriptor of the dependency to resolve
    * @param resolver the AutowireCandidateResolver to use for the actual resolution algorithm
@@ -628,7 +626,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
   /**
    * Determine whether the specified bean definition qualifies as an autowire candidate, to be injected into other beans which
    * declare a dependency of matching type.
-   * 
+   *
    * @param beanName the name of the bean definition to check
    * @param mbd the merged bean definition to check
    * @param descriptor the descriptor of the dependency to resolve
@@ -687,7 +685,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
   /**
    * Considers all beans as eligible for metadata caching if the factory's configuration has been marked as frozen.
-   * 
+   *
    * @see #freezeConfiguration()
    */
   @Override
@@ -825,7 +823,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
   /**
    * Reset all bean definition caches for the given bean, including the caches of beans that are derived from it.
-   * 
+   *
    * @param beanName the name of the bean to reset
    */
   protected void resetBeanDefinition(String beanName) {
@@ -1051,7 +1049,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
   /**
    * Find bean instances that match the required type. Called during autowiring for the specified bean.
-   * 
+   *
    * @param beanName the name of the bean that is about to be wired
    * @param requiredType the actual type of bean to look for (may be an array component type or collection element type)
    * @param descriptor the descriptor of the dependency to resolve
@@ -1094,7 +1092,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
    * Determine the autowire candidate in the given set of beans.
    * <p>
    * Looks for {@code @Primary} and {@code @Priority} (in that order).
-   * 
+   *
    * @param candidateBeans a Map of candidate names and candidate instances that match the required type, as returned by
    *        {@link #findAutowireCandidates}
    * @param descriptor the target dependency to match against
@@ -1124,7 +1122,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
   /**
    * Determine the primary candidate in the given set of beans.
-   * 
+   *
    * @param candidateBeans a Map of candidate names and candidate instances that match the required type
    * @param requiredType the target dependency type to match against
    * @return the name of the primary candidate, or {@code null} if none found
@@ -1156,7 +1154,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
   /**
    * Determine the candidate with the highest priority in the given set of beans. As defined by the
    * {@link org.springframework.core.Ordered} interface, the lowest value has the highest priority.
-   * 
+   *
    * @param candidateBeans a Map of candidate names and candidate instances that match the required type
    * @param requiredType the target dependency type to match against
    * @return the name of the candidate with the highest priority, or {@code null} if none found
@@ -1190,7 +1188,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
   /**
    * Return whether the bean definition for the given bean name has been marked as a primary bean.
-   * 
+   *
    * @param beanName the name of the bean
    * @param beanInstance the corresponding bean instance (can be null)
    * @return whether the given bean qualifies as primary
@@ -1211,7 +1209,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
    * {@link OrderComparator#getPriority method} if it is an extension of Spring's common {@link OrderComparator} - typically, an
    * {@link org.springframework.core.annotation.AnnotationAwareOrderComparator}. If no such comparator is present, this
    * implementation returns {@code null}.
-   * 
+   *
    * @param beanInstance the bean instance to check (can be {@code null})
    * @return the priority assigned to that bean or {@code null} if none is set
    */
@@ -1292,8 +1290,6 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
    */
   private static class SerializedBeanFactoryReference implements Serializable {
 
-    private static final long serialVersionUID = 4249718040866211582L;
-
     private final String id;
 
     public SerializedBeanFactoryReference(String id) {
@@ -1340,8 +1336,6 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
    * Serializable ObjectFactory for lazy resolution of a dependency.
    */
   private class DependencyObjectFactory implements ObjectFactory<Object>, Serializable {
-
-    private static final long serialVersionUID = 7415140309822800609L;
 
     private final DependencyDescriptor descriptor;
 
