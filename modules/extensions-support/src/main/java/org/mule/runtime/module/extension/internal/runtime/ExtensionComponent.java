@@ -408,6 +408,18 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         .orElseGet(() -> extensionManager.getConfiguration(extensionModel, componentModel, event));
   }
 
+  /**
+   * Similar to {@link #getConfiguration(CoreEvent)} but only works if the {@link #configurationProvider} is static.
+   * Otherwise, returns an empty value.
+   */
+  protected Optional<ConfigurationInstance> getStaticConfiguration() {
+    if (configurationProvider.get().isDynamic()) {
+      return empty();
+    }
+
+    return getConfiguration(getInitialiserEvent());
+  }
+
   protected CursorProviderFactory getCursorProviderFactory() {
     return cursorProviderFactory;
   }

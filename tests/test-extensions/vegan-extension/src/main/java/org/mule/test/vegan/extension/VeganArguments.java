@@ -6,11 +6,11 @@
  */
 package org.mule.test.vegan.extension;
 
+import static java.util.stream.Collectors.joining;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @ExclusiveOptionals
@@ -48,6 +48,6 @@ public class VeganArguments {
   public String toString() {
     return Stream.of(argument1, argument2, argument3)
         .filter(a -> a != null)
-        .collect(Collectors.joining(","));
+        .collect(joining(","));
   }
 }

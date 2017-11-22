@@ -38,6 +38,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -67,6 +68,7 @@ import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -239,7 +241,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private ComponentExecutor<T> createComponentExecutor() {
     Map<String, Object> params = new HashMap<>();
 
-    final ValueResolvingContext resolvingContext = ValueResolvingContext.from(getInitialiserEvent());
+    final ValueResolvingContext resolvingContext = from(getInitialiserEvent(), getStaticConfiguration());
 
     componentModel.getParameterGroupModels().stream().forEach(group -> {
       if (group.getName().equals(DEFAULT_GROUP_NAME)) {
@@ -264,22 +266,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           return;
         }
 
-        List<ParameterModel> initParameters = group.getParameterModels().stream()
-            .filter(p -> p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent())
-            .collect(toList());
+        List<ParameterModel> fieldParameters = getGroupsOfFieldParameters(group);
 
-        if (initParameters.isEmpty()) {
+        if (fieldParameters.isEmpty()) {
           return;
         }
 
-        DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(groupDescriptor.getType().getDeclaringClass());
-
-        initParameters.forEach(p -> {
-          ValueResolver resolver = resolverSet.getResolvers().get(p.getName());
-          if (resolver != null) {
-            groupBuilder.addPropertyResolver(getMemberName(p), resolver);
-          }
-        });
+        ObjectBuilder groupBuilder = createFieldParameterGroupBuilder(groupDescriptor, fieldParameters);
 
         try {
           params.put(((Field) groupDescriptor.getContainer()).getName(), groupBuilder.build(resolvingContext));
@@ -290,6 +283,25 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     });
 
     return getOperationExecutorFactory(componentModel).createExecutor(componentModel, params);
+  }
+
+  private ObjectBuilder createFieldParameterGroupBuilder(ParameterGroupDescriptor groupDescriptor,
+                                                                List<ParameterModel> fieldParameters) {
+    DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(groupDescriptor.getType().getDeclaringClass());
+
+    fieldParameters.forEach(p -> {
+      ValueResolver resolver = resolverSet.getResolvers().get(p.getName());
+      if (resolver != null) {
+        groupBuilder.addPropertyResolver(getMemberName(p), resolver);
+      }
+    });
+    return groupBuilder;
+  }
+
+  private List<ParameterModel> getGroupsOfFieldParameters(ParameterGroupModel group) {
+    return group.getParameterModels().stream()
+              .filter(p -> p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent())
+              .collect(toList());
   }
 
   protected ReturnDelegate createReturnDelegate() {
