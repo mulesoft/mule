@@ -27,6 +27,7 @@ import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Operators.lift;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.FlowOverloadException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -49,10 +50,6 @@ import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscription;
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -65,6 +62,9 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
+import org.slf4j.Logger;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -165,6 +165,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .concatMap(event -> just(event)
             .transform(next)
             .onErrorMap(MessagingException.class, resolveMessagingException(processor))
+            .onErrorMap(RejectedExecutionException.class,
+                        t -> resolveException((Component) processor, event, new FlowOverloadException(t.getMessage(), t)))
             .onErrorMap(t -> !(t instanceof MessagingException),
                         t -> resolveException((Component) processor, event, t))));
 
