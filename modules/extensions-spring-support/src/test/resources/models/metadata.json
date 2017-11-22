@@ -13713,7 +13713,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "AMERICA",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -13744,7 +13744,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "USA",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -13775,7 +13775,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "SFO",
               "role": "BEHAVIOUR",
               "dslConfiguration": {

@@ -13258,7 +13258,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -13284,7 +13284,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,

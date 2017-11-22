@@ -7,6 +7,8 @@
 package org.mule.test.vegan.extension;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -20,7 +22,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class VeganFidelityOperation {
+public class VeganFidelityOperation implements Initialisable {
+
+  @ParameterGroup(name = "Arguments")
+  private VeganArguments arguments;
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (arguments == null) {
+      throw new IllegalStateException("Forgot why I was began");
+    }
+  }
 
   @MediaType(TEXT_PLAIN)
   public String tryEat(@ParameterDsl(allowReferences = false) Object food,
@@ -29,7 +41,7 @@ public class VeganFidelityOperation {
       return "tasty " + food.getClass().getSimpleName();
     }
 
-    throw new IllegalArgumentException("I SHALL NEVER EAT " + food.toString());
+    throw new IllegalArgumentException("I SHALL NEVER EAT " + food.toString() + " because " + arguments.toString());
   }
 
   public List<Map<String, String>> tryToEatThisListOfMaps(@Optional @NullSafe @Content List<Map<String, String>> foods) {

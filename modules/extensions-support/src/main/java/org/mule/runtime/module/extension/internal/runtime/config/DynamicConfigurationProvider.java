@@ -248,4 +248,14 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     super.start();
     startIfNeeded(connectionProviderResolver);
   }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code false}
+   */
+  @Override
+  public boolean isDynamic() {
+    return true;
+  }
 }

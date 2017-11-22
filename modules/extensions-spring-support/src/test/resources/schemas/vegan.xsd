@@ -824,6 +824,9 @@
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="pojoGroupedFood"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="argument1"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="argument2"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="argument3"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1004,6 +1007,9 @@
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="required" name="food"></xs:attribute>
         <xs:attribute type="mule:expressionMap" use="optional" name="menu"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="argument1"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="argument2"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="argument3"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1024,6 +1030,9 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="foods"></xs:element>
         </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="argument1"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="argument2"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="argument3"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
