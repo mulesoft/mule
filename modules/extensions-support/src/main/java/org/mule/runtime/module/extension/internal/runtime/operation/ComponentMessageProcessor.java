@@ -286,7 +286,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private ObjectBuilder createFieldParameterGroupBuilder(ParameterGroupDescriptor groupDescriptor,
-                                                                List<ParameterModel> fieldParameters) {
+                                                         List<ParameterModel> fieldParameters) {
     DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(groupDescriptor.getType().getDeclaringClass());
 
     fieldParameters.forEach(p -> {
@@ -300,8 +300,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private List<ParameterModel> getGroupsOfFieldParameters(ParameterGroupModel group) {
     return group.getParameterModels().stream()
-              .filter(p -> p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent())
-              .collect(toList());
+        .filter(p -> p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent())
+        .collect(toList());
   }
 
   protected ReturnDelegate createReturnDelegate() {
