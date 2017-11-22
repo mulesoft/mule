@@ -270,10 +270,10 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:expressionString" use="optional" default="some value" name="required"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="AMERICA" name="continent"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="USA" name="country"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="SFO" name="city"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" default="some value" name="required"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" default="AMERICA" name="continent"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" default="USA" name="country"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" default="SFO" name="city"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -288,8 +288,8 @@
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
                   <xs:sequence></xs:sequence>
-                  <xs:attribute type="mule:expressionString" use="required" name="channels"></xs:attribute>
-                  <xs:attribute type="mule:expressionString" use="optional" name="anyParameter"></xs:attribute>
+                  <xs:attribute type="xs:string" use="required" name="channels"></xs:attribute>
+                  <xs:attribute type="xs:string" use="optional" name="anyParameter"></xs:attribute>
                 </xs:extension>
               </xs:complexContent>
             </xs:complexType>
@@ -306,8 +306,8 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:expressionString" use="required" name="superString"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="required" name="channels"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="superString"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="channels"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -318,8 +318,8 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:expressionString" use="required" name="channels"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="anyParameter"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="channels"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="anyParameter"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

@@ -57,6 +57,7 @@ public class ParameterDslFunctionalTestCase extends AbstractExtensionFunctionalT
   @Test
   public void eatBlank() throws Exception {
     expectedException.expectMessage(containsString("I SHALL NEVER EAT "));
+    expectedException.expectMessage(containsString("because reasons"));
     flowRunner("eatBlank").run();
   }
 

@@ -30,7 +30,6 @@ import static org.reflections.ReflectionUtils.getAllSuperTypes;
 import static org.reflections.ReflectionUtils.withName;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
 import static org.springframework.core.ResolvableType.forType;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -51,6 +50,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -96,6 +96,8 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
+import com.google.common.collect.ImmutableList;
+
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -121,7 +123,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import com.google.common.collect.ImmutableList;
 import org.springframework.core.ResolvableType;
 
 /**
@@ -466,6 +467,9 @@ public final class IntrospectionUtils {
     }
   }
 
+  public static <T extends EnrichableModel & NamedObject> String getMemberName(T enrichableNamedModel) {
+    return getMemberName(enrichableNamedModel, enrichableNamedModel.getName());
+  }
 
   public static String getMemberName(EnrichableModel enrichableModel, String defaultName) {
     return enrichableModel.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField().getName())

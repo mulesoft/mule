@@ -8,15 +8,19 @@
     <vegan:banana-config name="banana"/>
 
     <flow name="eatFromExpression">
-        <vegan:try-eat food="#[mel:payload]"/>
+        <vegan:try-eat food="#[payload]"/>
     </flow>
 
     <flow name="eatFixedMeat">
-        <vegan:try-eat food="Nice, juicy and tasty meat"/>
+        <vegan:try-eat food="Nice, juicy and tasty meat" argument1="reasons"/>
+    </flow>
+
+    <flow name="eatMeatWithIdentityCrisis">
+        <vegan:try-eat food="Nice, juicy and tasty meat" />
     </flow>
 
     <flow name="eatBlank">
-        <vegan:try-eat food=""/>
+        <vegan:try-eat food="" argument2="reasons"/>
     </flow>
 
     <flow name="eatPealedBanana">

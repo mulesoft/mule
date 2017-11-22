@@ -862,9 +862,9 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:expressionString" use="optional" default="AMERICA" name="continent"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="USA" name="country"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="SFO" name="city"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" default="AMERICA" name="continent"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" default="USA" name="country"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" default="SFO" name="city"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

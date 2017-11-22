@@ -6564,7 +6564,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "some value",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -6599,7 +6599,7 @@
                 "requiresConnection": false,
                 "isOpen": true
               },
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "AMERICA",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -6634,7 +6634,7 @@
                 "requiresConnection": false,
                 "isOpen": true
               },
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "USA",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -6669,7 +6669,7 @@
                 "requiresConnection": false,
                 "isOpen": true
               },
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "SFO",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -6957,7 +6957,7 @@
                 "requiresConnection": false,
                 "isOpen": true
               },
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -6983,7 +6983,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -7223,7 +7223,7 @@
               "hasDynamicType": false,
               "required": true,
               "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -7259,7 +7259,7 @@
                 "requiresConnection": false,
                 "isOpen": true
               },
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -7507,7 +7507,7 @@
                 "requiresConnection": false,
                 "isOpen": true
               },
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -7533,7 +7533,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
+              "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,

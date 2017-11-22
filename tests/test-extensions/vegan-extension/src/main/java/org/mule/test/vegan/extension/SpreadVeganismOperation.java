@@ -11,7 +11,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -73,31 +72,4 @@ public class SpreadVeganismOperation implements Initialisable {
 
   }
 
-  @ExclusiveOptionals
-  public static class VeganArguments {
-
-    @Parameter
-    @Optional
-    private String argument1;
-
-    @Parameter
-    @Optional
-    private String argument2;
-
-    @Parameter
-    @Optional
-    private String argument3;
-
-    public String getArgument1() {
-      return argument1;
-    }
-
-    public String getArgument2() {
-      return argument2;
-    }
-
-    public String getArgument3() {
-      return argument3;
-    }
-  }
 }
