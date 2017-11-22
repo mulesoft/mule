@@ -23,6 +23,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.exception.FlowOverloadException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
@@ -47,13 +48,12 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 
-import org.reactivestreams.Publisher;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -251,7 +251,8 @@ public class DefaultFlowBuilder implements Builder {
             try {
               getSink().accept(request);
             } catch (RejectedExecutionException ree) {
-              MessagingException me = new MessagingException(event, ree, this);
+              Throwable overloadException = new FlowOverloadException(ree.getMessage(), ree);
+              MessagingException me = new MessagingException(event, overloadException, this);
               ((BaseEventContext) request.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
             }
             return Mono.from(((BaseEventContext) request.getContext()).getResponsePublisher())
