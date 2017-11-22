@@ -40,4 +40,13 @@ public class StaticConfigurationProvider extends LifecycleAwareConfigurationProv
   public ConfigurationInstance get(Event muleEvent) {
     return configuration;
   }
+
+  /**
+   * {@inheritDoc}
+   * @return {@code false}
+   */
+  @Override
+  public boolean isDynamic() {
+    return false;
+  }
 }

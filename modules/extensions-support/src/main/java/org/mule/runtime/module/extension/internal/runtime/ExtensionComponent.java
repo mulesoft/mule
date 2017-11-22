@@ -420,7 +420,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       return empty();
     }
 
-    return getDefaultConfiguraiton(getInitialiserEvent());
+    return getConfiguration(getInitialiserEvent());
   }
 
   protected CursorProviderFactory getCursorProviderFactory() {

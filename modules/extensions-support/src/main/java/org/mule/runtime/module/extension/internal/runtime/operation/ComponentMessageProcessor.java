@@ -40,6 +40,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
@@ -241,7 +242,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private ComponentExecutor<T> createComponentExecutor() {
     Map<String, Object> params = new HashMap<>();
 
-    final ValueResolvingContext resolvingContext = from(getInitialiserEvent(), getStaticConfiguration());
+    LazyValue<Optional<ConfigurationInstance>> staticConfiguration = new LazyValue<>(this::getStaticConfiguration);
+    LazyValue<ValueResolvingContext> resolvingContext =
+        new LazyValue<>(() -> from(getInitialiserEvent(), staticConfiguration.get()));
 
     componentModel.getParameterGroupModels().stream().forEach(group -> {
       if (group.getName().equals(DEFAULT_GROUP_NAME)) {
@@ -251,7 +254,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               ValueResolver<?> resolver = resolverSet.getResolvers().get(p.getName());
               if (resolver != null) {
                 try {
-                  params.put(getMemberName(p), resolveValue(resolver, resolvingContext));
+                  params.put(getMemberName(p), resolveValue(resolver, resolvingContext.get()));
                 } catch (MuleException e) {
                   throw new MuleRuntimeException(e);
                 }
@@ -275,7 +278,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         ObjectBuilder groupBuilder = createFieldParameterGroupBuilder(groupDescriptor, fieldParameters);
 
         try {
-          params.put(((Field) groupDescriptor.getContainer()).getName(), groupBuilder.build(resolvingContext));
+          params.put(((Field) groupDescriptor.getContainer()).getName(), groupBuilder.build(resolvingContext.get()));
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
         }
