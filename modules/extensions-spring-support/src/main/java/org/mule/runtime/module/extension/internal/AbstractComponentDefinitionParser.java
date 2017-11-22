@@ -97,7 +97,6 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
 
       parseParameters(componentModel.getAllParameterModels());
     } else {
-
       List<ParameterGroupModel> inlineGroups = getInlineGroups(componentModel);
       parseParameters(getFlatParameters(inlineGroups, componentModel.getAllParameterModels()));
       for (ParameterGroupModel group : inlineGroups) {

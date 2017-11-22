@@ -60,4 +60,14 @@ public class StaticConfigurationProvider extends LifecycleAwareConfigurationProv
               : Either.<Class<?>, String>left(field.getType());
         }).collect(toList());
   }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code false}
+   */
+  @Override
+  public boolean isDynamic() {
+    return false;
+  }
 }

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -15,6 +16,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
+import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseLayoutAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isProcessorChain;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
@@ -103,9 +105,12 @@ public final class ParameterModelsLoaderDelegate {
         continue;
       }
 
-      if (declaredAsGroup(component, declarationContext, extensionParameter)) {
+      List<ParameterDeclarer> groupParams = declaredAsGroup(component, declarationContext, extensionParameter);
+      if (!groupParams.isEmpty()) {
+        declarerList.addAll(groupParams);
         continue;
       }
+
 
       ParameterGroupDeclarer groupDeclarer =
           parameterGroupDeclarer != null ? parameterGroupDeclarer : component.onDefaultParameterGroup();
@@ -151,14 +156,14 @@ public final class ParameterModelsLoaderDelegate {
     }
   }
 
-  private boolean declaredAsGroup(HasParametersDeclarer component,
-                                  ParameterDeclarationContext declarationContext,
-                                  ExtensionParameter groupParameter)
+  private List<ParameterDeclarer> declaredAsGroup(HasParametersDeclarer component,
+                                                  ParameterDeclarationContext declarationContext,
+                                                  ExtensionParameter groupParameter)
       throws IllegalParameterModelDefinitionException {
 
     ParameterGroup groupAnnotation = groupParameter.getAnnotation(ParameterGroup.class).orElse(null);
     if (groupAnnotation == null) {
-      return false;
+      return emptyList();
     }
 
     final String groupName = groupAnnotation.name();
@@ -223,20 +228,17 @@ public final class ParameterModelsLoaderDelegate {
       declarer.withExclusiveOptionals(optionalParamNames, annotation.isOneRequired());
     });
 
-
     declarer.withDslInlineRepresentation(groupAnnotation.showInDsl());
 
-    MuleExtensionAnnotationParser.parseLayoutAnnotations(groupParameter, LayoutModel.builder()).ifPresent(declarer::withLayout);
+    parseLayoutAnnotations(groupParameter, LayoutModel.builder()).ifPresent(declarer::withLayout);
 
     if (!annotatedParameters.isEmpty()) {
-      declare(component, annotatedParameters, declarationContext, declarer);
+      return declare(component, annotatedParameters, declarationContext, declarer);
     } else {
       Class declaringClass = type.getDeclaringClass();
       List<FieldWrapper> fields = getFieldsWithGetters(declaringClass).stream().map(FieldWrapper::new).collect(toList());
-      declare(component, fields, declarationContext, declarer);
+      return declare(component, fields, declarationContext, declarer);
     }
-
-    return true;
   }
 
   private void parseParameterRole(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
@@ -341,7 +343,7 @@ public final class ParameterModelsLoaderDelegate {
   }
 
   private void parseLayout(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
-    MuleExtensionAnnotationParser.parseLayoutAnnotations(extensionParameter, LayoutModel.builder())
+    parseLayoutAnnotations(extensionParameter, LayoutModel.builder())
         .ifPresent(parameter::withLayout);
   }
 
