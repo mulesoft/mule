@@ -89,7 +89,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     static String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.maxRetries";
     static final String REMOTELY_CLOSED = "Remotely closed";
     static final int DEFAULT_RETRY_ATTEMPTS = 3;
-    private static final int RETRY_ATTEMPTS  = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
+    private static int RETRY_ATTEMPTS  = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
 
     private DefaultHttpRequesterConfig requestConfig;
     private HttpRequesterRequestBuilder requestBuilder;

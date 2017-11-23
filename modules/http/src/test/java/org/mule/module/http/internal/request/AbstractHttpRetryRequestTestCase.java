@@ -45,9 +45,6 @@ public abstract class AbstractHttpRetryRequestTestCase extends FunctionalTestCas
     {
         expectedException.expectCause(REMOTELY_CLOSE_CAUSE_MATCHER);
         Field retryAttemptsField = DefaultHttpRequester.class.getDeclaredField("RETRY_ATTEMPTS");
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(retryAttemptsField, retryAttemptsField.getModifiers() & ~FINAL);
         retryAttemptsField.setAccessible(true);
         retryAttemptsField.setInt(null, getNumberOfRetries());
     }
@@ -60,7 +57,7 @@ public abstract class AbstractHttpRetryRequestTestCase extends FunctionalTestCas
     void runIdempotentFlow(int numberOfRetryExpected) throws Exception
     {
         TestServerSocket testServerSocket = new TestServerSocket(port.getNumber(), numberOfRetryExpected + 1);
-        assertThat("Http server can't be initialized.",testServerSocket.startServer(5000), is(true));
+        assertThat("Http server can't be initialized.", testServerSocket.startServer(5000), is(true));
         try
         {
             runFlow("retryIdempotentMethod");
@@ -69,6 +66,7 @@ public abstract class AbstractHttpRetryRequestTestCase extends FunctionalTestCas
         {
             assertThat(testServerSocket.getConnectionCounter() - 1, is(numberOfRetryExpected));
         }
+        assertThat("There was an error trying to dispose the http server.", testServerSocket.dispose(5000), is(true));
     }
 
     void runNonIdempotentFlow() throws Exception
@@ -83,6 +81,7 @@ public abstract class AbstractHttpRetryRequestTestCase extends FunctionalTestCas
         {
             assertThat(testServerSocket.getConnectionCounter() - 1, is(0));
         }
+        assertThat("There was an error trying to dispose the http server.", testServerSocket.dispose(5000), is(true));
     }
 
     protected int getNumberOfRetries ()
