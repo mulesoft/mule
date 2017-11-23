@@ -7,8 +7,9 @@
 package org.mule.runtime.core.privileged.processor.chain;
 
 
-import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 
 /**
  * Builds {@link MessageProcessorChain} instances.
@@ -20,7 +21,7 @@ public interface MessageProcessorChainBuilder extends MessageProcessorBuilder {
   /**
    * Chain a {@link Processor} by adding it the the list of processors that the builder implementation will use to construct a
    * {@link MessageProcessorChain}
-   * 
+   *
    * @param processors {@link Processor} instance(s) to be used in the construction of a {@link MessageProcessorChain}
    * @return the current {@link MessageProcessorBuilder} instance.
    */
@@ -37,8 +38,15 @@ public interface MessageProcessorChainBuilder extends MessageProcessorBuilder {
   MessageProcessorChainBuilder chain(MessageProcessorBuilder... builders);
 
   /**
-   * Build a new {@link MessageProcessorBuilder}
+   * Apply a {@link ProcessingStrategy} to the Processors of the target {@link MessageProcessorChain}.
    * 
+   * @param processingStrategy the strategy to apply for each {@link Processor} in the target {@link MessageProcessorChain}.
+   */
+  void setProcessingStrategy(ProcessingStrategy processingStrategy);
+
+  /**
+   * Build a new {@link MessageProcessorBuilder}
+   *
    * @return a new {@link MessageProcessorBuilder} instance.
    */
   @Override

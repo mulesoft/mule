@@ -41,6 +41,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -206,6 +207,7 @@ public class MuleContextUtils {
       injectableObjects.put(MuleContext.class, muleContext);
       injectableObjects.put(SchedulerService.class, schedulerService);
       injectableObjects.put(ErrorTypeRepository.class, errorTypeRepository);
+      injectableObjects.put(ExtendedExpressionManager.class, muleContext.getExpressionManager());
       injectableObjects.put(StreamingManager.class, muleContext.getRegistry().lookupObject(StreamingManager.class));
       injectableObjects.put(ObjectStoreManager.class, muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER));
       injectableObjects.put(NotificationDispatcher.class,
