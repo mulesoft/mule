@@ -6,6 +6,8 @@
  */
 package org.mule.transport.ftp;
 
+import static java.io.File.separator;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -35,7 +37,6 @@ import org.mule.transport.nameable.AbstractInboundEndpointNameableConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.MessageFormat;
@@ -43,7 +44,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -762,9 +762,9 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
 
     private String getResourceName (String path)
     {
-        if (path.contains(File.separator))
+        if (path.contains(separator))
         {
-            String [] splitPath = path.split(File.separator);
+            String [] splitPath = path.split(separator);
             return splitPath[splitPath.length -1];
         }
         return path;
