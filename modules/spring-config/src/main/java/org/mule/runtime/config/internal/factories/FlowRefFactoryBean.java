@@ -10,7 +10,6 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -23,19 +22,20 @@ import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
@@ -54,18 +54,24 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 import reactor.core.publisher.Mono;
 
-public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
-    implements ApplicationContextAware, MuleContextAware {
+public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> implements ApplicationContextAware {
 
   private static final Logger LOGGER = getLogger(FlowRefFactoryBean.class);
 
   private String refName;
   private ApplicationContext applicationContext;
   private MuleContext muleContext;
+
+  @Inject
+  private ExtendedExpressionManager expressionManager;
+
+  @Inject
+  private ConfigurationComponentLocator locator;
 
   public void setName(String name) {
     this.refName = name;
@@ -86,33 +92,35 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
                                            flowRefMessageProcessor);
     }
 
-    Processor referencedFlow = getReferencedProcessor(name);
+    Component referencedFlow = getReferencedProcessor(name);
     if (referencedFlow == null) {
       throw new RoutePathNotFoundException(createStaticMessage("No flow/sub-flow with name '%s' found", name),
                                            flowRefMessageProcessor);
     }
 
+
     // for subflows, we create a new one so it must be initialised manually
     if (!(referencedFlow instanceof Flow)) {
-      Map<QName, Object> annotations = new HashMap<>(((Component) referencedFlow).getAnnotations());
-      annotations.put(ROOT_CONTAINER_NAME_KEY, getRootContainerLocation().toString());
-      ((Component) referencedFlow).setAnnotations(annotations);
+      if (referencedFlow instanceof SubflowMessageProcessorChainBuilder) {
+        MessageProcessorChainBuilder chainBuilder = (MessageProcessorChainBuilder) referencedFlow;
 
-      if (referencedFlow instanceof Initialisable) {
-        initialiseIfNeeded(referencedFlow, muleContext);
-        if (referencedFlow instanceof MessageProcessorChain) {
-          for (Processor processor : ((MessageProcessorChain) referencedFlow).getMessageProcessors()) {
-            setMuleContextIfNeeded(processor, muleContext);
-          }
-        }
+        locator.find(flowRefMessageProcessor.getRootContainerLocation()).map(c -> (Flow) c)
+            .ifPresent(f -> chainBuilder.setProcessingStrategy(f.getProcessingStrategy()));
+
+        referencedFlow = chainBuilder.build();
       }
+      initialiseIfNeeded(referencedFlow, muleContext);
+
+      Map<QName, Object> annotations = new HashMap<>(referencedFlow.getAnnotations());
+      annotations.put(ROOT_CONTAINER_NAME_KEY, getRootContainerLocation().toString());
+      referencedFlow.setAnnotations(annotations);
       startIfNeeded(referencedFlow);
     }
 
-    return referencedFlow;
+    return (Processor) referencedFlow;
   }
 
-  private Processor getReferencedProcessor(String name) {
+  private Component getReferencedProcessor(String name) {
     if (applicationContext instanceof MuleArtifactContext) {
       MuleArtifactContext muleArtifactContext = (MuleArtifactContext) applicationContext;
 
@@ -125,7 +133,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
         return null;
       }
     }
-    return (Processor) applicationContext.getBean(name);
+    return (Component) applicationContext.getBean(name);
   }
 
   @Override
@@ -133,9 +141,13 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
     this.applicationContext = applicationContext;
   }
 
-  @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+    try {
+      muleContext.getInjector().inject(this);
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   private class FlowRefMessageProcessor extends AbstractComponent
@@ -155,7 +167,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
             }
           });
 
-      this.isExpression = muleContext.getExpressionManager().isExpression(refName);
+      this.isExpression = expressionManager.isExpression(refName);
     }
 
     @Override
@@ -189,7 +201,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
     protected Processor resolveReferencedProcessor(CoreEvent event) throws MuleException {
       String flowName;
       if (isExpression) {
-        flowName = muleContext.getExpressionManager().parse(refName, event, getLocation());
+        flowName = expressionManager.parse(refName, event, getLocation());
       } else {
         flowName = refName;
       }
