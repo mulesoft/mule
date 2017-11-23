@@ -35,6 +35,7 @@ import org.mule.transport.nameable.AbstractInboundEndpointNameableConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.MessageFormat;
@@ -42,9 +43,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 
@@ -719,7 +722,7 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         }
 
         //Checking if it is a file or a directory
-        boolean isFile = this.isFile(endpoint, client);
+        boolean isFile = this.isFile(endpoint.getEndpointURI().getPath(), client);
         if (!isFile && !client.changeWorkingDirectory(path))
         {
             throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
@@ -749,12 +752,22 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         return true;
     }
 
-    protected boolean isFile(ImmutableEndpoint endpoint, FTPClient client) throws IOException 
+    protected boolean isFile(String path, FTPClient client) throws IOException
     {
-          //Checking if it is a file or a directory
-          String path = endpoint.getEndpointURI().getPath();
-          FTPFile[] listFiles = client.listFiles(path);
-          return listFiles.length == 1 && listFiles[0].isFile();
+        String resourceName = getResourceName(path);
+        FTPListParseEngine engine = client.initiateListParsing(path);
+        FTPFile [] files = engine.getNext(2);
+        return files.length == 1 && files[0].isFile() && resourceName.equals(files[0].getName());
+    }
+
+    private String getResourceName (String path)
+    {
+        if (path.contains(File.separator))
+        {
+            String [] splitPath = path.split(File.separator);
+            return splitPath[splitPath.length -1];
+        }
+        return path;
     }
 
     public boolean isStreaming()

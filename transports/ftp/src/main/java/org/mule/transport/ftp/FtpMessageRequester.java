@@ -79,7 +79,7 @@ public class FtpMessageRequester extends AbstractMessageRequester
         {
             client = connector.createFtpClient(endpoint);
             FTPFile fileToProcess;
-            if(connector.isFile(endpoint,client))
+            if(connector.isFile(endpoint.getEndpointURI().getPath(), client))
             {
                 fileToProcess = client.listFiles(endpoint.getEndpointURI().getPath())[0];
                 if(!isValid(fileToProcess, getFilenameFilter()))
@@ -150,7 +150,7 @@ public class FtpMessageRequester extends AbstractMessageRequester
     protected FTPFile findFileToProcess(FTPClient client) throws Exception
     {
         //Checking if it is a file or a directory
-        boolean isFile = connector.isFile(endpoint, client);
+        boolean isFile = connector.isFile(endpoint.getEndpointURI().getPath(), client);
         FTPListParseEngine engine = client.initiateListParsing();
         FTPFile[] files = null;
         while (engine.hasNext())
