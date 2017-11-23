@@ -89,7 +89,6 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     static String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.maxRetries";
     static final String REMOTELY_CLOSED = "Remotely closed";
     static final int DEFAULT_RETRY_ATTEMPTS = 3;
-    private static int RETRY_ATTEMPTS  = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
 
     private DefaultHttpRequesterConfig requestConfig;
     private HttpRequesterRequestBuilder requestBuilder;
@@ -119,6 +118,8 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     private HttpResponseToMuleEvent httpResponseToMuleEvent;
 
     private NotificationHelper notificationHelper;
+    private int retryAttempts = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
+
 
     @Override
     public void initialise() throws InitialisationException
@@ -225,14 +226,14 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     @Override
     protected MuleEvent processBlocking(final MuleEvent muleEvent) throws MuleException
     {
-        return innerProcess(muleEvent, RETRY_ATTEMPTS);
+        return innerProcess(muleEvent, retryAttempts);
     }
 
     @Override
     protected void processNonBlocking(final MuleEvent muleEvent, final CompletionHandler completionHandler) throws
                                                                                                             MuleException
     {
-        innerProcessNonBlocking(muleEvent, completionHandler, RETRY_ATTEMPTS);
+        innerProcessNonBlocking(muleEvent, completionHandler, retryAttempts);
     }
 
     protected void innerProcessNonBlocking(final MuleEvent muleEvent, final CompletionHandler originalCompletionHandler,
