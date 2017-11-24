@@ -24,8 +24,10 @@ import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 
+import org.mule.runtime.api.exception.FlowOverloadException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.exception.SourceOverloadException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
@@ -57,15 +59,12 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import org.reactivestreams.Publisher;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import reactor.core.publisher.Mono;
+import org.reactivestreams.Publisher;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to process
@@ -217,7 +216,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             try {
               sink.accept(event);
             } catch (RejectedExecutionException ree) {
-              MessagingException me = new MessagingException(event, ree, this);
+              Throwable overloadException = new SourceOverloadException(ree.getMessage(), ree);
+              MessagingException me = new MessagingException(event, overloadException, this);
               ((BaseEventContext) event.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
             }
             return ((BaseEventContext) event.getContext()).getResponsePublisher();
@@ -234,7 +234,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           } else {
             // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with an OVERLOAD error.
             RejectedExecutionException rejectedExecutionException =
-                new RejectedExecutionException(format(OVERLOAD_ERROR_MESSAGE, getName()));
+                new FlowOverloadException(format(OVERLOAD_ERROR_MESSAGE, getName()));
             return error(exceptionResolver.resolve(new MessagingException(builder(event)
                 .error(ErrorBuilder.builder().errorType(overloadErrorType)
                     .description(format("Flow '%s' Busy.", getName()))
