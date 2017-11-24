@@ -25,6 +25,7 @@ public class TestServerSocket extends Thread
     private int numberOfExpectedConnections = 0;
     private int portNumber;
     private Latch serverConnectionLatch = new Latch();
+    private Latch disposeLatch = new Latch();
 
     public TestServerSocket(int portNumber, int numberOfExpectedConnections)
     {
@@ -32,7 +33,7 @@ public class TestServerSocket extends Thread
         this.numberOfExpectedConnections = numberOfExpectedConnections;
     }
 
-    public boolean startServer (long timeout) throws InterruptedException
+    public boolean startServer(long timeout) throws InterruptedException
     {
         start();
         return serverConnectionLatch.await(timeout, MILLISECONDS);
@@ -67,14 +68,21 @@ public class TestServerSocket extends Thread
                 }
                 catch (IOException | InterruptedException e)
                 {
-                    // Ignoring exception.
+                    // Ignoring exception
                 }
             }
 
-            try {
+            try
+            {
                 server.close();
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 // Ignoring exception
+            }
+            finally
+            {
+                disposeLatch.countDown();
             }
         }
     }
@@ -82,6 +90,11 @@ public class TestServerSocket extends Thread
     public int getConnectionCounter()
     {
         return connectionCounter;
+    }
+
+    public boolean dispose (int timeout) throws InterruptedException
+    {
+        return disposeLatch.await(timeout, MILLISECONDS);
     }
 
 }
