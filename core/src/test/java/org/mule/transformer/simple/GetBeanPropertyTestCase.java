@@ -6,14 +6,18 @@
  */
 package org.mule.transformer.simple;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.isA;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class GetBeanPropertyTestCase extends AbstractMuleTestCase
@@ -21,9 +25,15 @@ public class GetBeanPropertyTestCase extends AbstractMuleTestCase
     private CustomBean bean = new CustomBean();
     private GetBeanProperty transformer = new GetBeanProperty();
 
-    @Test(expected = TransformerException.class)
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Test
     public void classPropertySuppressed() throws Exception
     {
+        thrown.expect(TransformerException.class);
+        thrown.expectCause(isA(NoSuchMethodException.class));
+        thrown.expectMessage(startsWith("Unknown property 'class'"));
         transformer.setPropertyName("class");
         transformer.transform(bean);
     }
