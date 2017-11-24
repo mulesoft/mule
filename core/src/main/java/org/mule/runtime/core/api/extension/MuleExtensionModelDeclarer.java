@@ -41,7 +41,9 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.VALIDATION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.CRITICAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_OVERLOAD;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.SOURCE_OVERLOAD;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
@@ -665,6 +667,7 @@ class MuleExtensionModelDeclarer {
   private void declareErrors(ExtensionDeclarer extensionDeclarer) {
 
     final ErrorModel criticalError = newError(CRITICAL).build();
+    final ErrorModel overloadError = newError(OVERLOAD).withParent(criticalError).build();
     final ErrorModel securityError = newError(SECURITY).withParent(anyError).build();
     final ErrorModel sourceError = newError(SOURCE).withParent(anyError).build();
     final ErrorModel sourceResponseError = newError(SOURCE_RESPONSE).withParent(anyError).build();
@@ -700,7 +703,9 @@ class MuleExtensionModelDeclarer {
     extensionDeclarer.withErrorModel(newError(SOURCE_RESPONSE_SEND).withParent(sourceResponseError).build());
 
     extensionDeclarer.withErrorModel(criticalError);
-    extensionDeclarer.withErrorModel(newError(OVERLOAD).withParent(criticalError).build());
+    extensionDeclarer.withErrorModel(overloadError);
+    extensionDeclarer.withErrorModel(newError(SOURCE_OVERLOAD).withParent(overloadError).build());
+    extensionDeclarer.withErrorModel(newError(FLOW_OVERLOAD).withParent(overloadError).build());
     extensionDeclarer.withErrorModel(newError(FATAL).withParent(criticalError).build());
   }
 

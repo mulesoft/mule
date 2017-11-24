@@ -22,11 +22,15 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.VALIDATION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_OVERLOAD;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.SOURCE_OVERLOAD;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.exception.FlowOverloadException;
 import org.mule.runtime.api.exception.MuleFatalException;
+import org.mule.runtime.api.exception.SourceOverloadException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.security.ClientSecurityException;
 import org.mule.runtime.api.security.NotPermittedException;
@@ -78,6 +82,8 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(ServerSecurityException.class, errorTypeRepository.lookupErrorType(SERVER_SECURITY).get())
             .addExceptionMapping(NotPermittedException.class, errorTypeRepository.lookupErrorType(NOT_PERMITTED).get())
             .addExceptionMapping(RejectedExecutionException.class, errorTypeRepository.getErrorType(OVERLOAD).get())
+            .addExceptionMapping(SourceOverloadException.class, errorTypeRepository.getErrorType(SOURCE_OVERLOAD).get())
+            .addExceptionMapping(FlowOverloadException.class, errorTypeRepository.getErrorType(FLOW_OVERLOAD).get())
             .addExceptionMapping(MessageRedeliveredException.class,
                                  errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED).get())
             .addExceptionMapping(Exception.class, unknown)
