@@ -24,6 +24,7 @@ import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 
+import org.mule.runtime.api.exception.FlowOverloadException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.exception.SourceOverloadException;
@@ -233,7 +234,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           } else {
             // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with an OVERLOAD error.
             RejectedExecutionException rejectedExecutionException =
-                new SourceOverloadException(format(OVERLOAD_ERROR_MESSAGE, getName()));
+                new FlowOverloadException(format(OVERLOAD_ERROR_MESSAGE, getName()));
             return error(exceptionResolver.resolve(new MessagingException(builder(event)
                 .error(ErrorBuilder.builder().errorType(overloadErrorType)
                     .description(format("Flow '%s' Busy.", getName()))
