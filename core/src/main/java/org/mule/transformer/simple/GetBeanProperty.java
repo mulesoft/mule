@@ -27,7 +27,7 @@ import org.apache.commons.beanutils.BeanUtilsBean;
 public class GetBeanProperty extends AbstractTransformer
 {
     private String propertyName;
-    BeanUtilsBean beanUtilsBean;
+    private BeanUtilsBean beanUtilsBean;
 
     public GetBeanProperty()
     {
