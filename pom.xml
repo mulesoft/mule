@@ -206,7 +206,7 @@
         <disruptorVersion>3.3.0</disruptorVersion>
         <mockitoVersion>1.10.19</mockitoVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
-        <muleMvelVersion>2.1.9-MULE-012</muleMvelVersion>
+        <muleMvelVersion>2.1.9-MULE-013</muleMvelVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <projectReactorVersion>3.1.1.RELEASE</projectReactorVersion>
         <projectReactorExtraVersion>3.1.2.RELEASE</projectReactorExtraVersion>
