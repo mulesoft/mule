@@ -8,12 +8,8 @@
 
     <http:request-config name="requestConfig" host="localhost" port="${httpPort}" />
 
-    <flow name="retryIdempotentMethod">
-        <http:request config-ref="requestConfig" method="GET"  path="test" />
-    </flow>
-
-    <flow name="retryNonIdempotentMethod">
-        <http:request config-ref="requestConfig" method="POST" path="test"/>
+    <flow name="testRetryPolicy">
+        <http:request config-ref="requestConfig" method="#[flowVars.httpMethod]"  path="test" />
     </flow>
 
 </mule>
