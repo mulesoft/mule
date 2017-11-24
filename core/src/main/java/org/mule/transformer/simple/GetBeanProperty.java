@@ -27,12 +27,15 @@ import org.apache.commons.beanutils.BeanUtilsBean;
 public class GetBeanProperty extends AbstractTransformer
 {
     private String propertyName;
+    BeanUtilsBean beanUtilsBean;
 
     public GetBeanProperty()
     {
         super();
         registerSourceType(DataTypeFactory.OBJECT);
         setReturnDataType(DataTypeFactory.OBJECT);
+        beanUtilsBean = new BeanUtilsBean();
+        beanUtilsBean.getPropertyUtils().addBeanIntrospector(SUPPRESS_CLASS);
     }
 
     @Override
@@ -40,8 +43,6 @@ public class GetBeanProperty extends AbstractTransformer
     {
         try
         {
-            BeanUtilsBean beanUtilsBean = new BeanUtilsBean();
-            beanUtilsBean.getPropertyUtils().addBeanIntrospector(SUPPRESS_CLASS);
             return beanUtilsBean.getProperty(src, this.propertyName);
         }
         catch (Exception e)
