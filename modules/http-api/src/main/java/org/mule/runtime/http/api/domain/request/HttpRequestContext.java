@@ -17,18 +17,23 @@ import org.mule.runtime.http.api.server.HttpServer;
 public interface HttpRequestContext {
 
   /**
+   * @return The scheme of the HTTP request URL (http or https)
+   */
+  String getScheme();
+
+  /**
    * @return the HTTP request message
    */
   HttpRequest getRequest();
 
   /**
+   * @return the server connection descriptor
+   */
+  ServerConnection getServerConnection();
+
+  /**
    * @return the client connection descriptor
    */
   ClientConnection getClientConnection();
-
-  /**
-   * @return The scheme of the HTTP request URL (http or https)
-   */
-  String getScheme();
 
 }
