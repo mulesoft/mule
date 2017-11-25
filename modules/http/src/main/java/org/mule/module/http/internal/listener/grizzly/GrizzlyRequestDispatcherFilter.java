@@ -6,23 +6,18 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static org.glassfish.grizzly.http.HttpServerFilter.RESPONSE_COMPLETE_EVENT;
 import static org.glassfish.grizzly.http.util.HttpStatus.CONINTUE_100;
 import static org.glassfish.grizzly.http.util.HttpStatus.EXPECTATION_FAILED_417;
-import static org.glassfish.grizzly.http.util.HttpStatus.SERVICE_UNAVAILABLE_503;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.DROPPED;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
+import static org.mule.module.http.internal.listener.grizzly.ExecutorPerServerAddressIOStrategy.EXECUTOR_DISCARDED_ATTRIBUTE;
 import static org.mule.module.http.internal.listener.grizzly.ExecutorPerServerAddressIOStrategy.EXECUTOR_REJECTED_ATTRIBUTE;
 import static org.mule.module.http.internal.listener.grizzly.MuleSslFilter.SSL_SESSION_ATTRIBUTE_KEY;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.request.ClientConnection;
-import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.domain.response.HttpResponse;
-import org.mule.module.http.internal.listener.RequestHandlerProvider;
-import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -35,7 +30,15 @@ import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
-import org.glassfish.grizzly.http.HttpServerFilter;
+import org.mule.module.http.api.HttpConstants.HttpStatus;
+import org.mule.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.module.http.internal.domain.request.ClientConnection;
+import org.mule.module.http.internal.domain.request.HttpRequestContext;
+import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.module.http.internal.listener.RequestHandlerProvider;
+import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
+import org.mule.module.http.internal.listener.async.RequestHandler;
+import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 
 /**
  * Grizzly filter that dispatches the request to the right request handler
@@ -62,15 +65,14 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
         // handle the case when the worker pool is busy
         if (ctx.getConnection().getAttributes().getAttribute(EXECUTOR_REJECTED_ATTRIBUTE) != null)
         {
-            final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(request);
-            responsePacketBuilder.status(SERVICE_UNAVAILABLE_503.getStatusCode());
-            HttpResponsePacket packet = responsePacketBuilder.build();
-
-            // this is necessary to avoid chunk-encoding
-            packet.setContentLength(0);
-
-            ctx.write(packet);
-            ctx.notifyDownstream(HttpServerFilter.RESPONSE_COMPLETE_EVENT);
+            sendEmptyResponse(ctx, request, SERVICE_UNAVAILABLE);
+            return ctx.getStopAction();
+        }
+        
+        // handle the case when the worker pool discard the execution
+        if (ctx.getConnection().getAttributes().getAttribute(EXECUTOR_DISCARDED_ATTRIBUTE) != null)
+        {
+            sendEmptyResponse(ctx, request, DROPPED);
             return ctx.getStopAction();
         }
 
@@ -120,6 +122,19 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
             }
         });
         return ctx.getSuspendAction();
+    }
+
+    private void sendEmptyResponse(final FilterChainContext ctx, final HttpRequestPacket request, HttpStatus status)
+    {  
+        final HttpResponsePacket.Builder responsePacketBuilder = HttpResponsePacket.builder(request);
+        responsePacketBuilder.status(status.getStatusCode());
+        HttpResponsePacket packet = responsePacketBuilder.build();
+        // this is necessary to avoid chunk-encoding
+        packet.setContentLength(0);
+        packet.setReasonPhrase(status.getReasonPhrase());
+
+        ctx.write(packet);
+        ctx.notifyDownstream(RESPONSE_COMPLETE_EVENT);
     }
 
     private HttpRequestContext createRequestContext(FilterChainContext ctx, String scheme, GrizzlyHttpRequestAdapter httpRequest)
