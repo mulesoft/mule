@@ -89,6 +89,7 @@ public abstract class HttpConstants
         OK(200, "OK"),
         CREATED(201, "Created"),
         ACCEPTED(202, "Accepted"),
+        DROPPED(202, "Dropped"),
         NON_AUTHORITATIVE_INFORMATION(203, "Non Authoritative Information"),
         NO_CONTENT(204, "No Content"),
         RESET_CONTENT(205, "Reset Content"),
