@@ -6,16 +6,18 @@
  */
 package org.mule.transformer.simple;
 
+import static org.apache.commons.beanutils.SuppressPropertiesBeanIntrospector.SUPPRESS_CLASS;
+
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
-import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 /**
  * Looks up a property from a JavaBean using PropertyUtils.getProperty().
  * Nested properties are valid, assuming they follow JavaBean conventions.
- * 
+ *
  *   <transformer name="ExtractCustomer" className="org.mule.transformer.simple.GetBeanProperty">
  *       <properties>
  *           <property name="propertyName" value="customerRequest.customer" />
@@ -25,12 +27,15 @@ import org.apache.commons.beanutils.PropertyUtils;
 public class GetBeanProperty extends AbstractTransformer
 {
     private String propertyName;
-    
+    private BeanUtilsBean beanUtilsBean;
+
     public GetBeanProperty()
     {
         super();
         registerSourceType(DataTypeFactory.OBJECT);
         setReturnDataType(DataTypeFactory.OBJECT);
+        beanUtilsBean = new BeanUtilsBean();
+        beanUtilsBean.getPropertyUtils().addBeanIntrospector(SUPPRESS_CLASS);
     }
 
     @Override
@@ -38,7 +43,7 @@ public class GetBeanProperty extends AbstractTransformer
     {
         try
         {
-            return PropertyUtils.getProperty(src, this.propertyName);
+            return beanUtilsBean.getProperty(src, this.propertyName);
         }
         catch (Exception e)
         {
