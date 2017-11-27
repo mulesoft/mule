@@ -4,10 +4,10 @@ Created-By: Apache Maven
 Built-By: pablokraan
 Build-Jdk: 1.8.0_40
 Specification-Title: Mule Core
-Specification-Version: 4.0.0-SNAPSHOT
+Specification-Version: 4.1.0-SNAPSHOT
 Specification-Vendor: MuleSoft, Inc.
 Implementation-Title: Mule Core
-Implementation-Version: 4.0.0-SNAPSHOT
+Implementation-Version: 4.1.0-SNAPSHOT
 Implementation-Vendor-Id: org.mule
 Implementation-Vendor: MuleSoft, Inc.
 Build-Date: 2015-Nov-30 21:08:59
