@@ -46,12 +46,13 @@ public class ExceptionUtils {
    * Similar to {@link org.apache.commons.lang3.exception.ExceptionUtils#indexOfType(Throwable, Class)} but avoiding the
    * deprecated {@link org.apache.commons.lang3.exception.ExceptionUtils#getCause(Throwable)}.
    *
-   * <p>A <code>null</code> throwable returns <code>-1</code>.
-   * A <code>null</code> type returns <code>-1</code>.
-   * No match in the chain returns <code>-1</code>.</p>
+   * <p>
+   * A <code>null</code> throwable returns <code>-1</code>. A <code>null</code> type returns <code>-1</code>. No match in the
+   * chain returns <code>-1</code>.
+   * </p>
    *
-   * @param throwable  the throwable to inspect, may be null
-   * @param type  the type to search for, subclasses match, null returns -1
+   * @param throwable the throwable to inspect, may be null
+   * @param type the type to search for, subclasses match, null returns -1
    * @return the index into the throwable chain, -1 if no match or null input
    */
   public static int indexOfType(final Throwable throwable, final Class<?> type) {
@@ -62,12 +63,11 @@ public class ExceptionUtils {
    * Similar to {@link org.apache.commons.lang3.exception.ExceptionUtils#indexOf(Throwable, Class, int, boolean)} but avoiding the
    * deprecated {@link org.apache.commons.lang3.exception.ExceptionUtils#getCause(Throwable)}.
    *
-   * @param throwable  the throwable to inspect, may be null
-   * @param type  the type to search for, subclasses match, null returns -1
-   * @param fromIndex  the (zero based) index of the starting position,
-   *  negative treated as zero, larger than chain size returns -1
-   * @param subclass if <code>true</code>, compares with {@link Class#isAssignableFrom(Class)}, otherwise compares
-   * using references
+   * @param throwable the throwable to inspect, may be null
+   * @param type the type to search for, subclasses match, null returns -1
+   * @param fromIndex the (zero based) index of the starting position, negative treated as zero, larger than chain size returns -1
+   * @param subclass if <code>true</code>, compares with {@link Class#isAssignableFrom(Class)}, otherwise compares using
+   *        references
    * @return index of the <code>type</code> within throwables nested within the specified <code>throwable</code>
    */
   private static int indexOf(final Throwable throwable, final Class<?> type, int fromIndex, final boolean subclass) {
@@ -102,7 +102,7 @@ public class ExceptionUtils {
    * {@link org.apache.commons.lang3.exception.ExceptionUtils#getCause(Throwable)}.
    *
    * @see #getThrowableList(Throwable)
-   * @param throwable  the throwable to inspect, may be null
+   * @param throwable the throwable to inspect, may be null
    * @return the array of throwables, never null
    */
   public static Throwable[] getThrowables(final Throwable throwable) {
@@ -114,7 +114,7 @@ public class ExceptionUtils {
    * Similar to {@link org.apache.commons.lang3.exception.ExceptionUtils#getThrowableList(Throwable)} but avoiding the deprecated
    * {@link org.apache.commons.lang3.exception.ExceptionUtils#getCause(Throwable)}.
    *
-   * @param throwable  the throwable to inspect, may be null
+   * @param throwable the throwable to inspect, may be null
    * @return the list of throwables, never null
    */
   public static List<Throwable> getThrowableList(Throwable throwable) {
@@ -142,6 +142,16 @@ public class ExceptionUtils {
     }
 
     return builder.toString();
+  }
+
+  /**
+   * This method is intended to keep the method getFullStackTrace as this was also possible in mule 3.
+   * 
+   * @param throwable the throwable to inspect, may be <code>null</code>
+   * @return the stack trace as a string. Empty string if throwable was <code>null</code>
+   */
+  public static String getFullStackTrace(Throwable throwable) {
+    return org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(throwable);
   }
 
   /**
