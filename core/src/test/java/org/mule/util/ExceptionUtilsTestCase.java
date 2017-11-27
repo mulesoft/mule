@@ -7,7 +7,6 @@
 package org.mule.util;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -16,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.util.ExceptionUtils.containsType;
 import static org.mule.util.ExceptionUtils.getDeepestOccurenceOfType;
 import static org.mule.util.ExceptionUtils.getFullStackTraceWithoutMessages;
+import static org.mule.util.ExceptionUtils.getFullStackTrace;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
