@@ -15,8 +15,16 @@
     <http:listener-config name="defaultMaxActiveThreadsThreadingProfileConfig" host="localhost" port="${port2}">
         <http:worker-threading-profile poolExhaustedAction="ABORT" />
     </http:listener-config>
-
+    
     <http:listener-config name="listenerConfig" host="localhost" port="${port3}"/>
+    
+    <http:listener-config name="defaultMaxActiveThreadsThreadingProfileDiscardPolicyConfig" host="localhost" port="${port4}">
+        <http:worker-threading-profile poolExhaustedAction="DISCARD" />
+    </http:listener-config>
+    
+    <http:listener-config name="defaultMaxActiveThreadsThreadingProfileDiscardOldestPolicyConfig" host="localhost" port="${port5}">
+        <http:worker-threading-profile poolExhaustedAction="DISCARD_OLDEST" maxBufferSize="1" maxThreadsIdle="128"/>
+    </http:listener-config>
 
     <flow name="maxActiveThreadsConfigFlow">
         <http:listener path="/*" config-ref="maxActiveThreadsThreadingProfileConfig" />
@@ -25,6 +33,16 @@
 
     <flow name="defaultMaxActiveThreadsConfigFlow">
         <http:listener path="/*" config-ref="defaultMaxActiveThreadsThreadingProfileConfig" />
+        <test:component />
+    </flow>
+    
+     <flow name="defaultMaxActiveThreadsThreadingProfileDiscardPolicyFlow">
+        <http:listener path="/*" config-ref="defaultMaxActiveThreadsThreadingProfileDiscardPolicyConfig" />
+        <test:component />
+    </flow>
+    
+    <flow name="defaultMaxActiveThreadsThreadingProfileDiscardOldestPolicyFlow">
+        <http:listener path="/*" config-ref="defaultMaxActiveThreadsThreadingProfileDiscardOldestPolicyConfig" />
         <test:component />
     </flow>
 

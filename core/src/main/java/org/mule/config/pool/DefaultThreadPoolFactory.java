@@ -74,7 +74,7 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
                     pool.setRejectedExecutionHandler(new AbortPolicy());
                     break;
                 case ThreadingProfile.WHEN_EXHAUSTED_DISCARD :
-                    pool.setRejectedExecutionHandler(new DiscardPolicy());
+                    pool.setRejectedExecutionHandler(new MuleDiscardPolicy());
                     break;
                 default :
                     // WHEN_EXHAUSTED_WAIT
@@ -99,10 +99,10 @@ public class DefaultThreadPoolFactory extends ThreadPoolFactory
     {
         if (queue instanceof SynchronousQueue<?>)
         {
-            return new DiscardPolicy();
+            return new MuleDiscardPolicy();
         }
 
-        return new DiscardOldestPolicy();
+        return new MuleDiscardOldestPolicy();
     }
 
     @Override
