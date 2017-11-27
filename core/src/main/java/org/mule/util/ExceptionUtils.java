@@ -79,5 +79,17 @@ public class ExceptionUtils extends org.apache.commons.lang3.exception.Exception
 
         return builder.toString();
     }
+    
+    /**
+     * This method is intended to keep the method getFullStackTrace to guarantee retrocompatibility
+     * after upgrading commons lang library. 
+     * 
+     * @param throwable the throwable to inspect, may be <code>null</code>
+     * @return the stack trace as a string. Empty string if throwable was <code>null</code>
+     */
+    public static String getFullStackTrace(Throwable throwable)
+    {
+        return getStackTrace(throwable);
+    }
 
 }
