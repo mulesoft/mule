@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
@@ -115,6 +116,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
+  public FlowCallStack getFlowStack() {
+    return flowCallStack;
+  }
+
+  @Override
   public ProcessorsTrace getProcessorsTrace() {
     return processorsTrace;
   }
@@ -147,7 +153,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   /**
    * Builds a new execution context with the given parameters.
-   * 
+   *
    * @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
@@ -184,6 +190,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
                               FlowExceptionHandler messagingExceptionHandler) {
       super(messagingExceptionHandler, empty());
+      this.flowCallStack = parent.getFlowStack().clone();
       this.parent = parent;
       this.componentLocation = componentLocation;
       this.id = parent.getId() + identityHashCode(this);
@@ -212,6 +219,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public Optional<ProcessingTime> getProcessingTime() {
       return parent.getProcessingTime();
+    }
+
+    @Override
+    public FlowCallStack getFlowStack() {
+      return flowCallStack;
     }
 
     @Override
