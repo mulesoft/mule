@@ -16,9 +16,6 @@ import static java.nio.file.StandardOpenOption.WRITE;
 import static org.apache.commons.io.FileUtils.forceMkdir;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.channels.FileChannel;
@@ -27,6 +24,8 @@ import java.nio.channels.OverlappingFileLockException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import org.slf4j.Logger;
 
 /**
  * Finds available port numbers in a specified range.
@@ -131,7 +130,7 @@ public class FreePortFinder {
    * @param port the port number to check
    * @return true if the port is available, false otherwise
    */
-  public boolean isPortFree(int port) {
+  public static boolean isPortFree(int port) {
     boolean portIsFree = true;
 
     ServerSocket server = null;

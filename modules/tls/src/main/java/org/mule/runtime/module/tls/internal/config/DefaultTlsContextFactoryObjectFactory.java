@@ -8,6 +8,7 @@ package org.mule.runtime.module.tls.internal.config;
 
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
+import org.mule.runtime.core.privileged.security.RevocationCheck;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
@@ -22,6 +23,7 @@ public class DefaultTlsContextFactoryObjectFactory extends AbstractComponentFact
   private String name;
   private TlsContextKeyStoreConfiguration keyStore;
   private TlsContextTrustStoreConfiguration trustStore;
+  private RevocationCheck revocationCheck;
   private String enabledProtocols;
   private String enabledCipherSuites;
 
@@ -35,6 +37,10 @@ public class DefaultTlsContextFactoryObjectFactory extends AbstractComponentFact
 
   public void setTrustStore(TlsContextTrustStoreConfiguration trustStore) {
     this.trustStore = trustStore;
+  }
+
+  public void setRevocationCheck(RevocationCheck revocationCheck) {
+    this.revocationCheck = revocationCheck;
   }
 
   public void setEnabledProtocols(String enabledProtocols) {
@@ -80,6 +86,10 @@ public class DefaultTlsContextFactoryObjectFactory extends AbstractComponentFact
         tlsContextFactory.setTrustManagerAlgorithm(trustStore.getAlgorithm());
       }
       tlsContextFactory.setTrustStoreInsecure(trustStore.isInsecure());
+    }
+
+    if (revocationCheck != null) {
+      tlsContextFactory.setRevocationCheck(revocationCheck);
     }
 
     return tlsContextFactory;

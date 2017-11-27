@@ -10,9 +10,13 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
+import org.mule.runtime.core.privileged.security.RevocationCheck;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.runtime.module.tls.internal.revocation.CrlFile;
+import org.mule.runtime.module.tls.internal.revocation.CustomOcspResponder;
+import org.mule.runtime.module.tls.internal.revocation.StandardRevocationCheck;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -57,13 +61,36 @@ public class TlsComponentBuildingDefinitionProvider implements ComponentBuilding
             .withSetterParameterDefinition("insecure", fromSimpleParameter("insecure").build()).build());
 
     componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("standard-revocation-check")
+            .withTypeDefinition(fromType(StandardRevocationCheck.class))
+            .withSetterParameterDefinition("onlyEndEntities", fromSimpleParameter("onlyEndEntities").build())
+            .withSetterParameterDefinition("preferCrls", fromSimpleParameter("preferCrls").build())
+            .withSetterParameterDefinition("noFallback", fromSimpleParameter("noFallback").build())
+            .withSetterParameterDefinition("softFail", fromSimpleParameter("softFail").build())
+            .build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("custom-ocsp-responder").withTypeDefinition(fromType(CustomOcspResponder.class))
+            .withSetterParameterDefinition("url", fromSimpleParameter("url").build())
+            .withSetterParameterDefinition("certAlias", fromSimpleParameter("certAlias").build())
+            .build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("crl-file").withTypeDefinition(fromType(CrlFile.class))
+            .withSetterParameterDefinition("path", fromSimpleParameter("path").build())
+            .build());
+
+    componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(CONTEXT).withTypeDefinition(fromType(DefaultTlsContextFactory.class))
             .withObjectFactoryType(DefaultTlsContextFactoryObjectFactory.class)
             .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
             .withSetterParameterDefinition("enabledProtocols", fromSimpleParameter("enabledProtocols").build())
             .withSetterParameterDefinition("enabledCipherSuites", fromSimpleParameter("enabledCipherSuites").build())
             .withSetterParameterDefinition("keyStore", fromChildConfiguration(KeyStoreConfig.class).build())
-            .withSetterParameterDefinition("trustStore", fromChildConfiguration(TrustStoreConfig.class).build()).build());
+            .withSetterParameterDefinition("trustStore", fromChildConfiguration(TrustStoreConfig.class).build())
+            .withSetterParameterDefinition("revocationCheck", fromChildConfiguration(RevocationCheck.class)
+                .withWrapperIdentifier("revocation-check").build())
+            .build());
 
     return componentBuildingDefinitions;
   }

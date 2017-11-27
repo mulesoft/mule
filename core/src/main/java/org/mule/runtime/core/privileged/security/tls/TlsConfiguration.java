@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.core.privileged.security.tls;
 
+import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotLoadFromClasspath;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToLoad;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.lifecycle.CreateException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.privileged.security.TlsDirectKeyStore;
-import org.mule.runtime.core.privileged.security.TlsDirectTrustStore;
-import org.mule.runtime.core.privileged.security.TlsIndirectKeyStore;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.secutiry.tls.RestrictedSSLServerSocketFactory;
@@ -22,6 +24,10 @@ import org.mule.runtime.core.internal.secutiry.tls.TlsPropertiesMapper;
 import org.mule.runtime.core.internal.secutiry.tls.TlsPropertiesSocketFactory;
 import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.runtime.core.internal.util.SecurityUtils;
+import org.mule.runtime.core.privileged.security.RevocationCheck;
+import org.mule.runtime.core.privileged.security.TlsDirectKeyStore;
+import org.mule.runtime.core.privileged.security.TlsDirectTrustStore;
+import org.mule.runtime.core.privileged.security.TlsIndirectKeyStore;
 import org.mule.runtime.core.privileged.security.TlsIndirectTrustStore;
 
 import java.io.FileNotFoundException;
@@ -32,15 +38,25 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.TrustAnchor;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +131,9 @@ public final class TlsConfiguration extends AbstractComponent
   public static final String DEFAULT_KEYSTORE = ".keystore";
   public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
   public static final String DEFAULT_KEYMANAGER_ALGORITHM = KeyManagerFactory.getDefaultAlgorithm();
+  public static final String REVOCATION_KEYSTORE_ALGORITHM = "PKIX";
+  public static final String INVALID_CRL_ALGORITHM =
+      "TLS Context: certificate revocation checking is only available for algorithm %s (current value is %s)";
   public static final String DEFAULT_SSL_TYPE = "TLS";
   public static final String JSSE_NAMESPACE = "javax.net";
 
@@ -155,6 +174,9 @@ public final class TlsConfiguration extends AbstractComponent
   private boolean requireClientAuthentication = false;
 
   private TlsProperties tlsProperties = new TlsProperties();
+
+  // certificate revocation checking
+  private RevocationCheck revocationCheck = null;
 
   /**
    * Support for TLS connections with a given initial value for the key store
@@ -203,10 +225,10 @@ public final class TlsConfiguration extends AbstractComponent
 
   private void validate(boolean anon) throws CreateException {
     if (!anon) {
-      assertNotNull(getKeyStore(), "The KeyStore location cannot be null");
-      assertNotNull(getKeyPassword(), "The Key password cannot be null");
-      assertNotNull(getKeyStorePassword(), "The KeyStore password cannot be null");
-      assertNotNull(getKeyManagerAlgorithm(), "The Key Manager Algorithm cannot be null");
+      checkArgument(getKeyStore() != null, "The KeyStore location cannot be null");
+      checkArgument(getKeyPassword() != null, "The Key password cannot be null");
+      checkArgument(getKeyStorePassword() != null, "The KeyStore password cannot be null");
+      checkArgument(getKeyManagerAlgorithm() != null, "The Key Manager Algorithm cannot be null");
     }
   }
 
@@ -220,14 +242,14 @@ public final class TlsConfiguration extends AbstractComponent
       tempKeyStore = loadKeyStore();
       checkKeyStoreContainsAlias(tempKeyStore);
     } catch (Exception e) {
-      throw new CreateException(CoreMessages.failedToLoad("KeyStore: " + keyStoreName), e, this);
+      throw new CreateException(failedToLoad("KeyStore: " + keyStoreName), e, this);
     }
 
     try {
       keyManagerFactory = KeyManagerFactory.getInstance(getKeyManagerAlgorithm());
       keyManagerFactory.init(tempKeyStore, keyPassword.toCharArray());
     } catch (Exception e) {
-      throw new CreateException(CoreMessages.failedToLoad("Key Manager"), e, this);
+      throw new CreateException(failedToLoad("Key Manager"), e, this);
     }
   }
 
@@ -236,7 +258,7 @@ public final class TlsConfiguration extends AbstractComponent
 
     InputStream is = IOUtils.getResourceAsStream(keyStoreName, getClass());
     if (null == is) {
-      throw new FileNotFoundException(CoreMessages.cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
+      throw new FileNotFoundException(cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
     }
 
     tempKeyStore.load(is, keyStorePassword.toCharArray());
@@ -270,35 +292,76 @@ public final class TlsConfiguration extends AbstractComponent
   }
 
   private void initTrustManagerFactory() throws CreateException {
-    if (null != trustStoreName) {
-      trustStorePassword = null == trustStorePassword ? "" : trustStorePassword;
+    if (null == trustStoreName && revocationCheck == null) {
+      return;
+    }
 
-      KeyStore trustStore;
-      try {
-        trustStore = KeyStore.getInstance(trustStoreType);
-        InputStream is = IOUtils.getResourceAsStream(trustStoreName, getClass());
-        if (null == is) {
-          throw new FileNotFoundException("Failed to load truststore from classpath or local file: " + trustStoreName);
-        }
-        trustStore.load(is, trustStorePassword.toCharArray());
-      } catch (Exception e) {
-        throw new CreateException(CoreMessages.failedToLoad("TrustStore: " + trustStoreName), e, this);
-      }
+    Boolean revocationEnabled = revocationCheck != null;
 
-      try {
-        trustManagerFactory = TrustManagerFactory.getInstance(trustManagerAlgorithm);
+    // Revocation checking is only supported for PKIX algorithm
+    if (revocationEnabled && !REVOCATION_KEYSTORE_ALGORITHM.equalsIgnoreCase(trustManagerAlgorithm)) {
+      String errorText = formatInvalidCrlAlgorithm(getTrustManagerAlgorithm());
+      throw new CreateException(createStaticMessage(errorText), this);
+    }
+
+    try {
+      KeyStore trustStore = trustStoreName != null ? createTrustStore() : null;
+      trustManagerFactory = TrustManagerFactory.getInstance(trustManagerAlgorithm);
+
+      if (revocationEnabled) {
+        ManagerFactoryParameters tmfParams = revocationCheck.configFor(trustStore, getDefaultCaCerts());
+        trustManagerFactory.init(tmfParams);
+      } else {
         trustManagerFactory.init(trustStore);
-      } catch (Exception e) {
-        throw new CreateException(CoreMessages.failedToLoad("Trust Manager (" + trustManagerAlgorithm + ")"), e, this);
       }
+    } catch (Exception e) {
+      throw new CreateException(
+                                failedToLoad("Trust Manager (" + trustManagerAlgorithm + ")"), e, this);
     }
   }
 
 
-  private static void assertNotNull(Object value, String message) {
-    if (null == value) {
-      throw new IllegalArgumentException(message);
+  public static String formatInvalidCrlAlgorithm(String givenAlgorithm) {
+    return format(INVALID_CRL_ALGORITHM, REVOCATION_KEYSTORE_ALGORITHM, givenAlgorithm);
+  }
+
+  private KeyStore createTrustStore() throws CreateException {
+    trustStorePassword = null == trustStorePassword ? "" : trustStorePassword;
+
+    KeyStore trustStore;
+
+    try {
+      trustStore = KeyStore.getInstance(trustStoreType);
+      InputStream is = IOUtils.getResourceAsStream(trustStoreName, getClass());
+      if (null == is) {
+        throw new FileNotFoundException(
+                                        "Failed to load truststore from classpath or local file: " + trustStoreName);
+      }
+      trustStore.load(is, trustStorePassword.toCharArray());
+    } catch (Exception e) {
+      throw new CreateException(
+                                failedToLoad("TrustStore: " + trustStoreName), e, this);
     }
+
+    return trustStore;
+  }
+
+  public static Set<TrustAnchor> getDefaultCaCerts() throws GeneralSecurityException {
+    TrustManagerFactory trustManagerFactory =
+        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+    trustManagerFactory.init((KeyStore) null);
+
+    List<Certificate> x509Certificates = new ArrayList<>();
+    for (TrustManager tm : trustManagerFactory.getTrustManagers()) {
+      x509Certificates.addAll(Arrays.asList(((X509TrustManager) tm).getAcceptedIssuers()));
+    }
+
+    Set<TrustAnchor> trustAnchors = new HashSet<>();
+    for (Certificate cert : x509Certificates) {
+      trustAnchors.add(new TrustAnchor((X509Certificate) cert, null));
+    }
+
+    return trustAnchors;
   }
 
   private static String defaultForNull(String value, String deflt) {
@@ -544,6 +607,10 @@ public final class TlsConfiguration extends AbstractComponent
     this.keyAlias = keyAlias;
   }
 
+  public void setRevocationCheck(RevocationCheck revocationCheck) {
+    this.revocationCheck = revocationCheck;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -614,6 +681,9 @@ public final class TlsConfiguration extends AbstractComponent
     if (trustStoreType != null ? !trustStoreType.equals(that.trustStoreType) : that.trustStoreType != null) {
       return false;
     }
+    if (revocationCheck != null ? !revocationCheck.equals(that.revocationCheck) : that.revocationCheck != null) {
+      return false;
+    }
 
     return true;
   }
@@ -640,6 +710,7 @@ public final class TlsConfiguration extends AbstractComponent
     result = hashcodePrimeNumber * result + (explicitTrustStoreOnly ? 1 : 0);
     result = hashcodePrimeNumber * result + (requireClientAuthentication ? 1 : 0);
     result = hashcodePrimeNumber * result + (tlsProperties != null ? tlsProperties.hashCode() : 0);
+    result = hashcodePrimeNumber * result + (revocationCheck != null ? revocationCheck.hashCode() : 0);
     return result;
   }
 }
