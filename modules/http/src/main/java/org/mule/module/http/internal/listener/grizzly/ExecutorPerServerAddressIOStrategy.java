@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import org.mule.config.pool.CancellableRunnable;
 import org.mule.module.http.internal.listener.ServerAddress;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ import org.glassfish.grizzly.strategies.AbstractIOStrategy;
 public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
 {
     protected final static String EXECUTOR_REJECTED_ATTRIBUTE = "__executor_rejected__";
+    protected final static String EXECUTOR_DISCARDED_ATTRIBUTE = "__executor_discarded__";
 
     private final static EnumSet<IOEvent> WORKER_THREAD_EVENT_SET =
             EnumSet.of(IOEvent.READ, IOEvent.CLOSED);
@@ -76,15 +78,7 @@ public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
             }
             catch (RejectedExecutionException e)
             {
-                try
-                {
-                    connection.getAttributes().setAttribute(EXECUTOR_REJECTED_ATTRIBUTE, true);
-                    run0(connection, ioEvent, listener);
-                }
-                finally
-                {
-                    connection.getAttributes().removeAttribute(EXECUTOR_REJECTED_ATTRIBUTE);
-                }
+                setRejectedAttribute(connection, ioEvent, listener, EXECUTOR_REJECTED_ATTRIBUTE);
             }
         }
         else
@@ -93,6 +87,19 @@ public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
         }
 
         return true;
+    }
+
+    private static void setRejectedAttribute(final Connection connection, final IOEvent ioEvent, final IOEventLifeCycleListener listener, String attribute)
+    {
+        try
+        {
+            connection.getAttributes().setAttribute(attribute, true);
+            run0(connection, ioEvent, listener);
+        }
+        finally
+        {
+            connection.getAttributes().removeAttribute(attribute);
+        }
     }
 
     @Override
@@ -120,7 +127,7 @@ public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
 
     }
 
-    private static final class WorkerThreadRunnable implements Runnable
+    private static final class WorkerThreadRunnable extends CancellableRunnable
     {
 
         final Connection connection;
@@ -140,6 +147,12 @@ public class ExecutorPerServerAddressIOStrategy extends AbstractIOStrategy
         public void run()
         {
             run0(connection, ioEvent, lifeCycleListener);
+        }
+
+        @Override
+        public void cancel()
+        {
+            setRejectedAttribute(connection, ioEvent, lifeCycleListener, EXECUTOR_DISCARDED_ATTRIBUTE);         
         }
     }
 
