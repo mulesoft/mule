@@ -12,6 +12,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -28,7 +29,9 @@ import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -47,16 +50,25 @@ import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.EventContextDumpService;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.el.ExpressionExecutor;
+import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -69,12 +81,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
@@ -349,6 +355,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
           LOGGER.warn(e + " : " + e.getMessage());
         }
 
+        verifyNoActiveEventContexts();
         verifyAndStopSchedulers();
 
         MuleConfiguration configuration = muleContext.getConfiguration();
@@ -376,6 +383,21 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     } else {
       schedulersOnInit = emptyList();
     }
+  }
+
+  protected static void verifyNoActiveEventContexts() throws MuleException {
+    EventContextDumpService eventContextDumpService =
+        ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(EventContextDumpService.class);
+
+    Set<DefaultEventContext> currentContexts;
+    try {
+      currentContexts =
+          (Set<DefaultEventContext>) eventContextDumpService.getClass().getDeclaredField("currentContexts").get(null);
+    } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+      throw new DefaultMuleException(e);
+    }
+
+    assertThat(currentContexts, is(empty()));
   }
 
   protected static void verifyAndStopSchedulers() throws MuleException {

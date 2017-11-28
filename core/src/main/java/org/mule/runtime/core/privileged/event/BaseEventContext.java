@@ -69,7 +69,9 @@ public interface BaseEventContext extends EventContext {
    *
    * @since 3.8.0
    */
-  FlowCallStack getFlowCallStack();
+  default FlowCallStack getFlowCallStack() {
+    return null;
+  }
 
   /**
    * Events have a list of message processor paths it went trough so that the execution path of an event can be reconstructed

@@ -16,6 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Implementation of {@link EventContextDumpService} that keeps a reference to all active {@link DefaultEventContext}s in the Mule
+ * Runtime.
+ *
+ * @since 4.1
+ */
 public class DefaultEventContextDumpService implements EventContextDumpService {
 
   static Set<DefaultEventContext> currentContexts = newKeySet(512);
