@@ -9,6 +9,7 @@ package org.mule.runtime.module.launcher.coreextension;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -17,6 +18,7 @@ import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.event.EventContextDumpService;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -28,10 +30,10 @@ import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.ToolingServiceAware;
 
+import org.slf4j.Logger;
+
 import java.util.LinkedList;
 import java.util.List;
-
-import org.slf4j.Logger;
 
 public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionManagerServer {
 
@@ -46,6 +48,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   private List<MuleCoreExtension> orderedCoreExtensions;
   private ArtifactClassLoaderManager artifactClassLoaderManager;
   private ServiceRepository serviceRepository;
+  private EventContextDumpService eventContextDumpService;
 
   public DefaultMuleCoreExtensionManagerServer(MuleCoreExtensionDiscoverer coreExtensionDiscoverer,
                                                MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver) {
@@ -158,6 +161,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
         .withServiceRepository(serviceRepository)
         .withCoreExtensions(coreExtensions)
         .withArtifactClassLoaderManager(artifactClassLoaderManager)
+        .withEventContextDumpService(eventContextDumpService)
         .withToolingService(toolingService)
         .build();
   }
@@ -180,6 +184,11 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   @Override
   public void setArtifactClassLoaderManager(ArtifactClassLoaderManager artifactClassLoaderManager) {
     this.artifactClassLoaderManager = artifactClassLoaderManager;
+  }
+
+  @Override
+  public void setEventContextDumpService(EventContextDumpService eventContextDumpService) {
+    this.eventContextDumpService = eventContextDumpService;
   }
 
   @Override

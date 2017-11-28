@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+import static org.mule.runtime.core.internal.event.DefaultEventContextDumpService.currentContexts;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -91,6 +92,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
+  public String getServerId() {
+    return serverId;
+  }
+
+  @Override
   public String getCorrelationId() {
     return correlationId != null ? correlationId : id;
   }
@@ -116,7 +122,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
-  public FlowCallStack getFlowStack() {
+  public FlowCallStack getFlowCallStack() {
     return flowCallStack;
   }
 
@@ -149,6 +155,8 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.location = location;
     this.processingTime = ProcessingTime.newInstance(flow);
     this.correlationId = correlationId;
+
+    eventContextDumpMaintain();
   }
 
   /**
@@ -171,6 +179,15 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.location = location;
     this.processingTime = null;
     this.correlationId = correlationId;
+
+    eventContextDumpMaintain();
+  }
+
+  private void eventContextDumpMaintain() {
+    currentContexts.add(this);
+    this.onTerminated((e, t) -> {
+      currentContexts.remove(DefaultEventContext.this);
+    });
   }
 
   @Override
@@ -190,7 +207,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
                               FlowExceptionHandler messagingExceptionHandler) {
       super(messagingExceptionHandler, empty());
-      this.flowCallStack = parent.getFlowStack().clone();
+      this.flowCallStack = parent.getFlowCallStack().clone();
       this.parent = parent;
       this.componentLocation = componentLocation;
       this.id = parent.getId() + identityHashCode(this);
@@ -222,7 +239,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     }
 
     @Override
-    public FlowCallStack getFlowStack() {
+    public FlowCallStack getFlowCallStack() {
       return flowCallStack;
     }
 

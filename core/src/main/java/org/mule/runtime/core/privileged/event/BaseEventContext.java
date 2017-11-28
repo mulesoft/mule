@@ -69,7 +69,7 @@ public interface BaseEventContext extends EventContext {
    *
    * @since 3.8.0
    */
-  FlowCallStack getFlowStack();
+  FlowCallStack getFlowCallStack();
 
   /**
    * Events have a list of message processor paths it went trough so that the execution path of an event can be reconstructed
@@ -174,5 +174,16 @@ public interface BaseEventContext extends EventContext {
    * @return publisher that completes when this {@link BaseEventContext} instance has a response of error.
    */
   Publisher<CoreEvent> getResponsePublisher();
+
+  /**
+   * Provides an identifier string containing the name of the artifact that generated this {@link EventContext}.
+   *
+   * @return a unique identifier of the artifact that created this {@link EventContext}.
+   *
+   * @since 4.1
+   */
+  default String getServerId() {
+    return null;
+  }
 
 }

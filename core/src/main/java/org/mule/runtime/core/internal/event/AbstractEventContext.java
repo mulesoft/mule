@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
@@ -270,4 +271,14 @@ abstract class AbstractEventContext implements BaseEventContext {
       sink.success(result.getRight());
     }
   }
+
+  public synchronized void forEachChild(Consumer<BaseEventContext> childConsumer) {
+    for (BaseEventContext context : childContexts) {
+      childConsumer.accept(context);
+      if (context instanceof AbstractEventContext) {
+        ((AbstractEventContext) context).forEachChild(childConsumer);
+      }
+    }
+  }
+
 }

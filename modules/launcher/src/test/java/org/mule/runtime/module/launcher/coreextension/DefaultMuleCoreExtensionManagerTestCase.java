@@ -13,12 +13,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.event.EventContextDumpService;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -30,6 +32,11 @@ import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.InOrder;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -38,11 +45,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.InOrder;
 
 @SmallTest
 public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCase {
@@ -157,6 +159,16 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         (extensions, service) -> verify(extensions.get(0)).setServiceRepository(service);
 
     testServiceInjection(ServiceRepository.class, TestServiceRepositoryExtension.class, setServiceFunction,
+                         verificationFunction);
+  }
+
+  @Test
+  public void injectsEventContextDumpServiceAwareCoreExtension() throws Exception {
+    Consumer<EventContextDumpService> setServiceFunction = (service) -> coreExtensionManager.setEventContextDumpService(service);
+
+    BiConsumer<List<TestEventContextDumpServiceExtension>, EventContextDumpService> verificationFunction =
+        (extensions, service) -> verify(extensions.get(0)).setEventContextDumpService(service);
+    testServiceInjection(EventContextDumpService.class, TestEventContextDumpServiceExtension.class, setServiceFunction,
                          verificationFunction);
   }
 
@@ -374,6 +386,12 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   public interface TestArtifactDeploymentListenerExtension extends MuleCoreExtension, ArtifactDeploymentListener {
 
+  }
+
+  public interface TestEventContextDumpServiceExtension extends MuleCoreExtension {
+
+    @Inject
+    void setEventContextDumpService(EventContextDumpService eventContextDumpService);
   }
 
   public interface TestServiceRepositoryExtension extends MuleCoreExtension {

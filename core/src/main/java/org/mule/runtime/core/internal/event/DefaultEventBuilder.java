@@ -15,6 +15,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 
@@ -28,7 +30,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
@@ -321,7 +322,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       try {
         return (byte[]) transformMessage(DataType.BYTE_ARRAY, muleContext);
       } catch (Exception e) {
-        throw new DefaultMuleException(CoreMessages.cannotReadPayloadAsBytes(message.getPayload().getValue()
+        throw new DefaultMuleException(cannotReadPayloadAsBytes(message.getPayload().getValue()
             .getClass()
             .getName()), e);
       }
@@ -365,7 +366,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
         return (String) transformedMessage.getPayload().getValue();
       } catch (Exception e) {
-        throw new DefaultMuleException(CoreMessages.cannotReadPayloadAsString(message.getClass().getName()), e);
+        throw new DefaultMuleException(cannotReadPayloadAsString(message.getClass().getName()), e);
       }
     }
 
@@ -453,7 +454,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public FlowCallStack getFlowCallStack() {
-      return context.getFlowStack();
+      return context.getFlowCallStack();
     }
 
     @Override
