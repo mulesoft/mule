@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
+import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ArtifactClassLoaderManagerAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.tooling.api.ToolingServiceAware;
@@ -19,4 +20,10 @@ import org.mule.runtime.module.tooling.api.ToolingServiceAware;
 public interface MuleCoreExtensionManagerServer
     extends Lifecycle, DeploymentServiceAware, RepositoryServiceAware, ToolingServiceAware, ArtifactClassLoaderManagerAware {
 
+  /**
+   * Allows {@link ServiceRepository} injection.
+   *
+   * @param serviceRepository not null service repository.
+   */
+  void setServiceRepository(ServiceRepository serviceRepository);
 }

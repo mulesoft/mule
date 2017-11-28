@@ -9,12 +9,13 @@ package org.mule.runtime.module.launcher.coreextension;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ArtifactClassLoaderManagerAware;
 import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
@@ -27,10 +28,10 @@ import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.ToolingServiceAware;
 
-import org.slf4j.Logger;
-
 import java.util.LinkedList;
 import java.util.List;
+
+import org.slf4j.Logger;
 
 public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionManagerServer {
 
@@ -44,6 +45,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   private ToolingService toolingService;
   private List<MuleCoreExtension> orderedCoreExtensions;
   private ArtifactClassLoaderManager artifactClassLoaderManager;
+  private ServiceRepository serviceRepository;
 
   public DefaultMuleCoreExtensionManagerServer(MuleCoreExtensionDiscoverer coreExtensionDiscoverer,
                                                MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver) {
@@ -109,6 +111,8 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   private void initializeCoreExtensions() throws MuleException {
     LOGGER.info("Initializing core extensions");
 
+    Injector simpleRegistry = createContainerInjector();
+
     for (MuleCoreExtension extension : orderedCoreExtensions) {
       if (extension instanceof DeploymentServiceAware) {
         ((DeploymentServiceAware) extension).setDeploymentService(deploymentService);
@@ -140,9 +144,22 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
         ((ArtifactClassLoaderManagerAware) extension).setArtifactClassLoaderManager(artifactClassLoaderManager);
       }
 
+      simpleRegistry.inject(extension);
+
       extension.initialise();
       LOGGER.info("Core extension '{}' initialized", extension.toString());
     }
+  }
+
+  private Injector createContainerInjector() {
+    return new ContainerInjectorBuilder()
+        .withDeploymentService(deploymentService)
+        .withRepositoryService(repositoryService)
+        .withServiceRepository(serviceRepository)
+        .withCoreExtensions(coreExtensions)
+        .withArtifactClassLoaderManager(artifactClassLoaderManager)
+        .withToolingService(toolingService)
+        .build();
   }
 
   @Override
@@ -165,6 +182,11 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     this.artifactClassLoaderManager = artifactClassLoaderManager;
   }
 
+  @Override
+  public void setServiceRepository(ServiceRepository serviceRepository) {
+    this.serviceRepository = serviceRepository;
+  }
+
   /**
    * Creates a {@link DeploymentListenerAdapter}.
    *
@@ -175,5 +197,4 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   DeploymentListener createDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type) {
     return new DeploymentListenerAdapter(artifactDeploymentListener, type);
   }
-
 }

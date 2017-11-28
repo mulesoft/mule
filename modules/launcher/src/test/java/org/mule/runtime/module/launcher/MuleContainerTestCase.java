@@ -70,6 +70,7 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
     verify(coreExtensionManager).setDeploymentService(deploymentService);
     verify(coreExtensionManager).setRepositoryService(repositoryService);
     verify(coreExtensionManager).setToolingService(toolingService);
+    verify(coreExtensionManager).setServiceRepository(serviceManager);
     verify(coreExtensionManager).initialise();
     verify(coreExtensionManager).start();
   }

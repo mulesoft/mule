@@ -8,12 +8,12 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.service.api.manager.ServiceRepository;
 
 /**
  * Creates instances of {@link DefaultApplicationPolicyInstance}
@@ -31,7 +31,8 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
    */
-  public DefaultPolicyInstanceProviderFactory(ServiceRepository serviceRepository, ClassLoaderRepository classLoaderRepository,
+  public DefaultPolicyInstanceProviderFactory(ServiceRepository serviceRepository,
+                                              ClassLoaderRepository classLoaderRepository,
                                               ExtensionModelLoaderRepository extensionModelLoaderRepository) {
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     checkArgument(serviceRepository != null, "serviceRepository cannot be null");

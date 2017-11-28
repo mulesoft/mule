@@ -25,7 +25,6 @@ import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
@@ -35,6 +34,7 @@ import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.Notification.Action;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
@@ -60,14 +60,13 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.service.api.manager.ServiceRepository;
 
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 

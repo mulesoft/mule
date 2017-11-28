@@ -11,7 +11,10 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManag
 
 /**
  * Enables injection of container's {@link ArtifactClassLoaderManager}.
+ *
+ * @deprecated on 4.1, use @Inject on a field or setter method of type {@link ArtifactClassLoaderManager}
  */
+@Deprecated
 public interface ArtifactClassLoaderManagerAware {
 
   /**

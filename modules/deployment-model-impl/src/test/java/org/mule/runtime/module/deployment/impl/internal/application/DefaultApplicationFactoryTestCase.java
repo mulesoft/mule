@@ -16,8 +16,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
+import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
+import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -38,7 +39,6 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.service.api.manager.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;

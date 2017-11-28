@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhile
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -44,14 +43,14 @@ import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.internal.DefaultToolingService;
 
-import org.apache.logging.log4j.LogManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MuleContainer {
 
@@ -206,6 +205,7 @@ public class MuleContainer {
       coreExtensionManager.setRepositoryService(repositoryService);
       coreExtensionManager.setArtifactClassLoaderManager(artifactResourcesRegistry.getArtifactClassLoaderManager());
       coreExtensionManager.setToolingService(toolingService);
+      coreExtensionManager.setServiceRepository(serviceManager);
       coreExtensionManager.initialise();
       coreExtensionManager.start();
 

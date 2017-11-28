@@ -16,8 +16,8 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
-
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -25,16 +25,15 @@ import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.service.api.manager.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
-import org.junit.Test;
-
 import java.io.File;
 
 import javax.inject.Inject;
+
+import org.junit.Test;
 
 /**
  * This tests verifies that the {@link DefaultMuleApplication} status is set correctly depending on its
@@ -58,7 +57,8 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     when(mockArtifactContext.getMuleContext()).thenReturn(muleContext);
     when(mockArtifactContext.getRegistry()).thenReturn(new DefaultRegistry(muleContext));
     application = new DefaultMuleApplication(null, parentArtifactClassLoader, emptyList(),
-                                             null, mock(ServiceRepository.class), mock(ExtensionModelLoaderRepository.class),
+                                             null, mock(ServiceRepository.class),
+                                             mock(ExtensionModelLoaderRepository.class),
                                              appLocation, null, null);
     application.setArtifactContext(mockArtifactContext);
 
