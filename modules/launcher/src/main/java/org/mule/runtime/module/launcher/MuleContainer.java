@@ -201,6 +201,9 @@ public class MuleContainer {
 
       createExecutionMuleFolder();
 
+      // TODO(pablo.kraan): add a tests to ensure that serviceManager is started BEFORE the core extension manager (and stopped in the opposite way)
+      serviceManager.start();
+
       coreExtensionManager.setDeploymentService(deploymentService);
       coreExtensionManager.setRepositoryService(repositoryService);
       coreExtensionManager.setArtifactClassLoaderManager(artifactResourcesRegistry.getArtifactClassLoaderManager());
@@ -208,8 +211,6 @@ public class MuleContainer {
       coreExtensionManager.setServiceRepository(serviceManager);
       coreExtensionManager.initialise();
       coreExtensionManager.start();
-
-      serviceManager.start();
 
       extensionModelLoaderManager.start();
 
@@ -286,13 +287,13 @@ public class MuleContainer {
       extensionModelLoaderManager.stop();
     }
 
+    coreExtensionManager.stop();
+    coreExtensionManager.dispose();
+
     if (serviceManager != null) {
       serviceManager.stop();
     }
 
-    coreExtensionManager.stop();
-
-    coreExtensionManager.dispose();
     if (LogManager.getFactory() instanceof MuleLog4jContextFactory) {
       ((MuleLog4jContextFactory) LogManager.getFactory()).dispose();
     }
