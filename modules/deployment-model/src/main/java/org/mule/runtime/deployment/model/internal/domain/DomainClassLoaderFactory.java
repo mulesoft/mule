@@ -14,7 +14,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -90,7 +89,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
 
   private ArtifactClassLoader getCustomDomainClassLoader(ArtifactClassLoader parent, DomainDescriptor domain,
                                                          List<ArtifactClassLoader> artifactClassLoaders) {
-    validateDomain(domain.getName());
+    validateDomain(domain);
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = getApplicationClassLoaderLookupPolicy(parent, domain);
 
@@ -119,10 +118,10 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
                                            containerLookupPolicy.extend(emptyMap()), emptyList(), emptyList());
   }
 
-  private void validateDomain(String domain) {
-    File domainFolder = new File(getMuleDomainsDir(), domain);
+  private void validateDomain(DomainDescriptor domainDescriptor) {
+    File domainFolder = domainDescriptor.getRootFolder();
     if (!(domainFolder.exists() && domainFolder.isDirectory())) {
-      throw new DeploymentException(createStaticMessage(format("Domain %s does not exists", domain)));
+      throw new DeploymentException(createStaticMessage(format("Domain %s does not exists", domainDescriptor.getName())));
     }
   }
 

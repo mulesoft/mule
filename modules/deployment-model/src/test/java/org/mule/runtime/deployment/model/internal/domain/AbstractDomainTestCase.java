@@ -44,7 +44,9 @@ public class AbstractDomainTestCase extends AbstractMuleTestCase {
     muleHomeFolder = temporaryFolder.getRoot();
   }
 
-  protected void createDomainDir(String domainFolder, String domain) {
-    assertThat(new File(muleHomeFolder, domainFolder + File.separator + domain).mkdirs(), is(true));
+  protected File createDomainDir(String domainFolder, String domain) {
+    final File file = new File(muleHomeFolder, domainFolder + File.separator + domain);
+    assertThat(file.mkdirs(), is(true));
+    return file;
   }
 }
