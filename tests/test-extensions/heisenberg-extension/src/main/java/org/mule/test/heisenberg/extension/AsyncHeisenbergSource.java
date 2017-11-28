@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
+import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
@@ -38,12 +39,13 @@ public class AsyncHeisenbergSource extends HeisenbergSource {
                         @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin,
                         @ParameterGroup(name = "Success Info", showInDsl = true) PersonalInfo successInfo,
                         @Optional boolean fail,
-                        SourceCompletionCallback completionCallback) {
+                        SourceCompletionCallback completionCallback,
+                        NotificationEmitter notificationEmitter) {
 
     AsyncHeisenbergSource.completionCallback = completionCallback;
 
     try {
-      super.onSuccess(payment, sameNameParameter, ricin, successInfo, fail);
+      super.onSuccess(payment, sameNameParameter, ricin, successInfo, fail, notificationEmitter);
       completionCallback.success();
     } catch (Throwable t) {
       completionCallback.error(t);
@@ -55,12 +57,13 @@ public class AsyncHeisenbergSource extends HeisenbergSource {
                       @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin,
                       @ParameterGroup(name = "Error Info", showInDsl = true) PersonalInfo infoError,
                       @Optional boolean propagateError,
-                      SourceCompletionCallback completionCallback) {
+                      SourceCompletionCallback completionCallback,
+                      NotificationEmitter notificationEmitter) {
 
     AsyncHeisenbergSource.completionCallback = completionCallback;
 
     try {
-      super.onError(error, sameNameParameter, methylamine, ricin, infoError, propagateError);
+      super.onError(error, sameNameParameter, methylamine, ricin, infoError, propagateError, notificationEmitter);
       completionCallback.success();
     } catch (Throwable t) {
       completionCallback.error(t);

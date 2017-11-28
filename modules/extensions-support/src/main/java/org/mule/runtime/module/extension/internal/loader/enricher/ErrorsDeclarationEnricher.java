@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.INITIALIZE;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -71,7 +71,7 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
 
     ExtensionDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
     Optional<ImplementingTypeModelProperty> implementingType = declaration.getModelProperty(ImplementingTypeModelProperty.class);
-    String extensionNamespace = getExtensionsErrorNamespace(declaration);
+    String extensionNamespace = getExtensionsNamespace(declaration);
     ErrorsModelFactory errorModelDescriber = new ErrorsModelFactory(extensionNamespace);
     errorModelDescriber.getErrorModels().forEach(declaration::addErrorModel);
 

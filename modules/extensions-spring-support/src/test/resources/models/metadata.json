@@ -299,6 +299,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -694,6 +695,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -1082,6 +1084,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -1470,6 +1473,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -1819,6 +1823,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -2207,6 +2212,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -2537,6 +2543,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -2849,6 +2856,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -3218,6 +3226,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -3522,6 +3531,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -3932,6 +3942,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -4320,6 +4331,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -4708,6 +4720,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -5096,6 +5109,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -5438,6 +5452,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -5870,6 +5885,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -6257,6 +6273,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -6605,6 +6622,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -6947,6 +6965,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -7287,6 +7306,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -7815,6 +7835,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -8375,6 +8396,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -8857,6 +8879,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -9306,6 +9329,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -9617,6 +9641,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -9985,6 +10010,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "METADATA:CONNECTIVITY",
@@ -10683,6 +10709,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -11142,6 +11169,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -11242,6 +11270,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -11361,6 +11390,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -11440,6 +11470,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -11553,6 +11584,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -11707,6 +11739,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -11861,6 +11894,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -11958,7 +11992,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -11972,7 +12005,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -12028,6 +12062,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": true,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -12383,6 +12418,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -12592,6 +12628,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -12799,6 +12836,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -12976,7 +13014,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -12990,7 +13027,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -13037,6 +13075,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -13165,6 +13204,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -13179,7 +13219,6 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
-                  "label": "Person",
                   "classInformation": {
                     "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
@@ -13191,7 +13230,8 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": true
-                  }
+                  },
+                  "label": "Person"
                 },
                 "open": {
                   "type": "Any"
@@ -13371,6 +13411,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -13385,7 +13426,6 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
-                  "label": "Person",
                   "classInformation": {
                     "classname": "java.io.InputStream",
                     "hasDefaultConstructor": true,
@@ -13399,7 +13439,8 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "label": "Person"
                 },
                 "open": {
                   "type": "Any"
@@ -13563,7 +13604,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -13577,7 +13617,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -13633,6 +13674,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": true,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -13990,6 +14032,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -14103,6 +14146,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -14235,6 +14279,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -14442,6 +14487,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -14675,6 +14721,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -14807,6 +14854,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -14974,6 +15022,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15130,6 +15179,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15303,6 +15353,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15473,6 +15524,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15696,6 +15748,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15809,6 +15862,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15963,6 +16017,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": true,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -16529,6 +16584,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -16938,7 +16994,6 @@
                   "format": "json",
                   "type": "Object",
                   "annotations": {
-                    "label": "Person",
                     "classInformation": {
                       "classname": "java.io.InputStream",
                       "hasDefaultConstructor": true,
@@ -16952,7 +17007,8 @@
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "label": "Person"
                   },
                   "open": {
                     "type": "Any"
@@ -17046,6 +17102,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -17306,6 +17363,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": true,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -17730,6 +17788,7 @@
       "kind": "source"
     }
   ],
+  "notifications": [],
   "errors": [
     {
       "error": "MULE:CONNECTIVITY",

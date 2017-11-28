@@ -1028,6 +1028,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "PETSTORE:RETRY_EXHAUSTED",
@@ -1314,6 +1315,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "PETSTORE:RETRY_EXHAUSTED",
@@ -1600,6 +1602,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "PETSTORE:RETRY_EXHAUSTED",
@@ -1875,6 +1878,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "PETSTORE:PET_ERROR",
@@ -2186,6 +2190,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -2299,6 +2304,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "PETSTORE:RETRY_EXHAUSTED",
@@ -2568,6 +2574,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "PETSTORE:RETRY_EXHAUSTED",
@@ -2942,6 +2949,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -3076,6 +3084,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "PETSTORE:RETRY_EXHAUSTED",
@@ -8138,6 +8147,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -8624,6 +8634,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -8803,6 +8814,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -8978,6 +8990,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -9166,6 +9179,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -9474,6 +9488,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -9664,6 +9679,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -9909,6 +9925,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -10114,6 +10131,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -10227,6 +10245,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -10305,6 +10324,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15162,6 +15182,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15447,6 +15468,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15759,6 +15781,7 @@
       "kind": "source"
     }
   ],
+  "notifications": [],
   "errors": [
     {
       "error": "PETSTORE:PET_ERROR",

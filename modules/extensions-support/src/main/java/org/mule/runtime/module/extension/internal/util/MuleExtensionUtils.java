@@ -445,18 +445,18 @@ public class MuleExtensionUtils {
   /**
    * @return the extension's error namespace for a given {@link ExtensionModel}
    */
-  public static String getExtensionsErrorNamespace(ExtensionModel extensionModel) {
-    return getExtensionsErrorNamespace(extensionModel.getXmlDslModel());
+  public static String getExtensionsNamespace(ExtensionModel extensionModel) {
+    return getExtensionsNamespace(extensionModel.getXmlDslModel());
   }
 
   /**
    * @return the extension's error namespace for a given {@link ExtensionDeclaration}
    */
-  public static String getExtensionsErrorNamespace(ExtensionDeclaration extensionDeclaration) {
-    return getExtensionsErrorNamespace(extensionDeclaration.getXmlDslModel());
+  public static String getExtensionsNamespace(ExtensionDeclaration extensionDeclaration) {
+    return getExtensionsNamespace(extensionDeclaration.getXmlDslModel());
   }
 
-  private static String getExtensionsErrorNamespace(XmlDslModel dslModel) {
+  private static String getExtensionsNamespace(XmlDslModel dslModel) {
     return dslModel.getPrefix().toUpperCase();
   }
 

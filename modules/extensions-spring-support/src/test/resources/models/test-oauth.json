@@ -185,6 +185,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -327,6 +328,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "TEST-OAUTH:RETRY_EXHAUSTED",
@@ -596,6 +598,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "TEST-OAUTH:RETRY_EXHAUSTED",
@@ -789,6 +792,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -3938,6 +3942,7 @@
     }
   ],
   "messageSources": [],
+  "notifications": [],
   "errors": [
     {
       "error": "TEST-OAUTH:RETRY_EXHAUSTED",

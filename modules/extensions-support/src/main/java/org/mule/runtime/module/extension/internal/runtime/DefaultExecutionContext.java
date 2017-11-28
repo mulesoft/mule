@@ -14,6 +14,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
@@ -60,7 +61,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
   private final LazyValue<Optional<TransactionConfig>> transactionConfig;
-  private final ComponentLocation location;
+  private final Component component;
   private final RetryPolicyTemplate retryPolicyTemplate;
 
   /**
@@ -72,7 +73,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * @param event                 the current {@link CoreEvent}
    * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the executed component
    * @param streamingManager      the application's {@link StreamingManager}
-   * @param location              the {@link ComponentLocation location} of the executing component
+   * @param component             the {@link Component component} executing
    * @param retryPolicyTemplate   the reconnection strategy to use in case of connectivity problems
    * @param muleContext           the current {@link MuleContext}
    */
@@ -83,7 +84,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
                                  CoreEvent event,
                                  CursorProviderFactory cursorProviderFactory,
                                  StreamingManager streamingManager,
-                                 ComponentLocation location,
+                                 Component component,
                                  RetryPolicyTemplate retryPolicyTemplate,
                                  MuleContext muleContext) {
 
@@ -96,7 +97,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.cursorProviderFactory = cursorProviderFactory;
     this.streamingManager = streamingManager;
     this.muleContext = muleContext;
-    this.location = location;
+    this.component = component;
     this.retryPolicyTemplate = retryPolicyTemplate;
 
     final boolean isTransactional = isTransactional(componentModel);
@@ -245,8 +246,16 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * {@inheritDoc}
    */
   @Override
+  public Component getComponent() {
+    return component;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public ComponentLocation getComponentLocation() {
-    return location;
+    return component.getLocation();
   }
 
   /**

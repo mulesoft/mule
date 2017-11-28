@@ -247,7 +247,8 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        operationModel.getDisplayModel().orElse(null),
                                                        operationModel.getErrorModels(),
                                                        operationModel.getStereotype(),
-                                                       operationModel.getModelProperties()));
+                                                       operationModel.getModelProperties(),
+                                                       operationModel.getNotificationModels()));
       }
 
       @Override
@@ -275,7 +276,8 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                     sourceModel.supportsStreaming(),
                                                     sourceModel.getDisplayModel().orElse(null),
                                                     sourceModel.getStereotype(),
-                                                    sourceModel.getErrorModels(), sourceModel.getModelProperties()));
+                                                    sourceModel.getErrorModels(), sourceModel.getModelProperties(),
+                                                    sourceModel.getNotificationModels()));
       }
     });
 

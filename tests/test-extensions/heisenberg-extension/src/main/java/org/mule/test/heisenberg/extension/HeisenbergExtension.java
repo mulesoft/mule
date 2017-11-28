@@ -27,6 +27,7 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.runtime.extension.api.annotation.notification.NotificationActions;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -69,6 +70,7 @@ import javax.inject.Inject;
     requiredClassName = HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME, type = NATIVE,
     coordinates = "org.mule.libs:this-is-a-lib:dll:1.0.0")
 @ErrorTypes(HeisenbergErrors.class)
+@NotificationActions(HeisenbergNotificationAction.class)
 public class HeisenbergExtension implements Lifecycle {
 
   public static final String HEISENBERG = "Heisenberg";

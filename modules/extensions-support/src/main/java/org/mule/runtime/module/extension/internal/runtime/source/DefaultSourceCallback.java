@@ -189,9 +189,12 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   }
 
   private void executeFlow(SourceCallbackContext context, MessageProcessContext messageProcessContext, Message message) {
+    SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     messageProcessingManager.processMessage(
-                                            new ModuleFlowProcessingTemplate(message, listener, completionHandlerFactory
-                                                .createCompletionHandler((SourceCallbackContextAdapter) context)),
+                                            new ModuleFlowProcessingTemplate(message, listener,
+                                                                             contextAdapter.getSourceNotification(),
+                                                                             completionHandlerFactory
+                                                                                 .createCompletionHandler(contextAdapter)),
                                             messageProcessContext);
   }
 

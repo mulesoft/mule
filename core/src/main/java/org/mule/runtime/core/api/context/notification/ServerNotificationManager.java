@@ -10,7 +10,6 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.AsyncMessageNotification;
@@ -27,6 +26,8 @@ import org.mule.runtime.api.notification.ErrorHandlerNotification;
 import org.mule.runtime.api.notification.ErrorHandlerNotificationListener;
 import org.mule.runtime.api.notification.ExceptionNotification;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.notification.ExtensionNotification;
+import org.mule.runtime.api.notification.ExtensionNotificationListener;
 import org.mule.runtime.api.notification.FlowConstructNotification;
 import org.mule.runtime.api.notification.FlowConstructNotificationListener;
 import org.mule.runtime.api.notification.ManagementNotification;
@@ -50,14 +51,14 @@ import org.mule.runtime.core.internal.context.notification.Configuration;
 import org.mule.runtime.core.internal.context.notification.Policy;
 import org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler;
 
-import org.slf4j.Logger;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
+
+import org.slf4j.Logger;
 
 /**
  * A reworking of the event manager that allows efficient behaviour without global on/off switches in the config.
@@ -302,6 +303,7 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
     manager.addInterfaceToType(ConnectorMessageNotificationListener.class, ConnectorMessageNotification.class);
     manager.addInterfaceToType(ErrorHandlerNotificationListener.class, ErrorHandlerNotification.class);
     manager.addInterfaceToType(FlowConstructNotificationListener.class, FlowConstructNotification.class);
+    manager.addInterfaceToType(ExtensionNotificationListener.class, ExtensionNotification.class);
 
     return manager;
   }

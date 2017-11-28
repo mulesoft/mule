@@ -419,6 +419,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -839,6 +840,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -856,6 +858,7 @@
   "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
+  "notifications": [],
   "errors": [
     {
       "error": "RECONNECTION:CONNECTIVITY",

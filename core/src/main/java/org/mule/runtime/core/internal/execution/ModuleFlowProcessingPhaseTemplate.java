@@ -9,15 +9,16 @@ package org.mule.runtime.core.internal.execution;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
-
-import org.reactivestreams.Publisher;
+import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 
 import java.util.Map;
+import java.util.Optional;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Template methods for {@link MessageSource} specific behavior during flow execution.
@@ -28,6 +29,8 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    * @return a {@link Message} created from the original message
    */
   Message getMessage();
+
+  Optional<SourceNotification> getSourceNotification();
 
   /**
    * Routes the {@link CoreEvent} through the processors chain

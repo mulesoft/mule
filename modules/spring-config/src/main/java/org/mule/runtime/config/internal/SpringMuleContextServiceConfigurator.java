@@ -69,6 +69,8 @@ import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.api.notification.CustomNotificationListener;
 import org.mule.runtime.api.notification.ExceptionNotification;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.notification.ExtensionNotification;
+import org.mule.runtime.api.notification.ExtensionNotificationListener;
 import org.mule.runtime.api.notification.ManagementNotification;
 import org.mule.runtime.api.notification.ManagementNotificationListener;
 import org.mule.runtime.api.notification.Notification;
@@ -378,6 +380,7 @@ class SpringMuleContextServiceConfigurator {
             .add(new EnabledNotificationConfig<>(CustomNotificationListener.class, CustomNotification.class))
             .add(new EnabledNotificationConfig<>(ExceptionNotificationListener.class, ExceptionNotification.class))
             .add(new EnabledNotificationConfig<>(TransactionNotificationListener.class, TransactionNotification.class))
+            .add(new EnabledNotificationConfig<>(ExtensionNotificationListener.class, ExtensionNotification.class))
             .build())
         .getBeanDefinition();
   }

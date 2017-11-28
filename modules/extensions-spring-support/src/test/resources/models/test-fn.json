@@ -81,6 +81,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -1102,6 +1103,7 @@
   "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
+  "notifications": [],
   "errors": [
     {
       "error": "FN:CONNECTIVITY",

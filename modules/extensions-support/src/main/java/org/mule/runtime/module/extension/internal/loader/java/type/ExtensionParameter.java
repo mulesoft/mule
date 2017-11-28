@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -29,10 +30,10 @@ import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * A contract for any kind of component from which an extension's parameter can be derived
@@ -54,6 +55,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(ComponentLocation.class)
       .add(Chain.class)
       .add(CorrelationInfo.class)
+      .add(NotificationEmitter.class)
       .build();
 
   /**

@@ -20,6 +20,8 @@ import org.mule.runtime.api.notification.ErrorHandlerNotification;
 import org.mule.runtime.api.notification.ErrorHandlerNotificationListener;
 import org.mule.runtime.api.notification.ExceptionNotification;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.notification.ExtensionNotification;
+import org.mule.runtime.api.notification.ExtensionNotificationListener;
 import org.mule.runtime.api.notification.ManagementNotification;
 import org.mule.runtime.api.notification.ManagementNotificationListener;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
@@ -72,6 +74,7 @@ public abstract class NotificationConfig<N extends Notification, L extends Notif
         .put("ROUTING", RoutingNotification.class)
         .put("PIPELINE-MESSAGE", PipelineMessageNotification.class)
         .put("ASYNC-MESSAGE", AsyncMessageNotification.class)
+        .put("EXTENSION", ExtensionNotification.class)
         .build();
 
     INTERFACE_MAP = ImmutableMap.<String, Class<? extends NotificationListener>>builder()
@@ -89,6 +92,7 @@ public abstract class NotificationConfig<N extends Notification, L extends Notif
         .put("CLUSTER-NODE", ClusterNodeNotificationListener.class)
         .put("PIPELINE-MESSAGE", PipelineMessageNotificationListener.class)
         .put("ASYNC-MESSAGE", AsyncMessageNotificationListener.class)
+        .put("EXTENSION", ExtensionNotificationListener.class)
         .build();
   }
 

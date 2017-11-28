@@ -9,12 +9,15 @@ package org.mule.test.heisenberg.extension;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
+import static org.mule.runtime.api.metadata.TypedValue.of;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-
+import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKED_DOOR;
+import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKING_DOOR;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -24,6 +27,7 @@ import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
+import org.mule.runtime.extension.api.annotation.notification.EmitsNotifications;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -33,6 +37,7 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
+import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
@@ -41,6 +46,7 @@ import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
+import org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KillParameters;
@@ -55,7 +61,7 @@ import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
 
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -64,7 +70,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
+import javax.inject.Inject;
 
 
 @Stereotype(EmpireStereotype.class)
@@ -130,8 +136,13 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @MediaType(TEXT_PLAIN)
-  public String knock(KnockeableDoor knockedDoor) {
-    return knockedDoor.knock();
+  @EmitsNotifications(KnockNotificationProvider.class)
+  public String knock(KnockeableDoor knockedDoor, NotificationEmitter notificationEmitter) {
+    TypedValue<SimpleKnockeableDoor> door = of(new SimpleKnockeableDoor(knockedDoor));
+    notificationEmitter.fire(KNOCKING_DOOR, door);
+    String knock = knockedDoor.knock();
+    notificationEmitter.fire(KNOCKED_DOOR, door);
+    return knock;
   }
 
   @OutputResolver(output = HeisenbergOutputResolver.class)

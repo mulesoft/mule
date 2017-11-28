@@ -251,6 +251,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -293,6 +294,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "MARVEL:CUSTOM_ERROR"
@@ -483,6 +485,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -1021,6 +1024,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -1255,6 +1259,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -1597,6 +1602,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -1969,6 +1975,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -2741,6 +2748,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -2783,6 +2791,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "MARVEL:CONNECTIVITY",
@@ -3617,6 +3626,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -3835,6 +3845,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -3990,6 +4001,7 @@
   "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
+  "notifications": [],
   "errors": [
     {
       "error": "MARVEL:CONNECTIVITY",

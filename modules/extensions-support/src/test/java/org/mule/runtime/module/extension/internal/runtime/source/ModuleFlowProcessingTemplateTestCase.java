@@ -64,7 +64,7 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws Exception {
-    template = new ModuleFlowProcessingTemplate(message, messageProcessor, completionHandler);
+    template = new ModuleFlowProcessingTemplate(message, messageProcessor, null, completionHandler);
     when(completionHandler.onCompletion(any(), any())).thenReturn(Mono.empty());
     when(completionHandler.onFailure(any(), any())).thenReturn(Mono.empty());
   }

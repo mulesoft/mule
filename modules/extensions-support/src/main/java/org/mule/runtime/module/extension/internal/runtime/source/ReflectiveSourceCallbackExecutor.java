@@ -12,7 +12,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOU
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.error;
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -25,9 +25,9 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
 
 import com.google.common.collect.ImmutableList;
@@ -55,7 +55,7 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
   private final MuleContext muleContext;
   private final boolean async;
   private final ReflectiveMethodComponentExecutor<SourceModel> executor;
-  private final ComponentLocation location;
+  private final Component component;
 
   /**
    * Creates a new instance
@@ -67,7 +67,7 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
    * @param method                the method to be executed
    * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the owning source
    * @param streamingManager      the application's {@link StreamingManager}
-   * @param location              the source {@link ComponentLocation}
+   * @param component             the source {@link Component}
    * @param muleContext           the current {@link MuleContext}
    * @param sourceCallbackModel   the callback's model
    */
@@ -78,7 +78,7 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
                                           Method method,
                                           CursorProviderFactory cursorProviderFactory,
                                           StreamingManager streamingManager,
-                                          ComponentLocation location,
+                                          Component component,
                                           MuleContext muleContext,
                                           SourceCallbackModelProperty sourceCallbackModel) {
 
@@ -87,7 +87,7 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
     this.sourceModel = sourceModel;
     this.cursorProviderFactory = cursorProviderFactory;
     this.streamingManager = streamingManager;
-    this.location = location;
+    this.component = component;
     this.muleContext = muleContext;
 
     executor = new ReflectiveMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source);
@@ -130,7 +130,7 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
                                                                                           event,
                                                                                           cursorProviderFactory,
                                                                                           streamingManager,
-                                                                                          location,
+                                                                                          component,
                                                                                           null,
                                                                                           muleContext);
 

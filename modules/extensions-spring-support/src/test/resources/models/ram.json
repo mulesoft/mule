@@ -408,6 +408,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "RAM:SOAP_FAULT",
@@ -1576,6 +1577,7 @@
   "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
+  "notifications": [],
   "errors": [
     {
       "error": "RAM:SOAP_FAULT",

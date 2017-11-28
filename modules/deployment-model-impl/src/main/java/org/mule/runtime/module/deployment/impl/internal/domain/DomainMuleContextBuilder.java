@@ -16,6 +16,7 @@ import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.api.notification.CustomNotificationListener;
 import org.mule.runtime.api.notification.ExceptionNotification;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.notification.ExtensionNotification;
 import org.mule.runtime.api.notification.ManagementNotification;
 import org.mule.runtime.api.notification.ManagementNotificationListener;
 import org.mule.runtime.api.notification.SecurityNotification;
@@ -57,6 +58,7 @@ public class DomainMuleContextBuilder extends DefaultMuleContextBuilder {
     manager.addInterfaceToType(ConnectionNotificationListener.class, ConnectionNotification.class);
     manager.addInterfaceToType(ExceptionNotificationListener.class, ExceptionNotification.class);
     manager.addInterfaceToType(ClusterNodeNotificationListener.class, ClusterNodeNotification.class);
+    manager.addInterfaceToType(ExceptionNotificationListener.class, ExtensionNotification.class);
     return manager;
   }
 }

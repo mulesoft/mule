@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.runtime.privileged;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -81,8 +82,18 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
   StreamingManager getStreamingManager();
 
   /**
-   * @return The {@link ComponentLocation} of the executing component
+   * @return The {@link Component} executing
+   * @since 4.1
    */
+  default Component getComponent() {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * @return The {@link ComponentLocation} of the executing component
+   * @deprecated use {@link #getComponent().getLocation()}
+   */
+  @Deprecated
   ComponentLocation getComponentLocation();
 
   /**
