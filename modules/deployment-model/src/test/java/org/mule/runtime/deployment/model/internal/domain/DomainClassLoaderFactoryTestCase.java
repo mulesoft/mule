@@ -59,8 +59,8 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
   public void createClassLoaderUsingCustomDomain() {
     final String domainName = "custom-domain";
     final String artifactId = getDomainId(domainName);
-    createDomainDir(MULE_DOMAIN_FOLDER, domainName);
     DomainDescriptor descriptor = getTestDescriptor(domainName);
+    descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
 
     final ArtifactClassLoader domainClassLoader =
         new DomainClassLoaderFactory(getClass().getClassLoader()).create(null, containerClassLoader,
@@ -74,6 +74,7 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
   @Test(expected = DeploymentException.class)
   public void validateDomainBeforeCreatingClassLoader() {
     DomainDescriptor descriptor = getTestDescriptor("someDomain");
+    descriptor.setRootFolder(new File("unexistent"));
 
     new DomainClassLoaderFactory(getClass().getClassLoader()).create(null, containerClassLoader,
                                                                      descriptor, emptyList());
@@ -84,7 +85,7 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     final String domainName = "descriptor-domain";
     final String artifactId = getDomainId(domainName);
     DomainDescriptor descriptor = getTestDescriptor(domainName);
-    createDomainDir(MULE_DOMAIN_FOLDER, domainName);
+    descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
     ArtifactClassLoader domainClassLoader =
         new DomainClassLoaderFactory(getClass().getClassLoader()).create(null, containerClassLoader,
                                                                          descriptor,
