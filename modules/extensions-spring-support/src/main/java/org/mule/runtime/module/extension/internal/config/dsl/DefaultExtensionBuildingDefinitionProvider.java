@@ -105,12 +105,6 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
       registerXmlExtensionParsers(definitionBuilder, extensionModel, dslSyntaxResolver);
     } else {
       final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
-
-      registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                           parsingContext);
-
-      registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
-
       withContextClassLoader(extensionClassLoader, () -> {
         new IdempotentExtensionWalker() {
 
@@ -152,7 +146,10 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
         }.walk(extensionModel);
 
+        registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
+                                             parsingContext);
 
+        registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
       });
     }
   }
@@ -224,7 +221,8 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
                                          ExtensionParsingContext parsingContext) {
     Optional<DslElementSyntax> dslElement = dslSyntaxResolver.resolve(parameterType);
     if (!dslElement.isPresent() ||
-        parsingContext.isRegistered(dslElement.get().getElementName(), dslElement.get().getPrefix())) {
+        parsingContext.isRegistered(dslElement.get().getElementName(), dslElement.get().getPrefix())
+        || !IntrospectionUtils.isInstantiable(parameterType)) {
       return;
     }
 
