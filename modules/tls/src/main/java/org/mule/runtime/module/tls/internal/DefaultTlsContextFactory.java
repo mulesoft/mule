@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.secutiry.tls.RestrictedSSLServerSocketFactory;
 import org.mule.runtime.core.internal.secutiry.tls.RestrictedSSLSocketFactory;
 import org.mule.runtime.core.internal.util.ArrayUtils;
-import org.mule.runtime.api.tls.RevocationCheck;
+import org.mule.runtime.core.privileged.security.RevocationCheck;
 import org.mule.runtime.core.privileged.security.tls.TlsConfiguration;
 
 import com.google.common.base.Joiner;

@@ -8,7 +8,7 @@ package org.mule.runtime.module.tls.internal.revocation;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.api.tls.RevocationCheck;
+import org.mule.runtime.core.privileged.security.RevocationCheck;
 
 import java.net.URI;
 import java.net.URISyntaxException;
