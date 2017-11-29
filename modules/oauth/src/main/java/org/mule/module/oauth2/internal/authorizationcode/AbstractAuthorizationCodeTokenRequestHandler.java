@@ -13,6 +13,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.Flow;
 import org.mule.module.http.api.listener.HttpListener;
 import org.mule.module.http.api.listener.HttpListenerBuilder;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.oauth2.internal.AbstractTokenRequestHandler;
 import org.mule.module.oauth2.internal.DynamicFlowFactory;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
@@ -87,10 +88,11 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
 
     /**
      * @param oauthConfig oauth config for this token request handler.
+     * @param proxyConfig the proxy configuration used for doing token requests.
      */
-    public void setOauthConfig(AuthorizationCodeGrantType oauthConfig)
+    public void setOauthConfig(AuthorizationCodeGrantType oauthConfig, ProxyConfig proxyConfig) throws MuleException
     {
-        this.setTlsContextFactory(oauthConfig.getTlsContext());
+        this.buildHttpRequestOptions(oauthConfig.getTlsContext(), proxyConfig);
         this.oauthConfig = oauthConfig;
     }
 

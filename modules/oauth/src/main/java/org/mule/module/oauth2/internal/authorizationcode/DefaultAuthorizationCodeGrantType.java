@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.module.http.api.HttpHeaders;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.oauth2.api.RequestAuthenticationException;
 import org.mule.module.oauth2.internal.AbstractGrantType;
@@ -51,6 +52,8 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
     private TokenManagerConfig tokenManagerConfig;
     private AttributeEvaluator localAuthorizationUrlResourceOwnerIdEvaluator;
     private AttributeEvaluator resourceOwnerIdEvaluator;
+    private ProxyConfig proxyConfig;
+
 
     public void setClientId(final String clientId)
     {
@@ -256,8 +259,18 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
         }
         if (tokenRequestHandler != null)
         {
-            tokenRequestHandler.setOauthConfig(this);
+            tokenRequestHandler.setOauthConfig(this, proxyConfig);
             tokenRequestHandler.init();
         }
+    }
+
+    public ProxyConfig getProxyConfig()
+    {
+        return proxyConfig;
+    }
+
+    public void setProxyConfig(ProxyConfig proxyConfig)
+    {
+        this.proxyConfig = proxyConfig;
     }
 }

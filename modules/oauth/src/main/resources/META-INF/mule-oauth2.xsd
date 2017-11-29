@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/oauth2"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:spring="http://www.springframework.org/schema/beans"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:http="http://www.mulesoft.org/schema/mule/http"
             xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
@@ -62,6 +63,13 @@
                                 This element configures an automatic flow created by mule that listens in the configured
                                 url by the redirectUrl attribute and process the request to
                                 retrieve an access token from the oauth authentication server.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -160,6 +168,13 @@
                                 This element configures an automatic flow created by mule that listens in the configured
                                 url by the redirectUrl attribute and process the request to
                                 retrieve an access token from the oauth authentication server.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
