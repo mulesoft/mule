@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
-import static java.util.Optional.empty;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -16,6 +15,7 @@ import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClas
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
@@ -27,7 +27,6 @@ import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactCl
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
-import org.mule.runtime.module.service.api.manager.ServiceRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +60,8 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
    */
   public DefaultDomainFactory(DomainDescriptorFactory domainDescriptorFactory,
                               DomainManager domainManager,
-                              ClassLoaderRepository classLoaderRepository, ServiceRepository serviceRepository,
+                              ClassLoaderRepository classLoaderRepository,
+                              ServiceRepository serviceRepository,
                               PluginDependenciesResolver pluginDependenciesResolver,
                               DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
                               ExtensionModelLoaderManager extensionModelLoaderManager) {

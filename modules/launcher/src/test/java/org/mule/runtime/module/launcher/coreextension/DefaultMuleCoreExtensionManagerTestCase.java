@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -13,25 +14,34 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.service.Service;
+import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
+import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import javax.inject.Inject;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 
 @SmallTest
@@ -42,6 +52,9 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
       mock(MuleCoreExtensionDependencyResolver.class);
   private MuleCoreExtensionManagerServer coreExtensionManager =
       new DefaultMuleCoreExtensionManagerServer(coreExtensionDiscoverer, coreExtensionDependencyResolver);
+
+  @Rule
+  public ExpectedException expected = none();
 
   @Test
   public void discoversMuleCoreExtension() throws Exception {
@@ -86,6 +99,85 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         (extensions, service) -> verify(extensions.get(0)).setCoreExtensions(new ArrayList<>(extensions));
     testServiceInjection(DeploymentService.class, TestCoreExtensionsAwareExtension.class, setServiceFunction,
                          verificationFunction);
+  }
+
+
+  @Test
+  public void injectsDeploymentServiceOnExtension() throws Exception {
+    Consumer<DeploymentService> setServiceFunction = (service) -> coreExtensionManager.setDeploymentService(service);
+    BiConsumer<List<TestDeploymentServiceExtension>, DeploymentService> verificationFunction =
+        (extensions, service) -> verify(extensions.get(0)).setDeploymentService(service);
+    testServiceInjection(DeploymentService.class, TestDeploymentServiceExtension.class, setServiceFunction, verificationFunction);
+  }
+
+  @Test
+  public void injectRepositoryServiceOnExtension() throws Exception {
+    Consumer<RepositoryService> setServiceFunction = (service) -> coreExtensionManager.setRepositoryService(service);
+    BiConsumer<List<TestRepositoryServiceExtension>, RepositoryService> verificationFunction =
+        (extensions, service) -> verify(extensions.get(0)).setRepositoryService(service);
+    testServiceInjection(RepositoryService.class, TestRepositoryServiceExtension.class, setServiceFunction, verificationFunction);
+  }
+
+  @Test
+  public void injectsCoreExtensionsOnExtension() throws Exception {
+    Consumer<DeploymentService> setServiceFunction = (service) -> {
+    };
+    BiConsumer<List<TestCoreExtensionsExtension>, DeploymentService> verificationFunction =
+        (extensions, service) -> verify(extensions.get(0)).setCoreExtensions(new ArrayList<>(extensions));
+    testServiceInjection(DeploymentService.class, TestCoreExtensionsExtension.class, setServiceFunction, verificationFunction);
+  }
+
+  @Test
+  public void injectsArtifactClassLoaderManagerOnExtension() throws Exception {
+    Consumer<ArtifactClassLoaderManager> setServiceFunction =
+        (service) -> coreExtensionManager.setArtifactClassLoaderManager(service);
+
+    BiConsumer<List<TestArtifactClassLoaderManagerExtension>, ArtifactClassLoaderManager> verificationFunction =
+        (extensions, service) -> verify(extensions.get(0)).setArtifactClassLoaderManager(service);
+
+    testServiceInjection(ArtifactClassLoaderManager.class, TestArtifactClassLoaderManagerExtension.class, setServiceFunction,
+                         verificationFunction);
+  }
+
+  @Test
+  public void injectsToolingServiceOnExtension() throws Exception {
+    Consumer<ToolingService> setServiceFunction = (service) -> coreExtensionManager.setToolingService(service);
+
+    BiConsumer<List<TestToolingServiceExtension>, ToolingService> verificationFunction =
+        (extensions, service) -> verify(extensions.get(0)).setToolingService(service);
+
+    testServiceInjection(ToolingService.class, TestToolingServiceExtension.class, setServiceFunction, verificationFunction);
+  }
+
+  @Test
+  public void injectsServiceRepositoryCoreExtension() throws Exception {
+    Consumer<ServiceRepository> setServiceFunction = (service) -> coreExtensionManager.setServiceRepository(service);
+
+    BiConsumer<List<TestServiceRepositoryExtension>, ServiceRepository> verificationFunction =
+        (extensions, service) -> verify(extensions.get(0)).setServiceRepository(service);
+
+    testServiceInjection(ServiceRepository.class, TestServiceRepositoryExtension.class, setServiceFunction,
+                         verificationFunction);
+  }
+
+  @Test
+  public void injectsServiceOnExtension() throws Exception {
+    List<MuleCoreExtension> extensions = new LinkedList<>();
+    InjectedTestServiceExtension extension = mock(InjectedTestServiceExtension.class);
+    extensions.add(extension);
+
+    TestService service = mock(TestService.class);
+    when(service.getName()).thenReturn("testService");
+    ServiceRepository serviceRepository = mock(ServiceRepository.class);
+    when(serviceRepository.getServices()).thenReturn(Collections.singletonList(service));
+
+    when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+    when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(extensions);
+
+    coreExtensionManager.setServiceRepository(serviceRepository);
+    coreExtensionManager.initialise();
+
+    verify(extension).setService(service);
   }
 
   @Test
@@ -250,8 +342,20 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   }
 
+  public interface TestDeploymentServiceExtension extends MuleCoreExtension {
+
+    @Inject
+    void setDeploymentService(DeploymentService deploymentService);
+  }
+
   public interface TestRepositoryServiceAwareExtension extends MuleCoreExtension, RepositoryServiceAware {
 
+  }
+
+  public interface TestRepositoryServiceExtension extends MuleCoreExtension {
+
+    @Inject
+    void setRepositoryService(RepositoryService repositoryService);
   }
 
   public interface TestDeploymentListenerExtension extends MuleCoreExtension, DeploymentListener {
@@ -262,7 +366,41 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   }
 
+  public interface TestCoreExtensionsExtension extends MuleCoreExtension {
+
+    @Inject
+    void setCoreExtensions(List<MuleCoreExtension> coreExtensions);
+  }
+
   public interface TestArtifactDeploymentListenerExtension extends MuleCoreExtension, ArtifactDeploymentListener {
+
+  }
+
+  public interface TestServiceRepositoryExtension extends MuleCoreExtension {
+
+    @Inject
+    void setServiceRepository(ServiceRepository serviceRepository);
+  }
+
+  public interface TestArtifactClassLoaderManagerExtension extends MuleCoreExtension {
+
+    @Inject
+    void setArtifactClassLoaderManager(ArtifactClassLoaderManager artifactClassLoaderManager);
+  }
+
+  public interface TestToolingServiceExtension extends MuleCoreExtension {
+
+    @Inject
+    void setToolingService(ToolingService toolingService);
+  }
+
+  public interface InjectedTestServiceExtension extends MuleCoreExtension {
+
+    @Inject
+    void setService(TestService service);
+  }
+
+  public interface TestService extends Service {
 
   }
 

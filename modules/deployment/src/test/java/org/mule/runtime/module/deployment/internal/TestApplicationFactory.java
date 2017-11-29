@@ -8,7 +8,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
-import static java.util.Optional.empty;
+import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
@@ -30,7 +30,6 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDes
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.service.api.manager.ServiceRepository;
 
 import java.io.File;
 import java.io.IOException;

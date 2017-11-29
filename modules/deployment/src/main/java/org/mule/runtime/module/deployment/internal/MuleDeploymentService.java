@@ -20,6 +20,7 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -33,7 +34,6 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
-import org.mule.runtime.module.service.api.manager.ServiceManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -365,7 +365,7 @@ public class MuleDeploymentService implements DeploymentService {
    * @param serviceManager the manager to do the lookup of the service in.
    * @return the instance of the {@link SchedulerService} from within the given {@code serviceManager}.
    */
-  public static SchedulerService findSchedulerService(ServiceManager serviceManager) {
+  public static SchedulerService findSchedulerService(ServiceRepository serviceManager) {
     final List<Service> services = serviceManager.getServices();
     return (SchedulerService) services.stream().filter(s -> s instanceof SchedulerService).findFirst().get();
   }

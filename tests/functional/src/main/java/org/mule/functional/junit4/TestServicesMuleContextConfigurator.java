@@ -8,12 +8,11 @@
 package org.mule.functional.junit4;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.module.service.api.manager.ServiceRepository;
 
 import java.util.Collection;
 import java.util.HashMap;

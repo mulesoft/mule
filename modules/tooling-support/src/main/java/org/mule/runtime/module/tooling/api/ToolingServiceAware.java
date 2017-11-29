@@ -7,10 +7,12 @@
 package org.mule.runtime.module.tooling.api;
 
 /**
- * Enables {@link ToolingServiceAware} injection.
+ * Enables {@link ToolingService} injection.
  *
  * @since 4.0
+ * @deprecated on 4.1, use @Inject on a field or setter method of type {@link ToolingService}
  */
+@Deprecated
 public interface ToolingServiceAware {
 
   /**

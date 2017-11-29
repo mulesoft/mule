@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLI
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.policy.proxy.LifecycleFilterProxy.createLifecycleFilterProxy;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -26,6 +25,7 @@ import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.notification.PolicyNotification;
 import org.mule.runtime.api.notification.PolicyNotificationListener;
+import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
@@ -40,7 +40,6 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContext
 import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifactExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.service.api.manager.ServiceRepository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +74,8 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
    */
   public DefaultApplicationPolicyInstance(Application application, PolicyTemplate template,
-                                          PolicyParametrization parametrization, ServiceRepository serviceRepository,
+                                          PolicyParametrization parametrization,
+                                          ServiceRepository serviceRepository,
                                           ClassLoaderRepository classLoaderRepository, List<ArtifactPlugin> artifactPlugins,
                                           ExtensionModelLoaderRepository extensionModelLoaderRepository) {
     this.application = application;
