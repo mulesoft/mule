@@ -105,6 +105,12 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
       registerXmlExtensionParsers(definitionBuilder, extensionModel, dslSyntaxResolver);
     } else {
       final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+
+      registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
+                                           parsingContext);
+
+      registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
+
       withContextClassLoader(extensionClassLoader, () -> {
         new IdempotentExtensionWalker() {
 
@@ -146,10 +152,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
         }.walk(extensionModel);
 
-        registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                             parsingContext);
 
-        registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
       });
     }
   }
