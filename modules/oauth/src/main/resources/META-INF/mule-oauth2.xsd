@@ -138,6 +138,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="proxy-ref" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to a proxy context element.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -189,6 +196,13 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             References a TLS config that will be used to receive incoming HTTP request and do HTTP request during the OAuth dance.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="proxy-ref" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to a proxy context element.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

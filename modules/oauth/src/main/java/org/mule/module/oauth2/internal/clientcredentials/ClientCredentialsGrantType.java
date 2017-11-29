@@ -17,6 +17,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.module.http.api.HttpHeaders;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.module.oauth2.api.RequestAuthenticationException;
 import org.mule.module.oauth2.internal.AbstractGrantType;
@@ -36,6 +37,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
     private MuleContext muleContext;
     private TokenManagerConfig tokenManager;
     private TlsContextFactory tlsContextFactory;
+    private ProxyConfig proxyConfig;
 
     public void setClientId(final String clientId)
     {
@@ -87,9 +89,13 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
         }
         tokenRequestHandler.setApplicationCredentials(this);
         tokenRequestHandler.setTokenManager(tokenManager);
-        if (tlsContextFactory != null)
+        try
         {
-            tokenRequestHandler.setTlsContextFactory(tlsContextFactory);
+            tokenRequestHandler.buildHttpRequestOptions(tlsContextFactory, proxyConfig);
+        }
+        catch (MuleException e)
+        {
+            throw new InitialisationException(e, this);
         }
     }
 
@@ -146,5 +152,15 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
     public void setTokenManager(TokenManagerConfig tokenManager)
     {
         this.tokenManager = tokenManager;
+    }
+
+    public ProxyConfig getProxyConfig()
+    {
+        return proxyConfig;
+    }
+
+    public void setProxyConfig(ProxyConfig proxyConfig)
+    {
+        this.proxyConfig = proxyConfig;
     }
 }
