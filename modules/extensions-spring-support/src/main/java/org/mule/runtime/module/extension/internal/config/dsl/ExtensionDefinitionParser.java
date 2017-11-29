@@ -42,7 +42,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTargetParameter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -81,9 +80,9 @@ import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
-import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.config.dsl.construct.RouteComponentParser;
 import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultObjectParsingDelegate;
@@ -115,6 +114,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValue
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
+import com.google.common.collect.ImmutableList;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -135,7 +136,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
-import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.core.convert.ConversionService;
@@ -301,7 +301,9 @@ public abstract class ExtensionDefinitionParser {
           }
 
           if (!parsingContext.isRegistered(paramDsl.getElementName(), paramDsl.getPrefix())) {
-            parsingContext.registerObjectType(paramDsl.getElementName(), paramDsl.getPrefix(), objectType);
+            if (!paramDsl.supportsTopLevelDeclaration()) {
+              parsingContext.registerObjectType(paramDsl.getElementName(), paramDsl.getPrefix(), objectType);
+            }
             parseObjectParameter(parameter, paramDsl);
           } else {
             parseObject(getKey(parameter), parameter.getName(), objectType, parameter.getDefaultValue(),
