@@ -57,6 +57,17 @@
             <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-transport-http</artifactId>
             <version>${aetherVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${apacheHttpClientVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
