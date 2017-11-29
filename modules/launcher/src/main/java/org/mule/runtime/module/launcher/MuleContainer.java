@@ -201,7 +201,6 @@ public class MuleContainer {
 
       createExecutionMuleFolder();
 
-      // TODO(pablo.kraan): add a tests to ensure that serviceManager is started BEFORE the core extension manager (and stopped in the opposite way)
       serviceManager.start();
 
       coreExtensionManager.setDeploymentService(deploymentService);

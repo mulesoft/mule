@@ -84,7 +84,6 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
     ordered.verify(deploymentService).start();
   }
 
-
   @Test
   public void startsCoreExtensionsBeforeDeploymentService() throws Exception {
     container.start(false);
@@ -92,6 +91,25 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
     InOrder inOrder = inOrder(coreExtensionManager, deploymentService);
     inOrder.verify(coreExtensionManager).start();
     inOrder.verify(deploymentService).start();
+  }
+
+  @Test
+  public void startsServiceManagerBeforeCoreExtensions() throws Exception {
+    container.start(false);
+
+    final InOrder ordered = inOrder(coreExtensionManager, serviceManager);
+    ordered.verify(serviceManager).start();
+    ordered.verify(coreExtensionManager).start();
+  }
+
+  @Test
+  public void stopsServiceManagerAfterCoreExtensions() throws Exception {
+    container.start(false);
+    container.stop();
+
+    InOrder inOrder = inOrder(coreExtensionManager, serviceManager);
+    inOrder.verify(coreExtensionManager).stop();
+    inOrder.verify(serviceManager).stop();
   }
 
   @Test
