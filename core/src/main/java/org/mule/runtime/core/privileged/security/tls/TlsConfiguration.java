@@ -24,7 +24,7 @@ import org.mule.runtime.core.internal.secutiry.tls.TlsPropertiesMapper;
 import org.mule.runtime.core.internal.secutiry.tls.TlsPropertiesSocketFactory;
 import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.runtime.core.internal.util.SecurityUtils;
-import org.mule.runtime.core.privileged.security.RevocationCheck;
+import org.mule.runtime.api.tls.RevocationCheck;
 import org.mule.runtime.core.privileged.security.TlsDirectKeyStore;
 import org.mule.runtime.core.privileged.security.TlsDirectTrustStore;
 import org.mule.runtime.core.privileged.security.TlsIndirectKeyStore;

@@ -11,8 +11,13 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.tls.RevocationCheck;
+import org.mule.runtime.api.tls.RevocationCheckFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
+import org.mule.runtime.module.tls.internal.revocation.CrlFile;
+import org.mule.runtime.module.tls.internal.revocation.CustomOcspResponder;
+import org.mule.runtime.module.tls.internal.revocation.StandardRevocationCheck;
 
 import java.io.IOException;
 
@@ -109,6 +114,43 @@ public class DefaultTlsContextFactoryBuilder implements TlsContextFactoryBuilder
   @Override
   public TlsContextFactoryBuilder keyStoreAlgorithm(String algorithm) {
     tlsContextFactory.setKeyManagerAlgorithm(algorithm);
+    return this;
+  }
+
+  @Override
+  public RevocationCheckFactory getRevocationCheckFactory() {
+    return new RevocationCheckFactory() {
+
+      @Override
+      public RevocationCheck createStandard(Boolean onlyEndEntities, Boolean preferCrls, Boolean noFallback, Boolean softFail) {
+        StandardRevocationCheck revocationCheck = new StandardRevocationCheck();
+        revocationCheck.setOnlyEndEntities(onlyEndEntities);
+        revocationCheck.setPreferCrls(preferCrls);
+        revocationCheck.setNoFallback(noFallback);
+        revocationCheck.setSoftFail(softFail);
+        return revocationCheck;
+      }
+
+      @Override
+      public RevocationCheck createCustomOcsp(String url, String certAlias) {
+        CustomOcspResponder revocationCheck = new CustomOcspResponder();
+        revocationCheck.setUrl(url);
+        revocationCheck.setCertAlias(certAlias);
+        return revocationCheck;
+      }
+
+      @Override
+      public RevocationCheck createCrlFile(String path) {
+        CrlFile crlFile = new CrlFile();
+        crlFile.setPath(path);
+        return crlFile;
+      }
+    };
+  }
+
+  @Override
+  public TlsContextFactoryBuilder revocationCheck(RevocationCheck revocationCheck) {
+    tlsContextFactory.setRevocationCheck(revocationCheck);
     return this;
   }
 
