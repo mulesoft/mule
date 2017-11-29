@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Contains the output of a message source
@@ -24,6 +25,7 @@ public class SourceResultAdapter {
   private final CursorProviderFactory cursorProviderFactory;
   private final boolean isCollection;
   private final MediaType defaultMediaType;
+  private final Optional<String> correlationId;
 
   /**
    * Creates a new instance
@@ -32,15 +34,18 @@ public class SourceResultAdapter {
    * @param cursorProviderFactory the {@link CursorStreamProviderFactory} used by the source
    * @param defaultMediaType      the {@link MediaType} to set in the message if the {@code result} doesn't specify any
    * @param isCollection          whether the {@code result} represents a {@link List} of messages.
+   * @param correlationId         the correlationId of the message to be set
    */
   public SourceResultAdapter(Result<?, ?> result,
                              CursorProviderFactory cursorProviderFactory,
                              MediaType defaultMediaType,
-                             boolean isCollection) {
+                             boolean isCollection,
+                             Optional<String> correlationId) {
     this.result = result;
     this.cursorProviderFactory = cursorProviderFactory;
     this.defaultMediaType = defaultMediaType;
     this.isCollection = isCollection;
+    this.correlationId = correlationId;
   }
 
   /**
@@ -62,6 +67,14 @@ public class SourceResultAdapter {
    */
   public boolean isCollection() {
     return isCollection;
+  }
+
+  /**
+   * @return Optionally return a correlationId
+   * @since 4.1
+   */
+  public Optional<String> getCorrelationId() {
+    return correlationId;
   }
 
   public MediaType getMediaType() {

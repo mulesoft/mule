@@ -11,6 +11,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -26,6 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.transaction.TransactionManager;
+
 /**
  * Default implementation of {@link SourceCallbackContext}
  *
@@ -38,8 +41,10 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
 
   private final SourceCallbackAdapter sourceCallback;
   private final Map<String, Object> variables = new HashMap<>();
+  private String correlationId;
   private Object connection = null;
   private TransactionHandle transactionHandle = NULL_TRANSACTION_HANDLE;
+  private boolean dispatched = false;
 
   /**
    * Creates a new instance
@@ -91,6 +96,14 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
    * {@inheritDoc}
    */
   @Override
+  public void dispatched() {
+    dispatched = true;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void releaseConnection() {
     if (connection != null) {
       sourceCallback.getSourceConnectionManager().release(connection);
@@ -128,6 +141,20 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   @Override
   public void addVariable(String variableName, Object value) {
     variables.put(variableName, value);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setCorrelationId(String correlationId) {
+    checkState(!dispatched, "Cannot set the correlationId at this moment. This context was already used to dispatch a message");
+    this.correlationId = correlationId;
+  }
+
+  @Override
+  public Optional<String> getCorrelationId() {
+    return ofNullable(correlationId);
   }
 
   /**

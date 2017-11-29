@@ -20,4 +20,11 @@ public interface SourceCallbackContextAdapter extends SourceCallbackContext {
    * Releases the bound connection
    */
   void releaseConnection();
+
+  /**
+   * Indicates that {@code this} instance has already been used to dispatch an event
+   *
+   * @since 1.1
+   */
+  void dispatched();
 }
