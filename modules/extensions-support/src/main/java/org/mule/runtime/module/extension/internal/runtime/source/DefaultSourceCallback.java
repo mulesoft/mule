@@ -175,13 +175,17 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   public void handle(Result<T, A> result, SourceCallbackContext context) {
     checkArgument(context instanceof SourceCallbackContextAdapter, "The supplied context was not created through this callback, "
         + "you naughty developer");
+
+    SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     MessageProcessContext messageProcessContext = processContextSupplier.get();
 
     SourceResultAdapter resultAdapter =
-        new SourceResultAdapter(result, cursorProviderFactory, defaultMediaType, returnsListOfMessages);
+        new SourceResultAdapter(result, cursorProviderFactory, defaultMediaType, returnsListOfMessages,
+                                context.getCorrelationId());
     Message message = of(resultAdapter);
 
     executeFlow(context, messageProcessContext, message);
+    contextAdapter.dispatched();
   }
 
   private void executeFlow(SourceCallbackContext context, MessageProcessContext messageProcessContext, Message message) {

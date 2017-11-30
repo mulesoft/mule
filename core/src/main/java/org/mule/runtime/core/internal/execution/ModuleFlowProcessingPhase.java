@@ -32,7 +32,6 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -46,15 +45,14 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent.Builder;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
@@ -65,10 +63,6 @@ import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -76,6 +70,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -88,9 +83,6 @@ import reactor.core.publisher.Mono;
 public class ModuleFlowProcessingPhase
     extends NotificationFiringProcessingPhase<ModuleFlowProcessingPhaseTemplate> implements Initialisable {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(ModuleFlowProcessingPhase.class);
-
-  private ErrorTypeMatcher sourceResponseErrorTypeMatcher;
   private ErrorType sourceResponseGenerateErrorType;
   private ErrorType sourceResponseSendErrorType;
   private ErrorType sourceErrorResponseGenerateErrorType;
@@ -107,8 +99,6 @@ public class ModuleFlowProcessingPhase
   public void initialise() throws InitialisationException {
     final ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
     componentLocator = muleContext.getConfigurationComponentLocator();
-
-    sourceResponseErrorTypeMatcher = new SingleErrorTypeMatcher(errorTypeRepository.getSourceResponseErrorType());
 
     sourceResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_GENERATE).get();
     sourceResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_SEND).get();
@@ -273,15 +263,14 @@ public class ModuleFlowProcessingPhase
   private CoreEvent createEvent(ModuleFlowProcessingPhaseTemplate template, ComponentLocation sourceLocation,
                                 CompletableFuture responseCompletion, FlowConstruct flowConstruct) {
     Message message = template.getMessage();
-    CoreEvent templateEvent = InternalEvent
-        .builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null,
-                        Optional.of(responseCompletion),
-                        NullExceptionHandler.getInstance()))
-        .message(message)
-        .build();
+    Builder eventBuilder;
 
     if (message.getPayload().getValue() instanceof SourceResultAdapter) {
       SourceResultAdapter adapter = (SourceResultAdapter) message.getPayload().getValue();
+      eventBuilder =
+          createEventBuilder(sourceLocation, responseCompletion, flowConstruct, adapter.getCorrelationId().orElse(null), message);
+      CoreEvent templateEvent = eventBuilder.build();
+
       final Result<?, ?> result = adapter.getResult();
       final Object resultValue = result.getOutput();
 
@@ -295,9 +284,19 @@ public class ModuleFlowProcessingPhase
         message = toMessage(result, adapter.getMediaType(), adapter.getCursorProviderFactory(), templateEvent);
       }
 
-      templateEvent = builder(templateEvent).message(message).build();
+      return eventBuilder.message(message).build();
     }
-    return templateEvent;
+
+    return createEventBuilder(sourceLocation, responseCompletion, flowConstruct, null, message).build();
+  }
+
+  private Builder createEventBuilder(ComponentLocation sourceLocation, CompletableFuture responseCompletion,
+                                     FlowConstruct flowConstruct, String correlationId, Message message) {
+    return InternalEvent
+        .builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, correlationId,
+                        Optional.of(responseCompletion),
+                        NullExceptionHandler.getInstance()))
+        .message(message);
   }
 
 
