@@ -6,19 +6,23 @@
  */
 package org.mule.runtime.config.internal;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.AbstractRegistry;
@@ -311,7 +315,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
       return beans;
     } catch (FatalBeanException fbex) {
       // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
-      String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
+      String message = format("Failed to lookup beans of type %s from the Spring registry", type);
       throw new MuleRuntimeException(createStaticMessage(message), fbex);
     } catch (Exception e) {
       logger.debug(e.getMessage(), e);
@@ -321,16 +325,16 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
 
   protected <T> Map<String, T> internalLookupByTypeWithoutAncestorsAndObjectProviders(Class<T> type, boolean nonSingletons,
                                                                                       boolean eagerInit) {
-    try {
+  try {
       Map<String, T> beans = ((ObjectProviderAwareBeanFactory) applicationContext.getAutowireCapableBeanFactory())
-          .getBeansOfTypeWithObjectProviderObjects(type, nonSingletons, eagerInit);
+              .getBeansOfTypeWithObjectProviderObjects(type, nonSingletons, eagerInit);
       if (nonSingletons && eagerInit) {
         beans.forEach((key, value) -> applyLifecycleIfPrototype(value, key, true));
       }
       return beans;
     } catch (FatalBeanException fbex) {
       // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
-      String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
+    String message = format("Failed to lookup beans of type %s from the Spring registry", type);
       throw new MuleRuntimeException(createStaticMessage(message), fbex);
     } catch (Exception e) {
       if (logger.isDebugEnabled()) {
@@ -375,7 +379,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
 
     @Override
     public void registerObject(String key, Object value) throws RegistrationException {
-      doRegisterObject(key, value);
+      doRegisterObjectSynchronized(key, value);
     }
 
     @Override
@@ -407,30 +411,36 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
       return object;
     }
 
-    private void doRegisterObject(String key, Object value) throws RegistrationException {
-      synchronized (muleContext) {
-        if (springContextInitialised.get()) {
-          if (applicationContext.containsBean(key)) {
-            if (logger.isWarnEnabled()) {
-              logger.warn(String
-                  .format("Spring registry already contains an object named '%s'. The previous object will be overwritten.",
-                          key));
-            }
-            SpringRegistry.this.unregisterObject(key);
-          }
+    private void doRegisterObjectSynchronized(String key, Object value) {
+      muleContext.withLifecycleLock((CheckedRunnable) () -> doRegisterObject(key, value));
+    }
 
-          try {
-            value = initialiseObject(applicationContext, key, value);
-            applyLifecycle(value);
-            applicationContext.getBeanFactory().registerSingleton(key, value);
-          } catch (Exception e) {
-            throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
+    private void doRegisterObject(String key, Object value) throws RegistrationException {
+    if( getLifecycleManager().getCurrentPhase().equals(Stoppable.PHASE_NAME) || getLifecycleManager().getCurrentPhase().equals(Disposable.PHASE_NAME)) {
+      logger.warn(format("%s could not be registered in registry: %s because it was in an invalid lifecycle phase: %s",value,this,getLifecycleManager().getCurrentPhase()));
+      throw new RegistrationException(createStaticMessage(format("Can't register new object, registry in %s lifecycle phase",getLifecycleManager().getCurrentPhase())));
+    }
+      if (springContextInitialised.get()) {
+        if (applicationContext.containsBean(key)) {
+          if (logger.isWarnEnabled()) {
+            logger.warn(
+                    format("Spring registry already contains an object named '%s'. The previous object will be overwritten.",
+                        key));
           }
-        } else {
-          // since the context has not yet bean initialized, we register a bean definition instead.
-          registeredBeanDefinitionsBeforeInitialization.put(key, genericBeanDefinition(ConstantFactoryBean.class)
-              .addConstructorArgValue(value).getBeanDefinition());
+          SpringRegistry.this.unregisterObject(key);
         }
+
+        try {
+          value = initialiseObject(applicationContext, key, value);
+          applyLifecycle(value);
+          applicationContext.getBeanFactory().registerSingleton(key, value);
+        } catch (Exception e) {
+          throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
+        }
+      } else {
+        // since the context has not yet bean initialized, we register a bean definition instead.
+        registeredBeanDefinitionsBeforeInitialization.put(key, genericBeanDefinition(ConstantFactoryBean.class)
+            .addConstructorArgValue(value).getBeanDefinition());
       }
     }
   }
