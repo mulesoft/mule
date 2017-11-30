@@ -197,7 +197,7 @@ public class MessageProcessors {
 
   /**
    * Creates a new {@link BaseEventContext} which is child of the one in the given {@code event}
-   * 
+   *
    * @param event the parent event
    * @param componentLocation the location of the component creating the child context
    * @return a child {@link BaseEventContext}
@@ -241,7 +241,12 @@ public class MessageProcessors {
         .switchIfEmpty(from(((BaseEventContext) child).getResponsePublisher()))
         .map(result -> builder(event.getContext(), result).build())
         .doOnError(MessagingException.class,
-                   me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()))
+                   me -> {
+                     me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build());
+                     if (completeParentOnEmpty) {
+                       ((BaseEventContext) child).error(me);
+                     }
+                   })
         .doOnSuccess(result -> {
           if (result == null && completeParentOnEmpty) {
             ((BaseEventContext) event.getContext()).success();

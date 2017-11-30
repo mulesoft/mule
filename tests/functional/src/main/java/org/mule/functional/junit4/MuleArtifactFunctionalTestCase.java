@@ -7,6 +7,9 @@
 
 package org.mule.functional.junit4;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
@@ -16,6 +19,10 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.EventContextDumpService;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import javax.inject.Inject;
@@ -55,6 +62,9 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
   @Inject
   protected NotificationListenerRegistry notificationListenerRegistry;
 
+  @Inject
+  private EventContextDumpService eventContextDumpService;
+
   private CoreEvent _testEvent;
 
   /**
@@ -79,6 +89,21 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
   @Override
   protected boolean doTestClassInjection() {
     return true;
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    if (_testEvent != null) {
+      ((BaseEventContext) _testEvent.getContext()).success();
+    }
+    super.doTearDown();
+
+    if (eventContextDumpService != null) {
+      new PollingProber(RECEIVE_TIMEOUT, 100).check(new JUnitLambdaProbe(() -> {
+        assertThat(eventContextDumpService.getCurrentlyActiveFlowStacks(), is(empty()));
+        return true;
+      }));
+    }
   }
 
 }

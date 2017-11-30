@@ -31,6 +31,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
+
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
@@ -43,14 +44,14 @@ import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Optional;
-
 import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Optional;
 
 public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -62,6 +63,8 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
+  private Flow flow;
+
   @Override
   protected String getConfigFile() {
     return "heisenberg-source-config.xml";
@@ -71,10 +74,16 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   protected void doSetUp() throws Exception {
     sourceTimesStarted = 0;
     reset();
+    super.doSetUp();
   }
 
   @Override
   protected void doTearDown() throws Exception {
+    if (flow != null) {
+      flow.stop();
+    }
+
+    super.doTearDown();
     reset();
   }
 
@@ -277,7 +286,8 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   protected void startFlow(String flowName) throws Exception {
-    ((Flow) getFlowConstruct(flowName)).start();
+    flow = (Flow) getFlowConstruct(flowName);
+    flow.start();
   }
 
   private boolean assertState(boolean executedOnSuccess, boolean executedOnError, boolean executedOnTerminate) {

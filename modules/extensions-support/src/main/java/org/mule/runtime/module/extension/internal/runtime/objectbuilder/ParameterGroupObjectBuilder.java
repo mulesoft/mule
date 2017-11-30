@@ -8,7 +8,10 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -52,7 +55,15 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
 
   public T build(ResolverSetResult result) throws MuleException {
     final Map<String, Object> resultMap = result.asMap();
-    return doBuild(resultMap::containsKey, resultMap::get, from(getInitialiserEvent()));
+    CoreEvent initialiserEvent = null;
+    try {
+      initialiserEvent = getInitialiserEvent();
+      return doBuild(resultMap::containsKey, resultMap::get, from(initialiserEvent));
+    } finally {
+      if (initialiserEvent != null) {
+        ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
+    }
   }
 
   private T doBuild(Predicate<String> hasParameter, Function<String, Object> parameters, ValueResolvingContext context)

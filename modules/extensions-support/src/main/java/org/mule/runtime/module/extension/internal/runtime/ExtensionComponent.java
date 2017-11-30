@@ -15,18 +15,20 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -44,18 +46,18 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.Value;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -72,6 +74,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValu
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -79,9 +84,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor} and
@@ -356,30 +358,46 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private MetadataContext getMetadataContext() throws MetadataResolvingException {
-    CoreEvent fakeEvent = getInitialiserEvent(muleContext);
+    CoreEvent fakeEvent = null;
+    try {
+      fakeEvent = getInitialiserEvent(muleContext);
 
-    Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
+      Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
 
-    if (configuration.isPresent()) {
-      ConfigurationProvider configurationProvider = findConfigurationProvider()
-          .orElseThrow(() -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
-                                                            INVALID_CONFIGURATION));
+      if (configuration.isPresent()) {
+        ConfigurationProvider configurationProvider = findConfigurationProvider()
+            .orElseThrow(() -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
+                                                              INVALID_CONFIGURATION));
 
-      if (configurationProvider instanceof DynamicConfigurationProvider) {
-        throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", INVALID_CONFIGURATION);
+        if (configurationProvider instanceof DynamicConfigurationProvider) {
+          throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", INVALID_CONFIGURATION);
+        }
+      }
+
+      String cacheId = configuration.map(ConfigurationInstance::getName)
+          .orElseGet(() -> extensionModel.getName() + "|" + componentModel.getName());
+
+      return new DefaultMetadataContext(() -> configuration, connectionManager, metadataService.getMetadataCache(cacheId),
+                                        typeLoader);
+    } finally {
+      if (fakeEvent != null) {
+        ((BaseEventContext) fakeEvent.getContext()).success();
       }
     }
-
-    String cacheId = configuration.map(ConfigurationInstance::getName)
-        .orElseGet(() -> extensionModel.getName() + "|" + componentModel.getName());
-
-    return new DefaultMetadataContext(() -> configuration, connectionManager, metadataService.getMetadataCache(cacheId),
-                                      typeLoader);
   }
 
   private ExtensionResolvingContext getResolvingContext() {
-    CoreEvent fakeEvent = getInitialiserEvent(muleContext);
-    return new ExtensionResolvingContext(() -> getConfiguration(fakeEvent), connectionManager);
+    return new ExtensionResolvingContext(() -> {
+      CoreEvent fakeEvent = null;
+      try {
+        fakeEvent = getInitialiserEvent(muleContext);
+        return getConfiguration(fakeEvent);
+      } finally {
+        if (fakeEvent != null) {
+          ((BaseEventContext) fakeEvent.getContext()).success();
+        }
+      }
+    }, connectionManager);
   }
 
   /**
@@ -412,15 +430,23 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   /**
-   * Similar to {@link #getConfiguration(CoreEvent)} but only works if the {@link #configurationProvider} is static.
-   * Otherwise, returns an empty value.
+   * Similar to {@link #getConfiguration(CoreEvent)} but only works if the {@link #configurationProvider} is static. Otherwise,
+   * returns an empty value.
    */
   protected Optional<ConfigurationInstance> getStaticConfiguration() {
     if (!requiresConfig.get() || (isConfigurationSpecified() && configurationProvider.get().isDynamic())) {
       return empty();
     }
 
-    return getConfiguration(getInitialiserEvent());
+    CoreEvent initialiserEvent = null;
+    try {
+      initialiserEvent = getInitialiserEvent(muleContext);
+      return getConfiguration(initialiserEvent);
+    } finally {
+      if (initialiserEvent != null) {
+        ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
+    }
   }
 
   protected CursorProviderFactory getCursorProviderFactory() {

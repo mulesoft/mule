@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
@@ -85,12 +86,20 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension,
                                                              String operation,
                                                              OperationParameters parameters) {
-    OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
-    Mono<Result<T, A>> resultMono = from(processor.apply(just(getInitialiserEvent(muleContext))))
-        .map(event -> Result.<T, A>builder(event.getMessage()).build())
-        .onErrorMap(Exceptions::unwrap)
-        .doAfterTerminate(() -> disposeProcessor(processor));
-    return resultMono.toFuture();
+    CoreEvent initialiserEvent = null;
+    try {
+      initialiserEvent = getInitialiserEvent(muleContext);
+      OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
+      Mono<Result<T, A>> resultMono = from(processor.apply(just(initialiserEvent)))
+          .map(event -> Result.<T, A>builder(event.getMessage()).build())
+          .onErrorMap(Exceptions::unwrap)
+          .doAfterTerminate(() -> disposeProcessor(processor));
+      return resultMono.toFuture();
+    } finally {
+      if (initialiserEvent != null) {
+        ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
+    }
   }
 
   /**
@@ -100,11 +109,16 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
   public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters params)
       throws MuleException {
     OperationMessageProcessor processor = createProcessor(extension, operation, params);
+    CoreEvent initialiserEvent = null;
     try {
-      CoreEvent process = processor.process(getInitialiserEvent(muleContext));
+      initialiserEvent = getInitialiserEvent(muleContext);
+      CoreEvent process = processor.process(initialiserEvent);
       return Result.<T, A>builder(process.getMessage()).build();
     } finally {
       disposeProcessor(processor);
+      if (initialiserEvent != null) {
+        ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
     }
   }
 
@@ -116,19 +130,27 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     ExtensionModel extension = findExtension(extensionName);
     OperationModel operation = findOperation(extension, operationName);
     ConfigurationProvider config = parameters.getConfigName().map(this::findConfiguration).orElse(null);
-    Map<String, ValueResolver> resolvedParams = resolveParameters(parameters.get(), getInitialiserEvent(muleContext));
+    CoreEvent initialiserEvent = null;
     try {
-      OperationMessageProcessor processor =
-          new OperationMessageProcessorBuilder(extension, operation, policyManager, muleContext, registry)
-              .setConfigurationProvider(config)
-              .setParameters(resolvedParams)
-              .build();
+      initialiserEvent = getInitialiserEvent(muleContext);
+      Map<String, ValueResolver> resolvedParams = resolveParameters(parameters.get(), initialiserEvent);
+      try {
+        OperationMessageProcessor processor =
+            new OperationMessageProcessorBuilder(extension, operation, policyManager, muleContext, registry)
+                .setConfigurationProvider(config)
+                .setParameters(resolvedParams)
+                .build();
 
-      processor.initialise();
-      processor.start();
-      return processor;
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not create Operation Message Processor"), e);
+        processor.initialise();
+        processor.start();
+        return processor;
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Could not create Operation Message Processor"), e);
+      }
+    } finally {
+      if (initialiserEvent != null) {
+        ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
     }
   }
 

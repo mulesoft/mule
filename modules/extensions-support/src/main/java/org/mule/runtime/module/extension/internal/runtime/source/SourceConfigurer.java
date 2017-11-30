@@ -12,11 +12,14 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueR
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectComponentLocation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRefName;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -84,11 +87,17 @@ public final class SourceConfigurer {
 
         };
 
+    CoreEvent initialiserEvent = null;
     try {
-      return builder.build(from(getInitialiserEvent(muleContext), config));
+      initialiserEvent = getInitialiserEvent(muleContext);
+      return builder.build(from(initialiserEvent, config));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Exception was found trying to configure source of type "
           + source.getClass().getName()), e);
+    } finally {
+      if (initialiserEvent != null) {
+        ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
     }
   }
 

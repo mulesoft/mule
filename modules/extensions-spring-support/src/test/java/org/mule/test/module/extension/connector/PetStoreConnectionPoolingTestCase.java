@@ -70,6 +70,7 @@ public class PetStoreConnectionPoolingTestCase extends PetStoreConnectionTestCas
 
   @Override
   protected void doTearDown() throws Exception {
+    super.doTearDown();
     if (executorService != null) {
       executorService.shutdown();
     }

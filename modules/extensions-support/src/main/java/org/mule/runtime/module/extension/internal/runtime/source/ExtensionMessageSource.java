@@ -35,6 +35,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryCallback;
@@ -47,6 +48,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
@@ -61,13 +63,14 @@ import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourc
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
-import javax.inject.Inject;
+import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
+import javax.inject.Inject;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -119,13 +122,21 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private synchronized void createSource() throws Exception {
     if (sourceAdapter == null) {
-      sourceAdapter =
-          sourceAdapterFactory.createAdapter(getConfiguration(getInitialiserEvent(muleContext)),
-                                             createSourceCallbackFactory(),
-                                             getLocation(),
-                                             sourceConnectionManager,
-                                             new MessagingExceptionResolver(this));
-      muleContext.getInjector().inject(sourceAdapter);
+      CoreEvent initialiserEvent = null;
+      try {
+        initialiserEvent = getInitialiserEvent(muleContext);
+        sourceAdapter =
+            sourceAdapterFactory.createAdapter(getConfiguration(initialiserEvent),
+                                               createSourceCallbackFactory(),
+                                               getLocation(),
+                                               sourceConnectionManager,
+                                               new MessagingExceptionResolver(this));
+        muleContext.getInjector().inject(sourceAdapter);
+      } finally {
+        if (initialiserEvent != null) {
+          ((BaseEventContext) initialiserEvent.getContext()).success();
+        }
+      }
     }
   }
 
@@ -186,7 +197,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
             .debug(format("Message source '%s' on root component '%s' threw a '%s' but a reconnection is already in progress. "
                 + "Exception was: %s"
                 + "No action will be taken since this is most likely a bug in the Source",
-                          //sourceModel's name is used because at this point is very likely that the "sourceAdapter is null
+                          // sourceModel's name is used because at this point is very likely that the "sourceAdapter is null
                           sourceModel.getName(),
                           getLocation().getRootContainerName(),
                           ConnectionException.class.getSimpleName(),
@@ -438,12 +449,18 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public Map<String, Object> getInitialisationParameters() {
+    CoreEvent initialiserEvent = null;
     try {
-      return copyOf(toMap(sourceAdapterFactory.getSourceParameters(), getInitialiserEvent()));
+      initialiserEvent = getInitialiserEvent();
+      return copyOf(toMap(sourceAdapterFactory.getSourceParameters(), initialiserEvent));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not resolve parameters message source at location '%s'",
                                                                 getLocation().toString()),
                                                          e));
+    } finally {
+      if (initialiserEvent != null) {
+        ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
     }
   }
 }

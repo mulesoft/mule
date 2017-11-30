@@ -23,6 +23,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
@@ -97,27 +98,52 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
 
   @Test
   public void sameInstanceForEquivalentEvent() throws Exception {
-    CoreEvent event = getHeisenbergEvent();
-    HeisenbergExtension heisenberg = lookupHeisenberg(testConfig, event);
-    assertThat(heisenberg, is(sameInstance(lookupHeisenberg(testConfig, event))));
+    CoreEvent event = null;
+    try {
+      event = getHeisenbergEvent();
+      HeisenbergExtension heisenberg = lookupHeisenberg(testConfig, event);
+      assertThat(heisenberg, is(sameInstance(lookupHeisenberg(testConfig, event))));
+    } finally {
+      if (event != null) {
+        ((BaseEventContext) event.getContext()).success();
+      }
+    }
   }
 
   @Test
   public void configWithExpressionFunctionIsSameInstanceForDifferentEvents() throws Exception {
-    CoreEvent event = getHeisenbergEvent();
-    CoreEvent anotherEvent = testEvent();
-    HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, event);
-    HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_BYNAME, anotherEvent);
-    assertThat(config, is(sameInstance(anotherConfig)));
+    CoreEvent event = null;
+    try {
+      event = getHeisenbergEvent();
+      CoreEvent anotherEvent = testEvent();
+      HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, event);
+      HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_BYNAME, anotherEvent);
+      assertThat(config, is(sameInstance(anotherConfig)));
+    } finally {
+      if (event != null) {
+        ((BaseEventContext) event.getContext()).success();
+      }
+    }
   }
 
   @Test
   public void configWithExpressionFunctionStillDynamic() throws Exception {
-    CoreEvent event = getHeisenbergEvent();
-    CoreEvent anotherEvent = CoreEvent.builder(getHeisenbergEvent()).addVariable("age", 40).build();
-    HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
-    HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_EXPRESSION, anotherEvent);
-    assertThat(config, is(not(sameInstance(anotherConfig))));
+    CoreEvent event = null;
+    CoreEvent anotherEvent = null;
+    try {
+      event = getHeisenbergEvent();
+      anotherEvent = CoreEvent.builder(getHeisenbergEvent()).addVariable("age", 40).build();
+      HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
+      HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_EXPRESSION, anotherEvent);
+      assertThat(config, is(not(sameInstance(anotherConfig))));
+    } finally {
+      if (event != null) {
+        ((BaseEventContext) event.getContext()).success();
+      }
+      if (anotherEvent != null) {
+        ((BaseEventContext) anotherEvent.getContext()).success();
+      }
+    }
   }
 
   @Test

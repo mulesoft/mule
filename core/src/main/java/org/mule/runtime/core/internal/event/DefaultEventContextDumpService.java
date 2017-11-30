@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.event;
 
+import static java.lang.System.lineSeparator;
 import static java.util.concurrent.ConcurrentHashMap.newKeySet;
 
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -63,6 +64,11 @@ public class DefaultEventContextDumpService implements EventContextDumpService {
     @Override
     public FlowCallStack getFlowCallStack() {
       return flowCallStack;
+    }
+
+    @Override
+    public String toString() {
+      return "eventId: " + eventId + ";" + lineSeparator() + getFlowCallStack().toString();
     }
   }
 }

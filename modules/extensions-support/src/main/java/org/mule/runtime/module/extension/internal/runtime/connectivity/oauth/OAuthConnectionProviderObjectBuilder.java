@@ -27,6 +27,7 @@ import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthCo
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.SCOPES_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -35,11 +36,12 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
@@ -51,6 +53,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,8 +64,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * A specialization of {@link DefaultConnectionProviderObjectBuilder} to wrap the {@link ConnectionProvider}
@@ -250,22 +252,29 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
   }
 
   private OAuthConfig getInitialOAuthConfig() throws MuleException {
-    final CoreEvent initialiserEvent = getInitialiserEvent();
-    MapValueResolver mapResolver =
-        staticOnly((MapValueResolver) resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME));
-    AuthCodeConfig authCodeConfig = buildAuthCodeConfig(mapResolver.resolve(from(initialiserEvent)));
-    Optional<OAuthObjectStoreConfig> storeConfig = buildOAuthObjectStoreConfig(initialiserEvent);
+    CoreEvent initialiserEvent = null;
+    try {
+      initialiserEvent = getInitialiserEvent(muleContext);
+      MapValueResolver mapResolver =
+          staticOnly((MapValueResolver) resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME));
+      AuthCodeConfig authCodeConfig = buildAuthCodeConfig(mapResolver.resolve(from(initialiserEvent)));
+      Optional<OAuthObjectStoreConfig> storeConfig = buildOAuthObjectStoreConfig(initialiserEvent);
 
-    mapResolver = staticOnly((MapValueResolver) resolverSet.getResolvers().get(OAUTH_CALLBACK_GROUP_NAME));
-    OAuthCallbackConfig callbackConfig = buildOAuthCallbackConfig(mapResolver.resolve(from(initialiserEvent)));
+      mapResolver = staticOnly((MapValueResolver) resolverSet.getResolvers().get(OAUTH_CALLBACK_GROUP_NAME));
+      OAuthCallbackConfig callbackConfig = buildOAuthCallbackConfig(mapResolver.resolve(from(initialiserEvent)));
 
-    return new OAuthConfig(ownerConfigName,
-                           authCodeConfig,
-                           callbackConfig,
-                           storeConfig,
-                           grantType,
-                           getCustomParameters(initialiserEvent),
-                           callbackValues);
+      return new OAuthConfig(ownerConfigName,
+                             authCodeConfig,
+                             callbackConfig,
+                             storeConfig,
+                             grantType,
+                             getCustomParameters(initialiserEvent),
+                             callbackValues);
+    } finally {
+      if (initialiserEvent != null) {
+        ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
+    }
   }
 
   private MapValueResolver staticOnly(MapValueResolver resolver) throws MuleException {

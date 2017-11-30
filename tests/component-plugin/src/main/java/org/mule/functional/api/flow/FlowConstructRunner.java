@@ -10,12 +10,14 @@ import static java.lang.String.format;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.mockito.Mockito;
 
@@ -29,7 +31,7 @@ import javax.activation.DataHandler;
  *
  * @param <R> the runner class for a {@link FlowConstruct} implementation.
  */
-public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
+public abstract class FlowConstructRunner<R extends FlowConstructRunner> implements Disposable {
 
   protected Registry registry;
   protected TestEventBuilder eventBuilder = new TestEventBuilder();
@@ -259,5 +261,10 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @return the name of the {@link FlowConstruct} to use.
    */
   public abstract String getFlowConstructName();
+
+  @Override
+  public void dispose() {
+    ((BaseEventContext) requestEvent.getContext()).success();
+  }
 
 }

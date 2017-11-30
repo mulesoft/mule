@@ -45,6 +45,7 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
@@ -122,12 +123,18 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   }
 
   private MetadataContext getMetadataContext() throws MetadataResolvingException, ConnectionException {
-    CoreEvent fakeEvent = getInitialiserEvent(muleContext);
-    return new DefaultMetadataContext(() -> of(get(fakeEvent)),
-                                      connectionManager,
-                                      metadataService.getMetadataCache(getName()),
-                                      ExtensionsTypeLoaderFactory.getDefault()
-                                          .createTypeLoader(getClassLoader(getExtensionModel())));
+    return new DefaultMetadataContext(() -> {
+      CoreEvent fakeEvent = null;
+      try {
+        fakeEvent = getInitialiserEvent(muleContext);
+        return of(get(fakeEvent));
+      } finally {
+        if (fakeEvent != null) {
+          ((BaseEventContext) fakeEvent.getContext()).success();
+        }
+      }
+    }, connectionManager, metadataService.getMetadataCache(getName()), ExtensionsTypeLoaderFactory.getDefault()
+        .createTypeLoader(getClassLoader(getExtensionModel())));
   }
 
   /**

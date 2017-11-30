@@ -11,18 +11,16 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
-import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-
-import org.slf4j.Logger;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve extension objects that can be defined as named top level elements and be
@@ -71,9 +69,17 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
         return resolver;
       }
 
-      staticProduct = resolver.resolve(from(getInitialiserEvent(muleContext)));
-      muleContext.getInjector().inject(staticProduct);
-      return staticProduct;
+      CoreEvent initialiserEvent = null;
+      try {
+        initialiserEvent = getInitialiserEvent(muleContext);
+        staticProduct = resolver.resolve(from(initialiserEvent));
+        muleContext.getInjector().inject(staticProduct);
+        return staticProduct;
+      } finally {
+        if (initialiserEvent != null) {
+          ((BaseEventContext) initialiserEvent.getContext()).success();
+        }
+      }
     }, Exception.class, exception -> {
       throw exception;
     });

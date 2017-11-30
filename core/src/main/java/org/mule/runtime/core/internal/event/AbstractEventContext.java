@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -57,6 +59,8 @@ abstract class AbstractEventContext implements BaseEventContext {
   private transient final List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>();
   private transient final List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
 
+  private ReadWriteLock childContextsReadWriteLock = new ReentrantReadWriteLock();
+
   private volatile int state = STATE_READY;
   private volatile Either<Throwable, CoreEvent> result;
 
@@ -83,8 +87,11 @@ abstract class AbstractEventContext implements BaseEventContext {
   }
 
   void addChildContext(BaseEventContext childContext) {
-    synchronized (this) {
+    childContextsReadWriteLock.writeLock().lock();
+    try {
       childContexts.add(childContext);
+    } finally {
+      childContextsReadWriteLock.writeLock().unlock();
     }
   }
 
@@ -164,19 +171,30 @@ abstract class AbstractEventContext implements BaseEventContext {
     onResponseConsumerList.stream().forEach(consumer -> signalConsumerSilently(consumer));
   }
 
-  protected synchronized void tryComplete() {
-    if (state == STATE_RESPONSE && childContexts.stream().noneMatch(context -> !context.isComplete())) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(this + " completed.");
-      }
-      this.state = STATE_COMPLETE;
-      onCompletionConsumerList.forEach(consumer -> signalConsumerSilently(consumer));
-      getParentContext().ifPresent(context -> {
-        if (context instanceof AbstractEventContext) {
-          ((AbstractEventContext) context).tryComplete();
+  protected void tryComplete() {
+    boolean allChildrenComplete;
+
+    childContextsReadWriteLock.readLock().lock();
+    try {
+      allChildrenComplete = childContexts.stream().allMatch(context -> context.isComplete());
+    } finally {
+      childContextsReadWriteLock.readLock().unlock();
+    }
+
+    synchronized (this) {
+      if (state == STATE_RESPONSE && allChildrenComplete) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(this + " completed.");
         }
-      });
-      tryTerminate();
+        this.state = STATE_COMPLETE;
+        onCompletionConsumerList.forEach(consumer -> signalConsumerSilently(consumer));
+        getParentContext().ifPresent(context -> {
+          if (context instanceof AbstractEventContext) {
+            ((AbstractEventContext) context).tryComplete();
+          }
+        });
+        tryTerminate();
+      }
     }
   }
 
@@ -272,12 +290,17 @@ abstract class AbstractEventContext implements BaseEventContext {
     }
   }
 
-  public synchronized void forEachChild(Consumer<BaseEventContext> childConsumer) {
-    for (BaseEventContext context : childContexts) {
-      childConsumer.accept(context);
-      if (context instanceof AbstractEventContext) {
-        ((AbstractEventContext) context).forEachChild(childConsumer);
+  public void forEachChild(Consumer<BaseEventContext> childConsumer) {
+    childContextsReadWriteLock.readLock().lock();
+    try {
+      for (BaseEventContext context : childContexts) {
+        childConsumer.accept(context);
+        if (context instanceof AbstractEventContext) {
+          ((AbstractEventContext) context).forEachChild(childConsumer);
+        }
       }
+    } finally {
+      childContextsReadWriteLock.readLock().unlock();
     }
   }
 

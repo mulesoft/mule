@@ -11,7 +11,6 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.Cursor;
@@ -39,7 +38,7 @@ import java.util.function.Function;
  * <p>
  * This runner is <b>not</b> thread-safe.
  */
-public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Disposable {
+public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
   private String flowName;
 
@@ -333,5 +332,6 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
     }
 
     externalCompletionCallback.complete(null);
+    super.dispose();
   }
 }
