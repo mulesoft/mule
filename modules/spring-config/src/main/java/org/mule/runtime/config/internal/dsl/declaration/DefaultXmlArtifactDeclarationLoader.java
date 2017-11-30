@@ -736,13 +736,11 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
               config.getChildren().forEach(child -> {
                 ParameterObjectValue.Builder childBuilder = newObjectValue();
 
-
                 if (child.getIdentifier().equals(TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER)) {
-
-                  cloneAsDeclaration(child.getChildren().get(0),
-                                     childBuilder);
-                  childBuilder.ofType(child.getChildren().get(0).getIdentifier());
-
+                  child.getChildren().stream().findFirst().ifPresent(configLine -> {
+                    cloneAsDeclaration(configLine, childBuilder);
+                    childBuilder.ofType(configLine.getIdentifier());
+                  });
                 } else {
                   cloneAsDeclaration(child, childBuilder);
                 }

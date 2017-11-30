@@ -169,14 +169,14 @@ class InfrastructureElementModelDelegate {
                   return;
                 }
 
+                InternalComponentConfiguration.Builder innerComponent =
+                    InternalComponentConfiguration.builder()
+                        .withIdentifier(builder()
+                            .namespace(TLS_PREFIX)
+                            .name(name)
+                            .build());
 
                 if (TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER.equals(name)) {
-                  InternalComponentConfiguration.Builder revocationCheck = InternalComponentConfiguration.builder()
-                      .withIdentifier(builder()
-                          .namespace(TLS_PREFIX)
-                          .name(TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER)
-                          .build());
-
                   InfrastructureTypeMapping.getQName(objectValue.getTypeId())
                       .map(QNameModelProperty::getValue)
                       .ifPresent(qname -> {
@@ -186,21 +186,13 @@ class InfrastructureElementModelDelegate {
                                 .name(qname.getLocalPart())
                                 .build());
                         cloneParameters(objectValue, nested);
-                        revocationCheck.withNestedComponent(nested.build());
+                        innerComponent.withNestedComponent(nested.build());
                       });
-
-                  tlsConfig.withNestedComponent(revocationCheck.build());
                 } else {
-                  InternalComponentConfiguration.Builder nested = InternalComponentConfiguration.builder()
-                      .withIdentifier(builder()
-                          .namespace(TLS_PREFIX)
-                          .name(name)
-                          .build());
-
-                  cloneParameters(objectValue, nested);
-
-                  tlsConfig.withNestedComponent(nested.build());
+                  cloneParameters(objectValue, innerComponent);
                 }
+
+                tlsConfig.withNestedComponent(innerComponent.build());
               }
             }));
 
