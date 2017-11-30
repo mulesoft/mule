@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.el;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -22,11 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 
 public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
-  private Map<String, TypedValue> bindings;
+  private Map<String, Supplier<TypedValue>> bindings;
   private List<ExpressionModule> modules;
 
   public DefaultBindingContextBuilder() {
@@ -35,19 +37,25 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
   }
 
   public DefaultBindingContextBuilder(BindingContext bindingContext) {
-    this.bindings = bindingContext.identifiers().stream().collect(toMap(id -> id, id -> bindingContext.lookup(id).get()));
+    this.bindings = bindingContext.identifiers().stream().collect(toMap(id -> id, id -> () -> bindingContext.lookup(id).get()));
     this.modules = new ArrayList<>(bindingContext.modules());
   }
 
   @Override
   public BindingContext.Builder addBinding(String identifier, TypedValue value) {
-    bindings.put(identifier, value);
+    bindings.put(identifier, () -> value);
+    return this;
+  }
+
+  @Override
+  public BindingContext.Builder addBinding(String identifier, Supplier<TypedValue> lazyValue) {
+    bindings.put(identifier, lazyValue);
     return this;
   }
 
   @Override
   public BindingContext.Builder addAll(BindingContext context) {
-    context.identifiers().forEach(id -> bindings.put(id, context.lookup(id).get()));
+    context.identifiers().forEach(id -> bindings.put(id, () -> context.lookup(id).get()));
     modules.addAll(context.modules());
     return this;
   }
@@ -65,17 +73,18 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
   private class BindingContextImplementation implements BindingContext {
 
-    private Map<String, TypedValue> bindings;
+    private Map<String, Supplier<TypedValue>> bindings;
     private List<ExpressionModule> modules;
 
-    private BindingContextImplementation(Map<String, TypedValue> bindings, List<ExpressionModule> modules) {
+    private BindingContextImplementation(Map<String, Supplier<TypedValue>> bindings, List<ExpressionModule> modules) {
       this.bindings = unmodifiableMap(new HashMap<>(bindings));
       this.modules = unmodifiableList(new ArrayList<>(modules));
     }
 
     @Override
     public Collection<Binding> bindings() {
-      return bindings.entrySet().stream().map(entry -> new Binding(entry.getKey(), entry.getValue())).collect(toList());
+      return bindings.entrySet().stream()
+          .map(entry -> new Binding(entry.getKey(), entry.getValue() != null ? entry.getValue().get() : null)).collect(toList());
     }
 
     @Override
@@ -85,7 +94,8 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
     @Override
     public Optional<TypedValue> lookup(String identifier) {
-      return ofNullable(bindings.get(identifier));
+      final Supplier<TypedValue> supplier = bindings.get(identifier);
+      return supplier != null ? ofNullable(supplier.get()) : empty();
     }
 
     @Override
