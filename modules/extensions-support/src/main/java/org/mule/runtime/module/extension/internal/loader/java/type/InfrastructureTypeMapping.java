@@ -10,19 +10,25 @@ import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_CRL_FILE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_CUSTOM_OCSP_RESPONDER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_STANDARD_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
+
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tx.TransactionType;
+import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
-import org.mule.runtime.extension.api.property.QNameModelProperty;
+
 import com.google.common.collect.ImmutableMap;
 
-import javax.xml.namespace.QName;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.xml.namespace.QName;
 
 /**
  * Mapping for types considered of "Infrastructure", of the {@link Class} of the infrastructure type and the {@link String} name
@@ -32,6 +38,8 @@ import java.util.Optional;
  */
 public final class InfrastructureTypeMapping {
 
+  public static final String TLS_NAMESPACE_URI = "http://www.mulesoft.org/schema/mule/tls";
+
   private static Map<Class<?>, InfrastructureType> MAPPING = ImmutableMap.<Class<?>, InfrastructureType>builder()
       .put(TlsContextFactory.class, new InfrastructureType(TLS_PARAMETER_NAME, 8))
       .put(SourceTransactionalAction.class, new InfrastructureType(TRANSACTIONAL_ACTION_PARAMETER_NAME, 6))
@@ -40,9 +48,22 @@ public final class InfrastructureTypeMapping {
       .build();
 
   private static Map<String, QNameModelProperty> QNAMES = ImmutableMap.<String, QNameModelProperty>builder()
-      .put(TLS_PARAMETER_NAME, new QNameModelProperty(new QName("http://www.mulesoft.org/schema/mule/tls",
-                                                                TLS_CONTEXT_ELEMENT_IDENTIFIER,
-                                                                TLS_PREFIX)))
+      .put(TLS_PARAMETER_NAME,
+           new QNameModelProperty(new QName(TLS_NAMESPACE_URI,
+                                            TLS_CONTEXT_ELEMENT_IDENTIFIER,
+                                            TLS_PREFIX)))
+      .put(TLS_CUSTOM_OCSP_RESPONDER_ELEMENT_IDENTIFIER,
+           new QNameModelProperty(new QName(TLS_NAMESPACE_URI,
+                                            TLS_CUSTOM_OCSP_RESPONDER_ELEMENT_IDENTIFIER,
+                                            TLS_PREFIX)))
+      .put(TLS_STANDARD_REVOCATION_CHECK_ELEMENT_IDENTIFIER,
+           new QNameModelProperty(new QName(TLS_NAMESPACE_URI,
+                                            TLS_STANDARD_REVOCATION_CHECK_ELEMENT_IDENTIFIER,
+                                            TLS_PREFIX)))
+      .put(TLS_CRL_FILE_ELEMENT_IDENTIFIER,
+           new QNameModelProperty(new QName(TLS_NAMESPACE_URI,
+                                            TLS_CRL_FILE_ELEMENT_IDENTIFIER,
+                                            TLS_PREFIX)))
       .build();
 
   private static Map<String, ParameterDslConfiguration> DSL_CONFIGURATIONS =
@@ -67,8 +88,9 @@ public final class InfrastructureTypeMapping {
                    .build())
           .build();
 
-  private static Map<String, String> nameMap = MAPPING.entrySet().stream()
-      .collect(toImmutableMap(e -> e.getKey().getName(), e -> e.getValue().getName()));
+  private static Map<String, String> nameMap =
+      MAPPING.entrySet().stream().collect(
+                                          toImmutableMap(e -> e.getKey().getName(), e -> e.getValue().getName()));
 
   public static Map<Class<?>, InfrastructureType> getMap() {
     return MAPPING;

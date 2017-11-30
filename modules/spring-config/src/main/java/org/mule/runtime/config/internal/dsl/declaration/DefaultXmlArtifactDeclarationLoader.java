@@ -11,6 +11,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.CONNECTION;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
@@ -19,8 +21,6 @@ import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.c
 import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
 import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.CONNECTION;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
@@ -45,11 +45,32 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ComposableModel;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.construct.HasConstructModels;
+import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
+import org.mule.runtime.api.meta.model.operation.HasOperationModels;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.HasSourceModels;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.GlobalElementDeclaration;
@@ -75,25 +96,6 @@ import org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute;
 import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.config.internal.dsl.model.XmlArtifactDeclarationLoader;
-import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.ComposableModel;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.meta.model.construct.ConstructModel;
-import org.mule.runtime.api.meta.model.construct.HasConstructModels;
-import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
-import org.mule.runtime.api.meta.model.operation.HasOperationModels;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.meta.model.source.HasSourceModels;
-import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -728,7 +730,26 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         findAnyMatchingChildById(declaredConfigs, TLS_CONTEXT_ELEMENT_IDENTIFIER)
             .ifPresent(config -> {
               ParameterObjectValue.Builder tls = newObjectValue();
-              cloneAsDeclaration(config, tls);
+
+              copyExplicitAttributes(config.getConfigAttributes(), tls);
+
+              config.getChildren().forEach(child -> {
+                ParameterObjectValue.Builder childBuilder = newObjectValue();
+
+
+                if (child.getIdentifier().equals(TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER)) {
+
+                  cloneAsDeclaration(child.getChildren().get(0),
+                                     childBuilder);
+                  childBuilder.ofType(child.getChildren().get(0).getIdentifier());
+
+                } else {
+                  cloneAsDeclaration(child, childBuilder);
+                }
+
+                tls.withParameter(child.getIdentifier(), childBuilder.build());
+              });
+
               declarer.withParameterGroup(newParameterGroup()
                   .withParameter(TLS_PARAMETER_NAME, tls.build())
                   .getDeclaration());
@@ -742,9 +763,9 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
     return configs.stream().filter(c -> ids.contains(c.getIdentifier())).findFirst();
   }
 
-  private void cloneAsDeclaration(ConfigLine config, ParameterObjectValue.Builder poolingProfile) {
-    copyExplicitAttributes(config.getConfigAttributes(), poolingProfile);
-    copyChildren(config, poolingProfile);
+  private void cloneAsDeclaration(ConfigLine config, ParameterObjectValue.Builder objectValue) {
+    copyExplicitAttributes(config.getConfigAttributes(), objectValue);
+    copyChildren(config, objectValue);
   }
 
   private String getNamespace(ConfigLine configLine) {

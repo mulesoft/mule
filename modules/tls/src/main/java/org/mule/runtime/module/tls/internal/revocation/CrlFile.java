@@ -40,7 +40,7 @@ import javax.net.ssl.ManagerFactoryParameters;
  * Note that the signer of the CRL must be the client certificate's CA, in case that's not possible consider
  * using {@link CustomOcspResponder}.
  *
- * @since 3.9
+ * @since 4.1
  */
 public class CrlFile implements RevocationCheck {
 

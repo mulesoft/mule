@@ -31,7 +31,7 @@ import javax.net.ssl.ManagerFactoryParameters;
  * revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the
  * certificate, if any.
  *
- * @since 3.9
+ * @since 4.1
  */
 public class CustomOcspResponder implements RevocationCheck {
 

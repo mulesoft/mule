@@ -26,7 +26,7 @@ import javax.net.ssl.ManagerFactoryParameters;
  * corresponding extension points (additional tags for CRLDP or OCSP), and the availability
  * of revocation servers.
  *
- * @since 3.9
+ * @since 4.1
  */
 public class StandardRevocationCheck implements RevocationCheck {
 

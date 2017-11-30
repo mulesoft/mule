@@ -15,7 +15,7 @@ import javax.net.ssl.ManagerFactoryParameters;
 /**
  * Interface for certificate revocation checkers that prepare a trust manager factory configuration.
  *
- * @since 3.9
+ * @since 4.1
  */
 public interface RevocationCheck {
 
