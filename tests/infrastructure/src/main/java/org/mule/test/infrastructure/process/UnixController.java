@@ -42,7 +42,7 @@ public class UnixController extends AbstractOSController {
     if (this.doExecution(executor, new CommandLine(this.muleBin).addArgument("status"), newEnv) == 0) {
       Matcher matcher = STATUS_PATTERN.matcher(outputStream.toString());
       if (matcher.find()) {
-        return Integer.parseInt(matcher.group(2));
+        return Integer.parseInt(matcher.group(3));
       } else {
         throw new MuleControllerException("bin/mule status didn't return the expected pattern: " + STATUS);
       }
