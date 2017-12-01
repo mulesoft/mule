@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -45,6 +47,11 @@ public class SpringLifecycleCallbackTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws RegistrationException {
+    doAnswer(invocation -> {
+      Runnable task = (Runnable) invocation.getArguments()[0];
+      task.run();
+      return null;
+    }).when(muleContext).withLifecycleLock(any());
     springRegistry = mock(SpringRegistry.class, RETURNS_DEEP_STUBS);
     springRegistryLifecycleManager =
         new SpringRegistryLifecycleManager("id", springRegistry, muleContext, new MuleLifecycleInterceptor());
