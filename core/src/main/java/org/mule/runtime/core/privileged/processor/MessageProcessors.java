@@ -243,9 +243,6 @@ public class MessageProcessors {
         .doOnError(MessagingException.class,
                    me -> {
                      me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build());
-                     if (completeParentOnEmpty) {
-                       ((BaseEventContext) child).error(me);
-                     }
                    })
         .doOnSuccess(result -> {
           if (result == null && completeParentOnEmpty) {

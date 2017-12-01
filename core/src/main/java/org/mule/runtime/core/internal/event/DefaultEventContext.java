@@ -12,13 +12,13 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
-import static org.mule.runtime.core.internal.event.DefaultEventContextDumpService.currentContexts;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.EventContextDumpService;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
@@ -156,7 +156,8 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.processingTime = ProcessingTime.newInstance(flow);
     this.correlationId = correlationId;
 
-    eventContextDumpMaintain();
+    // Only generate flowStack dump information for when the eventContext is created for a flow.
+    eventContextDumpMaintain(flow.getMuleContext().getEventContextDumpService());
   }
 
   /**
@@ -179,15 +180,15 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.location = location;
     this.processingTime = null;
     this.correlationId = correlationId;
-
-    eventContextDumpMaintain();
   }
 
-  private void eventContextDumpMaintain() {
-    currentContexts.add(this);
-    this.onTerminated((e, t) -> {
-      currentContexts.remove(DefaultEventContext.this);
-    });
+  private void eventContextDumpMaintain(EventContextDumpService eventContextDumpService) {
+    if (eventContextDumpService != null && eventContextDumpService instanceof DefaultEventContextDumpService) {
+      ((DefaultEventContextDumpService) eventContextDumpService).addContext(this);
+      this.onTerminated((e, t) -> {
+        ((DefaultEventContextDumpService) eventContextDumpService).removeContext(DefaultEventContext.this);
+      });
+    }
   }
 
   @Override
@@ -256,7 +257,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public String toString() {
       return getClass().getSimpleName() + " { id: " + getId() + "; correlationId: " + parent.getCorrelationId()
-          + "; flowName: " + parent.getOriginatingLocation().getRootContainerName() + "; commponentLocation: "
+          + "; flowName: " + parent.getOriginatingLocation().getRootContainerName() + "; componentLocation: "
           + (componentLocation != null ? componentLocation.getLocation() : EMPTY) + ";";
     }
 

@@ -7,9 +7,6 @@
 
 package org.mule.functional.junit4;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
@@ -21,8 +18,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.EventContextDumpService;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import javax.inject.Inject;
@@ -98,12 +93,7 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
     }
     super.doTearDown();
 
-    if (eventContextDumpService != null) {
-      new PollingProber(RECEIVE_TIMEOUT, 100).check(new JUnitLambdaProbe(() -> {
-        assertThat(eventContextDumpService.getCurrentlyActiveFlowStacks(), is(empty()));
-        return true;
-      }));
-    }
+    // MULE-14151 Force a cleanup of stale contexts. This should be changed to an empty assertion
+    eventContextDumpService.getCurrentlyActiveFlowStacks();
   }
-
 }

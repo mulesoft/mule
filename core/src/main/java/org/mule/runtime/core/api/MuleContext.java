@@ -8,6 +8,7 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -24,6 +25,7 @@ import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.event.EventContextDumpService;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -283,6 +285,15 @@ public interface MuleContext extends Lifecycle {
   FlowTraceManager getFlowTraceManager();
 
   /**
+   * @return the keeper of all currently active {@link EventContext}s to generate a dump on demand.
+   *
+   * @since 4.1
+   */
+  default EventContextDumpService getEventContextDumpService() {
+    return null;
+  }
+
+  /**
    * @return the providers for additional context information for exceptions.
    *
    * @since 3.8.0
@@ -356,5 +367,6 @@ public interface MuleContext extends Lifecycle {
    * @return the deployment properties.
    */
   Properties getDeploymentProperties();
+
 }
 

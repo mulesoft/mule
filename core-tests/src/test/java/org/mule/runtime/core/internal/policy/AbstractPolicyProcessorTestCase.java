@@ -15,11 +15,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
@@ -45,6 +47,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
 
   private static final Message MESSAGE = Message.builder().value(PAYLOAD).attributesValue(new StringAttributes()).build();
 
+  private MuleContext muleContext = mockContextWithServices();
   protected Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
   protected Processor flowProcessor = mock(Processor.class);
   protected PolicyStateHandler policyStateHandler;
@@ -56,6 +59,8 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
 
   @Before
   public void before() {
+    when(mockFlowConstruct.getMuleContext()).thenReturn(muleContext);
+
     executionId = randomUUID().toString();
     initialEvent = createTestEvent();
 

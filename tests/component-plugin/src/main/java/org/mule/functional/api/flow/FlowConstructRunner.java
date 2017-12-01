@@ -254,6 +254,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
    * Clears the last built requestEvent, allowing for reuse of this runner.
    */
   public void reset() {
+    completeEventContext();
     requestEvent = null;
   }
 
@@ -264,7 +265,13 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
 
   @Override
   public void dispose() {
-    ((BaseEventContext) requestEvent.getContext()).success();
+    completeEventContext();
+  }
+
+  private void completeEventContext() {
+    if (requestEvent != null) {
+      ((BaseEventContext) requestEvent.getContext()).success();
+    }
   }
 
 }

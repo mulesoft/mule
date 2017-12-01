@@ -294,9 +294,11 @@ abstract class AbstractEventContext implements BaseEventContext {
     childContextsReadWriteLock.readLock().lock();
     try {
       for (BaseEventContext context : childContexts) {
-        childConsumer.accept(context);
-        if (context instanceof AbstractEventContext) {
-          ((AbstractEventContext) context).forEachChild(childConsumer);
+        if (!context.isTerminated()) {
+          childConsumer.accept(context);
+          if (context instanceof AbstractEventContext) {
+            ((AbstractEventContext) context).forEachChild(childConsumer);
+          }
         }
       }
     } finally {
