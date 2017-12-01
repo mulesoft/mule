@@ -18,6 +18,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleObject;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.lifecycle.phases.ContainerManagedLifecyclePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
@@ -48,6 +49,15 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
 
   @Override
   public void onTransition(String phaseName, T object) throws MuleException {
+    try {
+      registryLifecycleManager.muleContext.withLifecycleLock((CheckedRunnable) () -> doOnTransition(phaseName, object));
+    } catch (RuntimeException e) {
+      throw (MuleException) e.getCause();
+    }
+  }
+
+  private void doOnTransition(String phaseName, T object) throws MuleException {
+
     LifecyclePhase phase = registryLifecycleManager.phases.get(phaseName);
 
     if (LOGGER.isDebugEnabled()) {
@@ -145,4 +155,5 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
   public void setLifecycleInterceptor(LifecycleInterceptor interceptor) {
     this.interceptor = interceptor;
   }
+
 }
