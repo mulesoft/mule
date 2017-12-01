@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.config.internal;
 
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,7 +33,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -45,6 +52,11 @@ public class SpringLifecycleCallbackTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws RegistrationException {
+    doAnswer(invocation -> {
+      Runnable task = (Runnable) invocation.getArguments()[0];
+      task.run();
+      return null;
+    }).when(muleContext).withLifecycleLock(any());
     springRegistry = mock(SpringRegistry.class, RETURNS_DEEP_STUBS);
     springRegistryLifecycleManager =
         new SpringRegistryLifecycleManager("id", springRegistry, muleContext, new MuleLifecycleInterceptor());

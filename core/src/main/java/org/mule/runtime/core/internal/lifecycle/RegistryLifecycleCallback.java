@@ -49,7 +49,11 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
 
   @Override
   public void onTransition(String phaseName, T object) throws MuleException {
-    registryLifecycleManager.muleContext.withLifecycleLock((CheckedRunnable) () -> doOnTransition(phaseName, object));
+    try {
+      registryLifecycleManager.muleContext.withLifecycleLock((CheckedRunnable) () -> doOnTransition(phaseName, object));
+    } catch (RuntimeException e) {
+      throw (MuleException) e.getCause();
+    }
   }
 
 
@@ -72,7 +76,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     Set<Object> duplicates = new HashSet<>();
 
     final NotificationDispatcher notificationFirer = ((MuleContextWithRegistries) registryLifecycleManager.muleContext)
-            .getRegistry().lookupObject(NotificationDispatcher.class);
+        .getRegistry().lookupObject(NotificationDispatcher.class);
     for (LifecycleObject lifecycleObject : phase.getOrderedLifecycleObjects()) {
       lifecycleObject.firePreNotification(notificationFirer);
 

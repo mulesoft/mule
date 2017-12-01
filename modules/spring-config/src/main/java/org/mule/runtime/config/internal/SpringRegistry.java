@@ -12,10 +12,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.Injector;
@@ -325,16 +323,16 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
 
   protected <T> Map<String, T> internalLookupByTypeWithoutAncestorsAndObjectProviders(Class<T> type, boolean nonSingletons,
                                                                                       boolean eagerInit) {
-  try {
+    try {
       Map<String, T> beans = ((ObjectProviderAwareBeanFactory) applicationContext.getAutowireCapableBeanFactory())
-              .getBeansOfTypeWithObjectProviderObjects(type, nonSingletons, eagerInit);
+          .getBeansOfTypeWithObjectProviderObjects(type, nonSingletons, eagerInit);
       if (nonSingletons && eagerInit) {
         beans.forEach((key, value) -> applyLifecycleIfPrototype(value, key, true));
       }
       return beans;
     } catch (FatalBeanException fbex) {
       // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
-    String message = format("Failed to lookup beans of type %s from the Spring registry", type);
+      String message = format("Failed to lookup beans of type %s from the Spring registry", type);
       throw new MuleRuntimeException(createStaticMessage(message), fbex);
     } catch (Exception e) {
       if (logger.isDebugEnabled()) {
@@ -416,16 +414,12 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     }
 
     private void doRegisterObject(String key, Object value) throws RegistrationException {
-    if( getLifecycleManager().getCurrentPhase().equals(Stoppable.PHASE_NAME) || getLifecycleManager().getCurrentPhase().equals(Disposable.PHASE_NAME)) {
-      logger.warn(format("%s could not be registered in registry: %s because it was in an invalid lifecycle phase: %s",value,this,getLifecycleManager().getCurrentPhase()));
-      throw new RegistrationException(createStaticMessage(format("Can't register new object, registry in %s lifecycle phase",getLifecycleManager().getCurrentPhase())));
-    }
       if (springContextInitialised.get()) {
         if (applicationContext.containsBean(key)) {
           if (logger.isWarnEnabled()) {
             logger.warn(
-                    format("Spring registry already contains an object named '%s'. The previous object will be overwritten.",
-                        key));
+                        format("Spring registry already contains an object named '%s'. The previous object will be overwritten.",
+                               key));
           }
           SpringRegistry.this.unregisterObject(key);
         }
