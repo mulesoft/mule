@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.el.BindingContextUtils.FLOW;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
+import static org.mule.runtime.api.el.BindingContextUtils.addEventBuindingsToBuilder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.BindingContext.Builder;
+import org.mule.runtime.api.el.BindingContextUtils;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
@@ -203,13 +205,13 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
                                                           BindingContext context) {
     Builder contextBuilder;
     if (event != null) {
-      contextBuilder = BindingContext.builder(addEventBindings(event, context));
+      contextBuilder = addEventBuindingsToBuilder(event, context);
     } else {
       contextBuilder = BindingContext.builder(context);
     }
     if (componentLocation != null) {
-      contextBuilder.addBinding(FLOW, new TypedValue<>(new FlowVariablesAccessor(componentLocation.getRootContainerName()),
-                                                       fromType(FlowVariablesAccessor.class)));
+      contextBuilder.addBinding(FLOW, () -> new TypedValue<>(new FlowVariablesAccessor(componentLocation.getRootContainerName()),
+                                                             fromType(FlowVariablesAccessor.class)));
     }
     return contextBuilder;
   }
