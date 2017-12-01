@@ -56,7 +56,6 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     }
   }
 
-
   private void doOnTransition(String phaseName, T object) throws MuleException {
 
     LifecyclePhase phase = registryLifecycleManager.phases.get(phaseName);
@@ -156,5 +155,4 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
   public void setLifecycleInterceptor(LifecycleInterceptor interceptor) {
     this.interceptor = interceptor;
   }
-
 }

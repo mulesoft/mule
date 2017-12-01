@@ -409,8 +409,12 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
       return object;
     }
 
-    private void doRegisterObjectSynchronized(String key, Object value) {
-      muleContext.withLifecycleLock((CheckedRunnable) () -> doRegisterObject(key, value));
+    private void doRegisterObjectSynchronized(String key, Object value) throws RegistrationException {
+      try {
+        muleContext.withLifecycleLock((CheckedRunnable) () -> doRegisterObject(key, value));
+      } catch (RuntimeException e) {
+        throw (RegistrationException) e.getCause();
+      }
     }
 
     private void doRegisterObject(String key, Object value) throws RegistrationException {
