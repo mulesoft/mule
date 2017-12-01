@@ -8,7 +8,10 @@ package org.mule.test.petstore.extension;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
@@ -17,6 +20,7 @@ import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -27,6 +31,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
 import java.io.InputStream;
@@ -81,6 +86,11 @@ public class PetStoreOperations {
     return animal.toString();
   }
 
+  @OutputResolver(output = CorrelationInfoOutputResolver.class)
+  public CorrelationInfo getPetCorrelation(CorrelationInfo correlationInfo) {
+    return correlationInfo;
+  }
+
   public ExclusivePetBreeder getBreeder(@ParameterGroup(name = "Exclusive") ExclusivePetBreeder breeder) {
     return breeder;
   }
@@ -129,4 +139,17 @@ public class PetStoreOperations {
   }
 
   public void makePhoneCall(PhoneNumber phoneNumber) {}
+
+  public static class CorrelationInfoOutputResolver implements OutputTypeResolver<CorrelationInfo> {
+
+    @Override
+    public MetadataType getOutputType(MetadataContext context, CorrelationInfo key) {
+      return context.getTypeLoader().load(CorrelationInfo.class);
+    }
+
+    @Override
+    public String getCategoryName() {
+      return "correlationInfo";
+    }
+  }
 }
