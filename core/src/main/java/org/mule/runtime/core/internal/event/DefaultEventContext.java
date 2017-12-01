@@ -14,6 +14,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
@@ -157,7 +158,9 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.correlationId = correlationId;
 
     // Only generate flowStack dump information for when the eventContext is created for a flow.
-    eventContextDumpMaintain(flow.getMuleContext().getEventContextDumpService());
+    if (DefaultMuleConfiguration.isFlowTrace() && flow != null && flow.getMuleContext() != null) {
+      eventContextDumpMaintain(flow.getMuleContext().getEventContextDumpService());
+    }
   }
 
   /**

@@ -93,7 +93,9 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
     }
     super.doTearDown();
 
-    // MULE-14151 Force a cleanup of stale contexts. This should be changed to an empty assertion
-    eventContextDumpService.getCurrentlyActiveFlowStacks();
+    if (eventContextDumpService != null) {
+      // MULE-14151 Force a cleanup of stale contexts. This should be changed to an empty assertion
+      eventContextDumpService.getCurrentlyActiveFlowStacks();
+    }
   }
 }

@@ -18,27 +18,30 @@ import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
-import org.mule.runtime.api.component.execution.ExecutionResult;
-import org.mule.runtime.api.component.execution.InputEvent;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.component.execution.InputEvent;
+import org.mule.runtime.api.component.execution.ExecutionResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
+
 /**
  * Abstract implementation of {@link ExecutableComponent}.
- *
+ * 
  * @since 4.0
  */
 public abstract class AbstractExecutableComponent extends AbstractComponent implements ExecutableComponent {
@@ -58,7 +61,6 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
         .onErrorMap(throwable -> {
           MessagingException messagingException = (MessagingException) throwable;
           CoreEvent messagingExceptionEvent = messagingException.getEvent();
-          // ((BaseEventContext) messagingExceptionEvent.getContext()).error(messagingException);
           return new ComponentExecutionException(messagingExceptionEvent.getError().get().getCause(),
                                                  messagingExceptionEvent);
         })
@@ -83,7 +85,6 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
         .onErrorMap(throwable -> {
           MessagingException messagingException = (MessagingException) throwable;
           CoreEvent messagingExceptionEvent = messagingException.getEvent();
-          // ((BaseEventContext) messagingExceptionEvent.getContext()).error(messagingException);
           return new ComponentExecutionException(messagingExceptionEvent.getError().get().getCause(), messagingExceptionEvent);
         })
         .map(r -> builder(event.getContext(), r).build())
@@ -103,7 +104,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
   /**
    * Template method that allows to return a function to execute for this component. It may not be redefine by implementation of
    * this class if they are already instances of {@link Function<Publisher<CoreEvent>, Publisher<InternalEvent>>}
-   *
+   * 
    * @return an executable function. It must not be null.
    */
   protected ReactiveProcessor getExecutableFunction() {
@@ -128,7 +129,6 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
       this.complete = complete;
     }
 
-    @Override
     public Event getEvent() {
       return result;
     }
