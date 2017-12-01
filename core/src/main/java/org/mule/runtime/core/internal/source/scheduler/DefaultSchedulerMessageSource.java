@@ -81,7 +81,8 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     }
     try {
       // The initialization phase if handled by the scheduler
-      schedulingJob = scheduler.schedule(pollingExecutor, () -> run());
+      schedulingJob =
+          withContextClassLoader(muleContext.getExecutionClassLoader(), () -> scheduler.schedule(pollingExecutor, () -> run()));
       this.started = true;
     } catch (Exception ex) {
       this.stop();
