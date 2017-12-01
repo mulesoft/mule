@@ -377,7 +377,11 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
 
     @Override
     public void registerObject(String key, Object value) throws RegistrationException {
-      doRegisterObjectSynchronized(key, value);
+      try {
+        muleContext.withLifecycleLock((CheckedRunnable) () -> doRegisterObject(key, value));
+      } catch (RuntimeException e) {
+        throw (RegistrationException) e.getCause();
+      }
     }
 
     @Override
@@ -407,14 +411,6 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
       ((DefaultListableBeanFactory) applicationContext.getBeanFactory()).destroySingleton(key);
 
       return object;
-    }
-
-    private void doRegisterObjectSynchronized(String key, Object value) throws RegistrationException {
-      try {
-        muleContext.withLifecycleLock((CheckedRunnable) () -> doRegisterObject(key, value));
-      } catch (RuntimeException e) {
-        throw (RegistrationException) e.getCause();
-      }
     }
 
     private void doRegisterObject(String key, Object value) throws RegistrationException {
