@@ -155,4 +155,5 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
   public void setLifecycleInterceptor(LifecycleInterceptor interceptor) {
     this.interceptor = interceptor;
   }
+
 }
