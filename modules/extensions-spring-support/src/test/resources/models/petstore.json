@@ -470,6 +470,164 @@
                         "value": "NOT_SUPPORTED"
                       }
                     }
+                  },
+                  {
+                    "key": {
+                      "name": "revocation-check"
+                    },
+                    "model": {
+                      "type": "Union",
+                      "annotations": {
+                        "typeId": "RevocationCheck"
+                      },
+                      "of": [
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "standard-revocation-check",
+                            "description": {
+                              "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "onlyEndEntities"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Only verify the last element of the certificate chain."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "preferCrls"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Try CRL instead of OCSP first."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "noFallback"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Do not use the secondary checking method (the one not selected before)."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "softFail"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "custom-ocsp-responder",
+                            "description": {
+                              "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "url"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The URL of the OCSP responder."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "certAlias"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "crl-file",
+                            "description": {
+                              "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "path"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The path to the CRL file."
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
                   }
                 ]
               },
@@ -3693,6 +3851,164 @@
                             "value": "NOT_SUPPORTED"
                           }
                         }
+                      },
+                      {
+                        "key": {
+                          "name": "revocation-check"
+                        },
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "RevocationCheck"
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "standard-revocation-check",
+                                "description": {
+                                  "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "onlyEndEntities"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Only verify the last element of the certificate chain."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "preferCrls"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Try CRL instead of OCSP first."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "noFallback"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Do not use the secondary checking method (the one not selected before)."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "softFail"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "custom-ocsp-responder",
+                                "description": {
+                                  "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "url"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "The URL of the OCSP responder."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "certAlias"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "crl-file",
+                                "description": {
+                                  "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "path"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "The path to the CRL file."
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
+                        }
                       }
                     ]
                   },
@@ -4411,6 +4727,164 @@
                                   "value": "The algorithm used by the key store."
                                 }
                               }
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "revocation-check"
+                        },
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "RevocationCheck"
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "standard-revocation-check",
+                                "description": {
+                                  "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "onlyEndEntities"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Only verify the last element of the certificate chain."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "preferCrls"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Try CRL instead of OCSP first."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "noFallback"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Do not use the secondary checking method (the one not selected before)."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "softFail"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "custom-ocsp-responder",
+                                "description": {
+                                  "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "url"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "The URL of the OCSP responder."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "certAlias"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "crl-file",
+                                "description": {
+                                  "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "path"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "The path to the CRL file."
+                                    }
+                                  }
+                                }
+                              ]
                             }
                           ]
                         },
@@ -5145,6 +5619,164 @@
                                   "value": "The algorithm used by the key store."
                                 }
                               }
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "revocation-check"
+                        },
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "RevocationCheck"
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "standard-revocation-check",
+                                "description": {
+                                  "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "onlyEndEntities"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Only verify the last element of the certificate chain."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "preferCrls"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Try CRL instead of OCSP first."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "noFallback"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Do not use the secondary checking method (the one not selected before)."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "softFail"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "custom-ocsp-responder",
+                                "description": {
+                                  "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "url"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "The URL of the OCSP responder."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "certAlias"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "crl-file",
+                                "description": {
+                                  "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "path"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "The path to the CRL file."
+                                    }
+                                  }
+                                }
+                              ]
                             }
                           ]
                         },
@@ -6096,6 +6728,164 @@
                             "value": "NOT_SUPPORTED"
                           }
                         }
+                      },
+                      {
+                        "key": {
+                          "name": "revocation-check"
+                        },
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "RevocationCheck"
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "standard-revocation-check",
+                                "description": {
+                                  "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "onlyEndEntities"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Only verify the last element of the certificate chain."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "preferCrls"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Try CRL instead of OCSP first."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "noFallback"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Do not use the secondary checking method (the one not selected before)."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "softFail"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "custom-ocsp-responder",
+                                "description": {
+                                  "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "url"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "The URL of the OCSP responder."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "certAlias"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "crl-file",
+                                "description": {
+                                  "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "path"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "The path to the CRL file."
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
+                        }
                       }
                     ]
                   },
@@ -6814,6 +7604,164 @@
                                   "value": "The algorithm used by the key store."
                                 }
                               }
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "revocation-check"
+                        },
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "RevocationCheck"
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "standard-revocation-check",
+                                "description": {
+                                  "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "onlyEndEntities"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Only verify the last element of the certificate chain."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "preferCrls"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Try CRL instead of OCSP first."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "noFallback"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Do not use the secondary checking method (the one not selected before)."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "softFail"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "custom-ocsp-responder",
+                                "description": {
+                                  "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "url"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "The URL of the OCSP responder."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "certAlias"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "crl-file",
+                                "description": {
+                                  "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "path"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "The path to the CRL file."
+                                    }
+                                  }
+                                }
+                              ]
                             }
                           ]
                         },
@@ -9706,6 +10654,164 @@
                         "value": "NOT_SUPPORTED"
                       }
                     }
+                  },
+                  {
+                    "key": {
+                      "name": "revocation-check"
+                    },
+                    "model": {
+                      "type": "Union",
+                      "annotations": {
+                        "typeId": "RevocationCheck"
+                      },
+                      "of": [
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "standard-revocation-check",
+                            "description": {
+                              "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "onlyEndEntities"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Only verify the last element of the certificate chain."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "preferCrls"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Try CRL instead of OCSP first."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "noFallback"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Do not use the secondary checking method (the one not selected before)."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "softFail"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "custom-ocsp-responder",
+                            "description": {
+                              "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "url"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The URL of the OCSP responder."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "certAlias"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "crl-file",
+                            "description": {
+                              "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "path"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The path to the CRL file."
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
                   }
                 ]
               },
@@ -10424,6 +11530,164 @@
                               "value": "The algorithm used by the key store."
                             }
                           }
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "revocation-check"
+                    },
+                    "model": {
+                      "type": "Union",
+                      "annotations": {
+                        "typeId": "RevocationCheck"
+                      },
+                      "of": [
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "standard-revocation-check",
+                            "description": {
+                              "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "onlyEndEntities"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Only verify the last element of the certificate chain."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "preferCrls"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Try CRL instead of OCSP first."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "noFallback"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Do not use the secondary checking method (the one not selected before)."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "softFail"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "custom-ocsp-responder",
+                            "description": {
+                              "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "url"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The URL of the OCSP responder."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "certAlias"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "crl-file",
+                            "description": {
+                              "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "path"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The path to the CRL file."
+                                }
+                              }
+                            }
+                          ]
                         }
                       ]
                     },
@@ -11158,6 +12422,164 @@
                               "value": "The algorithm used by the key store."
                             }
                           }
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "revocation-check"
+                    },
+                    "model": {
+                      "type": "Union",
+                      "annotations": {
+                        "typeId": "RevocationCheck"
+                      },
+                      "of": [
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "standard-revocation-check",
+                            "description": {
+                              "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "onlyEndEntities"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Only verify the last element of the certificate chain."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "preferCrls"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Try CRL instead of OCSP first."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "noFallback"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Do not use the secondary checking method (the one not selected before)."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "softFail"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "custom-ocsp-responder",
+                            "description": {
+                              "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "url"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The URL of the OCSP responder."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "certAlias"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "crl-file",
+                            "description": {
+                              "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "path"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The path to the CRL file."
+                                }
+                              }
+                            }
+                          ]
                         }
                       ]
                     },
@@ -12109,6 +13531,164 @@
                         "value": "NOT_SUPPORTED"
                       }
                     }
+                  },
+                  {
+                    "key": {
+                      "name": "revocation-check"
+                    },
+                    "model": {
+                      "type": "Union",
+                      "annotations": {
+                        "typeId": "RevocationCheck"
+                      },
+                      "of": [
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "standard-revocation-check",
+                            "description": {
+                              "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "onlyEndEntities"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Only verify the last element of the certificate chain."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "preferCrls"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Try CRL instead of OCSP first."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "noFallback"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Do not use the secondary checking method (the one not selected before)."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "softFail"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "custom-ocsp-responder",
+                            "description": {
+                              "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "url"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The URL of the OCSP responder."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "certAlias"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "crl-file",
+                            "description": {
+                              "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "path"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The path to the CRL file."
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
                   }
                 ]
               },
@@ -12827,6 +14407,164 @@
                               "value": "The algorithm used by the key store."
                             }
                           }
+                        }
+                      ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "revocation-check"
+                    },
+                    "model": {
+                      "type": "Union",
+                      "annotations": {
+                        "typeId": "RevocationCheck"
+                      },
+                      "of": [
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "standard-revocation-check",
+                            "description": {
+                              "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "onlyEndEntities"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Only verify the last element of the certificate chain."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "preferCrls"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Try CRL instead of OCSP first."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "noFallback"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Do not use the secondary checking method (the one not selected before)."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "softFail"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "custom-ocsp-responder",
+                            "description": {
+                              "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "url"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The URL of the OCSP responder."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "certAlias"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "crl-file",
+                            "description": {
+                              "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "path"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The path to the CRL file."
+                                }
+                              }
+                            }
+                          ]
                         }
                       ]
                     },
@@ -14312,6 +16050,164 @@
                     "value": "NOT_SUPPORTED"
                   }
                 }
+              },
+              {
+                "key": {
+                  "name": "revocation-check"
+                },
+                "model": {
+                  "type": "Union",
+                  "annotations": {
+                    "typeId": "RevocationCheck"
+                  },
+                  "of": [
+                    {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "standard-revocation-check",
+                        "description": {
+                          "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "onlyEndEntities"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "false"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Only verify the last element of the certificate chain."
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "preferCrls"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "false"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Try CRL instead of OCSP first."
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "noFallback"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "false"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Do not use the secondary checking method (the one not selected before)."
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "softFail"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "false"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "custom-ocsp-responder",
+                        "description": {
+                          "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "url"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "The URL of the OCSP responder."
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "certAlias"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "crl-file",
+                        "description": {
+                          "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "path"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "The path to the CRL file."
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "annotations": {
+                  "parameterDsl": {
+                    "allowInlineDefinition": true,
+                    "allowReferences": false
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
+                }
               }
             ]
           },
@@ -14773,6 +16669,164 @@
                     "value": "NOT_SUPPORTED"
                   }
                 }
+              },
+              {
+                "key": {
+                  "name": "revocation-check"
+                },
+                "model": {
+                  "type": "Union",
+                  "annotations": {
+                    "typeId": "RevocationCheck"
+                  },
+                  "of": [
+                    {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "standard-revocation-check",
+                        "description": {
+                          "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "onlyEndEntities"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "false"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Only verify the last element of the certificate chain."
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "preferCrls"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "false"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Try CRL instead of OCSP first."
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "noFallback"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "false"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Do not use the secondary checking method (the one not selected before)."
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "softFail"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "false"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "custom-ocsp-responder",
+                        "description": {
+                          "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "url"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "The URL of the OCSP responder."
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "certAlias"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "crl-file",
+                        "description": {
+                          "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "path"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "The path to the CRL file."
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "annotations": {
+                  "parameterDsl": {
+                    "allowInlineDefinition": true,
+                    "allowReferences": false
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
+                }
               }
             ]
           },
@@ -15136,6 +17190,164 @@
                           "value": "The algorithm used by the key store."
                         }
                       }
+                    }
+                  ]
+                },
+                "annotations": {
+                  "parameterDsl": {
+                    "allowInlineDefinition": true,
+                    "allowReferences": false
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "revocation-check"
+                },
+                "model": {
+                  "type": "Union",
+                  "annotations": {
+                    "typeId": "RevocationCheck"
+                  },
+                  "of": [
+                    {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "standard-revocation-check",
+                        "description": {
+                          "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "onlyEndEntities"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "false"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Only verify the last element of the certificate chain."
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "preferCrls"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "false"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Try CRL instead of OCSP first."
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "noFallback"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "false"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Do not use the secondary checking method (the one not selected before)."
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "softFail"
+                          },
+                          "model": {
+                            "type": "Boolean",
+                            "annotations": {
+                              "default": "false"
+                            }
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "custom-ocsp-responder",
+                        "description": {
+                          "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "url"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "The URL of the OCSP responder."
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "name": "certAlias"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "crl-file",
+                        "description": {
+                          "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                        }
+                      },
+                      "fields": [
+                        {
+                          "key": {
+                            "name": "path"
+                          },
+                          "model": {
+                            "type": "String"
+                          },
+                          "annotations": {
+                            "description": {
+                              "value": "The path to the CRL file."
+                            }
+                          }
+                        }
+                      ]
                     }
                   ]
                 },
@@ -15552,6 +17764,164 @@
                                 "value": "The algorithm used by the key store."
                               }
                             }
+                          }
+                        ]
+                      },
+                      "annotations": {
+                        "parameterDsl": {
+                          "allowInlineDefinition": true,
+                          "allowReferences": false
+                        },
+                        "expressionSupport": {
+                          "value": "NOT_SUPPORTED"
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "revocation-check"
+                      },
+                      "model": {
+                        "type": "Union",
+                        "annotations": {
+                          "typeId": "RevocationCheck"
+                        },
+                        "of": [
+                          {
+                            "type": "Object",
+                            "annotations": {
+                              "typeId": "standard-revocation-check",
+                              "description": {
+                                "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                              }
+                            },
+                            "fields": [
+                              {
+                                "key": {
+                                  "name": "onlyEndEntities"
+                                },
+                                "model": {
+                                  "type": "Boolean",
+                                  "annotations": {
+                                    "default": "false"
+                                  }
+                                },
+                                "annotations": {
+                                  "description": {
+                                    "value": "Only verify the last element of the certificate chain."
+                                  }
+                                }
+                              },
+                              {
+                                "key": {
+                                  "name": "preferCrls"
+                                },
+                                "model": {
+                                  "type": "Boolean",
+                                  "annotations": {
+                                    "default": "false"
+                                  }
+                                },
+                                "annotations": {
+                                  "description": {
+                                    "value": "Try CRL instead of OCSP first."
+                                  }
+                                }
+                              },
+                              {
+                                "key": {
+                                  "name": "noFallback"
+                                },
+                                "model": {
+                                  "type": "Boolean",
+                                  "annotations": {
+                                    "default": "false"
+                                  }
+                                },
+                                "annotations": {
+                                  "description": {
+                                    "value": "Do not use the secondary checking method (the one not selected before)."
+                                  }
+                                }
+                              },
+                              {
+                                "key": {
+                                  "name": "softFail"
+                                },
+                                "model": {
+                                  "type": "Boolean",
+                                  "annotations": {
+                                    "default": "false"
+                                  }
+                                },
+                                "annotations": {
+                                  "description": {
+                                    "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Object",
+                            "annotations": {
+                              "typeId": "custom-ocsp-responder",
+                              "description": {
+                                "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                              }
+                            },
+                            "fields": [
+                              {
+                                "key": {
+                                  "name": "url"
+                                },
+                                "model": {
+                                  "type": "String"
+                                },
+                                "annotations": {
+                                  "description": {
+                                    "value": "The URL of the OCSP responder."
+                                  }
+                                }
+                              },
+                              {
+                                "key": {
+                                  "name": "certAlias"
+                                },
+                                "model": {
+                                  "type": "String"
+                                },
+                                "annotations": {
+                                  "description": {
+                                    "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "type": "Object",
+                            "annotations": {
+                              "typeId": "crl-file",
+                              "description": {
+                                "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                              }
+                            },
+                            "fields": [
+                              {
+                                "key": {
+                                  "name": "path"
+                                },
+                                "model": {
+                                  "type": "String"
+                                },
+                                "annotations": {
+                                  "description": {
+                                    "value": "The path to the CRL file."
+                                  }
+                                }
+                              }
+                            ]
                           }
                         ]
                       },
@@ -15994,6 +18364,164 @@
                                   "value": "The algorithm used by the key store."
                                 }
                               }
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "revocation-check"
+                        },
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "RevocationCheck"
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "standard-revocation-check",
+                                "description": {
+                                  "value": "Uses the standard JVM certificate revocation checks, which depend on the certificate having the corresponding extension points (additional tags for CRLDP or OCSP), and the availability of revocation servers."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "onlyEndEntities"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Only verify the last element of the certificate chain."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "preferCrls"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Try CRL instead of OCSP first."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "noFallback"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Do not use the secondary checking method (the one not selected before)."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "softFail"
+                                  },
+                                  "model": {
+                                    "type": "Boolean",
+                                    "annotations": {
+                                      "default": "false"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Avoid verification failure when the revocation server can not be reached or is busy."
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "custom-ocsp-responder",
+                                "description": {
+                                  "value": "Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the certificate, if any."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "url"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "The URL of the OCSP responder."
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "certAlias"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "Alias of the signing certificate for the OCSP response (must be in the trust store), if present."
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "crl-file",
+                                "description": {
+                                  "value": "Local file based certificate revocation checker, which requires a CRL file to be accessible and ignores extension points (additional tags for CRLDP and OCSP) in the certificate."
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "path"
+                                  },
+                                  "model": {
+                                    "type": "String"
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "The path to the CRL file."
+                                    }
+                                  }
+                                }
+                              ]
                             }
                           ]
                         },

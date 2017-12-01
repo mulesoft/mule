@@ -30,7 +30,9 @@ import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_KEY_STORE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.app.declaration.api.ParameterValue;
@@ -41,6 +43,8 @@ import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.property.QNameModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -155,21 +159,40 @@ class InfrastructureElementModelDelegate {
 
               @Override
               public void visitObjectValue(ParameterObjectValue objectValue) {
-                if (!(TLS_KEY_STORE_ELEMENT_IDENTIFIER.equals(name) || TLS_TRUST_STORE_ELEMENT_IDENTIFIER.equals(name))) {
+                if (!(TLS_KEY_STORE_ELEMENT_IDENTIFIER.equals(name)
+                    || TLS_TRUST_STORE_ELEMENT_IDENTIFIER.equals(name)
+                    || TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER.equals(name))) {
+
                   if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug(format("Skipping unknown parameter with name [%s] for TLSContext", name));
                   }
                   return;
                 }
 
-                InternalComponentConfiguration.Builder nested = InternalComponentConfiguration.builder()
-                    .withIdentifier(builder()
-                        .namespace(TLS_PREFIX)
-                        .name(name)
-                        .build());
+                InternalComponentConfiguration.Builder innerComponent =
+                    InternalComponentConfiguration.builder()
+                        .withIdentifier(builder()
+                            .namespace(TLS_PREFIX)
+                            .name(name)
+                            .build());
 
-                cloneParameters(objectValue, nested);
-                tlsConfig.withNestedComponent(nested.build());
+                if (TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER.equals(name)) {
+                  InfrastructureTypeMapping.getQName(objectValue.getTypeId())
+                      .map(QNameModelProperty::getValue)
+                      .ifPresent(qname -> {
+                        InternalComponentConfiguration.Builder nested = InternalComponentConfiguration.builder()
+                            .withIdentifier(builder()
+                                .namespace(qname.getPrefix())
+                                .name(qname.getLocalPart())
+                                .build());
+                        cloneParameters(objectValue, nested);
+                        innerComponent.withNestedComponent(nested.build());
+                      });
+                } else {
+                  cloneParameters(objectValue, innerComponent);
+                }
+
+                tlsConfig.withNestedComponent(innerComponent.build());
               }
             }));
 
@@ -277,13 +300,14 @@ class InfrastructureElementModelDelegate {
         .withConfig(result).build());
   }
 
-  private void cloneParameters(ParameterObjectValue objectValue, final InternalComponentConfiguration.Builder redeliveryConfig) {
+  private void cloneParameters(ParameterObjectValue objectValue,
+                               final InternalComponentConfiguration.Builder config) {
     objectValue.getParameters()
         .forEach((name, value) -> value.accept(new ParameterValueVisitor() {
 
           @Override
           public void visitSimpleValue(ParameterSimpleValue text) {
-            redeliveryConfig.withParameter(name, text.getValue());
+            config.withParameter(name, text.getValue());
           }
 
         }));

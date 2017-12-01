@@ -13,6 +13,11 @@ import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
+import org.mule.runtime.api.tls.TlsRevocationCheckBuilder;
+import org.mule.runtime.core.privileged.security.RevocationCheck;
+import org.mule.runtime.module.tls.internal.revocation.CrlFile;
+import org.mule.runtime.module.tls.internal.revocation.CustomOcspResponder;
+import org.mule.runtime.module.tls.internal.revocation.StandardRevocationCheck;
 
 import java.io.IOException;
 
@@ -23,6 +28,8 @@ public class DefaultTlsContextFactoryBuilder implements TlsContextFactoryBuilder
 
   private String trustStorePath;
   private String keyStorePath;
+
+  private RevocationCheck selectedRevocationCheck;
 
   public DefaultTlsContextFactoryBuilder(TlsContextFactory defaultTlsContextFactory) {
     this.defaultTlsContextFactory = defaultTlsContextFactory;
@@ -113,6 +120,43 @@ public class DefaultTlsContextFactoryBuilder implements TlsContextFactoryBuilder
   }
 
   @Override
+  public TlsRevocationCheckBuilder revocationCheck() {
+    TlsContextFactoryBuilder contextFactoryBuilder = this;
+
+    return new TlsRevocationCheckBuilder() {
+
+      @Override
+      public TlsContextFactoryBuilder standard(boolean onlyEndEntities, boolean preferCrls, boolean noFallback,
+                                               boolean softFail) {
+        StandardRevocationCheck revocationCheck = new StandardRevocationCheck();
+        revocationCheck.setOnlyEndEntities(onlyEndEntities);
+        revocationCheck.setPreferCrls(preferCrls);
+        revocationCheck.setNoFallback(noFallback);
+        revocationCheck.setSoftFail(softFail);
+        selectedRevocationCheck = revocationCheck;
+        return contextFactoryBuilder;
+      }
+
+      @Override
+      public TlsContextFactoryBuilder customOcsp(String url, String certAlias) {
+        CustomOcspResponder revocationCheck = new CustomOcspResponder();
+        revocationCheck.setUrl(url);
+        revocationCheck.setCertAlias(certAlias);
+        selectedRevocationCheck = revocationCheck;
+        return contextFactoryBuilder;
+      }
+
+      @Override
+      public TlsContextFactoryBuilder crlFile(String path) {
+        CrlFile revocationCheck = new CrlFile();
+        revocationCheck.setPath(path);
+        selectedRevocationCheck = revocationCheck;
+        return contextFactoryBuilder;
+      }
+    };
+  }
+
+  @Override
   public TlsContextFactory build() throws CreateException {
     try {
       if (trustStorePath != null) {
@@ -120,6 +164,9 @@ public class DefaultTlsContextFactoryBuilder implements TlsContextFactoryBuilder
       }
       if (keyStorePath != null) {
         tlsContextFactory.setKeyStorePath(keyStorePath);
+      }
+      if (selectedRevocationCheck != null) {
+        tlsContextFactory.setRevocationCheck(selectedRevocationCheck);
       }
       tlsContextFactory.initialise();
     } catch (IOException e) {

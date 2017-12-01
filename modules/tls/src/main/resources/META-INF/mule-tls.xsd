@@ -54,20 +54,29 @@
     <xsd:complexType name="tlsContextType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">
-                <xsd:choice minOccurs="1">
-                    <xsd:sequence>
-                        <xsd:element ref="trust-store" minOccurs="1" maxOccurs="1"/>
-                        <xsd:element ref="key-store" minOccurs="0" maxOccurs="1"/>
-                    </xsd:sequence>
-                    <xsd:sequence>
-                        <xsd:element ref="trust-store" minOccurs="0" maxOccurs="1"/>
-                        <xsd:element ref="key-store" minOccurs="1" maxOccurs="1"/>
-                    </xsd:sequence>
-                    <xsd:sequence>
-                        <xsd:element ref="trust-store" minOccurs="1" maxOccurs="1"/>
-                        <xsd:element ref="key-store" minOccurs="1" maxOccurs="1"/>
-                    </xsd:sequence>
-                </xsd:choice>
+                <xsd:sequence>
+                    <xsd:choice minOccurs="1">
+                        <xsd:sequence>
+                            <xsd:element ref="trust-store" minOccurs="1" maxOccurs="1" />
+                            <xsd:element ref="key-store" minOccurs="0" maxOccurs="1" />
+                        </xsd:sequence>
+                        <xsd:sequence>
+                            <xsd:element ref="trust-store" minOccurs="0" maxOccurs="1" />
+                            <xsd:element ref="key-store" minOccurs="1" maxOccurs="1" />
+                        </xsd:sequence>
+                        <xsd:sequence>
+                            <xsd:element ref="trust-store" minOccurs="1" maxOccurs="1" />
+                            <xsd:element ref="key-store" minOccurs="1" maxOccurs="1" />
+                        </xsd:sequence>
+                    </xsd:choice>
+                    <xsd:element name="revocation-check" type="rcWrapperElement" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Enable certificate revocation checking.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="name" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -92,7 +101,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
 
     <xsd:complexType name="tlsContextTrustStoreType">
         <xsd:attribute name="path" type="xsd:string">
@@ -176,6 +184,95 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The algorithm used by the key store.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="rcWrapperElement">
+        <xsd:choice minOccurs="1" maxOccurs="1">
+            <xsd:element name="standard-revocation-check" type="rcStandardType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Standard Java certificate revocation checking.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="crl-file" type="rcCrlFileType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Revocation checking from a local CRL (Certificate Revocation List) file.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="custom-ocsp-responder" type="rcCustomOcspType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Revocation checking against a custom OCSP provider.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="rcStandardType">
+        <xsd:attribute name="onlyEndEntities" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Only check the revocation status of end-entity certificates. Defaults to false.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="preferCrls" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Prefer CRLs to OCSP. The default behavior is to prefer OCSP. Defaults to false.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="noFallback" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Disable the fallback mechanism (the alternative algorithm, for instance if CRLs are
+                    selected it would be OCSP). Defaults to false.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="softFail" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Allow revocation check to succeed if the revocation status cannot be determined because of
+                    network or server errors. This is a possible security risk. Defaults to false.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="rcCrlFileType">
+        <xsd:attribute name="path" type="mule:substitutableString">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The path to a CRL (Certificate Revocation List) file to be used for this trust store.
+                    A certificate mentioned there will not be accepted for authentication.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="rcCustomOcspType">
+        <xsd:attribute name="url" type="mule:substitutableString">
+            <xsd:annotation>
+                <xsd:documentation>
+                    URL that identifies the location of the OCSP responder. This is used instead of the corresponding field
+                    in the certificate extension.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="certAlias" type="mule:substitutableString">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Alias of the certificate that signs the OCSP response, instead of the corresponding CA.
+                    Must be present in the trust store.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

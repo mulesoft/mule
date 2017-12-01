@@ -6,26 +6,23 @@
  */
 package org.mule.runtime.module.tls.internal;
 
-
 import static java.util.Arrays.copyOf;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
-import org.mule.runtime.core.internal.secutiry.tls.RestrictedSSLServerSocketFactory;
-import org.mule.runtime.core.internal.secutiry.tls.RestrictedSSLSocketFactory;
-import org.mule.runtime.core.privileged.security.tls.TlsConfiguration;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.internal.secutiry.tls.RestrictedSSLServerSocketFactory;
+import org.mule.runtime.core.internal.secutiry.tls.RestrictedSSLSocketFactory;
 import org.mule.runtime.core.internal.util.ArrayUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.runtime.core.privileged.security.RevocationCheck;
+import org.mule.runtime.core.privileged.security.tls.TlsConfiguration;
 
 import com.google.common.base.Joiner;
 
@@ -41,6 +38,9 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.xml.namespace.QName;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the {@code TlsContextFactory} interface, which delegates all its operations to a
@@ -214,6 +214,9 @@ public class DefaultTlsContextFactory extends AbstractComponent implements TlsCo
     this.trustStoreInsecure = insecure;
   }
 
+  public void setRevocationCheck(RevocationCheck revocationCheck) {
+    tlsConfiguration.setRevocationCheck(revocationCheck);
+  }
 
   @Override
   public SSLContext createSslContext() throws KeyManagementException, NoSuchAlgorithmException {
