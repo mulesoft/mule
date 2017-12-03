@@ -225,8 +225,9 @@
         <smackVersion>3.4.1</smackVersion>
         <springOsgiVersion>1.0.2</springOsgiVersion>
         <springVersion>4.1.9.RELEASE</springVersion>
-        <springSecurityVersion>4.0.4.RELEASE</springSecurityVersion>
         <sshCoreVersion>1.0.0</sshCoreVersion>
+        <springSecurityVersion>4.2.3.RELEASE</springSecurityVersion>
+        <springLdapVersion>2.3.2.RELEASE</springLdapVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <staxApiVersion>3.1.4</staxApiVersion>
         <staxonVersion>1.2</staxonVersion>
