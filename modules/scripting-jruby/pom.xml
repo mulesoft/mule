@@ -104,7 +104,7 @@
         <dependency>
             <groupId>com.github.jnr</groupId>
             <artifactId>jnr-posix</artifactId>
-            <version>3.0.41</version>
+            <version>3.0.42</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.github.jnr</groupId>
@@ -151,7 +151,7 @@
         <dependency>
             <groupId>com.headius</groupId>
             <artifactId>invokebinder</artifactId>
-            <version>1.7</version>
+            <version>1.10</version>
         </dependency>
         <dependency>
             <groupId>com.headius</groupId>
