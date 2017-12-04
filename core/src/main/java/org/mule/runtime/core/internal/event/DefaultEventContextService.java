@@ -11,7 +11,7 @@ import static java.util.concurrent.ConcurrentHashMap.newKeySet;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.event.EventContextDumpService;
+import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.slf4j.Logger;
@@ -25,21 +25,21 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Implementation of {@link EventContextDumpService} that keeps a reference to all active {@link DefaultEventContext}s in the Mule
+ * Implementation of {@link EventContextService} that keeps a reference to all active {@link DefaultEventContext}s in the Mule
  * Runtime.
  *
  * @since 4.1
  */
-public class DefaultEventContextDumpService implements EventContextDumpService {
+public class DefaultEventContextService implements EventContextService {
 
-  private static Logger LOGGER = getLogger(DefaultEventContextDumpService.class);
+  private static Logger LOGGER = getLogger(DefaultEventContextService.class);
 
   private final ReferenceQueue<DefaultEventContext> queue = new ReferenceQueue<>();
   private Set<WeakReference<DefaultEventContext>> currentContexts = newKeySet(512);
 
   @Override
-  public List<FlowStackDumpEntry> getCurrentlyActiveFlowStacks() {
-    List<FlowStackDumpEntry> flowStacks = new ArrayList<>();
+  public List<FlowStackEntry> getCurrentlyActiveFlowStacks() {
+    List<FlowStackEntry> flowStacks = new ArrayList<>();
 
     Set<WeakReference<DefaultEventContext>> gcdContexts = new HashSet<>();
 
@@ -49,8 +49,8 @@ public class DefaultEventContextDumpService implements EventContextDumpService {
       if (context == null) {
         gcdContexts.add(contextRef);
       } else {
-        flowStacks.add(new DefaultFlowStackDumpEntry(context));
-        context.forEachChild(childContext -> flowStacks.add(new DefaultFlowStackDumpEntry(childContext)));
+        flowStacks.add(new DefaultFlowStackEntry(context));
+        context.forEachChild(childContext -> flowStacks.add(new DefaultFlowStackEntry(childContext)));
       }
     }
 
@@ -74,13 +74,13 @@ public class DefaultEventContextDumpService implements EventContextDumpService {
     }
   }
 
-  private static final class DefaultFlowStackDumpEntry implements FlowStackDumpEntry {
+  private static final class DefaultFlowStackEntry implements FlowStackEntry {
 
     private final String serverId;
     private final String eventId;
     private final FlowCallStack flowCallStack;
 
-    public DefaultFlowStackDumpEntry(BaseEventContext context) {
+    public DefaultFlowStackEntry(BaseEventContext context) {
       this.serverId = context.getServerId();
       this.eventId = context.getId();
       this.flowCallStack = context.getFlowCallStack().clone();

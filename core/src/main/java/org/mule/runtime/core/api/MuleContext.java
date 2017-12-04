@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.EventContextDumpService;
+import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -289,7 +289,7 @@ public interface MuleContext extends Lifecycle {
    *
    * @since 4.1
    */
-  default EventContextDumpService getEventContextDumpService() {
+  default EventContextService getEventContextService() {
     return null;
   }
 

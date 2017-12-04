@@ -92,7 +92,7 @@ import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.api.event.EventContextDumpService;
+import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
@@ -105,7 +105,7 @@ import org.mule.runtime.core.internal.context.notification.DefaultNotificationDi
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.context.notification.MessageProcessingFlowTraceManager;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.internal.event.DefaultEventContextDumpService;
+import org.mule.runtime.core.internal.event.DefaultEventContextService;
 import org.mule.runtime.core.internal.exception.MessagingExceptionLocationProvider;
 import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
@@ -191,7 +191,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_NOTIFICATION_MANAGER, createNotificationManagerBeanDefinition())
       .put(OBJECT_NOTIFICATION_DISPATCHER, getBeanDefinition(DefaultNotificationDispatcher.class))
       .put(NotificationListenerRegistry.REGISTRY_KEY, getBeanDefinition(DefaultNotificationListenerRegistry.class))
-      .put(EventContextDumpService.REGISTRY_KEY, getBeanDefinition(DefaultEventContextDumpService.class))
+      .put(EventContextService.REGISTRY_KEY, getBeanDefinition(DefaultEventContextService.class))
       .put(BASE_IN_MEMORY_OBJECT_STORE_KEY,
            getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_STORE_IN_MEMORY)
                .getBeanDefinition())

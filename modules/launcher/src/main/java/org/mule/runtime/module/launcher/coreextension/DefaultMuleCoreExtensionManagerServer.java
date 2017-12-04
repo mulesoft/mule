@@ -18,7 +18,7 @@ import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.event.EventContextDumpService;
+import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -48,7 +48,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   private List<MuleCoreExtension> orderedCoreExtensions;
   private ArtifactClassLoaderManager artifactClassLoaderManager;
   private ServiceRepository serviceRepository;
-  private EventContextDumpService eventContextDumpService;
+  private EventContextService eventContextService;
 
   public DefaultMuleCoreExtensionManagerServer(MuleCoreExtensionDiscoverer coreExtensionDiscoverer,
                                                MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver) {
@@ -161,7 +161,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
         .withServiceRepository(serviceRepository)
         .withCoreExtensions(coreExtensions)
         .withArtifactClassLoaderManager(artifactClassLoaderManager)
-        .withEventContextDumpService(eventContextDumpService)
+        .withEventContextService(eventContextService)
         .withToolingService(toolingService)
         .build();
   }
@@ -187,8 +187,8 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   }
 
   @Override
-  public void setEventContextDumpService(EventContextDumpService eventContextDumpService) {
-    this.eventContextDumpService = eventContextDumpService;
+  public void setEventContextService(EventContextService eventContextService) {
+    this.eventContextService = eventContextService;
   }
 
   @Override

@@ -17,23 +17,23 @@ import java.util.List;
  *
  * @since 4.1
  */
-public interface EventContextDumpService {
+public interface EventContextService {
 
-  public static final String REGISTRY_KEY = "_muleEventContextDumpService";
+  public static final String REGISTRY_KEY = "_muleEventContextService";
 
   /**
    * The returned list will contain an element for each currently active {@link EventContext}.
    * <p>
    * An {@link EventContext} is considered active after it has been constructed and before its termination.
    *
-   * @return the {@link FlowStackDumpEntry}s for all the {@link Event}s that are currently being in process.
+   * @return the {@link FlowStackEntry}s for all the {@link Event}s that are currently being in process.
    */
-  List<FlowStackDumpEntry> getCurrentlyActiveFlowStacks();
+  List<FlowStackEntry> getCurrentlyActiveFlowStacks();
 
   /**
    * Contains a {@link FlowCallStack} and context information about its owner.
    */
-  public interface FlowStackDumpEntry {
+  public interface FlowStackEntry {
 
     /**
      * @return the serverId of the artifact (containing the name) that created the event for the {@link FlowCallStack}.

@@ -14,7 +14,7 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.Injector;
-import org.mule.runtime.core.api.event.EventContextDumpService;
+import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
@@ -104,8 +104,8 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
     return getThis();
   }
 
-  public T withEventContextDumpService(EventContextDumpService eventContextDumpService) {
-    registerObject(EventContextDumpService.class.getName(), eventContextDumpService);
+  public T withEventContextService(EventContextService eventContextService) {
+    registerObject(EventContextService.class.getName(), eventContextService);
 
     return getThis();
   }

@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.EventContextDumpService;
+import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
@@ -159,7 +159,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     // Only generate flowStack dump information for when the eventContext is created for a flow.
     if (DefaultMuleConfiguration.isFlowTrace() && flow != null && flow.getMuleContext() != null) {
-      eventContextDumpMaintain(flow.getMuleContext().getEventContextDumpService());
+      eventContextMaintain(flow.getMuleContext().getEventContextService());
     }
   }
 
@@ -185,11 +185,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.correlationId = correlationId;
   }
 
-  private void eventContextDumpMaintain(EventContextDumpService eventContextDumpService) {
-    if (eventContextDumpService != null && eventContextDumpService instanceof DefaultEventContextDumpService) {
-      ((DefaultEventContextDumpService) eventContextDumpService).addContext(this);
+  private void eventContextMaintain(EventContextService eventContextService) {
+    if (eventContextService != null && eventContextService instanceof DefaultEventContextService) {
+      ((DefaultEventContextService) eventContextService).addContext(this);
       this.onTerminated((e, t) -> {
-        ((DefaultEventContextDumpService) eventContextDumpService).removeContext(DefaultEventContext.this);
+        ((DefaultEventContextService) eventContextService).removeContext(DefaultEventContext.this);
       });
     }
   }

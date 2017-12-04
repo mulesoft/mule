@@ -13,7 +13,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.EventContextDumpService;
+import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.processor.Processor;
 
 import org.hamcrest.Description;
@@ -29,13 +29,13 @@ public class FlowTraceUtils {
   public static class FlowStackAsserter implements Processor {
 
     @Inject
-    private EventContextDumpService eventContextDumpService;
+    private EventContextService eventContextService;
 
     public static FlowCallStack stackToAssert;
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
-      eventContextDumpService.getCurrentlyActiveFlowStacks().stream()
+      eventContextService.getCurrentlyActiveFlowStacks().stream()
           .filter(fsde -> fsde.getEventId().equals(event.getContext().getId())).findAny()
           .ifPresent(dumpEntry -> stackToAssert = dumpEntry.getFlowCallStack());
 

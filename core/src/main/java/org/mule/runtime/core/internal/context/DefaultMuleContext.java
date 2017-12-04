@@ -85,7 +85,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.EventContextDumpService;
+import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -233,8 +233,8 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   private volatile FlowTraceManager flowTraceManager;
   private Object flowTraceManagerLock = new Object();
 
-  private volatile EventContextDumpService eventContextDumpService;
-  private Object eventContextDumpServiceLock = new Object();
+  private volatile EventContextService eventContextService;
+  private Object eventContextServiceLock = new Object();
 
   private volatile Collection<ExceptionContextProvider> exceptionContextProviders;
   private Object exceptionContextProvidersLock = new Object();
@@ -998,20 +998,20 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   }
 
   @Override
-  public EventContextDumpService getEventContextDumpService() {
-    if (eventContextDumpService == null) {
-      synchronized (eventContextDumpServiceLock) {
-        if (eventContextDumpService == null) {
+  public EventContextService getEventContextService() {
+    if (eventContextService == null) {
+      synchronized (eventContextServiceLock) {
+        if (eventContextService == null) {
           try {
-            eventContextDumpService = getRegistry().lookupObject(EventContextDumpService.class);
+            eventContextService = getRegistry().lookupObject(EventContextService.class);
           } catch (RegistrationException e) {
             // Should not occur
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Could not get 'EventContextService' instance from registry.", e);
           }
         }
       }
     }
-    return eventContextDumpService;
+    return eventContextService;
   }
 
   @Override

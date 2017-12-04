@@ -20,7 +20,7 @@ import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.event.EventContextDumpService;
+import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -163,12 +163,12 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void injectsEventContextDumpServiceAwareCoreExtension() throws Exception {
-    Consumer<EventContextDumpService> setServiceFunction = (service) -> coreExtensionManager.setEventContextDumpService(service);
+  public void injectsEventContextServiceAwareCoreExtension() throws Exception {
+    Consumer<EventContextService> setServiceFunction = (service) -> coreExtensionManager.setEventContextService(service);
 
-    BiConsumer<List<TestEventContextDumpServiceExtension>, EventContextDumpService> verificationFunction =
-        (extensions, service) -> verify(extensions.get(0)).setEventContextDumpService(service);
-    testServiceInjection(EventContextDumpService.class, TestEventContextDumpServiceExtension.class, setServiceFunction,
+    BiConsumer<List<TestEventContextServiceExtension>, EventContextService> verificationFunction =
+        (extensions, service) -> verify(extensions.get(0)).setEventContextService(service);
+    testServiceInjection(EventContextService.class, TestEventContextServiceExtension.class, setServiceFunction,
                          verificationFunction);
   }
 
@@ -388,10 +388,10 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   }
 
-  public interface TestEventContextDumpServiceExtension extends MuleCoreExtension {
+  public interface TestEventContextServiceExtension extends MuleCoreExtension {
 
     @Inject
-    void setEventContextDumpService(EventContextDumpService eventContextDumpService);
+    void setEventContextService(EventContextService eventContextService);
   }
 
   public interface TestServiceRepositoryExtension extends MuleCoreExtension {
