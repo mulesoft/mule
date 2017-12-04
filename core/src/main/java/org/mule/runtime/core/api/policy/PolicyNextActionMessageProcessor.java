@@ -81,11 +81,15 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                 + event.getContext().getId())));
           }
 
+          // ((BaseEventContext) event.getContext()).onResponse(notificationHelper.successOrErrorNotification(AFTER_NEXT));
+
           return just(event)
               .doOnNext(popBeforeNextFlowFlowStackElement().andThen(notificationHelper.notification(BEFORE_NEXT)))
               .transform(nextOperation)
               .doOnSuccess(pushAfterNextFlowStackElement().andThen(notificationHelper.notification(AFTER_NEXT)))
-              .doOnError(MessagingException.class, notificationHelper.errorNotification(AFTER_NEXT));
+              .doOnError(MessagingException.class, notificationHelper.errorNotification(AFTER_NEXT))
+              .doOnNext(notificationHelper.notification(BEFORE_NEXT))
+              .transform(nextOperation);
         });
   }
 

@@ -81,10 +81,12 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
                 return result;
               }
             })
-            // Required due to lack of decent support for error-handling in reactor. See
-            // https://github.com/reactor/reactor-core/issues/629.
+            // Ensure reference to current event is maintained in MessagingException. Reactor error handling does not
+            // maintain this with flatMap and we can't use ThreadLocal event as that will have potentially been overwritten by
+            // route chains.
             .onErrorMap(throwable -> !(throwable instanceof MessagingException),
-                        throwable -> new MessagingException(event, throwable, this)));
+                        throwable -> new MessagingException(event, throwable, this))
+            .errorStrategyStop());
   }
 
   /**

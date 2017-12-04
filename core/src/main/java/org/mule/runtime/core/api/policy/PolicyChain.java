@@ -115,9 +115,8 @@ public class PolicyChain extends AbstractComponent
                 }))
             .andThen(notificationHelper.notification(PROCESS_START)))
         .transform(chainWithPs)
-        .doOnSuccess(notificationHelper.notification(PROCESS_END))
         .doOnError(MessagingException.class, e -> popFlowFlowStackElement().accept(e.getEvent()))
-        .doOnError(MessagingException.class, notificationHelper.errorNotification(PROCESS_END));
+        .doOnSuccessOrError(notificationHelper.successOrErrorNotification(PROCESS_END));
   }
 
   private Consumer<CoreEvent> pushBeforeNextFlowStackElement() {

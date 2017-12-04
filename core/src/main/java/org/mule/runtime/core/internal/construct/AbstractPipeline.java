@@ -65,6 +65,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to process
@@ -211,7 +212,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private ReactiveProcessor dispatchToFlow(Sink sink) {
     if (source.getBackPressureStrategy() == WAIT) {
       // If back-pressure strategy is WAIT then use blocking `accept(Event event)` to dispatch Event
-      return publisher -> from(publisher)
+      return publisher -> Mono.from(publisher)
           .flatMap(event -> {
             try {
               sink.accept(event);
@@ -220,7 +221,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
               MessagingException me = new MessagingException(event, overloadException, this);
               ((BaseEventContext) event.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
             }
-            return ((BaseEventContext) event.getContext()).getResponsePublisher();
+            return Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher());
           });
     } else {
       // If back-pressure strategy is FAIL/DROP then using back-pressure aware `accept(Event event)` to dispatch Event

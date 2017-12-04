@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -58,6 +59,26 @@ public class PolicyNotificationHelper {
    */
   public Consumer<? super MessagingException> errorNotification(int action) {
     return (Consumer<MessagingException>) e -> fireNotification(e.getEvent(), e, action);
+  }
+
+  /**
+   * Creates an exception {@link BiConsumer} that fires a notification using the specified action on success or error.
+   * Notifications are not fired if the {@link BiConsumer} does not receive an {@link CoreEvent} or a {@link MessagingException}.
+   *
+   * @param action the action the notification is created with
+   * @return the created consumer
+   * @since 4.1
+   */
+  public BiConsumer<CoreEvent, Throwable> successOrErrorNotification(int action) {
+    return (e, t) -> {
+      if (t != null) {
+        if (t instanceof MessagingException) {
+          errorNotification(action).accept((MessagingException) t);
+        }
+      } else {
+        notification(action).accept(e);
+      }
+    };
   }
 
   public void fireNotification(CoreEvent event, Exception e, int action) {

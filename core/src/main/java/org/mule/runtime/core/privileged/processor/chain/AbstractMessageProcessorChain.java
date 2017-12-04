@@ -19,7 +19,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
-import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -57,6 +56,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -79,6 +79,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private static final String TCCL_REACTOR_CTX_KEY = "mule.context.tccl";
   private static final String TCCL_ORIGINAL_REACTOR_CTX_KEY = "mule.context.tccl_original";
   private static final String REACTOR_ON_OPERATOR_ERROR_LOCAL = "reactor.onOperatorError.local";
+  private static final String UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE =
+      "Unexpected state. Error handle should be invoked with either an Event instance of a MessagingException";
 
   private static Class<ClassLoader> appClClass;
 
@@ -126,21 +128,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       // along with the interceptors that decorate it.
       stream = stream.transform(applyInterceptors(interceptors, processor))
           // #1 Register local error hook to wrap exceptions in a MessagingException maintaining failed event.
-          .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL,
-                                                    operatorErrorLocalHook(processor)))
+          .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL, getLocalOperatorErrorHook(processor)))
           // #2 Register continue error strategy to handle errors without stopping the stream.
-          .errorStrategyContinue((throwable, event) -> {
-            throwable = Exceptions.unwrap(throwable);
-            if (throwable instanceof MessagingException) {
-              from(((BaseEventContext) ((MessagingException) throwable).getEvent().getContext())
-                  .error(resolveMessagingException(processor).apply((MessagingException) throwable)));
-            } else if (throwable instanceof RejectedExecutionException) {
-              getCurrentEvent().getContext()
-                  .error(resolveException((Component) processor, getCurrentEvent(), new FlowOverloadException(throwable)));
-            } else {
-              ((BaseEventContext) event.getContext()).error(resolveException((Component) processor, event, throwable));
-            }
-          });
+          .errorStrategyContinue(getContinueStrategyErrorHandler(processor));
     }
     return stream.subscriberContext(ctx -> {
       ClassLoader tccl = currentThread().getContextClassLoader();
@@ -153,6 +143,54 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             .put(TCCL_REACTOR_CTX_KEY, tccl.getParent());
       }
     });
+  }
+
+  /*
+   * Used to catch exceptions emitted by reactor operators and wrap these in a MessagingException while conserving a reference to
+   * the failed Event.
+   */
+  private BiFunction<Throwable, Object, Throwable> getLocalOperatorErrorHook(Processor processor) {
+    return (throwable, event) -> {
+      throwable = Exceptions.unwrap(throwable);
+      if (event instanceof CoreEvent) {
+        if (throwable instanceof MessagingException) {
+          return resolveMessagingException(processor).apply((MessagingException) throwable);
+        } else if (!(throwable instanceof RejectedExecutionException)) {
+          return resolveException((Component) processor, (CoreEvent) event, new FlowOverloadException(throwable));
+        } else {
+          return throwable;
+        }
+      } else {
+        return throwable;
+      }
+    };
+  }
+
+  /*
+   * Used to process failed events which are dropped from the reactor stream due to error. Errors are processed by invoking the
+   * current EventContext error callback.
+   */
+  private BiConsumer<Throwable, CoreEvent> getContinueStrategyErrorHandler(Processor processor) {
+    return (throwable, event) -> {
+      throwable = Exceptions.unwrap(throwable);
+      if (throwable instanceof MessagingException) {
+        // Give priority to failed event from reactor over MessagingException event.
+        BaseEventContext context = (BaseEventContext) (event != null ? event.getContext()
+            : ((MessagingException) throwable).getEvent().getContext());
+        context.error(resolveMessagingException(processor).apply((MessagingException) throwable));
+      } else {
+        if (event == null) {
+          LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
+          throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
+        }
+        BaseEventContext context = ((BaseEventContext) event.getContext());
+        if (throwable instanceof RejectedExecutionException) {
+          context.error(resolveException((Component) processor, event, new FlowOverloadException(throwable)));
+        } else {
+          context.error(resolveException((Component) processor, event, throwable));
+        }
+      }
+    };
   }
 
   private ReactiveProcessor applyInterceptors(List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted,
@@ -213,23 +251,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     interceptors.addAll(0, additionalInterceptors);
 
     return interceptors;
-  }
-
-  private BiFunction<Throwable, Object, Throwable> operatorErrorLocalHook(Processor processor) {
-    return (throwable, event) -> {
-      throwable = Exceptions.unwrap(throwable);
-      if (event instanceof CoreEvent) {
-        if (throwable instanceof MessagingException) {
-          return resolveMessagingException(processor).apply((MessagingException) throwable);
-        } else if (!(throwable instanceof RejectedExecutionException)) {
-          return resolveException((Component) processor, (CoreEvent) event, throwable);
-        } else {
-          return throwable;
-        }
-      } else {
-        return throwable;
-      }
-    };
   }
 
   private Function<? super Publisher<CoreEvent>, ? extends Publisher<CoreEvent>> doOnNextOrErrorWithContext(Consumer<Context> contextConsumer) {

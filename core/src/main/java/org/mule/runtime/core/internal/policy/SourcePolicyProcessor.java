@@ -26,6 +26,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import java.util.Optional;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 /**
  * This class is responsible for the processing of a policy applied to a {@link org.mule.runtime.core.api.source.MessageSource}.
@@ -108,17 +109,17 @@ public class SourcePolicyProcessor implements Processor {
 
       @Override
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-        return from(publisher)
+        return Flux.from(publisher)
             .cast(PrivilegedEvent.class)
             .doOnNext(event -> saveState(event))
             .map(event -> (CoreEvent) policyEventConverter.createEvent(event, sourceEvent))
             .flatMap(e -> from(processWithChildContext(e, nextProcessor, Optional.empty()))
-                .cast(PrivilegedEvent.class))
-            .map(result -> policyEventConverter.createEvent(result, loadState()))
-            .onErrorMap(MessagingException.class,
-                        e -> new MessagingException(policyEventConverter.createEvent((PrivilegedEvent) e.getEvent(), loadState()),
-                                                    e))
-            .cast(CoreEvent.class);
+                .cast(PrivilegedEvent.class)
+                .map(result -> policyEventConverter.createEvent(result, loadState()))
+                .onErrorMap(MessagingException.class,
+                            me -> new MessagingException(policyEventConverter.createEvent((PrivilegedEvent) me.getEvent(),
+                                                                                          loadState()),
+                                                         me)));
       }
 
       private PolicyStateId policyStateId = new PolicyStateId(executionIdentifier, policy.getPolicyId());
