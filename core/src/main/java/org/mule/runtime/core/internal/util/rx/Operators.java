@@ -54,12 +54,12 @@ public final class Operators {
    */
   @SuppressWarnings("unchecked")
   public static <T> Subscriber<T> requestUnbounded() {
-    return RequstMaxSubscriber.INSTANCE;
+    return RequestMaxSubscriber.INSTANCE;
   }
 
-  final static class RequstMaxSubscriber<T> implements Subscriber<T> {
+  final static class RequestMaxSubscriber<T> implements Subscriber<T> {
 
-    static final RequstMaxSubscriber INSTANCE = new RequstMaxSubscriber();
+    static final RequestMaxSubscriber INSTANCE = new RequestMaxSubscriber();
 
     @Override
     public void onSubscribe(Subscription s) {

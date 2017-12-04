@@ -1493,6 +1493,13 @@
                 <xsd:sequence>
                     <xsd:element ref="scheduling-strategy" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
+                <xsd:attribute name="disallowConcurrentExecution" default="false" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If set to 'true', executions triggered while the flow is still running from a previous trigger will be ignored, effectively avoiding different triggers of the flow to run concurrently.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

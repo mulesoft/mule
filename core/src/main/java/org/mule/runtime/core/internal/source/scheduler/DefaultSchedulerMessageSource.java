@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -37,6 +38,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.scheduler.PeriodicScheduler;
 import org.mule.runtime.core.internal.message.InternalEvent;
 
+import org.slf4j.Logger;
+
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -53,8 +56,11 @@ import java.util.concurrent.ScheduledFuture;
 public class DefaultSchedulerMessageSource extends AbstractComponent
     implements MessageSource, SchedulerMessageSource, MuleContextAware, Initialisable, Disposable {
 
+  private final static Logger LOGGER = getLogger(DefaultSchedulerMessageSource.class);
+
   private final PeriodicScheduler scheduler;
   private final NotificationHelper notificationHelper;
+  private final boolean disallowConcurrentExecution;
 
   private Scheduler pollingExecutor;
   private ScheduledFuture<?> schedulingJob;
@@ -62,14 +68,17 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private FlowConstruct flowConstruct;
   private MuleContext muleContext;
   private boolean started;
+  private volatile boolean executing = false;
 
   /**
    * @param muleContext application's context
    * @param scheduler the scheduler
    */
-  public DefaultSchedulerMessageSource(MuleContext muleContext, PeriodicScheduler scheduler) {
+  public DefaultSchedulerMessageSource(MuleContext muleContext, PeriodicScheduler scheduler,
+                                       boolean disallowConcurrentExecution) {
     this.muleContext = muleContext;
     this.scheduler = scheduler;
+    this.disallowConcurrentExecution = disallowConcurrentExecution;
     this.notificationHelper =
         new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
   }
@@ -125,21 +134,32 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     // Make sure we start with a clean state.
     setCurrentEvent(null);
 
-    if (!pollOnPrimaryInstanceOnly() || muleContext.isPrimaryPollingInstance()) {
+    if (muleContext.isPrimaryPollingInstance()) {
       poll();
     }
-  }
-
-  private boolean pollOnPrimaryInstanceOnly() {
-    return true;
   }
 
   /**
    * Triggers the forced execution of the polling message processor ignoring the configured scheduler.
    */
   private void poll() {
-    Message request = of(null);
-    pollWith(request);
+    boolean execute = false;
+    synchronized (this) {
+      if (disallowConcurrentExecution && executing) {
+        execute = false;
+      } else {
+        execute = true;
+        executing = true;
+      }
+    }
+
+    if (execute) {
+      Message request = of(null);
+      pollWith(request);
+    } else {
+      LOGGER.info("Flow '{}' is already running and 'disallowConcurrentExecution' is set to 'true'. Execution skipped.",
+                  flowConstruct.getRootContainerLocation().getGlobalName());
+    }
   }
 
   private void pollWith(final Message request) {
@@ -151,6 +171,11 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
           .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), MESSAGE_RECEIVED))
           .cast(CoreEvent.class)
           .transform(listener)
+          .doFinally(s -> {
+            synchronized (DefaultSchedulerMessageSource.this) {
+              executing = false;
+            }
+          })
           .subscribe(requestUnbounded());
     } catch (Exception e) {
       muleContext.getExceptionListener().handleException(e);

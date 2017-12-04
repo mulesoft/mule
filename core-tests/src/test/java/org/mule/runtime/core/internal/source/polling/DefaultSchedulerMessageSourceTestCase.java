@@ -107,7 +107,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
   private DefaultSchedulerMessageSource createMessageSource() throws Exception {
     createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
     schedulerMessageSource =
-        new DefaultSchedulerMessageSource(muleContext, scheduler());
+        new DefaultSchedulerMessageSource(muleContext, scheduler(), false);
     schedulerMessageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
     schedulerMessageSource.initialise();
     return schedulerMessageSource;
