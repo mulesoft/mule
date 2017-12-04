@@ -209,7 +209,7 @@
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <muleMvelVersion>2.1.9-MULE-013</muleMvelVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
-        <projectReactorVersion>3.1.1.RELEASE</projectReactorVersion>
+        <projectReactorVersion>3.1.3.BUILD-SNAPSHOT</projectReactorVersion>
         <projectReactorExtraVersion>3.1.2.RELEASE</projectReactorExtraVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
         <typesafeConfigVersion>1.3.1</typesafeConfigVersion>

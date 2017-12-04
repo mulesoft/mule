@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.processor.interceptor;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromFuture;
 
 import org.mule.runtime.api.component.Component;
@@ -56,7 +56,7 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
       LOGGER.debug("Configuring interceptor '{}' around processor '{}'...", interceptor, componentLocation.getLocation());
       return publisher -> from(publisher)
           .cast(InternalEvent.class)
-          .flatMapMany(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next))
+          .flatMap(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next))
               .onErrorMap(CompletionException.class, completionException -> completionException.getCause()));
     } else {
       return next;

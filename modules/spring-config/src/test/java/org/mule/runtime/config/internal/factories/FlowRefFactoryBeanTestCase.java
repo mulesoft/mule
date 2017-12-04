@@ -90,7 +90,6 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   private static final String DYNAMIC_REFERENCED_FLOW = "dynamicReferencedFlow";
   private static final String PARSED_DYNAMIC_REFERENCED_FLOW = "parsedDynamicReferencedFlow";
   private static final String DYNAMIC_NON_EXISTANT = "#['nonExistant']";
-  private static final String NON_EXISTANT = "nonExistant";
 
   private CoreEvent result;
   private ProcessingStrategy callerFlowProcessingStrategy = mock(ProcessingStrategy.class);
@@ -196,7 +195,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     Processor targetMuleContextAwareAware =
         (Processor) mock(MuleContextAware.class, INITIALIZABLE_MESSAGE_PROCESSOR);
 
-    when(targetMuleContextAwareAware.apply(any(Publisher.class))).thenReturn(just(result));
+    when(targetMuleContextAwareAware.apply(any(Publisher.class)))
+        .thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
 
     MessageProcessorChain targetSubFlowChain = mock(MessageProcessorChain.class, INITIALIZABLE_MESSAGE_PROCESSOR);
     when(targetSubFlowChain.apply(any(Publisher.class))).thenReturn(just(result));
