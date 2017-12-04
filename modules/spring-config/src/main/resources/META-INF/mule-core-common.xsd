@@ -1493,6 +1493,13 @@
                 <xsd:sequence>
                     <xsd:element ref="scheduling-strategy" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
+                <xsd:attribute name="synchronous" default="false" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether additional polling triggers of the scheduler will be executed if there is another exceution currently running.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

@@ -518,7 +518,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier(SCHEDULER)
         .withTypeDefinition(fromType(DefaultSchedulerMessageSource.class))
         .withObjectFactoryType(SchedulingMessageSourceFactoryBean.class)
-        .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
+        .withSetterParameterDefinition("synchronous", fromSimpleParameter("synchronous").withDefaultValue(false).build())
         .withSetterParameterDefinition("scheduler", fromChildConfiguration(PeriodicScheduler.class)
             .withWrapperIdentifier("scheduling-strategy").build())
         .build());

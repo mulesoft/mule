@@ -55,6 +55,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   private final PeriodicScheduler scheduler;
   private final NotificationHelper notificationHelper;
+  private final boolean synchronous;
 
   private Scheduler pollingExecutor;
   private ScheduledFuture<?> schedulingJob;
@@ -62,14 +63,16 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private FlowConstruct flowConstruct;
   private MuleContext muleContext;
   private boolean started;
+  private volatile boolean executing = false;
 
   /**
    * @param muleContext application's context
    * @param scheduler the scheduler
    */
-  public DefaultSchedulerMessageSource(MuleContext muleContext, PeriodicScheduler scheduler) {
+  public DefaultSchedulerMessageSource(MuleContext muleContext, PeriodicScheduler scheduler, boolean synchronous) {
     this.muleContext = muleContext;
     this.scheduler = scheduler;
+    this.synchronous = synchronous;
     this.notificationHelper =
         new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
   }
@@ -125,21 +128,29 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     // Make sure we start with a clean state.
     setCurrentEvent(null);
 
-    if (!pollOnPrimaryInstanceOnly() || muleContext.isPrimaryPollingInstance()) {
+    if (muleContext.isPrimaryPollingInstance()) {
       poll();
     }
-  }
-
-  private boolean pollOnPrimaryInstanceOnly() {
-    return true;
   }
 
   /**
    * Triggers the forced execution of the polling message processor ignoring the configured scheduler.
    */
   private void poll() {
-    Message request = of(null);
-    pollWith(request);
+    boolean execute = false;
+    synchronized (this) {
+      if (synchronous && executing) {
+        execute = false;
+      } else {
+        execute = true;
+        executing = true;
+      }
+    }
+
+    if (execute) {
+      Message request = of(null);
+      pollWith(request);
+    }
   }
 
   private void pollWith(final Message request) {
@@ -151,6 +162,11 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
           .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), MESSAGE_RECEIVED))
           .cast(CoreEvent.class)
           .transform(listener)
+          .doFinally(s -> {
+            synchronized (DefaultSchedulerMessageSource.this) {
+              executing = false;
+            }
+          })
           .subscribe(requestUnbounded());
     } catch (Exception e) {
       muleContext.getExceptionListener().handleException(e);
