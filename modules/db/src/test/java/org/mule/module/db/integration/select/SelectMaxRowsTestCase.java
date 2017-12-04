@@ -15,14 +15,19 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.module.db.integration.model.AbstractTestDatabase;
 import org.mule.module.db.integration.TestDbConfig;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 public class SelectMaxRowsTestCase extends AbstractDbIntegrationTestCase
 {
+
+    @Rule
+    public SystemProperty maxRows = new SystemProperty("maxRows", "2");
 
     public SelectMaxRowsTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase)
     {
