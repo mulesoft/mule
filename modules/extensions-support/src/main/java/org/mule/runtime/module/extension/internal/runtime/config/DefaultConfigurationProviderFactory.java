@@ -18,6 +18,8 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -64,14 +66,20 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
     return withExtensionClassLoader(extensionModel, () -> {
       configureConnectionProviderResolver(name, connectionProviderResolver);
       ConfigurationInstance configuration;
+      CoreEvent initialiserEvent = null;
       try {
+        initialiserEvent = getInitialiserEvent(muleContext);
         initialiseIfNeeded(resolverSet, true, muleContext);
         configuration = new ConfigurationInstanceFactory(extensionModel, configurationModel, resolverSet, muleContext)
-            .createConfiguration(name, getInitialiserEvent(muleContext), connectionProviderResolver);
+            .createConfiguration(name, initialiserEvent, connectionProviderResolver);
       } catch (MuleException e) {
         throw new ConfigurationException(createStaticMessage(format("Could not create configuration '%s' for the '%s'", name,
                                                                     extensionModel.getName())),
                                          e);
+      } finally {
+        if (initialiserEvent != null) {
+          ((BaseEventContext) initialiserEvent.getContext()).success();
+        }
       }
 
       return new ConfigurationProviderToolingAdapter(name, extensionModel, configurationModel, configuration, muleContext);

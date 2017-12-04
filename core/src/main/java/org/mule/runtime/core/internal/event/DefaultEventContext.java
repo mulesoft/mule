@@ -14,9 +14,12 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
@@ -90,6 +93,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
+  public String getServerId() {
+    return serverId;
+  }
+
+  @Override
   public String getCorrelationId() {
     return correlationId != null ? correlationId : id;
   }
@@ -112,6 +120,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   @Override
   public boolean isCorrelationIdFromSource() {
     return correlationId != null;
+  }
+
+  @Override
+  public FlowCallStack getFlowCallStack() {
+    return flowCallStack;
   }
 
   @Override
@@ -143,11 +156,16 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.location = location;
     this.processingTime = ProcessingTime.newInstance(flow);
     this.correlationId = correlationId;
+
+    // Only generate flowStack dump information for when the eventContext is created for a flow.
+    if (DefaultMuleConfiguration.isFlowTrace() && flow != null && flow.getMuleContext() != null) {
+      eventContextMaintain(flow.getMuleContext().getEventContextService());
+    }
   }
 
   /**
    * Builds a new execution context with the given parameters.
-   * 
+   *
    * @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
@@ -167,6 +185,15 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.correlationId = correlationId;
   }
 
+  private void eventContextMaintain(EventContextService eventContextService) {
+    if (eventContextService != null && eventContextService instanceof DefaultEventContextService) {
+      ((DefaultEventContextService) eventContextService).addContext(this);
+      this.onTerminated((e, t) -> {
+        ((DefaultEventContextService) eventContextService).removeContext(DefaultEventContext.this);
+      });
+    }
+  }
+
   @Override
   public String toString() {
     return getClass().getSimpleName() + " { id: " + id + "; correlationId: " + correlationId + "; flowName: "
@@ -184,6 +211,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
                               FlowExceptionHandler messagingExceptionHandler) {
       super(messagingExceptionHandler, empty());
+      this.flowCallStack = parent.getFlowCallStack().clone();
       this.parent = parent;
       this.componentLocation = componentLocation;
       this.id = parent.getId() + identityHashCode(this);
@@ -215,6 +243,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     }
 
     @Override
+    public FlowCallStack getFlowCallStack() {
+      return flowCallStack;
+    }
+
+    @Override
     public ProcessorsTrace getProcessorsTrace() {
       return parent.getProcessorsTrace();
     }
@@ -227,7 +260,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public String toString() {
       return getClass().getSimpleName() + " { id: " + getId() + "; correlationId: " + parent.getCorrelationId()
-          + "; flowName: " + parent.getOriginatingLocation().getRootContainerName() + "; commponentLocation: "
+          + "; flowName: " + parent.getOriginatingLocation().getRootContainerName() + "; componentLocation: "
           + (componentLocation != null ? componentLocation.getLocation() : EMPTY) + ";";
     }
 

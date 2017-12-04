@@ -18,8 +18,6 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getMetadata;
@@ -53,8 +51,8 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import org.junit.Before;
+import org.junit.runners.Parameterized;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -62,8 +60,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-import org.junit.Before;
-import org.junit.runners.Parameterized;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 //TODO MULE-12809: Make MetadataTestCase use LazyMetadataService
 @RunnerDelegateTo(Parameterized.class)
@@ -170,7 +168,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
 
   @Before
   public void setup() throws Exception {
-    event = CoreEvent.builder(create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION)).message(of("")).build();
+    event = CoreEvent.builder(testEvent()).message(of("")).build();
     personType = getMetadata(PERSON_METADATA_KEY.getId());
   }
 

@@ -15,6 +15,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 
@@ -28,13 +30,11 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -67,7 +67,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private Error error;
   private Optional<GroupCorrelation> groupCorrelation = empty();
   private String legacyCorrelationId;
-  private FlowCallStack flowCallStack;
   private ReplyToHandler replyToHandler;
   private Object replyToDestination;
   private MuleSession session;
@@ -78,7 +77,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   public DefaultEventBuilder(BaseEventContext messageContext) {
     this.context = messageContext;
-    this.flowCallStack = new DefaultFlowCallStack();
     this.session = new DefaultMuleSession();
   }
 
@@ -88,7 +86,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.message = event.getMessage();
     this.groupCorrelation = event.getGroupCorrelation();
     this.legacyCorrelationId = event.getLegacyCorrelationId();
-    this.flowCallStack = event.getFlowCallStack().clone();
     this.replyToHandler = event.getReplyToHandler();
     this.replyToDestination = event.getReplyToDestination();
     this.securityContext = event.getSecurityContext();
@@ -228,7 +225,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
       return new InternalEventImplementation(context, message, flowVariables,
                                              internalParameters, session, securityContext, replyToDestination,
-                                             replyToHandler, flowCallStack, groupCorrelation, error, legacyCorrelationId,
+                                             replyToHandler, groupCorrelation, error,
+                                             legacyCorrelationId,
                                              notificationsEnabled);
     }
   }
@@ -270,14 +268,13 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final CaseInsensitiveHashMap<String, TypedValue<?>> variables;
     private final Map<String, ?> internalParameters;
 
-    private FlowCallStack flowCallStack = new DefaultFlowCallStack();
     private final String legacyCorrelationId;
     private final Error error;
 
     // Use this constructor from the builder
     private InternalEventImplementation(BaseEventContext context, Message message, Map<String, TypedValue<?>> variables,
                                         Map<String, ?> internalParameters, MuleSession session, SecurityContext securityContext,
-                                        Object replyToDestination, ReplyToHandler replyToHandler, FlowCallStack flowCallStack,
+                                        Object replyToDestination, ReplyToHandler replyToHandler,
                                         Optional<GroupCorrelation> groupCorrelation, Error error,
                                         String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
@@ -289,8 +286,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
       this.replyToHandler = replyToHandler;
       this.replyToDestination = replyToDestination;
-
-      this.flowCallStack = flowCallStack;
 
       this.groupCorrelation = groupCorrelation.orElse(null);
       this.error = error;
@@ -327,7 +322,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       try {
         return (byte[]) transformMessage(DataType.BYTE_ARRAY, muleContext);
       } catch (Exception e) {
-        throw new DefaultMuleException(CoreMessages.cannotReadPayloadAsBytes(message.getPayload().getValue()
+        throw new DefaultMuleException(cannotReadPayloadAsBytes(message.getPayload().getValue()
             .getClass()
             .getName()), e);
       }
@@ -371,7 +366,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
         return (String) transformedMessage.getPayload().getValue();
       } catch (Exception e) {
-        throw new DefaultMuleException(CoreMessages.cannotReadPayloadAsString(message.getClass().getName()), e);
+        throw new DefaultMuleException(cannotReadPayloadAsString(message.getClass().getName()), e);
       }
     }
 
@@ -459,7 +454,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public FlowCallStack getFlowCallStack() {
-      return flowCallStack;
+      return context.getFlowCallStack();
     }
 
     @Override

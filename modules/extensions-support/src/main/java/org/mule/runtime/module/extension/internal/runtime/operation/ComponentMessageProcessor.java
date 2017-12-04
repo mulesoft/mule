@@ -31,6 +31,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
+
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -53,6 +54,7 @@ import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
@@ -75,6 +77,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -82,8 +87,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -244,7 +247,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     LazyValue<Optional<ConfigurationInstance>> staticConfiguration = new LazyValue<>(this::getStaticConfiguration);
     LazyValue<ValueResolvingContext> resolvingContext =
-        new LazyValue<>(() -> from(getInitialiserEvent(), staticConfiguration.get()));
+        new LazyValue<>(() -> {
+          CoreEvent initialiserEvent = null;
+          try {
+            initialiserEvent = getInitialiserEvent();
+            return from(initialiserEvent, staticConfiguration.get());
+          } finally {
+            if (initialiserEvent != null) {
+              ((BaseEventContext) initialiserEvent.getContext()).success();
+            }
+          }
+        });
 
     componentModel.getParameterGroupModels().stream().forEach(group -> {
       if (group.getName().equals(DEFAULT_GROUP_NAME)) {
@@ -377,9 +390,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   protected ParameterValueResolver getParameterValueResolver() {
-    final CoreEvent event = getInitialiserEvent(muleContext);
-    return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, componentModel, extensionModel,
-                                                                          from(event)));
+    CoreEvent event = null;
+    try {
+      event = getInitialiserEvent(muleContext);
+      return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, componentModel, extensionModel,
+                                                                            from(event)));
+    } finally {
+      if (event != null) {
+        ((BaseEventContext) event.getContext()).success();
+      }
+    }
   }
 
 

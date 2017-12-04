@@ -36,7 +36,9 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.scheduler.PeriodicScheduler;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.slf4j.Logger;
 
@@ -171,6 +173,9 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
           .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), MESSAGE_RECEIVED))
           .cast(CoreEvent.class)
           .transform(listener)
+          .doOnError(MessagingException.class,
+                     me -> ((BaseEventContext) me.getEvent().getContext()).error(me))
+          .doOnSuccess(result -> ((BaseEventContext) result.getContext()).success())
           .doFinally(s -> {
             synchronized (DefaultSchedulerMessageSource.this) {
               executing = false;

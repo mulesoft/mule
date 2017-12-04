@@ -14,6 +14,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.g
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
@@ -84,7 +85,15 @@ public abstract class AbstractConfigParserTestCase extends AbstractHeisenbergCon
   }
 
   protected HeisenbergExtension lookupHeisenberg(String key) throws Exception {
-    return lookupHeisenberg(key, getHeisenbergEvent());
+    CoreEvent heisenbergEvent = null;
+    try {
+      heisenbergEvent = getHeisenbergEvent();
+      return lookupHeisenberg(key, heisenbergEvent);
+    } finally {
+      if (heisenbergEvent != null) {
+        ((BaseEventContext) heisenbergEvent.getContext()).success();
+      }
+    }
   }
 
   protected HeisenbergExtension lookupHeisenberg(String key, CoreEvent event) throws Exception {

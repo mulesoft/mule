@@ -12,14 +12,13 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -39,10 +38,7 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
   private static final String CUSTOM_CORRELATION_ID = "customCorrelationIdValue";
   private static final String SERVER_ID = "serverId";
 
-  @Mock
-  private MuleConfiguration muleConfig;
-  @Mock
-  private MuleContext muleContext;
+  private MuleContext muleContext = mockContextWithServices();
   @Mock
   private FlowConstruct flow;
 
@@ -51,6 +47,7 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
+    when(flow.getMuleContext()).thenReturn(muleContext);
     when(flow.getUniqueIdString()).thenReturn(GENERATED_CORRELATION_ID);
     when(flow.getServerId()).thenReturn(SERVER_ID);
 

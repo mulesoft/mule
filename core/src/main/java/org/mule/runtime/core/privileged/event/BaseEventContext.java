@@ -8,6 +8,7 @@ package org.mule.runtime.core.privileged.event;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
@@ -58,6 +59,21 @@ public interface BaseEventContext extends EventContext {
   Optional<ProcessingTime> getProcessingTime();
 
   /**
+   * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can
+   * determine where this event came from.
+   * <p>
+   * This will only be enabled if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. If {@code false}, the stack will
+   * always be empty.
+   *
+   * @return the flow stack associated to this event.
+   *
+   * @since 3.8.0
+   */
+  default FlowCallStack getFlowCallStack() {
+    return null;
+  }
+
+  /**
    * Events have a list of message processor paths it went trough so that the execution path of an event can be reconstructed
    * after it has executed.
    * <p>
@@ -96,9 +112,9 @@ public interface BaseEventContext extends EventContext {
    * <li>Response consumer callbacks have been executed and response publisher subscribers signalled.</li>
    * <li>The external completion publisher, if provided, is completed.</li>
    * </ul>
-   * 
+   *
    * Completion callback consumers are executed after event context completeness status is updated.
-   * 
+   *
    * @return {@code true} if {@code this} context is complete.
    */
   boolean isTerminated();
@@ -119,7 +135,7 @@ public interface BaseEventContext extends EventContext {
    * terminates.
    * <p/>
    * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
-   * 
+   *
    * @param consumer callback to execute on event context completion.
    * @throws NullPointerException if consumer is {@code null}
    */
@@ -130,7 +146,7 @@ public interface BaseEventContext extends EventContext {
    * completes.
    * <p/>
    * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
-   * 
+   *
    * @param consumer callback to execute on event context completion.
    * @throws NullPointerException if consumer is {@code null}
    */
@@ -160,5 +176,16 @@ public interface BaseEventContext extends EventContext {
    * @return publisher that completes when this {@link BaseEventContext} instance has a response of error.
    */
   Publisher<CoreEvent> getResponsePublisher();
+
+  /**
+   * Provides an identifier string containing the name of the artifact that generated this {@link EventContext}.
+   *
+   * @return a unique identifier of the artifact that created this {@link EventContext}.
+   *
+   * @since 4.1
+   */
+  default String getServerId() {
+    return null;
+  }
 
 }

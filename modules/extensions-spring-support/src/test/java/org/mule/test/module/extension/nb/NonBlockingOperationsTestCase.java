@@ -20,6 +20,8 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.g
 import org.mule.functional.api.exception.ExpectedError;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.marvel.model.MissileProofVillain;
@@ -74,7 +76,15 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
   }
 
   private IronMan getIronMan(String name) throws Exception {
-    return (IronMan) getConfigurationInstanceFromRegistry(name, getInitialiserEvent(), muleContext).getValue();
+    CoreEvent initialiserEvent = null;
+    try {
+      initialiserEvent = getInitialiserEvent(muleContext);
+      return (IronMan) getConfigurationInstanceFromRegistry(name, initialiserEvent, muleContext).getValue();
+    } finally {
+      if (initialiserEvent != null) {
+        ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
+    }
   }
 
   private void fireMissileAndAssert(String flowName) throws Exception {

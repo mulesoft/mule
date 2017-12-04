@@ -16,7 +16,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.security.Authentication;
@@ -33,16 +32,16 @@ import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 
 public class MuleEventTestCase extends AbstractMuleContextTestCase {
@@ -146,7 +145,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testFlowVarNamesAddImmutable() throws Exception {
-    CoreEvent event = eventBuilder(muleContext)
+    CoreEvent event = getEventBuilder()
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
@@ -156,7 +155,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testFlowVarNamesRemoveImmutable() throws Exception {
-    CoreEvent event = eventBuilder(muleContext)
+    CoreEvent event = getEventBuilder()
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
@@ -167,7 +166,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testFlowVarsNotShared() throws Exception {
-    CoreEvent event = eventBuilder(muleContext)
+    CoreEvent event = getEventBuilder()
         .message(of("whatever"))
         .addVariable("foo", "bar")
         .build();

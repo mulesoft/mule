@@ -85,6 +85,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -124,6 +125,8 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 
+import org.slf4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -134,7 +137,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
-import org.slf4j.Logger;
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistries, PrivilegedMuleContext {
@@ -230,6 +232,9 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
   private volatile FlowTraceManager flowTraceManager;
   private Object flowTraceManagerLock = new Object();
+
+  private volatile EventContextService eventContextService;
+  private Object eventContextServiceLock = new Object();
 
   private volatile Collection<ExceptionContextProvider> exceptionContextProviders;
   private Object exceptionContextProvidersLock = new Object();
@@ -990,6 +995,23 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
       }
     }
     return flowTraceManager;
+  }
+
+  @Override
+  public EventContextService getEventContextService() {
+    if (eventContextService == null) {
+      synchronized (eventContextServiceLock) {
+        if (eventContextService == null) {
+          try {
+            eventContextService = getRegistry().lookupObject(EventContextService.class);
+          } catch (RegistrationException e) {
+            // Should not occur
+            throw new IllegalStateException("Could not get 'EventContextService' instance from registry.", e);
+          }
+        }
+      }
+    }
+    return eventContextService;
   }
 
   @Override

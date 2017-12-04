@@ -9,14 +9,17 @@ package org.mule.runtime.module.extension.api.tooling;
 import static java.lang.String.format;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
@@ -56,15 +59,17 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
    */
   @Override
   public ConnectionValidationResult testConnectivity(Object connectivityTestingObject) {
+    CoreEvent initialiserEvent = null;
     try {
+      initialiserEvent = getInitialiserEvent(muleContext);
       if (connectivityTestingObject instanceof ConnectionProviderResolver) {
         ConnectionProvider<Object> connectionProvider =
-            ((ConnectionProviderResolver<Object>) connectivityTestingObject).resolve(from(getInitialiserEvent(muleContext)))
+            ((ConnectionProviderResolver<Object>) connectivityTestingObject).resolve(from(initialiserEvent))
                 .getFirst();
         return connectionManager.testConnectivity(connectionProvider);
       } else if (connectivityTestingObject instanceof ConfigurationProvider) {
         ConfigurationProvider configurationProvider = (ConfigurationProvider) connectivityTestingObject;
-        ConfigurationInstance configurationInstance = configurationProvider.get(getInitialiserEvent(muleContext));
+        ConfigurationInstance configurationInstance = configurationProvider.get(initialiserEvent);
         return connectionManager.testConnectivity(configurationInstance);
       } else {
         throw new MuleRuntimeException(createStaticMessage(
@@ -73,6 +78,10 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
       }
     } catch (Exception e) {
       return failure("Failed to obtain connectivity testing object", e);
+    } finally {
+      if (initialiserEvent != null) {
+        ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
     }
   }
 

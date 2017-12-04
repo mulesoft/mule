@@ -16,6 +16,8 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.EventContextService;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import javax.inject.Inject;
@@ -55,6 +57,9 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
   @Inject
   protected NotificationListenerRegistry notificationListenerRegistry;
 
+  @Inject
+  private EventContextService eventContextService;
+
   private CoreEvent _testEvent;
 
   /**
@@ -81,4 +86,16 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
     return true;
   }
 
+  @Override
+  protected void doTearDown() throws Exception {
+    if (_testEvent != null) {
+      ((BaseEventContext) _testEvent.getContext()).success();
+    }
+    super.doTearDown();
+
+    if (eventContextService != null) {
+      // MULE-14151 Force a cleanup of stale contexts. This should be changed to an empty assertion
+      eventContextService.getCurrentlyActiveFlowStacks();
+    }
+  }
 }

@@ -10,8 +10,11 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -46,11 +49,17 @@ public final class ReflectiveOperationExecutorFactory<T, M extends ComponentMode
     DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder(implementationClass);
     parameters.forEach((k, v) -> objectBuilder.addPropertyResolver(k, new StaticValueResolver<>(v)));
     Object delegate;
+    CoreEvent initialiserEvent = null;
     try {
-      delegate = objectBuilder.build(from(getInitialiserEvent()));
+      initialiserEvent = getInitialiserEvent();
+      delegate = objectBuilder.build(from(initialiserEvent));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class "
           + implementationClass.getName()), e);
+    } finally {
+      if (initialiserEvent != null) {
+        ((BaseEventContext) initialiserEvent.getContext()).success();
+      }
     }
 
     return new ReflectiveMethodOperationExecutor(operationModel, operationMethod, delegate);

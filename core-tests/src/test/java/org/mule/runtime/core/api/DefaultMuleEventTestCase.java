@@ -24,10 +24,12 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,6 +57,11 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     flow = getTestFlow(muleContext);
     messageContext = create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = InternalEvent.builder(messageContext).message(muleMessage).build();
+  }
+
+  @After
+  public void after() {
+    ((BaseEventContext) messageContext).success();
   }
 
   @Test
