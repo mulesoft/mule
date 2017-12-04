@@ -7,6 +7,7 @@
 
 package org.mule.module.db.internal.config.processor;
 
+import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.module.db.internal.config.resolver.database.DefaultDbConfigResolverFactoryBean;
@@ -54,11 +55,11 @@ public abstract class AbstractDbProcessorDefinitionParser extends AbstractHierar
 
         if ("".equals(config))
         {
-            wrapper = BeanDefinitionBuilder.genericBeanDefinition(DefaultDbConfigResolverFactoryBean.class);
+            wrapper = genericBeanDefinition(DefaultDbConfigResolverFactoryBean.class);
         }
         else
         {
-            wrapper = BeanDefinitionBuilder.genericBeanDefinition(ConfiguredDbConfigResolver.class);
+            wrapper = genericBeanDefinition(ConfiguredDbConfigResolver.class);
             wrapper.addConstructorArgReference(config);
         }
 
@@ -78,7 +79,7 @@ public abstract class AbstractDbProcessorDefinitionParser extends AbstractHierar
 
     protected Object parseStatementFactory(Element element)
     {
-        BeanDefinitionBuilder defaultStatementFactory = BeanDefinitionBuilder.genericBeanDefinition(QueryStatementFactory.class);
+        BeanDefinitionBuilder defaultStatementFactory = genericBeanDefinition(QueryStatementFactory.class);
 
         if (element.hasAttribute(MAX_ROWS_ATTRIBUTE))
         {
