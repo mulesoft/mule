@@ -68,8 +68,6 @@ import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 import reactor.util.context.Context;
 
 /**
@@ -80,6 +78,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private static final String TCCL_REACTOR_CTX_KEY = "mule.context.tccl";
   private static final String TCCL_ORIGINAL_REACTOR_CTX_KEY = "mule.context.tccl_original";
+  private static final String REACTOR_ON_OPERATOR_ERROR_LOCAL = "reactor.onOperatorError.local";
 
   private static Class<ClassLoader> appClClass;
 
@@ -127,8 +126,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       // along with the interceptors that decorate it.
       stream = stream.transform(applyInterceptors(interceptors, processor))
           // #1 Register local error hook to wrap exceptions in a MessagingException maintaining failed event.
-          .subscriberContext(context -> context.put("reactor.onOperatorError.local",
-                                                    resolveMessagingExceptionFunction(processor)))
+          .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL,
+                                                    operatorErrorLocalHook(processor)))
           // #2 Register continue error strategy to handle errors without stopping the stream.
           .errorStrategyContinue((throwable, event) -> {
             throwable = Exceptions.unwrap(throwable);
@@ -178,7 +177,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .transform(doOnNextOrErrorWithContext(context -> context.getOrEmpty(TCCL_ORIGINAL_REACTOR_CTX_KEY)
             .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl)))));
 
-    // #2 Update ThreadLocal event/muleContext before processor execution once on processor thread.
+    // #2 Wrap execution, after processing strategy, on processor execution thread.
     interceptors.add((processor, next) -> stream -> from(stream)
         .cast(PrivilegedEvent.class)
         .doOnNext(event -> {
@@ -194,32 +193,29 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       interceptors.add((processor, next) -> processingStrategy.onProcessor(new InterceptedReactiveProcessor(processor, next)));
     }
 
-    // #4 Fire MessageProcessor notifications before and after processor execution.
+    // #4 Wrap execution, before processing strategy, on flow thread.
     interceptors.add((processor, next) -> stream -> from(stream)
         .cast(PrivilegedEvent.class)
         .doOnNext(preNotification(processor))
         .cast(CoreEvent.class)
         .transform(next)
         .cast(PrivilegedEvent.class)
-        .doOnNext(result -> {
+        .map(result -> {
           postNotification(processor).accept(result);
           setCurrentEvent(result);
+          // If the processor returns a CursorProvider, then have the StreamingManager manage it
+          return updateEventForStreaming(streamingManager).apply(result);
         })
         .doOnError(MessagingException.class, errorNotification(processor))
         .cast(CoreEvent.class));
 
-    // #4 If the processor returns a CursorProvider, then have the StreamingManager manage it
-    interceptors.add((processor, next) -> stream -> from(stream)
-        .transform(next)
-        .map(updateEventForStreaming(streamingManager)));
-
-    // #5 Apply processor interceptors.
+    // #5 Apply processor interceptors around processor and other core logic
     interceptors.addAll(0, additionalInterceptors);
 
     return interceptors;
   }
 
-  private BiFunction<Throwable, Object, Throwable> resolveMessagingExceptionFunction(Processor processor) {
+  private BiFunction<Throwable, Object, Throwable> operatorErrorLocalHook(Processor processor) {
     return (throwable, event) -> {
       throwable = Exceptions.unwrap(throwable);
       if (event instanceof CoreEvent) {
