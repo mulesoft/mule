@@ -16,7 +16,7 @@
     <flow name="selectMaxStreamedRows">
         <inbound-endpoint address="vm://selectMaxStreamedRows" exchange-pattern="request-response"/>
 
-        <db:select config-ref="dbConfig" maxRows="2">
+        <db:select config-ref="dbConfig" maxRows="${maxRows}">
             <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
         </db:select>
 
