@@ -35,6 +35,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
+import org.mule.runtime.extension.api.runtime.process.FlowExecutorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
@@ -44,6 +45,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.Configuration
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.DefaultEncodingArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.FlowExecutorFactoryArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.FlowListenerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.LiteralArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MediaTypeArgumentResolver;
@@ -96,6 +98,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       new ComponentLocationArgumentResolver();
   private static final ArgumentResolver<OperationTransactionalAction> OPERATION_TRANSACTIONAL_ACTION_ARGUMENT_RESOLVER =
       new OperationTransactionalActionArgumentResolver();
+  private static final ArgumentResolver<FlowExecutorFactory> FLOW_EXECUTOR_FACTORY_ARGUMENT_RESOLVER =
+      new FlowExecutorFactoryArgumentResolver();
 
 
   private final Method method;
@@ -173,6 +177,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = COMPONENT_LOCATION_ARGUMENT_RESOLVER;
       } else if (OperationTransactionalAction.class.equals(parameterType)) {
         argumentResolver = OPERATION_TRANSACTIONAL_ACTION_ARGUMENT_RESOLVER;
+      } else if (FlowExecutorFactory.class.equals(parameterType)) {
+        argumentResolver = FLOW_EXECUTOR_FACTORY_ARGUMENT_RESOLVER;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }

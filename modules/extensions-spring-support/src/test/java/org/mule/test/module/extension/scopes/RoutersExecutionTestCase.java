@@ -56,6 +56,22 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
   }
 
   @Test
+  public void flowRouter() throws Exception {
+    CoreEvent internalEvent = flowRunner("flowRouter")
+        .withVariable("delegateFlow", "singleRouteRouter")
+        .withPayload("message").withAttributes("other").run();
+
+    assertThat(internalEvent.getMessage().getPayload().getValue(), is("message"));
+    assertThat(internalEvent.getVariables().get("newPayload").getValue(), is("message"));
+
+    internalEvent = flowRunner("flowRouter")
+        .withVariable("delegateFlow", "concurrentRouteExecutor")
+        .run();
+
+    assertThat(internalEvent.getMessage().getPayload().getValue(), is("SUCCESS"));
+  }
+
+  @Test
   public void singleRouteRouter() throws Exception {
     CoreEvent internalEvent = flowRunner("singleRouteRouter").withPayload("message").withAttributes("other").run();
 

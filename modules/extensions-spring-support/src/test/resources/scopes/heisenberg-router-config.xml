@@ -131,4 +131,8 @@
         <heisenberg:spy processor="mule:set-payload*"/>
     </flow>
 
+    <flow name="flowRouter">
+        <heisenberg:flow-router flowName="#[vars.delegateFlow]"/>
+    </flow>
+
 </mule>

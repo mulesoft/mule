@@ -98,7 +98,8 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void blockingExecutionTypes() {
     final List<String> nonBlockingOperations = Arrays.asList("killMany", "executeAnything", "alwaysFailsWrapper", "getChain",
-                                                             "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier");
+                                                             "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier",
+                                                             "flowRouter");
 
     ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
     Reference<Boolean> cpuIntensive = new Reference<>(false);
