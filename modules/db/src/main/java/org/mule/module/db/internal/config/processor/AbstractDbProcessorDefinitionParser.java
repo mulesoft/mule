@@ -78,29 +78,29 @@ public abstract class AbstractDbProcessorDefinitionParser extends AbstractHierar
 
     protected Object parseStatementFactory(Element element)
     {
-        QueryStatementFactory defaultStatementFactory = new QueryStatementFactory();
+        BeanDefinitionBuilder defaultStatementFactory = BeanDefinitionBuilder.genericBeanDefinition(QueryStatementFactory.class);
 
         if (element.hasAttribute(MAX_ROWS_ATTRIBUTE))
         {
-            defaultStatementFactory.setMaxRows(Integer.parseInt(element.getAttribute(MAX_ROWS_ATTRIBUTE)));
+            defaultStatementFactory.addPropertyValue(MAX_ROWS_ATTRIBUTE, element.getAttribute(MAX_ROWS_ATTRIBUTE));
         }
 
         if (element.hasAttribute(FETCH_SIZE))
         {
-            defaultStatementFactory.setFetchSize(Integer.parseInt(element.getAttribute(FETCH_SIZE)));
+            defaultStatementFactory.addPropertyValue(FETCH_SIZE, element.getAttribute(FETCH_SIZE));
         }
         else if (streaming)
         {
             logger.warn("Streaming mode needs to configure fetchSize property. Using default value: " + DEFAULT_FETCH_SIZE);
-            defaultStatementFactory.setFetchSize(DEFAULT_FETCH_SIZE);
+            defaultStatementFactory.addPropertyValue(FETCH_SIZE, DEFAULT_FETCH_SIZE);
         }
 
         if (element.hasAttribute(QUERY_TIMEOUT_ATTRIBUTE))
         {
-            defaultStatementFactory.setQueryTimeout(Integer.parseInt(element.getAttribute(QUERY_TIMEOUT_ATTRIBUTE)));
+            defaultStatementFactory.addPropertyValue(QUERY_TIMEOUT_ATTRIBUTE, element.getAttribute(QUERY_TIMEOUT_ATTRIBUTE));
         }
 
-        return defaultStatementFactory;
+        return defaultStatementFactory.getBeanDefinition();
     }
 
     protected void processStreamingAttribute(String streamingValue)
