@@ -18,7 +18,7 @@ public class SchedulingMessageSourceFactoryBean extends AbstractComponentFactory
 
   private static final long DEFAULT_FREQUENCY = 1000l;
   protected PeriodicScheduler scheduler;
-  private boolean synchronous;
+  private boolean disallowConcurrentExecution;
   private MuleContext muleContext;
 
   private FixedFrequencyScheduler defaultScheduler() {
@@ -35,11 +35,11 @@ public class SchedulingMessageSourceFactoryBean extends AbstractComponentFactory
   @Override
   public DefaultSchedulerMessageSource doGetObject() throws Exception {
     scheduler = scheduler == null ? defaultScheduler() : scheduler;
-    return new DefaultSchedulerMessageSource(muleContext, scheduler, synchronous);
+    return new DefaultSchedulerMessageSource(muleContext, scheduler, disallowConcurrentExecution);
   }
 
-  public void setSynchronous(boolean synchronous) {
-    this.synchronous = synchronous;
+  public void setDisallowConcurrentExecution(boolean disallowConcurrentExecution) {
+    this.disallowConcurrentExecution = disallowConcurrentExecution;
   }
 
   @Override
