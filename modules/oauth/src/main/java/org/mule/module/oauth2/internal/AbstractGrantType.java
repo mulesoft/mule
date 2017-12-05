@@ -7,12 +7,15 @@
 package org.mule.module.oauth2.internal;
 
 import org.mule.module.http.api.HttpAuthentication;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
 
 /**
  * Common interface for all grant types must extend this interface.
  */
 public abstract class AbstractGrantType implements HttpAuthentication, ApplicationCredentials
 {
+
+    protected ProxyConfig proxyConfig;
 
     /**
      * @param accessToken an ouath access token
@@ -21,6 +24,17 @@ public abstract class AbstractGrantType implements HttpAuthentication, Applicati
     public static String buildAuthorizationHeaderContent(String accessToken)
     {
         return "Bearer " + accessToken;
+    }
+
+
+    public ProxyConfig getProxyConfig()
+    {
+        return proxyConfig;
+    }
+
+    public void setProxyConfig(ProxyConfig proxyConfig)
+    {
+        this.proxyConfig = proxyConfig;
     }
 
 }

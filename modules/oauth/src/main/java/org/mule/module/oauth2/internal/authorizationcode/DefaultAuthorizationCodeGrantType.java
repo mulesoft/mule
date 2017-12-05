@@ -52,8 +52,6 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
     private TokenManagerConfig tokenManagerConfig;
     private AttributeEvaluator localAuthorizationUrlResourceOwnerIdEvaluator;
     private AttributeEvaluator resourceOwnerIdEvaluator;
-    private ProxyConfig proxyConfig;
-
 
     public void setClientId(final String clientId)
     {
@@ -264,13 +262,4 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
         }
     }
 
-    public ProxyConfig getProxyConfig()
-    {
-        return proxyConfig;
-    }
-
-    public void setProxyConfig(ProxyConfig proxyConfig)
-    {
-        this.proxyConfig = proxyConfig;
-    }
 }

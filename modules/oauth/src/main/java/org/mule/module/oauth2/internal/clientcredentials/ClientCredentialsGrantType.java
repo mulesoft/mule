@@ -37,7 +37,6 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
     private MuleContext muleContext;
     private TokenManagerConfig tokenManager;
     private TlsContextFactory tlsContextFactory;
-    private ProxyConfig proxyConfig;
 
     public void setClientId(final String clientId)
     {
@@ -154,13 +153,4 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
         this.tokenManager = tokenManager;
     }
 
-    public ProxyConfig getProxyConfig()
-    {
-        return proxyConfig;
-    }
-
-    public void setProxyConfig(ProxyConfig proxyConfig)
-    {
-        this.proxyConfig = proxyConfig;
-    }
 }
