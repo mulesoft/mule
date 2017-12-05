@@ -7,12 +7,21 @@
 package org.mule.module.oauth2.internal;
 
 import org.mule.module.http.api.HttpAuthentication;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
+import org.mule.transport.ssl.api.TlsContextFactory;
 
 /**
  * Common interface for all grant types must extend this interface.
  */
 public abstract class AbstractGrantType implements HttpAuthentication, ApplicationCredentials
 {
+
+    protected ProxyConfig proxyConfig;
+    protected TokenManagerConfig tokenManagerConfig;
+    protected TlsContextFactory tlsContextFactory;
+    protected String clientId;
+    protected String clientSecret;
 
     /**
      * @param accessToken an ouath access token
@@ -23,4 +32,43 @@ public abstract class AbstractGrantType implements HttpAuthentication, Applicati
         return "Bearer " + accessToken;
     }
 
+    public void setProxyConfig(ProxyConfig proxyConfig)
+    {
+        this.proxyConfig = proxyConfig;
+    }
+
+    public TlsContextFactory getTlsContext()
+    {
+        return tlsContextFactory;
+    }
+
+    public void setTokenManager(TokenManagerConfig tokenManagerConfig)
+    {
+        this.tokenManagerConfig = tokenManagerConfig;
+    }
+
+    public void setTlsContext(TlsContextFactory tlsContextFactory)
+    {
+        this.tlsContextFactory = tlsContextFactory;
+    }
+
+    public void setClientId(final String clientId)
+    {
+        this.clientId = clientId;
+    }
+
+    public void setClientSecret(final String clientSecret)
+    {
+        this.clientSecret = clientSecret;
+    }
+
+    public String getClientSecret()
+    {
+        return clientSecret;
+    }
+
+    public String getClientId()
+    {
+        return clientId;
+    }
 }

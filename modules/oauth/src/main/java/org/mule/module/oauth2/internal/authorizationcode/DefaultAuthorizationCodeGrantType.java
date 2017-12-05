@@ -24,7 +24,6 @@ import org.mule.module.oauth2.internal.AbstractGrantType;
 import org.mule.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.util.AttributeEvaluator;
 
 import org.apache.commons.lang.StringUtils;
@@ -41,27 +40,13 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
 
     public static final String EXTERNAL_REDIRECT_URL_PROPERTY = SYSTEM_PROPERTY_PREFIX + "oauth2.externalRedirectUrl";
 
-    private String clientId;
-    private String clientSecret;
     private String redirectionUrl;
     private String externalRedirectionUrl;
     private AuthorizationRequestHandler authorizationRequestHandler;
     private AbstractAuthorizationCodeTokenRequestHandler tokenRequestHandler;
     private MuleContext muleContext;
-    private TlsContextFactory tlsContextFactory;
-    private TokenManagerConfig tokenManagerConfig;
     private AttributeEvaluator localAuthorizationUrlResourceOwnerIdEvaluator;
     private AttributeEvaluator resourceOwnerIdEvaluator;
-
-    public void setClientId(final String clientId)
-    {
-        this.clientId = clientId;
-    }
-
-    public void setClientSecret(final String clientSecret)
-    {
-        this.clientSecret = clientSecret;
-    }
 
     public void setRedirectionUrl(final String redirectionUrl)
     {
@@ -121,30 +106,10 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
         return tokenManagerConfig.getConfigOAuthContext();
     }
 
-    public String getClientSecret()
-    {
-        return clientSecret;
-    }
-
-    public String getClientId()
-    {
-        return clientId;
-    }
-
     @Override
     public void setMuleContext(final MuleContext context)
     {
         this.muleContext = context;
-    }
-
-    public TlsContextFactory getTlsContext()
-    {
-        return tlsContextFactory;
-    }
-
-    public void setTlsContext(TlsContextFactory tlsContextFactory)
-    {
-        this.tlsContextFactory = tlsContextFactory;
     }
 
     @Override
@@ -232,11 +197,6 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
         this.resourceOwnerIdEvaluator = new AttributeEvaluator(resourceOwnerId);
     }
 
-    public void setTokenManager(TokenManagerConfig tokenManagerConfig)
-    {
-        this.tokenManagerConfig = tokenManagerConfig;
-    }
-
     @Override
     public void start() throws MuleException
     {
@@ -247,8 +207,9 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
         }
         if (tokenRequestHandler != null)
         {
-            tokenRequestHandler.setOauthConfig(this);
+            tokenRequestHandler.setOauthConfig(this, proxyConfig);
             tokenRequestHandler.init();
         }
     }
+
 }
