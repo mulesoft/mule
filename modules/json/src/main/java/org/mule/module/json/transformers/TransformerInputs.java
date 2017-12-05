@@ -30,7 +30,7 @@ public class TransformerInputs
         "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
 
     private static final String PREFERRED_SCHEMA_FACTORY_CLASS_NAME =
-        "com.sun.org.apache.xerces.internal.jaxp.validation.XMLSchemaFactory";
+        "org.mule.apache.xerces.jaxp.validation.XMLSchemaFactory";
     /**
      * Turn whatever we got as the transformer's source into either an input stream or a reader
      */

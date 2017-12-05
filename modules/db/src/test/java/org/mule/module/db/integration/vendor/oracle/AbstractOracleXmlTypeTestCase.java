@@ -33,7 +33,7 @@ import org.junit.internal.matchers.TypeSafeMatcher;
  * <p/>
  * Also pass this property into the JVM runtime to force the usage of xerces
  * instead of oracle's implementation:
- * -Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
+ * -Djavax.xml.parsers.DocumentBuilderFactory=org.apache.xerces.jaxp.DocumentBuilderFactoryImpl
  */
 public abstract class AbstractOracleXmlTypeTestCase extends AbstractDbIntegrationTestCase
 {
