@@ -284,8 +284,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
+            <groupId>com.rackspace.apache</groupId>
+            <artifactId>xerces2-xsd11</artifactId>
             <version>${xercesVersion}</version>
             <scope>test</scope>
         </dependency>

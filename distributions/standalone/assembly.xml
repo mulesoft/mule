@@ -295,7 +295,7 @@
 
                 <!-- lib/endorsed -->
                 <exclude>xml-apis:xml-apis</exclude>
-                <exclude>xerces:xercesImpl</exclude>
+                <exclude>com.rackspace.apache:xerces2-xsd11</exclude>
                 <exclude>xerces:xml-serializer</exclude>
                 <exclude>xalan:xalan</exclude>
 
@@ -330,7 +330,7 @@
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>xml-apis:xml-apis</include>
-                <include>xerces:xercesImpl</include>
+                <include>com.rackspace.apache:xerces2-xsd11</include>
                 <include>xerces:xml-serializer</include>
                 <include>xalan:xalan</include>
             </includes>

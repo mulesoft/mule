@@ -99,7 +99,7 @@ public class ReversibleXMLStreamReaderTest extends AbstractMuleTestCase
         XMLStreamReader coreReader = xif.createXMLStreamReader(getClass().getResourceAsStream("/simple.xml"));
         
         //com.ctc.wstx.sr.ValidatingStreamReader
-        //com.sun.org.apache.xerces.internal.impl.XMLStreamReaderImpl
+        //com.sun.org.mule.apache.xerces.internal.impl.XMLStreamReaderImpl
         ReversibleXMLStreamReader xsr = new ReversibleXMLStreamReader(coreReader);
         xsr.setTracking(true);
         return xsr;
