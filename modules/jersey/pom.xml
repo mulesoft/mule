@@ -68,6 +68,12 @@
             <artifactId>jersey-media-multipart</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-jaxrs</artifactId>
+            <version>${jacksonVersion}</version>
+        </dependency>
+
         <!-- test dependencies -->
         <dependency>
             <groupId>org.mule.transports</groupId>
