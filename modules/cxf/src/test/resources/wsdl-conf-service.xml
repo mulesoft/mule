@@ -28,5 +28,14 @@
             </inbound>
             <test:component/>
         </service>
+        
+        <service name="cxfJaxwsService">
+            <inbound>
+                <inbound-endpoint address="http://localhost:${httpPort}/cxfJaxwsService" exchange-pattern="request-response">
+                    <cxf:jaxws-service serviceClass="org.mule.api.lifecycle.Callable" />
+                </inbound-endpoint>
+            </inbound>
+            <test:component/>
+        </service>
     </model>
 </mule>

@@ -29,4 +29,11 @@
         <test:component />
     </flow>
 
+    <flow name="cxfJaxwsService">
+        <http:listener config-ref="httpConfig" path="cxfJaxwsService"/>
+        <cxf:jaxws-service serviceClass="org.mule.api.lifecycle.Callable" />
+
+        <test:component />
+    </flow>
+
 </mule>
