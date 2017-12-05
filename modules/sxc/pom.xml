@@ -86,7 +86,15 @@
                     <groupId>stax</groupId>
                     <artifactId>stax-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-xjc</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.glassfish.jaxb</groupId>
+            <artifactId>jaxb-xjc</artifactId>
         </dependency>
     </dependencies>
 
