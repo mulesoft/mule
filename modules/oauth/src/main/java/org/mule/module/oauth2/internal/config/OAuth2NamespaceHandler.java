@@ -29,8 +29,11 @@ public class OAuth2NamespaceHandler extends MuleNamespaceHandler
     public void init()
     {
         registerBeanDefinitionParser("token-manager-config", new MuleOrphanDefinitionParser(TokenManagerConfig.class, true));
+
         final ChildDefinitionParser authorizationCodeGrantType = new ChildDefinitionParser("authentication", DefaultAuthorizationCodeGrantType.class);
+        authorizationCodeGrantType.addAlias("proxy", "proxyConfig");
         registerMuleBeanDefinitionParser("authorization-code-grant-type", authorizationCodeGrantType);
+
         registerMuleBeanDefinitionParser("authorization-request", new ChildDefinitionParser("authorizationRequestHandler", AuthorizationRequestHandler.class));
         final ParentContextDefinitionParser tokenRequestHandlerDefinitionParser = new ParentContextDefinitionParser("authorization-code-grant-type", new ChildDefinitionParser("tokenRequestHandler", AutoAuthorizationCodeTokenRequestHandler.class));
         tokenRequestHandlerDefinitionParser.otherwise(new ChildDefinitionParser("tokenRequestHandler", ClientCredentialsTokenRequestHandler.class));
@@ -38,7 +41,11 @@ public class OAuth2NamespaceHandler extends MuleNamespaceHandler
         registerMuleBeanDefinitionParser("token-response", new ChildDefinitionParser("tokenResponseConfiguration", TokenResponseConfiguration.class));
         registerMuleBeanDefinitionParser("custom-parameters", new GenericChildMapDefinitionParser("customParameters", "custom-parameter", "paramName", "value"));
         registerMuleBeanDefinitionParser("custom-parameter-extractor", new ChildDefinitionParser("parameterExtractor", ParameterExtractor.class));
-        registerMuleBeanDefinitionParser("client-credentials-grant-type", new ChildDefinitionParser("authentication", ClientCredentialsGrantType.class, true));
+
+        ChildDefinitionParser clientCredentialsGrantType = new ChildDefinitionParser("authentication", ClientCredentialsGrantType.class, true);
+        clientCredentialsGrantType.addAlias("proxy", "proxyConfig");
+        registerMuleBeanDefinitionParser("client-credentials-grant-type", clientCredentialsGrantType);
+
         registerMuleBeanDefinitionParser("invalidate-oauth-context", new MessageProcessorDefinitionParser(InvalidateOauthContextMessageProcessor.class));
     }
 
