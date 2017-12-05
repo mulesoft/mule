@@ -9,11 +9,10 @@ package org.mule.runtime.http.api.domain.message.request;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 import static org.mule.runtime.http.api.utils.UriCache.getUriFromString;
-
-import org.mule.runtime.http.api.HttpConstants.Method;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.HttpConstants.Method;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.message.HttpMessageBuilder;
-import org.mule.runtime.http.api.utils.UriCache;
 
 import java.net.URI;
 
@@ -82,7 +81,20 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
    * @return this builder
    */
   public HttpRequestBuilder queryParams(MultiMap<String, String> queryParams) {
-    this.queryParams = queryParams;
+    queryParams.keySet()
+        .forEach(key -> this.queryParams.put(key, queryParams.getAll(key)));
+    return this;
+  }
+
+  /**
+   * Includes a new queryParam to be sent in the desired {@link HttpMessage}.
+   *
+   * @param name the name of the HTTP queryParam
+   * @param value the value of the HTTP queryParam
+   * @return this builder
+   */
+  public HttpRequestBuilder addQueryParam(String name, String value) {
+    this.queryParams.put(name, value);
     return this;
   }
 
