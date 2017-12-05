@@ -29,4 +29,14 @@
         <test:component />
     </flow>
 
+    <flow name="cxfJaxwsService">
+
+        <inbound-endpoint address="http://localhost:${httpPort}/cxfJaxwsService"
+            exchange-pattern="request-response">
+            <cxf:jaxws-service serviceClass="org.mule.api.lifecycle.Callable" />
+        </inbound-endpoint>
+
+        <test:component />
+    </flow>
+
 </mule>
