@@ -9,12 +9,14 @@ package org.mule.module.oauth2.internal;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.module.http.api.HttpConstants.Protocols;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
@@ -66,20 +68,9 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware
 
     public void buildHttpRequestOptions (final TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig) throws MuleException
     {
-        if (tlsContextFactory != null && proxyConfig != null)
-        {
-            HttpRequesterConfig httpRequesterConfig = new HttpRequesterConfigBuilder(muleContext).setProxyConfig(proxyConfig).build();
-            httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().requestConfig(httpRequesterConfig).tlsContextFactory(tlsContextFactory).build();
-        }
-        else if (tlsContextFactory != null)
-        {
-            httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().tlsContextFactory(tlsContextFactory).build();
-        }
-        else if (proxyConfig != null )
-        {
-            HttpRequesterConfig httpRequesterConfig = new HttpRequesterConfigBuilder(muleContext).setProxyConfig(proxyConfig).build();
-            httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().requestConfig(httpRequesterConfig).build();
-        }
+        Protocols protocol = tlsContextFactory != null ? HTTPS : HTTP;
+        HttpRequesterConfig httpRequesterConfig = new HttpRequesterConfigBuilder(muleContext).setProxyConfig(proxyConfig).setProtocol(protocol).setTlsContext(tlsContextFactory).build();
+        httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).disableStatusCodeValidation().requestConfig(httpRequesterConfig).build();
     }
 
     protected MuleEvent invokeTokenUrl(final MuleEvent event) throws MuleException, TokenUrlResponseException
