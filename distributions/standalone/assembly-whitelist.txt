@@ -127,7 +127,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-cxf-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-db-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-devkit-support-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-drools-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-spring-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-http-${productVersion}.jar
@@ -191,7 +190,6 @@
 /mule-standalone-${productVersion}/lib/opt/annotations-api-6.0.53.jar
 /mule-standalone-${productVersion}/lib/opt/ant-1.9.6.jar
 /mule-standalone-${productVersion}/lib/opt/ant-launcher-1.9.6.jar
-/mule-standalone-${productVersion}/lib/opt/antlr-3.5.2.jar
 /mule-standalone-${productVersion}/lib/opt/antlr-runtime-3.5.2.jar
 /mule-standalone-${productVersion}/lib/opt/aopalliance-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/asm-3.3.1.jar
@@ -249,10 +247,6 @@
 /mule-standalone-${productVersion}/lib/opt/cxf-wstx-msv-validation-2.7.19-MULE-003.jar
 /mule-standalone-${productVersion}/lib/opt/dirgra-0.3.jar
 /mule-standalone-${productVersion}/lib/opt/dom4j-1.6.1.jar
-/mule-standalone-${productVersion}/lib/opt/knowledge-api-5.6.0.Final.jar
-/mule-standalone-${productVersion}/lib/opt/knowledge-internal-api-5.6.0.Final.jar
-/mule-standalone-${productVersion}/lib/opt/drools-compiler-5.6.0.Final.jar
-/mule-standalone-${productVersion}/lib/opt/drools-core-5.6.0.Final.jar
 /mule-standalone-${productVersion}/lib/opt/ecj-4.3.1.jar
 /mule-standalone-${productVersion}/lib/opt/el-api-6.0.53.jar
 /mule-standalone-${productVersion}/lib/opt/geronimo-ejb_2.1_spec-1.1.jar
@@ -367,7 +361,6 @@
 /mule-standalone-${productVersion}/lib/opt/mimepull-1.9.3.jar
 /mule-standalone-${productVersion}/lib/opt/msg-simple-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/msv-core-2011.1.jar
-/mule-standalone-${productVersion}/lib/opt/mvel2-2.1.8.Final.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-impl-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-jmx-2.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-remote-2.1.1.jar
@@ -409,14 +402,12 @@
 /mule-standalone-${productVersion}/lib/opt/spring-security-web-4.2.3.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-security-ldap-4.2.3.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-ldap-core-2.3.2.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/ST4-4.0.8.jar
 /mule-standalone-${productVersion}/lib/opt/spring-tx-4.1.9.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-web-4.1.9.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/stax-api-1.0-2.jar
 /mule-standalone-${productVersion}/lib/opt/stax-utils-20080702.jar
 /mule-standalone-${productVersion}/lib/opt/stax2-api-3.1.4.jar
 /mule-standalone-${productVersion}/lib/opt/staxon-1.2.jar
-/mule-standalone-${productVersion}/lib/opt/stringtemplate-3.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-core-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-runtime-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/sxc-xpath-0.7.3.jar
