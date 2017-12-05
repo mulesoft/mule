@@ -22,7 +22,6 @@ import org.mule.module.oauth2.api.RequestAuthenticationException;
 import org.mule.module.oauth2.internal.AbstractGrantType;
 import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.module.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.transport.ssl.api.TlsContextFactory;
 
 /**
  * Authorization element for client credentials oauth grant type
@@ -30,36 +29,12 @@ import org.mule.transport.ssl.api.TlsContextFactory;
 public class ClientCredentialsGrantType extends AbstractGrantType implements Initialisable, Startable, MuleContextAware
 {
 
-    private String clientId;
-    private String clientSecret;
     private ClientCredentialsTokenRequestHandler tokenRequestHandler;
     private MuleContext muleContext;
-    private TokenManagerConfig tokenManager;
-    private TlsContextFactory tlsContextFactory;
-
-    public void setClientId(final String clientId)
-    {
-        this.clientId = clientId;
-    }
-
-    public void setClientSecret(final String clientSecret)
-    {
-        this.clientSecret = clientSecret;
-    }
 
     public void setTokenRequestHandler(final ClientCredentialsTokenRequestHandler tokenRequestHandler)
     {
         this.tokenRequestHandler = tokenRequestHandler;
-    }
-
-    public TlsContextFactory getTlsContext()
-    {
-        return tlsContextFactory;
-    }
-
-    public void setTlsContext(TlsContextFactory tlsContextFactory)
-    {
-        this.tlsContextFactory = tlsContextFactory;
     }
 
     @Override
@@ -68,25 +43,15 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
         tokenRequestHandler.refreshAccessToken();
     }
 
-    public String getClientSecret()
-    {
-        return clientSecret;
-    }
-
-    public String getClientId()
-    {
-        return clientId;
-    }
-
     @Override
     public void initialise() throws InitialisationException
     {
-        if (tokenManager == null)
+        if (tokenManagerConfig == null)
         {
-            this.tokenManager = TokenManagerConfig.createDefault(muleContext);
+            this.tokenManagerConfig = TokenManagerConfig.createDefault(muleContext);
         }
         tokenRequestHandler.setApplicationCredentials(this);
-        tokenRequestHandler.setTokenManager(tokenManager);
+        tokenRequestHandler.setTokenManager(tokenManagerConfig);
         try
         {
             tokenRequestHandler.buildHttpRequestOptions(tlsContextFactory, proxyConfig);
@@ -116,7 +81,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
     @Override
     public void authenticate(MuleEvent muleEvent, HttpRequestBuilder builder) throws MuleException
     {
-        final String accessToken = tokenManager.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID).getAccessToken();
+        final String accessToken = tokenManagerConfig.getConfigOAuthContext().getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID).getAccessToken();
         if (accessToken == null)
         {
             throw new RequestAuthenticationException(createStaticMessage(String.format("No access token found. Verify that you have authenticated before trying to execute an operation to the API.")));
@@ -145,11 +110,6 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
             }
         }
         return shouldRetryRequest;
-    }
-
-    public void setTokenManager(TokenManagerConfig tokenManager)
-    {
-        this.tokenManager = tokenManager;
     }
 
 }
