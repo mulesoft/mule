@@ -273,13 +273,6 @@
             <type>jar</type>
         </dependency>
 
-        <!-- re-add our ant dependency as it gets transitively excluded by jetty's jsp support -->
-        <!-- <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>${antVersion}</version>
-        </dependency> -->
-
         <!-- add aspectj weaver dependency that was removed from spring-security-3.1 -->
         <dependency>
             <groupId>org.aspectj</groupId>
