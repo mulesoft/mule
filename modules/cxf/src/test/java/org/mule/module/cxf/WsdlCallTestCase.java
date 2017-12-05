@@ -100,4 +100,18 @@ public class WsdlCallTestCase extends AbstractServiceAndFlowTestCase
         assertEquals(location, ((Element) nodes.get(0)).attribute("location").getStringValue());
     }
 
+    @Test
+    public void testRequestJaxwsWsdlWithHttp() throws Exception
+    {
+        String location = "http://localhost:" + httpPort.getNumber() + "/cxfJaxwsService";
+        InputStream wsdlStream = new URL(location + "?wsdl").openStream();
+        
+        Document document = new SAXReader().read(wsdlStream);
+        List nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
+        assertEquals(((Element) nodes.get(0)).attribute("name").getStringValue(), "CallableService");
+        
+        nodes = document.selectNodes("//wsdl:definitions/wsdl:service/wsdl:port/soap:address");
+        assertEquals(location, ((Element) nodes.get(0)).attribute("location").getStringValue());
+    }
+    
 }
