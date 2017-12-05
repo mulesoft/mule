@@ -180,7 +180,7 @@
         <guavaVersion>18.0</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <hk2Version>2.3.0-b05</hk2Version>
-        <jacksonVersion>1.9.11</jacksonVersion>
+        <jacksonVersion>1.9.14-MULE-001</jacksonVersion>
         <jackson2Version>2.9.2</jackson2Version>
         <javax.inject.version>1</javax.inject.version>
         <jerseyVersion>2.11</jerseyVersion>
@@ -1271,6 +1271,10 @@
                     <exclusion>
                         <artifactId>stax-api</artifactId>
                         <groupId>stax</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.jackson</groupId>
+                        <artifactId>jackson-jaxrs</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
