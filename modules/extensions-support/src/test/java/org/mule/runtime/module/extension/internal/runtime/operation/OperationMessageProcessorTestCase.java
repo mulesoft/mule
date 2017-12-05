@@ -40,6 +40,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
 import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
@@ -48,12 +49,15 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -68,6 +72,7 @@ import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
+import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -77,18 +82,20 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+
+import com.google.common.reflect.TypeToken;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -227,6 +234,29 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
     assertThat(message.getPayload().getValue(), is(sameInstance(value)));
+  }
+
+  @Test
+  public void operationReturnsMapWithCorrectDataType() throws Exception {
+    Object payload = new HashMap<>();
+
+    Type type = new TypeToken<Map<String, String>>() {}.getType();
+    MetadataType load = new DefaultExtensionsTypeLoaderFactory().createTypeLoader().load(type);
+    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("desc", load, false, emptySet()));
+
+    messageProcessor.initialise();
+
+    when(operationExecutor.execute(any(ExecutionContext.class)))
+        .thenReturn(just(payload));
+
+    Message message = messageProcessor.process(event).getMessage();
+    assertThat(message, is(notNullValue()));
+
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
+    DataType dataType = message.getPayload().getDataType();
+    assertThat(dataType, instanceOf(MapDataType.class));
+    assertThat(((MapDataType) dataType).getKeyDataType(), like(String.class, ANY.withCharset(null)));
+    assertThat(((MapDataType) dataType).getValueDataType(), like(String.class, ANY));
   }
 
   @Test

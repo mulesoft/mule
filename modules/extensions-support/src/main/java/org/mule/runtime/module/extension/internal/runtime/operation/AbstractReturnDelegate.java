@@ -13,15 +13,19 @@ import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageIterator;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
@@ -35,6 +39,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MediaType
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -54,8 +59,11 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
   protected final MuleContext muleContext;
   private final boolean returnsListOfMessages;
+  private final boolean isMapType;
   private final CursorProviderFactory cursorProviderFactory;
   private final MediaType defaultMediaType;
+  private Class<?> mapKeyType;
+  private Class<?> mapValueType;
 
   /**
    * Creates a new instance
@@ -68,6 +76,14 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
                                    CursorProviderFactory cursorProviderFactory,
                                    MuleContext muleContext) {
     returnsListOfMessages = componentModel instanceof HasOutputModel && returnsListOfMessages((HasOutputModel) componentModel);
+
+    isMapType = componentModel instanceof HasOutputModel && isMap(((HasOutputModel) componentModel).getOutput().getType());
+    if (isMapType) {
+      MapDataType mapDataType = (MapDataType) toDataType(((HasOutputModel) componentModel).getOutput().getType());
+      mapKeyType = mapDataType.getKeyDataType().getType();
+      mapValueType = mapDataType.getValueDataType().getType();
+    }
+
     this.muleContext = muleContext;
     this.cursorProviderFactory = cursorProviderFactory;
     defaultMediaType = componentModel.getModelProperty(MediaTypeModelProperty.class)
@@ -105,6 +121,9 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       // org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION doesn't completely makes sense
       if (returnsListOfMessages && value instanceof Collection) {
         messageBuilder = Message.builder().collectionValue((Collection) value, Message.class);
+      } else if (isMapType && value instanceof Map) {
+        messageBuilder =
+            Message.builder().mapValue((Map) value, mapKeyType, mapValueType);
       } else {
         messageBuilder = Message.builder().value(value);
       }
