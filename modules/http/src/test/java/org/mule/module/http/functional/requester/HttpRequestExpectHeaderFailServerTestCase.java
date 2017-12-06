@@ -12,16 +12,16 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.EXPECTATION_FAIL
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
-import org.mule.module.http.functional.AbstractHttpExpectHeaderServerTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Test;
+import org.mule.api.MuleEvent;
+import org.mule.construct.Flow;
+import org.mule.module.http.functional.AbstractHttpExpectHeaderServerTestCase;
 
-public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase
+public class HttpRequestExpectHeaderFailServerTestCase extends AbstractHttpExpectHeaderServerTestCase
 {
 
     private static final String REQUEST_FLOW_NAME = "requestFlow";
@@ -29,23 +29,9 @@ public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderSer
     @Override
     protected String getConfigFile()
     {
-        return "http-request-expect-header-config.xml";
+        return "http-request-expect-fail-header-config.xml";
     }
-
-    @Test
-    public void handlesContinueResponse() throws Exception
-    {
-        startExpectContinueServer();
-
-        Flow flow = (Flow) getFlowConstruct(REQUEST_FLOW_NAME);
-        MuleEvent event = getTestEvent(TEST_MESSAGE);
-        event.getMessage().setOutboundProperty(EXPECT, CONTINUE);
-
-        flow.process(event);
-        assertThat(requestBody, equalTo(TEST_MESSAGE));
-
-        stopServer();
-    }
+    
 
     @Test
     public void handlesExpectationFailedResponse() throws Exception
