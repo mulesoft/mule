@@ -740,13 +740,13 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             if (logger.isDebugEnabled())
             {
-                logger.error("Closing non-TX session: " + session);
+                logger.debug("Closing non-TX session: " + session);
             }
             closeQuietly(session);
         }
         else if (logger.isDebugEnabled())
         {
-            logger.error("Not closing TX session: " + session);
+            logger.debug("Not closing TX session: " + session);
         }
     }
 
