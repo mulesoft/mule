@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -380,7 +381,12 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
       try {
         muleContext.withLifecycleLock((CheckedRunnable) () -> doRegisterObject(key, value));
       } catch (RuntimeException e) {
-        throw (RegistrationException) e.getCause();
+        Throwable cause = e.getCause();
+        if (cause instanceof RegistrationException) {
+          throw (RegistrationException) cause;
+        } else {
+          throw new RegistrationException(cause);
+        }
       }
     }
 
