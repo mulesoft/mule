@@ -6,16 +6,22 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.process.FlowExecutorFactory;
+import org.mule.runtime.extension.api.runtime.process.FlowNotFoundException;
+import org.mule.runtime.extension.api.runtime.process.InvalidFlowReferenceException;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.test.heisenberg.extension.model.Attribute;
@@ -31,6 +37,28 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class HeisenbergRouters {
+
+  @MediaType(MediaType.ANY)
+  public void flowRouter(@Content Object delegatePayload, String flowName,
+                         FlowExecutorFactory flowExecutorFactory,
+                         CompletionCallback<String, Void> cb) {
+    try {
+      flowExecutorFactory
+          .newExecutor(flowName)
+          .process(delegatePayload, null,
+                   cb::success,
+                   cb::error);
+
+    } catch (FlowNotFoundException e) {
+      cb.error(new IllegalArgumentException(format("[%s] is not a valid Flow name", flowName), e));
+
+    } catch (InvalidFlowReferenceException e) {
+      cb.error(new IllegalArgumentException(format("[%s] is not a valid Flow name. Component found was of kind [%s]",
+                                                   flowName, e.getComponentType().name()),
+                                            e));
+    }
+
+  }
 
   public void concurrentRouteExecutor(WhenRoute when, RouterCompletionCallback callback) {
 
