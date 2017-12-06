@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_CONSOLE
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.CORRELATION_ID_MDC_KEY;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleBase;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.FileUtils;
@@ -32,6 +31,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -77,6 +77,9 @@ final class LoggerContextConfigurer {
   private static final String MULE_DOMAIN_LOG_FILE_TEMPLATE = "mule-domain-%s.log";
   private static final String PATTERN_LAYOUT = "%-5p %d [%t] %X{" + CORRELATION_ID_MDC_KEY + "}%c: %m%n";
   private static final int DEFAULT_MONITOR_INTERVAL_SECS = 60;
+  private static final Function<String, Boolean> containerConsoleAppenderMatcher = (name) -> name.equals("Console");
+  private static final Function<String, Boolean> defaultConsoleAppenderMatcher = (name) -> name.startsWith("DefaultConsole-");
+
   static final String FORCED_CONSOLE_APPENDER_NAME = "Forced-Console";
   static final String PER_APP_FILE_APPENDER_NAME = "defaultFileAppender";
 
@@ -92,7 +95,7 @@ final class LoggerContextConfigurer {
 
     boolean forceConsoleLog = System.getProperty(MULE_FORCE_CONSOLE_LOG) != null;
     if (context.getConfigFile() == null && !forceConsoleLog) {
-      removeConsoleAppender(context);
+      removeConsoleAppender(context, containerConsoleAppenderMatcher);
     }
 
     if (context.isArtifactClassloader()) {
@@ -207,18 +210,24 @@ final class LoggerContextConfigurer {
 
     if (context.getConfigLocation() == null) {
       addDefaultAppender(context, logFile.getAbsolutePath());
-    } else if (!hasFileAppender(context) && isUrlInsideDirectory(context.getConfigFile(), getMuleConfDir())
-        || context.getConfiguration().getAppenders().isEmpty()) {
-      // If the artifact logging is configured using the global config file and there is no file appender for the artifact, then
-      // configure a default one. Same if there is no appender configured
-      addDefaultAppender(context, logFile.getAbsolutePath());
-      removeConsoleAppender(context);
+    } else if (isUrlInsideDirectory(context.getConfigFile(), getMuleConfDir())) {
+      removeConsoleAppender(context, containerConsoleAppenderMatcher);
+      if (!hasFileAppender(context)) {
+        addDefaultAppender(context, logFile.getAbsolutePath());
+      }
+    } else {
+      // Removes Log4j added default console appender
+      removeConsoleAppender(context, defaultConsoleAppenderMatcher);
+
+      if (context.getConfiguration().getAppenders().isEmpty()) {
+        addDefaultAppender(context, logFile.getAbsolutePath());
+      }
     }
   }
 
-  private void removeConsoleAppender(LoggerContext context) {
+  private void removeConsoleAppender(LoggerContext context, Function<String, Boolean> appenderNameMatcher) {
     for (Appender appender : getRootLogger(context).getAppenders().values()) {
-      if (appender instanceof ConsoleAppender) {
+      if (appender instanceof ConsoleAppender && appenderNameMatcher.apply(appender.getName())) {
         removeAppender(context, appender);
         getRootLogger(context).removeAppender(appender.getName());
       }
