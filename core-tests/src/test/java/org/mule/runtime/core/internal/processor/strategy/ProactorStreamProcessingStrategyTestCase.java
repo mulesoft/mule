@@ -54,7 +54,6 @@ import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
-@Ignore("MULE-13478")
 public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public ProactorStreamProcessingStrategyTestCase(Mode mode) {
