@@ -357,6 +357,7 @@
 /mule-standalone-${productVersion}/lib/opt/mailapi-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/mchange-commons-java-0.2.11.jar
 /mule-standalone-${productVersion}/lib/opt/mimepull-1.9.3.jar
+/mule-standalone-${productVersion}/lib/opt/modulator-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/msg-simple-1.1.jar
 /mule-standalone-${productVersion}/lib/opt/msv-core-2011.1.jar
 /mule-standalone-${productVersion}/lib/opt/mx4j-impl-2.1.1.jar
