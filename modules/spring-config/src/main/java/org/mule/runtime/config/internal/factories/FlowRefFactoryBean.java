@@ -104,7 +104,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       if (referencedFlow instanceof SubflowMessageProcessorChainBuilder) {
         MessageProcessorChainBuilder chainBuilder = (MessageProcessorChainBuilder) referencedFlow;
 
-        locator.find(flowRefMessageProcessor.getRootContainerLocation()).map(c -> (Flow) c)
+        locator.find(flowRefMessageProcessor.getRootContainerLocation()).filter(c -> c instanceof Flow).map(c -> (Flow) c)
             .ifPresent(f -> chainBuilder.setProcessingStrategy(f.getProcessingStrategy()));
 
         referencedFlow = chainBuilder.build();
