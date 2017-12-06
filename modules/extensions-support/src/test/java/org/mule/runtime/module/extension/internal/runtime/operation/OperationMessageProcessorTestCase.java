@@ -56,6 +56,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -84,7 +85,9 @@ import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -241,8 +244,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Object payload = new HashMap<>();
 
     Type type = new TypeToken<Map<String, String>>() {}.getType();
-    MetadataType load = new DefaultExtensionsTypeLoaderFactory().createTypeLoader().load(type);
-    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("desc", load, false, emptySet()));
+    MetadataType mapType = new DefaultExtensionsTypeLoaderFactory().createTypeLoader().load(type);
+    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("desc", mapType, false, emptySet()));
 
     messageProcessor.initialise();
 
@@ -257,6 +260,28 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     assertThat(dataType, instanceOf(MapDataType.class));
     assertThat(((MapDataType) dataType).getKeyDataType(), like(String.class, ANY.withCharset(null)));
     assertThat(((MapDataType) dataType).getValueDataType(), like(String.class, ANY));
+  }
+
+  @Test
+  public void operationReturnsCollectionWithCorrectDataType() throws Exception {
+    Object payload = new ArrayList<>();
+
+    Type type = new TypeToken<List<Integer>>() {}.getType();
+    MetadataType collectionType = new DefaultExtensionsTypeLoaderFactory().createTypeLoader().load(type);
+    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("desc", collectionType, false, emptySet()));
+
+    messageProcessor.initialise();
+
+    when(operationExecutor.execute(any(ExecutionContext.class)))
+        .thenReturn(just(payload));
+
+    Message message = messageProcessor.process(event).getMessage();
+    assertThat(message, is(notNullValue()));
+
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
+    DataType dataType = message.getPayload().getDataType();
+    assertThat(dataType, instanceOf(CollectionDataType.class));
+    assertThat(((CollectionDataType) dataType).getItemDataType(), like(Integer.class, ANY.withCharset(null)));
   }
 
   @Test

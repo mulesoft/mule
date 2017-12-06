@@ -239,12 +239,11 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     InternalMessage build();
   }
 
-  interface MapBuilder extends Message.MapBuilder, Builder {
+  interface CollectionBuilder extends Message.CollectionBuilder, Builder {
 
   }
 
-  interface CollectionBuilder extends Message.CollectionBuilder, Builder {
-
+  interface MapBuilder extends Message.MapBuilder, Builder {
 
   }
 }

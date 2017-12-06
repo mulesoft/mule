@@ -136,7 +136,7 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.MapBuilder mediaType(MediaType mediaType) {
+  public InternalMessage.Builder mediaType(MediaType mediaType) {
     this.payload =
         new TypedValue<>(payload.getValue(), builder(payload.getDataType()).mediaType(mediaType).build(), payload.getLength());
     return this;
