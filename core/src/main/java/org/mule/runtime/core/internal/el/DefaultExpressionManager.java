@@ -68,7 +68,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   private StreamingManager streamingManager;
   private Registry registry;
 
-  private ExtendedExpressionLanguageAdaptor expressionLanguage;
+  private ExpressionLanguageAdaptorHandler expressionLanguage;
   // Default style parser
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();
   private boolean melDefault;
@@ -84,7 +84,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
         mvelExpressionLanguage = registry.<MVELExpressionLanguage>lookupByName(OBJECT_EXPRESSION_LANGUAGE).get();
       }
       this.expressionLanguage = new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage);
-      this.melDefault = ((ExpressionLanguageAdaptorHandler) expressionLanguage).isMelDefault();
+      this.melDefault = expressionLanguage.isMelDefault();
 
       Collection<GlobalBindingContextProvider> contextProviders = registry.lookupAllByType(GlobalBindingContextProvider.class);
 
@@ -235,7 +235,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public String parse(String expression, CoreEvent event, ComponentLocation componentLocation)
       throws ExpressionRuntimeException {
     Builder eventBuilder = CoreEvent.builder(event);
-    if (hasMelExpression(expression) || melDefault) {
+
+    if ((!hasDwExpression(expression) && !hasMelExpression(expression) && melDefault) || hasMelExpression(expression)) {
       parseWarning.warn();
       return parser.parse(token -> melParseEvaluation(event, componentLocation, eventBuilder, token), expression);
     } else if (isExpression(expression)) {
@@ -249,7 +250,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
       }
     } else {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(String.format("No expression marker found in expression '%s'. Parsing as plain String.", expression));
+        LOGGER.debug(format("No expression marker found in expression '%s'. Parsing as plain String.", expression));
       }
       return expression;
     }
@@ -272,7 +273,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public String parseLogTemplate(String template, CoreEvent event, ComponentLocation componentLocation,
                                  BindingContext bindingContext)
       throws ExpressionRuntimeException {
-    if (hasMelExpression(template) || melDefault) {
+
+    if ((!hasDwExpression(template) && !hasMelExpression(template) && melDefault) || hasMelExpression(template)) {
       Builder eventBuilder = CoreEvent.builder(event);
       return parser.parse(token -> melParseEvaluation(event, componentLocation, eventBuilder, token), template);
     } else {
@@ -363,6 +365,16 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
    */
   public static boolean hasMelExpression(String expression) {
     return expression.contains(DEFAULT_EXPRESSION_PREFIX + MEL_PREFIX + PREFIX_EXPR_SEPARATOR);
+  }
+
+  /**
+   * Checks if an expression has DW prefix.
+   *
+   * @param expression the expression to check to see if is a DW expression.
+   * @return true if the expression is a MEL expression
+   */
+  public static boolean hasDwExpression(String expression) {
+    return expression.contains(DEFAULT_EXPRESSION_PREFIX + DW_PREFIX + PREFIX_EXPR_SEPARATOR);
   }
 
   @Inject

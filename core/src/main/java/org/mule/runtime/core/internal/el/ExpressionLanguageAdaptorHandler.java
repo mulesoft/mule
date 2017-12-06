@@ -163,7 +163,7 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
     }
   }
 
-  private String getLanguagePrefix(String expression) {
+  public String getLanguagePrefix(String expression) {
     final Matcher matcher = exprPrefixPattern.matcher(expression);
     if (matcher.find()) {
       int i = 1;
