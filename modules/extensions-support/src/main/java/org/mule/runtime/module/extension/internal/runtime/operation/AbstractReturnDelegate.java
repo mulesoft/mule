@@ -7,15 +7,19 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.isCollection;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageIterator;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler.nullHandler;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.message.Message;
@@ -31,6 +35,9 @@ import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.CollectionReturnHandler;
+import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.MapReturnHandler;
+import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler;
 
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -53,9 +60,11 @@ import java.util.Optional;
 abstract class AbstractReturnDelegate implements ReturnDelegate {
 
   protected final MuleContext muleContext;
-  private final boolean returnsListOfMessages;
+  private boolean returnsListOfMessages = false;
   private final CursorProviderFactory cursorProviderFactory;
   private final MediaType defaultMediaType;
+  private boolean isSpecialHandling = false;
+  private ReturnHandler returnHandler = nullHandler();
 
   /**
    * Creates a new instance
@@ -67,7 +76,22 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   protected AbstractReturnDelegate(ComponentModel componentModel,
                                    CursorProviderFactory cursorProviderFactory,
                                    MuleContext muleContext) {
-    returnsListOfMessages = componentModel instanceof HasOutputModel && returnsListOfMessages((HasOutputModel) componentModel);
+
+    if (componentModel instanceof HasOutputModel) {
+      HasOutputModel hasOutputModel = (HasOutputModel) componentModel;
+      returnsListOfMessages = returnsListOfMessages(hasOutputModel);
+
+      MetadataType outputType = hasOutputModel.getOutput().getType();
+
+      if (isMap(outputType)) {
+        isSpecialHandling = true;
+        returnHandler = new MapReturnHandler(hasOutputModel);
+      } else if (isCollection(outputType)) {
+        isSpecialHandling = true;
+        returnHandler = new CollectionReturnHandler(outputType);
+      }
+    }
+
     this.muleContext = muleContext;
     this.cursorProviderFactory = cursorProviderFactory;
     defaultMediaType = componentModel.getModelProperty(MediaTypeModelProperty.class)
@@ -89,7 +113,10 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     final CoreEvent event = operationContext.getEvent();
 
     if (value instanceof Result) {
-      return MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event);
+      Result resultValue = (Result) value;
+      return isSpecialHandling && returnHandler.handles(resultValue.getOutput())
+          ? MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event, returnHandler.getDataType())
+          : MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event);
     } else {
       if (value instanceof Collection && returnsListOfMessages) {
         value = toMessageCollection((Collection<Result>) value, cursorProviderFactory, event);
@@ -105,6 +132,8 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       // org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION doesn't completely makes sense
       if (returnsListOfMessages && value instanceof Collection) {
         messageBuilder = Message.builder().collectionValue((Collection) value, Message.class);
+      } else if (isSpecialHandling && returnHandler.handles(value)) {
+        messageBuilder = returnHandler.toMessageBuilder(value);
       } else {
         messageBuilder = Message.builder().value(value);
       }
