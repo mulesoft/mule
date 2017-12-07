@@ -306,5 +306,5 @@ public class MessageProcessors {
         .flatMap(event -> from(function.apply(event))
             .onErrorMap(e -> !(e instanceof MessagingException), e -> new MessagingException(event, e, component)));
   }
-  
+
 }
