@@ -30,11 +30,12 @@ public final class MapReturnHandler implements ReturnHandler<Map> {
 
   private final Class<?> mapKeyType;
   private final Class<?> mapValueType;
+  private final MapDataType mapDataType;
 
   public MapReturnHandler(HasOutputModel hasOutputModel) {
     MetadataType type = hasOutputModel.getOutput().getType();
     Preconditions.checkArgument(isMap(type), "The given output type is not a Map");
-    MapDataType mapDataType = (MapDataType) toDataType(type);
+    mapDataType = (MapDataType) toDataType(type);
     mapKeyType = mapDataType.getKeyDataType().getType();
     mapValueType = mapDataType.getValueDataType().getType();
   }
@@ -44,5 +45,20 @@ public final class MapReturnHandler implements ReturnHandler<Map> {
    */
   public Message.Builder toMessageBuilder(Map value) {
     return Message.builder().mapValue(value, mapKeyType, mapValueType);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public DataType getDataType() {
+    return mapDataType;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean handles(Object value) {
+    return value instanceof Map;
   }
 }

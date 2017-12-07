@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.util.message;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -54,7 +55,7 @@ public final class MessageUtils {
    * @return a {@link Message}
    */
   public static Message toMessage(Result result, MediaType mediaType) {
-    return toMessage(result, mediaType, null, null);
+    return toMessage(result, mediaType, (CursorProviderFactory) null, null);
   }
 
   /**
@@ -86,14 +87,27 @@ public final class MessageUtils {
                                   CursorProviderFactory cursorProviderFactory,
                                   CoreEvent event) {
     Object value = streamingContent(result.getOutput(), cursorProviderFactory, event);
-    Message.Builder builder = Message.builder()
-        .payload(new TypedValue<>(value, builder(DataType.fromObject(value)).mediaType(mediaType).build(),
-                                  result.getLength()));
+    return toMessage(result, mediaType, DataType.fromObject(value), value);
+  }
 
-    result.getAttributes().ifPresent(builder::attributesValue);
-    result.getAttributesMediaType().ifPresent(builder::attributesMediaType);
-
-    return builder.build();
+  /**
+   * Transforms the given {@code result} into a {@link Message}.
+   *
+   * @param result a {@link Result} object
+   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
+   * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
+   *        {@link Iterator}), will create a {@link CursorProvider}
+   * @param event Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *
+   * @return a {@link Message}
+   */
+  public static Message toMessage(Result<?, ?> result,
+                                  MediaType mediaType,
+                                  CursorProviderFactory cursorProviderFactory,
+                                  CoreEvent event,
+                                  DataType dataType) {
+    Object value = streamingContent(result.getOutput(), cursorProviderFactory, event);
+    return toMessage(result, mediaType, dataType, value);
   }
 
   /**
@@ -130,5 +144,16 @@ public final class MessageUtils {
     } else {
       return new ResultToMessageIterator((Iterator) results, cursorProviderFactory, event);
     }
+  }
+
+  private static Message toMessage(Result<?, ?> result, MediaType mediaType, DataType dataType, Object value) {
+    Message.Builder builder = Message.builder()
+        .payload(new TypedValue<>(value, builder(dataType).mediaType(mediaType).build(),
+                                  result.getLength()));
+
+    result.getAttributes().ifPresent(builder::attributesValue);
+    result.getAttributesMediaType().ifPresent(builder::attributesMediaType);
+
+    return builder.build();
   }
 }

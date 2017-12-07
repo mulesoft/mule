@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation.resulthandler;
 
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.LazyValue;
 
@@ -27,6 +28,16 @@ public interface ReturnHandler<T> {
    */
   Message.Builder toMessageBuilder(T value);
 
+  /**
+   * @return The current {@link DataType} of the handler
+   */
+  DataType getDataType();
+
+  /**
+   * @return A boolean indicating if the current handler supports the given value
+   */
+  boolean handles(Object value);
+
   static <T> ReturnHandler<T> nullHandler() {
     return nullHandler.get();
   }
@@ -36,6 +47,16 @@ public interface ReturnHandler<T> {
     @Override
     public Message.Builder toMessageBuilder(T value) {
       return Message.builder().payload(TypedValue.of(value));
+    }
+
+    @Override
+    public DataType getDataType() {
+      return DataType.OBJECT;
+    }
+
+    @Override
+    public boolean handles(Object value) {
+      return false;
     }
   }
 }

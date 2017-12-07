@@ -52,6 +52,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
@@ -76,6 +77,7 @@ import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -242,15 +244,22 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void operationReturnsMapWithCorrectDataType() throws Exception {
     Object payload = new HashMap<>();
+    setUpOperationReturning(payload, new TypeToken<Map<String, String>>() {}.getType());
 
-    Type type = new TypeToken<Map<String, String>>() {}.getType();
-    MetadataType mapType = new DefaultExtensionsTypeLoaderFactory().createTypeLoader().load(type);
-    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("desc", mapType, false, emptySet()));
+    Message message = messageProcessor.process(event).getMessage();
+    assertThat(message, is(notNullValue()));
 
-    messageProcessor.initialise();
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
+    DataType dataType = message.getPayload().getDataType();
+    assertThat(dataType, instanceOf(MapDataType.class));
+    assertThat(((MapDataType) dataType).getKeyDataType(), like(String.class, ANY.withCharset(null)));
+    assertThat(((MapDataType) dataType).getValueDataType(), like(String.class, ANY));
+  }
 
-    when(operationExecutor.execute(any(ExecutionContext.class)))
-        .thenReturn(just(payload));
+  @Test
+  public void operationReturnsResultMapWithCorrectDataType() throws Exception {
+    Object payload = new HashMap<>();
+    setUpOperationReturning(Result.builder().output(payload).build(), new TypeToken<Map<String, String>>() {}.getType());
 
     Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
@@ -265,15 +274,21 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void operationReturnsCollectionWithCorrectDataType() throws Exception {
     Object payload = new ArrayList<>();
+    setUpOperationReturning(payload, new TypeToken<List<Integer>>() {}.getType());
 
-    Type type = new TypeToken<List<Integer>>() {}.getType();
-    MetadataType collectionType = new DefaultExtensionsTypeLoaderFactory().createTypeLoader().load(type);
-    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("desc", collectionType, false, emptySet()));
+    Message message = messageProcessor.process(event).getMessage();
+    assertThat(message, is(notNullValue()));
 
-    messageProcessor.initialise();
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
+    DataType dataType = message.getPayload().getDataType();
+    assertThat(dataType, instanceOf(CollectionDataType.class));
+    assertThat(((CollectionDataType) dataType).getItemDataType(), like(Integer.class, ANY.withCharset(null)));
+  }
 
-    when(operationExecutor.execute(any(ExecutionContext.class)))
-        .thenReturn(just(payload));
+  @Test
+  public void operationReturnsResultCollectionWithCorrectDataType() throws Exception {
+    Object payload = new ArrayList<>();
+    setUpOperationReturning(Result.builder().output(payload).build(), new TypeToken<List<Integer>>() {}.getType());
 
     Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
@@ -469,5 +484,13 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(valueResolvers.get(eq(SOME_PARAM_NAME))).thenReturn(valueResolver);
     when(valueResolvers.containsKey(eq(SOME_PARAM_NAME))).thenReturn(true);
     when(valueResolver.resolve(any(ValueResolvingContext.class))).thenReturn("person");
+  }
+
+  private void setUpOperationReturning(Object payload, Type type) throws InitialisationException {
+    MetadataType mapType = new DefaultExtensionsTypeLoaderFactory().createTypeLoader().load(type);
+    when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("desc", mapType, false, emptySet()));
+    messageProcessor.initialise();
+    when(operationExecutor.execute(any(ExecutionContext.class)))
+        .thenReturn(just(payload));
   }
 }

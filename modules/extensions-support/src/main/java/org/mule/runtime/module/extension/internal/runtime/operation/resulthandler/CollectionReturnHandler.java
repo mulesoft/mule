@@ -41,4 +41,20 @@ public final class CollectionReturnHandler implements ReturnHandler<Collection> 
   public Message.Builder toMessageBuilder(Collection value) {
     return Message.builder().collectionValue(value, dataType.getItemDataType().getType());
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataType getDataType() {
+    return dataType;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean handles(Object value) {
+    return value instanceof Collection;
+  }
 }
