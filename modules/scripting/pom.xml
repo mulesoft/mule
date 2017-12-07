@@ -107,4 +107,28 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <argLine>-Xms64m -Xmx512m -XX:MaxPermSize=128m</argLine>
+                    <excludes>
+                        <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
+                        <exclude>**/Abstract*.*</exclude>
+                        <!-- Our tests never start with Test* but we have a lot of test helpers that match -->
+                        <exclude>**/Test*.java</exclude>
+                        <!-- exclude inner classes -->
+                        <exclude>**/*$*</exclude>
+                    </excludes>
+                    <excludedAnnotations>
+                        <excludedAnnotation>org.mule.tck.size.LargeTest</excludedAnnotation>
+                    </excludedAnnotations>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
