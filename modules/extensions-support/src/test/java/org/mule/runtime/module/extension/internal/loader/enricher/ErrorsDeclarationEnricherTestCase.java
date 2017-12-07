@@ -207,13 +207,13 @@ public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
         WHATEVER {
 
           @Override
-          public Optional<ErrorTypeDefinition<?>> getParent() {
+          public Optional<ErrorTypeDefinition<? extends Enum<?>>> getParent() {
             return empty();
           }
         };
 
         @Override
-        public Optional<ErrorTypeDefinition<?>> getParent() {
+        public Optional<ErrorTypeDefinition<? extends Enum<?>>> getParent() {
           return Optional.of(ANY);
         }
       }
@@ -231,21 +231,21 @@ public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
     TYPE_A {
 
       @Override
-      public Optional<ErrorTypeDefinition<?>> getParent() {
+      public Optional<ErrorTypeDefinition<? extends Enum<?>>> getParent() {
         return Optional.of(TYPE_B);
       }
     },
     TYPE_B {
 
       @Override
-      public Optional<ErrorTypeDefinition<?>> getParent() {
+      public Optional<ErrorTypeDefinition<? extends Enum<?>>> getParent() {
         return Optional.of(TYPE_C);
       }
     },
     TYPE_C {
 
       @Override
-      public Optional<ErrorTypeDefinition<?>> getParent() {
+      public Optional<ErrorTypeDefinition<? extends Enum<?>>> getParent() {
         return Optional.of(TYPE_A);
       }
     }
