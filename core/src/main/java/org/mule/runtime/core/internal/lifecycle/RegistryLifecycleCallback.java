@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -52,7 +53,11 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     try {
       registryLifecycleManager.muleContext.withLifecycleLock((CheckedRunnable) () -> doOnTransition(phaseName, object));
     } catch (RuntimeException e) {
-      throw (MuleException) e.getCause();
+      if (e.getCause() instanceof MuleException) {
+        throw (MuleException) e.getCause();
+      } else {
+        throw new MuleRuntimeException(e);
+      }
     }
   }
 
