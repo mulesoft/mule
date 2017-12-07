@@ -32,12 +32,13 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import org.reactivestreams.Publisher;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -278,4 +279,32 @@ public class MessageProcessors {
         .map(loc -> ((FlowConstruct) loc).getProcessingStrategy());
   }
 
+  /**
+   * Transform a given {@link Publisher} using a {@link ReactiveProcessor}. Primarily for use in the implementation of
+   * {@link ReactiveProcessor} in other class-loaders.
+   *
+   * @param publisher the publisher to transform
+   * @param processor the processor to transform publisher with
+   * @return the transformed publisher
+   */
+  public static Publisher<CoreEvent> transform(Publisher<CoreEvent> publisher, ReactiveProcessor processor) {
+    return Flux.from(publisher).transform(processor);
+  }
+
+  /**
+   * Perform processing using the provided {@link Function} for each {@link CoreEvent}. Primarily for use in the implementation of
+   * {@link ReactiveProcessor} in other class-loaders.
+   *
+   * @param publisher the publisher to transform
+   * @param function the function to apply to each event.
+   * @param component the component that implements this functionality.
+   * @return the transformed publisher
+   */
+  public static Publisher<CoreEvent> flatMap(Publisher<CoreEvent> publisher,
+                                             Function<CoreEvent, Publisher<CoreEvent>> function, Component component) {
+    return Flux.from(publisher)
+        .flatMap(event -> from(function.apply(event))
+            .onErrorMap(e -> !(e instanceof MessagingException), e -> new MessagingException(event, e, component)));
+  }
+  
 }
