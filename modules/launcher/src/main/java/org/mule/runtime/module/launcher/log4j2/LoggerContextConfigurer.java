@@ -77,8 +77,10 @@ final class LoggerContextConfigurer {
   private static final String MULE_DOMAIN_LOG_FILE_TEMPLATE = "mule-domain-%s.log";
   private static final String PATTERN_LAYOUT = "%-5p %d [%t] %X{" + CORRELATION_ID_MDC_KEY + "}%c: %m%n";
   private static final int DEFAULT_MONITOR_INTERVAL_SECS = 60;
-  private static final Function<String, Boolean> containerConsoleAppenderMatcher = (name) -> name.equals("Console");
-  private static final Function<String, Boolean> defaultConsoleAppenderMatcher = (name) -> name.startsWith("DefaultConsole-");
+  private static final Function<Appender, Boolean> containerConsoleAppenderMatcher =
+      (appender) -> appender instanceof ConsoleAppender && appender.getName().equals("Console");
+  private static final Function<Appender, Boolean> defaultConsoleAppenderMatcher =
+      (appender) -> appender instanceof ConsoleAppender && appender.getName().startsWith("DefaultConsole-");
 
   static final String FORCED_CONSOLE_APPENDER_NAME = "Forced-Console";
   static final String PER_APP_FILE_APPENDER_NAME = "defaultFileAppender";
@@ -95,7 +97,7 @@ final class LoggerContextConfigurer {
 
     boolean forceConsoleLog = System.getProperty(MULE_FORCE_CONSOLE_LOG) != null;
     if (context.getConfigFile() == null && !forceConsoleLog) {
-      removeConsoleAppender(context, containerConsoleAppenderMatcher);
+      removeAppender(context, containerConsoleAppenderMatcher);
     }
 
     if (context.isArtifactClassloader()) {
@@ -211,13 +213,13 @@ final class LoggerContextConfigurer {
     if (context.getConfigLocation() == null) {
       addDefaultAppender(context, logFile.getAbsolutePath());
     } else if (isUrlInsideDirectory(context.getConfigFile(), getMuleConfDir())) {
-      removeConsoleAppender(context, containerConsoleAppenderMatcher);
+      removeAppender(context, containerConsoleAppenderMatcher);
       if (!hasFileAppender(context)) {
         addDefaultAppender(context, logFile.getAbsolutePath());
       }
     } else {
       // Removes Log4j added default console appender
-      removeConsoleAppender(context, defaultConsoleAppenderMatcher);
+      removeAppender(context, defaultConsoleAppenderMatcher);
 
       if (context.getConfiguration().getAppenders().isEmpty()) {
         addDefaultAppender(context, logFile.getAbsolutePath());
@@ -225,9 +227,9 @@ final class LoggerContextConfigurer {
     }
   }
 
-  private void removeConsoleAppender(LoggerContext context, Function<String, Boolean> appenderNameMatcher) {
+  private void removeAppender(LoggerContext context, Function<Appender, Boolean> appenderMatcher) {
     for (Appender appender : getRootLogger(context).getAppenders().values()) {
-      if (appender instanceof ConsoleAppender && appenderNameMatcher.apply(appender.getName())) {
+      if (appenderMatcher.apply(appender)) {
         removeAppender(context, appender);
         getRootLogger(context).removeAppender(appender.getName());
       }
