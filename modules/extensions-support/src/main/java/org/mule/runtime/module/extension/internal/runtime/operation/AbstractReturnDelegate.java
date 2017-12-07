@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageIterator;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isJavaArray;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
@@ -86,7 +87,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       if (isMap(outputType)) {
         isSpecialHandling = true;
         returnHandler = new MapReturnHandler(hasOutputModel);
-      } else if (isCollection(outputType)) {
+      } else if (isCollection(outputType) && !isJavaArray(outputType)) {
         isSpecialHandling = true;
         returnHandler = new CollectionReturnHandler(outputType);
       }
