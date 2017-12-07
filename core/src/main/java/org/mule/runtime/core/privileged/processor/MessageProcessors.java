@@ -286,6 +286,7 @@ public class MessageProcessors {
    * @param publisher the publisher to transform
    * @param processor the processor to transform publisher with
    * @return the transformed publisher
+   * @since 4.1
    */
   public static Publisher<CoreEvent> transform(Publisher<CoreEvent> publisher, ReactiveProcessor processor) {
     return Flux.from(publisher).transform(processor);
@@ -299,6 +300,7 @@ public class MessageProcessors {
    * @param function the function to apply to each event.
    * @param component the component that implements this functionality.
    * @return the transformed publisher
+   * @since 4.1
    */
   public static Publisher<CoreEvent> flatMap(Publisher<CoreEvent> publisher,
                                              Function<CoreEvent, Publisher<CoreEvent>> function, Component component) {
