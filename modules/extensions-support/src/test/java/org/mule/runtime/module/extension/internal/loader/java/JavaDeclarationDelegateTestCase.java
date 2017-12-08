@@ -309,7 +309,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     MetadataType outputType = operation.getOutput().getType();
     assertThat(outputType, is(instanceOf(ArrayType.class)));
-    assertMessageType(((ArrayType) outputType).getType(), TYPE_BUILDER.anyType().build(), TYPE_BUILDER.voidType().build());
+    assertMessageType(((ArrayType) outputType).getType(), TYPE_BUILDER.anyType().build(), TYPE_BUILDER.anyType().build());
   }
 
   @Test

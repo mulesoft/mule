@@ -9,7 +9,9 @@ package org.mule.runtime.module.extension.internal.loader;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -42,8 +44,11 @@ public final class ParameterGroupDescriptor {
    * as an argument of an operation it should the corresponding {@link Method}'s {@link Parameter}.
    */
   private final AnnotatedElement container;
+  private ExtensionParameter groupParameterType;
 
-  public ParameterGroupDescriptor(String name, Type type, MetadataType metadataType, AnnotatedElement container) {
+  public ParameterGroupDescriptor(String name, Type type, MetadataType metadataType, AnnotatedElement container,
+                                  ExtensionParameter groupParameterType) {
+    this.groupParameterType = groupParameterType;
     checkArgument(!isBlank(name), "name cannot be blank");
     checkArgument(type != null, "type cannot be null");
     this.name = name;
@@ -53,7 +58,7 @@ public final class ParameterGroupDescriptor {
   }
 
   public ParameterGroupDescriptor(String name, Type type) {
-    this(name, type, null, null);
+    this(name, type, null, null, null);
   }
 
   /**
@@ -61,6 +66,10 @@ public final class ParameterGroupDescriptor {
    */
   public AnnotatedElement getContainer() {
     return container;
+  }
+
+  public WithAnnotations getAnnotatedContainer() {
+    return groupParameterType;
   }
 
   public String getName() {

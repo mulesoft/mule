@@ -40,25 +40,30 @@ public final class ModelLoaderUtils {
   }
 
   public static boolean isRoute(ExtensionParameter parameter) {
-    return Route.class.isAssignableFrom(parameter.getType().getDeclaringClass());
+    return parameter.getType().isAssignableTo(Route.class);
   }
 
   public static boolean isNonBlocking(MethodElement method) {
     return method.getParameters().stream()
-        .anyMatch(p -> CompletionCallback.class.isAssignableFrom(p.getType().getDeclaringClass()));
+        .anyMatch(p -> p.getType().isAssignableTo(CompletionCallback.class));
   }
 
   public static boolean isAutoPaging(MethodElement operationMethod) {
-    return PagingProvider.class.isAssignableFrom(operationMethod.getReturnType());
+    return operationMethod.getReturnType().isAssignableTo(PagingProvider.class);
   }
 
   public static boolean isProcessorChain(ExtensionParameter parameter) {
-    return Chain.class.equals(parameter.getType().getDeclaringClass());
+    return parameter.getType().isAssignableTo(Chain.class);
   }
 
   public static void handleByteStreaming(Method method, ExecutableComponentDeclarer executableComponent,
                                          MetadataType outputType) {
     executableComponent.supportsStreaming(isInputStream(outputType) || method.getAnnotation(Streaming.class) != null);
+  }
+
+  public static void handleByteStreaming(MethodElement method, ExecutableComponentDeclarer executableComponent,
+                                         MetadataType outputType) {
+    executableComponent.supportsStreaming(isInputStream(outputType) || method.isAnnotatedWith(Streaming.class));
   }
 
   /**

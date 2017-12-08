@@ -50,7 +50,7 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase {
     ParameterGroupDescriptor group =
         new ParameterGroupDescriptor("group", new TypeWrapper(PersonalInfo.class),
                                      ExtensionsTypeLoaderFactory.getDefault().createTypeLoader().load(PersonalInfo.class),
-                                     getField(HeisenbergExtension.class, personalInfo).get());
+                                     getField(HeisenbergExtension.class, personalInfo).get(), null);
 
     Map<String, Object> resultMap = new HashMap<>();
     resultMap.put("name", NAME);

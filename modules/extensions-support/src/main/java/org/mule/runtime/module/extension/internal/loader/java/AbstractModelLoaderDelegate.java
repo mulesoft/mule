@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclarer;
@@ -22,11 +23,9 @@ import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionPara
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAlias;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithParameters;
+import org.mule.runtime.module.extension.internal.loader.java.type.GenericInfo;
 
-import java.lang.reflect.Type;
 import java.util.List;
-
-import org.springframework.core.ResolvableType;
 
 /**
  * Base class for sub delegates of {@link DefaultJavaModelLoaderDelegate}
@@ -96,10 +95,12 @@ abstract class AbstractModelLoaderDelegate {
 
   private Class<?> resolveConnectionType(ExecutableComponentDeclarer componentDeclarer, ExtensionParameter connectionParameter,
                                          WithAlias alias) {
-    final Type type = connectionParameter.getJavaType();
-    if (type.getTypeName().startsWith(ConnectionProvider.class.getName())) {
-      ResolvableType resolvableType = ResolvableType.forType(type);
-      if (resolvableType.getGenerics().length == 0) {
+    org.mule.runtime.module.extension.internal.loader.java.type.Type connectionType = connectionParameter.getType();
+
+
+    if (connectionType.getTypeName().startsWith(ConnectionProvider.class.getName())) {
+      List<GenericInfo> generics = connectionType.getGenerics();
+      if (generics.size() == 0) {
         throw new IllegalOperationModelDefinitionException(format(
                                                                   "%s '%s' defines a %s without a connection type. Please add the generic",
                                                                   getComponentDeclarationTypeName(componentDeclarer
@@ -108,10 +109,10 @@ abstract class AbstractModelLoaderDelegate {
                                                                   ConnectionProvider.class.getSimpleName()));
       }
 
-      return resolvableType.getGeneric(0).getRawClass();
+      return generics.get(0).getConcreteType().getDeclaringClass();
     }
 
-    return connectionParameter.getType().getDeclaringClass();
+    return connectionType.getDeclaringClass();
   }
 
   void processMimeType(HasModelProperties declarer, WithAnnotations element) {

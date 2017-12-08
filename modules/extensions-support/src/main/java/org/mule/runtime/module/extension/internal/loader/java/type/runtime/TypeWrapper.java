@@ -6,17 +6,25 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
+import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.GenericInfo;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import org.springframework.core.ResolvableType;
 
 /**
  * Wrapper for {@link Class} that provide utility methods to facilitate the introspection of a {@link Class}
@@ -26,17 +34,26 @@ import java.util.stream.Stream;
 public class TypeWrapper implements Type {
 
   private final Class<?> aClass;
+  private final java.lang.reflect.Type type;
+  private List<GenericInfo> generics = Collections.emptyList();
 
   public TypeWrapper(Class<?> aClass) {
     this.aClass = aClass;
+    this.type = aClass;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Annotation[] getAnnotations() {
-    return aClass.getAnnotations();
+  public TypeWrapper(ResolvableType resolvableType) {
+    this.aClass = resolvableType.getRawClass();
+    this.type = resolvableType.getType();
+    generics = new ArrayList<>();
+    for (ResolvableType type : resolvableType.getGenerics()) {
+      TypeWrapper concreteType = new TypeWrapper(type);
+      generics.add(new GenericInfo(concreteType, concreteType.getGenerics()));
+    }
+  }
+
+  public TypeWrapper(java.lang.reflect.Type type) {
+    this(ResolvableType.forType(type));
   }
 
   /**
@@ -53,6 +70,11 @@ public class TypeWrapper implements Type {
   @Override
   public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
     return ofNullable(aClass.getAnnotation(annotationClass));
+  }
+
+  @Override
+  public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
+    return isAnnotatedWith(annotationClass) ? of(new ClassBasedAnnotationValueFetcher<>(annotationClass, aClass)) : empty();
   }
 
   /**
@@ -77,5 +99,31 @@ public class TypeWrapper implements Type {
   @Override
   public Class<?> getDeclaringClass() {
     return aClass;
+  }
+
+
+  @Override
+  public boolean isAssignableFrom(Class<?> clazz) {
+    return aClass != null && aClass.isAssignableFrom(clazz);
+  }
+
+  @Override
+  public boolean isAssignableTo(Class<?> clazz) {
+    return aClass != null && clazz.isAssignableFrom(aClass);
+  }
+
+  @Override
+  public java.lang.reflect.Type getReflectType() {
+    return type;
+  }
+
+  @Override
+  public String getTypeName() {
+    return aClass.getTypeName();
+  }
+
+  @Override
+  public List<GenericInfo> getGenerics() {
+    return generics;
   }
 }

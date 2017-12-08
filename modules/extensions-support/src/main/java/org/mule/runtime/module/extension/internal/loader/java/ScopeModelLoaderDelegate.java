@@ -11,21 +11,22 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.checkDefinition;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.processNonBlockingOperation;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
-import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +51,6 @@ final class ScopeModelLoaderDelegate extends AbstractModelLoaderDelegate {
                     HasOperationDeclarer ownerDeclarer,
                     Class<?> declaringClass,
                     MethodElement scopeMethod,
-                    Method method,
                     Optional<ExtensionParameter> configParameter,
                     Optional<ExtensionParameter> connectionParameter) {
 
@@ -60,11 +60,11 @@ final class ScopeModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     checkDefinition(!configParameter.isPresent(),
                     format("Scope '%s' requires a config, but that is not allowed, remove such parameter",
-                           method.getName()));
+                           scopeMethod.getName()));
 
     checkDefinition(!connectionParameter.isPresent(),
                     format("Scope '%s' requires a connection, but that is not allowed, remove such parameter",
-                           method.getName()));
+                           scopeMethod.getName()));
 
     checkDefinition(isNonBlocking(scopeMethod),
                     format("Scope '%s' does not declare a '%s' parameter. One is required for all operations "
@@ -77,10 +77,12 @@ final class ScopeModelLoaderDelegate extends AbstractModelLoaderDelegate {
       return;
     }
 
-    final OperationDeclarer scope = actualDeclarer.withOperation(scopeMethod.getAlias())
+    final OperationDeclarer scope = actualDeclarer.withOperation(scopeMethod.getAlias());
+    scope.withModelProperty(new ExtensionOperationDescriptorModelProperty(scopeMethod));
+    scopeMethod.getMethod().ifPresent(method -> scope
         .withModelProperty(new ImplementingMethodModelProperty(method))
-        .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass,
-                                                                                                       method)));
+        .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass, method))));
+
     processMimeType(scope, scopeMethod);
     processNonBlockingOperation(scope, scopeMethod, false, loader.getTypeLoader());
 

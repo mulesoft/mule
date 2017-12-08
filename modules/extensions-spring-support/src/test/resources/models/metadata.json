@@ -12322,7 +12322,26 @@
       "outputAttributes": {
         "type": {
           "format": "java",
-          "type": "Void"
+          "type": "Object",
+          "annotations": {
+            "typeId": "java.lang.Object",
+            "classInformation": {
+              "classname": "java.lang.Object",
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
+              "isFinal": false,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": [],
+              "isMap": false
+            },
+            "typeAlias": {
+              "value": "Object"
+            }
+          },
+          "fields": []
         },
         "hasDynamicType": false,
         "description": "",

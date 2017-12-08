@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java.type;
 
 import org.mule.runtime.extension.api.runtime.source.Source;
 
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 

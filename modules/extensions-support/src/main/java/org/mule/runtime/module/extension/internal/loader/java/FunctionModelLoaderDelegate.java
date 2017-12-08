@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclarer;
@@ -24,7 +25,6 @@ import org.mule.runtime.module.extension.internal.loader.java.type.WithFunctionC
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.function.ReflectiveFunctionExecutorFactory;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,13 +66,12 @@ final class FunctionModelLoaderDelegate extends AbstractModelLoaderDelegate {
       Class<?> declaringClass = methodOwnerClass != null ? methodOwnerClass : methodElement.getDeclaringClass();
       checkIsNotAnExtension(declaringClass);
 
-      final Method method = methodElement.getMethod();
       final Optional<ExtensionParameter> configParameter = loader.getConfigParameter(methodElement);
 
       if (configParameter.isPresent()) {
         throw new IllegalModelDefinitionException(format("Function '%s' requires a config parameter, but that is not allowed. "
             + "Remove such parameter.",
-                                                         method.getName()));
+                                                         methodElement.getName()));
       }
 
       HasFunctionDeclarer actualDeclarer =
@@ -84,12 +83,12 @@ final class FunctionModelLoaderDelegate extends AbstractModelLoaderDelegate {
         continue;
       }
 
-      final FunctionDeclarer function = actualDeclarer.withFunction(methodElement.getAlias())
+      final FunctionDeclarer function = actualDeclarer.withFunction(methodElement.getAlias());
+      methodElement.getMethod().ifPresent(method -> function
           .withModelProperty(new ImplementingMethodModelProperty(method))
-          .withModelProperty(new FunctionExecutorModelProperty(new ReflectiveFunctionExecutorFactory<>(declaringClass,
-                                                                                                       method)));
+          .withModelProperty(new FunctionExecutorModelProperty(new ReflectiveFunctionExecutorFactory<>(declaringClass, method))));
 
-      function.withOutput().ofType(getMethodReturnType(method, loader.getTypeLoader()));
+      function.withOutput().ofType(getMethodReturnType(methodElement, loader.getTypeLoader()));
 
       ParameterDeclarationContext declarationContext = new ParameterDeclarationContext(FUNCTION, function.getDeclaration());
       loader.getMethodParametersLoader().declare(function, methodElement.getParameters(), declarationContext);

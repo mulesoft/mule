@@ -60,7 +60,7 @@ public class ParameterGroupModelValidatorTestCase {
   public void invalidModelDueToNonInstantiableParameterGroup() {
     ParameterGroupDescriptor descriptor = new ParameterGroupDescriptor("name", new TypeWrapper(Serializable.class),
                                                                        null,
-                                                                       mock(AnnotatedElement.class));
+                                                                       mock(AnnotatedElement.class), null);
     when(groupModel.getModelProperty(ParameterGroupModelProperty.class))
         .thenReturn(of(new ParameterGroupModelProperty(descriptor)));
 

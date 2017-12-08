@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
-import org.mule.runtime.api.connection.ConnectionProvider;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.module.extension.internal.loader.java.type.ConnectionProviderElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -29,15 +29,10 @@ class ConnectionProviderTypeWrapper<T> extends TypeWrapper implements Connection
    * {@inheritDoc}
    */
   @Override
-  public List<Type> getSuperClassGenerics() {
-    return IntrospectionUtils.getSuperClassGenerics(getDeclaringClass(), ConnectionProvider.class);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public List<Class<?>> getInterfaceGenerics(Class clazz) {
-    return IntrospectionUtils.getInterfaceGenerics(getDeclaringClass(), clazz);
+  public List<org.mule.runtime.module.extension.internal.loader.java.type.Type> getInterfaceGenerics(Class clazz) {
+    return IntrospectionUtils.getInterfaceGenerics(getDeclaringClass(), clazz)
+        .stream()
+        .map(TypeWrapper::new)
+        .collect(toList());
   }
 }

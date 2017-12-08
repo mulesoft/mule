@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forMethodParameter;
 
+import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterElement;
 
@@ -49,15 +50,7 @@ public final class ParameterWrapper implements ParameterElement {
    */
   @Override
   public TypeWrapper getType() {
-    return new TypeWrapper(parameter.getType());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Annotation[] getAnnotations() {
-    return parameter.getAnnotations();
+    return new TypeWrapper(forMethodParameter(owner, index));
   }
 
   /**
@@ -66,6 +59,12 @@ public final class ParameterWrapper implements ParameterElement {
   @Override
   public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
     return Optional.ofNullable(parameter.getAnnotation(annotationClass));
+  }
+
+  @Override
+  public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
+    return isAnnotatedWith(annotationClass) ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, parameter))
+        : Optional.empty();
   }
 
   /**

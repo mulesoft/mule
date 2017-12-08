@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.BooleanType;
@@ -32,8 +33,8 @@ import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoad
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -57,8 +58,8 @@ public final class MetadataScopeAdapter {
   private Supplier<? extends AttributesTypeResolver> attributesResolver = nullMetadataResolverSupplier;
   private ClassTypeLoader typeLoader = new DefaultExtensionsTypeLoaderFactory().createTypeLoader();
 
-  public MetadataScopeAdapter(Class<?> extensionType, Method operation, OperationDeclaration declaration) {
-    OutputResolver outputResolverDeclaration = operation.getAnnotation(OutputResolver.class);
+  public MetadataScopeAdapter(Class<?> extensionType, MethodElement operation, OperationDeclaration declaration) {
+    Optional<OutputResolver> outputResolverDeclaration = operation.getAnnotation(OutputResolver.class);
     Optional<Pair<MetadataKeyId, MetadataType>> keyId = locateMetadataKeyId(declaration);
 
     inputResolvers = declaration.getAllParameters().stream()
@@ -67,17 +68,16 @@ public final class MetadataScopeAdapter {
                        p -> ResolverSupplier.of(getAnnotatedElement(p).get().getAnnotation(TypeResolver.class)
                            .value())));
 
-    if (outputResolverDeclaration != null || !inputResolvers.isEmpty()) {
-      if (outputResolverDeclaration != null) {
-        outputResolver = ResolverSupplier.of(outputResolverDeclaration.output());
-        attributesResolver = ResolverSupplier.of(outputResolverDeclaration.attributes());
-      }
+    if (outputResolverDeclaration.isPresent() || !inputResolvers.isEmpty()) {
+      outputResolverDeclaration.ifPresent(resolverDeclaration -> {
+        outputResolver = ResolverSupplier.of(resolverDeclaration.output());
+        attributesResolver = ResolverSupplier.of(resolverDeclaration.attributes());
+      });
 
-      if (keyId.isPresent()) {
-        Pair<MetadataKeyId, MetadataType> pair = keyId.get();
-        keysResolver = getKeysResolver(pair.getRight(), pair.getLeft(),
-                                       () -> getCategoryName(outputResolver, attributesResolver, inputResolvers));
-      }
+      keyId.ifPresent(pair -> keysResolver = getKeysResolver(pair.getRight(), pair.getLeft(),
+                                                             () -> getCategoryName(outputResolver, attributesResolver,
+                                                                                   inputResolvers)));
+
     } else {
       initializeFromClass(extensionType, operation.getDeclaringClass());
     }
@@ -112,7 +112,7 @@ public final class MetadataScopeAdapter {
       for (ParameterGroupDeclaration group : component.getParameterGroups()) {
         keyId = group.getModelProperty(ParameterGroupModelProperty.class)
             .map(ParameterGroupModelProperty::getDescriptor)
-            .filter(g -> g.getContainer().isAnnotationPresent(MetadataKeyId.class))
+            .filter(g -> g.getAnnotatedContainer().isAnnotatedWith(MetadataKeyId.class))
             .map(g -> new ImmutablePair<>(g.getContainer().getAnnotation(MetadataKeyId.class),
                                           typeLoader.load(g.getType().getDeclaringClass())));
 

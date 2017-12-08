@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import org.mule.runtime.api.meta.Category;
+
 import java.util.List;
 
 /**
@@ -19,4 +21,19 @@ public interface ExtensionElement extends ParameterizableTypeElement, ComponentE
    * @return A list {@link ConfigurationElement} of declared configurations
    */
   List<ConfigurationElement> getConfigurations();
+
+  /**
+   * @return The Extension's {@link Category}
+   */
+  Category getCategory();
+
+  /**
+   * @return The Extension's Vendor
+   */
+  String getVendor();
+
+  /**
+   * @return The Extension's Name
+   */
+  String getName();
 }

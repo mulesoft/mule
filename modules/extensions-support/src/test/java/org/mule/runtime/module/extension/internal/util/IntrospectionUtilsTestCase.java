@@ -102,7 +102,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void getNullMethodReturnType() throws Exception {
-    IntrospectionUtils.getMethodReturnType(null, TYPE_LOADER);
+    IntrospectionUtils.getMethodReturnType((Method) null, TYPE_LOADER);
   }
 
   @Test

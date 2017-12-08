@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java.type;
 import org.mule.runtime.api.meta.NamedObject;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 /**
  * A contract for an element to be considered as a Method
@@ -21,6 +22,10 @@ public interface MethodElement
   /**
    * @return The represented method
    */
-  // TODO MULE-10137 - Adapt logic to AST
-  Method getMethod();
+  Optional<Method> getMethod();
+
+  /**
+   * @return The {@link OperationContainerElement} which contains the current {@link MethodElement}
+   */
+  OperationContainerElement getEnclosingType();
 }

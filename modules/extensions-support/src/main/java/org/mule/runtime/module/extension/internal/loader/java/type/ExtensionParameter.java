@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
 
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.assignableFromAny;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -29,10 +28,10 @@ import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * A contract for any kind of component from which an extension's parameter can be derived
@@ -60,8 +59,8 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
    *         {@link ExtensionModel}
    */
   default boolean shouldBeAdvertised() {
-    return !(assignableFromAny(getType().getDeclaringClass(), IMPLICIT_ARGUMENT_TYPES)
-        || (isAnnotatedWith(Config.class) || isAnnotatedWith(Connection.class) || isAnnotatedWith(DefaultEncoding.class)));
+    return !(IMPLICIT_ARGUMENT_TYPES.stream().anyMatch(aClass -> getType().isAssignableTo(aClass))
+        || isAnnotatedWith(Config.class) || isAnnotatedWith(Connection.class) || isAnnotatedWith(DefaultEncoding.class));
   }
 
   /**
@@ -95,7 +94,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
   /**
    * @return The {@link AnnotatedElement} form which {@code this} instance was derived
    */
-  AnnotatedElement getDeclaringElement();
+  java.util.Optional<AnnotatedElement> getDeclaringElement();
 
   /**
    * @return The {@link Type} of an {@link ExtensionParameter}
