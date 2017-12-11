@@ -13,12 +13,12 @@ import java.util.List;
  *
  * @since 4.1
  */
-public class GenericInfo {
+public class TypeGeneric {
 
   private final Type concreteType;
-  private final List<GenericInfo> generics;
+  private final List<TypeGeneric> generics;
 
-  public GenericInfo(Type concreteType, List<GenericInfo> generics) {
+  public TypeGeneric(Type concreteType, List<TypeGeneric> generics) {
     this.concreteType = concreteType;
     this.generics = generics;
   }
@@ -27,7 +27,7 @@ public class GenericInfo {
     return concreteType;
   }
 
-  public List<GenericInfo> getGenerics() {
+  public List<TypeGeneric> getGenerics() {
     return generics;
   }
 }

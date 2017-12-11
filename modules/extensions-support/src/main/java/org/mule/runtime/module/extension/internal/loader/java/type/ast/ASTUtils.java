@@ -17,7 +17,7 @@ import static javax.lang.model.type.TypeKind.LONG;
 import static javax.lang.model.type.TypeKind.SHORT;
 import static javax.lang.model.type.TypeKind.VOID;
 
-import org.mule.runtime.module.extension.internal.loader.java.type.GenericInfo;
+import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -66,12 +66,12 @@ class ASTUtils {
     primitiveTypesClasses.put("short", Short.TYPE);
   }
 
-  <T extends Annotation> ASTBasedValueFetcher<T> fromAnnotation(Class<T> annotationClass, Element element) {
-    return new ASTBasedValueFetcher<>(annotationClass, element, processingEnvironment);
+  <T extends Annotation> ASTValueFetcher<T> fromAnnotation(Class<T> annotationClass, Element element) {
+    return new ASTValueFetcher<>(annotationClass, element, processingEnvironment);
   }
 
   java.lang.reflect.Type getReflectType(ASTType type) {
-    List<GenericInfo> generics = type.getGenerics();
+    List<TypeGeneric> generics = type.getGenerics();
     try {
       if (type.getTypeElement() != null) {
         String typeName = processingEnvironment.getElementUtils().getBinaryName(type.getTypeElement()).toString();
@@ -90,7 +90,7 @@ class ASTUtils {
     }
   }
 
-  static java.lang.reflect.Type toType(GenericInfo info) {
+  static java.lang.reflect.Type toType(TypeGeneric info) {
     java.lang.reflect.Type[] typeArguments =
         info.getGenerics().stream().map(ASTUtils::toType).toArray(java.lang.reflect.Type[]::new);
     try {

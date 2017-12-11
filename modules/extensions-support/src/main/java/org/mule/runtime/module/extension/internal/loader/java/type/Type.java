@@ -51,7 +51,7 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
    * @return The generics for the current type.
    * @since 4.1
    */
-  List<GenericInfo> getGenerics();
+  List<TypeGeneric> getGenerics();
 
   //TODO: Remove once the type loader exists MULE-14040
   java.lang.reflect.Type getReflectType();

@@ -42,13 +42,13 @@ import net.sf.cglib.proxy.MethodInterceptor;
  *
  * @since 4.1
  */
-public class ASTBasedValueFetcher<A extends Annotation> implements AnnotationValueFetcher<A> {
+public class ASTValueFetcher<A extends Annotation> implements AnnotationValueFetcher<A> {
 
   private final Class<A> annotationClass;
   private final Element typeElement;
   private final ProcessingEnvironment processingEnvironment;
 
-  ASTBasedValueFetcher(Class<A> annotationClass, Element annotatedElememt, ProcessingEnvironment processingEnvironment) {
+  ASTValueFetcher(Class<A> annotationClass, Element annotatedElememt, ProcessingEnvironment processingEnvironment) {
     this.annotationClass = annotationClass;
     this.typeElement = annotatedElememt;
     this.processingEnvironment = processingEnvironment;
@@ -163,7 +163,6 @@ public class ASTBasedValueFetcher<A extends Annotation> implements AnnotationVal
       if (method.getName().equals("toString")) {
         return "string";
       }
-      System.out.println(Thread.currentThread().toString());
       reference.set(null);
 
       getAnnotationFrom(annotationClass, annotatedElement, processingEnvironment)

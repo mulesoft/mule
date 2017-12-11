@@ -17,7 +17,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.GenericInfo;
+import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.ast.typevisitor.MuleTypeVisitor;
@@ -42,7 +42,7 @@ import java.util.stream.Stream;
 public class ASTType implements Type {
 
   private final TypeMirror typeMirror;
-  private final List<GenericInfo> genericInfo;
+  private final List<TypeGeneric> typeGenerics;
   private LazyValue<List<MethodElement>> methods;
   final ProcessingEnvironment processingEnvironment;
   final TypeElement typeElement;
@@ -58,7 +58,7 @@ public class ASTType implements Type {
     this.processingEnvironment = processingEnvironment;
     TypeIntrospectionResult accept = typeMirror.accept(new MuleTypeVisitor(processingEnvironment), builder());
     this.typeElement = accept.getConcreteType();
-    this.genericInfo = toGenericInfo(accept, processingEnvironment);
+    this.typeGenerics = toTypeGenerics(accept, processingEnvironment);
     this.typeMirror = typeMirror;
     init();
   }
@@ -67,7 +67,7 @@ public class ASTType implements Type {
     this.processingEnvironment = processingEnvironment;
     this.typeElement = typeElement;
     this.typeMirror = typeElement.asType();
-    this.genericInfo = emptyList();
+    this.typeGenerics = emptyList();
     init();
   }
 
@@ -150,8 +150,8 @@ public class ASTType implements Type {
    * {@inheritDoc}
    */
   @Override
-  public List<GenericInfo> getGenerics() {
-    return genericInfo;
+  public List<TypeGeneric> getGenerics() {
+    return typeGenerics;
   }
 
   /**
@@ -200,12 +200,12 @@ public class ASTType implements Type {
     return methods.get();
   }
 
-  private List<GenericInfo> toGenericInfo(TypeIntrospectionResult result, ProcessingEnvironment pe) {
-    List<GenericInfo> genericInfos = new ArrayList<>();
+  private List<TypeGeneric> toTypeGenerics(TypeIntrospectionResult result, ProcessingEnvironment pe) {
+    List<TypeGeneric> typeGenerics = new ArrayList<>();
     for (TypeIntrospectionResult aResult : result.getGenerics()) {
-      genericInfos.add(new GenericInfo(new ASTType(aResult.getConcreteType(), pe),
-                                       aResult.getGenerics().isEmpty() ? emptyList() : toGenericInfo(aResult, pe)));
+      typeGenerics.add(new TypeGeneric(new ASTType(aResult.getConcreteType(), pe),
+                                       aResult.getGenerics().isEmpty() ? emptyList() : toTypeGenerics(aResult, pe)));
     }
-    return genericInfos;
+    return typeGenerics;
   }
 }

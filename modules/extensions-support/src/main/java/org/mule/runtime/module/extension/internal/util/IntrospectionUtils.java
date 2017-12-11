@@ -100,7 +100,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.GenericInfo;
+import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ast.FieldTypeElement;
 
@@ -383,7 +383,7 @@ public final class IntrospectionUtils {
     ResolvableType outputType = ResolvableType.forType(method.getReturnType().getReflectType());
 
     if (returnType.isAssignableTo(Result.class)) {
-      List<GenericInfo> generics = returnType.getGenerics();
+      List<TypeGeneric> generics = returnType.getGenerics();
       if (generics.size() == 2) {
         ResolvableType resolvableType = ResolvableType.forType(generics.get(1).getConcreteType().getReflectType());
         if (resolvableType.getRawClass() != null) {
@@ -402,7 +402,7 @@ public final class IntrospectionUtils {
     }
 
     if (isCollection(returnType)) {
-      List<GenericInfo> generics = returnType.getGenerics();
+      List<TypeGeneric> generics = returnType.getGenerics();
 
       if (generics.size() > 0) {
         org.mule.runtime.module.extension.internal.loader.java.type.Type genericType =

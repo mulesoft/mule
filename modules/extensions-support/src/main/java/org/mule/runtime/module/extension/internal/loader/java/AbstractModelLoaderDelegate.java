@@ -23,7 +23,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionPara
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAlias;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithParameters;
-import org.mule.runtime.module.extension.internal.loader.java.type.GenericInfo;
+import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
 
 import java.util.List;
 
@@ -99,7 +99,7 @@ abstract class AbstractModelLoaderDelegate {
 
 
     if (connectionType.getTypeName().startsWith(ConnectionProvider.class.getName())) {
-      List<GenericInfo> generics = connectionType.getGenerics();
+      List<TypeGeneric> generics = connectionType.getGenerics();
       if (generics.size() == 0) {
         throw new IllegalOperationModelDefinitionException(format(
                                                                   "%s '%s' defines a %s without a connection type. Please add the generic",

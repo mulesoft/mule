@@ -39,7 +39,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement
 import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithOperationContainers;
-import org.mule.runtime.module.extension.internal.loader.java.type.GenericInfo;
+import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
@@ -253,7 +253,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
   private void processPagingTx(OperationDeclarer operation, MethodElement method) {
     checkArgument(method != null, "Can't introspect a null method");
     Type returnTypeElement = method.getReturnType();
-    List<GenericInfo> generics = returnTypeElement.getGenerics();
+    List<TypeGeneric> generics = returnTypeElement.getGenerics();
 
     if (!generics.isEmpty()) {
       operation.transactional(generics.get(0).getConcreteType().isAssignableTo(TransactionalConnection.class));

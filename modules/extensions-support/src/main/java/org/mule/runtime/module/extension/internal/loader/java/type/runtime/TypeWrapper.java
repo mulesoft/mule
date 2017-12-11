@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -14,12 +15,11 @@ import static java.util.stream.Collectors.toList;
 import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.java.type.GenericInfo;
+import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -35,7 +35,7 @@ public class TypeWrapper implements Type {
 
   private final Class<?> aClass;
   private final java.lang.reflect.Type type;
-  private List<GenericInfo> generics = Collections.emptyList();
+  private List<TypeGeneric> generics = emptyList();
 
   public TypeWrapper(Class<?> aClass) {
     this.aClass = aClass;
@@ -48,7 +48,7 @@ public class TypeWrapper implements Type {
     generics = new ArrayList<>();
     for (ResolvableType type : resolvableType.getGenerics()) {
       TypeWrapper concreteType = new TypeWrapper(type);
-      generics.add(new GenericInfo(concreteType, concreteType.getGenerics()));
+      generics.add(new TypeGeneric(concreteType, concreteType.getGenerics()));
     }
   }
 
@@ -123,7 +123,7 @@ public class TypeWrapper implements Type {
   }
 
   @Override
-  public List<GenericInfo> getGenerics() {
+  public List<TypeGeneric> getGenerics() {
     return generics;
   }
 }
