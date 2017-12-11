@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata"
+      xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/metadata http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd">
+               http://www.mulesoft.org/schema/mule/metadata http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd
+               http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd">
 
     <metadata:config name="config" dataWithDefault="staticOverride">
         <metadata:connection/>
@@ -16,6 +18,8 @@
     <metadata:config name="dynamic-config" data="#[mel:'dynamic']">
         <metadata:connection/>
     </metadata:config>
+
+    <vegan:apple-config name="appleConfig"/>
 
     <flow name="contentMetadataWithKeyId">
         <metadata:content-metadata-with-key-id config-ref="config" type="PERSON"/>
@@ -65,10 +69,6 @@
         <metadata:fail-with-runtime-exception config-ref="config" type="PERSON"/>
     </flow>
 
-    <flow name="keyParamWithoutKeyResolver">
-        <metadata:key-id-without-key-resolver config-ref="config" type="PERSON"/>
-    </flow>
-
     <flow name="messageAttributesVoidTypeMetadata">
         <metadata:message-attributes-void-type-metadata />
     </flow>
@@ -116,10 +116,6 @@
         <logger/>
     </flow>
 
-    <flow name="shouldInheritOperationResolvers">
-        <metadata:should-inherit-operation-resolvers config-ref="config" type="PERSON"/>
-    </flow>
-
     <flow name="enumMetadataKey">
         <metadata:enum-metadata-key config-ref="config" type="MAMMAL"/>
     </flow>
@@ -129,7 +125,7 @@
     </flow>
 
     <flow name="shouldInheritExtensionResolvers">
-        <metadata:should-inherit-extension-resolvers config-ref="config" type="PERSON"/>
+        <vegan:eat-apple config-ref="appleConfig" key="APPLE"/>
     </flow>
 
     <flow name="shouldInheritOperationParentResolvers">
@@ -150,6 +146,18 @@
 
     <flow name="simpleMultiLevelKeyResolver">
         <metadata:simple-multi-level-key-resolver config-ref="config" continent="AMERICA" country="USA" city="SFO"/>
+    </flow>
+
+    <flow name="emptyPartialMultilevelKeys">
+        <metadata:partial-multi-level-key-resolver config-ref="config"/>
+    </flow>
+
+    <flow name="partialMultiLevelKeyResolver">
+        <metadata:partial-multi-level-key-resolver config-ref="config" continent="AMERICA"/>
+    </flow>
+
+    <flow name="twoLevelPartialMultiLevelKeyResolver">
+        <metadata:partial-multi-level-key-resolver config-ref="config" continent="AMERICA" country="ARGENTINA"/>
     </flow>
 
     <flow name="incompleteMultiLevelKeyResolver">

@@ -23,7 +23,6 @@ import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKN
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -74,9 +73,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValu
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -84,6 +80,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor} and
@@ -261,7 +260,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     try {
       return runWithMetadataContext(
                                     context -> withContextClassLoader(getClassLoader(this.extensionModel),
-                                                                      () -> metadataMediator.getMetadataKeys(context)));
+                                                                      () -> metadataMediator.getMetadataKeys(context,
+                                                                                                             getParameterValueResolver())));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onKeys());
     }

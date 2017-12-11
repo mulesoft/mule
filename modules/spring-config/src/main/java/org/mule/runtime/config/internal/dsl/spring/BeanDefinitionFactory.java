@@ -31,7 +31,6 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPP
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.config.internal.model.ApplicationModel.OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
@@ -331,6 +330,12 @@ public class BeanDefinitionFactory {
     Map<String, WrapperElementType> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(parentBuildingDefinition);
     WrapperElementType wrapperElementType = wrapperIdentifierAndTypeMap.get(componentModel.getIdentifier().getName());
     if (wrapperElementType.equals(SINGLE)) {
+      if (componentModel.getInnerComponents().isEmpty()) {
+        String location =
+            componentModel.getComponentLocation() != null ? componentModel.getComponentLocation().getLocation() : "";
+        throw new IllegalStateException(format("Element [%s] located at [%s] does not have any child element declared, but one is required.",
+                                               componentModel.getIdentifier(), location));
+      }
       final SpringComponentModel firstComponentModel = (SpringComponentModel) componentModel.getInnerComponents().get(0);
       componentModel.setType(firstComponentModel.getType());
       componentModel.setBeanDefinition(firstComponentModel.getBeanDefinition());

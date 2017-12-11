@@ -50,9 +50,15 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
           .map(group -> new ParameterGroupArgumentResolver<>(group).resolve(executionContext))
           .orElseGet(() -> {
             String showInDslGroupName = showInDslParameters.get(parameterName);
-            return showInDslGroupName != null
-                ? getShowInDslParameterValue(parameterName, showInDslGroupName)
-                : executionContext.getParameter(parameterName);
+            if (showInDslGroupName != null) {
+              return getShowInDslParameterValue(parameterName, showInDslGroupName);
+            }
+
+            if (executionContext.hasParameter(parameterName)) {
+              return executionContext.getParameter(parameterName);
+            }
+
+            return null;
           });
     } catch (Exception e) {
       throw new ValueResolvingException("Unable to resolve value for the parameter: " + parameterName, e);
@@ -76,7 +82,8 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
     try {
       return getFieldValue(group, parameterName);
     } catch (IllegalAccessException | NoSuchFieldException e) {
-      throw new IllegalStateException(format("An error occurred trying to obtain the field '%s' from the group '%s' of the Operation '%s'",
+      throw new IllegalStateException(
+                                      format("An error occurred trying to obtain the field '%s' from the group '%s' of the Operation '%s'",
                                              parameterName, showInDslGroupName, operationModel.getName()));
     }
   }

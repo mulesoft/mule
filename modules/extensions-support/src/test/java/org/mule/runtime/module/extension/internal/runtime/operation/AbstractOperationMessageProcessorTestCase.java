@@ -242,7 +242,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(keyParamMock.getName()).thenReturn("type");
     when(keyParamMock.getType()).thenReturn(stringType);
     when(keyParamMock.getModelProperty(MetadataKeyPartModelProperty.class))
-        .thenReturn(of(new MetadataKeyPartModelProperty(0)));
+        .thenReturn(of(new MetadataKeyPartModelProperty(1)));
     when(keyParamMock.getRole()).thenReturn(BEHAVIOUR);
     when(keyParamMock.getDisplayModel()).thenReturn(empty());
     when(keyParamMock.getLayoutModel()).thenReturn(empty());

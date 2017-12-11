@@ -15,17 +15,17 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 public class LocationKey {
 
-  @Optional(defaultValue = "AMERICA")
-  @MetadataKeyPart(order = 1)
+  @Optional
+  @MetadataKeyPart(order = 1, providedByKeyResolver = false)
   @Parameter
   private String continent;
 
-  @Optional(defaultValue = "USA")
+  @Optional
   @MetadataKeyPart(order = 2)
   @Parameter
   private String country;
 
-  @Optional(defaultValue = "SFO")
+  @Optional
   @DisplayName("State | City")
   @MetadataKeyPart(order = 3)
   @Parameter

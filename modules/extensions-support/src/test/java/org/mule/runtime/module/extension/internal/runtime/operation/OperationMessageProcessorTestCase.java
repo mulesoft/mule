@@ -95,6 +95,12 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.reflect.TypeToken;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -422,7 +428,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     verify(metadataResolverFactory).getKeyResolver();
 
-    assertThat(metadataKeysResult.isSuccess(), is(true));
+    assertThat(metadataKeysResult.getFailures().toString(), metadataKeysResult.isSuccess(), is(true));
     final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
     assertThat(metadataKeys.size(), is(2));
 

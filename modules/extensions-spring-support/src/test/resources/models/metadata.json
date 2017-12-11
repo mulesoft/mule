@@ -341,7 +341,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -731,7 +732,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": false
                     }
                   }
                 },
@@ -1118,7 +1120,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -1854,7 +1857,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -2571,7 +2575,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": false
                     }
                   }
                 },
@@ -2882,7 +2887,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": false
                     }
                   }
                 },
@@ -3250,7 +3256,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -3564,7 +3571,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -3962,7 +3970,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -4349,7 +4358,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -4661,252 +4671,6 @@
           "output": {
             "type": {
               "format": "java",
-              "type": "Void"
-            },
-            "hasDynamicType": true,
-            "description": "",
-            "modelProperties": {}
-          },
-          "outputAttributes": {
-            "type": {
-              "format": "java",
-              "type": "Void"
-            },
-            "hasDynamicType": false,
-            "description": "",
-            "modelProperties": {}
-          },
-          "transactional": false,
-          "requiresConnection": true,
-          "supportsStreaming": false,
-          "nestedComponents": [],
-          "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
-          ],
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
-          "parameterGroupModels": [
-            {
-              "parameters": [
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 1
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "type",
-                  "description": "",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
-                    }
-                  }
-                }
-              ],
-              "exclusiveParametersModels": [],
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "showInDsl": false,
-              "name": "General",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "parameters": [
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Union",
-                    "annotations": {
-                      "typeId": "ReconnectionStrategy"
-                    },
-                    "of": [
-                      {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "reconnect"
-                        },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "classInformation": {
-                                  "classname": "java.lang.Long",
-                                  "hasDefaultConstructor": false,
-                                  "isInterface": false,
-                                  "isInstantiable": false,
-                                  "isAbstract": false,
-                                  "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
-                                  "parent": "java.lang.Number",
-                                  "genericTypes": [],
-                                  "isMap": false
-                                },
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "count"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "default": "2"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How many reconnection attempts to make"
-                              }
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "reconnect-forever"
-                        },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "classInformation": {
-                                  "classname": "java.lang.Long",
-                                  "hasDefaultConstructor": false,
-                                  "isInterface": false,
-                                  "isInstantiable": false,
-                                  "isAbstract": false,
-                                  "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
-                                  "parent": "java.lang.Number",
-                                  "genericTypes": [],
-                                  "isMap": false
-                                },
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 2,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "reconnectionStrategy",
-                  "description": "A retry strategy in case of connectivity errors",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                      "value": {
-                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-reconnection-strategy",
-                        "prefix": "mule"
-                      }
-                    },
-                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    }
-                  }
-                }
-              ],
-              "exclusiveParametersModels": [],
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2
-              },
-              "showInDsl": false,
-              "name": "Connection",
-              "description": "",
-              "modelProperties": {}
-            }
-          ],
-          "name": "keyIdWithoutKeyResolver",
-          "description": "",
-          "modelProperties": {
-            "metadataKeyId": {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "parameterName": "type"
-            }
-          },
-          "kind": "operation"
-        },
-        {
-          "blocking": true,
-          "executionType": "BLOCKING",
-          "output": {
-            "type": {
-              "format": "java",
               "type": "Object",
               "annotations": {
                 "typeId": "java.lang.Object",
@@ -4983,7 +4747,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -5369,7 +5134,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 }
@@ -5710,7 +5476,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -6141,7 +5908,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -6875,7 +6643,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": false
                     }
                   }
                 }
@@ -7216,7 +6985,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 }
@@ -8080,7 +7850,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": false
                     }
                   }
                 },
@@ -8639,7 +8410,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": false
                     }
                   }
                 },
@@ -9067,6 +8839,455 @@
           "output": {
             "type": {
               "format": "java",
+              "type": "@ref:org.mule.test.metadata.extension.LocationKey"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
+          ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "classInformation": {
+                        "classname": "java.lang.Object",
+                        "hasDefaultConstructor": true,
+                        "isInterface": false,
+                        "isInstantiable": true,
+                        "isAbstract": false,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
+                      "typeAlias": {
+                        "value": "Object"
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": true,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": "#[payload]",
+                  "role": "PRIMARY_CONTENT",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 4
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "content",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 0
+              },
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "continent",
+                  "description": "",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
+                      "order": 1,
+                      "providedByKeyResolver": false
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "country",
+                  "description": "",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
+                      "order": 2,
+                      "providedByKeyResolver": true
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "city",
+                  "displayModel": {
+                    "displayName": "State | City"
+                  },
+                  "description": "",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
+                      "order": 3,
+                      "providedByKeyResolver": true
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "showInDsl": false,
+              "name": "key",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 5,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "target",
+                  "displayModel": {
+                    "displayName": "Target Variable"
+                  },
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "REQUIRED",
+                  "defaultValue": "#[payload]",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 6,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "targetValue",
+                  "displayModel": {
+                    "displayName": "Target Value"
+                  },
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "showInDsl": false,
+              "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "ReconnectionStrategy"
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "reconnect"
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "classInformation": {
+                                  "classname": "java.lang.Long",
+                                  "hasDefaultConstructor": false,
+                                  "isInterface": false,
+                                  "isInstantiable": false,
+                                  "isAbstract": false,
+                                  "isFinal": true,
+                                  "implementedInterfaces": [
+                                    "java.lang.Comparable"
+                                  ],
+                                  "parent": "java.lang.Number",
+                                  "genericTypes": [],
+                                  "isMap": false
+                                },
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "reconnect-forever"
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "classInformation": {
+                                  "classname": "java.lang.Long",
+                                  "hasDefaultConstructor": false,
+                                  "isInterface": false,
+                                  "isInstantiable": false,
+                                  "isAbstract": false,
+                                  "isFinal": true,
+                                  "implementedInterfaces": [
+                                    "java.lang.Comparable"
+                                  ],
+                                  "parent": "java.lang.Number",
+                                  "genericTypes": [],
+                                  "isMap": false
+                                },
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 7,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "partialMultiLevelKeyResolver",
+          "description": "",
+          "modelProperties": {
+            "metadataKeyId": {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.metadata.extension.LocationKey"
+              },
+              "parameterName": "key"
+            }
+          },
+          "kind": "operation"
+        },
+        {
+          "blocking": true,
+          "executionType": "BLOCKING",
+          "output": {
+            "type": {
+              "format": "java",
               "type": "Void"
             },
             "hasDynamicType": false,
@@ -9123,7 +9344,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": false
                     }
                   }
                 },
@@ -9358,297 +9580,6 @@
           "output": {
             "type": {
               "format": "java",
-              "type": "Void"
-            },
-            "hasDynamicType": true,
-            "description": "",
-            "modelProperties": {}
-          },
-          "outputAttributes": {
-            "type": {
-              "format": "java",
-              "type": "Void"
-            },
-            "hasDynamicType": false,
-            "description": "",
-            "modelProperties": {}
-          },
-          "transactional": false,
-          "requiresConnection": true,
-          "supportsStreaming": false,
-          "nestedComponents": [],
-          "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
-          ],
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
-          "parameterGroupModels": [
-            {
-              "parameters": [
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 1
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "type",
-                  "description": "",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
-                    }
-                  }
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "java.lang.Object",
-                      "classInformation": {
-                        "classname": "java.lang.Object",
-                        "hasDefaultConstructor": true,
-                        "isInterface": false,
-                        "isInstantiable": true,
-                        "isAbstract": false,
-                        "isFinal": false,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      },
-                      "typeAlias": {
-                        "value": "Object"
-                      }
-                    },
-                    "fields": []
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "PRIMARY_CONTENT",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 2
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "content",
-                  "description": "",
-                  "modelProperties": {}
-                }
-              ],
-              "exclusiveParametersModels": [],
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "showInDsl": false,
-              "name": "General",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "parameters": [
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Union",
-                    "annotations": {
-                      "typeId": "ReconnectionStrategy"
-                    },
-                    "of": [
-                      {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "reconnect"
-                        },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "classInformation": {
-                                  "classname": "java.lang.Long",
-                                  "hasDefaultConstructor": false,
-                                  "isInterface": false,
-                                  "isInstantiable": false,
-                                  "isAbstract": false,
-                                  "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
-                                  "parent": "java.lang.Number",
-                                  "genericTypes": [],
-                                  "isMap": false
-                                },
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "count"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "default": "2"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How many reconnection attempts to make"
-                              }
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "reconnect-forever"
-                        },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "classInformation": {
-                                  "classname": "java.lang.Long",
-                                  "hasDefaultConstructor": false,
-                                  "isInterface": false,
-                                  "isInstantiable": false,
-                                  "isAbstract": false,
-                                  "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
-                                  "parent": "java.lang.Number",
-                                  "genericTypes": [],
-                                  "isMap": false
-                                },
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 3,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "reconnectionStrategy",
-                  "description": "A retry strategy in case of connectivity errors",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                      "value": {
-                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-reconnection-strategy",
-                        "prefix": "mule"
-                      }
-                    },
-                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    }
-                  }
-                }
-              ],
-              "exclusiveParametersModels": [],
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2
-              },
-              "showInDsl": false,
-              "name": "Connection",
-              "description": "",
-              "modelProperties": {}
-            }
-          ],
-          "name": "shouldInheritOperationParentResolvers",
-          "description": "",
-          "modelProperties": {
-            "metadataKeyId": {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "parameterName": "type"
-            }
-          },
-          "kind": "operation"
-        },
-        {
-          "blocking": true,
-          "executionType": "BLOCKING",
-          "output": {
-            "type": {
-              "format": "java",
               "type": "Object",
               "annotations": {
                 "typeId": "java.lang.Object",
@@ -9724,7 +9655,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -10016,7 +9948,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "shouldInheritOperationResolvers",
+          "name": "shouldInheritOperationParentResolvers",
           "description": "",
           "modelProperties": {
             "metadataKeyId": {
@@ -10135,7 +10067,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
-                  "defaultValue": "AMERICA",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -10153,7 +10084,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": false
                     }
                   }
                 },
@@ -10166,7 +10098,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
-                  "defaultValue": "USA",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -10184,7 +10115,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 2
+                      "order": 2,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -10197,7 +10129,6 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
-                  "defaultValue": "SFO",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -10218,7 +10149,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 3
+                      "order": 3,
+                      "providedByKeyResolver": true
                     }
                   }
                 }
@@ -10785,7 +10717,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -11511,7 +11444,8 @@
               "description": "",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 1
+                  "order": 1,
+                  "providedByKeyResolver": false
                 }
               }
             }
@@ -11719,7 +11653,8 @@
               "description": "",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 1
+                  "order": 1,
+                  "providedByKeyResolver": false
                 }
               }
             }
@@ -11923,7 +11858,8 @@
               "description": "",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 1
+                  "order": 1,
+                  "providedByKeyResolver": false
                 }
               }
             }
@@ -12263,7 +12199,8 @@
               "description": "",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 1
+                  "order": 1,
+                  "providedByKeyResolver": false
                 }
               }
             }
@@ -12580,7 +12517,8 @@
               "description": "",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 1
+                  "order": 1,
+                  "providedByKeyResolver": false
                 }
               }
             },
@@ -12942,7 +12880,8 @@
               "description": "",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 1
+                  "order": 1,
+                  "providedByKeyResolver": true
                 }
               }
             }
@@ -13154,7 +13093,8 @@
               "description": "",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 1
+                  "order": 1,
+                  "providedByKeyResolver": true
                 }
               }
             }
@@ -13263,7 +13203,8 @@
               "description": "",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 1
+                  "order": 1,
+                  "providedByKeyResolver": false
                 }
               }
             }
@@ -13435,7 +13376,8 @@
               "description": "",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 1
+                  "order": 1,
+                  "providedByKeyResolver": false
                 }
               }
             }
@@ -14200,7 +14142,6 @@
               "required": false,
               "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "AMERICA",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -14218,7 +14159,8 @@
               "description": "",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 1
+                  "order": 1,
+                  "providedByKeyResolver": false
                 }
               }
             },
@@ -14231,7 +14173,6 @@
               "required": false,
               "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "USA",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -14249,7 +14190,8 @@
               "description": "",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 2
+                  "order": 2,
+                  "providedByKeyResolver": true
                 }
               }
             },
@@ -14262,7 +14204,6 @@
               "required": false,
               "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "SFO",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -14283,7 +14224,8 @@
               "description": "",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 3
+                  "order": 3,
+                  "providedByKeyResolver": true
                 }
               }
             }
@@ -14402,7 +14344,6 @@
             "type": "String"
           },
           "annotations": {
-            "default": "AMERICA",
             "expressionSupport": {
               "value": "SUPPORTED"
             }
@@ -14416,7 +14357,6 @@
             "type": "String"
           },
           "annotations": {
-            "default": "USA",
             "expressionSupport": {
               "value": "SUPPORTED"
             }
@@ -14430,7 +14370,6 @@
             "type": "String"
           },
           "annotations": {
-            "default": "SFO",
             "expressionSupport": {
               "value": "SUPPORTED"
             },

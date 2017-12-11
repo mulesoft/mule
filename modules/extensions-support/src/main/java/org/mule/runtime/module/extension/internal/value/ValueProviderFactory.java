@@ -60,10 +60,7 @@ public class ValueProviderFactory {
       ValueProvider resolver = instantiateClass(resolverClass);
       initialiseIfNeeded(resolver, true, muleContext);
 
-      Optional<ValueResolvingException> optionalException = injectValueProviderFields(resolver);
-      if (optionalException.isPresent()) {
-        throw optionalException.get();
-      }
+      injectValueProviderFields(resolver);
 
       if (factoryModelProperty.usesConnection()) {
         injectValueIntoField(resolver, connectionSupplier.get(), connectionField);
@@ -80,25 +77,28 @@ public class ValueProviderFactory {
     }
   }
 
-  private Optional<ValueResolvingException> injectValueProviderFields(ValueProvider resolver)
-      throws org.mule.runtime.module.extension.internal.runtime.ValueResolvingException {
+  private void injectValueProviderFields(ValueProvider resolver) throws ValueResolvingException {
     List<String> missingParameters = new ArrayList<>();
     for (InjectableParameterInfo injectableParam : factoryModelProperty.getInjectableParameters()) {
+      Object parameterValue = null;
       String parameterName = injectableParam.getParameterName();
       try {
-        Object parameterValue = parameterValueResolver.getParameterValue(parameterName);
+        parameterValue = parameterValueResolver.getParameterValue(parameterName);
+      } catch (org.mule.runtime.module.extension.internal.runtime.ValueResolvingException ignored) {
+        // no op
+      }
+
+      if (parameterValue != null) {
         injectValueIntoField(resolver, parameterValue, parameterName);
-      } catch (org.mule.runtime.module.extension.internal.runtime.ValueResolvingException e) {
-        if (injectableParam.isRequired()) {
-          missingParameters.add(parameterName);
-        }
+      } else if (injectableParam.isRequired()) {
+        missingParameters.add(parameterName);
       }
     }
-    return missingParameters.isEmpty()
-        ? Optional.empty()
-        : Optional
-            .of(new ValueResolvingException("Unable to retrieve values. There are missing required parameters for the resolution: "
-                + missingParameters, MISSING_REQUIRED_PARAMETERS));
+
+    if (!missingParameters.isEmpty()) {
+      throw new ValueResolvingException("Unable to retrieve values. There are missing required parameters for the resolution: "
+          + missingParameters, MISSING_REQUIRED_PARAMETERS);
+    }
   }
 
   private static void injectValueIntoField(ValueProvider fieldContainer, Object valueToInject, String requiredParamName) {
