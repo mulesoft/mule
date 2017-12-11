@@ -73,6 +73,14 @@ public class ClassBasedAnnotationValueFetcher<T extends Annotation> implements A
    * {@inheritDoc}
    */
   @Override
+  public Boolean getBooleanValue(Function<T, Boolean> function) {
+    return function.apply(annotation.get());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public <E extends Enum> E getEnumValue(Function<T, E> function) {
     return function.apply(annotation.get());
   }

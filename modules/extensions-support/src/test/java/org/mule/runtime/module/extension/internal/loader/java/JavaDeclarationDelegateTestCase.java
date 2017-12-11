@@ -279,7 +279,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     OperationDeclaration operation = getOperation(declarer.getDeclaration(), "noGenerics");
 
     assertThat(operation.getOutput().getType(), is(instanceOf(AnyType.class)));
-    assertThat(operation.getOutputAttributes().getType(), is(instanceOf(VoidType.class)));
+    assertThat(operation.getOutputAttributes().getType(), is(instanceOf(AnyType.class)));
   }
 
   @Test

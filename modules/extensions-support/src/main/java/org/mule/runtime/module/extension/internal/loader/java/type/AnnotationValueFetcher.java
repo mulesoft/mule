@@ -41,12 +41,20 @@ public interface AnnotationValueFetcher<A extends Annotation> {
   Type getClassValue(Function<A, Class> function);
 
   /**
-   * Return the {@link Type} representing a {@link Class} property.
+   * Returns a {@link Number} value of an {@link Annotation} property
    *
    * @param function A function which executes the logic of retrieving the property value.
    * @return The {@link Type}
    */
   <N extends Number> N getNumberValue(Function<A, N> function);
+
+  /**
+   * Returns a {@link Boolean} value of an {@link Annotation} property
+   *
+   * @param function A function which executes the logic of retrieving the property value.
+   * @return The {@link Type}
+   */
+  Boolean getBooleanValue(Function<A, Boolean> function);
 
   /**
    * Returns the {@link Enum} value of an annotation property

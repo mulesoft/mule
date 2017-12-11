@@ -34,6 +34,7 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.LA_PLATA;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
+
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -60,6 +61,7 @@ import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -74,7 +76,7 @@ import org.junit.Test;
 public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase {
 
   private static final String MESSAGE_ATTRIBUTES_PERSON_TYPE_METADATA = "messageAttributesPersonTypeMetadata";
-  private static final String MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA = "messageAttributesVoidTypeMetadata";
+  private static final String MESSAGE_ATTRIBUTES_ANY_TYPE_METADATA = "messageAttributesAnyTypeMetadata";
   private static final String PAGED_OPERATION_METADATA = "pagedOperationMetadata";
   private static final String PAGED_OPERATION_METADATA_RESULT = "pagedOperationMetadataResult";
   private static final String PAGED_OPERATION_METADATA_RESULT_WITH_ATTRIBUTES =
@@ -265,10 +267,11 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
 
   @Test
   public void messageAttributesVoidTypeMetadata() throws Exception {
-    location = Location.builder().globalName(MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA).addProcessorsPart().addIndexPart(0).build();
+    location = Location.builder().globalName(MESSAGE_ATTRIBUTES_ANY_TYPE_METADATA).addProcessorsPart().addIndexPart(0).build();
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, TYPE_BUILDER.anyType().build(), void.class);
+    assertExpectedOutput(typedModel, ExtensionsTestUtils.TYPE_BUILDER.anyType().build(),
+                         ExtensionsTestUtils.TYPE_BUILDER.anyType().build());
     assertExpectedType(getParameter(typedModel, TARGET_PARAMETER_NAME), String.class);
   }
 
@@ -545,7 +548,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   public void operationWhichReturnsDynamicListOfMessages() throws Exception {
     location = Location.builder().globalName("dynamicListOfMessages").addProcessorsPart().addIndexPart(0).build();
     MetadataType param = getResolvedTypeFromList();
-    assertMessageType(((ArrayType) param).getType(), personType, TYPE_BUILDER.voidType().build());
+    assertMessageType(((ArrayType) param).getType(), personType, TYPE_BUILDER.anyType().build());
   }
 
   @Test

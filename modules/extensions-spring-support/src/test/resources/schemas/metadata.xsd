@@ -970,12 +970,11 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MessageAttributesPersonTypeMetadataType" substitutionGroup="mule:abstract-operator" name="message-attributes-person-type-metadata"></xs:element>
-  <xs:complexType name="MessageAttributesPersonTypeMetadataType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MessageAttributesAnyTypeMetadataType" substitutionGroup="mule:abstract-operator" name="message-attributes-any-type-metadata"></xs:element>
+  <xs:complexType name="MessageAttributesAnyTypeMetadataType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -989,11 +988,12 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MessageAttributesVoidTypeMetadataType" substitutionGroup="mule:abstract-operator" name="message-attributes-void-type-metadata"></xs:element>
-  <xs:complexType name="MessageAttributesVoidTypeMetadataType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MessageAttributesPersonTypeMetadataType" substitutionGroup="mule:abstract-operator" name="message-attributes-person-type-metadata"></xs:element>
+  <xs:complexType name="MessageAttributesPersonTypeMetadataType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

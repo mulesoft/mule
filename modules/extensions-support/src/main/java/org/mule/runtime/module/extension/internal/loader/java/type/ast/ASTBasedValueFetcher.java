@@ -99,6 +99,14 @@ public class ASTBasedValueFetcher<A extends Annotation> implements AnnotationVal
    * {@inheritDoc}
    */
   @Override
+  public Boolean getBooleanValue(Function<A, Boolean> function) {
+    return (Boolean) getConstant(function).getValue();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public <E extends Enum> E getEnumValue(Function<A, E> function) {
     VariableElement value = (VariableElement) ((AnnotationValue) getObjectValue(function)).getValue();
     Class<? extends Enum> annotationClass;

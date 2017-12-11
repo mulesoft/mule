@@ -316,7 +316,7 @@ public final class IntrospectionUtils {
         : typeBuilder().anyType().build();
 
     genericType = itemType.getGenerics()[1];
-    MetadataType attributesType = rawClass != null
+    MetadataType attributesType = genericType.getRawClass() != null
         ? typeLoader.load(genericType.getType())
         : typeBuilder().anyType().build();
 
@@ -385,7 +385,12 @@ public final class IntrospectionUtils {
     if (returnType.isAssignableTo(Result.class)) {
       List<GenericInfo> generics = returnType.getGenerics();
       if (generics.size() == 2) {
-        type = generics.get(1).getConcreteType().getReflectType();
+        ResolvableType resolvableType = ResolvableType.forType(generics.get(1).getConcreteType().getReflectType());
+        if (resolvableType.getRawClass() != null) {
+          type = resolvableType.getType();
+        } else {
+          return typeBuilder().anyType().build();
+        }
       }
     }
 
