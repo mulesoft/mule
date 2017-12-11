@@ -228,8 +228,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File loadsAppResourceCallbackClassFile;
   protected static File pluginEcho1TestClassFile;
 
-  private static File customExceptionClassFile;
-
   private static Boolean internalIsRunningTests;
 
   @BeforeClass
@@ -327,8 +325,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected final PolicyFileBuilder policyIncludingPluginFileBuilder =
       createPolicyIncludingPluginFileBuilder();
-
-
   protected final PolicyFileBuilder policyIncludingHelloPluginV2FileBuilder =
       createPolicyIncludingHelloPluginV2FileBuilder();
 
@@ -1255,7 +1251,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
         .build()).dependingOn(helloExtensionV1Plugin);
   }
-
 
   protected ServiceRegistryDescriptorLoaderRepository createDescriptorLoaderRepository() {
     return new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
