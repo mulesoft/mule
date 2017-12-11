@@ -6,6 +6,8 @@
  */
 package org.mule.transport.ftp;
 
+import static java.io.File.separator;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -45,6 +47,7 @@ import java.util.Map;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 
@@ -69,6 +72,12 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
      *  Java 5's covariant return types the benefits are diminished. Keeping it simple for now.
      */
     public static final String DEFAULT_FTP_CONNECTION_FACTORY_CLASS = "org.mule.transport.ftp.FtpConnectionFactory";
+
+
+    /**
+     * The minimum number of files to read for verifying if a path resource is a file or a directory.
+     */
+    public static final int FILES_TO_READ = 2;
 
     /**
      * Time in milliseconds to poll. On each poll the poll() method is called
@@ -749,12 +758,33 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         return true;
     }
 
-    protected boolean isFile(ImmutableEndpoint endpoint, FTPClient client) throws IOException 
+    /**
+     * Verifies if a resource is a file.
+     *
+     * We should check if the resource located in the given path contains only a file
+     * and if its name is equal to the last subPath of the given resource.
+     * The second condition avoids mistaking a directory with only one file for a file.
+     *
+     * @param endpoint the endpoint to get the resource path.
+     * @param client the ftpClient
+     *
+     */
+    protected boolean isFile(ImmutableEndpoint endpoint, FTPClient client) throws IOException
     {
-          //Checking if it is a file or a directory
-          String path = endpoint.getEndpointURI().getPath();
-          FTPFile[] listFiles = client.listFiles(path);
-          return listFiles.length == 1 && listFiles[0].isFile();
+        String resourceName = getResourceName(endpoint.getEndpointURI().getPath());
+        FTPListParseEngine engine = client.initiateListParsing(endpoint.getEndpointURI().getPath());
+        FTPFile[] files = engine.getNext(FILES_TO_READ);
+        return files.length == 1 && files[0].isFile() && resourceName.equals(files[0].getName());
+    }
+
+    private String getResourceName (String path)
+    {
+        if (path.contains(separator))
+        {
+            String [] splitPath = path.split(separator);
+            return splitPath[splitPath.length -1];
+        }
+        return path;
     }
 
     public boolean isStreaming()

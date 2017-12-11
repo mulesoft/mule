@@ -6,7 +6,13 @@
  */
 package org.mule.transport.ftp;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.transport.ftp.FtpConnector.FILES_TO_READ;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -17,11 +23,16 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transport.nameable.AbstractInboundEndpointNameableConnectorTestCase;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.apache.commons.pool.ObjectPool;
 import org.junit.Test;
+import sun.net.ftp.FtpClient;
 
 /**
  * Test configuration of FTP connector. It's all done in code, no configuration files
@@ -33,6 +44,7 @@ public class FTPConnectorTestCase extends AbstractInboundEndpointNameableConnect
     static final long POLLING_FREQUENCY_OVERRIDE = 4321;
     static final String TEST_ENDPOINT_URI = "ftp://foo:bar@example.com";
     static final String VALID_MESSAGE = "This is a valid FTP message";
+    static final String RESOURCE_PATH = "somePath";
 
     @Override
     public Connector createConnector() throws Exception
@@ -110,6 +122,58 @@ public class FTPConnectorTestCase extends AbstractInboundEndpointNameableConnect
         assertEquals("Custom FTP connection factory has been ignored.", testObject, obj);
     }
 
+    @Test
+    public void isFile() throws Exception
+    {
+        FTPFile file = mock(FTPFile.class);
+        FTPFile[] files = {file};
+        when(file.isFile()).thenReturn(true);
+        when(file.getName()).thenReturn(RESOURCE_PATH);
+        FtpConnector connector = (FtpConnector) getConnector();
+
+        assertThat(connector.isFile(mockEndpoint(), mockClient(files)), is(true));
+    }
+
+    @Test
+    public void isDirectory() throws Exception
+    {
+        FTPFile file = mock(FTPFile.class);
+        FTPFile secondFile = mock(FTPFile.class);
+        FTPFile[] files = {file, secondFile};
+        when(file.isFile()).thenReturn(true);
+        FtpConnector connector = (FtpConnector) getConnector();
+
+        assertThat(connector.isFile(mockEndpoint(), mockClient(files)), is(false));
+    }
+
+    @Test
+    public void isDirectoryWithOnlyAFile() throws Exception
+    {
+        FTPFile file = mock(FTPFile.class);
+        FTPFile[] files = {file};
+        when(file.isFile()).thenReturn(true);
+        when(file.getName()).thenReturn("someFile");
+        FtpConnector connector = (FtpConnector) getConnector();
+
+        assertThat(connector.isFile(mockEndpoint(), mockClient(files)), is(false));
+    }
+
+    private ImmutableEndpoint mockEndpoint ()
+    {
+        ImmutableEndpoint endpoint = mock(ImmutableEndpoint.class, RETURNS_DEEP_STUBS);
+        when(endpoint.getEndpointURI().getPath()).thenReturn(RESOURCE_PATH);
+        return endpoint;
+    }
+
+    private FTPClient mockClient (FTPFile[] filesToReturn) throws Exception
+    {
+        FTPListParseEngine engine = mock(FTPListParseEngine.class);
+        when(engine.getNext(2)).thenReturn(filesToReturn);
+
+        FTPClient client = mock(FTPClient.class);
+        when(client.initiateListParsing(RESOURCE_PATH)).thenReturn(engine);
+        return client;
+    }
 
     /**
      * Workaround. The super getConnector() call will init the connector,
