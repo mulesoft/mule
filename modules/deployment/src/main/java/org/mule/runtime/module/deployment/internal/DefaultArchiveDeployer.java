@@ -16,19 +16,27 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleAppsDir;
+
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
+
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
+import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,11 +48,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
-import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Deployer of an artifact within mule container. - Keeps track of deployed artifacts - Avoid already deployed artifacts to be
@@ -59,7 +62,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   private final ArtifactDeployer<T> deployer;
   private final ArtifactArchiveInstaller artifactArchiveInstaller;
-  private final Map<String, ZombieArtifact> artifactZombieMap = new HashMap<String, ZombieArtifact>();
+  private final Map<String, ZombieArtifact> artifactZombieMap = new HashMap<>();
   private final File artifactDir;
   private final ObservableList<T> artifacts;
   private final ArtifactDeploymentTemplate deploymentTemplate;
@@ -167,8 +170,12 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private void logDeploymentFailure(Throwable t, String artifactName) {
-    final String msg = miniSplash(format("Failed to deploy artifact '%s', see below", artifactName));
-    logger.error(msg, t);
+    if (containsType(t, DeploymentStartException.class)) {
+      logger.error(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", artifactName)));
+      logger.error(t.getMessage());
+    } else {
+      logger.error(miniSplash(format("Failed to deploy artifact '%s', see below", artifactName)), t);
+    }
   }
 
   @Override
@@ -261,16 +268,19 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
       addZombieFile(addedApp, artifactDir);
 
-      String msg = miniSplash(format("Failed to deploy exploded artifact: '%s', see below", addedApp));
-      logger.error(msg, t);
+      if (containsType(t, DeploymentStartException.class)) {
+        logger.error(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", addedApp)));
+        logger.error(t.getMessage());
+      } else {
+        logger.error(miniSplash(format("Failed to deploy artifact '%s', see below", addedApp)), t);
+      }
 
       deploymentListener.onDeploymentFailure(addedApp, t);
 
       if (t instanceof DeploymentException) {
         throw (DeploymentException) t;
       } else {
-        msg = "Failed to deploy artifact: " + addedApp;
-        throw new DeploymentException(createStaticMessage(msg), t);
+        throw new DeploymentException(createStaticMessage("Failed to deploy artifact: " + addedApp), t);
       }
     }
 
@@ -484,8 +494,13 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       artifactZombieMap.remove(artifact.getArtifactName());
     } catch (Throwable t) {
       // error text has been created by the deployer already
-      String msg = miniSplash(format("Failed to deploy artifact '%s', see below", artifact.getArtifactName()));
-      logger.error(msg, t);
+      if (containsType(t, DeploymentStartException.class)) {
+        logger.error(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details",
+                                       artifact.getArtifactName())));
+        logger.error(t.getMessage());
+      } else {
+        logger.error(miniSplash(format("Failed to deploy artifact '%s', see below", artifact.getArtifactName())), t);
+      }
 
       addZombieApp(artifact);
 
@@ -493,8 +508,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       if (t instanceof DeploymentException) {
         throw (DeploymentException) t;
       } else {
-        msg = "Failed to deploy artifact: " + artifact.getArtifactName();
-        throw new DeploymentException(createStaticMessage(msg), t);
+        throw new DeploymentException(createStaticMessage("Failed to deploy artifact: " + artifact.getArtifactName()), t);
       }
     }
   }
