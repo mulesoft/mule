@@ -323,6 +323,11 @@ public abstract class HttpHeaders {
      */
     public static final String X_FORWARDED_FOR = "X-Forwarded-For";
 
+    /**
+     * {@value "X-Correlation-ID"}
+     */
+    public static final String X_CORRELATION_ID = "X-Correlation-ID";
+
     private Names() {}
   }
 
