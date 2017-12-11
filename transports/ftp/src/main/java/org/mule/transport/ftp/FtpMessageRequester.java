@@ -79,7 +79,7 @@ public class FtpMessageRequester extends AbstractMessageRequester
         {
             client = connector.createFtpClient(endpoint);
             FTPFile fileToProcess;
-            if(connector.isFile(endpoint,client))
+            if(connector.isFile(endpoint, client))
             {
                 fileToProcess = client.listFiles(endpoint.getEndpointURI().getPath())[0];
                 if(!isValid(fileToProcess, getFilenameFilter()))
