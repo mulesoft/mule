@@ -25,6 +25,7 @@ import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
+import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -42,6 +43,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.CompletionCal
 import org.mule.runtime.module.extension.internal.runtime.resolver.ComponentLocationArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.CorrelationInfoArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.DefaultEncodingArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.FlowListenerArgumentResolver;
@@ -96,6 +98,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       new ComponentLocationArgumentResolver();
   private static final ArgumentResolver<OperationTransactionalAction> OPERATION_TRANSACTIONAL_ACTION_ARGUMENT_RESOLVER =
       new OperationTransactionalActionArgumentResolver();
+  private static final ArgumentResolver<CorrelationInfo> CORRELATION_INFO_ARGUMENT_RESOLVER =
+      new CorrelationInfoArgumentResolver();
 
 
   private final Method method;
@@ -173,6 +177,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = COMPONENT_LOCATION_ARGUMENT_RESOLVER;
       } else if (OperationTransactionalAction.class.equals(parameterType)) {
         argumentResolver = OPERATION_TRANSACTIONAL_ACTION_ARGUMENT_RESOLVER;
+      } else if (CorrelationInfo.class.equals(parameterType)) {
+        argumentResolver = CORRELATION_INFO_ARGUMENT_RESOLVER;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }

@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
+import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
@@ -53,6 +54,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(SourceResult.class)
       .add(ComponentLocation.class)
       .add(Chain.class)
+      .add(CorrelationInfo.class)
       .build();
 
   /**
