@@ -382,7 +382,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
-  @Ignore("MULE-14190: MetadataScope fundamentally broken")
+  @Ignore("MULE-14190: Revamp MetadataScope annotation")
   public void shouldInheritExtensionResolvers() throws Exception {
     location = Location.builder().globalName(SHOULD_INHERIT_EXTENSION_RESOLVERS).addProcessorsPart().addIndexPart(0).build();
 
@@ -414,7 +414,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final OperationModel typedModel = metadataDescriptor.getModel();
     assertExpectedOutput(typedModel, personType, void.class);
     assertExpectedType(getParameter(typedModel, "type"), String.class);
-    // TODO MULE-14190: MetadataScope fundamentally broken
+    // TODO MULE-14190: Revamp MetadataScope annotation
     // assertExpectedType(getParameter(typedModel, "content"), personType, true);
   }
 
