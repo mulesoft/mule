@@ -63,7 +63,7 @@ import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
@@ -349,7 +349,7 @@ public final class XmlExtensionLoaderDelegate {
     }
     ComponentModelReader componentModelReader =
         new ComponentModelReader(new DefaultConfigurationPropertiesResolver(empty(),
-                                                                            new SystemPropertiesConfigurationProvider()));
+                                                                            new EnvironmentPropertiesConfigurationProvider()));
     return componentModelReader.extractComponentDefinitionModel(parseModule.get(), modulePath);
   }
 
