@@ -32,6 +32,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -97,6 +98,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                        boolean enableLazyInitialisation, boolean disableXmlValidations)
       throws ConfigurationException {
     this(configurationFiles, artifactProperties, artifactType, enableLazyInitialisation, disableXmlValidations);
+    this.artifactType = APP;
     this.artifactDeclaration = artifactDeclaration;
   }
 
@@ -160,7 +162,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   }
 
   private List<ClassLoader> resolveAppAndDomainPluginClassLoaders() {
-    List<ClassLoader> artifactContextPluginClassLoaders = resolveContextArtifactPluginClassLoaders();
+    List<ClassLoader> artifactContextPluginClassLoaders = new ArrayList<>(resolveContextArtifactPluginClassLoaders());
     if (artifactType.equals(ArtifactType.APP) && parentContext != null) {
       ClassLoader currentClassLoader = currentThread().getContextClassLoader();
       try {

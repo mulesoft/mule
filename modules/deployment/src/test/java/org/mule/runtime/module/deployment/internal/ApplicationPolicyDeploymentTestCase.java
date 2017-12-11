@@ -16,6 +16,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
@@ -36,10 +38,12 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.meta.Product;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.PolicyNotification;
 import org.mule.runtime.api.notification.PolicyNotificationListener;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.policy.PolicyPointcut;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
@@ -54,8 +58,12 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Contains test for application deployment with policies on the default domain
@@ -90,6 +98,9 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                         getResourceFile("/org/foo/simple/SimpleOperation.java"))
             .compile("mule-module-simple-4.0-SNAPSHOT.jar", "1.0.0");
   }
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
@@ -296,7 +307,42 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                       getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     executeApplicationFlow("main");
-    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  public void appliesApplicationPolicyDuplicatingPluginWithNoSDKSupportedPlugin() throws Exception {
+
+    final String policyName = "exceptionPolicy";
+
+    PolicyFileBuilder exceptionPolicyFileBuilder = new PolicyFileBuilder(policyName).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
+                                                                                                        .setMinMuleVersion(MIN_MULE_VERSION)
+                                                                                                        .setName(policyName)
+                                                                                                        .setRequiredProduct(MULE)
+                                                                                                        .withBundleDescriptorLoader(createBundleDescriptorLoader(policyName, MULE_POLICY_CLASSIFIER,
+                                                                                                                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+                                                                                                        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+                                                                                                        .build())
+            .dependingOn(exceptionThrowingPlugin);
+
+    policyManager.registerPolicyTemplate(exceptionPolicyFileBuilder.getArtifactFile());
+
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("exception-throwing-app.xml",
+                                                                                           exceptionThrowingPlugin,helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), exceptionPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(policyName, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/exceptionThrowingPolicy.xml"), emptyList()));
+    try {
+      executeApplicationFlow("main");
+    }catch (MuleRuntimeException e) {
+      assertThat(e.getCause().getCause().getClass().getName(),is(equalTo("org.exception.CustomException")));
+    }
   }
 
   @Test
