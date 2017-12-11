@@ -1191,37 +1191,40 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   private ArtifactPluginFileBuilder createExceptionThrowingPluginFileBuilder() {
     MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
-            .setMinMuleVersion(MIN_MULE_VERSION)
-            .setName("exceptionPlugin")
-            .setRequiredProduct(MULE)
-            .withBundleDescriptorLoader(createBundleDescriptorLoader("exceptionPlugin",
-                                                                     MULE_PLUGIN_CLASSIFIER,
-                                                                     PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID,
-                                                                     "1.0.0"));
+        .setMinMuleVersion(MIN_MULE_VERSION)
+        .setName("exceptionPlugin")
+        .setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("exceptionPlugin",
+                                                                 MULE_PLUGIN_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID,
+                                                                 "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
-                                                                        .setId(MULE_LOADER_ID)
-                                                                        .addProperty(EXPORTED_RESOURCES,asList("/META-INF/mule-exception.xsd", "/META-INF/mule.schemas"))
-                                                                        .build());
+        .setId(MULE_LOADER_ID)
+        .addProperty(EXPORTED_RESOURCES, asList("/META-INF/mule-exception.xsd", "/META-INF/mule.schemas"))
+        .build());
 
     File exceptionTestClassFile = null;
     File serviceTestClassFile = null;
 
     try {
-      exceptionTestClassFile = new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/exception/CustomException.java"));
-      serviceTestClassFile = new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/exception/ExceptionComponentBuildingDefinitionProvider.java"));
-    }catch (URISyntaxException e) {
+      exceptionTestClassFile =
+          new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/exception/CustomException.java"));
+      serviceTestClassFile = new CompilerUtils.SingleClassCompiler()
+          .compile(getResourceFile("/org/exception/ExceptionComponentBuildingDefinitionProvider.java"));
+    } catch (URISyntaxException e) {
       fail(e.getMessage());
     }
 
     ArtifactPluginFileBuilder exceptionPluginFileBuilder = new ArtifactPluginFileBuilder("exceptionPlugin")
-            .containingResource("exception/META-INF/mule.schemas","META-INF/mule.schemas")
-            .containingResource("exception/META-INF/mule-exception.xsd", "META-INF/mule-exception.xsd")
-            .containingResource("exception/META-INF/services/org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider", "META-INF/services/org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider")
-            .containingClass(exceptionTestClassFile, "org/exception/CustomException.class")
-            .containingClass(serviceTestClassFile, "org/exception/ExceptionComponentBuildingDefinitionProvider.class")
-            .configuredWith(EXPORTED_RESOURCE_PROPERTY, "META-INF/mule-exception.xsd,META-INF/mule.schemas")
-            .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.exception")
-            .describedBy(mulePluginModelBuilder.build());
+        .containingResource("exception/META-INF/mule.schemas", "META-INF/mule.schemas")
+        .containingResource("exception/META-INF/mule-exception.xsd", "META-INF/mule-exception.xsd")
+        .containingResource("exception/META-INF/services/org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider",
+                            "META-INF/services/org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider")
+        .containingClass(exceptionTestClassFile, "org/exception/CustomException.class")
+        .containingClass(serviceTestClassFile, "org/exception/ExceptionComponentBuildingDefinitionProvider.class")
+        .configuredWith(EXPORTED_RESOURCE_PROPERTY, "META-INF/mule-exception.xsd,META-INF/mule.schemas")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.exception")
+        .describedBy(mulePluginModelBuilder.build());
 
     return exceptionPluginFileBuilder;
 

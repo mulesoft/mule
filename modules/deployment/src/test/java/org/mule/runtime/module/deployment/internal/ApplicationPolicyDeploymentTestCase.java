@@ -310,25 +310,27 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
-  public void appliesApplicationPolicyDuplicatingPluginWithNoSDKSupportedPlugin() throws Exception {
+  public void appliesApplicationPolicyDuplicatingPluginWithNoSDKHandledPlugin() throws Exception {
 
     final String policyName = "exceptionPolicy";
 
-    PolicyFileBuilder exceptionPolicyFileBuilder = new PolicyFileBuilder(policyName).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
-                                                                                                        .setMinMuleVersion(MIN_MULE_VERSION)
-                                                                                                        .setName(policyName)
-                                                                                                        .setRequiredProduct(MULE)
-                                                                                                        .withBundleDescriptorLoader(createBundleDescriptorLoader(policyName, MULE_POLICY_CLASSIFIER,
-                                                                                                                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-                                                                                                        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
-                                                                                                        .build())
+    PolicyFileBuilder exceptionPolicyFileBuilder =
+        new PolicyFileBuilder(policyName).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
+            .setMinMuleVersion(MIN_MULE_VERSION)
+            .setName(policyName)
+            .setRequiredProduct(MULE)
+            .withBundleDescriptorLoader(createBundleDescriptorLoader(policyName, MULE_POLICY_CLASSIFIER,
+                                                                     PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+            .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+            .build())
             .dependingOn(exceptionThrowingPlugin);
 
     policyManager.registerPolicyTemplate(exceptionPolicyFileBuilder.getArtifactFile());
 
 
-    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("exception-throwing-app.xml",
-                                                                                           exceptionThrowingPlugin,helloExtensionV1Plugin);
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           exceptionThrowingPlugin,
+                                                                                           helloExtensionV1Plugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
 
@@ -340,8 +342,9 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                       getResourceFile("/exceptionThrowingPolicy.xml"), emptyList()));
     try {
       executeApplicationFlow("main");
-    }catch (MuleRuntimeException e) {
-      assertThat(e.getCause().getCause().getClass().getName(),is(equalTo("org.exception.CustomException")));
+      fail();
+    } catch (MuleRuntimeException e) {
+      assertThat(e.getCause().getCause().getClass().getName(), is(equalTo("org.exception.CustomException")));
     }
   }
 

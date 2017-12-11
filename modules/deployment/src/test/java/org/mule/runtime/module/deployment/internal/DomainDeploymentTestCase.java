@@ -32,6 +32,7 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -83,6 +84,9 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
       new DomainFileBuilder("shared-domain").definedBy("shared-domain-config.xml");
   private final DomainFileBuilder domainWithPropsFileBuilder =
       new DomainFileBuilder("domain-with-props").definedBy("domain-with-props-config.xml");
+  private final DomainFileBuilder exceptionThrowingPluginImportingDomain =
+      new DomainFileBuilder("exception-throwi-plugin-importing-domain").definedBy("empty-domain-config.xml")
+          .dependingOn(exceptionThrowingPlugin);
 
   // Application artifact builders
   private final ApplicationFileBuilder dummyDomainApp1FileBuilder =
@@ -202,6 +206,24 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
     executeApplicationFlow("main");
+  }
+
+  @Test
+  public void pluginNotHandledBySDKFromDomainUsedInApp() throws Exception {
+    addPackedDomainFromBuilder(exceptionThrowingPluginImportingDomain);
+
+    ApplicationFileBuilder applicationFileBuilder =
+        createExtensionApplicationWithServices("exception-throwing-app.xml").dependingOn(exceptionThrowingPluginImportingDomain);
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+
+    try {
+      executeApplicationFlow("main");
+      fail();
+    } catch (MuleRuntimeException e) {
+      assertThat(e.getCause().getCause().getClass().getName(), is(equalTo("org.exception.CustomException")));
+    }
+
   }
 
   @Test
