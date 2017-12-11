@@ -59,7 +59,7 @@ import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolve
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
-import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -286,7 +286,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                          List<ConfigFile> alreadyResolvedConfigFiles) {
 
     DefaultConfigurationPropertiesResolver propertyResolver =
-        new DefaultConfigurationPropertiesResolver(empty(), new SystemPropertiesConfigurationProvider());
+        new DefaultConfigurationPropertiesResolver(empty(), new EnvironmentPropertiesConfigurationProvider());
 
     ImmutableList.Builder<ConfigFile> resolvedConfigFilesBuilder =
         ImmutableList.<ConfigFile>builder().addAll(alreadyResolvedConfigFiles);

@@ -67,7 +67,7 @@ import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigura
 import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
-import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler;
@@ -352,13 +352,14 @@ public class ApplicationModel {
                                                     Optional<ConfigurationProperties> parentConfigurationProperties,
                                                     Map<String, String> deploymentProperties) {
 
-    SystemPropertiesConfigurationProvider systemPropertiesConfigurationProvider = new SystemPropertiesConfigurationProvider();
+    EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
+        new EnvironmentPropertiesConfigurationProvider();
     ConfigurationPropertiesProvider globalPropertiesConfigurationAttributeProvider =
         createProviderFromGlobalProperties(artifactConfig);
     DefaultConfigurationPropertiesResolver localResolver =
         new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(empty(),
                                                                                                  globalPropertiesConfigurationAttributeProvider)),
-                                                   systemPropertiesConfigurationProvider);
+                                                   environmentPropertiesConfigurationProvider);
     List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
         getConfigurationPropertiesProvidersFromComponents(artifactConfig, localResolver);
     FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
@@ -394,7 +395,7 @@ public class ApplicationModel {
                                                    globalPropertiesConfigurationAttributeProvider);
     DefaultConfigurationPropertiesResolver systemPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
-                                                   systemPropertiesConfigurationProvider);
+                                                   environmentPropertiesConfigurationProvider);
     DefaultConfigurationPropertiesResolver externalPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
                                                    externalPropertiesConfigurationProvider);
