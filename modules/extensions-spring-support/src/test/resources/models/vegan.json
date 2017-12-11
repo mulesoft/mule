@@ -368,7 +368,26 @@
           "output": {
             "type": {
               "format": "java",
-              "type": "@ref:org.mule.tck.testmodels.fruit.Apple"
+              "type": "Object",
+              "annotations": {
+                "typeId": "java.lang.Object",
+                "classInformation": {
+                  "classname": "java.lang.Object",
+                  "hasDefaultConstructor": true,
+                  "isInterface": false,
+                  "isInstantiable": true,
+                  "isAbstract": false,
+                  "isFinal": false,
+                  "implementedInterfaces": [],
+                  "parent": "",
+                  "genericTypes": [],
+                  "isMap": false
+                },
+                "typeAlias": {
+                  "value": "Object"
+                }
+              },
+              "fields": []
             },
             "hasDynamicType": true,
             "description": "",
@@ -424,7 +443,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": false
                     }
                   }
                 }
@@ -2121,7 +2141,8 @@
                   "description": "",
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                      "order": 1
+                      "order": 1,
+                      "providedByKeyResolver": true
                     }
                   }
                 },
@@ -7709,7 +7730,7 @@
             "type": "String"
           }
         },
-        "hasDynamicType": true,
+        "hasDynamicType": false,
         "description": "",
         "modelProperties": {}
       },
@@ -7734,36 +7755,6 @@
       "parameterGroupModels": [
         {
           "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "allowedStereotypeModels": [],
-              "name": "key",
-              "description": "",
-              "modelProperties": {
-                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
-                  "order": 1
-                }
-              }
-            },
             {
               "type": {
                 "format": "java",
@@ -7805,7 +7796,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2
+                "order": 1
               },
               "allowedStereotypeModels": [],
               "name": "apples",
@@ -7846,7 +7837,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -7877,7 +7868,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -7904,15 +7895,7 @@
       ],
       "name": "getAllApples",
       "description": "",
-      "modelProperties": {
-        "metadataKeyId": {
-          "type": {
-            "format": "java",
-            "type": "String"
-          },
-          "parameterName": "key"
-        }
-      },
+      "modelProperties": {},
       "kind": "operation"
     },
     {

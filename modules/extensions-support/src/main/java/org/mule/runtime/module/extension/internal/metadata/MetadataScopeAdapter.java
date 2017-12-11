@@ -88,7 +88,6 @@ public final class MetadataScopeAdapter {
   }
 
   private void initializeFromClass(Class<?> extensionType, Class<?> source) {
-    // TODO MULE-10891: Add support for Source Callback parameters
     MetadataScope scope = getAnnotation(source, MetadataScope.class);
     scope = scope != null ? scope : getAnnotation(extensionType, MetadataScope.class);
 

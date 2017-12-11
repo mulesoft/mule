@@ -10,7 +10,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -46,6 +45,7 @@ import org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputAttributesResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputResolverWithoutKeyResolver;
+import org.mule.test.metadata.extension.resolver.TestPartialMultiLevelKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestResolverWithCache;
 import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
 
@@ -162,6 +162,13 @@ public class MetadataOperations {
                                                  @ParameterGroup(
                                                      name = "key") @MetadataKeyId(TestMultiLevelKeyResolver.class) LocationKey locationKey,
                                                  @Content @TypeResolver(TestMultiLevelKeyResolver.class) Object content) {
+    return locationKey;
+  }
+
+  public LocationKey partialMultiLevelKeyResolver(@Connection MetadataConnection connection,
+                                                  @ParameterGroup(
+                                                      name = "key") @MetadataKeyId(TestPartialMultiLevelKeyResolver.class) LocationKey locationKey,
+                                                  @Content @TypeResolver(TestMultiLevelKeyResolver.class) Object content) {
     return locationKey;
   }
 

@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
-import org.mule.runtime.api.meta.NamedObject;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -22,16 +23,19 @@ import org.mule.runtime.api.metadata.MetadataKeyProvider;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder;
+import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 
 import com.google.common.collect.ImmutableSet;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -63,17 +67,29 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
    * Dynamic keys are a available or the retrieval fails for any reason
    */
   MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context) {
+    return getMetadataKeys(context, null);
+  }
+
+  MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context, Object partialKey) {
     final TypeKeysResolver keyResolver = resolverFactory.getKeyResolver();
     final String componentResolverName = keyResolver.getCategoryName();
     final MetadataKeysContainerBuilder keysContainer = MetadataKeysContainerBuilder.getInstance();
+
     if (keyParts.isEmpty()) {
       return success(keysContainer.add(componentResolverName, ImmutableSet.of(new NullMetadataKey())).build());
     }
+
     try {
-      final Set<MetadataKey> metadataKeys = keyResolver.getKeys(context);
-      final Map<Integer, String> partOrder = getPartOrderMapping(keyParts);
+      final Map<Integer, ParameterModel> partsByOrder = getPartOrderMapping(keyParts);
+      Set<MetadataKey> metadataKeys;
+      if (keyResolver instanceof PartialTypeKeysResolver && hasInitialLevel(partialKey, partsByOrder)) {
+        metadataKeys = singleton(((PartialTypeKeysResolver) keyResolver).resolveChilds(context, partialKey));
+      } else {
+        metadataKeys = keyResolver.getKeys(context);
+      }
+
       final Set<MetadataKey> enrichedMetadataKeys = metadataKeys.stream()
-          .map(metadataKey -> cloneAndEnrichMetadataKey(metadataKey, partOrder))
+          .map(metadataKey -> cloneAndEnrichMetadataKey(metadataKey, partsByOrder))
           .map(MetadataKeyBuilder::build).collect(toSet());
       keysContainer.add(componentResolverName, enrichedMetadataKeys);
 
@@ -84,6 +100,30 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
     }
   }
 
+  private boolean hasInitialLevel(Object keyValue, Map<Integer, ParameterModel> partsByOrder) {
+    if (keyValue == null) {
+      return false;
+    }
+
+    Optional<DeclaringMemberModelProperty> member =
+        partsByOrder.get(INITIAL_PART_LEVEL).getModelProperty(DeclaringMemberModelProperty.class);
+
+    if (!member.isPresent()) {
+      return false;
+    }
+
+    return getField(keyValue.getClass(), member.get().getDeclaringField().getName())
+        .map(field -> {
+          field.setAccessible(true);
+          try {
+            return field.get(keyValue) != null;
+          } catch (Exception e) {
+            return false;
+          }
+        })
+        .orElse(false);
+  }
+
   /**
    * Introspect the {@link List} of {@link ParameterModel} of the {@link ComponentModel} and filter the ones that are parts of the
    * {@link MetadataKey} and creates a mapping with the order number of each part with their correspondent name.
@@ -91,17 +131,17 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
    * @param parameterModels of the {@link ComponentModel}
    * @return the mapping of the order number of each part with their correspondent name
    */
-  private Map<Integer, String> getPartOrderMapping(List<ParameterModel> parameterModels) {
+  private Map<Integer, ParameterModel> getPartOrderMapping(List<ParameterModel> parameterModels) {
     return parameterModels.stream()
         .filter(this::isKeyPart)
-        .collect(toMap(part -> part.getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder(), NamedObject::getName));
+        .collect(toMap(part -> part.getModelProperty(MetadataKeyPartModelProperty.class).get().getOrder(), part -> part));
   }
 
   private boolean isKeyPart(ParameterModel part) {
     return part.getModelProperty(MetadataKeyPartModelProperty.class).isPresent();
   }
 
-  private MetadataKeyBuilder cloneAndEnrichMetadataKey(MetadataKey key, Map<Integer, String> partOrderMapping) {
+  private MetadataKeyBuilder cloneAndEnrichMetadataKey(MetadataKey key, Map<Integer, ParameterModel> partOrderMapping) {
     return cloneAndEnrichMetadataKey(key, partOrderMapping, INITIAL_PART_LEVEL);
   }
 
@@ -114,8 +154,10 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
    * @param level            the current level of the part of the {@link MetadataKey} to be cloned and enriched
    * @return a {@link MetadataKeyBuilder} with the cloned and enriched keys
    */
-  private MetadataKeyBuilder cloneAndEnrichMetadataKey(MetadataKey key, Map<Integer, String> partOrderMapping, int level) {
-    final MetadataKeyBuilder keyBuilder = newKey(key.getId(), partOrderMapping.get(level)).withDisplayName(key.getDisplayName());
+  private MetadataKeyBuilder cloneAndEnrichMetadataKey(MetadataKey key, Map<Integer, ParameterModel> partOrderMapping,
+                                                       int level) {
+    final MetadataKeyBuilder keyBuilder =
+        newKey(key.getId(), partOrderMapping.get(level).getName()).withDisplayName(key.getDisplayName());
     key.getProperties().forEach(keyBuilder::withProperty);
     key.getChilds().forEach(childKey -> keyBuilder.withChild(cloneAndEnrichMetadataKey(childKey, partOrderMapping, level + 1)));
     return keyBuilder;

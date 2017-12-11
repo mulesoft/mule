@@ -40,8 +40,7 @@ public class ConfigMetadataKeysTestCase extends AbstractExtensionFunctionalTestC
         metadataManager.getMetadataKeys(builder().globalName("apple").build());
     assertThat(metadataKeysResult.isSuccess(), is(true));
     final Map<String, Set<MetadataKey>> metadataKeys = getKeyMapFromContainer(metadataKeysResult);
-    assertThat(metadataKeys.size(), is(2));
-    assertThat(metadataKeys.get("AppleKeys").size(), is(1));
+    assertThat(metadataKeys.size(), is(1));
     assertThat(metadataKeys.get("HarvestedKeys").size(), is(1));
   }
 

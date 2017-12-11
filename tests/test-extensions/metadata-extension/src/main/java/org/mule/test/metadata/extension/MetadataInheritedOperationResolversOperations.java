@@ -6,18 +6,15 @@
  */
 package org.mule.test.metadata.extension;
 
-import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 public class MetadataInheritedOperationResolversOperations extends MetadataOperationsParent {
 
-  public void shouldInheritOperationParentResolvers(@Connection MetadataConnection connection, @MetadataKeyId String type,
-                                                    @Optional @Content Object content) {}
-
-  public Object shouldInheritOperationResolvers(@Connection MetadataConnection connection, @MetadataKeyId String type,
-                                                @Optional @Content Object content) {
+  public Object shouldInheritOperationParentResolvers(@Connection MetadataConnection connection, @MetadataKeyId String type,
+                                                      @Optional @Content Object content) {
     return null;
   }
 

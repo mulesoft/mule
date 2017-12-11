@@ -24,9 +24,6 @@ public class MetadataFailureOperations extends MetadataOperationsParent {
     return null;
   }
 
-  // With keysResolver resolver and without KeyParam
-  public void keyIdWithoutKeyResolver(@Connection MetadataConnection connection, @MetadataKeyId String type) {}
-
   // Resolver for content and output type
   // With keysResolver and KeyParam
   @OutputResolver(output = TestMetadataResolverRuntimeExceptionFailure.class)
