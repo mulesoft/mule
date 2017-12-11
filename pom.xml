@@ -194,7 +194,7 @@
         <jerseyVersion>2.11</jerseyVersion>
         <javassistVersion>3.7.ga</javassistVersion>
         <javaMailVersion>1.4.3</javaMailVersion>
-        <javaXmlBindVersion>2.1.13</javaXmlBindVersion>
+        <javaXmlBindVersion>2.3.0-MULE-001</javaXmlBindVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
         <jdomVersion>1.1.3</jdomVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
@@ -827,13 +827,13 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.sun.xml.bind</groupId>
+                <groupId>org.mule.glassfish.jaxb</groupId>
                 <artifactId>jaxb-xjc</artifactId>
                 <version>${javaXmlBindVersion}</version>
             </dependency>
             <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
+                <groupId>org.mule.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
                 <version>${javaXmlBindVersion}</version>
             </dependency>
             <dependency>
