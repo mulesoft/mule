@@ -11886,6 +11886,375 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
+          "format": "json",
+          "type": "Object",
+          "annotations": {
+            "label": "Person",
+            "classInformation": {
+              "classname": "java.io.InputStream",
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [
+                "java.io.Closeable"
+              ],
+              "parent": "",
+              "genericTypes": [],
+              "isMap": false
+            }
+          },
+          "open": {
+            "type": "Any"
+          },
+          "fields": [
+            {
+              "key": {
+                "name": "firstName",
+                "required": "true"
+              },
+              "model": {
+                "type": "String"
+              }
+            },
+            {
+              "key": {
+                "name": "lastName",
+                "required": "true"
+              },
+              "model": {
+                "type": "String"
+              }
+            },
+            {
+              "key": {
+                "name": "age"
+              },
+              "model": {
+                "type": "Number",
+                "annotations": {
+                  "range": {
+                    "from": 0
+                  },
+                  "int": {}
+                }
+              }
+            }
+          ]
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "@ref:org.mule.tck.testmodels.fruit.Banana"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": true,
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Union",
+                "annotations": {
+                  "typeId": "ByteStreamingStrategy"
+                },
+                "of": [
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "repeatable-in-memory-stream"
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "initialBufferSize"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "512"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "This is the amount of memory that will be allocated in order to consume the stream and provide random access to it. If the stream contains more data than can be fit into this buffer, then it will be expanded by according to the bufferSizeIncrement attribute, with an upper limit of maxInMemorySize."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "bufferSizeIncrement"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "512"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "This is by how much will be buffer size by expanded if it exceeds its initial size. Setting a value of zero or lower will mean that the buffer should not expand, meaning that a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised when the buffer gets full."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "maxBufferSize"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "1024"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised. A value lower or equal to zero means no limit."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "bufferUnit"
+                        },
+                        "model": {
+                          "type": "String",
+                          "annotations": {
+                            "enum": {
+                              "type": "[Ljava.lang.String;",
+                              "values": [
+                                "BYTE",
+                                "KB",
+                                "MB",
+                                "GB"
+                              ]
+                            },
+                            "default": "KB"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The unit in which all these attributes are expressed"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "repeatable-file-store-stream"
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "maxInMemorySize"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "512"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Defines the maximum memory that the stream should use to keep data in memory. If more than that is consumed then it will start to buffer the content on disk."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "bufferUnit"
+                        },
+                        "model": {
+                          "type": "String",
+                          "annotations": {
+                            "enum": {
+                              "type": "[Ljava.lang.String;",
+                              "values": [
+                                "BYTE",
+                                "KB",
+                                "MB",
+                                "GB"
+                              ]
+                            },
+                            "default": "KB"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The unit in which maxInMemorySize is expressed"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "non-repeatable-stream",
+                      "description": {
+                        "value": "This configuration allows the input stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
+                      }
+                    },
+                    "fields": []
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "streamingStrategy",
+              "description": "Configure if repeatable streams should be used and their behaviour",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "abstract-byte-streaming-strategy",
+                    "prefix": "mule"
+                  }
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 2
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 0
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "customTypeOutputWithStaticAttributes",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
           "format": "java",
           "type": "Array",
           "annotations": {
@@ -17215,6 +17584,68 @@
           },
           "model": {
             "type": "String"
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.tck.testmodels.fruit.Banana",
+        "classInformation": {
+          "classname": "org.mule.tck.testmodels.fruit.Banana",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "org.mule.tck.testmodels.fruit.Fruit"
+          ],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "Banana"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "bitten"
+          },
+          "model": {
+            "type": "Boolean",
+            "annotations": {
+              "typeId": "boolean"
+            }
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "origin"
+          },
+          "model": {
+            "type": "String"
+          }
+        },
+        {
+          "key": {
+            "name": "peeled"
+          },
+          "model": {
+            "type": "Boolean",
+            "annotations": {
+              "typeId": "boolean"
+            }
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
           }
         }
       ]

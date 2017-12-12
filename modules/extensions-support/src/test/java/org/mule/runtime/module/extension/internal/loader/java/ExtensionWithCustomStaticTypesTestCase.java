@@ -17,9 +17,9 @@ import static org.mule.metadata.api.model.MetadataFormat.XML;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
-import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -27,10 +27,10 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.metadata.extension.MetadataExtension;
 
 import org.junit.Test;
-import scala.annotation.meta.param;
 
 public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase {
 
@@ -40,38 +40,38 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
   public void withInputXmlStaticType() throws Exception {
     OperationModel o = getOperation("xmlInput");
     ParameterModel param = o.getAllParameterModels().get(0);
-    assertXml(param);
+    assertXmlOrder(param);
   }
 
   @Test
   public void withOutputXmlStaticType() throws Exception {
     OperationModel o = getOperation("xmlOutput");
-    assertXml(o.getOutput());
+    assertXmlOrder(o.getOutput());
   }
 
   @Test
   public void withOutputAttributesXmlStaticType() throws Exception {
     OperationModel o = getOperation("xmlAttributes");
-    assertXml(o.getOutputAttributes());
+    assertXmlOrder(o.getOutputAttributes());
   }
 
   @Test
   public void withInputJsonType() throws Exception {
     OperationModel o = getOperation("jsonInputStream");
     ParameterModel param = o.getAllParameterModels().get(0);
-    assertJson(param);
+    assertJsonPerson(param);
   }
 
   @Test
   public void withOutputJsonType() throws Exception {
     OperationModel o = getOperation("jsonOutput");
-    assertJson(o.getOutput());
+    assertJsonPerson(o.getOutput());
   }
 
   @Test
   public void withOutputAttributesJsonType() throws Exception {
     OperationModel o = getOperation("jsonAttributes");
-    assertJson(o.getOutputAttributes());
+    assertJsonPerson(o.getOutputAttributes());
   }
 
   @Test
@@ -105,10 +105,17 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
   }
 
   @Test
+  public void customTypeOutputWithStaticAttributes() throws Exception {
+    OperationModel o = getOperation("customTypeOutputWithStaticAttributes");
+    assertJsonPerson(o.getOutput());
+    assertThat(MetadataTypeUtils.getTypeId(o.getOutputAttributes().getType()).get(), is(Banana.class.getName()));
+  }
+
+  @Test
   public void sourceXmlOutput() {
     SourceModel s = getSource("xml-static-metadata");
-    assertXml(s.getOutput());
-    assertXml(s.getOutputAttributes());
+    assertXmlOrder(s.getOutput());
+    assertXmlOrder(s.getOutputAttributes());
   }
 
   @Test
@@ -120,13 +127,13 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
   @Test
   public void sourceOnErrorCustomType() {
     SourceModel s = getSource("custom-static-metadata");
-    assertJson(s.getErrorCallback().get().getAllParameterModels().get(0));
+    assertJsonPerson(s.getErrorCallback().get().getAllParameterModels().get(0));
   }
 
   @Test
   public void sourceOnSuccessCustomType() {
     SourceModel s = getSource("custom-static-metadata");
-    assertXml(s.getSuccessCallback().get().getAllParameterModels().get(0));
+    assertXmlOrder(s.getSuccessCallback().get().getAllParameterModels().get(0));
   }
 
   private SourceModel getSource(String name) {
@@ -140,14 +147,14 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
     assertThat(t.getType(), is(instanceOf(ObjectType.class)));
   }
 
-  private void assertXml(Typed typed) {
+  private void assertXmlOrder(Typed typed) {
     MetadataType type = typed.getType();
     assertThat(typed.hasDynamicType(), is(false));
     assertThat(type.getMetadataFormat(), is(XML));
     assertThat(type.toString(), is("shiporder"));
   }
 
-  private void assertJson(Typed typed) {
+  private void assertJsonPerson(Typed typed) {
     MetadataType type = typed.getType();
     assertThat(typed.hasDynamicType(), is(false));
     assertThat(type.getMetadataFormat(), is(JSON));

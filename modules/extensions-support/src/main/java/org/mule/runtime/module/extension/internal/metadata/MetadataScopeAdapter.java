@@ -72,14 +72,14 @@ public final class MetadataScopeAdapter {
                        p -> ResolverSupplier.of(getAnnotatedElement(p).get().getAnnotation(TypeResolver.class).value())));
 
     if (outputResolverDeclaration.isPresent() || !inputResolvers.isEmpty()) {
-        outputResolverDeclaration.ifPresent(resolverDeclaration -> {
-          if (!hasCustomStaticType(declaration.getOutput())) {
-            outputResolver = ResolverSupplier.of(resolverDeclaration.output());
-          }
-          if (!hasCustomStaticType(declaration.getOutputAttributes())) {
-            attributesResolver = ResolverSupplier.of(resolverDeclaration.attributes());
-          }
-        });
+      outputResolverDeclaration.ifPresent(resolverDeclaration -> {
+        if (!hasCustomStaticType(declaration.getOutput())) {
+          outputResolver = ResolverSupplier.of(resolverDeclaration.output());
+        }
+        if (!hasCustomStaticType(declaration.getOutputAttributes())) {
+          attributesResolver = ResolverSupplier.of(resolverDeclaration.attributes());
+        }
+      });
       keyId.ifPresent(pair -> keysResolver = getKeysResolver(pair.getRight(), pair.getLeft(),
                                                              () -> getCategoryName(outputResolver, attributesResolver,
                                                                                    inputResolvers)));

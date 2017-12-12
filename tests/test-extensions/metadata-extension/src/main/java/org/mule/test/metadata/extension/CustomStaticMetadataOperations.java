@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputXmlType;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.metadata.extension.resolver.CsvInputStaticTypeResolver;
 import org.mule.test.metadata.extension.resolver.JavaOutputStaticTypeResolver;
 import org.mule.test.metadata.extension.resolver.JsonInputStaticTypeResolver;
@@ -56,6 +57,13 @@ public class CustomStaticMetadataOperations {
 
   public int jsonInputMap(@InputJsonType(schema = "person-schema.json") Map<String, Object> json) {
     return (int) json.get("age");
+  }
+
+  @OutputJsonType(schema = "person-schema.json")
+  public Result<InputStream, Banana> customTypeOutputWithStaticAttributes() {
+    return Result.<InputStream, Banana>builder()
+        .output(new ByteArrayInputStream(new byte[] {}))
+        .build();
   }
 
   @OutputResolver(output = CsvInputStaticTypeResolver.class)
