@@ -36,9 +36,11 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
   private TransformationService transformationService;
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
+  private Class<T> type;
 
-  ExpressionBasedParameterResolver(String expression, MetadataType metadataType, ValueResolvingContext context) {
+  ExpressionBasedParameterResolver(String expression, Class<T> type, ValueResolvingContext context, MetadataType metadataType) {
     this.expression = expression;
+    this.type = type;
     this.context = context;
     this.metadataType = metadataType;
   }
@@ -65,7 +67,7 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
 
   @Override
   public void initialise() throws InitialisationException {
-    valueResolver = new TypeSafeExpressionValueResolver<>(expression, metadataType);
+    valueResolver = new TypeSafeExpressionValueResolver<>(expression, type, metadataType);
     valueResolver.setExtendedExpressionManager(extendedExpressionManager);
     valueResolver.setTransformationService(transformationService);
     valueResolver.initialise();

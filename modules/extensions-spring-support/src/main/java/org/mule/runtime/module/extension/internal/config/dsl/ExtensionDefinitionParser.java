@@ -370,7 +370,7 @@ public abstract class ExtensionDefinitionParser {
       mapType = LinkedHashMap.class;
     }
 
-    final MetadataType valueType = dictionaryType.getOpenRestriction().get();
+    final MetadataType valueType = dictionaryType.getOpenRestriction().orElse(typeLoader.load(Object.class));
     final Class<?> valueClass = getType(valueType);
     final MetadataType keyType = typeLoader.load(String.class);
     final Class<?> keyClass = String.class;
@@ -683,7 +683,7 @@ public abstract class ExtensionDefinitionParser {
 
     ValueResolver<T> resolver;
 
-    final Class<Object> expectedClass = ExtensionMetadataTypeUtils.getType(expectedType).orElse(Object.class);
+    final Class<?> expectedClass = ExtensionMetadataTypeUtils.getType(expectedType).orElse(Object.class);
 
     if (isExpression(value, parser)) {
       final String expression = (String) value;
@@ -714,20 +714,20 @@ public abstract class ExtensionDefinitionParser {
    * Generates the {@link ValueResolver} for expression based values
    */
   private ValueResolver getExpressionBasedValueResolver(MetadataType expectedType, String value,
-                                                        Set<ModelProperty> modelProperties, Class<Object> expectedClass) {
+                                                        Set<ModelProperty> modelProperties, Class<?> expectedClass) {
     ValueResolver resolver;
     Optional<StackedTypesModelProperty> stackedTypesModelProperty = getStackedTypesModelProperty(modelProperties);
     if (stackedTypesModelProperty.isPresent()) {
       resolver = stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(value, expectedClass);
       //TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be removed once implemented
     } else if (isParameterResolver(expectedType)) {
-      resolver = new ExpressionBasedParameterResolverValueResolver<>(value, expectedType);
+      resolver = new ExpressionBasedParameterResolverValueResolver<>(value, expectedClass, expectedType);
     } else if (isTypedValue(expectedType)) {
       resolver = new ExpressionTypedValueValueResolver<>(value, expectedClass);
     } else if (isLiteral(expectedType) || isTargetParameter(modelProperties)) {
       resolver = new StaticLiteralValueResolver<>(value, expectedClass);
     } else {
-      resolver = new TypeSafeExpressionValueResolver(value, expectedType);
+      resolver = new TypeSafeExpressionValueResolver(value, expectedClass, expectedType);
     }
     return resolver;
   }
@@ -737,7 +737,7 @@ public abstract class ExtensionDefinitionParser {
    */
   private ValueResolver getStaticValueResolver(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
                                                Set<ModelProperty> modelProperties, boolean acceptsReferences,
-                                               Class<Object> expectedClass) {
+                                               Class<?> expectedClass) {
 
     Optional<StackedTypesModelProperty> optionalStackedTypeModelProperty = getStackedTypesModelProperty(modelProperties);
 
@@ -772,7 +772,7 @@ public abstract class ExtensionDefinitionParser {
   private ValueResolver getValueResolverFromMetadataType(final String parameterName, MetadataType expectedType,
                                                          final Object value,
                                                          final Object defaultValue, final boolean acceptsReferences,
-                                                         final Class<Object> expectedClass) {
+                                                         final Class<?> expectedClass) {
     final Reference<ValueResolver> resolverValueHolder = new Reference<>();
     expectedType.accept(new BasicTypeMetadataVisitor() {
 
@@ -823,7 +823,7 @@ public abstract class ExtensionDefinitionParser {
             .map(delegate -> delegate.parse(value.toString(), metadataType, null))
             .orElseGet(() -> acceptsReferences
                 ? defaultValueResolverParsingDelegate.parse(value.toString(), metadataType, null)
-                : new TypeSafeValueResolverWrapper<>(new StaticValueResolver<>(value), expectedClass));
+                : new TypeSafeValueResolverWrapper(new StaticValueResolver<>(value), expectedClass));
 
         resolverValueHolder.set(delegateResolver);
       }
@@ -1076,7 +1076,7 @@ public abstract class ExtensionDefinitionParser {
   private ValueResolver parseDate(Object value, MetadataType dateType, Object defaultValue) {
     Class<?> type = getType(dateType);
     if (isExpression(value, parser)) {
-      return new TypeSafeExpressionValueResolver<>((String) value, dateType);
+      return new TypeSafeExpressionValueResolver<>((String) value, type, dateType);
     }
 
     if (value == null) {
@@ -1099,7 +1099,7 @@ public abstract class ExtensionDefinitionParser {
     return format("%s%s%s", CHILD_ELEMENT_KEY_PREFIX, key, CHILD_ELEMENT_KEY_SUFFIX);
   }
 
-  private Object convertSimpleValue(Object value, Class<Object> expectedClass, String parameterName) {
+  private Object convertSimpleValue(Object value, Class<?> expectedClass, String parameterName) {
     try {
       return conversionService.convert(value, expectedClass);
     } catch (Exception e) {

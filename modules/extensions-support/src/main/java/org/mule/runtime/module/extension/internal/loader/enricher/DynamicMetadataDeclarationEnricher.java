@@ -61,7 +61,6 @@ import java.util.Set;
  */
 public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
 
-
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     new EnricherDelegate().enrich(extensionLoadingContext);
@@ -100,7 +99,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       declaration.getModelProperty(ImplementingTypeModelProperty.class)
           .ifPresent(prop -> {
             final Class<?> sourceType = prop.getType();
-            MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(extensionType, sourceType);
+            MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(extensionType, sourceType, declaration);
             declareMetadataResolverFactory(declaration, metadataScope);
             enrichMetadataKeyParameters(declaration, metadataScope.getKeysResolver().get());
           });

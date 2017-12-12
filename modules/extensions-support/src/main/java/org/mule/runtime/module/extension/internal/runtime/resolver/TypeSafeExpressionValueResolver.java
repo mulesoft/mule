@@ -17,6 +17,7 @@ import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 
 import javax.inject.Inject;
 
@@ -45,10 +46,10 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
 
-  public TypeSafeExpressionValueResolver(String expression, MetadataType expectedMetadataType) {
-    checkArgument(expectedMetadataType != null, "expected type cannot be null");
+  public TypeSafeExpressionValueResolver(String expression, Class<T> expectedType, MetadataType expectedMetadataType) {
+    checkArgument(expectedType != null, "expected type cannot be null");
     this.expression = expression;
-    this.expectedType = getType(expectedMetadataType);
+    this.expectedType = expectedType;
     this.expectedMetadataType = expectedMetadataType;
   }
 

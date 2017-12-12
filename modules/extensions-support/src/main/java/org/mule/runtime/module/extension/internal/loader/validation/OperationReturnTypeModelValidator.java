@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionE
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -45,16 +46,16 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
           throw missingReturnTypeException(extensionModel, operationModel);
         }
 
-        final Class<Object> returnType = getType(operationModel.getOutput().getType());
-
-        illegalReturnTypes.stream().filter(forbiddenType -> forbiddenType.isAssignableFrom(returnType)).findFirst()
-            .ifPresent(forbiddenType -> {
-              problemsReporter.addError(new Problem(operationModel, format(
-                                                                           "Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are "
-                                                                               + "not allowed to return objects of that type",
-                                                                           operationModel.getName(), extensionModel.getName(),
-                                                                           forbiddenType.getName())));
-            });
+        getType(operationModel.getOutput().getType())
+            .ifPresent(returnType -> illegalReturnTypes.stream()
+                .filter(forbiddenType -> forbiddenType.isAssignableFrom(returnType)).findFirst()
+                .ifPresent(forbiddenType -> {
+                  problemsReporter.addError(new Problem(operationModel, format(
+                                                                               "Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are "
+                                                                                   + "not allowed to return objects of that type",
+                                                                               operationModel.getName(), extensionModel.getName(),
+                                                                               forbiddenType.getName())));
+                }));
       }
     }.walk(extensionModel);
   }
