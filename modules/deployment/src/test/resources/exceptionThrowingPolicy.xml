@@ -10,7 +10,7 @@
 
     <test-policy:proxy>
         <test-policy:operation>
-            <ex:throw-exception exception="org.exception.CustomException" error="ANY"/>
+            <ex:throw-exception exceptionClassName="org.exception.CustomException" error="ANY"/>
             <test-policy:execute-next/>
         </test-policy:operation>
     </test-policy:proxy>

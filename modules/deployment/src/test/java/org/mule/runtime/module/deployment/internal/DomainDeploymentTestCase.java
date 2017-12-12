@@ -85,7 +85,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   private final DomainFileBuilder domainWithPropsFileBuilder =
       new DomainFileBuilder("domain-with-props").definedBy("domain-with-props-config.xml");
   private final DomainFileBuilder exceptionThrowingPluginImportingDomain =
-      new DomainFileBuilder("exception-throwi-plugin-importing-domain").definedBy("empty-domain-config.xml")
+      new DomainFileBuilder("exception-throwing-plugin-importing-domain").definedBy("empty-domain-config.xml")
           .dependingOn(exceptionThrowingPlugin);
 
   // Application artifact builders
@@ -209,7 +209,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  public void pluginNotHandledBySDKFromDomainUsedInApp() throws Exception {
+  public void pluginFromDomainUsedInApp() throws Exception {
     addPackedDomainFromBuilder(exceptionThrowingPluginImportingDomain);
 
     ApplicationFileBuilder applicationFileBuilder =
@@ -219,9 +219,9 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     try {
       executeApplicationFlow("main");
-      fail();
-    } catch (MuleRuntimeException e) {
-      assertThat(e.getCause().getCause().getClass().getName(), is(equalTo("org.exception.CustomException")));
+      fail("Flow execution was expected to throw an exception");
+    } catch (MuleRuntimeException expected) {
+      assertThat(expected.getCause().getCause().getClass().getName(), is(equalTo("org.exception.CustomException")));
     }
 
   }

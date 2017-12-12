@@ -6,7 +6,7 @@
       http://www.mulesoft.org/schema/mule/exception http://www.mulesoft.org/schema/mule/test/current/mule-exception.xsd">
 
         <flow name="main">
-            <ex:throw-exception exception="org.exception.CustomException" error="ANY"/>
+            <ex:throw-exception exceptionClassName="org.exception.CustomException" error="ANY"/>
         </flow>
 
 </mule>

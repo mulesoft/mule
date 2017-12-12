@@ -14,7 +14,7 @@
     <xsd:element name="throw-exception" type="throwType" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Mock message source that links to a shared-config.
+                Throws an instance of the exception defined.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -22,7 +22,7 @@
     <xsd:complexType name="throwType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractMessageProcessorType">
-                <xsd:attribute name="exception" type="mule:substitutableName" use="required">
+                <xsd:attribute name="exceptionClassName" type="mule:substitutableName" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             A fully qualified classname of the exception object to throw.
@@ -32,7 +32,7 @@
                 <xsd:attribute name="error" type="mule:errorIdentifierType" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The error to throw
+                            The mule error included in the exception thrown.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

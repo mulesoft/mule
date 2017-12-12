@@ -1186,11 +1186,13 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   private ArtifactPluginFileBuilder createExceptionThrowingPluginFileBuilder() {
+    final String pluginName = "exceptionPlugin";
+
     MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION)
-        .setName("exceptionPlugin")
+        .setName(pluginName)
         .setRequiredProduct(MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader("exceptionPlugin",
+        .withBundleDescriptorLoader(createBundleDescriptorLoader(pluginName,
                                                                  MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID,
                                                                  "1.0.0"));

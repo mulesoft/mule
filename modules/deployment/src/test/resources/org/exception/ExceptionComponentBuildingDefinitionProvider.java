@@ -24,8 +24,6 @@ public class ExceptionComponentBuildingDefinitionProvider implements ComponentBu
 
   private ComponentBuildingDefinition.Builder baseDefinition;
 
-  public ExceptionComponentBuildingDefinitionProvider() {}
-
   @Override
   public void init() {
     baseDefinition = new ComponentBuildingDefinition.Builder().withNamespace("ex");
@@ -39,13 +37,10 @@ public class ExceptionComponentBuildingDefinitionProvider implements ComponentBu
     componentBuildingDefinitions.add(baseDefinition
                                              .withIdentifier("throw-exception")
                                              .withTypeDefinition(fromType(ThrowProcessor.class))
-                                             .withSetterParameterDefinition("exception", fromSimpleParameter("exception").build())
+                                             .withSetterParameterDefinition("exception", fromSimpleParameter("exceptionClassName").build())
                                              .withSetterParameterDefinition("error", fromSimpleParameter("error").build())
                                              .withSetterParameterDefinition("count", fromSimpleParameter("count").withDefaultValue(-1).build()).build());
-
     return componentBuildingDefinitions;
-
-
   }
 
 }

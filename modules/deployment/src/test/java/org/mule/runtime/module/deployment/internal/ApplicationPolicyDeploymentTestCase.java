@@ -57,9 +57,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Contains test for application deployment with policies on the default domain
@@ -285,7 +283,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
-  public void appliesApplicationPolicyDuplicatingPlugin() throws Exception {
+  public void appliesApplicationPolicyDuplicatingExtensionPlugin() throws Exception {
     policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
@@ -303,7 +301,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
-  public void appliesApplicationPolicyDuplicatingPluginWithNoSDKHandledPlugin() throws Exception {
+  public void appliesApplicationPolicyDuplicatingPlugin() throws Exception {
 
     final String policyName = "exceptionPolicy";
 
@@ -335,9 +333,9 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                       getResourceFile("/exceptionThrowingPolicy.xml"), emptyList()));
     try {
       executeApplicationFlow("main");
-      fail();
-    } catch (MuleRuntimeException e) {
-      assertThat(e.getCause().getCause().getClass().getName(), is(equalTo("org.exception.CustomException")));
+      fail("Flow execution was expected to throw an exception");
+    } catch (MuleRuntimeException expected) {
+      assertThat(expected.getCause().getCause().getClass().getName(), is(equalTo("org.exception.CustomException")));
     }
   }
 
