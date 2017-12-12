@@ -8,8 +8,10 @@ package org.mule.runtime.core.api.util;
 
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
@@ -25,6 +27,7 @@ import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.streaming.bytes.ByteArrayCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.object.ListCursorIteratorProvider;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -163,6 +166,68 @@ public final class StreamingUtils {
    */
   public static CursorStreamProvider asCursorProvider(byte[] bytes) {
     return new ByteArrayCursorStreamProvider(bytes);
+  }
+
+  /**
+   * If the {@code event} has a repeatable payload (instance of {@link CursorProvider}), then this method returns a new
+   * event which payload has an equivalent, already consumed structure. This functionality makes sense for cases like
+   * caching in which the contents of the stream need to survive the completion of the event that generated it.
+   * <p>
+   * If the payload is a {@link CursorStreamProvider}, then it will be consumed into a {@link ByteArrayCursorStreamProvider}
+   * so that the contents are fully in memory while still keeping repeatable byte streaming semantics.
+   * <p>
+   * If the payload is a {@link CursorIteratorProvider}, then the contents will be consumed into a {@link List}.
+   * <p>
+   * In any other case, the same input event is returned
+   *
+   * @param event an event which might have a repeatable payload
+   * @return a {@link CoreEvent}
+   * @since 4.1
+   */
+  public static CoreEvent consumeRepeatablePayload(CoreEvent event) {
+    TypedValue payload = event.getMessage().getPayload();
+    final Object originalPayload = payload.getValue();
+
+    if (originalPayload == null) {
+      return event;
+    }
+
+    DataType originalDataType = payload.getDataType();
+    TypedValue replacedPayload = null;
+
+    if (originalPayload instanceof CursorStreamProvider) {
+      Object consumedPayload = asCursorProvider(toByteArray((CursorStreamProvider) originalPayload));
+
+      replacedPayload = new TypedValue(consumedPayload, DataType.builder(originalDataType)
+          .type(consumedPayload.getClass())
+          .build());
+
+    } else if (originalPayload instanceof CursorIteratorProvider) {
+      List consumed = new LinkedList<>();
+      ((CursorIteratorProvider) originalPayload).openCursor().forEachRemaining(consumed::add);
+      DataType newDataType;
+      if (originalDataType instanceof CollectionDataType) {
+        final CollectionDataType collectionDataType = (CollectionDataType) originalDataType;
+        newDataType = DataType.builder(originalDataType).collectionType(consumed.getClass())
+            .itemType(collectionDataType.getItemDataType().getType())
+            .itemMediaType(collectionDataType.getItemDataType().getMediaType())
+            .build();
+      } else {
+        newDataType = DataType.builder(originalDataType).type(consumed.getClass()).build();
+      }
+
+      replacedPayload = new TypedValue(consumed, newDataType);
+    }
+
+    if (replacedPayload != null) {
+      event = CoreEvent.builder(event).message(
+                                               Message.builder(event.getMessage())
+                                                   .payload(replacedPayload)
+                                                   .build())
+          .build();
+    }
+
+    return event;
   }
 
   private static CoreEvent replacePayload(CoreEvent event, Object newPayload) {
