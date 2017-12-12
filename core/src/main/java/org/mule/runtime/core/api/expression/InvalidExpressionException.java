@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.expression;
 
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 /**
  * Is thrown explicitly when an expression is Malformed or invalid. Malformed means the syntax is not correct, but an expression
@@ -14,12 +14,14 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
  */
 public class InvalidExpressionException extends ExpressionRuntimeException {
 
+  private static final long serialVersionUID = 7812777734559472971L;
+
   private String expression;
 
   private String message;
 
   public InvalidExpressionException(String expression, String message) {
-    super(CoreMessages.createStaticMessage(message + ". Offending expression string is: " + expression));
+    super(createStaticMessage(message + ". Offending expression string is: " + expression));
     this.expression = expression;
     this.message = message;
   }
@@ -28,6 +30,7 @@ public class InvalidExpressionException extends ExpressionRuntimeException {
     return expression;
   }
 
+  @Override
   public String getMessage() {
     return message;
   }
