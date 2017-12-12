@@ -11,8 +11,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.internal.lifecycle.DefaultLifecycleInterceptor.createInitDisposeLifecycleInterceptor;
-import static org.mule.runtime.core.internal.lifecycle.DefaultLifecycleInterceptor.createStartStopLifecycleInterceptor;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -29,7 +27,6 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
-import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
 import java.util.ArrayList;
