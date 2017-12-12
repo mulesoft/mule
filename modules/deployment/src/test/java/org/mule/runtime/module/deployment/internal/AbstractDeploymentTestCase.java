@@ -482,7 +482,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     installService("echoService", "org.mule.echo.EchoServiceProvider", defaulServiceEchoJarFile);
   }
 
-  protected void installService(String serviceName, String serviceProviderClassName, File serviceJarFile) throws IOException {
+  private void installService(String serviceName, String serviceProviderClassName, File serviceJarFile) throws IOException {
     final ServiceFileBuilder echoService =
         new ServiceFileBuilder(serviceName).withServiceProviderClass(serviceProviderClassName)
             .usingLibrary(serviceJarFile.getAbsolutePath());
