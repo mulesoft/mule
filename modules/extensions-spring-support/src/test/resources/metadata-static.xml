@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/metadata http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd">
+
+
+    <flow name="input">
+        <set-payload value="#[%dw 2.0 output application/xml --- {person: {age: 12}}]"/>
+        <metadata:xml-input xml="#[payload]"/>
+    </flow>
+
+    <flow name="custom-input">
+        <set-payload value="#[%dw 2.0 output application/json --- {age: 12, dni: 1478231}]"/>
+        <metadata:custom-type-input type="#[payload]"/>
+    </flow>
+
+    <flow name="custom-output">
+        <metadata:custom-type-output/>
+    </flow>
+
+    <flow name="output">
+        <metadata:xml-output/>
+    </flow>
+
+    <flow name="jsonInputToMap">
+        <set-payload value="#[%dw 2.0 output application/json --- {age: 12, dni: 1478231}]"/>
+        <metadata:json-input-map json="#[payload]"/>
+    </flow>
+
+    <flow name="jsonInputToStream">
+        <set-payload value="#[%dw 2.0 output application/json --- {age: 12, dni: 1478231}]"/>
+        <metadata:json-input-stream json="#[payload]"/>
+    </flow>
+
+    <flow name="jsonOutput">
+        <metadata:json-output/>
+    </flow>
+
+    <flow name="onSuccessCustomType" initialState="stopped">
+        <metadata:custom-static-metadata
+                order="#[payload]"
+                person="#[%dw 2.0 output application/json --- {age: 12, dni: 1478231}]"/>
+        <set-payload value="#[%dw 2.0 output application/xml --- {person: {age: 12}}]"/>
+    </flow>
+
+    <flow name="onErrorCustomType" initialState="stopped">
+        <metadata:custom-static-metadata
+                person="#[%dw 2.0 output application/json --- {age: 12, dni: 1478231}]"
+                order="#[%dw 2.0 output application/xml --- {person: {age: 12}}]"/>
+        <set-payload value="#[hi ++]"/>
+    </flow>
+</mule>

@@ -117,6 +117,7 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
             .setStaticResolverFactory(value -> new StaticValueResolver<>(new StaticParameterResolver<>(value)))
             .setDelegateResolverFactory(resolver -> new ParameterResolverValueResolverWrapper(resolver))
             .setExpressionBasedResolverFactory((value, expectedType) -> new ExpressionBasedParameterResolverValueResolver(value,
+                                                                                                                          expectedType,
                                                                                                                           typeLoader
                                                                                                                               .load(expectedType)))
             .build())

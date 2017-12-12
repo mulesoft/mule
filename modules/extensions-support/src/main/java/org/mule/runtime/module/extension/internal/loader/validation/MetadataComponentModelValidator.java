@@ -38,6 +38,7 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
@@ -186,8 +187,10 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
 
         @Override
         public void visitObject(ObjectType objectType) {
-          objectType.getOpenRestriction().ifPresent(t -> checkValidType(component, extensionModel, t, problemsReporter));
-          checkValidType(component, extensionModel, objectType, problemsReporter);
+          if (!isCustomStaticType(objectType)) {
+            objectType.getOpenRestriction().ifPresent(t -> checkValidType(component, extensionModel, t, problemsReporter));
+            checkValidType(component, extensionModel, objectType, problemsReporter);
+          }
         }
 
         @Override
@@ -196,6 +199,10 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
         }
       });
     }
+  }
+
+  private boolean isCustomStaticType(ObjectType objectType) {
+    return objectType.getAnnotation(CustomDefinedStaticTypeAnnotation.class).isPresent();
   }
 
   // todo refactor with metadata factory getCategoryName()
@@ -234,7 +241,7 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
   }
 
   private void failIfTypeIsObject(ComponentModel componentModel, ExtensionModel extensionModel,
-                                  String componentTypeName, Class<?> type,
+                                  MetadataType metadataType, String componentTypeName, Class<?> type,
                                   ProblemsReporter problemsReporter) {
     if (Object.class.equals(type)) {
       problemsReporter
@@ -263,7 +270,7 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
                               ProblemsReporter problemsReporter) {
     String componentTypeName = getComponentModelTypeName(componentModel);
     getType(metadataType).ifPresent(type -> {
-      failIfTypeIsObject(componentModel, extensionModel, componentTypeName, type, problemsReporter);
+      failIfTypeIsObject(componentModel, extensionModel, metadataType, componentTypeName, type, problemsReporter);
       failIfTypeIsInterface(componentModel, extensionModel, metadataType, componentTypeName, type, problemsReporter);
     });
   }

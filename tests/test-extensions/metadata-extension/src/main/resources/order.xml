@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shiporder orderid="889923" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="order.xsd">
+    <orderperson>John Smith</orderperson>
+    <shipto>
+        <name>Mariano GonzaleSSSSS</name>
+        <address>Calle falsa 123</address>
+        <city>Mordor</city>
+        <country>Peronia</country>
+    </shipto>
+    <item>
+        <title>Esmalte</title>
+        <note>Special Edition</note>
+        <quantity>1</quantity>
+        <price>10.90</price>
+    </item>
+    <item>
+        <title>Bandana full discography</title>
+        <quantity>1</quantity>
+        <price>9.90</price>
+    </item>
+</shiporder>

@@ -76,8 +76,8 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
   }
 
   private void validateOptionsResolver(ParameterModel param, ValueProviderFactoryModelProperty modelProperty,
-                                       ParameterizedModel model,
-                                       ProblemsReporter problemsReporter, boolean supportsConnectionsAndConfigs) {
+                                       ParameterizedModel model, ProblemsReporter problemsReporter,
+                                       boolean supportsConnectionsAndConfigs) {
     Class<? extends ValueProvider> valueProvider = modelProperty.getValueProvider();
     String providerName = valueProvider.getSimpleName();
     Map<String, MetadataType> allParameters =

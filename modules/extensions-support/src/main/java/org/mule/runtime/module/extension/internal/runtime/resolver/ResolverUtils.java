@@ -151,12 +151,13 @@ public class ResolverUtils {
         return valueResolver;
       } else if (isParameterResolver.getAsBoolean()) {
         ExpressionBasedParameterResolverValueResolver<Object> valueResolver =
-            new ExpressionBasedParameterResolverValueResolver<>(expression, type);
+            new ExpressionBasedParameterResolverValueResolver<>(expression, getType(type), type);
         valueResolver.setTransformationService(muleContext.getTransformationService());
         valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
         return valueResolver;
       } else if (muleContext.getExpressionManager().isExpression(expression)) {
-        TypeSafeExpressionValueResolver<Object> valueResolver = new TypeSafeExpressionValueResolver<>(expression, type);
+        TypeSafeExpressionValueResolver<Object> valueResolver =
+            new TypeSafeExpressionValueResolver<>(expression, getType(type), type);
         valueResolver.setTransformationService(muleContext.getTransformationService());
         valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
         valueResolver.initialise();

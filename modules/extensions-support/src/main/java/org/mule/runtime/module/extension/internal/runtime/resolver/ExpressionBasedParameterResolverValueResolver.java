@@ -29,9 +29,11 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
 
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
+  private Class<T> type;
 
-  public ExpressionBasedParameterResolverValueResolver(String expression, MetadataType metadataType) {
+  public ExpressionBasedParameterResolverValueResolver(String expression, Class<T> type, MetadataType metadataType) {
     this.expression = expression;
+    this.type = type;
     this.metadataType = metadataType;
   }
 
@@ -40,7 +42,8 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
    */
   @Override
   public ParameterResolver<T> resolve(ValueResolvingContext context) throws MuleException {
-    ExpressionBasedParameterResolver<T> resolver = new ExpressionBasedParameterResolver<>(expression, metadataType, context);
+    ExpressionBasedParameterResolver<T> resolver =
+        new ExpressionBasedParameterResolver<>(expression, type, context, metadataType);
     resolver.setTransformationService(transformationService);
     resolver.setExtendedExpressionManager(extendedExpressionManager);
     resolver.initialise();

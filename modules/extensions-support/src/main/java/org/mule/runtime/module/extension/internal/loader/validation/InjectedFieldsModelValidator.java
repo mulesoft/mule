@@ -8,8 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getId;
-import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
@@ -93,18 +92,14 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
 
               @Override
               public void visitObject(ObjectType objectType) {
-                getId(objectType).ifPresent(typeId -> {
-                  try {
-                    Class<?> type = loadClass(typeId, classLoaderModelProperty.getClassLoader());
-                    if (validatedTypes.add(type)) {
-                      validateType(model, type, DefaultEncoding.class);
-                    }
-                  } catch (ClassNotFoundException e) {
-                    problemsReporter
-                        .addWarning(new Problem(model,
-                                                format("Class '%s' couldn't be validated because it wasn't found", typeId)));
+                try {
+                  Class<?> type = getType(objectType, classLoaderModelProperty.getClassLoader());
+                  if (validatedTypes.add(type)) {
+                    validateType(model, type, DefaultEncoding.class);
                   }
-                });
+                } catch (Exception e) {
+                  problemsReporter.addWarning(new Problem(model, "Could not validate Class: " + e.getMessage()));
+                }
               }
             });
           }

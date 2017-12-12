@@ -18,6 +18,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -102,7 +103,9 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   }
 
   private <T> ValueResolver<T> getResolver(String expression, MetadataType expectedType) throws Exception {
-    TypeSafeExpressionValueResolver<T> valueResolver = new TypeSafeExpressionValueResolver<>(expression, expectedType);
+    TypeSafeExpressionValueResolver<T> valueResolver = new TypeSafeExpressionValueResolver(expression,
+                                                                                           getType(expectedType).orElse(null),
+                                                                                           expectedType);
     valueResolver.setExtendedExpressionManager(expressionManager);
     valueResolver.setTransformationService(muleContext.getTransformationService());
     valueResolver.initialise();
