@@ -12,6 +12,7 @@ import static org.mule.runtime.api.meta.model.connection.ConnectionManagementTyp
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
+
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
@@ -27,7 +28,9 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Connectio
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ConnectionProviderElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithConnectionProviders;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 import java.util.HashMap;
@@ -68,7 +71,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
       name = DEFAULT_CONNECTION_PROVIDER_NAME;
     }
 
-    List<Class<?>> providerGenerics = providerType.getInterfaceGenerics(ConnectionProvider.class);
+    List<Type> providerGenerics = providerType.getInterfaceGenerics(ConnectionProvider.class);
 
     if (providerGenerics.size() != 1) {
       // TODO: MULE-9220: Add a syntax validator for this
@@ -83,8 +86,10 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
                                                                                                              providerClass,
                                                                                                              getExtensionType()
                                                                                                                  .getClassLoader())))
-        .withModelProperty(new ConnectionTypeModelProperty(providerGenerics.get(0)))
+        .withModelProperty(new ConnectionTypeModelProperty(providerGenerics.get(0).getDeclaringClass()))
         .withModelProperty(new ImplementingTypeModelProperty(providerClass));
+
+    providerDeclarer.withModelProperty(new ExtensionTypeDescriptorModelProperty(providerType));
 
     loader.parseExternalLibs(providerType, providerDeclarer);
 

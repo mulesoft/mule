@@ -9,8 +9,10 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodsAnnotatedWith;
+
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
@@ -19,11 +21,11 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.SourceElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +57,10 @@ final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements S
    */
   @Override
   public List<Type> getSuperClassGenerics() {
-    return IntrospectionUtils.getSuperClassGenerics(aClass, Source.class);
+    return IntrospectionUtils.getSuperClassGenerics(aClass, Source.class)
+        .stream()
+        .map(TypeWrapper::new)
+        .collect(toList());
   }
 
   @Override

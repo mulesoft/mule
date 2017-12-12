@@ -69,8 +69,8 @@
         <metadata:fail-with-runtime-exception config-ref="config" type="PERSON"/>
     </flow>
 
-    <flow name="messageAttributesVoidTypeMetadata">
-        <metadata:message-attributes-void-type-metadata />
+    <flow name="messageAttributesAnyTypeMetadata">
+        <metadata:message-attributes-any-type-metadata />
     </flow>
 
     <flow name="messageAttributesPersonTypeMetadata">

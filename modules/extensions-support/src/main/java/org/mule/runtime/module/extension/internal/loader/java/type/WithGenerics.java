@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -17,13 +16,8 @@ import java.util.List;
 public interface WithGenerics {
 
   /**
-   * @return A list of {@link Type} generic that the super class holds
-   */
-  List<Type> getSuperClassGenerics();
-
-  /**
    * @param clazz Interface class to look for their generics
    * @return A list of {@link Class} generic that the implemented interface, indicated by {@code clazz}, holds
    */
-  List<Class<?>> getInterfaceGenerics(Class clazz);
+  List<Type> getInterfaceGenerics(Class clazz);
 }

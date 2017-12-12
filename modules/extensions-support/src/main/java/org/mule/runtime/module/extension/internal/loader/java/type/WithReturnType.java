@@ -14,7 +14,7 @@ package org.mule.runtime.module.extension.internal.loader.java.type;
 interface WithReturnType {
 
   /**
-   * @return the return type {@link Class} of the implementer component
+   * @return the return type {@link Type} of the implementer component
    */
-  Class<?> getReturnType();
+  Type getReturnType();
 }

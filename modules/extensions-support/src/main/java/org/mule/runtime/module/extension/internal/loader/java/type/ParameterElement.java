@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import static java.util.Optional.ofNullable;
+
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Parameter;
+import java.util.Optional;
 
 /**
  * A contract for an element from which a parameter can be derived
@@ -26,7 +29,7 @@ public interface ParameterElement extends ExtensionParameter {
    * {@inheritDoc}
    */
   @Override
-  default AnnotatedElement getDeclaringElement() {
-    return getParameter();
+  default Optional<AnnotatedElement> getDeclaringElement() {
+    return ofNullable(getParameter());
   }
 }

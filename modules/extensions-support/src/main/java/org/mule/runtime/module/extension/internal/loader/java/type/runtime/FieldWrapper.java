@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forField;
+
+import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
 
@@ -49,14 +51,6 @@ public class FieldWrapper implements FieldElement {
    * {@inheritDoc}
    */
   @Override
-  public Annotation[] getAnnotations() {
-    return field.getAnnotations();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
     return ofNullable(field.getAnnotation(annotationClass));
   }
@@ -66,7 +60,7 @@ public class FieldWrapper implements FieldElement {
    */
   @Override
   public TypeWrapper getType() {
-    return new TypeWrapper(field.getType());
+    return new TypeWrapper(forField(field));
   }
 
   /**
@@ -92,6 +86,12 @@ public class FieldWrapper implements FieldElement {
   @Override
   public String getOwnerDescription() {
     return format("Class: '%s'", field.getDeclaringClass().getSimpleName());
+  }
+
+  @Override
+  public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
+    return isAnnotatedWith(annotationClass) ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, field))
+        : Optional.empty();
   }
 
   @Override

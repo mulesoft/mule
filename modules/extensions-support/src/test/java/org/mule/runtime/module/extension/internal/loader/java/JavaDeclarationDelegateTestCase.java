@@ -279,7 +279,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     OperationDeclaration operation = getOperation(declarer.getDeclaration(), "noGenerics");
 
     assertThat(operation.getOutput().getType(), is(instanceOf(AnyType.class)));
-    assertThat(operation.getOutputAttributes().getType(), is(instanceOf(VoidType.class)));
+    assertThat(operation.getOutputAttributes().getType(), is(instanceOf(AnyType.class)));
   }
 
   @Test
@@ -309,7 +309,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     MetadataType outputType = operation.getOutput().getType();
     assertThat(outputType, is(instanceOf(ArrayType.class)));
-    assertMessageType(((ArrayType) outputType).getType(), TYPE_BUILDER.anyType().build(), TYPE_BUILDER.voidType().build());
+    assertMessageType(((ArrayType) outputType).getType(), TYPE_BUILDER.anyType().build(), TYPE_BUILDER.anyType().build());
   }
 
   @Test

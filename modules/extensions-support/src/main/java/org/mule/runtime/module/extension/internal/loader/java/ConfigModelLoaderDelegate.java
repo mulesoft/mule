@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.String.format;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -48,7 +49,7 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
   }
 
   private void declareConfiguration(ExtensionDeclarer declarer, ExtensionElement extensionType, ComponentElement configType) {
-    checkConfigurationIsNotAnOperation(configType.getDeclaringClass());
+    checkConfigurationIsNotAnOperation(configType);
     ConfigurationDeclarer configurationDeclarer;
 
     Optional<Configuration> configurationAnnotation = configType.getAnnotation(Configuration.class);
@@ -76,10 +77,11 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     getConnectionProviderModelLoaderDelegate().declareConnectionProviders(configurationDeclarer, configType);
   }
 
-  private void checkConfigurationIsNotAnOperation(Class<?> configurationType) {
+  private void checkConfigurationIsNotAnOperation(ComponentElement configurationType) {
     Class<?>[] operationClasses = loader.getOperationClasses(getExtensionType());
     for (Class<?> operationClass : operationClasses) {
-      if (configurationType.isAssignableFrom(operationClass) || operationClass.isAssignableFrom(configurationType)) {
+      if (configurationType.isAssignableFrom(operationClass)
+          || configurationType.isAssignableTo(operationClass)) {
         throw new IllegalConfigurationModelDefinitionException(
                                                                format("Configuration class '%s' cannot be the same class (nor a derivative) of any operation class '%s",
                                                                       configurationType.getName(), operationClass.getName()));

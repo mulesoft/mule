@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.checkDefinition;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -17,18 +18,18 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
+import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,16 +51,16 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
   }
 
   void declareRouter(ExtensionDeclarer extensionDeclarer, HasOperationDeclarer ownerDeclarer, Class<?> declaringClass,
-                     MethodElement routerMethod, Method method, Optional<ExtensionParameter> configParameter,
+                     MethodElement routerMethod, Optional<ExtensionParameter> configParameter,
                      Optional<ExtensionParameter> connectionParameter) {
 
     checkDefinition(!configParameter.isPresent(),
                     format("Scope '%s' requires a config, but that is not allowed, remove such parameter",
-                           method.getName()));
+                           routerMethod.getName()));
 
     checkDefinition(!connectionParameter.isPresent(),
                     format("Scope '%s' requires a connection, but that is not allowed, remove such parameter",
-                           method.getName()));
+                           routerMethod.getName()));
 
     HasConstructDeclarer actualDeclarer =
         (HasConstructDeclarer) loader.selectDeclarerBasedOnConfig(extensionDeclarer, (Declarer) ownerDeclarer,
@@ -70,9 +71,11 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
       return;
     }
 
-    final ConstructDeclarer router = actualDeclarer.withConstruct(routerMethod.getAlias())
+    final ConstructDeclarer router = actualDeclarer.withConstruct(routerMethod.getAlias());
+    router.withModelProperty(new ExtensionOperationDescriptorModelProperty(routerMethod));
+    routerMethod.getMethod().ifPresent(method -> router
         .withModelProperty(new ImplementingMethodModelProperty(method))
-        .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass, method)));
+        .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass, method))));
 
     processMimeType(router, routerMethod);
 
@@ -96,8 +99,8 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
                     format("Router '%s' defines more than one %s parameters. Only one is allowed",
                            routerMethod.getAlias(), RouterCompletionCallback.class.getSimpleName()));
 
-    checkDefinition(isVoid(routerMethod.getMethod()), format("Router '%s' is not declared in a void method.",
-                                                             routerMethod.getAlias()));
+    checkDefinition(isVoid(routerMethod), format("Router '%s' is not declared in a void method.",
+                                                 routerMethod.getAlias()));
 
     loader.getMethodParametersLoader().declare(router,
                                                routerMethod.getParameters().stream()

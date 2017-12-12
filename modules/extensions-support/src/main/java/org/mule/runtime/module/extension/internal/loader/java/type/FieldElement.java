@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import static java.util.Optional.ofNullable;
+
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.util.Optional;
 
 /**
  * A contract for an element to be considered as a Field
@@ -26,7 +29,7 @@ public interface FieldElement extends ExtensionParameter {
    * {@inheritDoc}
    */
   @Override
-  default AnnotatedElement getDeclaringElement() {
-    return getField();
+  default Optional<AnnotatedElement> getDeclaringElement() {
+    return ofNullable(getField());
   }
 }

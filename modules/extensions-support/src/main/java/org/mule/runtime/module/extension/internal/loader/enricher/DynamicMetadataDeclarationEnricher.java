@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
@@ -36,17 +37,18 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.QueryMetadataResolverFactory;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.Set;
 
@@ -105,14 +107,14 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
     }
 
     private void enrichOperationMetadata(OperationDeclaration declaration) {
-      declaration.getModelProperty(ImplementingMethodModelProperty.class)
-          .ifPresent(prop -> {
-            final Method method = prop.getMethod();
-
-            if (method.isAnnotationPresent(Query.class)) {
-              enrichWithDsql(declaration, method);
+      declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+          .map(ExtensionOperationDescriptorModelProperty::getOperationMethod)
+          .filter(operation -> operation.getMethod().isPresent())
+          .ifPresent(operation -> {
+            if (operation.isAnnotatedWith(Query.class)) {
+              enrichWithDsql(declaration, operation);
             } else {
-              MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(extensionType, method, declaration);
+              MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(extensionType, operation, declaration);
               declareMetadataResolverFactory(declaration, metadataScope);
               enrichMetadataKeyParameters(declaration, metadataScope.getKeysResolver().get());
             }
@@ -122,10 +124,10 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
     private void enrichMetadataKeyParameters(ParameterizedDeclaration<?> declaration,
                                              TypeKeysResolver typeKeysResolver) {
       declaration.getAllParameters()
-          .forEach(paramDeclaration -> getAnnotatedElement(paramDeclaration)
-              .ifPresent(annotatedElement -> parseMetadataKeyAnnotations(annotatedElement,
-                                                                         paramDeclaration,
-                                                                         typeKeysResolver)));
+          .forEach(paramDeclaration -> paramDeclaration.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+              .ifPresent(modelProperty -> parseMetadataKeyAnnotations(modelProperty.getExtensionParameter(),
+                                                                      paramDeclaration,
+                                                                      typeKeysResolver)));
     }
 
     private void declareMetadataResolverFactory(ComponentDeclaration<? extends ComponentDeclaration> declaration,
@@ -139,11 +141,11 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       }
     }
 
-    private void enrichWithDsql(OperationDeclaration declaration, Method method) {
-      Query query = method.getAnnotation(Query.class);
-      declaration.addModelProperty(new MetadataResolverFactoryModelProperty(
-                                                                            () -> new QueryMetadataResolverFactory(query
-                                                                                .nativeOutputResolver(),
+    private void enrichWithDsql(OperationDeclaration declaration, MethodElement method) {
+      Query query = method.getAnnotation(Query.class).get();
+      declaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> new QueryMetadataResolverFactory(
+                                                                                                                   query
+                                                                                                                       .nativeOutputResolver(),
                                                                                                                    query
                                                                                                                        .entityResolver())));
       addQueryModelProperties(declaration, query);
@@ -213,7 +215,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       return component.getParameterGroups().stream()
           .map(group -> group.getModelProperty(ParameterGroupModelProperty.class).orElse(null))
           .filter(group -> group != null)
-          .filter(group -> group.getDescriptor().getContainer().getAnnotation(MetadataKeyId.class) != null)
+          .filter(group -> group.getDescriptor().getAnnotatedContainer().isAnnotatedWith(MetadataKeyId.class))
           .map(group -> new MetadataKeyIdModelProperty(typeLoader.load(group.getDescriptor().getType().getDeclaringClass()),
                                                        group.getDescriptor().getName()))
           .findFirst();
@@ -235,19 +237,20 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
      * @param element         the method annotated parameter parsed
      * @param baseDeclaration the {@link ParameterDeclarer} associated to the parsed parameter
      */
-    private void parseMetadataKeyAnnotations(AnnotatedElement element,
-                                             BaseDeclaration baseDeclaration,
+    private void parseMetadataKeyAnnotations(ExtensionParameter element, BaseDeclaration baseDeclaration,
                                              TypeKeysResolver keysResolver) {
-      if (element.isAnnotationPresent(MetadataKeyId.class)) {
-        boolean hasKeyResolver = !(keysResolver instanceof NullMetadataResolver);
-        baseDeclaration.addModelProperty(new MetadataKeyPartModelProperty(1, hasKeyResolver));
-      }
+      element.getValueFromAnnotation(MetadataKeyId.class)
+          .ifPresent(valueFetcher -> {
+            boolean hasKeyResolver = !(keysResolver instanceof NullMetadataResolver);
+            baseDeclaration.addModelProperty(new MetadataKeyPartModelProperty(1, hasKeyResolver));
+          });
 
-      if (element.isAnnotationPresent(MetadataKeyPart.class)) {
-        MetadataKeyPart metadataKeyPart = element.getAnnotation(MetadataKeyPart.class);
-        baseDeclaration.addModelProperty(new MetadataKeyPartModelProperty(metadataKeyPart.order(),
-                                                                          metadataKeyPart.providedByKeyResolver()));
-      }
+      element.getValueFromAnnotation(MetadataKeyPart.class)
+          .ifPresent(valueFetcher -> baseDeclaration
+              .addModelProperty(new MetadataKeyPartModelProperty(valueFetcher.getNumberValue(MetadataKeyPart::order),
+                                                                 valueFetcher
+                                                                     .getBooleanValue(MetadataKeyPart::providedByKeyResolver))));
+
     }
   }
 }

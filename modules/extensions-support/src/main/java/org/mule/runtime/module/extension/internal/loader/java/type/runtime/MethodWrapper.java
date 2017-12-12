@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -37,8 +41,13 @@ public final class MethodWrapper implements MethodElement {
    * @return The wrapped method
    */
   @Override
-  public Method getMethod() {
-    return method;
+  public Optional<Method> getMethod() {
+    return of(method);
+  }
+
+  @Override
+  public OperationContainerElement getEnclosingType() {
+    return new OperationContainerWrapper(getDeclaringClass());
   }
 
   /**
@@ -97,29 +106,24 @@ public final class MethodWrapper implements MethodElement {
    * {@inheritDoc}
    */
   @Override
-  public Annotation[] getAnnotations() {
-    return method.getAnnotations();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
     return ofNullable(method.getAnnotation(annotationClass));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public Class<?> getReturnType() {
-    return forMethodReturnType(method).getRawClass();
+  public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
+    return isAnnotatedWith(annotationClass) ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, method))
+        : Optional.empty();
+  }
+
+  @Override
+  public Type getReturnType() {
+    return new TypeWrapper(forMethodReturnType(method));
   }
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof MethodElement && method.equals(((MethodElement) obj).getMethod());
+    return obj instanceof MethodElement && method.equals(((MethodElement) obj).getMethod().orElse(null));
   }
 
   @Override

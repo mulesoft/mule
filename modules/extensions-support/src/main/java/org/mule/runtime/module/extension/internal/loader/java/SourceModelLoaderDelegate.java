@@ -11,6 +11,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isInputStream;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLifecycle;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -28,12 +29,12 @@ import org.mule.runtime.module.extension.internal.loader.java.property.SourceFac
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.SourceElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithMessageSources;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFactory;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,9 +123,9 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
   }
 
   private void resolveOutputTypes(SourceDeclarer source, List<Type> sourceGenerics, SourceElement sourceType) {
-    final MetadataType outputTtype = getSourceReturnType(sourceGenerics.get(0), getTypeLoader());
+    final MetadataType outputTtype = getSourceReturnType(sourceGenerics.get(0).getReflectType(), getTypeLoader());
     source.withOutput().ofType(outputTtype);
-    source.withOutputAttributes().ofType(getTypeLoader().load(sourceGenerics.get(1)));
+    source.withOutputAttributes().ofType(getTypeLoader().load(sourceGenerics.get(1).getDeclaringClass()));
     source.supportsStreaming(isInputStream(outputTtype) || sourceType.getAnnotation(Streaming.class).isPresent());
   }
 
@@ -163,6 +164,6 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
   }
 
   private Optional<Method> getMethod(Optional<MethodElement> method) {
-    return method.map(MethodElement::getMethod);
+    return method.flatMap(MethodElement::getMethod);
   }
 }

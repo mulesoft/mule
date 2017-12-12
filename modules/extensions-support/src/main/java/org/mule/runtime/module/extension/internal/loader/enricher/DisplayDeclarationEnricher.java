@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.LAYOUT;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.toClassValueModel;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
@@ -31,12 +32,11 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 
-import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
 
 /**
@@ -85,21 +85,9 @@ public final class DisplayDeclarationEnricher extends AbstractAnnotatedDeclarati
   }
 
   private void enrichParameter(ParameterDeclaration declaration) {
-    final Optional<DeclaringMemberModelProperty> declaringMemberProperty =
-        declaration.getModelProperty(DeclaringMemberModelProperty.class);
-    final Optional<ImplementingParameterModelProperty> implementingParameterProperty =
-        declaration.getModelProperty(ImplementingParameterModelProperty.class);
-    AnnotatedElement annotatedElement = null;
+    declaration.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+        .ifPresent(modelProperty -> enrichDeclaration(declaration, modelProperty.getExtensionParameter()));
 
-    if (declaringMemberProperty.isPresent()) {
-      annotatedElement = declaringMemberProperty.get().getDeclaringField();
-    }
-
-    if (implementingParameterProperty.isPresent()) {
-      annotatedElement = implementingParameterProperty.get().getParameter();
-    }
-
-    enrichDeclaration(declaration, annotatedElement);
   }
 
   private void enrichTypes(BaseDeclaration declaration) {
@@ -119,18 +107,18 @@ public final class DisplayDeclarationEnricher extends AbstractAnnotatedDeclarati
   }
 
   private void enrichOperation(OperationDeclaration declaration) {
-    declaration.getModelProperty(ImplementingMethodModelProperty.class)
-        .map(ImplementingMethodModelProperty::getMethod)
+    declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+        .map(ExtensionOperationDescriptorModelProperty::getOperationMethod)
         .ifPresent(annotatedElement -> enrichDeclaration(declaration, annotatedElement));
   }
 
-  private void enrichDeclaration(BaseDeclaration declaration, AnnotatedElement annotatedElement) {
+  private void enrichDeclaration(BaseDeclaration declaration, WithAnnotations annotatedElement) {
     if (annotatedElement != null) {
-      final Summary summaryAnnotation = annotatedElement.getAnnotation(Summary.class);
-      final DisplayName displayNameAnnotation = annotatedElement.getAnnotation(DisplayName.class);
-      final Example exampleAnnotation = annotatedElement.getAnnotation(Example.class);
-      final Path pathAnnotation = annotatedElement.getAnnotation(Path.class);
-      final ClassValue classValue = annotatedElement.getAnnotation(ClassValue.class);
+      final Summary summaryAnnotation = annotatedElement.getAnnotation(Summary.class).orElse(null);
+      final DisplayName displayNameAnnotation = annotatedElement.getAnnotation(DisplayName.class).orElse(null);
+      final Example exampleAnnotation = annotatedElement.getAnnotation(Example.class).orElse(null);
+      final Path pathAnnotation = annotatedElement.getAnnotation(Path.class).orElse(null);
+      final ClassValue classValue = annotatedElement.getAnnotation(ClassValue.class).orElse(null);
 
       createDisplayModelProperty(declaration, summaryAnnotation, displayNameAnnotation, exampleAnnotation, pathAnnotation,
                                  classValue);

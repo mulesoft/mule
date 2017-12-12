@@ -23,6 +23,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionHandlerFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -197,9 +198,12 @@ public final class MuleExtensionAnnotationParser {
   }
 
   static java.util.Optional<ExceptionHandlerFactory> getExceptionEnricherFactory(WithAnnotations element) {
-    final java.util.Optional<OnException> onExceptionAnnotation = element.getAnnotation(OnException.class);
-    if (onExceptionAnnotation.isPresent()) {
-      return of(new DefaultExceptionHandlerFactory(onExceptionAnnotation.get().value()));
+    if (element.isAnnotatedWith(OnException.class)) {
+      Type classValue = element.getValueFromAnnotation(OnException.class).get().getClassValue(OnException::value);
+      Class declaringClass = classValue.getDeclaringClass();
+      if (declaringClass != null) {
+        return of(new DefaultExceptionHandlerFactory(declaringClass));
+      }
     }
     return java.util.Optional.empty();
   }
