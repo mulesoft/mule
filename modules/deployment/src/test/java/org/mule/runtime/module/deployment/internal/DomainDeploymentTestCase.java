@@ -32,6 +32,7 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -202,6 +203,24 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
     executeApplicationFlow("main");
+  }
+
+  @Test
+  public void pluginFromDomainUsedInApp() throws Exception {
+    addPackedDomainFromBuilder(exceptionThrowingPluginImportingDomain);
+
+    ApplicationFileBuilder applicationFileBuilder =
+        createExtensionApplicationWithServices("exception-throwing-app.xml").dependingOn(exceptionThrowingPluginImportingDomain);
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+
+    try {
+      executeApplicationFlow("main");
+      fail("Flow execution was expected to throw an exception");
+    } catch (MuleRuntimeException expected) {
+      assertThat(expected.getCause().getCause().getClass().getName(), is(equalTo("org.exception.CustomException")));
+    }
+
   }
 
   @Test

@@ -50,12 +50,15 @@ import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
@@ -75,7 +78,9 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
+import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
+import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.exception.MuleException;
@@ -120,6 +125,7 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.tck.probe.file.FileExists;
+import org.mule.tck.util.CompilerUtils;
 import org.mule.tck.util.CompilerUtils.ExtensionCompiler;
 import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
@@ -185,6 +191,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static final String BAR_POLICY_NAME = "barPolicy";
   protected static final String BAZ_POLICY_NAME = "bazPolicy";
+  protected static final String EXCEPTION_POLICY_NAME = "exceptionPolicy";
   protected static final String FOO_POLICY_ID = "fooPolicy";
 
   protected static final String MIN_MULE_VERSION = "4.0.0";
@@ -284,6 +291,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected final ArtifactPluginFileBuilder helloExtensionV1Plugin = createHelloExtensionV1PluginFileBuilder();
   protected final ArtifactPluginFileBuilder helloExtensionV2Plugin = createHelloExtensionV2PluginFileBuilder();
 
+  protected final ArtifactPluginFileBuilder exceptionThrowingPlugin = createExceptionThrowingPluginFileBuilder();
+
   // Application file builders
   protected final ApplicationFileBuilder emptyAppFileBuilder =
       new ApplicationFileBuilder("empty-app").definedBy("empty-config.xml");
@@ -318,9 +327,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected final PolicyFileBuilder policyIncludingPluginFileBuilder =
       createPolicyIncludingPluginFileBuilder();
-
   protected final PolicyFileBuilder policyIncludingHelloPluginV2FileBuilder =
       createPolicyIncludingHelloPluginV2FileBuilder();
+  protected final PolicyFileBuilder exceptionThrowingPluginImportingPolicyFileBuilder =
+      createExceptionThrowingPluginImportingPolicyFileBuilder();
+
+  protected final DomainFileBuilder exceptionThrowingPluginImportingDomain =
+      new DomainFileBuilder("exception-throwing-plugin-importing-domain").definedBy("empty-domain-config.xml")
+          .dependingOn(exceptionThrowingPlugin);
 
   private File muleHome;
   protected final boolean parallelDeployment;
@@ -1090,7 +1104,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), flowName);
       CoreEvent result = flowRunner.withPayload(TEST_MESSAGE).run();
       flowRunner.dispose();
-
       assertThat(currentThread().getContextClassLoader(), sameInstance(appClassLoader));
 
       return result;
@@ -1178,6 +1191,63 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     return new ArtifactPluginFileBuilder("helloExtensionPlugin-2.0.0")
         .dependingOn(new JarFileBuilder("helloExtensionV2", helloExtensionV2JarFile))
         .describedBy((mulePluginModelBuilder.build()));
+  }
+
+  private PolicyFileBuilder createExceptionThrowingPluginImportingPolicyFileBuilder() {
+    PolicyFileBuilder exceptionPolicyFileBuilder =
+        new PolicyFileBuilder(EXCEPTION_POLICY_NAME).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
+            .setMinMuleVersion(MIN_MULE_VERSION)
+            .setName(EXCEPTION_POLICY_NAME)
+            .setRequiredProduct(MULE)
+            .withBundleDescriptorLoader(createBundleDescriptorLoader(EXCEPTION_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                     PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+            .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+            .build())
+            .dependingOn(exceptionThrowingPlugin);
+    return exceptionPolicyFileBuilder;
+  }
+
+  private ArtifactPluginFileBuilder createExceptionThrowingPluginFileBuilder() {
+    final String pluginName = "exceptionPlugin";
+
+    MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION)
+        .setName(pluginName)
+        .setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader(pluginName,
+                                                                 MULE_PLUGIN_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID,
+                                                                 "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
+        .setId(MULE_LOADER_ID)
+        .addProperty(EXPORTED_RESOURCES, asList("/META-INF/mule-exception.xsd", "/META-INF/mule.schemas"))
+        .build());
+
+    File exceptionTestClassFile = null;
+    File serviceTestClassFile = null;
+
+    try {
+      exceptionTestClassFile =
+          new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/exception/CustomException.java"));
+      serviceTestClassFile = new CompilerUtils.SingleClassCompiler()
+          .compile(getResourceFile("/org/exception/ExceptionComponentBuildingDefinitionProvider.java"));
+    } catch (URISyntaxException e) {
+      fail(e.getMessage());
+    }
+
+    ArtifactPluginFileBuilder exceptionPluginFileBuilder = new ArtifactPluginFileBuilder("exceptionPlugin")
+        .containingResource("exception/META-INF/mule.schemas", "META-INF/mule.schemas")
+        .containingResource("exception/META-INF/mule-exception.xsd", "META-INF/mule-exception.xsd")
+        .containingResource("exception/META-INF/services/org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider",
+                            "META-INF/services/org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider")
+        .containingClass(exceptionTestClassFile, "org/exception/CustomException.class")
+        .containingClass(serviceTestClassFile, "org/exception/ExceptionComponentBuildingDefinitionProvider.class")
+        .configuredWith(EXPORTED_RESOURCE_PROPERTY, "META-INF/mule-exception.xsd,META-INF/mule.schemas")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.exception")
+        .describedBy(mulePluginModelBuilder.build());
+
+    return exceptionPluginFileBuilder;
+
   }
 
   private ArtifactPluginFileBuilder createHelloExtensionV1PluginFileBuilder() {

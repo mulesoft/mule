@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.config.internal;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.internal.lifecycle.DefaultLifecycleInterceptor.createInitDisposeLifecycleInterceptor;
-import static org.mule.runtime.core.internal.lifecycle.DefaultLifecycleInterceptor.createStartStopLifecycleInterceptor;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -28,12 +27,14 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
-import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -96,8 +97,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                        boolean enableLazyInitialisation, boolean disableXmlValidations)
       throws ConfigurationException {
     this(configurationFiles, artifactProperties, artifactType, enableLazyInitialisation, disableXmlValidations);
-    this.artifactDeclaration = artifactDeclaration;
     this.artifactType = APP;
+    this.artifactDeclaration = artifactDeclaration;
   }
 
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, MuleContext domainContext,
@@ -150,13 +151,35 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     if (enableLazyInit) {
       return new LazyMuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration,
                                          optionalObjectsController,
-                                         getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders(),
+                                         getArtifactProperties(), artifactType,
+                                         resolveArtifactContextPluginClassLoadersRecursively(),
                                          resolveParentConfigurationProperties(), disableXmlValidations);
     }
 
     return new MuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration, optionalObjectsController,
-                                   getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders(),
+                                   getArtifactProperties(), artifactType, resolveArtifactContextPluginClassLoadersRecursively(),
                                    resolveParentConfigurationProperties(), disableXmlValidations);
+  }
+
+  private List<ClassLoader> resolveArtifactContextPluginClassLoadersRecursively() {
+    Set<ClassLoader> artifactContextPluginClassLoaders = new HashSet<>(resolveContextArtifactPluginClassLoaders());
+    artifactContextPluginClassLoaders.addAll(resolveArtifactContextPluginClassLoaders(parentContext));
+    return new ArrayList<>(artifactContextPluginClassLoaders);
+  }
+
+  private Set<ClassLoader> resolveArtifactContextPluginClassLoaders(ApplicationContext context) {
+    Set<ClassLoader> artifactContextPluginClassLoaders = new HashSet<>();
+    if (context != null) {
+      ClassLoader currentClassLoader = currentThread().getContextClassLoader();
+      try {
+        currentThread().setContextClassLoader(context.getClassLoader());
+        artifactContextPluginClassLoaders.addAll(resolveContextArtifactPluginClassLoaders());
+        artifactContextPluginClassLoaders.addAll(resolveArtifactContextPluginClassLoaders(context.getParent()));
+      } finally {
+        currentThread().setContextClassLoader(currentClassLoader);
+      }
+    }
+    return artifactContextPluginClassLoaders;
   }
 
   private ConfigResource[] resolveArtifactConfigResources() {
