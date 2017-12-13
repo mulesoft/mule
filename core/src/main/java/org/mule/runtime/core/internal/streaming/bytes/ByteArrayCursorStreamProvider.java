@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.streaming.bytes;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 
+import java.io.Serializable;
+
 /**
  * A {@link CursorStreamProvider} which is backed by a fixed {@link byte[]}.
  * <p>
@@ -22,7 +24,9 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
  *
  * @since 4.0
  */
-public class ByteArrayCursorStreamProvider implements CursorStreamProvider {
+public class ByteArrayCursorStreamProvider implements CursorStreamProvider, Serializable {
+
+  private static final long serialVersionUID = -7152264489981618670L;
 
   private boolean closed = false;
   private byte[] content;
