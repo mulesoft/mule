@@ -107,6 +107,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                     nonCallbackParameters,
                                     successCallbackParameters,
                                     errorCallbackParameters,
+                                    isLazyModeEnabled(),
                                     cursorProviderFactory,
                                     muleContext);
   }

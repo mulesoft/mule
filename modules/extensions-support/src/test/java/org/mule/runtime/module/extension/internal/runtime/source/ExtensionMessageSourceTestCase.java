@@ -515,7 +515,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
                              mock(ComponentLocation.class),
                              mock(SourceConnectionManager.class),
                              null, callbackParameters, null,
-                             mock(MessagingExceptionResolver.class));
+                             mock(MessagingExceptionResolver.class),
+                             false);
   }
 
   private BaseMatcher<Throwable> exhaustedBecauseOf(Matcher<Throwable> causeMatcher) {

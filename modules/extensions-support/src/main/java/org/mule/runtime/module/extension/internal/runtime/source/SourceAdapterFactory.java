@@ -32,6 +32,7 @@ public class SourceAdapterFactory {
   private final ResolverSet sourceParameters;
   private final ResolverSet successCallbackParameters;
   private final ResolverSet errorCallbackParameters;
+  private final boolean lazyModeEnabled;
   private final CursorProviderFactory cursorProviderFactory;
   private final MuleContext muleContext;
 
@@ -40,6 +41,7 @@ public class SourceAdapterFactory {
                               ResolverSet sourceParameters,
                               ResolverSet successCallbackParameters,
                               ResolverSet errorCallbackParameters,
+                              boolean lazyModeEnabled,
                               CursorProviderFactory cursorProviderFactory,
                               MuleContext muleContext) {
     this.extensionModel = extensionModel;
@@ -47,6 +49,7 @@ public class SourceAdapterFactory {
     this.sourceParameters = sourceParameters;
     this.successCallbackParameters = successCallbackParameters;
     this.errorCallbackParameters = errorCallbackParameters;
+    this.lazyModeEnabled = lazyModeEnabled;
     this.cursorProviderFactory = cursorProviderFactory;
     this.muleContext = muleContext;
   }
@@ -54,24 +57,23 @@ public class SourceAdapterFactory {
   /**
    * Creates a new {@link SourceAdapter}
    *
-   * @param configurationInstance an {@link Optional} {@link ConfigurationInstance} in case the source requires a config
+   * @param configInstance an {@link Optional} {@link ConfigurationInstance} in case the source requires a config
    * @param sourceCallbackFactory a {@link SourceCallbackFactory}
    * @return a new {@link SourceAdapter}
    */
-  public SourceAdapter createAdapter(Optional<ConfigurationInstance> configurationInstance,
+  public SourceAdapter createAdapter(Optional<ConfigurationInstance> configInstance,
                                      SourceCallbackFactory sourceCallbackFactory,
                                      ComponentLocation location,
                                      SourceConnectionManager connectionManager,
                                      MessagingExceptionResolver exceptionResolver) {
     Source source = getSourceFactory(sourceModel).createSource();
     try {
-      source =
-          new SourceConfigurer(sourceModel, location, sourceParameters, muleContext).configure(source, configurationInstance);
+      source = new SourceConfigurer(sourceModel, location, sourceParameters, muleContext).configure(source, configInstance);
 
       return new SourceAdapter(extensionModel,
                                sourceModel,
                                source,
-                               configurationInstance,
+                               configInstance,
                                cursorProviderFactory,
                                sourceCallbackFactory,
                                location,
@@ -79,7 +81,8 @@ public class SourceAdapterFactory {
                                sourceParameters,
                                successCallbackParameters,
                                errorCallbackParameters,
-                               exceptionResolver);
+                               exceptionResolver,
+                               lazyModeEnabled);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'",
                                                                 sourceModel.getName())),
