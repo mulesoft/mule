@@ -26,6 +26,8 @@ import java.util.Map;
     outputResolver = TestInputAndOutputWithAttributesResolverWithKeyResolver.class)
 public class MetadataSource extends Source<Map<String, Object>, StringAttributes> {
 
+  public static boolean STARTED = false;
+
   @MetadataKeyId
   @Parameter
   public String type;
@@ -35,6 +37,7 @@ public class MetadataSource extends Source<Map<String, Object>, StringAttributes
 
   @Override
   public void onStart(SourceCallback<Map<String, Object>, StringAttributes> sourceCallback) throws MuleException {
+    STARTED = true;
     if (!type.equals(PERSON)) {
       throw new RuntimeException(String.format("Invalid MetadataKey with value [%s], the key should be [%s]", type, PERSON));
     }

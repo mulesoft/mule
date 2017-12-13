@@ -105,6 +105,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
   private final ComponentLocation componentLocation;
   private final SourceConnectionManager connectionManager;
   private final MessagingExceptionResolver exceptionResolver;
+  private final boolean lazyModeEnabled;
 
   @Inject
   private StreamingManager streamingManager;
@@ -122,7 +123,8 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
                        ResolverSet nonCallbackParameters,
                        ResolverSet successCallbackParameters,
                        ResolverSet errorCallbackParameters,
-                       MessagingExceptionResolver exceptionResolver) {
+                       MessagingExceptionResolver exceptionResolver,
+                       boolean lazyModeEnabled) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
     this.source = source;
@@ -135,6 +137,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     this.successCallbackParameters = successCallbackParameters;
     this.errorCallbackParameters = errorCallbackParameters;
     this.exceptionResolver = exceptionResolver;
+    this.lazyModeEnabled = lazyModeEnabled;
     this.configurationSetter = fetchConfigurationField();
     this.connectionSetter = fetchConnectionProviderField();
   }
@@ -263,7 +266,9 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
       setConfiguration(configurationInstance);
       setConnection();
       muleContext.getInjector().inject(source);
-      source.onStart(createSourceCallback());
+      if (!lazyModeEnabled) {
+        source.onStart(createSourceCallback());
+      }
     } catch (Exception e) {
       throw new DefaultMuleException(e);
     }
