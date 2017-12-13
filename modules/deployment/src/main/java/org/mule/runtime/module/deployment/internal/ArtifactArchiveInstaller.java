@@ -8,12 +8,13 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
-
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
@@ -85,7 +86,8 @@ public class ArtifactArchiveInstaller {
       final File source = artifactFile;
 
       FileUtils.unzip(source, artifactDir);
-      if ("file".equals(artifactUri.getScheme())) {
+      if ("file".equals(artifactUri.getScheme())
+          && toFile(artifactUri.toURL()).getAbsolutePath().startsWith(artifactParentDir.getAbsolutePath())) {
         deleteQuietly(source);
       }
     } catch (IOException e) {
