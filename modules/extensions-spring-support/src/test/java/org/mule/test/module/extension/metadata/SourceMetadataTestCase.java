@@ -16,6 +16,7 @@ import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
 
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.tck.message.StringAttributes;
+import org.mule.test.metadata.extension.MetadataSource;
 
 import java.util.Set;
 
@@ -63,5 +65,12 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
     ComponentMetadataDescriptor<SourceModel> componentMetadata = result.get();
     assertExpectedOutput(componentMetadata.getModel(), personType, typeLoader.load(StringAttributes.class));
     assertThat(componentMetadata.getMetadataAttributes().getKey().get(), is(PERSON_METADATA_KEY));
+  }
+
+  @Test
+  public void sourcesMustNotStartWhenResolvingMetadata() {
+    final MetadataResult<ComponentMetadataDescriptor<SourceModel>> result = getComponentDynamicMetadata(PERSON_METADATA_KEY);
+    assertThat(result.isSuccess(), is(true));
+    assertThat(MetadataSource.STARTED, is(false));
   }
 }
