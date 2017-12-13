@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.scheduler.Schedulers.fromExecutor;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -46,13 +45,12 @@ import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcess
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 
 
@@ -64,7 +62,7 @@ public class DefaultPolicyInstance extends AbstractComponent
   @Inject
   private SchedulerService schedulerService;
 
-  private PolicyProcessingStrategy processingStrategy;
+  private ProcessingStrategy processingStrategy;
 
   private PolicyChain operationPolicyChain;
   private PolicyChain sourcePolicyChain;
@@ -189,7 +187,7 @@ public class DefaultPolicyInstance extends AbstractComponent
   }
 
   @Override
-  public PolicyProcessingStrategy getProcessingStrategy() {
+  public ProcessingStrategy getProcessingStrategy() {
     return processingStrategy;
   }
 
