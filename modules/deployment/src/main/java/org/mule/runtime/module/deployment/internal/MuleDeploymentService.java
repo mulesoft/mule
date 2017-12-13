@@ -14,6 +14,7 @@ import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
@@ -218,26 +219,7 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   private void deploy(final URI appArchiveUri, final Optional<Properties> deploymentProperties) throws IOException {
-    executeSynchronized(() -> {
-      try {
-        File appLocation = toFile(appArchiveUri.toURL());
-        String fileName = appLocation.getName();
-        if (fileName.endsWith(".jar")) {
-          applicationDeployer.deployPackagedArtifact(appArchiveUri, deploymentProperties);
-        } else {
-          if (!appLocation.getParent().equals(getAppsFolder())) {
-            try {
-              copyDirectory(appLocation, new File(getAppsFolder(), fileName));
-            } catch (IOException e) {
-              throw new MuleRuntimeException(e);
-            }
-          }
-          applicationDeployer.deployExplodedArtifact(fileName, deploymentProperties);
-        }
-      } catch (MalformedURLException e) {
-        throw new MuleRuntimeException(e);
-      }
-    });
+    deployTemplateMethod(appArchiveUri, deploymentProperties, getAppsFolder(), applicationDeployer);
   }
 
   @Override
@@ -250,11 +232,11 @@ public class MuleDeploymentService implements DeploymentService {
     redeploy(artifactName, empty());
   }
 
-
   @Override
   public void redeploy(String artifactName, Properties appProperties) {
     redeploy(artifactName, ofNullable(appProperties));
   }
+
 
   @Override
   public void undeployDomain(String domainName) {
@@ -266,8 +248,8 @@ public class MuleDeploymentService implements DeploymentService {
     deployDomain(domainArchiveUri, empty());
   }
 
-  private void deployDomain(URI domainArchiveUri, Optional<Properties> properties) {
-    executeSynchronized(() -> domainDeployer.deployPackagedArtifact(domainArchiveUri, properties));
+  private void deployDomain(URI domainArchiveUri, Optional<Properties> deploymentProperties) throws IOException {
+    deployTemplateMethod(domainArchiveUri, deploymentProperties, getDomainsFolder(), domainDeployer);
   }
 
   @Override
@@ -339,6 +321,32 @@ public class MuleDeploymentService implements DeploymentService {
   private interface SynchronizedDeploymentAction {
 
     void execute();
+
+  }
+
+  private void deployTemplateMethod(final URI artifactArchiveUri, final Optional<Properties> deploymentProperties,
+                                    File artifactDeploymentFolder, ArchiveDeployer archiveDeployer)
+      throws IOException {
+    executeSynchronized(() -> {
+      try {
+        File artifactLocation = toFile(artifactArchiveUri.toURL());
+        String fileName = artifactLocation.getName();
+        if (fileName.endsWith(".jar")) {
+          archiveDeployer.deployPackagedArtifact(artifactArchiveUri, deploymentProperties);
+        } else {
+          if (!artifactLocation.getParent().equals(artifactDeploymentFolder)) {
+            try {
+              copyDirectory(artifactLocation, new File(artifactDeploymentFolder, fileName));
+            } catch (IOException e) {
+              throw new MuleRuntimeException(e);
+            }
+          }
+          archiveDeployer.deployExplodedArtifact(fileName, deploymentProperties);
+        }
+      } catch (MalformedURLException e) {
+        throw new MuleRuntimeException(e);
+      }
+    });
   }
 
   private void executeSynchronized(SynchronizedDeploymentAction deploymentAction) {
