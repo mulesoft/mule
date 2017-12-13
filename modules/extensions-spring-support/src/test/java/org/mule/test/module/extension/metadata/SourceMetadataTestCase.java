@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.metadata;
 
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
@@ -14,6 +15,7 @@ import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
+import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.STARTED_KEY_MASK;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -25,12 +27,16 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.MetadataSource;
+import org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver;
+import org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver;
 
 import java.util.Set;
 
 import org.junit.Test;
 
 public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<SourceModel> {
+
+  private static final String EXPECTED_STARTED_KEY_ID = format(STARTED_KEY_MASK, false);
 
   public SourceMetadataTestCase(ResolutionType resolutionType) {
     super(resolutionType);
@@ -54,8 +60,9 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
     final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);
     assertThat(metadataKeysResult.isSuccess(), is(true));
     final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
-    assertThat(metadataKeys.size(), is(3));
-    assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR), metadataKeyWithId(HOUSE)));
+    assertThat(metadataKeys.size(), is(4));
+    assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR),
+                                      metadataKeyWithId(HOUSE), metadataKeyWithId(EXPECTED_STARTED_KEY_ID)));
   }
 
   @Test
@@ -67,10 +74,15 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
     assertThat(componentMetadata.getMetadataAttributes().getKey().get(), is(PERSON_METADATA_KEY));
   }
 
+  /**
+   * Since the classloader for this tests is different from the one that actually initialize the components
+   * the STARTED/STOPPED information is retrieved building a key with the source status in the correct environment.
+   */
   @Test
   public void sourcesMustNotStartWhenResolvingMetadata() {
-    final MetadataResult<ComponentMetadataDescriptor<SourceModel>> result = getComponentDynamicMetadata(PERSON_METADATA_KEY);
-    assertThat(result.isSuccess(), is(true));
-    assertThat(MetadataSource.STARTED, is(false));
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);
+    final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
+    assertThat(metadataKeys.size(), is(4));
+    assertThat(metadataKeys, hasItems(metadataKeyWithId(EXPECTED_STARTED_KEY_ID)));
   }
 }

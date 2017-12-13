@@ -16,13 +16,13 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.message.StringAttributes;
-import org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver;
+import org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestInputAndOutputWithAttributesResolverWithKeyResolver;
 
 import java.util.Map;
 
 
-@MetadataScope(keysResolver = TestInputAndOutputResolverWithKeyResolver.class,
+@MetadataScope(keysResolver = TestInputOutputSourceResolverWithKeyResolver.class,
     outputResolver = TestInputAndOutputWithAttributesResolverWithKeyResolver.class)
 public class MetadataSource extends Source<Map<String, Object>, StringAttributes> {
 
