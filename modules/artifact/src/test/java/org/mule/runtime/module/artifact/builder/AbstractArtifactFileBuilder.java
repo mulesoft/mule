@@ -193,11 +193,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
         final List<ZipResource> zipResources = new LinkedList<>(resources);
         zipResources.add(new ZipResource(getArtifactPomFile().getAbsolutePath(), getArtifactFileBundledPomPath()));
         zipResources.addAll(getCustomResources());
-        try {
-          compress(tempFile, zipResources.toArray(new ZipResource[0]));
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+        compress(tempFile, zipResources.toArray(new ZipResource[0]));
       }
 
       artifactFile = new File(tempFile.getAbsolutePath());
