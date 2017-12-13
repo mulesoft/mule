@@ -106,7 +106,7 @@
         <metadata:output-metadata-without-keys-with-key-id config-ref="config" type="PERSON"/>
     </flow>
 
-    <flow name="sourceMetadata" initialState="stopped">
+    <flow name="sourceMetadata">
         <metadata:metadata-source config-ref="config" type="PERSON">
             <redelivery-policy useSecureHash="true" maxRedeliveryCount="3"/>
         </metadata:metadata-source>

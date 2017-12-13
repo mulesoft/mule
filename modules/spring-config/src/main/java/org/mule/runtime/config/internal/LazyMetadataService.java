@@ -125,7 +125,7 @@ public class LazyMetadataService implements MetadataService, Initialisable {
 
   private Optional<MetadataResult<?>> initializeComponent(Location location) {
     try {
-      lazyMuleArtifactContext.initializeComponent(location);
+      lazyMuleArtifactContext.initializeComponent(location, false);
     } catch (Exception e) {
       Throwable rootCause = getRootException(e);
       MetadataFailure.Builder builder = newFailure(e).withMessage(rootCause.getMessage());
