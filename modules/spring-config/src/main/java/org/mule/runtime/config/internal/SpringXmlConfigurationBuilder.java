@@ -10,6 +10,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -30,9 +31,11 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -150,23 +153,29 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       return new LazyMuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration,
                                          optionalObjectsController,
                                          getArtifactProperties(), artifactType,
-                                         resolveArtifactAndParentContextsPluginClassLoaders(),
+                                         resolveArtifactContextPluginClassLoadersRecursively(),
                                          resolveParentConfigurationProperties(), disableXmlValidations);
     }
 
     return new MuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration, optionalObjectsController,
-                                   getArtifactProperties(), artifactType, resolveArtifactAndParentContextsPluginClassLoaders(),
+                                   getArtifactProperties(), artifactType, resolveArtifactContextPluginClassLoadersRecursively(),
                                    resolveParentConfigurationProperties(), disableXmlValidations);
   }
 
-  private List<ClassLoader> resolveArtifactAndParentContextsPluginClassLoaders() {
-    List<ClassLoader> artifactContextPluginClassLoaders = new ArrayList<>(resolveContextArtifactPluginClassLoaders());
-    if (parentContext != null) {
+  private List<ClassLoader> resolveArtifactContextPluginClassLoadersRecursively() {
+    Set<ClassLoader> artifactContextPluginClassLoaders = new HashSet<>(resolveContextArtifactPluginClassLoaders());
+    artifactContextPluginClassLoaders.addAll(resolveArtifactContextPluginClassLoaders(parentContext));
+    return new ArrayList<>(artifactContextPluginClassLoaders);
+  }
+
+  private Set<ClassLoader> resolveArtifactContextPluginClassLoaders(ApplicationContext context) {
+    Set<ClassLoader> artifactContextPluginClassLoaders = new HashSet<>();
+    if (context != null) {
       ClassLoader currentClassLoader = currentThread().getContextClassLoader();
       try {
-        currentThread().setContextClassLoader(parentContext.getClassLoader());
-        List<ClassLoader> parentArtifactContextPluginClassLoaders = resolveContextArtifactPluginClassLoaders();
-        artifactContextPluginClassLoaders.addAll(parentArtifactContextPluginClassLoaders);
+        currentThread().setContextClassLoader(context.getClassLoader());
+        artifactContextPluginClassLoaders.addAll(resolveContextArtifactPluginClassLoaders());
+        artifactContextPluginClassLoaders.addAll(resolveArtifactContextPluginClassLoaders(context.getParent()));
       } finally {
         currentThread().setContextClassLoader(currentClassLoader);
       }

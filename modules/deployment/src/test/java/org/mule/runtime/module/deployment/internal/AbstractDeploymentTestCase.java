@@ -80,6 +80,7 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
+import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.exception.MuleException;
@@ -190,6 +191,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static final String BAR_POLICY_NAME = "barPolicy";
   protected static final String BAZ_POLICY_NAME = "bazPolicy";
+  protected static final String EXCEPTION_POLICY_NAME = "exceptionPolicy";
   protected static final String FOO_POLICY_ID = "fooPolicy";
 
   protected static final String MIN_MULE_VERSION = "4.0.0";
@@ -327,6 +329,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       createPolicyIncludingPluginFileBuilder();
   protected final PolicyFileBuilder policyIncludingHelloPluginV2FileBuilder =
       createPolicyIncludingHelloPluginV2FileBuilder();
+  protected final PolicyFileBuilder exceptionThrowingPluginImportingPolicyFileBuilder =
+      createExceptionThrowingPluginImportingPolicyFileBuilder();
+
+  protected final DomainFileBuilder exceptionThrowingPluginImportingDomain =
+      new DomainFileBuilder("exception-throwing-plugin-importing-domain").definedBy("empty-domain-config.xml")
+          .dependingOn(exceptionThrowingPlugin);
 
   private File muleHome;
   protected final boolean parallelDeployment;
@@ -1183,6 +1191,20 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     return new ArtifactPluginFileBuilder("helloExtensionPlugin-2.0.0")
         .dependingOn(new JarFileBuilder("helloExtensionV2", helloExtensionV2JarFile))
         .describedBy((mulePluginModelBuilder.build()));
+  }
+
+  private PolicyFileBuilder createExceptionThrowingPluginImportingPolicyFileBuilder() {
+    PolicyFileBuilder exceptionPolicyFileBuilder =
+        new PolicyFileBuilder(EXCEPTION_POLICY_NAME).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
+            .setMinMuleVersion(MIN_MULE_VERSION)
+            .setName(EXCEPTION_POLICY_NAME)
+            .setRequiredProduct(MULE)
+            .withBundleDescriptorLoader(createBundleDescriptorLoader(EXCEPTION_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                     PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+            .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+            .build())
+            .dependingOn(exceptionThrowingPlugin);
+    return exceptionPolicyFileBuilder;
   }
 
   private ArtifactPluginFileBuilder createExceptionThrowingPluginFileBuilder() {

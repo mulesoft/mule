@@ -303,20 +303,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Test
   public void appliesApplicationPolicyDuplicatingPlugin() throws Exception {
 
-    final String policyName = "exceptionPolicy";
-
-    PolicyFileBuilder exceptionPolicyFileBuilder =
-        new PolicyFileBuilder(policyName).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
-            .setMinMuleVersion(MIN_MULE_VERSION)
-            .setName(policyName)
-            .setRequiredProduct(MULE)
-            .withBundleDescriptorLoader(createBundleDescriptorLoader(policyName, MULE_POLICY_CLASSIFIER,
-                                                                     PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-            .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
-            .build())
-            .dependingOn(exceptionThrowingPlugin);
-
-    policyManager.registerPolicyTemplate(exceptionPolicyFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(exceptionThrowingPluginImportingPolicyFileBuilder.getArtifactFile());
 
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
@@ -324,12 +311,37 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                                                            helloExtensionV1Plugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), exceptionThrowingPluginImportingPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(EXCEPTION_POLICY_NAME, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/exceptionThrowingPolicy.xml"), emptyList()));
+    try {
+      executeApplicationFlow("main");
+      fail("Flow execution was expected to throw an exception");
+    } catch (MuleRuntimeException expected) {
+      assertThat(expected.getCause().getCause().getClass().getName(), is(equalTo("org.exception.CustomException")));
+    }
+  }
+
+  @Test
+  public void appliesApplicationPolicyDuplicatingPluginOnDomain() throws Exception {
+
+    addPackedDomainFromBuilder(exceptionThrowingPluginImportingDomain);
+
+    policyManager.registerPolicyTemplate(exceptionThrowingPluginImportingPolicyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin)
+                                                                                               .dependingOn(exceptionThrowingPluginImportingDomain);
+    addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), exceptionPolicyFileBuilder.getArtifactId(),
-                            new PolicyParametrization(policyName, s -> true, 1, emptyMap(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), exceptionThrowingPluginImportingPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(EXCEPTION_POLICY_NAME, s -> true, 1, emptyMap(),
                                                       getResourceFile("/exceptionThrowingPolicy.xml"), emptyList()));
     try {
       executeApplicationFlow("main");

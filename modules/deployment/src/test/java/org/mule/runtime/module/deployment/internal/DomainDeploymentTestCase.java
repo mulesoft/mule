@@ -84,9 +84,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
       new DomainFileBuilder("shared-domain").definedBy("shared-domain-config.xml");
   private final DomainFileBuilder domainWithPropsFileBuilder =
       new DomainFileBuilder("domain-with-props").definedBy("domain-with-props-config.xml");
-  private final DomainFileBuilder exceptionThrowingPluginImportingDomain =
-      new DomainFileBuilder("exception-throwing-plugin-importing-domain").definedBy("empty-domain-config.xml")
-          .dependingOn(exceptionThrowingPlugin);
 
   // Application artifact builders
   private final ApplicationFileBuilder dummyDomainApp1FileBuilder =
