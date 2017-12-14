@@ -38,9 +38,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
 
   private void headers(HttpMessage httpMessage) {
     for (String headerName : httpMessage.getHeaderNames()) {
-      for (String headerValue : httpMessage.getHeaderValues(headerName)) {
-        addHeader(headerName, headerValue);
-      }
+      headers.put(headerName, httpMessage.getHeaderValues(headerName));
     }
   }
 
