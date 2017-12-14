@@ -29,7 +29,6 @@ import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
@@ -39,14 +38,17 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import javax.inject.Inject;
-
 public class PetStoreOperations {
 
-  @Inject
-  private ExtensionsClient client;
+  public List<String> getPets(@Connection PetStoreClient client,
+                              @Config PetStoreConnector config,
+                              String ownerName,
+                              @Optional InputStream ownerSignature) {
 
-  public List<String> getPets(@Connection PetStoreClient client, @Config PetStoreConnector config, String ownerName) {
+    if (ownerSignature != null) {
+      ownerName += IOUtils.toString(ownerSignature);
+    }
+
     return client.getPets(ownerName, config);
   }
 

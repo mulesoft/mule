@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -22,11 +21,11 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
-import org.mule.runtime.extension.api.runtime.InterceptorFactory;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
+import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -81,10 +80,9 @@ public class ConnectionDeclarationEnricherTestCase extends AbstractMuleTestCase 
     enricher.enrich(extensionLoadingContext);
     verify(connectedOperation).addModelProperty(isA(InterceptorsModelProperty.class));
     InterceptorsModelProperty interceptors = connectedOperation.getModelProperty(InterceptorsModelProperty.class).get();
-    assertThat(interceptors.getInterceptorFactories(), hasSize(1));
-    InterceptorFactory factory = interceptors.getInterceptorFactories().get(0);
-    assertThat(factory, is(notNullValue()));
-    assertThat(factory.createInterceptor(), is(instanceOf(ConnectionInterceptor.class)));
+    assertThat(interceptors.getInterceptorFactories(), hasSize(2));
+    assertThat(interceptors.getInterceptorFactories().get(0).createInterceptor(), is(instanceOf(ConnectionInterceptor.class)));
+    assertThat(interceptors.getInterceptorFactories().get(1).createInterceptor(), is(instanceOf(CursorResetInterceptor.class)));
   }
 
   @Test

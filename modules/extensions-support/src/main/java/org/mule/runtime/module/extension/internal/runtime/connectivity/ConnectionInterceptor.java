@@ -62,8 +62,8 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
   public Throwable onError(ExecutionContext<ComponentModel> executionContext, Throwable exception) {
     extractConnectionException(exception).ifPresent(
                                                     e -> setCloseCommand(executionContext,
-                                                                         () -> onConnection(executionContext,
-                                                                                            ConnectionHandler::invalidate)));
+                                                                         () -> withConnection(executionContext,
+                                                                                              ConnectionHandler::invalidate)));
 
     return exception;
   }
@@ -84,10 +84,10 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
   }
 
   private void release(ExecutionContext<ComponentModel> executionContext) {
-    onConnection(executionContext, ConnectionHandler::release);
+    withConnection(executionContext, ConnectionHandler::release);
   }
 
-  private void onConnection(ExecutionContext<ComponentModel> executionContext, Consumer<ConnectionHandler> consumer) {
+  private void withConnection(ExecutionContext<ComponentModel> executionContext, Consumer<ConnectionHandler> consumer) {
     ConnectionHandler handler = ((ExecutionContextAdapter<ComponentModel>) executionContext).removeVariable(CONNECTION_PARAM);
     if (handler != null) {
       consumer.accept(handler);

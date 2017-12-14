@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -72,6 +73,11 @@ public abstract class AbstractExecutionContextAdapterDecorator<M extends Compone
   @Override
   public <T> T getParameter(String arg0) {
     return decorated.getParameter(arg0);
+  }
+
+  @Override
+  public Map<String, Object> getParameters() {
+    return decorated.getParameters();
   }
 
   @Override

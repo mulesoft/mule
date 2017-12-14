@@ -15,6 +15,7 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
+import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 
 /**
  * Adds a {@link ConnectionInterceptor} to all {@link OperationModel operations} which contain the
@@ -37,6 +38,7 @@ public final class ConnectionDeclarationEnricher extends AbstractAnnotatedDeclar
       protected void onOperation(OperationDeclaration declaration) {
         if (declaration.isRequiresConnection()) {
           addInterceptorFactory(declaration, ConnectionInterceptor::new);
+          addInterceptorFactory(declaration, CursorResetInterceptor::new);
         }
       }
     }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
