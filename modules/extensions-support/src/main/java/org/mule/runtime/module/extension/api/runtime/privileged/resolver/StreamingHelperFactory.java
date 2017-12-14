@@ -11,11 +11,11 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 
 /**
- * An argument resolver which provides instances of {@link StreamingHelper}
+ * A factory which provides instances of {@link StreamingHelper}
  *
- * @since 4.0
+ * @since 4.1
  */
-public class StreamingHelperArgumentResolverFactory {
+public class StreamingHelperFactory {
 
   public StreamingHelper resolve(ExecutionContext executionContext) {
     return new StreamingHelperArgumentResolver().resolve(executionContext);
