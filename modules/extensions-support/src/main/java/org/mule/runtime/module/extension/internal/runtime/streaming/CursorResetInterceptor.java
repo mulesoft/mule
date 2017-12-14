@@ -63,7 +63,7 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
           } catch (IOException e) {
             if (LOGGER.isWarnEnabled()) {
               LOGGER.warn("Could not reset cursor back to position " + position + ". Inconsistencies might occur if "
-                              + "reconnection attempted", e);
+                  + "reconnection attempted", e);
             }
           }
         });
