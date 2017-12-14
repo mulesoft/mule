@@ -25,6 +25,8 @@ import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
+import org.mule.runtime.module.license.api.LicenseValidator;
+import org.mule.runtime.module.license.internal.DefaultLicenseValidator;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,13 +41,16 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
   private final PluginDependenciesResolver pluginDependenciesResolver = mock(PluginDependenciesResolver.class);
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory = mock(DomainClassLoaderBuilderFactory.class);
   private final ExtensionModelLoaderManager extensionModelLoaderManager = mock(ExtensionModelLoaderManager.class);
+  private final LicenseValidator licenseValidator = mock(LicenseValidator.class);
   private final DefaultDomainFactory domainFactory = new DefaultDomainFactory(
-                                                                              domainDescriptorFactory, new DefaultDomainManager(),
+                                                                              domainDescriptorFactory,
+                                                                              new DefaultDomainManager(),
                                                                               null,
                                                                               serviceRepository,
                                                                               pluginDependenciesResolver,
                                                                               domainClassLoaderBuilderFactory,
-                                                                              extensionModelLoaderManager);
+                                                                              extensionModelLoaderManager,
+                                                                              licenseValidator);
 
   public DefaultDomainFactoryTestCase() throws IOException {}
 

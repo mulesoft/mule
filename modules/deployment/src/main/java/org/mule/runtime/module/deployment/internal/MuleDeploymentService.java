@@ -95,11 +95,11 @@ public class MuleDeploymentService implements DeploymentService {
                                                             NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
                                                             new DeploymentMuleContextListenerFactory(applicationDeploymentListener));
     this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
-    this.domainDeployer = new DomainArchiveDeployer(new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
-                                                                                 new DomainDeploymentTemplate(applicationDeployer,
-                                                                                                              this),
-                                                                                 new DeploymentMuleContextListenerFactory(
-                                                                                                                          domainDeploymentListener)),
+    this.domainDeployer = new DomainArchiveDeployer(new DefaultArchiveDeployer<Domain>(domainMuleDeployer, domainFactory, domains,
+                                                                                       new DomainDeploymentTemplate(applicationDeployer,
+                                                                                                                    this),
+                                                                                       new DeploymentMuleContextListenerFactory(
+                                                                                                                                domainDeploymentListener)),
                                                     applicationDeployer, this);
     this.domainDeployer.setDeploymentListener(domainDeploymentListener);
 

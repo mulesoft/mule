@@ -17,6 +17,7 @@ import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClas
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -115,6 +116,11 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   @Override
   public File getArtifactDir() {
     return MuleContainerBootstrapUtils.getMuleAppsDir();
+  }
+
+  @Override
+  public DeployableArtifactDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
+    return applicationDescriptorFactory.create(artifactLocation, deploymentProperties);
   }
 
   public Application createArtifact(ApplicationDescriptor descriptor) throws IOException {
