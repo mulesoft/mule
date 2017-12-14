@@ -10,6 +10,7 @@ import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -19,22 +20,24 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.reactivestreams.Publisher;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
-
-import reactor.core.publisher.Mono;
 
 /**
  * Policy chain for handling the message processor associated to a policy.
@@ -104,11 +107,30 @@ public class PolicyChain extends AbstractComponent
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return Mono.from(publisher)
-        .doOnNext(notificationHelper.notification(PROCESS_START))
+    return from(publisher)
+        .doOnNext(pushBeforeNextFlowStackElement()
+            .andThen(e -> ((BaseEventContext) e.getContext())
+                .onResponse((ev, t) -> {
+                  popFlowFlowStackElement().accept(ev);
+                }))
+            .andThen(notificationHelper.notification(PROCESS_START)))
         .transform(chainWithPs)
         .doOnSuccess(notificationHelper.notification(PROCESS_END))
+        .doOnError(MessagingException.class, e -> popFlowFlowStackElement().accept(e.getEvent()))
         .doOnError(MessagingException.class, notificationHelper.errorNotification(PROCESS_END));
+  }
+
+  private Consumer<CoreEvent> pushBeforeNextFlowStackElement() {
+    return event -> {
+      ((DefaultFlowCallStack) event.getFlowCallStack())
+          .push(new FlowStackElement(getLocation().getLocation() + "[before next]", null));
+    };
+  }
+
+  private Consumer<CoreEvent> popFlowFlowStackElement() {
+    return event -> {
+      ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
+    };
   }
 
 }

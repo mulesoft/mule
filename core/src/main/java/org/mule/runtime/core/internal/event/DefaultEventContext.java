@@ -147,10 +147,26 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
    *        depend on completion of source.
    */
-  public DefaultEventContext(FlowConstruct flow, ComponentLocation location,
-                             String correlationId,
+  public DefaultEventContext(FlowConstruct flow, ComponentLocation location, String correlationId,
                              Optional<CompletableFuture<Void>> externalCompletion) {
-    super(flow.getExceptionListener(), externalCompletion);
+    this(flow, flow.getExceptionListener(), location, correlationId, externalCompletion);
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *
+   * @param flow the flow that processes events of this context.
+   * @param exceptionHandler the exception handler that will deal with an error context. This will be used instead of the one from
+   *        the given {@code flow}
+   * @param location the location of the component that received the first message for this context.
+   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
+   *        context, if available.
+   * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
+   *        depend on completion of source.
+   */
+  public DefaultEventContext(FlowConstruct flow, FlowExceptionHandler exceptionHandler, ComponentLocation location,
+                             String correlationId, Optional<CompletableFuture<Void>> externalCompletion) {
+    super(exceptionHandler, externalCompletion);
     this.id = flow.getUniqueIdString();
     this.serverId = flow.getServerId();
     this.location = location;
