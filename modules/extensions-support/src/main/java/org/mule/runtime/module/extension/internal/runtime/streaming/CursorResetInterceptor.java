@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This interceptor tracks all the {@link Cursor cursors} that were resolved as parameters of a given operation
  * execution and the position they were in <b>before</b> the execution.
@@ -30,6 +33,7 @@ import java.util.Map;
  */
 public class CursorResetInterceptor implements Interceptor<OperationModel> {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(CursorResetInterceptor.class);
   private static final String CURSOR_POSITIONS = "CURSOR_POSITIONS";
 
   @Override
@@ -57,7 +61,10 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
           try {
             cursor.seek(position);
           } catch (IOException e) {
-            //figure this out
+            if (LOGGER.isWarnEnabled()) {
+              LOGGER.warn("Could not reset cursor back to position " + position + ". Inconsistencies might occur if "
+                              + "reconnection attempted", e);
+            }
           }
         });
       }
