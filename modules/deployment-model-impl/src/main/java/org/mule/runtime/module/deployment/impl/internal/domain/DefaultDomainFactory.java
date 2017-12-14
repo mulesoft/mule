@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Domain> {
 
@@ -144,7 +143,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     DomainDescriptor domainDescriptor = findDomain(domainName, deploymentProperties);
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors =
-        domainDescriptor.getPlugins().stream().collect(Collectors.toList());
+        domainDescriptor.getPlugins().stream().collect(toList());
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(artifactPluginDescriptors);
 
@@ -152,7 +151,8 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
         domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();
     MuleDeployableArtifactClassLoader domainClassLoader =
         artifactClassLoaderBuilder
-            .addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors.toArray(new ArtifactPluginDescriptor[0]))
+            .addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors
+                .toArray(new ArtifactPluginDescriptor[resolvedArtifactPluginDescriptors.size()]))
             .setArtifactId(domainDescriptor.getName()).setArtifactDescriptor(domainDescriptor).build();
 
     List<ArtifactPlugin> artifactPlugins =
