@@ -21,6 +21,21 @@ public final class HttpResponseBuilder extends HttpMessageBuilder<HttpResponseBu
   private ResponseStatus responseStatus = new ResponseStatus();
 
   /**
+   * Instantiates a builder that has as starting point another {@link HttpResponse}
+   *
+   * @param httpResponse the {@link HttpResponse} to configure this builder with.
+   */
+  public HttpResponseBuilder(HttpResponse httpResponse) {
+    super(httpResponse);
+    responseStatus(httpResponse);
+  }
+
+  private void responseStatus(HttpResponse httpResponse) {
+    statusCode(httpResponse.getStatusCode());
+    reasonPhrase(httpResponse.getReasonPhrase());
+  }
+
+  /**
    * @param statusCode the HTTP status line code desired for the {@link HttpResponse}
    * @return this builder
    */
