@@ -63,7 +63,7 @@ public class DomainClassLoaderBuilder extends AbstractArtifactClassLoaderBuilder
 
   @Override
   protected String getArtifactId(ArtifactDescriptor artifactDescriptor) {
-    return getDomainId(artifactDescriptor.getName());
+    return getDomainId(((DomainDescriptor) artifactDescriptor).getDataFolderName());
   }
 
   /**

@@ -21,22 +21,17 @@ import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleAppsDir;
-
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
-
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
-import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +43,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
+import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Deployer of an artifact within mule container. - Keeps track of deployed artifacts - Avoid already deployed artifacts to be
@@ -66,12 +66,13 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   private final File artifactDir;
   private final ObservableList<T> artifacts;
   private final ArtifactDeploymentTemplate deploymentTemplate;
-  private ArtifactFactory<T> artifactFactory;
+  private AbstractDeployableArtifactFactory<T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
   private MuleContextListenerFactory muleContextListenerFactory;
 
 
-  public DefaultArchiveDeployer(final ArtifactDeployer deployer, final ArtifactFactory artifactFactory,
+  public DefaultArchiveDeployer(final ArtifactDeployer deployer,
+                                final AbstractDeployableArtifactFactory artifactFactory,
                                 final ObservableList<T> artifacts,
                                 ArtifactDeploymentTemplate deploymentTemplate,
                                 MuleContextListenerFactory muleContextListenerFactory) {
@@ -124,18 +125,18 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     return artifactFactory.getArtifactDir();
   }
 
-  private void undeployArtifactIfItsAPatch(T artifact) {
-    Optional<T> foundMatchingArtifact = isPatchedArtifact(artifact);
+  private void undeployArtifactIfItsAPatch(DeployableArtifactDescriptor artifactDescriptor) {
+    Optional<T> foundMatchingArtifact = isPatchedArtifact(artifactDescriptor);
     foundMatchingArtifact.ifPresent(this::undeployArtifactWithoutRemovingData);
   }
 
-  private Optional<T> isPatchedArtifact(T artifact) {
+  private Optional<T> isPatchedArtifact(DeployableArtifactDescriptor artifactDescriptor) {
     return artifacts.stream()
         .filter(deployedArtifact -> deployedArtifact.getDescriptor().getBundleDescriptor() != null)
-        .filter(deployedArtifact -> !artifactZombieMap.containsKey(artifact.getArtifactName()))
+        .filter(deployedArtifact -> !artifactZombieMap.containsKey(artifactDescriptor.getName()))
         .filter(deployedArtifact -> {
           BundleDescriptor deployedBundleDescriptor = deployedArtifact.getDescriptor().getBundleDescriptor();
-          BundleDescriptor artifactBundleDescriptor = artifact.getDescriptor().getBundleDescriptor();
+          BundleDescriptor artifactBundleDescriptor = artifactDescriptor.getBundleDescriptor();
           if (artifactBundleDescriptor != null
               && deployedBundleDescriptor.getGroupId().equals(artifactBundleDescriptor.getGroupId())
               && deployedBundleDescriptor.getArtifactId().equals(artifactBundleDescriptor.getArtifactId())) {
@@ -194,7 +195,11 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public void setArtifactFactory(final ArtifactFactory<T> artifactFactory) {
-    this.artifactFactory = artifactFactory;
+    if (!(artifactFactory instanceof AbstractDeployableArtifactFactory)) {
+      throw new IllegalArgumentException("artifactFactory is expected to be of type "
+          + AbstractDeployableArtifactFactory.class.getName());
+    }
+    this.artifactFactory = (AbstractDeployableArtifactFactory<T>) artifactFactory;
   }
 
   @Override
@@ -252,7 +257,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       artifact = createArtifact(artifactLocation, deploymentProperties);
 
       // Skips the exploded artifact if it corresponds to an already deployed packaged one
-      if (isPatchedArtifact(artifact).isPresent()) {
+      if (isPatchedArtifact(artifact.getDescriptor()).isPresent()) {
 
         if (artifactLocation.exists() && !deleteTree(artifactLocation)) {
           throw new IOException("Cannot delete existing folder " + artifactLocation);
@@ -363,8 +368,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       throw e;
     } catch (IOException e) {
       deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
-      throw new DeploymentException(I18nMessageFactory
-          .createStaticMessage("Failed undeploying artifact " + artifact.getArtifactName()), e);
+      throw new DeploymentException(
+                                    createStaticMessage("Failed undeploying artifact " + artifact.getArtifactName()), e);
     }
   }
 
@@ -520,8 +525,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
       T artifact;
       try {
+        DeployableArtifactDescriptor artifactDescriptor =
+            artifactFactory.createArtifactDescriptor(artifactLocation, appProperties);
+        undeployArtifactIfItsAPatch(artifactDescriptor);
         artifact = createArtifact(artifactLocation, appProperties);
-        undeployArtifactIfItsAPatch(artifact);
         trackArtifact(artifact);
       } catch (Throwable t) {
         String artifactName = artifactLocation.getName();

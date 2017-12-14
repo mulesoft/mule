@@ -16,6 +16,7 @@ import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClas
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
@@ -24,9 +25,10 @@ import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilde
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
+import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +37,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-public class DefaultDomainFactory implements ArtifactFactory<Domain> {
+public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Domain> {
 
   private final DomainManager domainManager;
   private final DomainDescriptorFactory domainDescriptorFactory;
@@ -64,7 +66,11 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
                               ServiceRepository serviceRepository,
                               PluginDependenciesResolver pluginDependenciesResolver,
                               DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
-                              ExtensionModelLoaderManager extensionModelLoaderManager) {
+                              ExtensionModelLoaderManager extensionModelLoaderManager,
+                              LicenseValidator licenseValidator) {
+
+    super(licenseValidator);
+
     checkArgument(domainDescriptorFactory != null, "domainDescriptorFactory cannot be null");
     checkArgument(domainManager != null, "Domain manager cannot be null");
     checkArgument(serviceRepository != null, "Service repository cannot be null");
@@ -79,30 +85,6 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
     this.pluginDependenciesResolver = pluginDependenciesResolver;
     this.domainClassLoaderBuilderFactory = domainClassLoaderBuilderFactory;
     this.extensionModelLoaderManager = extensionModelLoaderManager;
-  }
-
-  public Domain createArtitact(DomainDescriptor descriptor) throws IOException {
-    List<ArtifactPluginDescriptor> artifactPluginDescriptors = descriptor.getPlugins().stream().collect(Collectors.toList());
-    List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
-        pluginDependenciesResolver.resolve(artifactPluginDescriptors);
-
-    DomainClassLoaderBuilder artifactClassLoaderBuilder =
-        domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();
-    MuleDeployableArtifactClassLoader domainClassLoader =
-        artifactClassLoaderBuilder
-            .addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors.toArray(new ArtifactPluginDescriptor[0]))
-            .setArtifactId(descriptor.getName()).setArtifactDescriptor(descriptor).build();
-
-    List<ArtifactPlugin> artifactPlugins =
-        createArtifactPluginList(domainClassLoader, resolvedArtifactPluginDescriptors);
-
-    DefaultMuleDomain defaultMuleDomain =
-        new DefaultMuleDomain(descriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-                              extensionModelLoaderManager);
-
-    DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
-    domainManager.addDomain(domainWrapper);
-    return domainWrapper;
   }
 
   private DomainDescriptor findDomain(String domainName, Optional<Properties> deploymentProperties) throws IOException {
@@ -149,7 +131,7 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
   }
 
   @Override
-  public Domain createArtifact(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
+  protected Domain doCreateArtifact(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
     String domainName = domainLocation.getName();
     Domain domain = domainManager.getDomain(domainName);
     if (domain != null) {
@@ -159,7 +141,34 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
       throw new IllegalArgumentException("Mule domain name may not contain spaces: " + domainName);
     }
 
-    return createArtitact(findDomain(domainName, deploymentProperties));
+    DomainDescriptor domainDescriptor = findDomain(domainName, deploymentProperties);
 
+    List<ArtifactPluginDescriptor> artifactPluginDescriptors =
+        domainDescriptor.getPlugins().stream().collect(Collectors.toList());
+    List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
+        pluginDependenciesResolver.resolve(artifactPluginDescriptors);
+
+    DomainClassLoaderBuilder artifactClassLoaderBuilder =
+        domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();
+    MuleDeployableArtifactClassLoader domainClassLoader =
+        artifactClassLoaderBuilder
+            .addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors.toArray(new ArtifactPluginDescriptor[0]))
+            .setArtifactId(domainDescriptor.getName()).setArtifactDescriptor(domainDescriptor).build();
+
+    List<ArtifactPlugin> artifactPlugins =
+        createArtifactPluginList(domainClassLoader, resolvedArtifactPluginDescriptors);
+
+    DefaultMuleDomain defaultMuleDomain =
+        new DefaultMuleDomain(domainDescriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
+                              extensionModelLoaderManager);
+
+    DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
+    domainManager.addDomain(domainWrapper);
+    return domainWrapper;
+  }
+
+  @Override
+  public DeployableArtifactDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
+    return domainDescriptorFactory.create(artifactLocation, deploymentProperties);
   }
 }

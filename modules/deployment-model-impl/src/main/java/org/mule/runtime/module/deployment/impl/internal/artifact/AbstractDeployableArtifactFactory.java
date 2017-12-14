@@ -7,9 +7,8 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.validateArtifactLicense;
-import static java.util.Optional.empty;
-
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -54,6 +53,16 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
    * @throws IOException if there was a problem reading the content of the artifact.
    */
   protected abstract T doCreateArtifact(File artifactDir, Optional<Properties> properties) throws IOException;
+
+  /**
+   * Creates the artifact descriptor of the artifact.
+   *
+   * @param artifactLocation the artifact location
+   * @param deploymentProperties the artifact deployment properties
+   * @return the artifact descriptor
+   */
+  public abstract DeployableArtifactDescriptor createArtifactDescriptor(File artifactLocation,
+                                                                        Optional<Properties> deploymentProperties);
 
 
 }
