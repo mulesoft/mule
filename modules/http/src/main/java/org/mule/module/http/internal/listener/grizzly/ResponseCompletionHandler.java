@@ -97,7 +97,7 @@ public class ResponseCompletionHandler
         if (!contentSend)
         {
             contentSend = true;
-            isDone = !httpResponsePacket.isChunked();
+            isDone = httpResponsePacket.getRequest().getMethod().equals(HEAD) || !httpResponsePacket.isChunked();
             ctx.write(httpResponseContent, this);
             return;
         }
@@ -118,9 +118,6 @@ public class ResponseCompletionHandler
             if (!isDone)
             {
                 sendResponse();
-                if(isDone && httpResponsePacket.getRequest().getMethod().equals(HEAD)){
-                    doComplete();
-                }
             }
             else
             {

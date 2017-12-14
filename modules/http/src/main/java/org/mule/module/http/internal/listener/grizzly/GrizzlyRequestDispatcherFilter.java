@@ -11,6 +11,7 @@ import static org.glassfish.grizzly.http.util.HttpStatus.CONINTUE_100;
 import static org.glassfish.grizzly.http.util.HttpStatus.EXPECTATION_FAILED_417;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.DROPPED;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.mule.module.http.api.HttpConstants.Methods.HEAD;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
@@ -109,7 +110,7 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
                 try
                 {
                     //If the HTTP Method is HEAD we don't want to process the whole body only to be discarted later
-                    if(httpRequest.getMethod().equals("HEAD"))
+                    if(httpRequest.getMethod().equals(HEAD.name()))
                     {
                         if (httpResponse.getEntity() instanceof InputStreamHttpEntity)
                         {
