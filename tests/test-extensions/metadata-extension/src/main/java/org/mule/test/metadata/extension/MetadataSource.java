@@ -45,6 +45,6 @@ public class MetadataSource extends Source<Map<String, Object>, StringAttributes
 
   @Override
   public void onStop() {
-
+    STARTED = false;
   }
 }
