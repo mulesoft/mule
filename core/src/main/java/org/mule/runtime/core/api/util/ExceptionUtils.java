@@ -7,13 +7,11 @@
 package org.mule.runtime.core.api.util;
 
 import static java.lang.System.lineSeparator;
-import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -21,8 +19,10 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
@@ -185,11 +185,23 @@ public class ExceptionUtils {
       return of((T) throwable);
     }
 
-    if (throwable == null || !containsType(throwable, throwableType)) {
+    if (throwable == null) {
       return empty();
     }
 
-    return (Optional<T>) stream(getThrowables(throwable)).filter(throwableType::isInstance).findFirst();
+    Set<Throwable> causes = new HashSet<>();
+
+    for (throwable = throwable.getCause(); throwable != null; throwable = throwable.getCause()) {
+      if (!causes.add(throwable)) {
+        return empty();
+      }
+
+      if (throwableType.isInstance(throwable)) {
+        return of((T) throwable);
+      }
+    }
+
+    return empty();
   }
 
   /**

@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import org.mule.runtime.api.exception.MuleException;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.stream.Collectors.toMap;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
@@ -17,6 +20,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -33,7 +37,7 @@ import java.util.Optional;
  */
 public class LazyExecutionContext<M extends ComponentModel> implements EventedExecutionContext<M> {
 
-  private final Map<String, ValueResolver<?>> valueResolvers;
+  private final Map<String, LazyValue<Object>> valueResolvers;
   private final M componentModel;
   private final ExtensionModel extensionModel;
   private final ValueResolvingContext resolvingContext;
@@ -41,10 +45,21 @@ public class LazyExecutionContext<M extends ComponentModel> implements EventedEx
   public LazyExecutionContext(ResolverSet resolverSet, M componentModel, ExtensionModel extensionModel,
                               ValueResolvingContext resolvingContext) {
 
-    this.valueResolvers = resolverSet.getResolvers();
+    this.resolvingContext = resolvingContext;
+    this.valueResolvers = getValueResolvers(resolverSet);
     this.componentModel = componentModel;
     this.extensionModel = extensionModel;
-    this.resolvingContext = resolvingContext;
+  }
+
+  private Map<String, LazyValue<Object>> getValueResolvers(ResolverSet resolverSet) {
+    Map<String, LazyValue<Object>> valueResolvers = new HashMap<>();
+    resolverSet.getResolvers().forEach((key, resolver) -> valueResolvers.put(key, lazy(resolver)));
+
+    return valueResolvers;
+  }
+
+  private LazyValue<Object> lazy(ValueResolver resolver) {
+    return new LazyValue((CheckedSupplier) () -> resolver.resolve(resolvingContext));
   }
 
   /**
@@ -61,14 +76,19 @@ public class LazyExecutionContext<M extends ComponentModel> implements EventedEx
   @Override
   public <T> T getParameter(String parameterName) {
     if (hasParameter(parameterName)) {
-      try {
-        return (T) valueResolvers.get(parameterName).resolve(resolvingContext);
-      } catch (MuleException e) {
-        throw new RuntimeException(e);
-      }
+      return (T) valueResolvers.get(parameterName).get();
     } else {
       throw new NoSuchElementException();
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Map<String, Object> getParameters() {
+    return unmodifiableMap(valueResolvers.entrySet().stream()
+        .collect(toMap(entry -> entry.getKey(), entry -> entry.getValue().get())));
   }
 
   /**

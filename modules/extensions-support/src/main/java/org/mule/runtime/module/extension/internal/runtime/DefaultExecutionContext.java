@@ -7,23 +7,23 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
@@ -129,6 +129,14 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     } else {
       throw new NoSuchElementException(parameterName);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Map<String, Object> getParameters() {
+    return unmodifiableMap(parameters);
   }
 
   /**

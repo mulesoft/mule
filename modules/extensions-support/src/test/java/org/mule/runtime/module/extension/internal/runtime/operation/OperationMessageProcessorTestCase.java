@@ -48,7 +48,6 @@ import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataReso
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
@@ -85,18 +84,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
+import com.google.common.reflect.TypeToken;
+
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-
-import com.google.common.reflect.TypeToken;
-import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -484,11 +478,10 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   private void setUpValueResolvers() throws MuleException {
-    final Map<String, ValueResolver<?>> valueResolvers = mock(Map.class);
+    final Map<String, ValueResolver<?>> valueResolvers = new HashMap<>();
     when(resolverSet.getResolvers()).thenReturn(valueResolvers);
     final ValueResolver valueResolver = mock(ValueResolver.class);
-    when(valueResolvers.get(eq(SOME_PARAM_NAME))).thenReturn(valueResolver);
-    when(valueResolvers.containsKey(eq(SOME_PARAM_NAME))).thenReturn(true);
+    valueResolvers.put(SOME_PARAM_NAME, valueResolver);
     when(valueResolver.resolve(any(ValueResolvingContext.class))).thenReturn("person");
   }
 
