@@ -20,6 +20,17 @@ public class HttpResponseBuilder
     private ResponseStatus responseStatus = new ResponseStatus();
     private HttpEntity body;
 
+    public HttpResponseBuilder(HttpResponse httpResponse)
+    {
+        setResponseStatus(httpResponse);
+        setHeaders(httpResponse);
+        setEntity(httpResponse.getEntity());
+    }
+
+    public HttpResponseBuilder()
+    {
+    }
+
     public HttpResponseBuilder addHeader(String name, Object value)
     {
         headers.put(name, value);
@@ -58,6 +69,23 @@ public class HttpResponseBuilder
     public HttpResponse build()
     {
         return new DefaultHttpResponse(responseStatus, headers, body);
+    }
+
+    private void setResponseStatus(HttpResponse httpResponse)
+    {
+        setReasonPhrase(httpResponse.getReasonPhrase());
+        setStatusCode(httpResponse.getStatusCode());
+    }
+
+    private void setHeaders(HttpResponse httpResponse)
+    {
+        for(String headerName : httpResponse.getHeaderNames())
+        {
+            for(String headerValue : httpResponse.getHeaderValues(headerName))
+            {
+                addHeader(headerName, headerValue);
+            }
+        }
     }
 
 }

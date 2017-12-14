@@ -52,7 +52,7 @@ public class HttpListenerCloseConnectionOnHeadRequestTestCase extends Functional
             {
                 try
                 {
-                    return socket.getInputStream().read(readBuffer) == -1;
+                    return  socket.getInputStream().read(readBuffer) == -1;
                 }
                 catch (IOException e)
                 {

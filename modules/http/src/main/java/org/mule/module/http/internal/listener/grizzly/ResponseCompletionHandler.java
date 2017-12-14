@@ -6,7 +6,9 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static org.glassfish.grizzly.http.Method.HEAD;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
@@ -116,17 +118,24 @@ public class ResponseCompletionHandler
             if (!isDone)
             {
                 sendResponse();
+                if(isDone && httpResponsePacket.getRequest().getMethod().equals(HEAD)){
+                    doComplete();
+                }
             }
             else
             {
-                ctx.notifyDownstream(HttpServerFilter.RESPONSE_COMPLETE_EVENT);
-                resume();
+                doComplete();
             }
         }
         catch (IOException e)
         {
             failed(e);
         }
+    }
+
+    public void doComplete(){
+        ctx.notifyDownstream(HttpServerFilter.RESPONSE_COMPLETE_EVENT);
+        resume();
     }
 
     /**
