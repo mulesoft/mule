@@ -34,6 +34,7 @@ import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassL
 import org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.TrackingDeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationPluginDescriptorsResolver;
@@ -142,8 +143,13 @@ public class MuleArtifactResourcesRegistry {
         new ArtifactPluginDescriptorFactory();
     artifactPluginDescriptorLoader = new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
     descriptorLoaderRepository = new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
-    domainDescriptorFactory = new DomainDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
-    applicationDescriptorFactory = new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
+
+    ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder = ArtifactDescriptorValidatorBuilder.builder();
+
+    domainDescriptorFactory = new DomainDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
+                                                          artifactDescriptorValidatorBuilder);
+    applicationDescriptorFactory = new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
+                                                                    artifactDescriptorValidatorBuilder);
     DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()));
     pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
@@ -159,7 +165,8 @@ public class MuleArtifactResourcesRegistry {
         ServiceManager.create(new DefaultServiceDiscoverer(
                                                            new FileSystemServiceProviderDiscoverer(containerClassLoader,
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
-                                                                                                   descriptorLoaderRepository),
+                                                                                                   descriptorLoaderRepository,
+                                                                                                   artifactDescriptorValidatorBuilder),
                                                            new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
     domainFactory =

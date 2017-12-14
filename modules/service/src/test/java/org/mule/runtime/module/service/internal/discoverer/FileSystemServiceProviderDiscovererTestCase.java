@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
@@ -28,13 +29,15 @@ import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.runtime.module.service.internal.artifact.ServiceClassLoaderFactory;
+import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 
@@ -53,6 +56,8 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
   public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
   private ArtifactClassLoader containerClassLoader = mock(ArtifactClassLoader.class);
   private DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
+  private ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder = mock(ArtifactDescriptorValidatorBuilder.class);
+  private ArtifactDescriptorValidator artifactDescriptorValidator = mock(ArtifactDescriptorValidator.class);
 
   @Before
   public void setUp() throws Exception {
@@ -65,12 +70,16 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
         .thenReturn(mock(BundleDescriptorLoader.class));
     when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(ClassLoaderModelLoader.class))))
         .thenReturn(mock(ClassLoaderModelLoader.class));
+
+    when(artifactDescriptorValidatorBuilder.build()).thenReturn(artifactDescriptorValidator);
+    doNothing().when(artifactDescriptorValidator).validate(anyObject());
   }
 
   @Test
   public void discoversNoServices() throws Exception {
     final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
-        new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository);
+        new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
+                                                artifactDescriptorValidatorBuilder);
 
     final List<Pair<ArtifactClassLoader, ServiceProvider>> discover = serviceProviderDiscoverer.discover();
 
@@ -88,7 +97,8 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
                                                                                                                               ClassLoaderLookupPolicy.class))))
                                                                                                                                   .thenReturn(serviceClassLoader);
     final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
-        new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository);
+        new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
+                                                artifactDescriptorValidatorBuilder);
 
     final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProvidersPairs = serviceProviderDiscoverer.discover();
 
@@ -109,7 +119,8 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
                                                                                                                               ClassLoaderLookupPolicy.class))))
                                                                                                                                   .thenReturn(serviceClassLoader);
     final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
-        new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository);
+        new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
+                                                artifactDescriptorValidatorBuilder);
 
     serviceProviderDiscoverer.discover();
   }

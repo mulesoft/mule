@@ -14,8 +14,10 @@ import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerialize
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 
 import java.io.File;
 import java.util.Optional;
@@ -30,9 +32,12 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
    * Creates a new factory
    *
    * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
    */
-  public ServiceDescriptorFactory(DescriptorLoaderRepository descriptorLoaderRepository) {
-    super(descriptorLoaderRepository);
+  public ServiceDescriptorFactory(DescriptorLoaderRepository descriptorLoaderRepository,
+                                  ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
+    super(descriptorLoaderRepository,
+          artifactDescriptorValidatorBuilder.doNotFailIfBundleDescriptorNotPresentWhenValidationVersionFormat());
   }
 
   @Override
@@ -47,13 +52,6 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
     }
 
     return super.create(artifactFolder, properties);
-  }
-
-  @Override
-  protected void validateVersion(ServiceDescriptor descriptor) {
-    if (descriptor.getBundleDescriptor() != null) {
-      super.validateVersion(descriptor);
-    }
   }
 
   @Override

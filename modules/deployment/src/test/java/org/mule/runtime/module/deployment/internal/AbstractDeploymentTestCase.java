@@ -101,6 +101,7 @@ import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.TestDeploymentListener;
@@ -419,7 +420,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                           new PolicyTemplateDescriptorFactory(
                                                                               muleArtifactResourcesRegistry
                                                                                   .getArtifactPluginDescriptorLoader(),
-                                                                              createDescriptorLoaderRepository()));
+                                                                              createDescriptorLoaderRepository(),
+                                                                              ArtifactDescriptorValidatorBuilder.builder()));
     // Reset test component state
     invocationCount = 0;
     policyParametrization = "";

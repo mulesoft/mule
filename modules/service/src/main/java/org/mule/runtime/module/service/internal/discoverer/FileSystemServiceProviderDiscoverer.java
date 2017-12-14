@@ -18,13 +18,14 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.ServiceProvider;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
@@ -45,6 +46,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   private final ArtifactClassLoader apiClassLoader;
   private final ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory;
   private final DescriptorLoaderRepository descriptorLoaderRepository;
+  private final ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder;
 
   /**
    * Creates a new instance.
@@ -52,20 +54,25 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
    * @param containerClassLoader container artifact classLoader. Non null.
    * @param serviceClassLoaderFactory factory used to create service's classloaders. Non null.
    * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
    */
   public FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
                                              ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
-                                             DescriptorLoaderRepository descriptorLoaderRepository) {
+                                             DescriptorLoaderRepository descriptorLoaderRepository,
+                                             ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     this.descriptorLoaderRepository = descriptorLoaderRepository;
     checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
     checkArgument(serviceClassLoaderFactory != null, "serviceClassLoaderFactory cannot be null");
+    checkArgument(artifactDescriptorValidatorBuilder != null, "artifactDescriptorValidatorBuilder cannot be null");
     this.apiClassLoader = containerClassLoader;
     this.serviceClassLoaderFactory = serviceClassLoaderFactory;
+    this.artifactDescriptorValidatorBuilder = artifactDescriptorValidatorBuilder;
   }
 
   @Override
   public List<Pair<ArtifactClassLoader, ServiceProvider>> discover() throws ServiceResolutionError {
-    final ServiceDescriptorFactory serviceDescriptorFactory = new ServiceDescriptorFactory(descriptorLoaderRepository);
+    final ServiceDescriptorFactory serviceDescriptorFactory =
+        new ServiceDescriptorFactory(descriptorLoaderRepository, artifactDescriptorValidatorBuilder);
 
     final List<ServiceDescriptor> serviceDescriptors = new LinkedList<>();
 

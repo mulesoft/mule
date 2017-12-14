@@ -9,20 +9,12 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static org.mule.runtime.api.deployment.meta.Product.getProductByName;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.meta.MuleVersion.NO_REVISION;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductName;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
-import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -47,15 +39,24 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
   public static final String ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR = "Artifact descriptor does not exists: ";
   protected final DescriptorLoaderRepository descriptorLoaderRepository;
+  private ArtifactDescriptorValidator artifactDescriptorValidator;
 
   /**
    * Creates a new factory
    *
    * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
    */
-  public AbstractArtifactDescriptorFactory(DescriptorLoaderRepository descriptorLoaderRepository) {
+  public AbstractArtifactDescriptorFactory(DescriptorLoaderRepository descriptorLoaderRepository,
+                                           ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     checkArgument(descriptorLoaderRepository != null, "descriptorLoaderRepository cannot be null");
     this.descriptorLoaderRepository = descriptorLoaderRepository;
+
+    this.artifactDescriptorValidator = artifactDescriptorValidatorBuilder
+        .validateMinMuleVersion()
+        .validateMuleProduct()
+        .validateVersionFormat()
+        .build();
   }
 
   @Override
@@ -111,39 +112,9 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
     doDescriptorConfig(artifactModel, descriptor, artifactLocation);
 
-    validate(descriptor);
+    artifactDescriptorValidator.validate(descriptor);
+
     return descriptor;
-  }
-
-  private void validate(T descriptor) {
-    MuleVersion minMuleVersion = descriptor.getMinMuleVersion();
-    MuleVersion runtimeVersion = new MuleVersion(getProductVersion());
-    runtimeVersion = new MuleVersion(runtimeVersion.toCompleteNumericVersion().replace("-" + runtimeVersion.getSuffix(), ""));
-    if (runtimeVersion.priorTo(minMuleVersion)) {
-      throw new MuleRuntimeException(
-                                     createStaticMessage("Artifact %s requires a newest runtime version. Artifact required version is %s and Mule Runtime version is %s",
-                                                         descriptor.getName(),
-                                                         descriptor.getMinMuleVersion().toCompleteNumericVersion(),
-                                                         runtimeVersion.toCompleteNumericVersion()));
-    }
-    Product requiredProduct = descriptor.getRequiredProduct();
-    Product runtimeProduct = getProductByName(getProductName());
-    if (!runtimeProduct.supports(requiredProduct)) {
-      throw new MuleRuntimeException(createStaticMessage("The artifact %s requires a different runtime. The artifact required runtime is %s and the runtime is %s",
-                                                         descriptor.getName(), descriptor.getRequiredProduct().name(),
-                                                         runtimeProduct.name()));
-    }
-    validateVersion(descriptor);
-  }
-
-  protected void validateVersion(T descriptor) {
-    String bundleDescriptorVersion = descriptor.getBundleDescriptor().getVersion();
-    checkState(bundleDescriptorVersion != null,
-               format("No version specified in the bundle descriptor of the artifact %s", descriptor.getName()));
-    MuleVersion artifactVersion = new MuleVersion(bundleDescriptorVersion);
-    checkState(artifactVersion.getRevision() != NO_REVISION,
-               format("Artifact %s version %s must contain a revision number. The version format must be x.y.z and the z part is missing",
-                      descriptor.getName(), artifactVersion));
   }
 
   /**

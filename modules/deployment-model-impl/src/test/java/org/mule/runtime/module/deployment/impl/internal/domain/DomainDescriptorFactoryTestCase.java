@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactDescriptorFactoryTestCase;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
@@ -25,7 +26,7 @@ public class DomainDescriptorFactoryTestCase
   protected DomainDescriptor createArtifactDescriptor(String domainPath) throws URISyntaxException {
     final DomainDescriptorFactory DomainDescriptorFactory =
         new DomainDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                    createDescriptorLoaderRepository());
+                                    createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
 
     return DomainDescriptorFactory.create(getArtifact(domainPath), empty());
   }
@@ -59,7 +60,7 @@ public class DomainDescriptorFactoryTestCase
   protected DomainDescriptor createArtifactDescriptor() {
     final DomainDescriptorFactory artifactDescriptorFactory =
         new DomainDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                    createDescriptorLoaderRepository());
+                                    createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
 
     return artifactDescriptorFactory.create(getArtifactFolder(), empty());
   }
