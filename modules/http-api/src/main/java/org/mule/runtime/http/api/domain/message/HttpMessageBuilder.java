@@ -29,6 +29,19 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
   protected MultiMap<String, String> headers = new CaseInsensitiveMultiMap();
   protected HttpEntity entity = new EmptyHttpEntity();
 
+  protected HttpMessageBuilder() {}
+
+  protected HttpMessageBuilder(HttpMessage httpMessage) {
+    entity(httpMessage.getEntity());
+    headers(httpMessage);
+  }
+
+  private void headers(HttpMessage httpMessage) {
+    for (String headerName : httpMessage.getHeaderNames()) {
+      headers.put(headerName, httpMessage.getHeaderValues(headerName));
+    }
+  }
+
   /**
    * @param entity the {@link HttpEntity} that should be used as body for the {@link HttpMessage}. Non null.
    * @return this builder
