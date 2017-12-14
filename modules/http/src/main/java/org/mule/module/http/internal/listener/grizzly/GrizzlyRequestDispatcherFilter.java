@@ -11,6 +11,7 @@ import static org.glassfish.grizzly.http.util.HttpStatus.CONINTUE_100;
 import static org.glassfish.grizzly.http.util.HttpStatus.EXPECTATION_FAILED_417;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.DROPPED;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.mule.module.http.api.HttpConstants.Methods.HEAD;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.api.HttpHeaders.Names.EXPECT;
@@ -31,10 +32,12 @@ import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.mule.module.http.api.HttpConstants.HttpStatus;
+import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.ClientConnection;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.module.http.internal.domain.response.HttpResponseBuilder;
 import org.mule.module.http.internal.listener.RequestHandlerProvider;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
 import org.mule.module.http.internal.listener.async.RequestHandler;
@@ -106,6 +109,15 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
             {
                 try
                 {
+                    //If the HTTP Method is HEAD we don't want to process the whole body only to be discarted later
+                    if(httpRequest.getMethod().equals(HEAD.name()))
+                    {
+                        if (httpResponse.getEntity() instanceof InputStreamHttpEntity)
+                        {
+                            ((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream().close();
+                        }
+                        httpResponse = new HttpResponseBuilder(httpResponse).setEntity(new EmptyHttpEntity()).build();
+                    }
                     if (httpResponse.getEntity() instanceof InputStreamHttpEntity)
                     {
                         new ResponseStreamingCompletionHandler(ctx, request, httpResponse, responseStatusCallback).start();
