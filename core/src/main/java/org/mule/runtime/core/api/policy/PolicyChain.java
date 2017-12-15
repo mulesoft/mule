@@ -109,15 +109,11 @@ public class PolicyChain extends AbstractComponent
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .doOnNext(pushBeforeNextFlowStackElement()
-            .andThen(e -> ((BaseEventContext) e.getContext())
-                .onResponse((ev, t) -> {
-                  popFlowFlowStackElement().accept(ev);
-                }))
+            .andThen(req -> ((BaseEventContext) req.getContext())
+                .onResponse(notificationHelper.successOrErrorNotification(PROCESS_END)
+                    .andThen((resp, t) -> popFlowFlowStackElement().accept(req))))
             .andThen(notificationHelper.notification(PROCESS_START)))
-        .transform(chainWithPs)
-        .doOnSuccess(notificationHelper.notification(PROCESS_END))
-        .doOnError(MessagingException.class, e -> popFlowFlowStackElement().accept(e.getEvent()))
-        .doOnError(MessagingException.class, notificationHelper.errorNotification(PROCESS_END));
+        .transform(chainWithPs);
   }
 
   private Consumer<CoreEvent> pushBeforeNextFlowStackElement() {

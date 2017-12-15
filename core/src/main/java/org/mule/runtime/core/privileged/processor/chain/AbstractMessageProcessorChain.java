@@ -23,7 +23,6 @@ import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentE
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Operators.lift;
 
 import org.mule.runtime.api.component.Component;
@@ -39,6 +38,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
@@ -56,6 +56,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -67,7 +68,6 @@ import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
 /**
@@ -78,6 +78,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private static final String TCCL_REACTOR_CTX_KEY = "mule.context.tccl";
   private static final String TCCL_ORIGINAL_REACTOR_CTX_KEY = "mule.context.tccl_original";
+  private static final String REACTOR_ON_OPERATOR_ERROR_LOCAL = "reactor.onOperatorError.local";
+  private static final String UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE =
+      "Unexpected state. Error handler should be invoked with either an Event instance or a MessagingException";
 
   private static Class<ClassLoader> appClClass;
 
@@ -123,7 +126,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     for (Processor processor : getProcessorsToExecute()) {
       // Perform assembly for processor chain by transforming the existing publisher with a publisher function for each processor
       // along with the interceptors that decorate it.
-      stream = stream.transform(applyInterceptors(interceptors, processor));
+      stream = stream.transform(applyInterceptors(interceptors, processor))
+          // #1 Register local error hook to wrap exceptions in a MessagingException maintaining failed event.
+          .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL, getLocalOperatorErrorHook(processor)))
+          // #2 Register continue error strategy to handle errors without stopping the stream.
+          .errorStrategyContinue(getContinueStrategyErrorHandler(processor));
     }
     return stream.subscriberContext(ctx -> {
       ClassLoader tccl = currentThread().getContextClassLoader();
@@ -136,6 +143,54 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             .put(TCCL_REACTOR_CTX_KEY, tccl.getParent());
       }
     });
+  }
+
+  /*
+   * Used to catch exceptions emitted by reactor operators and wrap these in a MessagingException while conserving a reference to
+   * the failed Event.
+   */
+  private BiFunction<Throwable, Object, Throwable> getLocalOperatorErrorHook(Processor processor) {
+    return (throwable, event) -> {
+      throwable = Exceptions.unwrap(throwable);
+      if (event instanceof CoreEvent) {
+        if (throwable instanceof MessagingException) {
+          return resolveMessagingException(processor).apply((MessagingException) throwable);
+        } else if (!(throwable instanceof RejectedExecutionException)) {
+          return resolveException((Component) processor, (CoreEvent) event, new FlowOverloadException(throwable));
+        } else {
+          return throwable;
+        }
+      } else {
+        return throwable;
+      }
+    };
+  }
+
+  /*
+   * Used to process failed events which are dropped from the reactor stream due to error. Errors are processed by invoking the
+   * current EventContext error callback.
+   */
+  private BiConsumer<Throwable, CoreEvent> getContinueStrategyErrorHandler(Processor processor) {
+    return (throwable, event) -> {
+      throwable = Exceptions.unwrap(throwable);
+      if (throwable instanceof MessagingException) {
+        // Give priority to failed event from reactor over MessagingException event.
+        BaseEventContext context = (BaseEventContext) (event != null ? event.getContext()
+            : ((MessagingException) throwable).getEvent().getContext());
+        context.error(resolveMessagingException(processor).apply((MessagingException) throwable));
+      } else {
+        if (event == null) {
+          LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
+          throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
+        }
+        BaseEventContext context = ((BaseEventContext) event.getContext());
+        if (throwable instanceof RejectedExecutionException) {
+          context.error(resolveException((Component) processor, event, new FlowOverloadException(throwable)));
+        } else {
+          context.error(resolveException((Component) processor, event, throwable));
+        }
+      }
+    };
   }
 
   private ReactiveProcessor applyInterceptors(List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted,
@@ -152,7 +207,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors =
         new ArrayList<>();
 
-    // #1 Update TCCL with the one from the Region of the processor to execute
+    // #1 Update TCCL with the one from the Region of the processor to execute once in execution thread.
     interceptors.add((processor, next) -> stream -> from(stream)
         .transform(doOnNextOrErrorWithContext(context -> context.getOrEmpty(TCCL_REACTOR_CTX_KEY)
             .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl))))
@@ -160,75 +215,40 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .transform(doOnNextOrErrorWithContext(context -> context.getOrEmpty(TCCL_ORIGINAL_REACTOR_CTX_KEY)
             .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl)))));
 
-    // #2 Update MessagingException with failing processor if required, create Error and set error context.
-    interceptors.add((processor, next) -> stream -> from(stream)
-        .concatMap(event -> just(event)
-            .transform(next)
-            .onErrorMap(MessagingException.class, resolveMessagingException(processor))
-            .onErrorMap(RejectedExecutionException.class,
-                        t -> resolveException((Component) processor, event, new FlowOverloadException(t.getMessage(), t)))
-            .onErrorMap(t -> !(t instanceof MessagingException),
-                        t -> resolveException((Component) processor, event, t))));
-
-    // #3 Update ThreadLocal event before processor execution once on processor thread.
+    // #2 Wrap execution, after processing strategy, on processor execution thread.
     interceptors.add((processor, next) -> stream -> from(stream)
         .cast(PrivilegedEvent.class)
-        .doOnNext(event -> currentMuleContext.set(muleContext))
-        .doOnNext(event -> setCurrentEvent(event))
+        .doOnNext(event -> {
+          currentMuleContext.set(muleContext);
+          setCurrentEvent(event);
+        })
         .cast(CoreEvent.class)
         .transform(next));
 
-    // #4 Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
+    // #3 Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
     if (processingStrategy != null) {
       interceptors.add((processor, next) -> processingStrategy.onProcessor(new InterceptedReactiveProcessor(processor, next)));
     }
 
-    // #5 Update ThreadLocal event after processor execution once back on flow thread.
-    interceptors.add((processor, next) -> stream -> from(stream)
-        .transform(next)
-        .cast(PrivilegedEvent.class)
-        .doOnNext(result -> setCurrentEvent(result))
-        .cast(CoreEvent.class));
-
-    // #6 Fire MessageProcessor notifications before and after processor execution.
+    // #4 Wrap execution, before processing strategy, on flow thread.
     interceptors.add((processor, next) -> stream -> from(stream)
         .cast(PrivilegedEvent.class)
         .doOnNext(preNotification(processor))
         .cast(CoreEvent.class)
         .transform(next)
         .cast(PrivilegedEvent.class)
-        .doOnNext(postNotification(processor))
+        .map(result -> {
+          postNotification(processor).accept(result);
+          setCurrentEvent(result);
+          // If the processor returns a CursorProvider, then have the StreamingManager manage it
+          return updateEventForStreaming(streamingManager).apply(result);
+        })
         .doOnError(MessagingException.class, errorNotification(processor))
         .cast(CoreEvent.class));
 
-    // #7 If the processor returns a CursorProvider, then have the StreamingManager manage it
-    interceptors.add((processor, next) -> stream -> from(stream)
-        .transform(next)
-        .map(updateEventForStreaming(streamingManager)));
-
-    // #8 Apply processor interceptors.
+    // #5 Apply processor interceptors around processor and other core logic
     interceptors.addAll(0, additionalInterceptors);
-
-    // #9 Handle errors that occur during Processor execution. This is done outside to any scheduling to ensure errors in
-    // scheduling such as RejectedExecutionException's can be handled cleanly.
-    interceptors.add((processor, next) -> stream -> from(stream)
-        .concatMap(event -> just(event)
-            .transform(next)
-            .doOnEach(signal -> currentMuleContext.set(null))
-            .onErrorResume(RejectedExecutionException.class,
-                           throwable -> Mono.from(((BaseEventContext) event.getContext())
-                               .error(resolveException((Component) processor, event, throwable)))
-                               .then(Mono.empty()))
-            // If we already got a MessagingException, avoid wrapping it again
-            .onErrorResume(MessagingException.class,
-                           throwable -> {
-                             throwable = resolveMessagingException(processor).apply(throwable);
-                             return Mono.from(((BaseEventContext) event.getContext()).error(throwable)).then(Mono.empty());
-                           })
-            .onErrorResume(throwable -> Mono
-                .from(((BaseEventContext) event.getContext()).error(resolveException((Component) processor, event, throwable)))
-                .then(Mono.empty()))));
 
     return interceptors;
   }
@@ -236,15 +256,17 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private Function<? super Publisher<CoreEvent>, ? extends Publisher<CoreEvent>> doOnNextOrErrorWithContext(Consumer<Context> contextConsumer) {
     return lift((scannable, subscriber) -> new CoreSubscriber<CoreEvent>() {
 
+      private Context context = subscriber.currentContext();
+
       @Override
       public void onNext(CoreEvent event) {
-        contextConsumer.accept(subscriber.currentContext());
+        contextConsumer.accept(context);
         subscriber.onNext(event);
       }
 
       @Override
       public void onError(Throwable throwable) {
-        contextConsumer.accept(subscriber.currentContext());
+        contextConsumer.accept(context);
         subscriber.onError(throwable);
       }
 
@@ -255,7 +277,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
       @Override
       public Context currentContext() {
-        return subscriber.currentContext();
+        return context;
       }
 
       @Override
