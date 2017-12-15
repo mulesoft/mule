@@ -31,6 +31,7 @@ import org.junit.Ignore;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(WORK_QUEUE)
+@Ignore("MULE-13478")
 public class TransactionAwareWorkQueueStreamProcessingStrategyTestCase extends WorkQueueStreamProcessingStrategyTestCase {
 
   public TransactionAwareWorkQueueStreamProcessingStrategyTestCase(Mode mode) {
