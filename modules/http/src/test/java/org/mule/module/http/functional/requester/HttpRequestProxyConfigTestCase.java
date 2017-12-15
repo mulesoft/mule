@@ -175,6 +175,15 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
                     Thread.yield();
                 }
 
+                try
+                {
+                    sleep(100);
+                }
+                catch (InterruptedException e)
+                {
+                    //Ignore exception
+                }
+
                 sc.close();
 
                 latch.release();
