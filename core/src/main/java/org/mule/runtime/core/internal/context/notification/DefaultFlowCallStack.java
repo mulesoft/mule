@@ -26,7 +26,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
 
   /**
    * Adds an element to the top of this stack
-   * 
+   *
    * @param flowStackElement the element to add
    */
   public void push(FlowStackElement flowStackElement) {
@@ -35,18 +35,20 @@ public class DefaultFlowCallStack implements FlowCallStack {
 
   /**
    * Adds a message processor path to the list of processors that were invoked as part of the processing of this stack's event.
-   * 
+   *
    * @param processorPath the path to mark as invoked.
    * @throws EmptyStackException if this stack is empty.
    */
   public void setCurrentProcessorPath(String processorPath) {
-    FlowStackElement topElement = innerStack.pop();
-    innerStack.push(new FlowStackElement(topElement.getFlowName(), processorPath));
+    if (!innerStack.empty()) {
+      FlowStackElement topElement = innerStack.pop();
+      innerStack.push(new FlowStackElement(topElement.getFlowName(), processorPath));
+    }
   }
 
   /**
    * Removes the top-most element from this stack.
-   * 
+   *
    * @return the top-most element of this stack.
    * @throws EmptyStackException if this stack is empty.
    */

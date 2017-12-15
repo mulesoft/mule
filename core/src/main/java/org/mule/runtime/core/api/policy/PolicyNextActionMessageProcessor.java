@@ -15,19 +15,24 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 
-import javax.inject.Inject;
-
 import org.reactivestreams.Publisher;
+
+import java.util.function.Consumer;
+
+import javax.inject.Inject;
 
 /**
  * Next-operation message processor implementation.
@@ -52,6 +57,20 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     return processToApply(event, this);
   }
 
+  private Consumer<CoreEvent> pushAfterNextFlowStackElement() {
+    return event -> ((DefaultFlowCallStack) event.getFlowCallStack())
+        .push(new FlowStackElement(toPolicyLocation(getLocation()), null));
+  }
+
+  private String toPolicyLocation(ComponentLocation componentLocation) {
+    return componentLocation.getParts().get(0).getPartPath() + "/" + componentLocation.getParts().get(1).getPartPath()
+        + "[after next]";
+  }
+
+  private Consumer<CoreEvent> popBeforeNextFlowFlowStackElement() {
+    return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
+  }
+
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
@@ -63,9 +82,9 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
           }
 
           return just(event)
-              .doOnNext(notificationHelper.notification(BEFORE_NEXT))
+              .doOnNext(popBeforeNextFlowFlowStackElement().andThen(notificationHelper.notification(BEFORE_NEXT)))
               .transform(nextOperation)
-              .doOnSuccess(notificationHelper.notification(AFTER_NEXT))
+              .doOnSuccess(pushAfterNextFlowStackElement().andThen(notificationHelper.notification(AFTER_NEXT)))
               .doOnError(MessagingException.class, notificationHelper.errorNotification(AFTER_NEXT));
         });
   }

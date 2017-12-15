@@ -48,7 +48,7 @@ public interface EventContextFactory {
 
   /**
    * Builds a new execution context with the given parameters.
-   * 
+   *
    * @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
@@ -61,7 +61,7 @@ public interface EventContextFactory {
 
   /**
    * Builds a new execution context with the given parameters and an empty publisher.
-   * 
+   *
    * @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
@@ -89,7 +89,24 @@ public interface EventContextFactory {
 
   /**
    * Builds a new execution context with the given parameters.
-   * 
+   *
+   * @param flow the flow that processes events of this context.
+   * @param exceptionHandler the exception handler that will deal with an error context. This will be used instead of the one from
+   *        the given {@code flow}
+   * @param location the location of the component that received the first message for this context.
+   * @param correlationId See {@link EventContext#getCorrelationId()}.
+   * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
+   *        depend on completion of source.
+   */
+  static EventContext create(FlowConstruct flow, FlowExceptionHandler exceptionHandler, ComponentLocation location,
+                             String correlationId,
+                             Optional<CompletableFuture<Void>> externalCompletion) {
+    return new DefaultEventContext(flow, exceptionHandler, location, correlationId, externalCompletion);
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *
    * @param id the unique id for this event context.
    * @param location the location of the component that received the first message for this context.
    * @param correlationId See {@link EventContext#getCorrelationId()}.

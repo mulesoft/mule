@@ -8,14 +8,12 @@ package org.mule.runtime.core.internal.policy;
 
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
@@ -25,13 +23,15 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import org.reactivestreams.Publisher;
 
 /**
  * {@link SourcePolicy} created from a list of {@link Policy}.
@@ -42,6 +42,8 @@ import org.reactivestreams.Publisher;
  */
 public class CompositeSourcePolicy extends
     AbstractCompositePolicy<SourcePolicyParametersTransformer, MessageSourceResponseParametersProcessor> implements SourcePolicy {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(LoggerFactory.class);
 
   private final Processor flowExecutionProcessor;
   private final SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
@@ -69,17 +71,17 @@ public class CompositeSourcePolicy extends
 
   /**
    * Executes the flow.
-   * 
+   *
    * If there's a {@link SourcePolicyParametersTransformer} provided then it will use it to convert the source response or source
    * failure response from the parameters back to a {@link Message} that can be routed through the policy chain which later will
    * be convert back to response or failure response parameters thus allowing the policy chain to modify the response.. That
    * message will be the result of the next-operation of the policy.
-   * 
+   *
    * If no {@link SourcePolicyParametersTransformer} is provided, then the same response from the flow is going to be routed as
    * response of the next-operation of the policy chain. In this case, the same response from the flow is going to be used to
    * generate the response or failure response for the source so the policy chain is not going to be able to modify the response
    * sent by the source.
-   * 
+   *
    * When the flow execution fails, it will create a {@link FlowExecutionException} instead of a regular
    * {@link MessagingException} to signal that the failure was through the the flow exception and not the policy logic.
    */
@@ -113,7 +115,8 @@ public class CompositeSourcePolicy extends
                                            messagingException.getInfo().get(INFO_ALREADY_LOGGED_KEY));
           }
           return flowExecutionException;
-        });
+        })
+        .doOnError(e -> LOGGER.error(e.getMessage(), e));
   }
 
   /**
@@ -127,11 +130,11 @@ public class CompositeSourcePolicy extends
 
   /**
    * Process the set of policies.
-   * 
+   * <p>
    * When there's a {@link SourcePolicyParametersTransformer} then the final set of parameters to be sent by the response function
    * and the error response function will be calculated based on the output of the policy chain. If there's no
    * {@link SourcePolicyParametersTransformer} then those parameters will be exactly the one defined by the message source.
-   * 
+   *
    * @param sourceEvent the event generated from the source.
    * @return a {@link Publisher} that emits {@link SourcePolicySuccessResult} which contains the response parameters and the
    *         result event of the execution or a {@link SourcePolicyFailureResult} which contains the failure response parameters
@@ -148,6 +151,7 @@ public class CompositeSourcePolicy extends
               .orElse(originalResponseParameters);
           return right(new SourcePolicySuccessResult(policiesResultEvent, responseParameters, getParametersProcessor()));
         })
+        .doOnError(e -> LOGGER.error(e.getMessage(), e))
         .onErrorResume(FlowExecutionException.class, e -> {
           Supplier<Map<String, Object>> responseParameters = () -> getParametersTransformer()
               .map(parametersTransformer -> concatMaps(originalFailureResponseParameters, parametersTransformer

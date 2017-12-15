@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.util.ComponentLocationProvider.resolveProcessorRepresentation;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -48,6 +49,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
@@ -189,6 +191,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         };
       }
       if (getLocation() != null) {
+        String resolveProcessorRepresentation =
+            resolveProcessorRepresentation(muleContext.getConfiguration().getId(), getLocation().getLocation(), this);
+
+        ((DefaultFlowCallStack) event.getFlowCallStack()).setCurrentProcessorPath(resolveProcessorRepresentation);
         return policyManager
             .createOperationPolicy(this, event, getResolutionResult(event, configuration), operationExecutionFunction)
             .process(event);

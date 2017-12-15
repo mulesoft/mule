@@ -32,6 +32,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -63,6 +64,8 @@ import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import org.reactivestreams.Publisher;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -70,7 +73,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -293,9 +295,8 @@ public class ModuleFlowProcessingPhase
   private Builder createEventBuilder(ComponentLocation sourceLocation, CompletableFuture responseCompletion,
                                      FlowConstruct flowConstruct, String correlationId, Message message) {
     return InternalEvent
-        .builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, correlationId,
-                        Optional.of(responseCompletion),
-                        NullExceptionHandler.getInstance()))
+        .builder(create(flowConstruct, NullExceptionHandler.getInstance(), sourceLocation, correlationId,
+                        Optional.of(responseCompletion)))
         .message(message);
   }
 
