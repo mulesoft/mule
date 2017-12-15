@@ -273,23 +273,22 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
                               Map<String, Pair<String, MetadataType>> unevaluatedMap) {
       unevaluatedMap.entrySet().stream()
           .forEach(entry -> {
-            final Object value = expressionManager.isExpression(entry.getValue().getFirst())
+            final TypedValue value = expressionManager.isExpression(entry.getValue().getFirst())
                 ? getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond())
-                : entry.getValue().getFirst();
+                : TypedValue.of(entry.getValue().getFirst());
 
-            builder.addVariable(entry.getKey(), value);
+            builder.addVariable(entry.getKey(), value.getValue(), value.getDataType());
 
           });
     }
 
-    private Object getEvaluatedValue(CoreEvent event, String value, MetadataType metadataType) {
+    private TypedValue getEvaluatedValue(CoreEvent event, String value, MetadataType metadataType) {
       ComponentLocation headLocation;
       final Processor head = getProcessorsToExecute().get(0);
       headLocation = ((Component) head).getLocation();
 
-      Object evaluatedResult;
       if (MetadataFormat.JAVA.equals(metadataType.getMetadataFormat())) {
-        evaluatedResult = expressionManager.evaluate(value, event, headLocation).getValue();
+        return expressionManager.evaluate(value, event, headLocation);
       } else {
         final String mediaType = metadataType.getMetadataFormat().getValidMimeTypes().iterator().next();
         final DataType expectedOutputType =
@@ -298,10 +297,9 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
                 .mediaType(mediaType)
                 .charset(UTF_8)
                 .build();
-        evaluatedResult = expressionManager
-            .evaluate(value, expectedOutputType, NULL_BINDING_CONTEXT, event, headLocation, false).getValue();
+        return expressionManager
+            .evaluate(value, expectedOutputType, NULL_BINDING_CONTEXT, event, headLocation, false);
       }
-      return evaluatedResult;
     }
   }
 }
