@@ -63,7 +63,7 @@ public class PolicyNotificationHelper {
 
   /**
    * Creates an exception {@link BiConsumer} that fires a notification using the specified action on success or error.
-   * Notifications are not fired if the {@link BiConsumer} receive an {@link CoreEvent} or a {@link MessagingException}.
+   * Notifications are not fired if the {@link BiConsumer} receives a {@link CoreEvent} or a {@link MessagingException}.
    *
    * @param action the action the notification is created with
    * @return the created consumer
