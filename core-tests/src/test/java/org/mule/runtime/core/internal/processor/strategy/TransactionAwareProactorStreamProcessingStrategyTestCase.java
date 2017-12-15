@@ -32,6 +32,7 @@ import org.junit.Ignore;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(DEFAULT)
+@Ignore("MULE-13478")
 public class TransactionAwareProactorStreamProcessingStrategyTestCase extends ProactorStreamProcessingStrategyTestCase {
 
   public TransactionAwareProactorStreamProcessingStrategyTestCase(AbstractProcessingStrategyTestCase.Mode mode) {

@@ -39,6 +39,7 @@ import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(REACTOR)
+@Ignore("MULE-13478")
 public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingStrategyTestCase {
 
   public ReactorStreamProcessingStrategyTestCase(Mode mode) {
