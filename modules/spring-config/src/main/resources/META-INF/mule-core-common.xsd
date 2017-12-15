@@ -1311,6 +1311,20 @@
             <xsd:complexContent>
                 <xsd:extension base="abstractMessageProcessorType">
                     <xsd:attribute name="name" type="xsd:string" use="required"/>
+                    <xsd:attribute name="target" type="substitutableString">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Variable where to save processed payload
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="targetValue" type="expressionString" default="#[payload]">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -2541,11 +2555,17 @@
                     <xsd:attribute name="target" type="substitutableString">
                         <xsd:annotation>
                             <xsd:documentation>
+                                Variable where to save processed payload
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="targetValue" type="expressionString" default="#[payload]">
+                        <xsd:annotation>
+                            <xsd:documentation>
                                 An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="targetValue" type="expressionString" default="#[payload]"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

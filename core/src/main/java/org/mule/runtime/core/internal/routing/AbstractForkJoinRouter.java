@@ -7,41 +7,40 @@
 
 package org.mule.runtime.core.internal.routing;
 
-import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
-import static org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
+import static org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
+import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
-import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.privileged.processor.Router;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
+
+import org.reactivestreams.Publisher;
 
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
-import org.reactivestreams.Publisher;
-
 /**
  * Abstract base class for routers using a {@link ForkJoinStrategy} to process multiple {@link RoutingPair}'s and aggregate
  * results.
- * 
+ *
  * @since 4.0
  */
 public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<MessageProcessorChain> implements Router {
@@ -73,14 +72,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
     return from(publisher)
         .doOnNext(onEvent())
         .flatMap(event -> from(forkJoinStrategy.forkJoin(event, getRoutingPairs(event)))
-            .map(result -> {
-              if (target != null) {
-                TypedValue targetValue = getTargetValue(result);
-                return builder(event).addVariable(target, targetValue.getValue(), targetValue.getDataType()).build();
-              } else {
-                return result;
-              }
-            })
+            .map(outputToTarget(event, target, targetValue, expressionManager))
             // Ensure reference to current event is maintained in MessagingException. Reactor error handling does not
             // maintain this with flatMap and we can't use ThreadLocal event as that will have potentially been overwritten by
             // route chains.
@@ -101,7 +93,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
 
   /**
    * Returns a list of {@link RoutingPair}'s to be processed by the {@link ForkJoinStrategy}.
-   * 
+   *
    * @param event the incoming event in the route.
    * @return a potentially non-finite
    */
@@ -135,7 +127,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   /**
    * Set the {@link ForkJoinStrategyFactory} to use for this router. This defines how routing pairs are processed and how results
    * are aggregated to create a single result event.
-   * 
+   *
    * @param forkJoinStrategyFactory
    */
   public void setForkJoinStrategyFactory(ForkJoinStrategyFactory forkJoinStrategyFactory) {
@@ -158,7 +150,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
 
   /**
    * Set the maximum concurrency which defines at most how any routing pairs can execute in parallel.
-   * 
+   *
    * @param maxConcurrency
    * @throws IllegalArgumentException if the value is zero or less.
    */
@@ -169,7 +161,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
 
   /**
    * The variable where the result from this router should be stored. If this is not set then the result is set in the payload.
-   * 
+   *
    * @param target a variable name.
    */
   public void setTarget(String target) {
@@ -187,7 +179,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
 
   /**
    * Template method that allows implementations to define a default max concurrency.
-   * 
+   *
    * @return
    */
   protected abstract int getDefaultMaxConcurrency();
@@ -203,13 +195,9 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   /**
    * Template method that allows implementations to the default {@link ForkJoinStrategyFactory} that should be used if one isn't
    * configured.
-   * 
+   *
    * @return the default fork-join strategy.
    */
   protected abstract ForkJoinStrategyFactory getDefaultForkJoinStrategyFactory();
-
-  private TypedValue getTargetValue(CoreEvent event) {
-    return muleContext.getExpressionManager().evaluate(targetValue, getTargetBindingContext(event.getMessage()));
-  }
 
 }

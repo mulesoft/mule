@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -57,6 +58,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> implements ApplicationContextAware {
@@ -64,6 +66,9 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   private static final Logger LOGGER = getLogger(FlowRefFactoryBean.class);
 
   private String refName;
+  private String target;
+  private String targetValue = "#[payload]";
+
   private ApplicationContext applicationContext;
   private MuleContext muleContext;
 
@@ -75,6 +80,24 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
   public void setName(String name) {
     this.refName = name;
+  }
+
+  /**
+   * The variable where the result from this router should be stored. If this is not set then the result is set in the payload.
+   *
+   * @param target a variable name.
+   */
+  public void setTarget(String target) {
+    this.target = target;
+  }
+
+  /**
+   * Defines the target value expression
+   *
+   * @param targetValue the target value expresion
+   */
+  public void setTargetValue(String targetValue) {
+    this.targetValue = targetValue;
   }
 
   @Override
@@ -185,16 +208,19 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
           return error(e);
         }
 
+        Flux<CoreEvent> flux;
         // If referenced processor is a Flow use a child EventContext and wait for completion else simply compose
         if (referencedProcessor instanceof Flow) {
-          return just(event)
+          flux = just(event)
               .flatMap(request -> Mono
                   .from(processWithChildContext(request, referencedProcessor,
                                                 ofNullable(FlowRefFactoryBean.this.getLocation()),
                                                 ((Flow) referencedProcessor).getExceptionListener())));
         } else {
-          return just(event).transform(referencedProcessor);
+          flux = just(event).transform(referencedProcessor);
         }
+
+        return flux.map(outputToTarget(event, target, targetValue, expressionManager));
       });
     }
 
