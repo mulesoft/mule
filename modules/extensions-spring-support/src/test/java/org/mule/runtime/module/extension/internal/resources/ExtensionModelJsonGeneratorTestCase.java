@@ -22,6 +22,7 @@ import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtension
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionModelJsonGeneratorTestCase.ExtensionJsonGeneratorTestUnit.newTestUnit;
 
+import org.mule.extension.test.extension.reconnection.ReconnectionExtension;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -102,7 +103,8 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
                         newTestUnit(javaLoader, TypedValueExtension.class, "typed-value.json"),
                         newTestUnit(javaLoader, TestOAuthExtension.class, "test-oauth.json"),
                         newTestUnit(javaLoader, WeaveFunctionExtension.class, "test-fn.json"),
-                        newTestUnit(javaLoader, ValuesExtension.class, "values.json"));
+                        newTestUnit(javaLoader, ValuesExtension.class, "values.json"),
+                        newTestUnit(javaLoader, ReconnectionExtension.class, "reconnection-extension.json"));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);

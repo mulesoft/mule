@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:reconnection="http://www.mulesoft.org/schema/mule/reconnection"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/reconnection http://www.mulesoft.org/schema/mule/reconnection/current/mule-reconnection.xsd
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <reconnection:config name="reconnection_Config" configId="dsa" >
+        <reconnection:connection>
+            <reconnection >
+                <reconnect count="3" frequency="1000"/>
+            </reconnection>
+        </reconnection:connection>
+    </reconnection:config>
+
+    <flow name="reconnectForever" initialState="stopped">
+        <reconnection:reconection-source config-ref="reconnection_Config">
+            <reconnect-forever />
+        </reconnection:reconection-source>
+        <test:processor class="org.mule.test.module.extension.reconnection.ReconnectionTestCase$CaptureProcessor" />
+    </flow>
+
+    <flow name="switchConnection">
+        <reconnection:switch-connection />
+    </flow>
+    
+</mule>

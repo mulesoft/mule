@@ -25,7 +25,6 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -67,10 +66,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -80,6 +75,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and

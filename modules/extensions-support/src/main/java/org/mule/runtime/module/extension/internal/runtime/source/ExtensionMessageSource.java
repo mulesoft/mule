@@ -22,7 +22,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -63,14 +62,13 @@ import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourc
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
-import org.slf4j.Logger;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -192,19 +190,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public void onException(ConnectionException exception) {
     if (!reconnecting.compareAndSet(false, true)) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER
-            .debug(format("Message source '%s' on root component '%s' threw a '%s' but a reconnection is already in progress. "
-                + "Exception was: %s"
-                + "No action will be taken since this is most likely a bug in the Source",
-                          // sourceModel's name is used because at this point is very likely that the "sourceAdapter is null
-                          sourceModel.getName(),
-                          getLocation().getRootContainerName(),
-                          ConnectionException.class.getSimpleName(),
-                          exception.getMessage()),
-                   exception);
-      }
-      return;
+      throw new MuleRuntimeException(
+                                     createStaticMessage(format("Message source '%s' on root component '%s' failed to reconnect. Error was: %s",
+                                                                // sourceModel's name is used because at this point is very likely that the "sourceAdapter is null
+                                                                sourceModel.getName(),
+                                                                getLocation().getRootContainerName(),
+                                                                exception.getMessage())),
+                                     exception);
     }
 
     LOGGER.warn(format("Message source '%s' on root component '%s' threw exception. Attempting to reconnect...",
@@ -277,7 +269,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public void doStop() throws MuleException {
     synchronized (started) {
-      stopIfNeeded(retryPolicyTemplate);
       started.set(false);
       try {
         stopSource();
@@ -289,8 +280,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public void doDispose() {
-    disposeIfNeeded(retryPolicyTemplate, LOGGER);
     disposeSource();
+    try {
+      stopIfNeeded(retryPolicyTemplate);
+      disposeIfNeeded(retryPolicyTemplate, LOGGER);
+    } catch (MuleException e) {
+      LOGGER.warn(format("Failed to dispose message source at root element '%s'. %s",
+                         getLocation().getRootContainerName(),
+                         e.getMessage()),
+                  e);
+    }
   }
 
   private void shutdown() {
@@ -332,7 +331,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     transactionConfig.setMuleContext(muleContext);
     TransactionType transactionalType = sourceAdapter.getTransactionalType();
     transactionConfig.setFactory(transactionFactoryLocator.lookUpTransactionFactory(transactionalType)
-        .orElseThrow(() -> new IllegalStateException(format("Unable to create Source with Transactions of Type: [%s]. No factory available for this transaction type",
+        .orElseThrow(() -> new IllegalStateException(format(
+                                                            "Unable to create Source with Transactions of Type: [%s]. No factory available for this transaction type",
                                                             transactionalType))));
 
     return transactionConfig;
@@ -386,6 +386,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         createSource();
         sourceAdapter.initialise();
         sourceAdapter.start();
+        reconnecting.set(false);
       } catch (Exception e) {
         stopSource();
         disposeSource();
