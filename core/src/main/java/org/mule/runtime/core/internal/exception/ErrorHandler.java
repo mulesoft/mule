@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Un
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.error;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -24,6 +23,7 @@ import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
@@ -42,7 +42,7 @@ import org.reactivestreams.Publisher;
 public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
     implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle {
 
-  private static final String MUST_ACCEPT_ANY_EVENT_MESSAGE = "Default exception strategy must accept any event.";
+  private static final String MUST_ACCEPT_ANY_EVENT_MESSAGE = "Default error handler must accept any event.";
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private String name;
 
@@ -77,13 +77,21 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     if (exception instanceof MessagingException) {
       CoreEvent event = addExceptionPayload(exception, ((MessagingException) exception).getEvent());
       ((MessagingException) exception).setProcessedEvent(event);
-      for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
-        if (exceptionListener.accept(event)) {
-          return exceptionListener.apply(exception);
+      try {
+        for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
+          if (exceptionListener.accept(event)) {
+            return exceptionListener.apply(exception);
+          }
         }
+        throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
+      } catch (Exception e) {
+        return error(new MessagingExceptionResolver(this).resolve(new MessagingException(event, e, this),
+                                                                  muleContext));
       }
+    } else {
+      // This should never occur since all exceptions at this point are ME
+      return error(exception);
     }
-    return error(new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE)));
   }
 
   @Override
