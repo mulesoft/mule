@@ -217,7 +217,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             try {
               sink.accept(event);
             } catch (RejectedExecutionException ree) {
-              Throwable overloadException = new SourceOverloadException(ree.getMessage(), ree);
+              Throwable overloadException = new SourceOverloadException(format(OVERLOAD_ERROR_MESSAGE, getName(), ree));
               MessagingException me = new MessagingException(event, overloadException, this);
               ((BaseEventContext) event.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
             }

@@ -63,7 +63,7 @@ public class PolicyNotificationHelper {
 
   /**
    * Creates an exception {@link BiConsumer} that fires a notification using the specified action on success or error.
-   * Notifications are not fired if the {@link BiConsumer} does not receive an {@link CoreEvent} or a {@link MessagingException}.
+   * Notifications are not fired if the {@link BiConsumer} receive an {@link CoreEvent} or a {@link MessagingException}.
    *
    * @param action the action the notification is created with
    * @return the created consumer
@@ -71,11 +71,9 @@ public class PolicyNotificationHelper {
    */
   public BiConsumer<CoreEvent, Throwable> successOrErrorNotification(int action) {
     return (e, t) -> {
-      if (t != null) {
-        if (t instanceof MessagingException) {
-          errorNotification(action).accept((MessagingException) t);
-        }
-      } else {
+      if (t != null && t instanceof MessagingException) {
+        errorNotification(action).accept((MessagingException) t);
+      } else if (e != null) {
         notification(action).accept(e);
       }
     };

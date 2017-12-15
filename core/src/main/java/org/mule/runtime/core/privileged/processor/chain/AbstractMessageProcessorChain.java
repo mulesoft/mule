@@ -80,7 +80,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private static final String TCCL_ORIGINAL_REACTOR_CTX_KEY = "mule.context.tccl_original";
   private static final String REACTOR_ON_OPERATOR_ERROR_LOCAL = "reactor.onOperatorError.local";
   private static final String UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE =
-      "Unexpected state. Error handle should be invoked with either an Event instance of a MessagingException";
+      "Unexpected state. Error handler should be invoked with either an Event instance or a MessagingException";
 
   private static Class<ClassLoader> appClClass;
 
@@ -180,8 +180,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         context.error(resolveMessagingException(processor).apply((MessagingException) throwable));
       } else {
         if (event == null) {
-          LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
-          throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
+          IllegalStateException illegalStateException = new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
+          LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, illegalStateException);
+          throw illegalStateException;
         }
         BaseEventContext context = ((BaseEventContext) event.getContext());
         if (throwable instanceof RejectedExecutionException) {

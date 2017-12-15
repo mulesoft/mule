@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
 
@@ -81,15 +82,12 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                 + event.getContext().getId())));
           }
 
-          // ((BaseEventContext) event.getContext()).onResponse(notificationHelper.successOrErrorNotification(AFTER_NEXT));
-
           return just(event)
-              .doOnNext(popBeforeNextFlowFlowStackElement().andThen(notificationHelper.notification(BEFORE_NEXT)))
+              .doOnNext(popBeforeNextFlowFlowStackElement().andThen(notificationHelper.notification(BEFORE_NEXT))
+                  .andThen(req -> ((BaseEventContext) req.getContext())
+                      .onResponse(notificationHelper.successOrErrorNotification(AFTER_NEXT))))
               .transform(nextOperation)
-              .doOnSuccess(pushAfterNextFlowStackElement().andThen(notificationHelper.notification(AFTER_NEXT)))
-              .doOnError(MessagingException.class, notificationHelper.errorNotification(AFTER_NEXT))
-              .doOnNext(notificationHelper.notification(BEFORE_NEXT))
-              .transform(nextOperation);
+              .doOnSuccessOrError((ev, t) -> pushAfterNextFlowStackElement().accept(event));
         });
   }
 
