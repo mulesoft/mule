@@ -180,7 +180,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         context.error(resolveMessagingException(processor).apply((MessagingException) throwable));
       } else {
         if (event == null) {
-          LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE + "Throwable is: " + throwable);
+          LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
           throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
         }
         BaseEventContext context = ((BaseEventContext) event.getContext());
