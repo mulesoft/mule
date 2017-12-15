@@ -55,8 +55,8 @@ public class ObjectFactoryClassRepository {
    * @param objectFactoryType the {@link ObjectFactory} of the component
    * @param createdObjectType the type of object created by the {@code ObjectFactory}
    * @param isLazyInitFunction function that defines if the object created by the component can be created lazily
-   * @param instancePostCreationFunctionOptional function to do custom processing of the created instance by the {@code ObjectFactory}.
-   *        When there's no need for post processing this value must be {@link Optional#empty()}
+   * @param instancePostCreationFunctionOptional function to do custom processing of the created instance by the
+   *        {@code ObjectFactory}. When there's no need for post processing this value must be {@link Optional#empty()}
    * @return the {@code FactoryBean} class to be used by spring for the provided configuration.
    */
   public Class<ObjectFactory> getObjectFactoryClass(ComponentBuildingDefinition componentBuildingDefinition,
@@ -90,42 +90,52 @@ public class ObjectFactoryClassRepository {
      * create as FactoryBean a dynamic class that will have the same attributes and methods as the ObjectFactory that the user
      * defined. This way our API does not expose spring specific classes.
      */
-    Enhancer enhancer = new Enhancer();
-    // Use SmartFactoryBean since it's the only way to force spring to pre-instantiate FactoryBean for singletons
-    enhancer.setInterfaces(new Class[] {SmartFactoryBean.class});
-    enhancer.setSuperclass(objectFactoryType);
-    enhancer.setCallbackType(MethodInterceptor.class);
-    if (SmartFactoryBean.class.getClassLoader() != objectFactoryType.getClassLoader()) {
-      // CGLIB needs access to both the spring interface and the extended factory class.
-      // If the factory class is defined in a plugin, its classloader has to be passed.
-      enhancer.setClassLoader(new CompositeClassLoader(ObjectFactoryClassRepository.class.getClassLoader(),
-                                                       objectFactoryType.getClassLoader()));
+    ClassLoader originalClassLoader = null;
+    try {
+      Enhancer enhancer = new Enhancer();
+      // Use SmartFactoryBean since it's the only way to force spring to pre-instantiate FactoryBean for singletons
+      enhancer.setInterfaces(new Class[] {SmartFactoryBean.class});
+      enhancer.setSuperclass(objectFactoryType);
+      enhancer.setCallbackType(MethodInterceptor.class);
+      if (SmartFactoryBean.class.getClassLoader() != objectFactoryType.getClassLoader()) {
+        // CGLIB needs access to both the spring interface and the extended factory class.
+        // If the factory class is defined in a plugin, its classloader has to be passed.
+        CompositeClassLoader loader = new CompositeClassLoader(ObjectFactoryClassRepository.class.getClassLoader(),
+                                                               objectFactoryType.getClassLoader());
+        enhancer.setClassLoader(loader);
+        originalClassLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(loader);
+      }
+      enhancer.setUseCache(false);
+      Class<ObjectFactory> factoryBeanClass = enhancer.createClass();
+      registerStaticCallbacks(factoryBeanClass, new Callback[] {
+          (MethodInterceptor) (obj, method, args, proxy) -> {
+            if (method.getName().equals("isSingleton")) {
+              return !componentBuildingDefinition.isPrototype();
+            }
+            if (method.getName().equals("getObjectType") && !ObjectTypeProvider.class.isAssignableFrom(obj.getClass())) {
+              return createdObjectType;
+            }
+            if (method.getName().equals("getObject")) {
+              Object createdInstance = proxy.invokeSuper(obj, args);
+              instancePostCreationFunction.accept(createdInstance);
+              return createdInstance;
+            }
+            if (method.getName().equals("isPrototype")) {
+              return componentBuildingDefinition.isPrototype();
+            }
+            if (method.getName().equals("isEagerInit")) {
+              return !isLazyInitFunction.get();
+            }
+            return proxy.invokeSuper(obj, args);
+          }
+      });
+      return factoryBeanClass;
+    } finally {
+      if (originalClassLoader != null) {
+        Thread.currentThread().setContextClassLoader(originalClassLoader);
+      }
     }
-    enhancer.setUseCache(false);
-    Class<ObjectFactory> factoryBeanClass = enhancer.createClass();
-    registerStaticCallbacks(factoryBeanClass, new Callback[] {
-        (MethodInterceptor) (obj, method, args, proxy) -> {
-          if (method.getName().equals("isSingleton")) {
-            return !componentBuildingDefinition.isPrototype();
-          }
-          if (method.getName().equals("getObjectType") && !ObjectTypeProvider.class.isAssignableFrom(obj.getClass())) {
-            return createdObjectType;
-          }
-          if (method.getName().equals("getObject")) {
-            Object createdInstance = proxy.invokeSuper(obj, args);
-            instancePostCreationFunction.accept(createdInstance);
-            return createdInstance;
-          }
-          if (method.getName().equals("isPrototype")) {
-            return componentBuildingDefinition.isPrototype();
-          }
-          if (method.getName().equals("isEagerInit")) {
-            return !isLazyInitFunction.get();
-          }
-          return proxy.invokeSuper(obj, args);
-        }
-    });
-    return factoryBeanClass;
   }
 
   /**
