@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
@@ -34,7 +35,9 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -657,7 +660,17 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private void updateBeanDefinitionRootContainerName(String rootContainerName, BeanDefinition beanDefinition) {
-    updateAnnotationValue(ROOT_CONTAINER_NAME_KEY, rootContainerName, beanDefinition);
+    Class<?> beanClass = null;
+    try {
+      beanClass = currentThread().getContextClassLoader().loadClass(beanDefinition.getBeanClassName());
+    } catch (ClassNotFoundException e) {
+      // Nothing to do, spring will break because of this eventually
+    }
+
+    if (beanClass == null || Component.class.isAssignableFrom(beanClass)) {
+      updateAnnotationValue(ROOT_CONTAINER_NAME_KEY, rootContainerName, beanDefinition);
+    }
+
     for (PropertyValue propertyValue : beanDefinition.getPropertyValues().getPropertyValueList()) {
       Object value = propertyValue.getValue();
       processBeanValue(rootContainerName, value);
