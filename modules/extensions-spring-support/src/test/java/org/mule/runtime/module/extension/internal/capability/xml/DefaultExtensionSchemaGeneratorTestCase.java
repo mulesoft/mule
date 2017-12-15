@@ -22,6 +22,7 @@ import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtension
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.capability.xml.DefaultExtensionSchemaGeneratorTestCase.SchemaGeneratorTestUnit.newTestUnit;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+import org.mule.extension.test.extension.reconnection.ReconnectionExtension;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
@@ -118,7 +119,8 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
                         newTestUnit(javaLoader, TypedValueExtension.class, "typed-value.xsd"),
                         newTestUnit(javaLoader, TestOAuthExtension.class, "test-oauth.xsd"),
                         newTestUnit(javaLoader, WeaveFunctionExtension.class, "test-fn.xsd"),
-                        newTestUnit(javaLoader, ValuesExtension.class, "values.xsd"));
+                        newTestUnit(javaLoader, ValuesExtension.class, "values.xsd"),
+                        newTestUnit(javaLoader, ReconnectionExtension.class, "reconnection-extension.xsd"));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);
