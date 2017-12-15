@@ -9,6 +9,7 @@ package org.mule.module.http.functional.requester;
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isIn;
 import static org.junit.Assert.assertThat;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -19,6 +20,7 @@ import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.module.http.internal.request.NtlmProxyConfig;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.ConnectException;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
@@ -43,8 +45,9 @@ import org.slf4j.Logger;
 @RunWith(Parameterized.class)
 public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
 {
-    private static Logger LOGGER = getLogger(HttpRequestProxyConfigTestCase.class);
 
+    private static Logger LOGGER = getLogger(HttpRequestProxyConfigTestCase.class);
+    private static String[] CLOSE_CONNECTION_ERRORS = new String[] {"Connection refused", "Connection reset by peer"};
     private static final String PROXY_HOST = "localhost";
     private static final String PROXY_USERNAME = "theUsername";
     private static final String PROXY_PASSWORD = "thePassword";
@@ -140,7 +143,7 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
         catch (MessagingException e)
         {
             assertThat(e.getCauseException(), is(instanceOf(IOException.class)));
-            assertThat(e.getCauseException().getMessage(), is("Connection refused"));
+            assertThat(e.getCauseException().getMessage(), isIn(CLOSE_CONNECTION_ERRORS));
         }
         latch.await(1, TimeUnit.SECONDS);
     }
@@ -173,6 +176,15 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
                 {
                     sc = ssc.accept();
                     Thread.yield();
+                }
+
+                try
+                {
+                    sleep(100);
+                }
+                catch (InterruptedException e)
+                {
+                    //Ignore exception
                 }
 
                 sc.close();
