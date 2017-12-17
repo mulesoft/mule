@@ -24,7 +24,11 @@ import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 
-import org.mule.runtime.api.exception.FlowOverloadException;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.function.Consumer;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.exception.SourceOverloadException;
@@ -59,12 +63,8 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.function.Consumer;
-
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -235,7 +235,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           } else {
             // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with an OVERLOAD error.
             RejectedExecutionException rejectedExecutionException =
-                new FlowOverloadException(format(OVERLOAD_ERROR_MESSAGE, getName()));
+                new SourceOverloadException(format(OVERLOAD_ERROR_MESSAGE, getName()));
             return error(exceptionResolver.resolve(new MessagingException(builder(event)
                 .error(ErrorBuilder.builder().errorType(overloadErrorType)
                     .description(format("Flow '%s' Busy.", getName()))
@@ -254,8 +254,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         .doOnNext(beforeProcessors())
         .transform(processingStrategy.onPipeline(pipeline))
         .doOnNext(afterProcessors())
-        .doOnError(throwable -> !(throwable instanceof RejectedExecutionException),
-                   throwable -> LOGGER.error("Unhandled exception in Flow ", throwable));
+        .doOnError(throwable -> LOGGER.error("Unhandled exception in Flow ", throwable));
   }
 
   private Consumer<CoreEvent> beforeProcessors() {

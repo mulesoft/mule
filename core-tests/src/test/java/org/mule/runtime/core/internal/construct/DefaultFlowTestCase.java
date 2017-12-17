@@ -25,6 +25,7 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static reactor.core.publisher.Mono.just;
@@ -260,8 +261,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
       customFlow.start();
       assertThat(customFlow.getMaxConcurrency(), equalTo(customMaxConcurrency));
       verify(muleContext.getSchedulerService())
-          .ioScheduler(eq(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(customMaxConcurrency)
-              .withName(flow.getName() + "." + BLOCKING.name())));
+          .ioScheduler(eq(muleContext.getSchedulerBaseConfig().withName(flow.getName() + "." + BLOCKING.name())));
       customFlow.stop();
 
     } finally {

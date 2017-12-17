@@ -292,6 +292,27 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   }
 
   @Test
+  @Description("If max concurrency is 2, only 2 threads are used for CPU_LITE processors and further requests blocks.")
+  public void singleCpuLightConcurrentMaxConcurrency2() throws Exception {
+    internalConcurrent(flowBuilder.get()
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+                                                                                             DEFAULT_BUFFER_SIZE,
+                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             DEFAULT_WAIT_STRATEGY,
+                                                                                             () -> cpuLight,
+                                                                                             () -> blocking,
+                                                                                             () -> cpuIntensive,
+                                                                                             2)),
+                       true, CPU_LITE, 2);
+    assertThat(threads, hasSize(2));
+    assertThat(threads, not(hasItem(startsWith(RING_BUFFER))));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(2l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Test
   @Description("If max concurrency is 1, only 1 thread is used for BLOCKING processors and further requests blocks. When " +
       "maxConcurrency < subscribers processing is done on ring-buffer thread.")
   public void singleBlockingConcurrentMaxConcurrency1() throws Exception {
@@ -346,25 +367,19 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Test
   @Description("When back-pressure strategy is 'WAIT' the source thread blocks and all requests are processed.")
   public void sourceBackPressureWait() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
-    }
+    testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
   }
 
   @Test
   @Description("When back-pressure strategy is 'FAIL' some requests fail with an OVERLOAD error.")
   public void sourceBackPressureFail() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(FAIL, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
-    }
+    testBackPressure(FAIL, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
   }
 
   @Test
   @Description("When back-pressure strategy is 'DROP' some requests fail with and are dropped.")
   public void sourceBackPressureDrop() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(DROP, lessThan(STREAM_ITERATIONS), equalTo(0), lessThan(STREAM_ITERATIONS));
-    }
+    testBackPressure(DROP, lessThan(STREAM_ITERATIONS), equalTo(0), lessThan(STREAM_ITERATIONS));
   }
 
 }

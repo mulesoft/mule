@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -40,7 +42,7 @@ public class DirectStreamPerThreadProcessingStrategyFactory implements Processin
         @Override
         public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
           return new PerThreadSink(() -> new DirectSink(pipeline, event -> {
-          }));
+          }, SMALL_BUFFER_SIZE));
         }
       };
 

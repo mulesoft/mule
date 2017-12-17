@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.time.Duration.ofMillis;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -43,46 +42,31 @@ import org.slf4j.Logger;
  */
 public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory {
 
-  private static final ReactorProcessingStrategyFactory NOT_CONCURRENT_TX_AWARE_PS_FACTORY =
-      new ReactorProcessingStrategyFactory();
-
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    if (getMaxConcurrency() == 1) {
-      return NOT_CONCURRENT_TX_AWARE_PS_FACTORY.create(muleContext, schedulersNamePrefix);
-    } else {
-      return new ProactorStreamProcessingStrategy(() -> muleContext.getSchedulerService()
-          .customScheduler(muleContext.getSchedulerBaseConfig()
-              .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
-              .withMaxConcurrentTasks(getSubscriberCount() + 1)),
-                                                  getBufferSize(),
-                                                  getSubscriberCount(),
-                                                  getWaitStrategy(), () -> muleContext.getSchedulerService()
-                                                      .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
-                                                          .withName(schedulersNamePrefix + "." + CPU_LITE.name())),
-                                                  () -> muleContext.getSchedulerService()
-                                                      .ioScheduler(muleContext.getSchedulerBaseConfig()
-                                                          .withName(schedulersNamePrefix + "." + BLOCKING.name())),
-                                                  () -> muleContext.getSchedulerService()
-                                                      .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
-                                                          .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                                  getMaxConcurrency());
-    }
+    return new ProactorStreamProcessingStrategy(getRingBufferSchedulerSupplier(muleContext, schedulersNamePrefix),
+                                                getBufferSize(),
+                                                getSubscriberCount(),
+                                                getWaitStrategy(),
+                                                getCpuLightSchedulerSupplier(muleContext, schedulersNamePrefix),
+                                                () -> muleContext.getSchedulerService()
+                                                    .ioScheduler(muleContext.getSchedulerBaseConfig()
+                                                        .withName(schedulersNamePrefix + "." + BLOCKING.name())),
+                                                () -> muleContext.getSchedulerService()
+                                                    .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
+                                                        .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
+                                                getMaxConcurrency());
   }
 
   @Override
   public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
-    if (getMaxConcurrency() == 1) {
-      return NOT_CONCURRENT_TX_AWARE_PS_FACTORY.getProcessingStrategyType();
-    } else {
-      return ProactorStreamProcessingStrategy.class;
-    }
+    return ProactorStreamProcessingStrategy.class;
   }
 
   static class ProactorStreamProcessingStrategy extends ReactorStreamProcessingStrategy {
 
     private static Logger LOGGER = getLogger(ProactorStreamProcessingStrategy.class);
-    private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 10;
+    private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 2;
 
     private Supplier<Scheduler> blockingSchedulerSupplier;
     private Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
@@ -144,7 +128,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
               .retryWhen(errors -> errors
                   .flatMap(error -> delay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS),
                                           fromExecutorService(getCpuLightScheduler())))),
-                   maxConcurrency);
+                   maxConcurrency / (getNumCpuLightThreads() * subscribers));
     }
 
   }

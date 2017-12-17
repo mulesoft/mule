@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -24,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 import reactor.core.publisher.FluxSink;
+import reactor.util.concurrent.Queues;
 
 /**
  * Abstract base {@link ProcessingStrategy} that creates a basic {@link Sink} that serializes events.
@@ -34,7 +36,7 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
 
   @Override
   public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
-    return new DirectSink(pipeline, createOnEventConsumer());
+    return new DirectSink(pipeline, createOnEventConsumer(), SMALL_BUFFER_SIZE);
   }
 
   protected Consumer<CoreEvent> createOnEventConsumer() {

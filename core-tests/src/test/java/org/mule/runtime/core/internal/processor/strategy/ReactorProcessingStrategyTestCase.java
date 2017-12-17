@@ -221,25 +221,19 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Test
   @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
   public void sourceBackPressureWait() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
-    }
+    testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
   }
 
   @Test
   @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
   public void sourceBackPressureFail() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(FAIL, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
-    }
+    testBackPressure(FAIL, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
   }
 
   @Test
   @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
   public void sourceBackPressureDrop() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(DROP, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
-    }
+    testBackPressure(DROP, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
   }
 
 }

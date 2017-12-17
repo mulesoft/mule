@@ -39,15 +39,17 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new ReactorStreamProcessingStrategy(() -> muleContext.getSchedulerService()
-        .customScheduler(muleContext.getSchedulerBaseConfig()
-            .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
-            .withMaxConcurrentTasks(getSubscriberCount() + 1).withWaitAllowed(true)), getBufferSize(), getSubscriberCount(),
+    return new ReactorStreamProcessingStrategy(getRingBufferSchedulerSupplier(muleContext, schedulersNamePrefix),
+                                               getBufferSize(), getSubscriberCount(),
                                                getWaitStrategy(),
-                                               () -> muleContext.getSchedulerService()
-                                                   .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
-                                                       .withName(schedulersNamePrefix + "." + CPU_LITE.name())),
+                                               getCpuLightSchedulerSupplier(muleContext, schedulersNamePrefix),
                                                getMaxConcurrency());
+  }
+
+  protected Supplier<Scheduler> getCpuLightSchedulerSupplier(MuleContext muleContext, String schedulersNamePrefix) {
+    return () -> muleContext.getSchedulerService()
+        .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
+            .withName(schedulersNamePrefix + "." + CPU_LITE.name()));
   }
 
   @Override
@@ -77,8 +79,8 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
       }
     }
 
-    private int getNumCpuLightThreads() {
-      return min(getRuntime().availableProcessors() * 2, maxConcurrency);
+    protected int getNumCpuLightThreads() {
+      return min(getRuntime().availableProcessors() * 2, maxConcurrency / subscribers);
     }
 
     @Override

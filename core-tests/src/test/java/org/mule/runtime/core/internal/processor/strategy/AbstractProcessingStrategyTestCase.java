@@ -76,6 +76,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -198,7 +199,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     cpuLight = new TestScheduler(2, CPU_LIGHT, false);
     blocking = new TestScheduler(4, IO, true);
     cpuIntensive = new TestScheduler(2, CPU_INTENSIVE, true);
-    custom = new TestScheduler(1, CUSTOM, true);
+    custom = new TestScheduler(4, CUSTOM, true);
     ringBuffer = new TestScheduler(1, RING_BUFFER, true);
     asyncExecutor = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(SchedulerService.class).ioScheduler();
 
@@ -222,6 +223,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       flow.stop();
       flow.dispose();
     }
+    ringBuffer.stop();
     cpuLight.stop();
     blocking.stop();
     cpuIntensive.stop();
@@ -532,7 +534,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     }
   }
 
-  class MultipleInvocationLatchedProcessor implements Processor {
+  class MultipleInvocationLatchedProcessor extends AbstractComponent implements Processor {
 
     private ProcessingType type;
     private volatile Latch latch = new Latch();
@@ -605,8 +607,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     @Override
     public void stop() {
-      shutdownNow();
-      executor.shutdownNow();
+      shutdown();
+      executor.shutdown();
     }
 
     @Override
@@ -673,7 +675,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       if (getProcessingType() == CPU_LITE_ASYNC) {
         return from(publisher).transform(processorPublisher -> Processor.super.apply(publisher))
-            .publishOn(fromExecutorService(custom));
+            .publishOn(fromExecutorService(custom)).errorStrategyStop();
       } else {
         return Processor.super.apply(publisher);
       }
