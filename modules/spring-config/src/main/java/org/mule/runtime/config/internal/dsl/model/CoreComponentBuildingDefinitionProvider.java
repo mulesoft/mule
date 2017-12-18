@@ -382,6 +382,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(processorRefBuilder
         .withIdentifier(FLOW_REF)
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("target", fromSimpleParameter("target").build())
+        .withSetterParameterDefinition("targetValue", fromSimpleParameter("targetValue")
+            .withDefaultValue("#[payload]")
+            .build())
         .build());
     componentBuildingDefinitions.add(processorRefBuilder
         .withIdentifier(PROCESSOR)

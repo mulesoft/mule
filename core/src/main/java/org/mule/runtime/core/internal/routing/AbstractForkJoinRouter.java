@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
 import static org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
+import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -73,14 +74,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
     return from(publisher)
         .doOnNext(onEvent())
         .flatMap(event -> from(forkJoinStrategy.forkJoin(event, getRoutingPairs(event)))
-            .map(result -> {
-              if (target != null) {
-                TypedValue targetValue = getTargetValue(result);
-                return builder(event).addVariable(target, targetValue.getValue(), targetValue.getDataType()).build();
-              } else {
-                return result;
-              }
-            })
+            .map(outputToTarget(event, target, targetValue, expressionManager))
             // Required due to lack of decent support for error-handling in reactor. See
             // https://github.com/reactor/reactor-core/issues/629.
             .onErrorMap(throwable -> !(throwable instanceof MessagingException),
@@ -205,9 +199,5 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
    * @return the default fork-join strategy.
    */
   protected abstract ForkJoinStrategyFactory getDefaultForkJoinStrategyFactory();
-
-  private TypedValue getTargetValue(CoreEvent event) {
-    return muleContext.getExpressionManager().evaluate(targetValue, getTargetBindingContext(event.getMessage()));
-  }
 
 }
