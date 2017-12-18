@@ -7,10 +7,8 @@
 package org.mule.runtime.deployment.model.api;
 
 import static java.util.Collections.emptySet;
-import static org.mule.runtime.deployment.model.internal.artifact.ArtifactUtils.generateArtifactName;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.File;
 import java.util.HashSet;
@@ -95,11 +93,7 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
    * @return the artifact data storage folder name
    */
   public String getDataFolderName() {
-    BundleDescriptor bundleDescriptor = getBundleDescriptor();
-    if (bundleDescriptor == null) {
-      return getArtifactLocation().getName();
-    }
-    return generateArtifactName(bundleDescriptor);
+    return getArtifactLocation().getName();
   }
 
   /**
