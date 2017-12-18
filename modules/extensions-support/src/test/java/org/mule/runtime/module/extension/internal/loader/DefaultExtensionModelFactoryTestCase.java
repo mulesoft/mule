@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -13,15 +14,23 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
+import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
+import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR_DEFINITION;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR;
@@ -36,6 +45,7 @@ import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -48,12 +58,42 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Export;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.OnException;
+import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Sources;
+import org.mule.runtime.extension.api.annotation.Streaming;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.annotation.source.BackPressure;
+import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
+import org.mule.test.heisenberg.extension.HeisenbergErrors;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.HeisenbergOperations;
+import org.mule.test.heisenberg.extension.HeisenbergRouters;
+import org.mule.test.heisenberg.extension.HeisenbergScopes;
+import org.mule.test.heisenberg.extension.HeisenbergSource;
+import org.mule.test.heisenberg.extension.KillingOperations;
+import org.mule.test.heisenberg.extension.MoneyLaunderingOperation;
+import org.mule.test.heisenberg.extension.SecureHeisenbergConnectionProvider;
+import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
+import org.mule.test.heisenberg.extension.exception.HeisenbergException;
+import org.mule.test.heisenberg.extension.model.CarDealer;
+import org.mule.test.heisenberg.extension.model.CarWash;
+import org.mule.test.heisenberg.extension.model.Investment;
+import org.mule.test.heisenberg.extension.model.Ricin;
+import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
@@ -64,12 +104,17 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   private ExtensionModel createExtension(Class<?> annotatedClass) {
     return loadExtension(annotatedClass);
@@ -251,6 +296,70 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     assertThat(connectionProviderModel.supportsConnectivityTesting(), is(true));
   }
 
+  @Test
+  public void sourceWithReducedBackPressureStrategies() {
+    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
+    SourceModel source = extensionModel.getConfigurationModels().get(0).getSourceModel("ListenPayments").get();
+
+    ParameterModel parameter = source.getAllParameterModels().stream()
+        .filter(p -> BACK_PRESSURE_STRATEGY_PARAMETER_NAME.equals(p.getName()))
+        .findAny().orElseThrow(() -> new IllegalStateException("No backPressureStrategy parameter"));
+
+    assertThat(parameter.getType(), is(instanceOf(StringType.class)));
+    assertThat(parameter.getDefaultValue(), is(FAIL));
+
+    EnumAnnotation enumAnnotation = parameter.getType().getAnnotation(EnumAnnotation.class)
+        .orElseThrow(() -> new IllegalStateException("No enum annotation"));
+
+    assertThat(asList(enumAnnotation.getValues()), containsInAnyOrder(FAIL.name(), DROP.name()));
+  }
+
+  @Test
+  public void sourceWithFixedBackPressureStrategy() {
+    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
+    SourceModel source = extensionModel.getSourceModels().get(0);
+
+    Optional<ParameterModel> parameter = source.getAllParameterModels().stream()
+        .filter(p -> BACK_PRESSURE_STRATEGY_PARAMETER_NAME.equals(p.getName()))
+        .findAny();
+
+    assertThat(parameter.isPresent(), is(false));
+  }
+
+  @Test
+  public void sourceWithDefaultBackPressureStrategies() {
+    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
+    SourceModel source = extensionModel.getConfigurationModels().get(0).getSourceModel("ReconnectableListenPayments").get();
+
+    ParameterModel parameter = source.getAllParameterModels().stream()
+        .filter(p -> BACK_PRESSURE_STRATEGY_PARAMETER_NAME.equals(p.getName()))
+        .findAny().orElseThrow(() -> new IllegalStateException("No backPressureStrategy parameter"));
+
+    assertThat(parameter.getType(), is(instanceOf(StringType.class)));
+    assertThat(parameter.getDefaultValue(), is(WAIT));
+
+    EnumAnnotation enumAnnotation = parameter.getType().getAnnotation(EnumAnnotation.class)
+        .orElseThrow(() -> new IllegalStateException("No enum annotation"));
+
+    assertThat(asList(enumAnnotation.getValues()), containsInAnyOrder(FAIL.name(), DROP.name(), WAIT.name()));
+  }
+
+  @Test
+  public void sourceWithInvalidDefaultBackPressureStrategies() {
+    expectedException.expect(IllegalModelDefinitionException.class);
+    expectedException
+        .expectMessage("backPressureStrategy parameter has a default value which is not listed as an available option");
+
+    createExtension(BadBackPressureHeisenbergExtension.class);
+  }
+
+  @Test
+  public void sourceWithInvalidBackPressureStrategies() {
+    expectedException.expect(IllegalModelDefinitionException.class);
+
+    createExtension(IllegalBackPressureHeisenbergExtension.class);
+  }
+
   private void assertStreamingStrategy(ParameterModel streamingParameter) {
     assertThat(streamingParameter.getType(), equalTo(new StreamingStrategyTypeBuilder().getByteStreamingStrategyType()));
     assertThat(streamingParameter.isRequired(), is(false));
@@ -284,5 +393,51 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   private <T> T aggressiveGet(Optional<T> optional) {
     return optional.orElseThrow(NoSuchElementException::new);
+  }
+
+  @Extension(name = HeisenbergExtension.HEISENBERG, category = SELECT)
+  @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class,
+      KillingOperations.class, HeisenbergScopes.class, HeisenbergRouters.class})
+  @OnException(HeisenbergConnectionExceptionEnricher.class)
+  @ConnectionProviders({HeisenbergConnectionProvider.class, SecureHeisenbergConnectionProvider.class})
+  @Sources(BadBackPressureSource.class)
+  @Export(classes = {HeisenbergExtension.class, HeisenbergException.class}, resources = "methRecipe.json")
+  @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
+  @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
+  @ErrorTypes(HeisenbergErrors.class)
+  public static class BadBackPressureHeisenbergExtension extends HeisenbergExtension {
+
+  }
+
+  @Alias("ListenPayments")
+  @EmitsResponse
+  @Streaming
+  @MediaType(TEXT_PLAIN)
+  @BackPressure(defaultMode = FAIL, supportedModes = {DROP, WAIT})
+  public static class BadBackPressureSource extends HeisenbergSource {
+
+  }
+
+  @Extension(name = HeisenbergExtension.HEISENBERG, category = SELECT)
+  @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class,
+      KillingOperations.class, HeisenbergScopes.class, HeisenbergRouters.class})
+  @OnException(HeisenbergConnectionExceptionEnricher.class)
+  @ConnectionProviders({HeisenbergConnectionProvider.class, SecureHeisenbergConnectionProvider.class})
+  @Sources(IllegalBackPressureSource.class)
+  @Export(classes = {HeisenbergExtension.class, HeisenbergException.class}, resources = "methRecipe.json")
+  @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
+  @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
+  @ErrorTypes(HeisenbergErrors.class)
+  public static class IllegalBackPressureHeisenbergExtension extends HeisenbergExtension {
+
+  }
+
+  @Alias("ListenPayments")
+  @EmitsResponse
+  @Streaming
+  @MediaType(TEXT_PLAIN)
+  @BackPressure(defaultMode = FAIL, supportedModes = {DROP, WAIT})
+  public static class IllegalBackPressureSource extends HeisenbergSource {
+
   }
 }

@@ -44,6 +44,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
@@ -58,6 +59,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
+import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
@@ -295,6 +297,31 @@ public class MuleExtensionUtils {
     }
 
     throw new IllegalArgumentException("Unsupported action: " + action.name());
+  }
+
+  /**
+   * @param mode a {@link BackPressureMode}
+   * @return a {@link BackPressureStrategy}
+   */
+  public static BackPressureStrategy toBackPressureStrategy(BackPressureMode mode) {
+    switch (mode) {
+      case WAIT:
+        return BackPressureStrategy.WAIT;
+      case FAIL:
+        return BackPressureStrategy.FAIL;
+      case DROP:
+        return BackPressureStrategy.DROP;
+    }
+
+    throw new IllegalArgumentException("Unmapped mode " + mode.name());
+  }
+
+  /**
+   * @param backPressureModeName the name of a {@link BackPressureMode}
+   * @return a {@link BackPressureStrategy}
+   */
+  public static BackPressureStrategy toBackPressureStrategy(String backPressureModeName) {
+    return toBackPressureStrategy(BackPressureMode.valueOf(backPressureModeName));
   }
 
   /**

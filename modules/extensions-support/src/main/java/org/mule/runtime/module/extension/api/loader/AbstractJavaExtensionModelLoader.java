@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+import org.mule.runtime.module.extension.internal.loader.enricher.BackPressureDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ConnectionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DefaultEncodingDeclarationEnricher;
@@ -111,7 +112,8 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ExtensionDescriptionsEnricher(),
                                                                                                new ValueProvidersParameterDeclarationEnricher(),
                                                                                                new ParameterAllowedStereotypesDeclarionEnricher(),
-                                                                                               new ParameterLayoutOrderDeclarationEnricher()));
+                                                                                               new ParameterLayoutOrderDeclarationEnricher(),
+                                                                                               new BackPressureDeclarationEnricher()));
 
   private final String id;
   private final BiFunction<Class<?>, String, ModelLoaderDelegate> delegateFactory;

@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.SOURCE_OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
@@ -29,12 +30,14 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -105,8 +108,13 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
   private final SourceConnectionManager connectionManager;
   private final MessagingExceptionResolver exceptionResolver;
 
+  private ErrorType sourceOverloadErrorType;
+
   @Inject
   private StreamingManager streamingManager;
+
+  @Inject
+  private ErrorTypeRepository errorTypeRepository;
 
   @Inject
   private MuleContext muleContext;
@@ -152,8 +160,11 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     final SourceCallbackExecutor onSuccessExecutor = getMethodExecutor(modelProperty.getOnSuccessMethod(), modelProperty);
     final SourceCallbackExecutor onErrorExecutor = getMethodExecutor(modelProperty.getOnErrorMethod(), modelProperty);
     final SourceCallbackExecutor onTerminateExecutor = getMethodExecutor(modelProperty.getOnTerminateMethod(), modelProperty);
+    final SourceCallbackExecutor onBackPressureExecutor =
+        getMethodExecutor(modelProperty.getOnBackPressureMethod(), modelProperty);
 
-    return context -> new DefaultSourceCompletionHandler(onSuccessExecutor, onErrorExecutor, onTerminateExecutor, context);
+    return context -> new DefaultSourceCompletionHandler(onSuccessExecutor, onErrorExecutor, onTerminateExecutor,
+                                                         onBackPressureExecutor, context);
   }
 
   private SourceCallbackExecutor getMethodExecutor(Optional<Method> method, SourceCallbackModelProperty sourceCallbackModel) {
@@ -169,6 +180,9 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
 
   @Override
   public void initialise() throws InitialisationException {
+    sourceOverloadErrorType = errorTypeRepository.getErrorType(SOURCE_OVERLOAD)
+        .orElseThrow(() -> new IllegalStateException("SOURCE_OVERLOAD error type not found"));
+
     initialiseIfNeeded(this.nonCallbackParameters, true, muleContext);
     initialiseIfNeeded(this.errorCallbackParameters, true, muleContext);
     initialiseIfNeeded(this.successCallbackParameters, true, muleContext);
@@ -181,14 +195,17 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     private final SourceCallbackExecutor onErrorExecutor;
     private final SourceCallbackContextAdapter context;
     private final SourceCallbackExecutor onTerminateExecutor;
+    private final SourceCallbackExecutor onBackPressureExecutor;
 
     public DefaultSourceCompletionHandler(SourceCallbackExecutor onSuccessExecutor,
                                           SourceCallbackExecutor onErrorExecutor,
                                           SourceCallbackExecutor onTerminateExecutor,
+                                          SourceCallbackExecutor onBackPressureExecutor,
                                           SourceCallbackContextAdapter context) {
       this.onSuccessExecutor = onSuccessExecutor;
       this.onErrorExecutor = onErrorExecutor;
       this.onTerminateExecutor = onTerminateExecutor;
+      this.onBackPressureExecutor = onBackPressureExecutor;
       this.context = context;
     }
 
@@ -199,7 +216,19 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
 
     @Override
     public Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters) {
-      return from(onErrorExecutor.execute(exception.getEvent(), parameters, context))
+      final CoreEvent event = exception.getEvent();
+      final boolean isOverloadError = event.getError()
+          .map(e -> sourceOverloadErrorType.equals(e.getErrorType()))
+          .orElse(false);
+
+      if (isOverloadError) {
+        return from(onBackPressureExecutor.execute(event, emptyMap(), context)).doAfterTerminate(() -> {
+          rollback();
+          context.releaseConnection();
+        });
+      }
+
+      return from(onErrorExecutor.execute(event, parameters, context))
           .doAfterTerminate(() -> rollback());
     }
 

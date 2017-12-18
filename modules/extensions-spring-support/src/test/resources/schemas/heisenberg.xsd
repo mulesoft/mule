@@ -684,6 +684,12 @@
         </xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="required" name="initialBatchNumber"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
+        <xs:attribute type="mule:substitutableLong" use="optional" default="300" name="frequency"></xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="Heisenberg-AsyncListenPayments-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
+          <xs:annotation>
+            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="sameNameParameter"></xs:attribute>
         <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="fail"></xs:attribute>
@@ -811,6 +817,12 @@
         </xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="required" name="initialBatchNumber"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
+        <xs:attribute type="mule:substitutableLong" use="optional" default="300" name="frequency"></xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="Heisenberg-ListenPayments-backPressureStrategyEnumType" use="optional" default="FAIL" name="backPressureStrategy">
+          <xs:annotation>
+            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="sameNameParameter"></xs:attribute>
         <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="fail"></xs:attribute>
@@ -930,7 +942,13 @@
         </xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="required" name="initialBatchNumber"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
+        <xs:attribute type="mule:substitutableLong" use="optional" default="300" name="frequency"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="reconnectable"></xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="Heisenberg-ReconnectableListenPayments-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
+          <xs:annotation>
+            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="sameNameParameter"></xs:attribute>
         <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="fail"></xs:attribute>
@@ -2575,6 +2593,47 @@
         <xs:restriction base="xs:string">
           <xs:enumeration value="GOATIE"></xs:enumeration>
           <xs:enumeration value="MUSTACHE"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="Heisenberg-AsyncListenPayments-backPressureStrategyEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL"></xs:enumeration>
+          <xs:enumeration value="WAIT"></xs:enumeration>
+          <xs:enumeration value="DROP"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="Heisenberg-ListenPayments-backPressureStrategyEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL"></xs:enumeration>
+          <xs:enumeration value="DROP"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="Heisenberg-ReconnectableListenPayments-backPressureStrategyEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL"></xs:enumeration>
+          <xs:enumeration value="WAIT"></xs:enumeration>
+          <xs:enumeration value="DROP"></xs:enumeration>
         </xs:restriction>
       </xs:simpleType>
       <xs:simpleType>

@@ -30,6 +30,7 @@ import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
+import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
@@ -38,6 +39,7 @@ import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.BackPressureContextArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ByParameterNameArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.CompletionCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ComponentLocationArgumentResolver;
@@ -94,6 +96,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       new StreamingHelperArgumentResolver();
   private static final ArgumentResolver<SourceResult> SOURCE_RESULT_ARGUMENT_RESOLVER =
       new SourceResultArgumentResolver(ERROR_ARGUMENT_RESOLVER, SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER);
+  private static final ArgumentResolver<BackPressureContext> BACK_PRESSURE_CONTEXT_ARGUMENT_RESOLVER =
+      new BackPressureContextArgumentResolver();
   private static final ArgumentResolver<ComponentLocation> COMPONENT_LOCATION_ARGUMENT_RESOLVER =
       new ComponentLocationArgumentResolver();
   private static final ArgumentResolver<OperationTransactionalAction> OPERATION_TRANSACTIONAL_ACTION_ARGUMENT_RESOLVER =
@@ -171,6 +175,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = STREAMING_HELPER_ARGUMENT_RESOLVER;
       } else if (SourceResult.class.equals(parameterType)) {
         argumentResolver = SOURCE_RESULT_ARGUMENT_RESOLVER;
+      } else if (BackPressureContext.class.equals(parameterType)) {
+        argumentResolver = BACK_PRESSURE_CONTEXT_ARGUMENT_RESOLVER;
       } else if (SourceCompletionCallback.class.equals(parameterType)) {
         argumentResolver = ASYNC_SOURCE_COMPLETION_CALLBACK_ARGUMENT_RESOLVER;
       } else if (ComponentLocation.class.equals(parameterType)) {

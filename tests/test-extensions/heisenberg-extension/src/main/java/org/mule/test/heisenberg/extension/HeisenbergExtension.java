@@ -6,6 +6,7 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static com.google.common.collect.ImmutableList.copyOf;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -33,6 +34,7 @@ import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
+import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
@@ -183,6 +185,20 @@ public class HeisenbergExtension implements Lifecycle {
 
   @ParameterGroup(name = BROTHER_IN_LAW, showInDsl = true)
   private HankSchrader brotherInLaw;
+
+  private List<BackPressureContext> backPressureContexts = new LinkedList<>();
+
+  public void onBackPressure(BackPressureContext ctx) {
+    synchronized (backPressureContexts) {
+      backPressureContexts.add(ctx);
+    }
+  }
+
+  public List<BackPressureContext> getBackPressureContexts() {
+    synchronized (backPressureContexts) {
+      return copyOf(backPressureContexts);
+    }
+  }
 
   @Override
   public void initialise() throws InitialisationException {

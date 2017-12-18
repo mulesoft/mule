@@ -34,4 +34,6 @@ public interface SourceElement extends ParameterizableTypeElement {
 
   Optional<MethodElement> getOnTerminateMethod();
 
+  Optional<MethodElement> getOnBackPressureMethod();
+
 }

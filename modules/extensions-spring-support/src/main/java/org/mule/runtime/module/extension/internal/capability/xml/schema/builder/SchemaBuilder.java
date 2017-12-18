@@ -369,7 +369,7 @@ public final class SchemaBuilder {
     attribute.setUse(required ? USE_REQUIRED : USE_OPTIONAL);
     attribute.setAnnotation(createDocAnnotation(description));
 
-    if (defaultValue instanceof String && isNotBlank(defaultValue.toString())) {
+    if ((defaultValue instanceof String && isNotBlank(defaultValue.toString())) || defaultValue instanceof Enum) {
       attribute.setDefault(defaultValue.toString());
     }
 

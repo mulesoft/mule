@@ -9,6 +9,8 @@ package org.mule.runtime.core.api.source;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
@@ -47,14 +49,14 @@ public interface MessageSource extends Component {
     FAIL,
 
     /**
-     * On back-pressure block the current thread and wait until the {@link org.mule.runtime.core.api.InternalEvent} can be
+     * On back-pressure block the current thread and wait until the {@link CoreEvent} can be
      * accepted.
      */
     WAIT,
 
     /**
-     * On back-pressure drop the {@link org.mule.runtime.core.api.InternalEvent} by immediately completing
-     * {@link org.mule.runtime.core.api.InternalEventContext} with no result without performing any processing.
+     * On back-pressure drop the {@link CoreEvent} by immediately completing
+     * {@link EventContext} with no result without performing any processing.
      */
     DROP
   }

@@ -58,9 +58,14 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/tx" type="org.mule.runtime.extension.api.tx.SourceTransactionalActionEnumType" use="optional" name="transactionalAction">
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/tx" type="org.mule.runtime.extension.api.tx.SourceTransactionalActionEnumType" use="optional" default="NONE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of beginning action that sources can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/tx" type="transactional-TransactionalSource-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
+          <xs:annotation>
+            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:transactionType" use="optional" default="LOCAL" name="transactionType">
@@ -89,7 +94,12 @@
             <xs:documentation>The type of transaction to create. Availability will depend on the runtime version.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/tx" type="org.mule.runtime.extension.api.tx.SourceTransactionalActionEnumType" use="optional" name="transactionalAction">
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/tx" type="transactional-TransactionalSourceWithTXParameters-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
+          <xs:annotation>
+            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/tx" type="org.mule.runtime.extension.api.tx.SourceTransactionalActionEnumType" use="optional" default="NONE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of beginning action that sources can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -109,7 +119,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -139,7 +149,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -170,7 +180,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -200,7 +210,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -221,7 +231,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -241,7 +251,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -261,7 +271,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -281,7 +291,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -303,6 +313,34 @@
         <xs:restriction base="xs:string">
           <xs:enumeration value="ALWAYS_BEGIN"></xs:enumeration>
           <xs:enumeration value="NONE"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="transactional-TransactionalSource-backPressureStrategyEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL"></xs:enumeration>
+          <xs:enumeration value="WAIT"></xs:enumeration>
+          <xs:enumeration value="DROP"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="transactional-TransactionalSourceWithTXParameters-backPressureStrategyEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL"></xs:enumeration>
+          <xs:enumeration value="WAIT"></xs:enumeration>
+          <xs:enumeration value="DROP"></xs:enumeration>
         </xs:restriction>
       </xs:simpleType>
       <xs:simpleType>
