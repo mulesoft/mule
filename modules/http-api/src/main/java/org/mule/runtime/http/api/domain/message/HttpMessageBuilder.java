@@ -29,7 +29,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
   protected MultiMap<String, String> headers = new CaseInsensitiveMultiMap();
   protected HttpEntity entity = new EmptyHttpEntity();
 
-  protected HttpMessageBuilder() {}
+  public HttpMessageBuilder() {}
 
   protected HttpMessageBuilder(HttpMessage httpMessage) {
     entity(httpMessage.getEntity());
