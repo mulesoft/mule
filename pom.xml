@@ -187,7 +187,7 @@
         <greenmailVersion>1.5.0</greenmailVersion>
         <groovyVersion>2.4.4</groovyVersion>
         <gsonVersion>2.5</gsonVersion>
-        <guavaVersion>18.0</guavaVersion>
+        <guavaVersion>23.5-jre</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <jacksonVersion>1.9.11</jacksonVersion>
         <javax.inject.version>1</javax.inject.version>
