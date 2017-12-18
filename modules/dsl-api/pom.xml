@@ -16,6 +16,7 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <oldMuleArtifactVersion>1.0.0</oldMuleArtifactVersion>
     </properties>
 
     <dependencies>
@@ -40,5 +41,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

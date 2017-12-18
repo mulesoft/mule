@@ -307,6 +307,7 @@
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
+        <oldMuleArtifactVersion>4.0.0</oldMuleArtifactVersion>
     </properties>
 
     <dependencies>
@@ -1752,12 +1753,6 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.mule.tools.maven</groupId>
-                    <artifactId>mule-module-maven-plugin</artifactId>
-                    <version>${mule.module.maven.plugin.version}</version>
-                    <extensions>true</extensions>
-                </plugin>
-                <plugin>
                     <groupId>org.mule.runtime.plugins</groupId>
                     <artifactId>mule-plugin-maven-plugin</artifactId>
                     <version>${mule.app.plugins.maven.plugin.version}</version>
@@ -1811,19 +1806,6 @@
                     <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
                     <shortRevisionLength>8</shortRevisionLength>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.mule.tools.maven</groupId>
-                <artifactId>mule-module-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>analyze</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>analyze</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>com.marvinformatics.formatter</groupId>
@@ -2146,6 +2128,82 @@
                                     </rules>
                                     <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
                                 </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>mule-module</id>
+            <activation>
+                <file>
+                    <exists>target/classes/META-INF/mule-module.properties</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.mule.tools.maven</groupId>
+                        <artifactId>mule-module-maven-plugin</artifactId>
+                        <version>${mule.module.maven.plugin.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>analyze</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>analyze</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.revapi</groupId>
+                        <artifactId>revapi-maven-plugin</artifactId>
+                        <version>0.9.5</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.mule.tools.maven</groupId>
+                                <artifactId>mule-revapi-extension</artifactId>
+                                <version>1.0.0-SNAPSHOT</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <oldVersion>${oldMuleArtifactVersion}</oldVersion>
+                            <failOnUnresolvedArtifacts>true</failOnUnresolvedArtifacts>
+                            <failOnMissingConfigurationFiles>false</failOnMissingConfigurationFiles>
+                            <analysisConfiguration><![CDATA[
+                                {
+                                    "revapi" : {
+                                        "java" : {
+                                            "missing-classes" : {
+                                                "behavior" : "report"
+                                            }
+                                        },
+                                        "semver": {
+                                          "ignore": {
+                                            "enabled": true,
+                                            "versionIncreaseAllows" : {
+                                              "major" : "breaking",
+                                              "minor" : "nonBreaking",
+                                              "patch" : "equivalent"
+                                            }
+                                          }
+                                        }
+                                    }
+                                }
+                            ]]></analysisConfiguration>
+                            <analysisConfigurationFiles combine.children="append">
+                                <configurationFile>
+                                    <path>api-ignored.json</path>
+                                </configurationFile>
+                            </analysisConfigurationFiles>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>api-check</id>
+                                <goals><goal>check</goal></goals>
                             </execution>
                         </executions>
                     </plugin>

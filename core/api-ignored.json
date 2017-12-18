@@ -1,0 +1,301 @@
+{
+  "revapi": {
+    "ignore": [
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundAttachment(java.lang.String, javax.activation.DataHandler)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundAttachment(java.lang.String, javax.activation.DataHandler)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundProperty(java.lang.String, java.io.Serializable)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundProperty(java.lang.String, java.io.Serializable)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundAttachment(java.lang.String, javax.activation.DataHandler)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundAttachment(java.lang.String, javax.activation.DataHandler)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundProperty(java.lang.String, java.io.Serializable)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundProperty(java.lang.String, java.io.Serializable)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::attributes(org.mule.runtime.api.metadata.TypedValue<?>)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::attributes(org.mule.runtime.api.metadata.TypedValue<?>)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::attributesMediaType(org.mule.runtime.api.metadata.MediaType)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::attributesMediaType(org.mule.runtime.api.metadata.MediaType)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::attributesValue(java.lang.Object)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::attributesValue(java.lang.Object)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::exceptionPayload(org.mule.runtime.core.api.message.ExceptionPayload)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::exceptionPayload(org.mule.runtime.core.api.message.ExceptionPayload)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::inboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::inboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::inboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::inboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChangedCovariantly",
+        "old": "method org.mule.runtime.core.api.processor.strategy.ProcessingStrategy org.mule.runtime.core.api.construct.FlowConstruct::getProcessingStrategy() @ org.mule.runtime.core.api.policy.DefaultPolicyInstance",
+        "new": "method org.mule.runtime.core.api.policy.DefaultPolicyInstance.PolicyProcessingStrategy org.mule.runtime.core.api.policy.DefaultPolicyInstance::getProcessingStrategy()",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::mediaType(org.mule.runtime.api.metadata.MediaType)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::mediaType(org.mule.runtime.api.metadata.MediaType)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::nullAttributesValue()",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::nullAttributesValue()",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::outboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::outboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::outboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::outboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeInboundAttachment(java.lang.String)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeInboundAttachment(java.lang.String)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeInboundProperty(java.lang.String)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeInboundProperty(java.lang.String)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeOutboundAttachment(java.lang.String)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeOutboundAttachment(java.lang.String)",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeOutboundProperty(java.lang.String)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeOutboundProperty(java.lang.String)",
+        "oldType": "org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addInboundAttachment(java.lang.String, javax.activation.DataHandler)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addInboundAttachment(java.lang.String, javax.activation.DataHandler) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addInboundProperty(java.lang.String, java.io.Serializable)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addInboundProperty(java.lang.String, java.io.Serializable) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addOutboundAttachment(java.lang.String, javax.activation.DataHandler)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addOutboundAttachment(java.lang.String, javax.activation.DataHandler) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addOutboundProperty(java.lang.String, java.io.Serializable)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addOutboundProperty(java.lang.String, java.io.Serializable) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::attributes(org.mule.runtime.api.metadata.TypedValue<?>)",
+        "new": "method org.mule.runtime.api.message.Message.Builder org.mule.runtime.api.message.Message.Builder::attributes(org.mule.runtime.api.metadata.TypedValue<?>) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::attributesMediaType(org.mule.runtime.api.metadata.MediaType)",
+        "new": "method org.mule.runtime.api.message.Message.Builder org.mule.runtime.api.message.Message.Builder::attributesMediaType(org.mule.runtime.api.metadata.MediaType) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::attributesValue(java.lang.Object)",
+        "new": "method org.mule.runtime.api.message.Message.Builder org.mule.runtime.api.message.Message.Builder::attributesValue(java.lang.Object) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::build()",
+        "new": "method org.mule.runtime.api.message.Message org.mule.runtime.api.message.Message.Builder::build() @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::exceptionPayload(org.mule.runtime.core.api.message.ExceptionPayload)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::exceptionPayload(org.mule.runtime.core.api.message.ExceptionPayload) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::inboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::inboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::inboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::inboundProperties(java.util.Map<java.lang.String, java.io.Serializable>) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::itemMediaType(org.mule.runtime.api.metadata.MediaType)",
+        "new": "method org.mule.runtime.api.message.Message.CollectionBuilder org.mule.runtime.api.message.Message.CollectionBuilder::itemMediaType(org.mule.runtime.api.metadata.MediaType) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::mediaType(org.mule.runtime.api.metadata.MediaType)",
+        "new": "method org.mule.runtime.api.message.Message.Builder org.mule.runtime.api.message.Message.Builder::mediaType(org.mule.runtime.api.metadata.MediaType) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::nullAttributesValue()",
+        "new": "method org.mule.runtime.api.message.Message.Builder org.mule.runtime.api.message.Message.Builder::nullAttributesValue() @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::outboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::outboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::outboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::outboundProperties(java.util.Map<java.lang.String, java.io.Serializable>) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::removeInboundAttachment(java.lang.String)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::removeInboundAttachment(java.lang.String) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::removeInboundProperty(java.lang.String)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::removeInboundProperty(java.lang.String) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::removeOutboundAttachment(java.lang.String)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::removeOutboundAttachment(java.lang.String) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.returnTypeChanged",
+        "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::removeOutboundProperty(java.lang.String)",
+        "new": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::removeOutboundProperty(java.lang.String) @ org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.class.nonPublicPartOfAPI",
+        "old": "class org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder",
+        "new": "class org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      },
+      {
+        "code": "java.method.addedToInterface",
+        "new": "method void org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder::setProcessingStrategy(org.mule.runtime.core.api.processor.strategy.ProcessingStrategy)",
+        "package": "org.mule.runtime.core.privileged.processor.chain",
+        "justification": "MULE-14279: API broken by MULE-14171"
+      }
+    ]
+  }
+}
