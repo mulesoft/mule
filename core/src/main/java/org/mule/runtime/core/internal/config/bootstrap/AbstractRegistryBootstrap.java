@@ -6,80 +6,92 @@
  */
 package org.mule.runtime.core.internal.config.bootstrap;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.singleton;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getCause;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.ALL;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.createFromString;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.PropertiesUtils;
-import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Set;
 
 /**
  * Base class for an object will load objects defined in a file called <code>registry-bootstrap.properties</code> into the local
  * registry. This allows modules and transports to make certain objects available by default. The most common use case is for a
  * module or transport to load stateless transformers into the registry. For this file to be located it must be present in the
  * modules META-INF directory under
- * 
+ *
  * <pre>
  * META-INF/org/mule/config/
  * </pre>
  * <p/>
  * The format of this file is a simple key / value pair. i.e.
- * 
+ *
  * <pre>
  * myobject = org.foo.MyObject
  * </pre>
- * 
+ *
  * Will register an instance of MyObject with a key of 'myobject'. If you don't care about the object name and want to ensure that
  * the ojbect gets a unique name you can use -
- * 
+ *
  * <pre>
  * object.1=org.foo.MyObject
  * object.2=org.bar.MyObject
  * </pre>
- * 
+ *
  * or
- * 
+ *
  * <pre>
  * myFoo=org.foo.MyObject
  * myBar=org.bar.MyObject
  * </pre>
- * 
+ *
  * It's also possible to define if the entry must be applied to a domain, an application, or both by using the parameter
  * applyToArtifactType.
- * 
+ *
  * <pre>
  * myFoo=org.foo.MyObject will be applied to any mule application since the parameter applyToArtifactType default value is app
  * myFoo=org.foo.MyObject;applyToArtifactType=app will be applied to any mule application
  * myFoo=org.foo.MyObject;applyToArtifactType=domain will be applied to any mule domain
  * myFoo=org.foo.MyObject;applyToArtifactType=app/domain will be applied to any mule application and any mule domain
  * </pre>
- * 
+ *
  * Loading transformers has a slightly different notation since you can define the 'returnClass' with optional mime type, and
  * 'name'of the transformer as parameters i.e.
- * 
+ *
  * <pre>
  * transformer.1=org.mule.compatibility.core.transport.jms.transformers.JMSMessageToObject,returnClass=byte[]
  * transformer.2=org.mule.compatibility.core.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String:text/xml, name=JMSMessageToString
  * transformer.3=org.mule.compatibility.core.transport.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
  * </pre>
- * 
+ *
  * Note that the key used for transformers must be 'transformer.x' where 'x' is a sequential number. The transformer name will be
  * automatically generated as JMSMessageToXXX where XXX is the return class name i.e. JMSMessageToString unless a 'name' parameter
  * is specified. If no 'returnClass' is specified the default in the transformer will be used.
@@ -116,7 +128,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
 
   /**
    * TODO Optimize me! MULE-9343
-   * 
+   *
    * {@inheritDoc}
    */
   @Override
@@ -200,7 +212,8 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
     properties.put(MIME_TYPE_PROPERTY, mime);
     properties.put(RETURN_CLASS_PROPERTY, returnClassName);
 
-    return new TransformerBootstrapProperty(bootstrapService, APP, optional, name, className, returnClassName, mime);
+    return new TransformerBootstrapProperty(bootstrapService, new HashSet<>(asList(APP, POLICY)), optional, name, className,
+                                            returnClassName, mime);
   }
 
   private TransactionFactoryBootstrapProperty createTransactionFactoryBootstrapProperty(BootstrapService bootstrapService,
@@ -210,8 +223,9 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
     String transactionResourceKey = propertyKey.replace(".transaction.factory", TRANSACTION_RESOURCE_SUFFIX);
     String transactionResource = bootstrapProperties.getProperty(transactionResourceKey);
     if (transactionResource == null) {
-      throw new InitialisationException(CoreMessages.createStaticMessage(String
-          .format("There is no transaction resource specified for transaction factory %s", propertyKey)), this);
+      throw new InitialisationException(createStaticMessage(format("There is no transaction resource specified for transaction factory %s",
+                                                                   propertyKey)),
+                                        this);
     }
 
     String transactionResourceClassNameProperties = transactionResource;
@@ -224,22 +238,25 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
     final String transactionResourceClassName =
         (index == -1 ? transactionResourceClassNameProperties : transactionResourceClassNameProperties.substring(0, index));
 
-    return new TransactionFactoryBootstrapProperty(bootstrapService, APP, optional, propertyValue, transactionResourceClassName);
+    return new TransactionFactoryBootstrapProperty(bootstrapService, singleton(APP), optional, propertyValue,
+                                                   transactionResourceClassName);
   }
 
   private ObjectBootstrapProperty createObjectBootstrapProperty(BootstrapService bootstrapService, String propertyKey,
                                                                 String propertyValue) {
     boolean optional = false;
     String className;
-    ArtifactType artifactTypeParameterValue = APP;
+    Set<ArtifactType> artifactTypesParameterValue = new HashSet<>(asList(APP, DOMAIN, POLICY));
 
     final String value = propertyValue;
     int index = value.indexOf(",");
     if (index > -1) {
       Properties p = PropertiesUtils.getPropertiesFromString(value.substring(index + 1), ',');
-      if (p.containsKey(ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY)) {
-        artifactTypeParameterValue =
-            ArtifactType.createFromString((String) p.get(ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY));
+      if (p.containsKey(APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY)) {
+
+        artifactTypesParameterValue = stream(((String) p.get(APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY)).split("\\/"))
+            .map(t -> createFromString(t))
+            .collect(toSet());
       }
       optional = p.containsKey(OPTIONAL_ATTRIBUTE);
       className = value.substring(0, index);
@@ -247,7 +264,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
       className = value;
     }
 
-    return new ObjectBootstrapProperty(bootstrapService, artifactTypeParameterValue, optional, propertyKey, className);
+    return new ObjectBootstrapProperty(bootstrapService, artifactTypesParameterValue, optional, propertyKey, className);
   }
 
   private void registerUnnamedObjects(List<ObjectBootstrapProperty> bootstrapProperties) throws Exception {
@@ -264,7 +281,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
 
   private void registerObject(ObjectBootstrapProperty bootstrapProperty) throws Exception {
     try {
-      if (!bootstrapProperty.getArtifactType().equals(ALL) && !bootstrapProperty.getArtifactType().equals(artifactType)) {
+      if (!bootstrapProperty.getArtifactTypes().contains(artifactType) && !bootstrapProperty.getArtifactTypes().contains(ALL)) {
         return;
       }
 

@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.core.api.config.bootstrap;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
+
+import java.util.Set;
 
 /**
  * List the possible types of deployable artifacts
@@ -15,8 +18,13 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
  * @since 3.7.0
  */
 public enum ArtifactType {
-  APP("app"), DOMAIN("domain"), PLUGIN("plugin"), POLICY("policy"), SERVICE("service"), SERVER_PLUGIN("serverPlugin"), ALL(
-      "app/domain");
+  APP("app"), DOMAIN("domain"), PLUGIN("plugin"), POLICY("policy"), SERVICE("service"), SERVER_PLUGIN("serverPlugin"),
+
+  /**
+   * @deprecated Use a {@link Set} of applicable {@link ArtifactType}s where possible.
+   */
+  @Deprecated
+  ALL("app/domain");
 
   public static final String APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY = "applyToArtifactType";
   private final String artifactTypeAsString;
@@ -35,6 +43,6 @@ public enum ArtifactType {
         return artifactType;
       }
     }
-    throw new MuleRuntimeException(CoreMessages.createStaticMessage("No artifact type found for value: " + artifactTypeAsString));
+    throw new MuleRuntimeException(createStaticMessage("No artifact type found for value: " + artifactTypeAsString));
   }
 }

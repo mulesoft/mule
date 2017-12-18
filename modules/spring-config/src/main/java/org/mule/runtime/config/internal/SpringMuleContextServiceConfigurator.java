@@ -160,14 +160,19 @@ class SpringMuleContextServiceConfigurator {
   private final CustomServiceRegistry customServiceRegistry;
   private final BeanDefinitionRegistry beanDefinitionRegistry;
 
-  private static final ImmutableSet<String> APPLICATION_ONLY_SERVICES =
-      ImmutableSet.<String>builder().add(OBJECT_SECURITY_MANAGER).add(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)
-          .add(OBJECT_MULE_STREAM_CLOSER_SERVICE).add(OBJECT_CONVERTER_RESOLVER).add(OBJECT_LOCK_FACTORY)
-          .add(OBJECT_LOCK_PROVIDER).add(OBJECT_PROCESSING_TIME_WATCHER).add(OBJECT_EXCEPTION_LOCATION_PROVIDER)
-          .add(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER).build();
+  private static final ImmutableSet<String> APPLICATION_ONLY_SERVICES = ImmutableSet.<String>builder()
+      .add(OBJECT_SECURITY_MANAGER)
+      .add(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)
+      .add(OBJECT_MULE_STREAM_CLOSER_SERVICE)
+      .add(OBJECT_CONVERTER_RESOLVER)
+      .add(OBJECT_PROCESSING_TIME_WATCHER)
+      .add(OBJECT_EXCEPTION_LOCATION_PROVIDER)
+      .add(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER)
+      .build();
 
   private static final ImmutableMap<String, String> OBJECT_STORE_NAME_TO_LOCAL_OBJECT_STORE_NAME =
-      ImmutableMap.<String, String>builder().put(BASE_IN_MEMORY_OBJECT_STORE_KEY, OBJECT_LOCAL_STORE_IN_MEMORY)
+      ImmutableMap.<String, String>builder()
+          .put(BASE_IN_MEMORY_OBJECT_STORE_KEY, OBJECT_LOCAL_STORE_IN_MEMORY)
           .put(BASE_PERSISTENT_OBJECT_STORE_KEY, OBJECT_LOCAL_STORE_PERSISTENT)
           .build();
 

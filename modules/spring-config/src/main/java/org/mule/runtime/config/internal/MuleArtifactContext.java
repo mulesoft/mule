@@ -68,7 +68,6 @@ import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
-import org.mule.runtime.config.internal.processor.ContextExclusiveInjectorProcessor;
 import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
@@ -581,10 +580,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected void registerInjectorProcessor(ConfigurableListableBeanFactory beanFactory) {
     MuleInjectorProcessor muleInjectorProcessor = null;
-    if (artifactType.equals(ArtifactType.APP)) {
+    if (artifactType.equals(ArtifactType.APP) || artifactType.equals(ArtifactType.DOMAIN)) {
       muleInjectorProcessor = new MuleInjectorProcessor();
-    } else if (artifactType.equals(ArtifactType.DOMAIN)) {
-      muleInjectorProcessor = new ContextExclusiveInjectorProcessor(this);
     }
     if (muleInjectorProcessor != null) {
       muleInjectorProcessor.setBeanFactory(beanFactory);
@@ -705,4 +702,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     return getMuleContext().getRegistry().get(OBJECT_REGISTRY);
   }
 
+  @Override
+  public String toString() {
+    return format("%s: %s (%s)", this.getClass().getName(), muleContext.getConfiguration().getId(), artifactType.name());
+  }
 }
