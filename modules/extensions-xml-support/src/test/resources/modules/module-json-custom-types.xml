@@ -53,4 +53,22 @@
         </body>
         <output type="Type1"/>
     </operation>
+
+
+    <operation name="get-hardcoded-type1-as-json">
+        <body>
+            <mule:set-payload value="#[output application/json --- { 'street_type': 'Avenue', 'street_name': 'calle 7'}]" />
+        </body>
+        <output type="Type1"/>
+    </operation>
+
+    <operation name="check-street-is-avenue">
+        <parameters>
+            <parameter name="street" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[output application/java --- vars.street == 'Avenue']" />
+        </body>
+        <output type="boolean"/>
+    </operation>
 </module>

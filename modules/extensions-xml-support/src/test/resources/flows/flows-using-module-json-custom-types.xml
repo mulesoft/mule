@@ -36,4 +36,15 @@
     <flow name="testCopyJsonType1FromExpressionFlow">
         <modulejson:copy-jsontype1 aParameter="#[{ 'street_type': 'Avenue', 'street_name': 'calle 7'}]" />
     </flow>
+
+    <flow name="testExtractingJsonResponseAndFeedingSimpleType">
+        <!-- working with the payload -->
+        <modulejson:get-hardcoded-type1-as-json/>
+        <modulejson:check-street-is-avenue street="Boulevard" target="checkingNotAvenue"/>
+        <modulejson:check-street-is-avenue street="#[{ 'street_type': 'Avenue', 'street_name': 'calle 7'}.street_type]" target="checkingFromExpression"/>
+        <modulejson:check-street-is-avenue street="#[payload.street_type]" target="checkingFromHardcodedType1"/>
+        <!-- working with variable and checking the target does put the correct datatype in the binding -->
+        <modulejson:get-hardcoded-type1-as-json target="someVariable"/>
+        <modulejson:check-street-is-avenue street="#[vars.someVariable.street_type]" target="checkingFromHardcodedType1WithVariables"/>
+    </flow>
 </mule>
