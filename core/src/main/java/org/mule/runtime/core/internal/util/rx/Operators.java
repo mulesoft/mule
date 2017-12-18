@@ -9,8 +9,8 @@ package org.mule.runtime.core.internal.util.rx;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 
+import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
@@ -53,7 +53,7 @@ public final class Operators {
 
   public static Function<CoreEvent, CoreEvent> outputToTarget(CoreEvent originalEvent, String target,
                                                               String targetValueExpression,
-                                                              ExtendedExpressionManager expressionManager) {
+                                                              ExpressionLanguage expressionManager) {
     return result -> {
       if (target != null) {
         TypedValue targetValue = expressionManager.evaluate(targetValueExpression, getTargetBindingContext(result.getMessage()));
