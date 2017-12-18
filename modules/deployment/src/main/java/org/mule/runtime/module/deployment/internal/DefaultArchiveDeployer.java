@@ -20,10 +20,8 @@ import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleAppsDir;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
@@ -118,26 +116,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   @Override
   public File getDeploymentDirectory() {
     return artifactFactory.getArtifactDir();
-  }
-
-  private void undeployArtifactIfItsAPatch(T artifact) {
-    Optional<T> foundMatchingArtifact = artifacts.stream()
-        .filter(deployedArtifact -> deployedArtifact.getDescriptor().getBundleDescriptor() != null)
-        .filter(deployedArtifact -> !artifactZombieMap.containsKey(artifact.getArtifactName()))
-        .filter(deployedArtifact -> {
-          BundleDescriptor deployedBundleDescriptor = deployedArtifact.getDescriptor().getBundleDescriptor();
-          BundleDescriptor artifactBundleDescriptor = artifact.getDescriptor().getBundleDescriptor();
-          if (deployedBundleDescriptor.getGroupId().equals(artifactBundleDescriptor.getGroupId()) &&
-              deployedBundleDescriptor.getArtifactId().equals(artifactBundleDescriptor.getArtifactId())) {
-            MuleVersion deployedVersion = new MuleVersion(deployedBundleDescriptor.getVersion());
-            MuleVersion artifactVersion = new MuleVersion(artifactBundleDescriptor.getVersion());
-            if (artifactVersion.sameBaseVersion(deployedVersion)) {
-              return true;
-            }
-          }
-          return false;
-        }).findAny();
-    foundMatchingArtifact.ifPresent(this::undeployArtifactWithoutRemovingData);
   }
 
   private File installArtifact(URI artifactAchivedUri) throws IOException {
@@ -491,7 +469,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       T artifact;
       try {
         artifact = createArtifact(artifactLocation, appProperties);
-        undeployArtifactIfItsAPatch(artifact);
         trackArtifact(artifact);
       } catch (Throwable t) {
         String artifactName = artifactLocation.getName();
