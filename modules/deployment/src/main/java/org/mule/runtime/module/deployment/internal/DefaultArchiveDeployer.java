@@ -19,10 +19,10 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleAppsDir;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
@@ -60,12 +60,13 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   private final File artifactDir;
   private final ObservableList<T> artifacts;
   private final ArtifactDeploymentTemplate deploymentTemplate;
-  private ArtifactFactory<T> artifactFactory;
+  private AbstractDeployableArtifactFactory<T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
   private MuleContextListenerFactory muleContextListenerFactory;
 
 
-  public DefaultArchiveDeployer(final ArtifactDeployer deployer, final ArtifactFactory artifactFactory,
+  public DefaultArchiveDeployer(final ArtifactDeployer deployer,
+                                final AbstractDeployableArtifactFactory artifactFactory,
                                 final ObservableList<T> artifacts,
                                 ArtifactDeploymentTemplate deploymentTemplate,
                                 MuleContextListenerFactory muleContextListenerFactory) {
@@ -159,7 +160,11 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public void setArtifactFactory(final ArtifactFactory<T> artifactFactory) {
-    this.artifactFactory = artifactFactory;
+    if (!(artifactFactory instanceof AbstractDeployableArtifactFactory)) {
+      throw new IllegalArgumentException("artifactFactory is expected to be of type "
+          + AbstractDeployableArtifactFactory.class.getName());
+    }
+    this.artifactFactory = (AbstractDeployableArtifactFactory<T>) artifactFactory;
   }
 
   @Override
@@ -315,8 +320,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       throw e;
     } catch (IOException e) {
       deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
-      throw new DeploymentException(I18nMessageFactory
-          .createStaticMessage("Failed undeploying artifact " + artifact.getArtifactName()), e);
+      throw new DeploymentException(
+                                    createStaticMessage("Failed undeploying artifact " + artifact.getArtifactName()), e);
     }
   }
 

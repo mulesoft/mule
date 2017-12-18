@@ -87,11 +87,13 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
     artifactModel.validateModel(artifactLocation.getName());
 
+    BundleDescriptor bundleDescriptor = getBundleDescriptor(artifactLocation, artifactModel);
     final T descriptor = createArtifactDescriptor(artifactLocation, artifactModel.getName(), deploymentProperties);
     if (artifactLocation.isDirectory()) {
       descriptor.setRootFolder(artifactLocation);
     }
-    descriptor.setBundleDescriptor(getBundleDescriptor(artifactLocation, artifactModel));
+
+    descriptor.setBundleDescriptor(bundleDescriptor);
     descriptor.setMinMuleVersion(new MuleVersion(artifactModel.getMinMuleVersion()));
     descriptor.setRequiredProduct(artifactModel.getRequiredProduct());
 

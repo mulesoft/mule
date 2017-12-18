@@ -75,7 +75,7 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
 
   @Override
   protected String getArtifactId(ArtifactDescriptor artifactDescriptor) {
-    return getApplicationId(domain.getArtifactId(), artifactDescriptor.getName());
+    return getApplicationId(domain.getArtifactId(), ((ApplicationDescriptor) artifactDescriptor).getDataFolderName());
   }
 
   /**
@@ -97,14 +97,14 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
 
   /**
    * @param domainId name of the domain where the application is deployed. Non empty.
-   * @param applicationName name of the application. Non empty.
+   * @param applicationId id of the application. Non empty.
    * @return the unique identifier for the application in the container.
    */
-  public static String getApplicationId(String domainId, String applicationName) {
+  public static String getApplicationId(String domainId, String applicationId) {
     checkArgument(!isEmpty(domainId), "domainId cannot be empty");
-    checkArgument(!isEmpty(applicationName), "applicationName cannot be empty");
+    checkArgument(!isEmpty(applicationId), "applicationName cannot be empty");
 
-    return domainId + "/app/" + applicationName;
+    return domainId + "/app/" + applicationId;
   }
 
   @Override

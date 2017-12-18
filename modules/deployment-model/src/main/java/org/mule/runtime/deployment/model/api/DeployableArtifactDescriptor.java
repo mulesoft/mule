@@ -108,4 +108,5 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   protected Set<String> getDefaultConfigResources() {
     return emptySet();
   }
+
 }
