@@ -22,9 +22,9 @@
             <parameter name="aParameter" type="Type1"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[vars.aParameter as String]"/>
+            <mule:set-payload value="#[output application/java --- vars.aParameter is {street_type: String , street_name: String} ]"/>
         </body>
-        <output type="string"/>
+        <output type="boolean"/>
     </operation>
 
     <operation name="is-jsontype2">
@@ -32,14 +32,24 @@
             <parameter name="aParameter" type="Type2"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[vars.aParameter as String]"/>
+            <mule:set-payload value="#[output application/java --- vars.aParameter is {firstName: String , lastName: String, age: Number}]"/>
         </body>
-        <output type="string"/>
+        <output type="boolean"/>
     </operation>
 
     <operation name="get-hardcoded-type1">
         <body>
             <mule:set-payload value="#[{ 'street_type': 'Avenue', 'street_name': 'calle 7'}]" />
+        </body>
+        <output type="Type1"/>
+    </operation>
+
+    <operation name="copy-jsontype1">
+        <parameters>
+            <parameter name="aParameter" type="Type1"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[output application/java --- { 'street_type': vars.aParameter.street_type, 'street_name': vars.aParameter.street_name }]"/>
         </body>
         <output type="Type1"/>
     </operation>

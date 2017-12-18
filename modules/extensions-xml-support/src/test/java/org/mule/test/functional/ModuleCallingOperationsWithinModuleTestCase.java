@@ -41,8 +41,8 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractXmlExte
   @Parameterized.Parameters(name = "{index}: Running tests for {0} (validating XML [{2}])")
   public static Collection<Object[]> data() {
     return asList(getSimpleScenario(false),
-                  getSimpleScenario(false),
-                  getNestedModulesScenario(true),
+                  getSimpleScenario(true),
+                  getNestedModulesScenario(false),
                   getNestedModulesScenario(true));
   }
 
