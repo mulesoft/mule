@@ -18,7 +18,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
@@ -34,17 +33,17 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,8 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-
-import reactor.core.publisher.Mono;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -273,23 +270,25 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
                               Map<String, Pair<String, MetadataType>> unevaluatedMap) {
       unevaluatedMap.entrySet().stream()
           .forEach(entry -> {
-            final Object value = expressionManager.isExpression(entry.getValue().getFirst())
-                ? getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond())
-                : entry.getValue().getFirst();
-
-            builder.addVariable(entry.getKey(), value);
-
+            final boolean isExpression = expressionManager.isExpression(entry.getValue().getFirst());
+            if (isExpression) {
+              final TypedValue<?> evaluatedValue =
+                  getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond());
+              builder.addVariable(entry.getKey(), evaluatedValue.getValue(), evaluatedValue.getDataType());
+            } else {
+              builder.addVariable(entry.getKey(), entry.getValue().getFirst());
+            }
           });
     }
 
-    private Object getEvaluatedValue(CoreEvent event, String value, MetadataType metadataType) {
+    private TypedValue<?> getEvaluatedValue(CoreEvent event, String value, MetadataType metadataType) {
       ComponentLocation headLocation;
       final Processor head = getProcessorsToExecute().get(0);
       headLocation = ((Component) head).getLocation();
 
-      Object evaluatedResult;
+      TypedValue<?> evaluatedResult;
       if (MetadataFormat.JAVA.equals(metadataType.getMetadataFormat())) {
-        evaluatedResult = expressionManager.evaluate(value, event, headLocation).getValue();
+        evaluatedResult = expressionManager.evaluate(value, event, headLocation);
       } else {
         final String mediaType = metadataType.getMetadataFormat().getValidMimeTypes().iterator().next();
         final DataType expectedOutputType =
@@ -299,7 +298,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
                 .charset(UTF_8)
                 .build();
         evaluatedResult = expressionManager
-            .evaluate(value, expectedOutputType, NULL_BINDING_CONTEXT, event, headLocation, false).getValue();
+            .evaluate(value, expectedOutputType, NULL_BINDING_CONTEXT, event, headLocation, false);
       }
       return evaluatedResult;
     }

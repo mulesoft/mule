@@ -24,14 +24,25 @@
             <parameter name="aParameter" type="XsdType1::{http://validationnamespace.raml.org}User"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[vars.aParameter as String]"/>
+            <mule:set-payload value="#[output application/java --- vars.aParameter is { User : { name: String, kind: String, weight : String, email : String, userId: String } }]"/>
         </body>
-        <output type="string"/>
+        <output type="boolean"/>
     </operation>
 
     <operation name="get-hardcoded-xsdtype1">
         <body>
             <mule:set-payload value="#[ns val http://validationnamespace.raml.org --- { val#User: { val#name: 'somename', val#kind: 'somekind', val#weight: 100, val#email: 'somename@domain.com', val#userId: 'somename-id' } }]" />
+        </body>
+        <output type="XsdType1::{http://validationnamespace.raml.org}User"/>
+    </operation>
+
+    <operation name="copy-xsdtype1">
+        <parameters>
+            <parameter name="aParameter" type="XsdType1::{http://validationnamespace.raml.org}User"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[output application/java
+            ns val http://validationnamespace.raml.org --- { val#User: { val#name: vars.aParameter.User.name, val#kind: vars.aParameter.User.kind, val#weight: vars.aParameter.User.weight as Number, val#email: vars.aParameter.User.email, val#userId: vars.aParameter.User.userId } }]" />
         </body>
         <output type="XsdType1::{http://validationnamespace.raml.org}User"/>
     </operation>
