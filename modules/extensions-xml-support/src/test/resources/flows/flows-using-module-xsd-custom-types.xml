@@ -30,4 +30,9 @@
         <set-variable variableName="extracted-user-email" value="#[payload.User.email]" />
         <set-variable variableName="extracted-user-userId" value="#[payload.User.userId]" />
     </flow>
+
+    <flow name="testCopyXsdType1WithNamespaceFromExpressionFlow">
+        <modulexsd:copy-xsdtype1 aParameter="#[ns val http://validationnamespace.raml.org --- { val#User: { val#name: 'somename', val#kind: 'somekind', val#weight: 100, val#email: 'somename@domain.com', val#userId: 'somename-id' } }]" />
+    </flow>
+
 </mule>

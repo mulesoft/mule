@@ -6,46 +6,20 @@
  */
 package org.mule.test.functional;
 
-import static org.custommonkey.xmlunit.XMLUnit.setIgnoreAttributeOrder;
-import static org.custommonkey.xmlunit.XMLUnit.setIgnoreComments;
-import static org.custommonkey.xmlunit.XMLUnit.setIgnoreWhitespace;
-import static org.custommonkey.xmlunit.XMLUnit.setNormalizeWhitespace;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import com.google.common.collect.ImmutableMap;
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.Difference;
-import org.custommonkey.xmlunit.XMLUnit;
+import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.mule.runtime.core.api.event.CoreEvent;
 
-import java.util.List;
 import java.util.Map;
 
 public class ModuleXsdCustomTypeTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
-  private static final String XML_TYPE1_SAMPLE_WITH_NAMESPACE = "<?xml version='1.0' encoding='US-ASCII'?>"
-      + "<val:User xmlns:val=\"http://validationnamespace.raml.org\">"
-      + "  <val:name>somename</val:name>"
-      + "  <val:kind>somekind</val:kind>"
-      + "  <val:weight>100</val:weight>"
-      + "  <val:email>somename@domain.com</val:email>"
-      + "  <val:userId>somename-id</val:userId>"
-      + "</val:User>";
-
-  private static final String XML_TYPE1_SAMPLE = "<?xml version='1.0' encoding='US-ASCII'?>"
-      + "<User>"
-      + "  <name>somename</name>"
-      + "  <kind>somekind</kind>"
-      + "  <weight>100</weight>"
-      + "  <email>somename@domain.com</email>"
-      + "  <userId>somename-id</userId>"
-      + "</User>";
-
-  //the order matters when describing a , and ImmutableMap guarantees it
+  //the order matters when describing a type, and ImmutableMap guarantees it
   private static final ImmutableMap<String, Object> USER_DATA = ImmutableMap.<String, Object>builder()
       .put("name", "somename")
       .put("kind", "somekind")
@@ -53,7 +27,8 @@ public class ModuleXsdCustomTypeTestCase extends AbstractXmlExtensionMuleArtifac
       .put("email", "somename@domain.com")
       .put("userId", "somename-id")
       .build();
-  private static final Map<String, Object> EXPECTED_XSDTYPE_1 = ImmutableMap.of("User", USER_DATA);
+  private static final String USER = "User";
+  private static final Map<String, Object> EXPECTED_XSDTYPE_1 = ImmutableMap.of(USER, USER_DATA);
 
   @Override
   protected String getModulePath() {
@@ -68,19 +43,19 @@ public class ModuleXsdCustomTypeTestCase extends AbstractXmlExtensionMuleArtifac
   @Test
   public void testSendingXsdType1FromMap() throws Exception {
     final CoreEvent muleEvent = flowRunner("testIsXsdType1FromPayloadFlow").withPayload(EXPECTED_XSDTYPE_1).run();
-    compareXML((String) muleEvent.getMessage().getPayload().getValue(), XML_TYPE1_SAMPLE);
+    assertIsExpectedType(muleEvent);
   }
 
   @Test
   public void testSendingXsdType1FromExpression() throws Exception {
     final CoreEvent muleEvent = flowRunner("testIsXsdType1FromExpressionFlow").run();
-    compareXML((String) muleEvent.getMessage().getPayload().getValue(), XML_TYPE1_SAMPLE);
+    assertIsExpectedType(muleEvent);
   }
 
   @Test
   public void testIsXsdType1WithNamespaceFromExpression() throws Exception {
     final CoreEvent muleEvent = flowRunner("testIsXsdType1WithNamespaceFromExpressionFlow").run();
-    compareXML((String) muleEvent.getMessage().getPayload().getValue(), XML_TYPE1_SAMPLE_WITH_NAMESPACE);
+    assertIsExpectedType(muleEvent);
   }
 
   @Test
@@ -102,23 +77,31 @@ public class ModuleXsdCustomTypeTestCase extends AbstractXmlExtensionMuleArtifac
     }
   }
 
-  private void compareXML(String expected, String actual) throws Exception {
-    setNormalizeWhitespace(true);
-    setIgnoreWhitespace(true);
-    setIgnoreComments(true);
-    setIgnoreAttributeOrder(false);
+  @Test
+  public void testCopyXsdType1WithNamespaceFromExpressionFlow() throws Exception {
+    final CoreEvent muleEvent = flowRunner("testCopyXsdType1WithNamespaceFromExpressionFlow").run();
+    assertIsXmlType1(muleEvent);
+  }
 
-    Diff diff = XMLUnit.compareXML(expected, actual);
-    if (!(diff.similar() && diff.identical())) {
-      DetailedDiff detDiff = new DetailedDiff(diff);
-      @SuppressWarnings("rawtypes")
-      List differences = detDiff.getAllDifferences();
-      StringBuilder diffLines = new StringBuilder();
-      for (Object object : differences) {
-        Difference difference = (Difference) object;
-        diffLines.append(difference.toString() + '\n');
-      }
-      throw new IllegalArgumentException("Actual XML differs from expected: \n" + diffLines.toString());
+
+  /**
+   * Validations are done with DW scripts within the module being consumed here.
+   * (the module is targeted by the method {@link #getModulePath()})
+   *
+   * @param muleEvent
+   */
+  private void assertIsExpectedType(CoreEvent muleEvent) {
+    assertThat(muleEvent.getMessage().getPayload().getValue(), Is.is(true));
+  }
+
+  private void assertIsXmlType1(CoreEvent muleEvent) {
+    assertThat(muleEvent.getMessage().getPayload().getValue(), instanceOf(Map.class));
+    final Map<String, Object> actualUserMap = (Map<String, Object>) muleEvent.getMessage().getPayload().getValue();
+    assertThat(actualUserMap.containsKey(USER), is(true));
+    assertThat(actualUserMap.get(USER), instanceOf(Map.class));
+    final Map<String, Object> userDataEvent = (Map<String, Object>) actualUserMap.get(USER);
+    for (Map.Entry<String, Object> entry : USER_DATA.entrySet()) {
+      assertThat(userDataEvent, hasEntry(entry.getKey(), entry.getValue()));
     }
   }
 

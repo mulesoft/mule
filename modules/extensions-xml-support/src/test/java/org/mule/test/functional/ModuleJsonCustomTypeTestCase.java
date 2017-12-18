@@ -38,35 +38,31 @@ public class ModuleJsonCustomTypeTestCase extends AbstractXmlExtensionMuleArtifa
   @Test
   public void testSendingJsonType1FromMap() throws Exception {
     final CoreEvent muleEvent = flowRunner("testIsJsonType1FromPayloadFlow").withPayload(EXPECTED_TYPE_1).run();
-    assertIsJsonType1(muleEvent);
+    assertIsExpectedType(muleEvent);
   }
 
   @Test
   public void testSendingJsonType1FromExpression() throws Exception {
     final CoreEvent muleEvent = flowRunner("testIsJsonType1FromExpressionFlow").run();
-    assertIsJsonType1(muleEvent);
+    assertIsExpectedType(muleEvent);
   }
 
   @Test
   public void testSendingJsonType2FromMap() throws Exception {
     final CoreEvent muleEvent = flowRunner("testIsJsonType2FromPayloadFlow").withPayload(EXPECTED_TYPE_2).run();
-    assertIsJsonType2(muleEvent);
+    assertIsExpectedType(muleEvent);
   }
 
   @Test
   public void testSendingJsonType2FromExpression() throws Exception {
     final CoreEvent muleEvent = flowRunner("testIsJsonType2FromExpressionFlow").run();
-    assertIsJsonType2(muleEvent);
+    assertIsExpectedType(muleEvent);
   }
 
   @Test
   public void testHardcodedType1Flow() throws Exception {
     final CoreEvent muleEvent = flowRunner("testHardcodedType1Flow").run();
-    assertThat(muleEvent.getMessage().getPayload().getValue(), instanceOf(Map.class));
-    for (Map.Entry<String, Object> entry : EXPECTED_TYPE_1.entrySet()) {
-      assertThat((Map<String, Object>) muleEvent.getMessage().getPayload().getValue(),
-                 hasEntry(entry.getKey(), entry.getValue()));
-    }
+    assertIsJsonType1(muleEvent);
   }
 
   @Test
@@ -77,13 +73,27 @@ public class ModuleJsonCustomTypeTestCase extends AbstractXmlExtensionMuleArtifa
     }
   }
 
-  private void assertIsJsonType1(CoreEvent muleEvent) {
-    assertThat(muleEvent.getMessage().getPayload().getValue(),
-               is("{\n  \"street_type\": \"Avenue\",\n  \"street_name\": \"calle 7\"\n}"));
+  @Test
+  public void testCopyJsonType1FromExpressionFlow() throws Exception {
+    final CoreEvent muleEvent = flowRunner("testCopyJsonType1FromExpressionFlow").run();
+    assertIsJsonType1(muleEvent);
   }
 
-  private void assertIsJsonType2(CoreEvent muleEvent) {
-    assertThat(muleEvent.getMessage().getPayload().getValue(),
-               is("{\n  \"firstName\": \"Dardo\",\n  \"lastName\": \"Rocha\",\n  \"age\": 83\n}"));
+  private void assertIsJsonType1(CoreEvent muleEvent) {
+    assertThat(muleEvent.getMessage().getPayload().getValue(), instanceOf(Map.class));
+    for (Map.Entry<String, Object> entry : EXPECTED_TYPE_1.entrySet()) {
+      assertThat((Map<String, Object>) muleEvent.getMessage().getPayload().getValue(),
+                 hasEntry(entry.getKey(), entry.getValue()));
+    }
+  }
+
+  /**
+   * Validations are done with DW scripts within the module being consumed here.
+   * (the module is targeted by the method {@link #getModulePath()})
+   *
+   * @param muleEvent
+   */
+  private void assertIsExpectedType(CoreEvent muleEvent) {
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is(true));
   }
 }

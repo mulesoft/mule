@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:echo="http://www.mulesoft.org/schema/mule/module-echo"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/module-echo http://www.mulesoft.org/schema/mule/module-echo/current/mule-module-echo.xsd">
+
+    <flow name="test">
+        <echo:data-type value="#[payload]" />
+    </flow>
+
+</mule>
