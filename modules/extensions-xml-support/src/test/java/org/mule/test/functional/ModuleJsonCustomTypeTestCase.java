@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.core.Is.is;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Map;
@@ -77,6 +78,16 @@ public class ModuleJsonCustomTypeTestCase extends AbstractXmlExtensionMuleArtifa
   public void testCopyJsonType1FromExpressionFlow() throws Exception {
     final CoreEvent muleEvent = flowRunner("testCopyJsonType1FromExpressionFlow").run();
     assertIsJsonType1(muleEvent);
+  }
+
+  @Test
+  public void testExtractingJsonResponseAndFeedingSimpleType() throws Exception {
+    final CoreEvent muleEvent = flowRunner("testExtractingJsonResponseAndFeedingSimpleType").run();
+    final Map<String, TypedValue<?>> variables = muleEvent.getVariables();
+    assertThat(variables.get("checkingNotAvenue").getValue(), is(false));
+    assertThat(variables.get("checkingFromExpression").getValue(), is(true));
+    assertThat(variables.get("checkingFromHardcodedType1").getValue(), is(true));
+    assertThat(variables.get("checkingFromHardcodedType1WithVariables").getValue(), is(true));
   }
 
   private void assertIsJsonType1(CoreEvent muleEvent) {
