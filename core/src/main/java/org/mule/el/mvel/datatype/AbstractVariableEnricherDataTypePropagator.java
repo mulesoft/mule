@@ -60,7 +60,7 @@ public class AbstractVariableEnricherDataTypePropagator extends AbstractEnricher
         {
             CompiledAccExpression compiledAccExpression = getCompiledAccExpression(node);
 
-            if (compiledAccExpression.getAccessor() instanceof VariableAccessor)
+            if (compiledAccExpression != null && compiledAccExpression.getAccessor() instanceof VariableAccessor)
             {
                 VariableAccessor variableAccessor = (VariableAccessor) compiledAccExpression.getAccessor();
                 if (variableAccessor.getProperty().equals(propertyName))
