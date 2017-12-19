@@ -264,7 +264,6 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
-  // TODO
   public void appliesApplicationPolicyUsingPluginOnlyInPolicy() throws Exception {
     policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
 
