@@ -51,18 +51,20 @@ import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.util.CompilerUtils;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 /**
  * Contains test for application deployment with policies on the default domain
  */
 public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestCase {
+
+  private static final String APP_WITH_SIMPLE_EXTENSION_CONFIG = "app-with-simple-extension-config.xml";
 
   private static final int POLICY_NOTIFICATION_TIMEOUT = 5000;
 
@@ -262,12 +264,32 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  // TODO
+  public void appliesApplicationPolicyUsingPluginOnlyInPolicy() throws Exception {
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder =
+        createExtensionApplicationWithServices(APP_WITH_SIMPLE_EXTENSION_CONFIG, createSingleExtensionPlugin());
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
   public void appliesApplicationPolicyIncludingPlugin() throws Exception {
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
 
     policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
 
-    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("app-with-simple-extension-config.xml",
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_SIMPLE_EXTENSION_CONFIG,
                                                                                            simpleExtensionPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
@@ -381,7 +403,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     PolicyFileBuilder fooPolicyFileBuilder = createInjectedPolicy();
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
-    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("app-with-simple-extension-config.xml",
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_SIMPLE_EXTENSION_CONFIG,
                                                                                            createSingleExtensionPlugin(),
                                                                                            bootstrapPluginFileBuilder);
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -403,7 +425,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.registerPolicyTemplate(policyWithPluginAndResource().getArtifactFile());
 
-    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("app-with-simple-extension-config.xml",
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_SIMPLE_EXTENSION_CONFIG,
                                                                                            simpleExtensionPlugin);
 
     addPackedAppFromBuilder(applicationFileBuilder);

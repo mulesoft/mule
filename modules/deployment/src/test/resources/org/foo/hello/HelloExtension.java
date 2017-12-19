@@ -26,9 +26,15 @@ public class HelloExtension {
   @Inject
   private FooService fooService;
 
+  @Inject
+  private HelloRegistryBean registryBean;
+
   public HelloExtension() {}
 
   public String getMessage() {
+    if(registryBean == null) {
+      throw new NullPointerException("registryBean is null!");
+    }
     return this.fooService.doFoo(this.message);
   }
 }
