@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.util.Optional.empty;
-
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 
@@ -85,7 +84,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   }
 
   @Override
-  public void setDeploymentListener(CompositeDeploymentListener deploymentListener) {
+  public void setDeploymentListener(DeploymentListener deploymentListener) {
     domainDeployer.setDeploymentListener(deploymentListener);
   }
 

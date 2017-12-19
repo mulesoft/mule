@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+
 import java.io.File;
 import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.module.artifact.api.Artifact;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 
 /**
  * Deploys a file based artifact into the mule container.
@@ -38,7 +40,7 @@ public interface ArchiveDeployer<T extends Artifact> {
 
   File getDeploymentDirectory();
 
-  void setDeploymentListener(CompositeDeploymentListener deploymentListener);
+  void setDeploymentListener(DeploymentListener deploymentListener);
 
   void redeploy(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException;
 
