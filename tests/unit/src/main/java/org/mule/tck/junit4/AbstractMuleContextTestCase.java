@@ -130,6 +130,12 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    */
   public static final int BLOCK_TIMEOUT = 500;
 
+
+  /**
+   * Default shutdown timeout used when {@link #isGracefulShutdown()} is {@code false}.
+   */
+  protected static final long NON_GRACEFUL_SHUTDOWN_TIMEOUT = 10;
+
   /**
    * Indicates if the context should be instantiated per context. Default is false, which means that a context will be
    * instantiated per test method.
@@ -251,7 +257,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         context = muleContextFactory.createMuleContext(builders, contextBuilder);
         recordSchedulersOnInit(context);
         if (!isGracefulShutdown()) {
-          ((DefaultMuleConfiguration) context.getConfiguration()).setShutdownTimeout(0);
+          // Even though graceful shutdown is disabled allow small amount of time to avoid rejection errors when stream emits
+          // complete signal
+          ((DefaultMuleConfiguration) context.getConfiguration()).setShutdownTimeout(NON_GRACEFUL_SHUTDOWN_TIMEOUT);
         }
       } finally {
         currentThread().setContextClassLoader(originalContextClassLoader);
@@ -472,7 +480,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   /**
-   * Uses {@link org.mule.runtime.api.transformation.TransformationService} to get representation of a message for a given {@link DataType}
+   * Uses {@link org.mule.runtime.api.transformation.TransformationService} to get representation of a message for a given
+   * {@link DataType}
    *
    * @param message message to get payload from
    * @param dataType dataType to be transformed to
@@ -484,7 +493,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   /**
-   * Uses {@link org.mule.runtime.api.transformation.TransformationService} to get representation of a message for a given {@link Class}
+   * Uses {@link org.mule.runtime.api.transformation.TransformationService} to get representation of a message for a given
+   * {@link Class}
    *
    * @param message message to get payload from
    * @param clazz type of the payload to be transformed to
