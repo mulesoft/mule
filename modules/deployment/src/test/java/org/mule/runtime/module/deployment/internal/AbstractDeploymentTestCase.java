@@ -165,7 +165,7 @@ import org.mockito.verification.VerificationMode;
  */
 public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
-  protected static final int FILE_TIMESTAMP_PRECISION_MILLIS = 1000;
+  protected static final int FILE_TIMESTAMP_PRECISION_MILLIS = 2000;
   protected static final String FLOW_PROPERTY_NAME = "flowName";
   protected static final String COMPONENT_NAME = "componentValue";
   protected static final String COMPONENT_NAME_IN_APP = "component";
@@ -585,27 +585,63 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     assertStatus(artifactName, STARTED);
   }
 
-  private void assertRedeploymentSuccess(DeploymentListener listener, String artifactName,
-                                         Supplier<Map<String, Map<URI, Long>>> zombieSupplier) {
-    assertDeploymentSuccess(listener, artifactName);
+  protected void assertRedeploymentSuccess(DeploymentListener listener, String artifactName,
+                                           Supplier<Map<String, Map<URI, Long>>> zombieSupplier) {
+    assertRedeploymentStart(listener, artifactName);
+    assertRedeploymentSuccess(listener, artifactName);
     verify(listener, times(1)).onUndeploymentStart(artifactName);
     verify(listener, times(1)).onUndeploymentSuccess(artifactName);
 
     assertArtifactIsNotRegisteredAsZombie(artifactName, zombieSupplier.get());
   }
 
-  private void assertRedeploymentFailure(DeploymentListener listener, String artifactName,
-                                         Supplier<Map<String, Map<URI, Long>>> zombieSupplier) {
-    assertDeploymentFailure(listener, artifactName);
+  private void assertRedeploymentSuccess(DeploymentListener listener, String artifactName) {
+    Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+    prober.check(new JUnitProbe() {
+
+      @Override
+      protected boolean test() throws Exception {
+        verify(listener, times(1)).onRedeploymentSuccess(artifactName);
+        return true;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "Failed to redeploy artifact: " + artifactName + System.lineSeparator() + super.describeFailure();
+      }
+    });
+  }
+
+  protected void assertRedeploymentFailure(DeploymentListener listener, String artifactName) {
+    assertRedeploymentStart(listener, artifactName);
+    assertArtifactRedeploymentFailure(listener, artifactName);
+
     verify(listener, times(1)).onUndeploymentStart(artifactName);
     verify(listener, times(1)).onUndeploymentSuccess(artifactName);
+  }
 
-    assertArtifactIsRegisteredAsZombie(artifactName, zombieSupplier.get());
+  private void assertArtifactRedeploymentFailure(DeploymentListener listener, String artifactName) {
+    Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+    prober.check(new JUnitProbe() {
+
+      @Override
+      protected boolean test() throws Exception {
+        verify(listener).onRedeploymentFailure(eq(artifactName), any(Throwable.class));
+        return true;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "Failed to redeploy application: " + artifactName + System.lineSeparator() + super.describeFailure();
+      }
+    });
   }
 
   private void assertFailedArtifactRedeploymentSuccess(DeploymentListener listener, String artifactName,
                                                        Supplier<Map<String, Map<URI, Long>>> zombieSupplier) {
+    assertRedeploymentStart(listener, artifactName);
     assertDeploymentSuccess(listener, artifactName);
+    assertRedeploymentSuccess(listener, artifactName);
     verify(listener, never()).onUndeploymentStart(artifactName);
     verify(listener, never()).onUndeploymentSuccess(artifactName);
 
@@ -614,7 +650,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   private void assertFailedArtifactRedeploymentFailure(DeploymentListener listener, String artifactName,
                                                        Supplier<Map<String, Map<URI, Long>>> zombieSupplier) {
+    assertRedeploymentStart(listener, artifactName);
     assertDeploymentFailure(listener, artifactName);
+    assertArtifactRedeploymentFailure(listener, artifactName);
     verify(listener, times(0)).onUndeploymentStart(artifactName);
     verify(listener, times(0)).onUndeploymentSuccess(artifactName);
 
@@ -635,9 +673,18 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void assertApplicationRedeploymentFailure(String artifactName) {
-    assertRedeploymentFailure(applicationDeploymentListener, artifactName, deploymentService::getZombieApplications);
+    assertRedeploymentFailure(applicationDeploymentListener, artifactName);
 
+    assertDeploymentFailure(applicationDeploymentListener, artifactName);
+    assertArtifactIsRegisteredAsZombie(artifactName, deploymentService.getZombieApplications());
     assertStatus(artifactName, ApplicationStatus.DEPLOYMENT_FAILED);
+  }
+
+  protected void assertApplicationMissingOnBundleRedeployment(String artifactName) {
+    assertRedeploymentFailure(applicationDeploymentListener, artifactName);
+
+    assertDeploymentFailure(applicationDeploymentListener, artifactName);
+    assertArtifactIsNotRegisteredAsZombie(artifactName, deploymentService.getZombieApplications());
   }
 
   protected void assertFailedApplicationRedeploymentFailure(DeploymentListener listener, String artifactName) {
@@ -654,7 +701,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void assertDomainRedeploymentFailure(String artifactName) {
-    assertRedeploymentFailure(domainDeploymentListener, artifactName, deploymentService::getZombieDomains);
+    assertRedeploymentFailure(domainDeploymentListener, artifactName);
+
+    assertDeploymentFailure(domainDeploymentListener, artifactName);
+    assertArtifactIsRegisteredAsZombie(artifactName, deploymentService.getZombieDomains());
   }
 
   protected void assertFailedDomainRedeploymentFailure(String artifactName) {
@@ -814,9 +864,40 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
       @Override
       public String describeFailure() {
-        return "Application deployment was supposed to fail for: " + artifactName + super.describeFailure();
+        return getArtifactType(listener) + " deployment was supposed to fail for: " + artifactName + super.describeFailure();
       }
     });
+  }
+
+  protected void assertRedeploymentStart(final DeploymentListener listener, final String artifactName) {
+    Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+    prober.check(new JUnitProbe() {
+
+      @Override
+      public boolean test() {
+        verify(listener).onRedeploymentStart(eq(artifactName));
+        return true;
+      }
+
+      @Override
+      public String describeFailure() {
+        return getArtifactType(listener) + " redeployment was supposed to start for: " + artifactName + super.describeFailure();
+      }
+    });
+  }
+
+  private String getArtifactType(DeploymentListener deploymentListener) {
+    String artifactType;
+    if (deploymentListener == applicationDeploymentListener) {
+      artifactType = "Application";
+    } else if (deploymentListener == domainDeploymentListener) {
+      artifactType = "Domain";
+    } else {
+      throw new IllegalArgumentException("Cannot determine the artifact type from deployment listener");
+    }
+
+    return artifactType;
+
   }
 
   protected void assertNoDeploymentInvoked(final DeploymentListener deploymentListener) {
@@ -1016,7 +1097,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       // Need to update the config file lastModified ere to ensure that is different from previous value
       File configFile = new File(tempFolder, getConfigFilePathWithinArtifact(configFileName));
       if (configFile.exists()) {
-        configFile.setLastModified(System.currentTimeMillis() + FILE_TIMESTAMP_PRECISION_MILLIS);
+        configFile.setLastModified(currentTimeMillis() + FILE_TIMESTAMP_PRECISION_MILLIS);
       }
 
       File appFolder = new File(destinationDir, artifactName);
@@ -1334,5 +1415,17 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     } else {
       deploymentService.redeploy(id, deploymentProperties);
     }
+  }
+
+  /**
+   * Updates a file's last modified time to be greater than the original timestamp
+   *
+   * @param timestamp time value in milliseconds of the original file's last modified time
+   * @param file file to update
+   */
+  protected void updateFileModifiedTime(long timestamp, File file) {
+    do {
+      file.setLastModified(currentTimeMillis());
+    } while (file.lastModified() == timestamp);
   }
 }

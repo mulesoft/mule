@@ -97,14 +97,16 @@ public class MuleDeploymentService implements DeploymentService {
     this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
     this.domainDeployer = new DomainArchiveDeployer(new DefaultArchiveDeployer<Domain>(domainMuleDeployer, domainFactory, domains,
                                                                                        new DomainDeploymentTemplate(applicationDeployer,
-                                                                                                                    this),
+                                                                                                                    this,
+                                                                                                                    applicationDeploymentListener),
                                                                                        new DeploymentMuleContextListenerFactory(
                                                                                                                                 domainDeploymentListener)),
                                                     applicationDeployer, this);
     this.domainDeployer.setDeploymentListener(domainDeploymentListener);
 
     this.domainBundleDeployer = new DomainBundleArchiveDeployer(domainBundleDeploymentListener, domainDeployer, domains,
-                                                                applicationDeployer, applications);
+                                                                applicationDeployer, applications, domainDeploymentListener,
+                                                                applicationDeploymentListener, this);
 
     if (useParallelDeployment()) {
       if (isDeployingSelectedAppsInOrder()) {

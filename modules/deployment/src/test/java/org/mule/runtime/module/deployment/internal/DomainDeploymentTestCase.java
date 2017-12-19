@@ -1150,8 +1150,40 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertDomainRedeploymentSuccess(dummyDomainFileBuilder.getId());
 
+    assertApplicationRedeploymentSuccess(dummyDomainApp1FileBuilder.getId());
+    assertApplicationRedeploymentSuccess(dummyDomainApp2FileBuilder.getId());
+  }
+
+  @Test
+  public void redeploysDomainAndAllApplicationsEvenWhenOneFails() throws Exception {
+    addExplodedDomainFromBuilder(dummyDomainFileBuilder, dummyDomainFileBuilder.getId());
+
+    addExplodedAppFromBuilder(dummyDomainApp1FileBuilder, dummyDomainApp1FileBuilder.getId());
+    addExplodedAppFromBuilder(dummyDomainApp2FileBuilder, dummyDomainApp2FileBuilder.getId());
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2FileBuilder.getId());
+
+    reset(domainDeploymentListener);
+    reset(applicationDeploymentListener);
+
+    deploymentService.getLock().lock();
+    try {
+      doRedeployDummyDomainByChangingConfigFileWithGoodOne();
+      ApplicationFileBuilder updateAppDomainBuilder =
+          new ApplicationFileBuilder("dummy-domain-app1").definedBy("incomplete-app-config.xml");
+      addExplodedAppFromBuilder(updateAppDomainBuilder);
+    } finally {
+      deploymentService.getLock().unlock();
+    }
+
+    assertDomainRedeploymentFailure(dummyDomainFileBuilder.getId());
+    assertApplicationRedeploymentFailure(dummyDomainApp1FileBuilder.getId());
+    assertApplicationRedeploymentSuccess(dummyDomainApp2FileBuilder.getId());
   }
 
   @Test
@@ -1258,10 +1290,9 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
       deploymentService.getLock().unlock();
     }
 
-    assertDomainRedeploymentSuccess(dummyDomainFileBuilder.getId());
-
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
     assertDeploymentFailure(applicationDeploymentListener, dummyDomainApp2FileBuilder.getId());
+    assertDomainRedeploymentFailure(dummyDomainFileBuilder.getId());
   }
 
   @Test
@@ -1379,6 +1410,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
         new File(domainsDir + File.separator + incompleteDomainFileBuilder.getId(), DEFAULT_CONFIGURATION_RESOURCE);
     URL url = getClass().getResource("/empty-domain-config.xml");
     File newConfigFile = new File(url.toURI());
+    updateFileModifiedTime(originalConfigFile.lastModified(), newConfigFile);
     copyFile(newConfigFile, originalConfigFile);
     assertFailedDomainRedeploymentSuccess(incompleteDomainFileBuilder.getId());
 

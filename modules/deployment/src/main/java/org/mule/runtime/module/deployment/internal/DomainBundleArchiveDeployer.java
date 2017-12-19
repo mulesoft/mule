@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
@@ -20,14 +21,18 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
@@ -47,6 +52,9 @@ public class DomainBundleArchiveDeployer {
   private final ObservableList<Domain> domains;
   private final ArchiveDeployer<Application> applicationDeployer;
   private final ObservableList<Application> applications;
+  private final DeploymentListener domainDeploymentListener;
+  private final CompositeDeploymentListener applicationDeploymentListener;
+  private final DeploymentService deploymentService;
 
   /**
    * Creates a new deployer
@@ -56,16 +64,25 @@ public class DomainBundleArchiveDeployer {
    * @param domains maintains the deployed domain artifacts
    * @param applicationDeployer deploys the application artifact contained on the domain bundles
    * @param applications maintains the deployed application artifacts
+   * @param domainDeploymentListener
+   * @param applicationDeploymentListener
+   * @param deploymentService
    */
   public DomainBundleArchiveDeployer(DeploymentListener deploymentListener, ArchiveDeployer<Domain> domainDeployer,
                                      ObservableList<Domain> domains,
                                      ArchiveDeployer<Application> applicationDeployer,
-                                     ObservableList<Application> applications) {
+                                     ObservableList<Application> applications,
+                                     DeploymentListener domainDeploymentListener,
+                                     CompositeDeploymentListener applicationDeploymentListener,
+                                     DeploymentService deploymentService) {
     this.deploymentListener = deploymentListener;
     this.domainDeployer = domainDeployer;
     this.domains = domains;
     this.applicationDeployer = applicationDeployer;
     this.applications = applications;
+    this.domainDeploymentListener = domainDeploymentListener;
+    this.applicationDeploymentListener = applicationDeploymentListener;
+    this.deploymentService = deploymentService;
   }
 
   /**
@@ -75,25 +92,65 @@ public class DomainBundleArchiveDeployer {
    * @throws DeploymentException when the domain bundle was not successfully deployed
    */
   public void deployArtifact(URI uri) throws DeploymentException {
+    LOGGER.info("deploying artifact: " + uri);
     File bundleFile = new File(uri);
     final String bundleName = removeEndIgnoreCase(bundleFile.getName(), ZIP_FILE_SUFFIX);
     deploymentListener.onDeploymentStart(bundleName);
 
     File tempFolder = null;
+    boolean isRedeploy = false;
+    String domainName = null;
     try {
       tempFolder = unzipDomainBundle(bundleFile);
+      File domainFile = getDomainFile(tempFolder);
+      domainName = getBaseName(domainFile.getName());
+      Domain domain = findDomain(domainName);
+      isRedeploy = domain != null;
 
+      Set<String> originalAppIds = new HashSet<>();
+      if (isRedeploy) {
+        domainDeploymentListener.onRedeploymentStart(domainName);
+
+        Collection<Application> originalDomainApplications = deploymentService.findDomainApplications(domainName);
+        for (Application domainApplication : originalDomainApplications) {
+          if (domainApplication.getStatus() == ApplicationStatus.STARTED
+              || domainApplication.getStatus() == ApplicationStatus.STOPPED) {
+            applicationDeploymentListener.onRedeploymentStart(domainApplication.getArtifactName());
+          }
+        }
+
+        originalAppIds = originalDomainApplications.stream().map(a -> a.getArtifactName()).collect(toSet());
+      }
       try {
-        deployDomain(tempFolder);
+        deployDomain(domainFile);
       } catch (Exception e) {
         // Ignore, deploy applications anyway
         LOGGER.warn("Domain bundle's domain was not deployed", e);
       }
 
-      deployApplications(tempFolder);
+      deployApplications(tempFolder, isRedeploy);
 
+      if (isRedeploy) {
+        Collection<Application> newDomainApplications = deploymentService.findDomainApplications(domainName);
+
+        originalAppIds.stream().forEach(appId -> {
+          Optional<Application> application =
+              newDomainApplications.stream().filter(newApp -> appId.equals(newApp.getArtifactName())).findFirst();
+          if (!application.isPresent()) {
+            DeploymentException cause = new DeploymentException(
+                                                                createStaticMessage("Application was not included in the updated domain bundle"));
+            applicationDeploymentListener.onDeploymentFailure(appId, cause);
+            applicationDeploymentListener.onRedeploymentFailure(appId, cause);
+          }
+        });
+
+        domainDeploymentListener.onRedeploymentSuccess(domainName);
+      }
       deploymentListener.onDeploymentSuccess(bundleName);
     } catch (Exception e) {
+      if (isRedeploy) {
+        domainDeploymentListener.onRedeploymentFailure(domainName, e);
+      }
       deploymentListener.onDeploymentFailure(bundleName, e);
       if (e instanceof DeploymentException) {
         throw (DeploymentException) e;
@@ -107,7 +164,7 @@ public class DomainBundleArchiveDeployer {
     }
   }
 
-  private void deployApplications(File tempFolder) {
+  private void deployApplications(File tempFolder, boolean isRedeploy) {
     File applicationsFolder = new File(tempFolder, "applications");
     if (!applicationsFolder.exists()) {
       throw new DeploymentException(createStaticMessage("Domain bundle does not contain an application folder"));
@@ -122,7 +179,7 @@ public class DomainBundleArchiveDeployer {
     boolean applicationDeploymentError = false;
     for (String applicationArtifact : applicationArtifacts) {
       try {
-        deployApplication(applicationsFolder, deployedApps, applicationArtifact);
+        deployApplication(applicationsFolder, deployedApps, applicationArtifact, isRedeploy);
       } catch (Exception e) {
         applicationDeploymentError = true;
       }
@@ -133,27 +190,24 @@ public class DomainBundleArchiveDeployer {
     }
   }
 
-  private void deployApplication(File applicationsFolder, Set<String> deployedApps, String applicationArtifact) {
+  private void deployApplication(File applicationsFolder, Set<String> deployedApps, String applicationArtifact,
+                                 boolean isRedeploy) {
     String applicationName = getBaseName(applicationArtifact);
     deployedApps.add(applicationName);
-    Application application = findApplication(applicationName);
-    if (application != null) {
-      applicationDeployer.redeploy(application, empty());
-    } else {
+
+    try {
       applicationDeployer.deployPackagedArtifact(new File(applicationsFolder, applicationArtifact).toURI(), empty());
+      applicationDeploymentListener.onRedeploymentSuccess(applicationName);
+    } catch (RuntimeException e) {
+      if (isRedeploy) {
+        applicationDeploymentListener.onRedeploymentFailure(applicationName, e);
+      }
+      throw e;
     }
   }
 
-  private void deployDomain(File tempFolder) throws IOException {
-    File sourceDomainFolder = new File(tempFolder, "domain");
-    String[] domainFileNames = sourceDomainFolder.list(new SuffixFileFilter(JAR_FILE_SUFFIX));
-    if (domainFileNames == null) {
-      throw new DeploymentException(createStaticMessage("Domain bundle does not contain a domain artifact"));
-    }
-
-    File domainFile = new File(sourceDomainFolder, domainFileNames[0]);
-
-    String domainName = getBaseName(domainFileNames[0]);
+  private void deployDomain(File domainFile) throws IOException {
+    String domainName = getBaseName(domainFile.getName());
     Domain domain = findDomain(domainName);
     if (domain != null) {
       domainDeployer.undeployArtifact(domainName);
@@ -161,6 +215,20 @@ public class DomainBundleArchiveDeployer {
     }
 
     domainDeployer.deployPackagedArtifact(domainFile.toURI(), empty());
+  }
+
+  private File getDomainFile(File tempFolder) {
+    File sourceDomainFolder = new File(tempFolder, "domain");
+    String domainFileName = getDomainFileName(sourceDomainFolder);
+    return new File(sourceDomainFolder, domainFileName);
+  }
+
+  private String getDomainFileName(File sourceDomainFolder) {
+    String[] domainFileNames = sourceDomainFolder.list(new SuffixFileFilter(JAR_FILE_SUFFIX));
+    if (domainFileNames == null) {
+      throw new DeploymentException(createStaticMessage("Domain bundle does not contain a domain artifact"));
+    }
+    return domainFileNames[0];
   }
 
   private File unzipDomainBundle(File bundleFile) throws IOException {
@@ -174,9 +242,5 @@ public class DomainBundleArchiveDeployer {
 
   private Domain findDomain(String domainName) {
     return (Domain) find(domains, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, domainName));
-  }
-
-  private Application findApplication(String appName) {
-    return (Application) find(applications, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, appName));
   }
 }

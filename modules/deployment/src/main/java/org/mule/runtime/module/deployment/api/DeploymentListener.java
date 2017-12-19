@@ -71,6 +71,37 @@ public interface DeploymentListener {
   }
 
   /**
+   * Notifies that a redeploy for a given artifact has started.
+   *
+   * @param artifactName the name of the artifact being deployed
+   * @since 4.1
+   */
+  default void onRedeploymentStart(String artifactName) {
+
+  }
+
+  /**
+   * Notifies that a redeploy for a given artifact has successfully finished.
+   *
+   * @param artifactName the name of the artifact being deployed
+   * @since 4.1
+   */
+  default void onRedeploymentSuccess(String artifactName) {
+
+  }
+
+  /**
+   * Notifies that a redeploy for a given artifact has finished with a failure.
+   *
+   * @param artifactName the name of the artifact being deployed
+   * @param cause the cause of the failure
+   * @since 4.1
+   */
+  default void onRedeploymentFailure(String artifactName, Throwable cause) {
+
+  }
+
+  /**
    * Notifies the artifact creation for a given app.
    *
    * @param artifactName name of the application that owns the mule context

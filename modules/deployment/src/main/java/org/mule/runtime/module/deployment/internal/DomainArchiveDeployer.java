@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.util.Optional.empty;
-
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -116,25 +114,12 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
 
   @Override
   public void redeploy(Domain artifact, Optional<Properties> deploymentProperties) throws DeploymentException {
-    Collection<Application> domainApplications = findApplicationsAssociated(artifact);
-    for (Application domainApplication : domainApplications) {
-      applicationDeployer.undeployArtifactWithoutUninstall(domainApplication);
-    }
     try {
       domainDeployer.redeploy(artifact, deploymentProperties);
     } catch (DeploymentException e) {
       logger.warn(String.format("Failure during redeployment of domain %s, domain applications deployment will be skipped",
                                 artifact.getArtifactName()));
       throw e;
-    }
-    for (Application domainApplication : domainApplications) {
-      try {
-        applicationDeployer.redeploy(domainApplication, deploymentProperties);
-      } catch (Exception e) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Error redeploying application {}", domainApplication.getArtifactName(), e);
-        }
-      }
     }
   }
 
