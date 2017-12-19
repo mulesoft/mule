@@ -70,7 +70,11 @@ public class ConnectionManagerConfigurationBuilder implements ConfigurationBuild
   }
 
   private void registerConnectionManager(MuleContext muleContext, ConnectionManager connectionManager) {
-    muleContext.getCustomizationService().overrideDefaultServiceImpl(OBJECT_CONNECTION_MANAGER, connectionManager);
+    if (Boolean.getBoolean("munit.enabled")) {
+      muleContext.getCustomizationService().overrideDefaultServiceImpl(OBJECT_CONNECTION_MANAGER, connectionManager);
+    } else {
+      muleContext.getCustomizationService().overrideDefaultServiceImpl(OBJECT_CONNECTION_MANAGER, connectionManager);
+    }
   }
 
   @Override
