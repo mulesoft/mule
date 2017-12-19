@@ -515,7 +515,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "java.lang.Object"
+              ],
               "isMap": false
             }
           },
@@ -1711,7 +1713,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "org.mule.test.heisenberg.extension.model.KnockeableDoor"
+              ],
               "isMap": false
             }
           },
@@ -1760,7 +1764,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.heisenberg.extension.model.KnockeableDoor"
+                    ],
                     "isMap": false
                   }
                 },
@@ -2338,7 +2344,8 @@
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -2476,7 +2483,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "java.lang.String"
+              ],
               "isMap": false
             }
           },
@@ -2525,7 +2534,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.String"
+                    ],
                     "isMap": false
                   }
                 },
@@ -2687,7 +2698,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "java.lang.String"
+                ],
                 "isMap": false
               }
             },
@@ -2757,7 +2770,9 @@
                         "java.util.Collection"
                       ],
                       "parent": "",
-                      "genericTypes": [],
+                      "genericTypes": [
+                        "java.lang.String"
+                      ],
                       "isMap": false
                     }
                   },
@@ -3901,7 +3916,8 @@
                 "parent": "java.lang.Number",
                 "genericTypes": [],
                 "isMap": false
-              }
+              },
+              "int": {}
             }
           },
           "annotations": {

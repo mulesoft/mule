@@ -508,7 +508,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.lang.String"
+                        ],
                         "isMap": false
                       }
                     },
@@ -3740,7 +3742,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "java.lang.String"
+              ],
               "isMap": false
             }
           },
@@ -3787,7 +3791,9 @@
                     "isFinal": false,
                     "implementedInterfaces": [],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.String"
+                    ],
                     "isMap": false
                   }
                 },

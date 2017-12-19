@@ -668,7 +668,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "java.util.List"
+              ],
               "isMap": false
             }
           },
@@ -686,7 +688,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "java.lang.Object"
+                ],
                 "isMap": false
               }
             },
@@ -737,7 +741,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.Object"
+                    ],
                     "isMap": false
                   }
                 },

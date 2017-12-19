@@ -855,7 +855,8 @@
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "int": {}
                 }
               }
             },
