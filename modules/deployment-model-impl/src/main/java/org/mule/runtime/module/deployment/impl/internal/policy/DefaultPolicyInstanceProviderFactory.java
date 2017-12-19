@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -48,7 +49,7 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
                                           PolicyParametrization parametrization) {
     return new DefaultApplicationPolicyInstance(application, policyTemplate, parametrization, serviceRepository,
                                                 classLoaderRepository, policyTemplate.getArtifactPlugins(),
-                                                extensionModelLoaderRepository);
+                                                extensionModelLoaderRepository, null);
   }
 
 }

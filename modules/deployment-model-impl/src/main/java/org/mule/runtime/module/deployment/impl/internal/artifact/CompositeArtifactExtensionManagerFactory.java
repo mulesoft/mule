@@ -8,16 +8,17 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
+
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.CompositeArtifactExtensionManager;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class CompositeArtifactExtensionManagerFactory extends ArtifactExtensionM
 
   /**
    * Creates a new factory
-   * 
+   *
    * @param parentArtifact application on which the policies are applied. Non null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
    * @param artifactPlugins artifact plugins deployed inside the artifact. Non null.
@@ -51,7 +52,7 @@ public class CompositeArtifactExtensionManagerFactory extends ArtifactExtensionM
     ExtensionManager policyExtensionManager = super.create(muleContext);
 
     ExtensionManager applicationExtensionManager =
-        parentArtifact.getRegistry().<ExtensionManager>lookupByName(MuleProperties.OBJECT_EXTENSION_MANAGER).get();
+        parentArtifact.getRegistry().<ExtensionManager>lookupByName(OBJECT_EXTENSION_MANAGER).get();
 
     return new CompositeArtifactExtensionManager(applicationExtensionManager, policyExtensionManager);
   }

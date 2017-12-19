@@ -31,6 +31,9 @@ import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionU
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
@@ -580,7 +583,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected void registerInjectorProcessor(ConfigurableListableBeanFactory beanFactory) {
     MuleInjectorProcessor muleInjectorProcessor = null;
-    if (artifactType.equals(ArtifactType.APP) || artifactType.equals(ArtifactType.DOMAIN)) {
+    if (artifactType.equals(APP) || artifactType.equals(POLICY) || artifactType.equals(DOMAIN)) {
       muleInjectorProcessor = new MuleInjectorProcessor();
     }
     if (muleInjectorProcessor != null) {
