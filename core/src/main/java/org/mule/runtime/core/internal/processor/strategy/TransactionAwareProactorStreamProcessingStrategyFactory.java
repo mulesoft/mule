@@ -74,7 +74,7 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
-            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, maxConcurrency);
+            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, CORES, maxConcurrency);
     }
 
     @Override

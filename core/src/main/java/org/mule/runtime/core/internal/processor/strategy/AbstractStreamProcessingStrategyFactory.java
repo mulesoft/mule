@@ -52,6 +52,7 @@ import reactor.core.publisher.WorkQueueProcessor;
  */
 abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
 
+  protected static int CORES = getRuntime().availableProcessors();
   private static final String SYSTEM_PROPERTY_PREFIX = AbstractStreamProcessingStrategyFactory.class.getName() + ".";
 
   public static final int DEFAULT_BUFFER_SIZE = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_BUFFER_SIZE", SMALL_BUFFER_SIZE);

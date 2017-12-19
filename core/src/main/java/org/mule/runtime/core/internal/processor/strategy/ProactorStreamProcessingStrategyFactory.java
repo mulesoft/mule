@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.time.Duration.ofMillis;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
@@ -55,7 +57,27 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                                 () -> muleContext.getSchedulerService()
                                                     .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                         .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
+                                                resolveParallelism(),
                                                 getMaxConcurrency());
+  }
+
+  @Override
+  protected int resolveParallelism() {
+    if (getMaxConcurrency() == Integer.MAX_VALUE) {
+      return max(CORES / getSubscriberCount(), 1);
+    } else {
+      // Resolve maximum factor of max concurrency that is less than number of cores in order to respect maxConcurrency more
+      // closely.
+      return min(CORES, maxFactor(max(getMaxConcurrency() / getSubscriberCount(), 1)));
+    }
+  }
+
+  private int maxFactor(int test) {
+    for (int i = CORES; i > 1; i--)
+      if (test % i == 0) {
+        return i;
+      }
+    return 1;
   }
 
   @Override
@@ -80,10 +102,12 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                             Supplier<Scheduler> cpuLightSchedulerSupplier,
                                             Supplier<Scheduler> blockingSchedulerSupplier,
                                             Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                            int parrelism,
                                             int maxConcurrency)
 
     {
-      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, maxConcurrency);
+      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier, parrelism,
+            maxConcurrency);
       this.blockingSchedulerSupplier = blockingSchedulerSupplier;
       this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
     }
@@ -108,9 +132,9 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-      if (processor.getProcessingType() == BLOCKING && maxConcurrency > subscribers) {
+      if (processor.getProcessingType() == BLOCKING && maxConcurrency > getParallelism()) {
         return proactor(processor, blockingScheduler);
-      } else if (processor.getProcessingType() == CPU_INTENSIVE && maxConcurrency > subscribers) {
+      } else if (processor.getProcessingType() == CPU_INTENSIVE && maxConcurrency > getParallelism()) {
         return proactor(processor, cpuIntensiveScheduler);
       } else {
         return super.onProcessor(processor);
@@ -128,7 +152,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
               .retryWhen(errors -> errors
                   .flatMap(error -> delay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS),
                                           fromExecutorService(getCpuLightScheduler())))),
-                   maxConcurrency / (getNumCpuLightThreads() * subscribers));
+                   maxConcurrency / (getParallelism() * subscribers));
     }
 
   }
