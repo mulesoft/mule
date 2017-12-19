@@ -2138,7 +2138,7 @@
             <id>mule-module</id>
             <activation>
                 <file>
-                    <exists>target/classes/META-INF/mule-module.properties</exists>
+                    <exists>src/main/resources/META-INF/mule-module.properties</exists>
                 </file>
             </activation>
             <build>
