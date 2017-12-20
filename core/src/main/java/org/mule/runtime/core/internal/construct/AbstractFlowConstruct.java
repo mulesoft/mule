@@ -31,6 +31,7 @@ import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
@@ -78,6 +79,9 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     this.muleContext = muleContext;
     this.name = name;
     this.exceptionListener = exceptionListener.orElse(muleContext.getDefaultErrorHandler(of(name)));
+    if (this.exceptionListener instanceof ErrorHandler) {
+      ((ErrorHandler) this.exceptionListener).setStatistics(statistics);
+    }
     this.initialState = initialState;
     try {
       this.lifecycleManager = new FlowConstructLifecycleManager(this, ((MuleContextWithRegistries) muleContext).getRegistry()
