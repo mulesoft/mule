@@ -79,9 +79,6 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     this.muleContext = muleContext;
     this.name = name;
     this.exceptionListener = exceptionListener.orElse(muleContext.getDefaultErrorHandler(of(name)));
-    if (this.exceptionListener instanceof ErrorHandler) {
-      ((ErrorHandler) this.exceptionListener).setStatistics(statistics);
-    }
     this.initialState = initialState;
     try {
       this.lifecycleManager = new FlowConstructLifecycleManager(this, ((MuleContextWithRegistries) muleContext).getRegistry()
@@ -191,7 +188,11 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     return statistics;
   }
 
-  protected void doInitialise() throws MuleException {}
+  protected void doInitialise() throws MuleException {
+    if (this.exceptionListener instanceof ErrorHandler) {
+      ((ErrorHandler) this.exceptionListener).setStatistics(statistics);
+    }
+  }
 
   public static FlowConstructStatistics createFlowStatistics(String flowName, MuleContext muleContext) {
     DefaultFlowConstructStatistics statistics = new DefaultFlowConstructStatistics("Flow", flowName);
