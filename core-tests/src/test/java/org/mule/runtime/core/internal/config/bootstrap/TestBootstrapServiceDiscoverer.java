@@ -7,11 +7,12 @@
 
 package org.mule.runtime.core.internal.config.bootstrap;
 
+import static java.util.Collections.singletonList;
+
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapService;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,6 +34,6 @@ public class TestBootstrapServiceDiscoverer implements BootstrapServiceDiscovere
 
   @Override
   public List<BootstrapService> discover() {
-    return Collections.singletonList(new PropertiesBootstrapService(this.getClass().getClassLoader(), properties));
+    return singletonList(new PropertiesBootstrapService(this.getClass().getClassLoader(), properties));
   }
 }

@@ -15,9 +15,10 @@ import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.policy.proxy.LifecycleFilterProxy.createLifecycleFilterProxy;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -26,6 +27,8 @@ import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.notification.PolicyNotification;
 import org.mule.runtime.api.notification.PolicyNotificationListener;
 import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
@@ -59,6 +62,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   private final ClassLoaderRepository classLoaderRepository;
   private final List<ArtifactPlugin> artifactPlugins;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
+  private final MuleContextListener muleContextListener;
   private ArtifactContext policyContext;
   private PolicyInstance policyInstance;
 
@@ -72,12 +76,15 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
    * @param artifactPlugins artifact plugins deployed inside the policy. Non null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
+   * @param muleContextListener the listener to execute for specific events that occur on the {@link MuleContext} of the policy.
+   *        May be {@code null}.
    */
   public DefaultApplicationPolicyInstance(Application application, PolicyTemplate template,
                                           PolicyParametrization parametrization,
                                           ServiceRepository serviceRepository,
                                           ClassLoaderRepository classLoaderRepository, List<ArtifactPlugin> artifactPlugins,
-                                          ExtensionModelLoaderRepository extensionModelLoaderRepository) {
+                                          ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                                          MuleContextListener muleContextListener) {
     this.application = application;
     this.template = template;
     this.parametrization = parametrization;
@@ -85,11 +92,12 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     this.classLoaderRepository = classLoaderRepository;
     this.artifactPlugins = artifactPlugins;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
+    this.muleContextListener = muleContextListener;
   }
 
   private void initPolicyContext() throws InitialisationException {
     ArtifactContextBuilder artifactBuilder =
-        newBuilder().setArtifactType(APP)
+        newBuilder().setArtifactType(POLICY)
             .setArtifactProperties(new HashMap<>(parametrization.getParameters()))
             .setArtifactName(parametrization.getId())
             .setConfigurationFiles(parametrization.getConfig().getAbsolutePath())
@@ -100,7 +108,8 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setParentArtifact(application)
             .setExtensionManagerFactory(new CompositeArtifactExtensionManagerFactory(application, extensionModelLoaderRepository,
                                                                                      artifactPlugins,
-                                                                                     new DefaultExtensionManagerFactory()));
+                                                                                     new DefaultExtensionManagerFactory()))
+            .setMuleContextListener(muleContextListener);
 
     artifactBuilder.withServiceConfigurator(customizationService -> {
       Registry applicationRegistry = application.getRegistry();

@@ -8,8 +8,11 @@
 package org.mule.runtime.core.internal.config.bootstrap;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
+
+import java.util.Set;
 
 /**
  * Base class to define bootstrap properties
@@ -18,22 +21,23 @@ public class AbstractBootstrapProperty {
 
   protected final BootstrapService service;
   protected final Boolean optional;
-  protected final ArtifactType artifactType;
+  protected final Set<ArtifactType> artifactTypes;
 
   /**
    * Creates a bootstrap property
    *
    * @param service service that provides the property. Not null.
-   * @param artifactType defines what is the artifact this bootstrap object applies to
+   * @param artifactTypes defines what is the artifact this bootstrap object applies to
    * @param optional indicates whether or not the bootstrapped transformer is optional. When a bootstrap object is optional, any
    *        error creating it will be ignored.
    */
-  public AbstractBootstrapProperty(BootstrapService service, ArtifactType artifactType, Boolean optional) {
+  public AbstractBootstrapProperty(BootstrapService service, Set<ArtifactType> artifactTypes, Boolean optional) {
     checkArgument(service != null, "service cannot be null");
-    checkArgument(artifactType != null, "artifactType cannot be null");
+    checkArgument(artifactTypes != null, "artifactTypes cannot be null");
+    checkArgument(!artifactTypes.isEmpty(), "artifactTypes cannot be empty");
 
     this.optional = optional;
-    this.artifactType = artifactType;
+    this.artifactTypes = artifactTypes;
     this.service = service;
   }
 
@@ -45,7 +49,7 @@ public class AbstractBootstrapProperty {
     return optional;
   }
 
-  public ArtifactType getArtifactType() {
-    return artifactType;
+  public Set<ArtifactType> getArtifactTypes() {
+    return artifactTypes;
   }
 }

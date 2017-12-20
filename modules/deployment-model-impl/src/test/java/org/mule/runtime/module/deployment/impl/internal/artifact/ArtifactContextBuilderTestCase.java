@@ -17,10 +17,11 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.EXECUTION_CLASSLOADER_WAS_NOT_SET;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.INSTALLATION_DIRECTORY_MUST_BE_A_DIRECTORY;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.MULE_CONTEXT_ARTIFACT_PROPERTIES_CANNOT_BE_NULL;
-import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_ARTIFACT;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.ONLY_APPLICATIONS_OR_POLICIES_ARE_ALLOWED_TO_HAVE_A_PARENT_ARTIFACT;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.SERVICE_CONFIGURATOR_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.SERVICE_REPOSITORY_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
@@ -79,7 +80,7 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void buildWithoutClassloaderRepository() throws Exception {
     expectedException.expectMessage(CLASS_LOADER_REPOSITORY_WAS_NOT_SET);
-    newBuilder().setExecutionClassloader(Thread.currentThread().getContextClassLoader()).build();
+    newBuilder().setExecutionClassloader(currentThread().getContextClassLoader()).build();
   }
 
   @Test
@@ -90,9 +91,9 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void buildUsingDomainAndParentArtifact() throws Exception {
-    expectedException.expectMessage(ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_ARTIFACT);
+    expectedException.expectMessage(ONLY_APPLICATIONS_OR_POLICIES_ARE_ALLOWED_TO_HAVE_A_PARENT_ARTIFACT);
     newBuilder().setArtifactType(DOMAIN)
-        .setExecutionClassloader(Thread.currentThread().getContextClassLoader()).setParentArtifact(mock(DeployableArtifact.class))
+        .setExecutionClassloader(currentThread().getContextClassLoader()).setParentArtifact(mock(DeployableArtifact.class))
         .setClassLoaderRepository(mock(ClassLoaderRepository.class))
         .build();
   }

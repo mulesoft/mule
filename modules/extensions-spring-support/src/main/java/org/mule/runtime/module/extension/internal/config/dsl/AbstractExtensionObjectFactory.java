@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import static java.lang.String.copyValueOf;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_PREFIX;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -97,7 +97,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
 
   public void setParameters(Map<String, Object> parameters) {
     this.parameters = normalize(parameters);
-    this.parametersResolver = new LazyValue<ParametersResolver>(parametersResolverFromValues(muleContext));
+    this.parametersResolver = new LazyValue<>(parametersResolverFromValues(muleContext));
   }
 
   @Override

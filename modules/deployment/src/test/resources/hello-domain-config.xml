@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule-domain xmlns="http://www.mulesoft.org/schema/mule/domain"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:hello="http://www.mulesoft.org/schema/mule/hello"
+             xsi:schemaLocation="http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd
+             http://www.mulesoft.org/schema/mule/hello http://www.mulesoft.org/schema/mule/hello/current/mule-hello.xsd">
+
+    <hello:config name="default" message="Hello from domain!!!"/>
+</mule-domain>

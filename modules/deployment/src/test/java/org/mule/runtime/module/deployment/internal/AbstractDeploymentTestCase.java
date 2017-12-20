@@ -73,6 +73,7 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.in
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -131,6 +132,15 @@ import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.test.runner.classloader.TestModuleDiscoverer;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -147,15 +157,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 /**
@@ -188,6 +189,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private static final String BAD_APP_CONFIG_XML = "/bad-app-config.xml";
   protected static final String EMPTY_DOMAIN_CONFIG_XML = "/empty-domain-config.xml";
   protected static final String APP_WITH_EXTENSION_PLUGIN_CONFIG = "app-with-extension-plugin-config.xml";
+  protected static final String APP_WITH_SHARED_EXTENSION_PLUGIN_CONFIG = "app-with-shared-extension-plugin-config.xml";
 
   protected static final String BAR_POLICY_NAME = "barPolicy";
   protected static final String BAZ_POLICY_NAME = "bazPolicy";
@@ -255,8 +257,11 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .dependingOn(defaulServiceEchoJarFile.getAbsoluteFile())
         .compile("mule-module-service-foo-default-4.0-SNAPSHOT.jar");
 
-    helloExtensionV1JarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
-                                                                getResourceFile("/org/foo/hello/HelloOperation.java"))
+    helloExtensionV1JarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
+                   getResourceFile("/org/foo/hello/HelloOperation.java"))
+        .including(getResourceFile("/org/foo/hello/registry-bootstrap.properties"),
+                   "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
         .compile("mule-module-hello-1.0.0.jar", "1.0.0");
 
     helloExtensionV2JarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),

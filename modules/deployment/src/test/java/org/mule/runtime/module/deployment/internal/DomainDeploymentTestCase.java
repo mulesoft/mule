@@ -32,6 +32,7 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -47,6 +48,9 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFi
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,9 +61,6 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Properties;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * Contains test for domain deployment
@@ -518,6 +519,31 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     ApplicationFileBuilder applicationFileBuilder =
         new ApplicationFileBuilder("appWithHelloExtension").definedBy(APP_WITH_EXTENSION_PLUGIN_CONFIG)
+            .dependingOn(domainFileBuilder);
+
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  public void deploysAppUsingDomainExtensionWithSharedExtension() throws Exception {
+    installEchoService();
+    installFooService();
+
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("hello-domain-bundle")
+        .definedBy("hello-domain-config.xml")
+        .dependingOn(helloExtensionV1Plugin);
+
+    ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder("appWithSharedHelloExtension").definedBy(APP_WITH_SHARED_EXTENSION_PLUGIN_CONFIG)
             .dependingOn(domainFileBuilder);
 
 
