@@ -28,7 +28,6 @@ import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -59,23 +58,25 @@ import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
-
 import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
@@ -247,6 +248,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         contextBuilder.setMuleConfiguration(muleConfiguration);
         contextBuilder.setExecutionClassLoader(executionClassLoader);
         contextBuilder.setObjectSerializer(getObjectSerializer());
+        contextBuilder.setDeploymentProperties(getDeploymentProperties());
         configureMuleContext(contextBuilder);
         context = muleContextFactory.createMuleContext(builders, contextBuilder);
         recordSchedulersOnInit(context);
@@ -258,6 +260,13 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       }
     }
     return context;
+  }
+
+  /**
+   * @return the deployment properties to be used
+   */
+  protected Optional<Properties> getDeploymentProperties() {
+    return Optional.empty();
   }
 
   /**
@@ -472,7 +481,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   /**
-   * Uses {@link org.mule.runtime.api.transformation.TransformationService} to get representation of a message for a given {@link DataType}
+   * Uses {@link org.mule.runtime.api.transformation.TransformationService} to get representation of a message for a given
+   * {@link DataType}
    *
    * @param message message to get payload from
    * @param dataType dataType to be transformed to
@@ -484,7 +494,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   /**
-   * Uses {@link org.mule.runtime.api.transformation.TransformationService} to get representation of a message for a given {@link Class}
+   * Uses {@link org.mule.runtime.api.transformation.TransformationService} to get representation of a message for a given
+   * {@link Class}
    *
    * @param message message to get payload from
    * @param clazz type of the payload to be transformed to
