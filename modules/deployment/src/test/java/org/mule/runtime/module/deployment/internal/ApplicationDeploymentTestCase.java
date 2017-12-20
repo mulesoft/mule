@@ -50,7 +50,6 @@ import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
-
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -74,9 +73,6 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainMana
 import org.mule.tck.util.CompilerUtils;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -92,6 +88,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * Contains test for application deployment on the default domain
@@ -585,8 +583,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     File configFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(),
                                getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
-    assertThat(configFile.exists(), is(true));
-    configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
+    updateFileModifiedTime(configFile.lastModified(), configFile);
 
     assertFailedApplicationRedeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
   }

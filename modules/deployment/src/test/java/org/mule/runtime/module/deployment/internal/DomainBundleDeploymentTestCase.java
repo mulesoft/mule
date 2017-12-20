@@ -7,6 +7,9 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.reset;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -98,10 +101,8 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
     addDomainBundleFromBuilder(domainBundleFileBuilder);
 
     assertDeploymentSuccess(domainBundleDeploymentListener, domainBundleFileBuilder.getId());
-    assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
-    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
-    assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertDomainRedeploymentSuccess(dummyDomainFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
   }
 
   @Test
@@ -131,11 +132,9 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
     addDomainBundleFromBuilder(domainBundleFileBuilder);
 
     assertDeploymentSuccess(domainBundleDeploymentListener, domainBundleFileBuilder.getId());
-    assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
-    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
-    assertUndeploymentSuccess(applicationDeploymentListener, applicationFileBuilder1.getId());
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder1.getId());
-    assertUndeploymentSuccess(applicationDeploymentListener, applicationFileBuilder2.getId());
+    assertDomainRedeploymentSuccess(dummyDomainFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(applicationFileBuilder1.getId());
+    assertApplicationMissingOnBundleRedeployment(applicationFileBuilder2.getId());
   }
 
   @Test
@@ -162,10 +161,9 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
     addDomainBundleFromBuilder(domainBundleFileBuilder);
 
     assertDeploymentFailure(domainBundleDeploymentListener, domainBundleFileBuilder.getId());
-    assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
-    assertDeploymentFailure(domainDeploymentListener, dummyDomainFileBuilder.getId());
-    assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    assertDeploymentFailure(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertDomainRedeploymentFailure(dummyDomainFileBuilder.getId());
+    assertRedeploymentFailure(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertThat(deploymentService.findApplication(dummyAppDescriptorFileBuilder.getId()), is(nullValue()));
   }
 
   private void addDomainBundleFromBuilder(DomainBundleFileBuilder domainBundleFileBuilder) throws Exception {

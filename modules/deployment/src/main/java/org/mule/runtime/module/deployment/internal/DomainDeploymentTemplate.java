@@ -24,10 +24,13 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
   private Collection<Application> domainApplications = Collections.emptyList();
   private final DefaultArchiveDeployer<Application> applicationDeployer;
   private final DeploymentService deploymentservice;
+  private final CompositeDeploymentListener applicationDeploymentListener;
 
-  public DomainDeploymentTemplate(DefaultArchiveDeployer<Application> applicationDeployer, DeploymentService deploymentservice) {
+  public DomainDeploymentTemplate(DefaultArchiveDeployer<Application> applicationDeployer, DeploymentService deploymentservice,
+                                  CompositeDeploymentListener applicationDeploymentListener) {
     this.applicationDeployer = applicationDeployer;
     this.deploymentservice = deploymentservice;
+    this.applicationDeploymentListener = applicationDeploymentListener;
   }
 
   /**
@@ -38,6 +41,7 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
     if (domain instanceof Domain) {
       domainApplications = deploymentservice.findDomainApplications(domain.getArtifactName());
       for (Application domainApplication : domainApplications) {
+        applicationDeploymentListener.onRedeploymentStart(domainApplication.getArtifactName());
         applicationDeployer.undeployArtifactWithoutUninstall(domainApplication);
       }
     }
@@ -49,11 +53,23 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
   @Override
   public void postRedeploy(Artifact domain) {
     if (domain != null && !domainApplications.isEmpty()) {
+      RuntimeException firstException = null;
       for (Application domainApplication : domainApplications) {
         applicationDeployer.preTrackArtifact(domainApplication);
         if (applicationDeployer.isUpdatedZombieArtifact(domainApplication.getArtifactName())) {
-          applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(), empty());
+          try {
+            applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(), empty());
+            applicationDeploymentListener.onRedeploymentSuccess(domainApplication.getArtifactName());
+          } catch (RuntimeException e) {
+            applicationDeploymentListener.onRedeploymentFailure(domainApplication.getArtifactName(), e);
+            if (firstException == null) {
+              firstException = e;
+            }
+          }
         }
+      }
+      if (firstException != null) {
+        throw firstException;
       }
     }
     domainApplications = Collections.emptyList();

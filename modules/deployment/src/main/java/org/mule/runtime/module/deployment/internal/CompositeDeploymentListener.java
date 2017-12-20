@@ -143,6 +143,39 @@ public class CompositeDeploymentListener implements DeploymentListener, Deployme
     }
   }
 
+  @Override
+  public void onRedeploymentStart(String artifactName) {
+    for (DeploymentListener listener : deploymentListeners) {
+      try {
+        listener.onRedeploymentStart(artifactName);
+      } catch (Throwable t) {
+        logNotificationProcessingError(artifactName, listener, "onRedeploymentStart", t);
+      }
+    }
+  }
+
+  @Override
+  public void onRedeploymentSuccess(String artifactName) {
+    for (DeploymentListener listener : deploymentListeners) {
+      try {
+        listener.onRedeploymentSuccess(artifactName);
+      } catch (Throwable t) {
+        logNotificationProcessingError(artifactName, listener, "onRedeploymentSuccess", t);
+      }
+    }
+  }
+
+  @Override
+  public void onRedeploymentFailure(String artifactName, Throwable cause) {
+    for (DeploymentListener listener : deploymentListeners) {
+      try {
+        listener.onRedeploymentFailure(artifactName, cause);
+      } catch (Throwable t) {
+        logNotificationProcessingError(artifactName, listener, "onRedeploymentFailure", t);
+      }
+    }
+  }
+
   private void logNotificationProcessingError(String appName, DeploymentListener listener, String notification, Throwable error) {
     logger.error(String.format("Listener '%s' failed to process notification '%s' for application '%s'", listener, notification,
                                appName),
