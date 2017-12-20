@@ -71,6 +71,18 @@ public interface AllureConstants {
     }
   }
 
+  interface DeploymentConfiguration {
+
+    String DEPLOYMENT_CONFIGURATION = "Deployment Configuration";
+
+    interface LazyConnectionsStory {
+
+      String LAZY_CONNECTIONS = "Lazy Connections";
+
+    }
+
+  }
+
   interface EmailFeature {
 
     String EMAIL_EXTENSION = "Email Extension";

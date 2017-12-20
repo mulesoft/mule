@@ -35,7 +35,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class CompositeConnectionManager implements ConnectionManager, Lifecycle, ConnectionManagerAdapter {
+public class CompositeConnectionManager implements ConnectionManager, ConnectionManagerAdapter {
 
   private static final Logger LOGGER = getLogger(CompositeConnectionManager.class);
 
