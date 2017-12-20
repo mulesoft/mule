@@ -5,7 +5,20 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/module-using-errormapping http://www.mulesoft.org/schema/mule/module-using-errormapping/current/mule-module-using-errormapping.xsd">
 
-    <module-using-errormapping:config name="petstoreconfig" />
+    <module-using-errormapping:config name="petstoreconfig" username="john"/>
+
+    <configuration defaultErrorHandler-ref="catchAllSMART_CONNECTOR_CUSTOM_ERROR_TIMEOUT"/>
+
+    <error-handler name="catchAllSMART_CONNECTOR_CUSTOM_ERROR_TIMEOUT">
+        <on-error-continue type="MODULE-USING-ERRORMAPPING:SMART_CONNECTOR_CUSTOM_ERROR_TIMEOUT">
+            <!-- using a normal MP within the on-error-continue chain scenario -->
+            <set-payload value="Timeout happened!"/>
+        </on-error-continue>
+        <on-error-continue type="MODULE-USING-ERRORMAPPING:SMART_CONNECTOR_CUSTOM_ERROR_SECURITY">
+            <!-- using a xml operation within the on-error-continue chain scenario -->
+            <module-using-errormapping:simple-op config-ref="petstoreconfig" />
+        </on-error-continue>
+    </error-handler>
 
     <flow name="noMapping">
         <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]" failExpression="#[vars.failExpression]"/>
@@ -120,4 +133,27 @@
         </error-handler>
     </flow>
 
+    <flow name="globalMappingWithDefaultErrorHandlerTimeout">
+        <module-using-errormapping:fail-by-timeout config-ref="petstoreconfig" petNames="#[vars.names]"/>
+    </flow>
+
+    <flow name="globalMappingWithDefaultErrorHandlerSecurity">
+        <module-using-errormapping:fail-by-security config-ref="petstoreconfig" petNames="#[vars.names]"/>
+    </flow>
+
+    <flow name="globalMappingWithDefaultErrorHandlerTimeoutThruSubflow">
+        <flow-ref name="aSubFlow" />
+    </flow>
+
+    <sub-flow name="aSubFlow">
+        <module-using-errormapping:fail-by-timeout config-ref="petstoreconfig" petNames="#[vars.names]"/>
+    </sub-flow>
+
+    <flow name="globalMappingWithDefaultErrorHandlerTimeoutThruSubSubflow">
+        <flow-ref name="aSubSubFlow" />
+    </flow>
+
+    <sub-flow name="aSubSubFlow">
+        <flow-ref name="aSubFlow" />
+    </sub-flow>
 </mule>
