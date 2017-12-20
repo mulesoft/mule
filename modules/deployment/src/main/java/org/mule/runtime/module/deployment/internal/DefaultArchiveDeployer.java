@@ -191,7 +191,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   @Override
-  public void setDeploymentListener(CompositeDeploymentListener deploymentListener) {
+  public void setDeploymentListener(DeploymentListener deploymentListener) {
     this.deploymentListener = deploymentListener;
   }
 
@@ -320,7 +320,14 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
       if (removeData) {
         final File dataFolder = getAppDataFolder(artifact.getDescriptor().getDataFolderName());
-        deleteDirectory(dataFolder);
+        try {
+          deleteDirectory(dataFolder);
+        } catch (IOException e) {
+          logger.warn(
+                      format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
+                             dataFolder, artifact.getArtifactName()),
+                      e);
+        }
       }
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
 
@@ -328,10 +335,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     } catch (RuntimeException e) {
       deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
       throw e;
-    } catch (IOException e) {
-      deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
-      throw new DeploymentException(
-                                    createStaticMessage("Failed undeploying artifact " + artifact.getArtifactName()), e);
     }
   }
 
