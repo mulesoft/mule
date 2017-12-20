@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory.TransactionAwareWorkQueueProcessingStrategy.DelegateSink;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.concurrent.ExecutorService;
@@ -67,9 +66,9 @@ public class TransactionAwareWorkQueueStreamProcessingStrategyFactory extends Wo
 
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
-      Sink superSink = super.createSink(flowConstruct, pipeline);
+      Sink workQueueSink = super.createSink(flowConstruct, pipeline);
       Sink syncSink = BLOCKING_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, pipeline);
-      return new DelegateSink(syncSink, superSink);
+      return new TransactionalDelegateSink(syncSink, workQueueSink);
     }
 
     @Override
@@ -81,8 +80,19 @@ public class TransactionAwareWorkQueueStreamProcessingStrategyFactory extends Wo
 
     @Override
     protected ExecutorService decorateScheduler(Scheduler scheduler) {
-      return new ConditionalExecutorServiceDecorator(scheduler, cuurentScheduler -> isTransactionActive());
+      return new ConditionalExecutorServiceDecorator(scheduler, currentScheduler -> isTransactionActive());
     }
+
+    @Override
+    public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
+      return isTransactionActive() ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline) : super.onPipeline(pipeline);
+    }
+
+    @Override
+    public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+      return isTransactionActive() ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor) : super.onProcessor(processor);
+    }
+
   }
 
 }
