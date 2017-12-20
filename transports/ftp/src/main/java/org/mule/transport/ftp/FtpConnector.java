@@ -777,12 +777,15 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         return files.length == 1 && files[0].isFile() && resourceName.equals(files[0].getName());
     }
 
-    private String getResourceName (String path)
+    private String getResourceName(String path)
     {
         if (path.contains(separator))
         {
-            String [] splitPath = path.split(separator);
-            return splitPath[splitPath.length -1];
+            String[] splitPath = path.split(separator);
+            if (splitPath.length > 1)
+            {
+                return splitPath[splitPath.length - 1];
+            }
         }
         return path;
     }
