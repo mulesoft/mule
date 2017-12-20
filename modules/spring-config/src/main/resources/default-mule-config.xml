@@ -19,8 +19,6 @@
 
         <spring:bean name="_muleMessageProcessingManager" class="org.mule.execution.MuleMessageProcessingManager"/>
 
-        <spring:bean name="_muleEndpointFactory" class="org.mule.endpoint.DefaultEndpointFactory"/>
-
         <spring:bean name="_muleStreamCloserService" class="org.mule.util.DefaultStreamCloserService"/>
 
         <spring:bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile"/>
@@ -31,13 +29,7 @@
 
         <spring:bean name="_defaultRetryPolicyTemplate" class="org.mule.retry.policies.NoRetryPolicyTemplate"/>
 
-        <spring:bean name="_muleLockFactory" class="org.mule.util.lock.MuleLockFactory"/>
-
-        <spring:bean name="_muleLockProvider" class="org.mule.util.lock.SingleServerLockProvider"/>
-
         <spring:bean name="_muleProcessingTimeWatcher" class="org.mule.management.stats.DefaultProcessingTimeWatcher"/>
-
-        <spring:bean name="_muleConnectorMessageProcessorLocator" class="org.mule.connector.MuleConnectorOperationLocator"/>
 
         <spring:bean name="_muleExceptionLocationProvider" class="org.mule.exception.MessagingExceptionLocationProvider"/>
 
