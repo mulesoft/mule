@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.config.bootstrap;
 
+import static java.lang.String.format;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -25,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 
 public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase {
@@ -51,6 +54,7 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
     createTestRegistryBootstrap(APP);
     assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(String.class), notNullValue());
     assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(Properties.class), nullValue());
+    assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(HashMap.class), nullValue());
     assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(ArrayList.class), notNullValue());
   }
 
@@ -59,17 +63,27 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
     createTestRegistryBootstrap(DOMAIN);
     assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(String.class), nullValue());
     assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(Properties.class), notNullValue());
+    assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(HashMap.class), nullValue());
+    assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(ArrayList.class), notNullValue());
+  }
+
+  @Test
+  public void registerOnlyPolicyPropertiesType() throws Exception {
+    createTestRegistryBootstrap(POLICY);
+    assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(String.class), nullValue());
+    assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(Properties.class), nullValue());
+    assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(HashMap.class), notNullValue());
     assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(ArrayList.class), notNullValue());
   }
 
   private SimpleRegistryBootstrap createTestRegistryBootstrap(ArtifactType artifactType) throws InitialisationException {
     final Properties properties = new Properties();
-    properties.put("1", String.format("java.lang.String,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, APP.getAsString()));
-    properties.put("2", String.format("java.util.Properties,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, DOMAIN.getAsString()));
-    properties
-        .put("3",
-             String.format("java.util.ArrayList,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, ArtifactType.ALL.getAsString()));
-    properties.put("jms.singletx.transaction.resource1", String.format("%s,optional)", TEST_TRANSACTION_FACTORY_CLASS));
+    properties.put("1", format("java.lang.String,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, APP.getAsString()));
+    properties.put("2", format("java.util.Properties,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, DOMAIN.getAsString()));
+    properties.put("3", format("java.util.HashMap,%s=%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY, POLICY.getAsString()));
+    properties.put("4", format("java.util.ArrayList,%s=%s/%s/%s", APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY,
+                               APP.getAsString(), DOMAIN.getAsString(), POLICY.getAsString()));
+    properties.put("jms.singletx.transaction.resource1", format("%s,optional)", TEST_TRANSACTION_FACTORY_CLASS));
     properties.put("test.singletx.transaction.factory1", FakeTransactionFactory.class.getName());
     properties.put("test.singletx.transaction.resource1", FakeTransactionResource.class.getName());
 

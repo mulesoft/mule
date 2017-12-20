@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.ALL;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import static org.mule.runtime.module.deployment.internal.DeploymentListenerAdapter.UNSUPPORTED_ARTIFACT_TYPE_ERROR;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -59,7 +60,7 @@ public class DeploymentListenerAdapterTestCase extends AbstractMuleTestCase {
   public void invalidArtifactType() {
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(UNSUPPORTED_ARTIFACT_TYPE_ERROR);
-    new DeploymentListenerAdapter(listener, ALL);
+    new DeploymentListenerAdapter(listener, SERVICE);
   }
 
   private void assertDeploymentListenerInvocations(DeploymentListener deploymentListener, ArtifactType artifactType) {

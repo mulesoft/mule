@@ -281,7 +281,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
 
   private void registerObject(ObjectBootstrapProperty bootstrapProperty) throws Exception {
     try {
-      if (!bootstrapProperty.getArtifactTypes().contains(artifactType) && !bootstrapProperty.getArtifactTypes().contains(ALL)) {
+      if (!bootstrapProperty.getArtifactTypes().contains(artifactType)) {
         return;
       }
 

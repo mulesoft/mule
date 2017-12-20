@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
@@ -27,6 +28,11 @@ abstract class SupportsPropertiesMuleContextBuilder extends DefaultMuleContextBu
 
   private final Map<String, String> artifactProperties;
 
+  /**
+   * Constructs a new {@link MuleContext} builder with the given {@code artifactProperties}.
+   * @param artifactType the type of artifact the target {@link MuleContext} is for.
+   * @param artifactProperties The properties of the artifact.
+   */
   protected SupportsPropertiesMuleContextBuilder(ArtifactType artifactType, Map<String, String> artifactProperties) {
     super(artifactType);
     this.artifactProperties = artifactProperties;
