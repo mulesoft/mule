@@ -66,4 +66,36 @@
     <flow name="testSetPayloadUsingParamValueMoreThanOnceFlow">
         <simple-prefix:set-payload-using-param-value-more-than-once value="a payload written 2 or more times in the same operation using the same parameter" />
     </flow>
+
+    <flow name="testSetPayloadHardcodedFlowThruSubflow">
+        <flow-ref name="aSubFlow" />
+    </flow>
+
+    <sub-flow name="aSubFlow">
+        <simple-prefix:set-payload-hardcoded-value />
+    </sub-flow>
+
+    <flow name="testSetPayloadHardcodedFlowThruSubSubflow">
+        <flow-ref name="aSubSubFlow" />
+    </flow>
+
+    <sub-flow name="aSubSubFlow">
+        <flow-ref name="aSubFlow" />
+    </sub-flow>
+
+    <flow name="testSetPayloadHardcodedFlowThruSubflowWithNestedElements">
+        <flow-ref name="aSubFlowWithNestedElements" />
+    </flow>
+
+    <sub-flow name="aSubFlowWithNestedElements">
+        <choice>
+            <when expression="#[true]">
+                <choice>
+                    <when expression="#[true]">
+                        <simple-prefix:set-payload-hardcoded-value />
+                    </when>
+                </choice>
+            </when>
+        </choice>
+    </sub-flow>
 </mule>

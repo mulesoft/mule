@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import org.mule.runtime.dsl.api.component.MapEntry;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.dsl.api.component.MapEntry;
+import org.springframework.beans.factory.FactoryBean;
 
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.FactoryBean;
-
 /**
  * {@code FactoryBean} that creates a {@code Map} from a collection of {@code MapEntry} and the type of the map.
  */
-public class MapFactoryBean implements FactoryBean {
+public class MapFactoryBean extends AbstractComponent implements FactoryBean {
 
   private final List<MapEntry> mapEntries;
   private final Class<? extends Map> mapType;

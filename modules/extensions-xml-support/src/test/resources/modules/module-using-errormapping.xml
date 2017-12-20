@@ -9,8 +9,10 @@
            http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
+    <property name="username" type="string" />
+
     <petstore:config name="config" cashierName="cashierName">
-        <petstore:connection username="john" password="doe"/>
+        <petstore:connection username="#[vars.username]" password="doe"/>
         <petstore:pets>
             <petstore:pet value="Dog"/>
         </petstore:pets>
@@ -74,4 +76,40 @@
         </errors>
     </operation>
 
+    <operation name="fail-by-timeout">
+        <parameters>
+            <parameter name="petNames" type="string"/>
+        </parameters>
+        <body>
+            <petstore:fail petNames="#[vars.petNames]">
+                <mule:error-mapping targetType="MODULE-USING-ERRORMAPPING:SMART_CONNECTOR_CUSTOM_ERROR_TIMEOUT" sourceType="CONNECTIVITY"/>
+            </petstore:fail>
+        </body>
+        <output type="string"/>
+        <errors>
+            <error type="SMART_CONNECTOR_CUSTOM_ERROR_TIMEOUT"/>
+        </errors>
+    </operation>
+
+    <operation name="fail-by-security">
+        <parameters>
+            <parameter name="petNames" type="string"/>
+        </parameters>
+        <body>
+            <petstore:fail petNames="#[vars.petNames]">
+                <mule:error-mapping targetType="MODULE-USING-ERRORMAPPING:SMART_CONNECTOR_CUSTOM_ERROR_SECURITY" sourceType="CONNECTIVITY"/>
+            </petstore:fail>
+        </body>
+        <output type="string"/>
+        <errors>
+            <error type="SMART_CONNECTOR_CUSTOM_ERROR_SECURITY"/>
+        </errors>
+    </operation>
+
+    <operation name="simple-op">
+        <body>
+            <mule:set-payload value="simple operation called" />
+        </body>
+        <output type="string"/>
+    </operation>
 </module>

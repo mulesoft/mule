@@ -12,15 +12,14 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
@@ -152,5 +151,23 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
     CoreEvent muleEvent = flowRunner("testSetPayloadUsingParamValueMoreThanOnceFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(),
                is("a payload written 2 or more times in the same operation using the same parameter"));
+  }
+
+  @Test
+  public void testSetPayloadHardcodedFlowThruSubflow() throws Exception {
+    CoreEvent event = flowRunner("testSetPayloadHardcodedFlowThruSubflow").run();
+    assertThat(event.getMessage().getPayload().getValue(), is("hardcoded value"));
+  }
+
+  @Test
+  public void testSetPayloadHardcodedFlowThruSubSubflow() throws Exception {
+    CoreEvent event = flowRunner("testSetPayloadHardcodedFlowThruSubSubflow").run();
+    assertThat(event.getMessage().getPayload().getValue(), is("hardcoded value"));
+  }
+
+  @Test
+  public void testSetPayloadHardcodedFlowThruSubflowWithNestedElements() throws Exception {
+    CoreEvent event = flowRunner("testSetPayloadHardcodedFlowThruSubflowWithNestedElements").run();
+    assertThat(event.getMessage().getPayload().getValue(), is("hardcoded value"));
   }
 }
