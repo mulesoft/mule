@@ -11,9 +11,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
-import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -61,7 +59,7 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
       Sink workQueueSink = super.createSink(flowConstruct, pipeline);
       Sink syncSink = BLOCKING_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, pipeline);
-      return new DelegateSink(syncSink, workQueueSink);
+      return new TransactionalDelegateSink(syncSink, workQueueSink);
     }
 
     @Override
@@ -73,43 +71,19 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
 
     @Override
     protected ExecutorService decorateScheduler(Scheduler scheduler) {
-      return new ConditionalExecutorServiceDecorator(scheduler, cuurentScheduler -> isTransactionActive());
+      return new ConditionalExecutorServiceDecorator(scheduler, currentScheduler -> isTransactionActive());
     }
 
-    final static class DelegateSink implements Sink, Disposable {
-
-      private final Sink syncSink;
-      private final Sink workQueueSink;
-
-      public DelegateSink(Sink syncSink, Sink workQueueSink) {
-        this.syncSink = syncSink;
-        this.workQueueSink = workQueueSink;
-      }
-
-      @Override
-      public void accept(CoreEvent event) {
-        if (isTransactionActive()) {
-          syncSink.accept(event);
-        } else {
-          workQueueSink.accept(event);
-        }
-      }
-
-      @Override
-      public boolean emit(CoreEvent event) {
-        if (isTransactionActive()) {
-          return syncSink.emit(event);
-        } else {
-          return workQueueSink.emit(event);
-        }
-      }
-
-      @Override
-      public void dispose() {
-        disposeIfNeeded(syncSink, NOP_LOGGER);
-        disposeIfNeeded(workQueueSink, NOP_LOGGER);
-      }
+    @Override
+    public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
+      return isTransactionActive() ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline) : super.onPipeline(pipeline);
     }
+
+    @Override
+    public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+      return isTransactionActive() ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor) : super.onProcessor(processor);
+    }
+
   }
 
 }

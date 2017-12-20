@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory.TransactionAwareWorkQueueProcessingStrategy.DelegateSink;
+import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 /**
@@ -60,8 +60,7 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
     return TransactionAwareProactorStreamProcessingStrategy.class;
   }
 
-  static class TransactionAwareProactorStreamProcessingStrategy extends
-      ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy {
+  static class TransactionAwareProactorStreamProcessingStrategy extends ProactorStreamProcessingStrategy {
 
     TransactionAwareProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
                                                      int bufferSize,
@@ -81,7 +80,7 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
       Sink proactorSink = super.createSink(flowConstruct, pipeline);
       Sink syncSink = BLOCKING_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, pipeline);
-      return new DelegateSink(syncSink, proactorSink);
+      return new TransactionalDelegateSink(syncSink, proactorSink);
     }
 
     @Override
@@ -93,8 +92,19 @@ public class TransactionAwareProactorStreamProcessingStrategyFactory extends Rea
 
     @Override
     protected ExecutorService decorateScheduler(Scheduler scheduler) {
-      return new ConditionalExecutorServiceDecorator(scheduler, cuurentScheduler -> isTransactionActive());
+      return new ConditionalExecutorServiceDecorator(scheduler, currentScheduler -> isTransactionActive());
     }
+
+    @Override
+    public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
+      return isTransactionActive() ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline) : super.onPipeline(pipeline);
+    }
+
+    @Override
+    public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+      return isTransactionActive() ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor) : super.onProcessor(processor);
+    }
+
   }
 
 }
