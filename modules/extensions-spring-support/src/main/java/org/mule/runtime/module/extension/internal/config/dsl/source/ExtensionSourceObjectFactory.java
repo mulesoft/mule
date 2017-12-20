@@ -50,6 +50,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   private ConfigurationProvider configurationProvider;
   private RetryPolicyTemplate retryPolicyTemplate;
   private CursorProviderFactory cursorProviderFactory;
+  private Boolean primaryNodeOnly = null;
   private BackPressureStrategy backPressureStrategy = null;
 
   public ExtensionSourceObjectFactory(ExtensionModel extensionModel, SourceModel sourceModel, MuleContext muleContext) {
@@ -81,6 +82,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                                                 responseCallbackParameters,
                                                                 errorCallbackParameters),
                                         configurationProvider,
+                                        primaryNodeOnly != null ? primaryNodeOnly : sourceModel.isRunsOnPrimaryNodeOnly(),
                                         getRetryPolicyTemplate(),
                                         cursorProviderFactory,
                                         getBackPressureStrategy(),
@@ -146,6 +148,10 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   public void setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {
     this.cursorProviderFactory = cursorProviderFactory;
+  }
+
+  public void setPrimaryNodeOnly(Boolean primaryNodeOnly) {
+    this.primaryNodeOnly = primaryNodeOnly;
   }
 
   public void setBackPressureStrategy(BackPressureStrategy backPressureStrategy) {

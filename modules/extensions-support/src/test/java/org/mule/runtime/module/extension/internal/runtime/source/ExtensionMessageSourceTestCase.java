@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
@@ -53,6 +55,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -98,6 +101,7 @@ import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptio
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -113,11 +117,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
 
   private static final String CONFIG_NAME = "myConfig";
@@ -127,6 +131,14 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   private final SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(0, 2);
   private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
   private CursorStreamProviderFactory cursorStreamProviderFactory;
+
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return asList(new Object[][] {
+        {"primary node only", true},
+        {"all nodes", false}
+    });
+  }
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -197,10 +209,16 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   @Mock
   protected MetadataResolverFactory metadataResolverFactory;
 
+
+  private boolean primaryNodeOnly;
   private SourceAdapter sourceAdapter;
   private SourceCallback sourceCallback;
   private ExtensionMessageSource messageSource;
   private StreamingManager streamingManager = spy(new DefaultStreamingManager());
+
+  public ExtensionMessageSourceTestCase(String name, boolean primaryNodeOnly) {
+    this.primaryNodeOnly = primaryNodeOnly;
+  }
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
@@ -214,6 +232,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
   @Before
   public void before() throws Exception {
+    initMocks(this);
     spyInjector(muleContext);
     reset(muleContext.getSchedulerService());
     when(result.getMediaType()).thenReturn(of(ANY));
@@ -275,24 +294,31 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     messageSource = getNewExtensionMessageSourceInstance();
 
     sourceCallback = spy(DefaultSourceCallback.builder()
-        .setSourceModel(sourceModel)
-        .setProcessingManager(messageProcessingManager)
-        .setListener(messageProcessor)
-        .setSource(messageSource)
-        .setMuleContext(muleContext)
-        .setProcessContextSupplier(() -> messageProcessContext)
-        .setCompletionHandlerFactory(completionHandlerFactory)
-        .setExceptionCallback(exceptionCallback)
-        .setCursorStreamProviderFactory(cursorStreamProviderFactory)
-        .build());
+                             .setSourceModel(sourceModel)
+                             .setProcessingManager(messageProcessingManager)
+                             .setListener(messageProcessor)
+                             .setSource(messageSource)
+                             .setMuleContext(muleContext)
+                             .setProcessContextSupplier(() -> messageProcessContext)
+                             .setCompletionHandlerFactory(completionHandlerFactory)
+                             .setExceptionCallback(exceptionCallback)
+                             .setCursorStreamProviderFactory(cursorStreamProviderFactory)
+                             .build());
 
     when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);
   }
 
   @After
   public void after() throws MuleException {
-    messageSource.stop();
-    messageSource.dispose();
+    try {
+      if (messageSource.getLifecycleState().isStarted()) {
+        messageSource.stop();
+      }
+    } finally {
+      if (messageSource.getLifecycleState().isStopped() || messageSource.getLifecycleState().isInitialised()) {
+        messageSource.dispose();
+      }
+    }
   }
 
   @Test
@@ -307,29 +333,27 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
       return null;
     }).when(cpuLightScheduler).execute(any());
 
-    messageSource.initialise();
-    messageSource.start();
+    start();
 
     verify(sourceCallback).handle(result);
   }
 
   @Test
   public void handleExceptionAndRestart() throws Exception {
-    initialise();
     start();
-
     messageSource.onException(new ConnectionException(ERROR_MESSAGE));
     verify(source).onStop();
     verify(ioScheduler, never()).stop();
     verify(cpuLightScheduler, never()).stop();
     verify(source, times(2)).onStart(sourceCallback);
-    handleMessage();
   }
 
   @Test
   public void initialise() throws Exception {
-    messageSource.initialise();
-    verify(source, never()).onStart(sourceCallback);
+    if (!messageSource.getLifecycleState().isInitialised()) {
+      messageSource.initialise();
+      verify(source, never()).onStart(sourceCallback);
+    }
   }
 
   @Test
@@ -351,6 +375,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void failWithConnectionExceptionWhenStartingAndGetRetryPolicyExhausted() throws Exception {
+    messageSource.initialise();
     final ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
     doThrow(new RuntimeException(connectionException)).when(source).onStart(sourceCallback);
 
@@ -364,6 +389,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   public void failWithNonConnectionExceptionWhenStartingAndGetRetryPolicyExhausted() throws Exception {
     doThrow(new DefaultMuleException(new IOException(ERROR_MESSAGE))).when(source).onStart(sourceCallback);
 
+    messageSource.initialise();
     final Throwable throwable = catchThrowable(messageSource::start);
     assertThat(throwable, is(instanceOf(RetryPolicyExhaustedException.class)));
     assertThat(getThrowables(throwable), hasItemInArray(instanceOf(IOException.class)));
@@ -422,7 +448,9 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   @Test
   public void start() throws Exception {
     initialise();
-    messageSource.start();
+    if (!messageSource.getLifecycleState().isStarted()) {
+      messageSource.start();
+    }
 
     verify(source).onStart(sourceCallback);
     verify(muleContext.getInjector()).inject(source);
@@ -430,13 +458,14 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void failedToCreateRetryScheduler() throws Exception {
+    messageSource.initialise();
     Exception e = new RuntimeException();
 
     SchedulerService schedulerService = muleContext.getSchedulerService();
     doThrow(e).when(schedulerService).cpuLightScheduler();
 
     final Throwable throwable = catchThrowable(messageSource::start);
-    assertThat(throwable, is(sameInstance(e)));
+    assertThat(throwable.getCause(), is(sameInstance(e)));
   }
 
   @Test
@@ -446,8 +475,10 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     SchedulerService schedulerService = muleContext.getSchedulerService();
     doThrow(e).when(schedulerService).cpuLightScheduler();
 
+    messageSource.initialise();
     final Throwable throwable = catchThrowable(messageSource::start);
-    assertThat(throwable, is(sameInstance(e)));
+    assertThat(throwable, is(instanceOf(LifecycleException.class)));
+    assertThat(throwable.getCause(), is(sameInstance(e)));
   }
 
   @Test
@@ -465,6 +496,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     mockExceptionEnricher(sourceModel, enricherFactory);
     mockExceptionEnricher(sourceModel, enricherFactory);
     ExtensionMessageSource messageSource = getNewExtensionMessageSourceInstance();
+    messageSource.initialise();
+
     doThrow(new RuntimeException(ERROR_MESSAGE)).when(source).onStart(sourceCallback);
     Throwable t = catchThrowable(messageSource::start);
 
@@ -482,6 +515,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(enricherFactory.createHandler()).thenReturn(exceptionEnricher);
     mockExceptionEnricher(extensionModel, enricherFactory);
     ExtensionMessageSource messageSource = getNewExtensionMessageSourceInstance();
+    messageSource.initialise();
+
     doThrow(new RuntimeException(ERROR_MESSAGE)).when(source).onStart(sourceCallback);
     Throwable t = catchThrowable(messageSource::start);
 
@@ -492,7 +527,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void workManagerDisposedIfSourceFailsToStart() throws Exception {
-    initialise();
     start();
 
     Exception e = new RuntimeException();
@@ -515,7 +549,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   private ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException {
 
     ExtensionMessageSource messageSource =
-        new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider,
+        new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider, primaryNodeOnly,
                                    retryPolicyTemplate, cursorStreamProviderFactory, FAIL, extensionManager);
     messageSource.setListener(messageProcessor);
     messageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
@@ -579,9 +613,11 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     private String metadataKey;
 
     @Override
-    public void onStart(SourceCallback sourceCallback) throws MuleException {}
+    public void onStart(SourceCallback sourceCallback) throws MuleException {
+    }
 
     @Override
-    public void onStop() {}
+    public void onStop() {
+    }
   }
 }
