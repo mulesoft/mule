@@ -95,11 +95,11 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       final Optional<ExtensionParameter> connectionParameter = loader.getConnectionParameter(operationMethod);
 
       if (isScope(operationMethod)) {
-        scopesDelegate.declareScope(extensionDeclarer, ownerDeclarer, methodOwnerClass, operationMethod, configParameter,
+        scopesDelegate.declareScope(extensionDeclarer, ownerDeclarer, declaringClass, operationMethod, configParameter,
                                     connectionParameter);
         continue;
       } else if (isRouter(operationMethod)) {
-        routersDelegate.declareRouter(extensionDeclarer, ownerDeclarer, methodOwnerClass, operationMethod,
+        routersDelegate.declareRouter(extensionDeclarer, ownerDeclarer, declaringClass, operationMethod,
                                       configParameter,
                                       connectionParameter);
         continue;
