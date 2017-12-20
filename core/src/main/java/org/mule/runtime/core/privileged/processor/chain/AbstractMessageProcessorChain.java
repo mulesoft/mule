@@ -25,6 +25,19 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Operators.lift;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import javax.inject.Inject;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.FlowOverloadException;
 import org.mule.runtime.api.exception.MuleException;
@@ -50,22 +63,10 @@ import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import javax.inject.Inject;
-
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
+
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
@@ -182,12 +183,13 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         if (event == null) {
           LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
           throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
-        }
-        BaseEventContext context = ((BaseEventContext) event.getContext());
-        if (throwable instanceof RejectedExecutionException) {
-          context.error(resolveException((Component) processor, event, new FlowOverloadException(throwable)));
         } else {
-          context.error(resolveException((Component) processor, event, throwable));
+          BaseEventContext context = ((BaseEventContext) event.getContext());
+          if (throwable instanceof RejectedExecutionException) {
+            context.error(resolveException((Component) processor, event, new FlowOverloadException(throwable)));
+          } else {
+            context.error(resolveException((Component) processor, event, throwable));
+          }
         }
       }
     };

@@ -14,14 +14,20 @@ import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -38,10 +44,7 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new WorkQueueStreamProcessingStrategy(() -> muleContext.getSchedulerService()
-        .customScheduler(muleContext.getSchedulerBaseConfig()
-            .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
-            .withMaxConcurrentTasks(getSubscriberCount() + 1).withWaitAllowed(true)),
+    return new WorkQueueStreamProcessingStrategy(getRingBufferSchedulerSupplier(muleContext, schedulersNamePrefix),
                                                  getBufferSize(),
                                                  getSubscriberCount(),
                                                  getWaitStrategy(),
@@ -56,12 +59,11 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
     return WorkQueueStreamProcessingStrategy.class;
   }
 
-  static class WorkQueueStreamProcessingStrategy
-      extends AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy
-      implements Startable, Stoppable {
+  static class WorkQueueStreamProcessingStrategy extends AbstractStreamProcessingStrategy implements Startable, Stoppable {
 
     private final Supplier<Scheduler> blockingSchedulerSupplier;
     private Scheduler blockingScheduler;
+    private List<Sink> sinkList = new ArrayList<>();
 
     protected WorkQueueStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize,
                                                 int subscribers,
@@ -100,6 +102,7 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
 
     @Override
     public void stop() throws MuleException {
+      sinkList.stream().filter(sink -> sink instanceof Disposable).forEach(sink -> ((Disposable) sink).dispose());
       if (blockingScheduler != null) {
         blockingScheduler.stop();
       }

@@ -138,12 +138,12 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
   @Description("When using DirectProcessingStrategy continued processing is carried out using async processor thread which can "
       + "cause processing to block if there are concurrent requests and the number of custom async processor threads are reduced")
   public void asyncCpuLightConcurrent() throws Exception {
-    internalConcurrent(flowBuilder.get(), true, CPU_LITE, 1, asyncProcessor);
-    assertThat(threads.size(), between(2, 3));
+    internalConcurrent(flowBuilder.get(), true, CPU_LITE, 4, asyncProcessor);
+    assertThat(threads.size(), between(2, 9));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
     assertThat(threads, not(hasItem(startsWith(IO))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
-    assertThat(threads.stream().filter(name -> name.startsWith(CUSTOM)).count(), equalTo(1l));
+    assertThat(threads.stream().filter(name -> name.startsWith(CUSTOM)).count(), equalTo(4l));
   }
 
   protected void assertAsyncCpuLight() {

@@ -39,7 +39,8 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueStreamProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
@@ -314,7 +315,7 @@ public class DefaultFlowBuilder implements Builder {
      */
     @Override
     protected ProcessingStrategyFactory createDefaultProcessingStrategyFactory() {
-      return new TransactionAwareWorkQueueProcessingStrategyFactory();
+      return new TransactionAwareProactorStreamProcessingStrategyFactory();
     }
 
     @Override

@@ -19,7 +19,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
@@ -34,12 +33,10 @@ import org.mule.runtime.core.internal.processor.strategy.WorkQueueStreamProcessi
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Ignore;
 import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(WORK_QUEUE)
-@Ignore("MULE-13478")
 public class WorkQueueStreamProcessingStrategyTestCase extends WorkQueueProcessingStrategyTestCase {
 
   public WorkQueueStreamProcessingStrategyTestCase(Mode mode) {
@@ -97,25 +94,19 @@ public class WorkQueueStreamProcessingStrategyTestCase extends WorkQueueProcessi
   @Test
   @Description("When back-pressure strategy is 'WAIT' the source thread blocks and all requests are processed.")
   public void sourceBackPressureWait() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
-    }
+    testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
   }
 
   @Test
   @Description("When back-pressure strategy is 'FAIL' some requests fail with an OVERLOAD error.")
   public void sourceBackPressureFail() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(FAIL, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
-    }
+    testBackPressure(FAIL, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
   }
 
   @Test
   @Description("When back-pressure strategy is 'DROP' some requests fail with and are dropped.")
   public void sourceBackPressureDrop() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(DROP, lessThan(STREAM_ITERATIONS), equalTo(0), lessThan(STREAM_ITERATIONS));
-    }
+    testBackPressure(DROP, lessThan(STREAM_ITERATIONS), equalTo(0), lessThan(STREAM_ITERATIONS));
   }
 
 }

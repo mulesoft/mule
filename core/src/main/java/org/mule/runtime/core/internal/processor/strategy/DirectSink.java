@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static reactor.core.publisher.DirectProcessor.create;
-
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -18,7 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.DirectProcessor;
+import reactor.core.publisher.EmitterProcessor;
 
 /**
  * {@link Sink} implementation that dispatches incoming events directly to to the {@link Flow} serializing concurrent events.
@@ -37,10 +35,10 @@ class DirectSink implements Sink, Disposable {
    * @param eventConsumer event consumer called just before {@link CoreEvent}'s emission.
    */
   public DirectSink(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> function,
-                    Consumer<CoreEvent> eventConsumer) {
-    DirectProcessor<CoreEvent> directProcessor = create();
+                    Consumer<CoreEvent> eventConsumer, int bufferSize) {
+    EmitterProcessor<CoreEvent> emitterProcessor = EmitterProcessor.create(bufferSize);
     reactorSink =
-        new ReactorSink(directProcessor.serialize().sink(), directProcessor.transform(function).doOnError(throwable -> {
+        new ReactorSink(emitterProcessor.sink(), emitterProcessor.transform(function).doOnError(throwable -> {
         }).subscribe(), eventConsumer);
   }
 

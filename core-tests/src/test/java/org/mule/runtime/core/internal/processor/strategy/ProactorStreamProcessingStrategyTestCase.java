@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -26,7 +27,7 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
@@ -34,8 +35,13 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
-import org.mule.runtime.api.scheduler.Scheduler;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.Test;
+
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -43,18 +49,12 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Ignore;
-import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
-@Ignore("MULE-13478")
 public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public ProactorStreamProcessingStrategyTestCase(Mode mode) {
@@ -70,7 +70,8 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                 () -> cpuLight,
                                                 () -> blocking,
                                                 () -> cpuIntensive,
-                                                4);
+                                                CORES,
+                                                MAX_VALUE);
   }
 
   @Override
@@ -227,7 +228,8 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuLight,
                                                                                              () -> rejectingSchedulerSpy,
                                                                                              () -> cpuIntensive,
-                                                                                             4))
+                                                                                             1,
+                                                                                             2))
         .build();
     flow.initialise();
     flow.start();
@@ -255,7 +257,8 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
                                                                                              () -> rejectingSchedulerSpy,
-                                                                                             4))
+                                                                                             1,
+                                                                                             2))
         .build();
     flow.initialise();
     flow.start();
@@ -281,11 +284,34 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
                                                                                              () -> cpuIntensive,
+                                                                                             CORES,
                                                                                              1)),
                        true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(RING_BUFFER)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Test
+  @Description("If max concurrency is 2, only 2 threads are used for CPU_LITE processors and further requests blocks.")
+  public void singleCpuLightConcurrentMaxConcurrency2() throws Exception {
+    internalConcurrent(flowBuilder.get()
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+                                                                                             DEFAULT_BUFFER_SIZE,
+                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             DEFAULT_WAIT_STRATEGY,
+                                                                                             () -> cpuLight,
+                                                                                             () -> blocking,
+                                                                                             () -> cpuIntensive,
+                                                                                             CORES,
+                                                                                             2)),
+                       true, CPU_LITE, 2);
+    assertThat(threads, hasSize(2));
+    assertThat(threads, not(hasItem(startsWith(RING_BUFFER))));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(2l));
     assertThat(threads, not(hasItem(startsWith(IO))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
@@ -303,6 +329,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
                                                                                              () -> cpuIntensive,
+                                                                                             CORES,
                                                                                              1)),
                        true, BLOCKING, 1);
     assertThat(threads, hasSize(1));
@@ -324,6 +351,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
                                                                                              () -> cpuIntensive,
+                                                                                             1,
                                                                                              2)),
                        true, BLOCKING, 2);
     assertThat(threads, hasSize(2));
@@ -346,25 +374,19 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Test
   @Description("When back-pressure strategy is 'WAIT' the source thread blocks and all requests are processed.")
   public void sourceBackPressureWait() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
-    }
+    testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
   }
 
   @Test
   @Description("When back-pressure strategy is 'FAIL' some requests fail with an OVERLOAD error.")
   public void sourceBackPressureFail() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(FAIL, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
-    }
+    testBackPressure(FAIL, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
   }
 
   @Test
   @Description("When back-pressure strategy is 'DROP' some requests fail with and are dropped.")
   public void sourceBackPressureDrop() throws Exception {
-    if (mode.equals(SOURCE)) {
-      testBackPressure(DROP, lessThan(STREAM_ITERATIONS), equalTo(0), lessThan(STREAM_ITERATIONS));
-    }
+    testBackPressure(DROP, lessThan(STREAM_ITERATIONS), equalTo(0), lessThan(STREAM_ITERATIONS));
   }
 
 }

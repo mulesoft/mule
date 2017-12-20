@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.lang.Runtime.getRuntime;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static reactor.core.publisher.Flux.from;
@@ -36,18 +36,28 @@ import java.util.function.Supplier;
  */
 public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProcessingStrategyFactory {
 
-
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new ReactorStreamProcessingStrategy(() -> muleContext.getSchedulerService()
-        .customScheduler(muleContext.getSchedulerBaseConfig()
-            .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
-            .withMaxConcurrentTasks(getSubscriberCount() + 1).withWaitAllowed(true)), getBufferSize(), getSubscriberCount(),
+    return new ReactorStreamProcessingStrategy(getRingBufferSchedulerSupplier(muleContext, schedulersNamePrefix),
+                                               getBufferSize(), getSubscriberCount(),
                                                getWaitStrategy(),
-                                               () -> muleContext.getSchedulerService()
-                                                   .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
-                                                       .withName(schedulersNamePrefix + "." + CPU_LITE.name())),
+                                               getCpuLightSchedulerSupplier(muleContext, schedulersNamePrefix),
+                                               resolveParallelism(),
                                                getMaxConcurrency());
+  }
+
+  protected int resolveParallelism() {
+    if (getMaxConcurrency() == Integer.MAX_VALUE) {
+      return max(CORES / getSubscriberCount(), 1);
+    } else {
+      return min(CORES, max(getMaxConcurrency() / getSubscriberCount(), 1));
+    }
+  }
+
+  protected Supplier<Scheduler> getCpuLightSchedulerSupplier(MuleContext muleContext, String schedulersNamePrefix) {
+    return () -> muleContext.getSchedulerService()
+        .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
+            .withName(schedulersNamePrefix + "." + CPU_LITE.name()));
   }
 
   @Override
@@ -59,17 +69,20 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
 
     private Supplier<Scheduler> cpuLightSchedulerSupplier;
     private Scheduler cpuLightScheduler;
+    private int parallelism;
 
     ReactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,
-                                    String waitStrategy, Supplier<Scheduler> cpuLightSchedulerSupplier, int maxConcurrency) {
+                                    String waitStrategy, Supplier<Scheduler> cpuLightSchedulerSupplier, int parallelism,
+                                    int maxConcurrency) {
       super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, maxConcurrency);
       this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
+      this.parallelism = parallelism;
     }
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       if (maxConcurrency > subscribers) {
-        return publisher -> from(publisher).parallel(getNumCpuLightThreads())
+        return publisher -> from(publisher).parallel(parallelism)
             .runOn(fromExecutorService(decorateScheduler(getCpuLightScheduler())))
             .composeGroup(pipeline);
       } else {
@@ -77,18 +90,18 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
       }
     }
 
-    private int getNumCpuLightThreads() {
-      return min(getRuntime().availableProcessors() * 2, maxConcurrency);
-    }
-
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-        return publisher -> from(publisher).transform(processor).parallel(getNumCpuLightThreads())
+        return publisher -> from(publisher).transform(processor).parallel(parallelism)
             .runOn(fromExecutorService(decorateScheduler(getCpuLightScheduler())));
       } else {
         return super.onProcessor(processor);
       }
+    }
+
+    protected int getParallelism() {
+      return parallelism;
     }
 
     @Override
