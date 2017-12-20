@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Math.min;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
@@ -36,16 +37,18 @@ public class ProactorStreamProcessingStrategyFactoryTestCase extends AbstractMul
   @Description("Number of CPU Light threads is limited by max concurrency.")
   public void cpuLightCountMaxConcurrency2() {
     processingStrategy.setMaxConcurrency(2);
-    assertThat(processingStrategy.resolveParallelism(), equalTo(2));
-
+    assertThat(processingStrategy.resolveParallelism(), equalTo(min(2, CORES)));
   }
 
   @Test
   @Description("Number of CPU Light threads is limited to number to a factor of maxConcurrency less than number of cores.")
   public void cpuLightCountMaxConcurrency9() {
     processingStrategy.setMaxConcurrency(9);
-    assertThat(processingStrategy.resolveParallelism(), equalTo(3));
-
+    if (CORES >= 3) {
+      assertThat(processingStrategy.resolveParallelism(), equalTo(3));
+    } else {
+      assertThat(processingStrategy.resolveParallelism(), equalTo(1));
+    }
   }
 
   @Test
