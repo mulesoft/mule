@@ -11100,7 +11100,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.String"
+                    ],
                     "isMap": false
                   }
                 },
@@ -12269,7 +12271,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "java.lang.Object"
+              ],
               "isMap": false
             }
           },
@@ -12683,7 +12687,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "java.lang.Object"
+              ],
               "isMap": false
             }
           },
@@ -12890,7 +12896,8 @@
               "parent": "java.lang.Number",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "int": {}
           }
         },
         "hasDynamicType": false,
@@ -14323,7 +14330,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "java.lang.Object"
+              ],
               "isMap": false
             }
           },
@@ -14422,7 +14431,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.Object"
+                    ],
                     "isMap": false
                   }
                 },
@@ -15598,7 +15609,8 @@
               "parent": "java.lang.Number",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "int": {}
           }
         },
         "hasDynamicType": false,
@@ -17499,7 +17511,6 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "custom-java",
         "classInformation": {
           "classname": "java.lang.Object",
           "hasDefaultConstructor": true,
@@ -17511,7 +17522,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "custom-java"
       },
       "fields": []
     },
@@ -17519,7 +17531,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "json-object",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -17533,7 +17544,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "json-object"
       },
       "fields": [
         {
@@ -18232,7 +18244,6 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -18246,7 +18257,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "shiporder"
       },
       "fields": [
         {

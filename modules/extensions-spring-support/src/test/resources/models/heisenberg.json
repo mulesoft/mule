@@ -87,7 +87,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.heisenberg.extension.model.PersonalInfo"
+                    ],
                     "isMap": false
                   }
                 },
@@ -132,7 +134,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.String"
+                    ],
                     "isMap": false
                   }
                 },
@@ -177,7 +181,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.Long"
+                    ],
                     "isMap": false
                   }
                 },
@@ -197,7 +203,8 @@
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "int": {}
                   }
                 }
               },
@@ -289,7 +296,8 @@
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "int": {}
                   }
                 },
                 "fields": []
@@ -350,7 +358,9 @@
                         "java.util.Collection"
                       ],
                       "parent": "",
-                      "genericTypes": [],
+                      "genericTypes": [
+                        "java.lang.String"
+                      ],
                       "isMap": false
                     }
                   },
@@ -465,7 +475,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.Object"
+                    ],
                     "isMap": false
                   }
                 },
@@ -510,7 +522,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.Object"
+                    ],
                     "isMap": false
                   }
                 },
@@ -801,7 +815,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.heisenberg.extension.model.HealthStatus"
+                    ],
                     "isMap": false
                   }
                 },
@@ -1061,7 +1077,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.heisenberg.extension.model.Ricin"
+                    ],
                     "isMap": false
                   }
                 },
@@ -1155,7 +1173,8 @@
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -1320,7 +1339,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.String"
+                    ],
                     "isMap": false
                   }
                 },
@@ -4273,7 +4294,8 @@
                   "parent": "java.lang.Number",
                   "genericTypes": [],
                   "isMap": false
-                }
+                },
+                "int": {}
               }
             },
             "hasDynamicType": false,
@@ -5683,7 +5705,8 @@
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "int": {}
                 }
               }
             },
@@ -7321,7 +7344,8 @@
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
-                        }
+                        },
+                        "int": {}
                       }
                     },
                     "hasDynamicType": false,
@@ -7501,7 +7525,9 @@
                             "java.util.Collection"
                           ],
                           "parent": "",
-                          "genericTypes": [],
+                          "genericTypes": [
+                            "org.mule.test.heisenberg.extension.model.Ricin"
+                          ],
                           "isMap": false
                         }
                       },
@@ -7594,7 +7620,8 @@
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
-                        }
+                        },
+                        "int": {}
                       }
                     },
                     "hasDynamicType": false,
@@ -7759,7 +7786,9 @@
                             "java.util.Collection"
                           ],
                           "parent": "",
-                          "genericTypes": [],
+                          "genericTypes": [
+                            "java.lang.String"
+                          ],
                           "isMap": false
                         }
                       },
@@ -7991,7 +8020,9 @@
                             "java.util.Collection"
                           ],
                           "parent": "",
-                          "genericTypes": [],
+                          "genericTypes": [
+                            "org.mule.test.heisenberg.extension.model.Ricin"
+                          ],
                           "isMap": false
                         }
                       },
@@ -8084,7 +8115,8 @@
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
-                        }
+                        },
+                        "int": {}
                       }
                     },
                     "hasDynamicType": false,
@@ -8249,7 +8281,9 @@
                             "java.util.Collection"
                           ],
                           "parent": "",
-                          "genericTypes": [],
+                          "genericTypes": [
+                            "java.lang.String"
+                          ],
                           "isMap": false
                         }
                       },
@@ -8969,7 +9003,8 @@
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
-                        }
+                        },
+                        "int": {}
                       }
                     },
                     "hasDynamicType": false,
@@ -9149,7 +9184,9 @@
                             "java.util.Collection"
                           ],
                           "parent": "",
-                          "genericTypes": [],
+                          "genericTypes": [
+                            "org.mule.test.heisenberg.extension.model.Ricin"
+                          ],
                           "isMap": false
                         }
                       },
@@ -9242,7 +9279,8 @@
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
-                        }
+                        },
+                        "int": {}
                       }
                     },
                     "hasDynamicType": false,
@@ -9407,7 +9445,9 @@
                             "java.util.Collection"
                           ],
                           "parent": "",
-                          "genericTypes": [],
+                          "genericTypes": [
+                            "java.lang.String"
+                          ],
                           "isMap": false
                         }
                       },
@@ -9639,7 +9679,9 @@
                             "java.util.Collection"
                           ],
                           "parent": "",
-                          "genericTypes": [],
+                          "genericTypes": [
+                            "org.mule.test.heisenberg.extension.model.Ricin"
+                          ],
                           "isMap": false
                         }
                       },
@@ -9732,7 +9774,8 @@
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
-                        }
+                        },
+                        "int": {}
                       }
                     },
                     "hasDynamicType": false,
@@ -9897,7 +9940,9 @@
                             "java.util.Collection"
                           ],
                           "parent": "",
-                          "genericTypes": [],
+                          "genericTypes": [
+                            "java.lang.String"
+                          ],
                           "isMap": false
                         }
                       },
@@ -10613,7 +10658,8 @@
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
-                        }
+                        },
+                        "int": {}
                       }
                     },
                     "hasDynamicType": false,
@@ -10793,7 +10839,9 @@
                             "java.util.Collection"
                           ],
                           "parent": "",
-                          "genericTypes": [],
+                          "genericTypes": [
+                            "org.mule.test.heisenberg.extension.model.Ricin"
+                          ],
                           "isMap": false
                         }
                       },
@@ -10886,7 +10934,8 @@
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
-                        }
+                        },
+                        "int": {}
                       }
                     },
                     "hasDynamicType": false,
@@ -11051,7 +11100,9 @@
                             "java.util.Collection"
                           ],
                           "parent": "",
-                          "genericTypes": [],
+                          "genericTypes": [
+                            "java.lang.String"
+                          ],
                           "isMap": false
                         }
                       },
@@ -11283,7 +11334,9 @@
                             "java.util.Collection"
                           ],
                           "parent": "",
-                          "genericTypes": [],
+                          "genericTypes": [
+                            "org.mule.test.heisenberg.extension.model.Ricin"
+                          ],
                           "isMap": false
                         }
                       },
@@ -11376,7 +11429,8 @@
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
-                        }
+                        },
+                        "int": {}
                       }
                     },
                     "hasDynamicType": false,
@@ -11541,7 +11595,9 @@
                             "java.util.Collection"
                           ],
                           "parent": "",
-                          "genericTypes": [],
+                          "genericTypes": [
+                            "java.lang.String"
+                          ],
                           "isMap": false
                         }
                       },
@@ -12403,7 +12459,8 @@
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -12568,7 +12625,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.String"
+                    ],
                     "isMap": false
                   }
                 },
@@ -13657,7 +13716,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "org.mule.test.heisenberg.extension.model.Ricin"
+              ],
               "isMap": false
             }
           },
@@ -13706,7 +13767,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.heisenberg.extension.model.Ricin"
+                    ],
                     "isMap": false
                   }
                 },
@@ -15099,7 +15162,8 @@
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -15264,7 +15328,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.String"
+                    ],
                     "isMap": false
                   }
                 },
@@ -16214,7 +16280,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "java.lang.String"
+              ],
               "isMap": false
             }
           },
@@ -16271,7 +16339,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.Object"
+                    ],
                     "isMap": false
                   }
                 },
@@ -16414,7 +16484,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "java.lang.String"
+              ],
               "isMap": false
             }
           },
@@ -16471,7 +16543,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.heisenberg.extension.model.Weapon"
+                    ],
                     "isMap": false
                   }
                 },
@@ -16615,7 +16689,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "org.mule.test.heisenberg.extension.model.Ricin"
+              ],
               "isMap": false
             }
           },
@@ -16672,7 +16748,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.heisenberg.extension.model.Ricin"
+                    ],
                     "isMap": false
                   }
                 },
@@ -17210,7 +17288,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "java.lang.String"
+              ],
               "isMap": false
             }
           },
@@ -17263,7 +17343,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.heisenberg.extension.model.KnockeableDoor"
+                    ],
                     "isMap": false
                   }
                 },
@@ -18178,7 +18260,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "java.lang.String"
+              ],
               "isMap": false
             }
           },
@@ -18231,7 +18315,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.String"
+                    ],
                     "isMap": false
                   }
                 },
@@ -18732,7 +18818,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "org.mule.test.heisenberg.extension.model.Weapon"
+              ],
               "isMap": false
             }
           },
@@ -18785,7 +18873,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.heisenberg.extension.model.Weapon"
+                    ],
                     "isMap": false
                   }
                 },
@@ -18928,7 +19018,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "org.mule.test.heisenberg.extension.model.Weapon"
+              ],
               "isMap": false
             }
           },
@@ -18981,7 +19073,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.heisenberg.extension.model.Weapon"
+                    ],
                     "isMap": false
                   }
                 },
@@ -19822,7 +19916,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.heisenberg.extension.model.Attribute"
+                    ],
                     "isMap": false
                   }
                 },
@@ -22284,7 +22380,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "org.mule.test.heisenberg.extension.model.PersonalInfo"
+                ],
                 "isMap": false
               }
             },
@@ -22352,7 +22450,8 @@
                         "parent": "java.lang.Number",
                         "genericTypes": [],
                         "isMap": false
-                      }
+                      },
+                      "int": {}
                     }
                   },
                   "annotations": {
@@ -22495,7 +22594,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.lang.String"
+                        ],
                         "isMap": false
                       }
                     },
@@ -22546,7 +22647,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "java.lang.String"
+                ],
                 "isMap": false
               }
             },
@@ -22579,7 +22682,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "java.lang.Long"
+                ],
                 "isMap": false
               }
             },
@@ -22599,7 +22704,8 @@
                   "parent": "java.lang.Number",
                   "genericTypes": [],
                   "isMap": false
-                }
+                },
+                "int": {}
               }
             }
           },
@@ -22665,7 +22771,8 @@
                   "parent": "java.lang.Number",
                   "genericTypes": [],
                   "isMap": false
-                }
+                },
+                "int": {}
               }
             },
             "fields": []
@@ -22713,7 +22820,9 @@
                     "java.util.Collection"
                   ],
                   "parent": "",
-                  "genericTypes": [],
+                  "genericTypes": [
+                    "java.lang.String"
+                  ],
                   "isMap": false
                 }
               },
@@ -22826,7 +22935,8 @@
                               "parent": "java.lang.Number",
                               "genericTypes": [],
                               "isMap": false
-                            }
+                            },
+                            "int": {}
                           }
                         },
                         "annotations": {
@@ -23025,7 +23135,9 @@
                         "java.util.Collection"
                       ],
                       "parent": "",
-                      "genericTypes": [],
+                      "genericTypes": [
+                        "org.mule.test.heisenberg.extension.model.Ricin"
+                      ],
                       "isMap": false
                     }
                   },
@@ -23077,7 +23189,8 @@
                               "parent": "java.lang.Number",
                               "genericTypes": [],
                               "isMap": false
-                            }
+                            },
+                            "int": {}
                           }
                         },
                         "annotations": {
@@ -23264,7 +23377,8 @@
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "int": {}
                   }
                 },
                 "annotations": {
@@ -23407,7 +23521,9 @@
                         "java.util.Collection"
                       ],
                       "parent": "",
-                      "genericTypes": [],
+                      "genericTypes": [
+                        "java.lang.String"
+                      ],
                       "isMap": false
                     }
                   },
@@ -23520,7 +23636,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "java.lang.Object"
+                ],
                 "isMap": false
               }
             },
@@ -23572,7 +23690,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "java.lang.Object"
+                ],
                 "isMap": false
               }
             },
@@ -23867,7 +23987,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "org.mule.test.heisenberg.extension.model.HealthStatus"
+                ],
                 "isMap": false
               }
             },
@@ -24840,7 +24962,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "org.mule.test.heisenberg.extension.model.Investment"
+                ],
                 "isMap": false
               }
             },
@@ -24980,7 +25104,8 @@
                               "parent": "java.lang.Number",
                               "genericTypes": [],
                               "isMap": false
-                            }
+                            },
+                            "int": {}
                           }
                         },
                         "annotations": {
@@ -25083,7 +25208,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "org.mule.test.heisenberg.extension.model.Investment"
+                        ],
                         "isMap": false
                       }
                     },
@@ -25164,7 +25291,8 @@
                               "parent": "java.lang.Number",
                               "genericTypes": [],
                               "isMap": false
-                            }
+                            },
+                            "int": {}
                           }
                         },
                         "annotations": {
@@ -25275,7 +25403,9 @@
                               "java.util.Collection"
                             ],
                             "parent": "",
-                            "genericTypes": [],
+                            "genericTypes": [
+                              "org.mule.test.heisenberg.extension.model.Investment"
+                            ],
                             "isMap": false
                           }
                         },
@@ -25361,7 +25491,8 @@
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "int": {}
                   }
                 },
                 "annotations": {
@@ -25468,7 +25599,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "org.mule.test.heisenberg.extension.model.Investment"
+                ],
                 "isMap": false
               }
             },
@@ -25608,7 +25741,8 @@
                               "parent": "java.lang.Number",
                               "genericTypes": [],
                               "isMap": false
-                            }
+                            },
+                            "int": {}
                           }
                         },
                         "annotations": {
@@ -25711,7 +25845,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "org.mule.test.heisenberg.extension.model.Investment"
+                        ],
                         "isMap": false
                       }
                     },
@@ -25792,7 +25928,8 @@
                               "parent": "java.lang.Number",
                               "genericTypes": [],
                               "isMap": false
-                            }
+                            },
+                            "int": {}
                           }
                         },
                         "annotations": {
@@ -25903,7 +26040,9 @@
                               "java.util.Collection"
                             ],
                             "parent": "",
-                            "genericTypes": [],
+                            "genericTypes": [
+                              "org.mule.test.heisenberg.extension.model.Investment"
+                            ],
                             "isMap": false
                           }
                         },
@@ -25989,7 +26128,8 @@
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "int": {}
                   }
                 },
                 "annotations": {
@@ -26063,7 +26203,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "org.mule.test.heisenberg.extension.model.Investment"
+                ],
                 "isMap": false
               }
             },
@@ -26165,7 +26307,8 @@
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "int": {}
                   }
                 },
                 "annotations": {
@@ -26372,7 +26515,8 @@
                 "parent": "java.lang.Number",
                 "genericTypes": [],
                 "isMap": false
-              }
+              },
+              "int": {}
             }
           },
           "annotations": {
@@ -26515,7 +26659,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "java.lang.String"
+                ],
                 "isMap": false
               }
             },
@@ -26655,7 +26801,9 @@
                         "java.util.Collection"
                       ],
                       "parent": "",
-                      "genericTypes": [],
+                      "genericTypes": [
+                        "org.mule.test.heisenberg.extension.model.RecursiveChainA"
+                      ],
                       "isMap": false
                     }
                   },
@@ -26694,7 +26842,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "org.mule.test.heisenberg.extension.model.RecursiveChainB"
+                ],
                 "isMap": false
               }
             },
@@ -26768,7 +26918,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "org.mule.test.heisenberg.extension.model.RecursiveChainA"
+                        ],
                         "isMap": false
                       }
                     },
@@ -26906,7 +27058,9 @@
                         "java.util.Collection"
                       ],
                       "parent": "",
-                      "genericTypes": [],
+                      "genericTypes": [
+                        "org.mule.test.heisenberg.extension.model.RecursiveChainB"
+                      ],
                       "isMap": false
                     }
                   },
@@ -26945,7 +27099,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "org.mule.test.heisenberg.extension.model.RecursiveChainA"
+                ],
                 "isMap": false
               }
             },
@@ -27019,7 +27175,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "org.mule.test.heisenberg.extension.model.RecursiveChainB"
+                        ],
                         "isMap": false
                       }
                     },
@@ -27097,7 +27255,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "org.mule.test.heisenberg.extension.model.RecursivePojo"
+                ],
                 "isMap": false
               }
             },
@@ -27192,7 +27352,8 @@
                 "parent": "java.lang.Number",
                 "genericTypes": [],
                 "isMap": false
-              }
+              },
+              "int": {}
             }
           },
           "annotations": {
@@ -27337,7 +27498,8 @@
                 "parent": "java.lang.Number",
                 "genericTypes": [],
                 "isMap": false
-              }
+              },
+              "int": {}
             }
           },
           "annotations": {

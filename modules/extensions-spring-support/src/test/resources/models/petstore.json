@@ -46,7 +46,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.String"
+                    ],
                     "isMap": false
                   }
                 },
@@ -117,7 +119,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.petstore.extension.PetCage"
+                    ],
                     "isMap": false
                   }
                 },
@@ -889,7 +893,8 @@
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -931,7 +936,8 @@
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -1002,7 +1008,8 @@
                   "parent": "java.lang.Number",
                   "genericTypes": [],
                   "isMap": false
-                }
+                },
+                "int": {}
               }
             },
             "hasDynamicType": false,
@@ -1287,7 +1294,8 @@
                   "parent": "java.lang.Number",
                   "genericTypes": [],
                   "isMap": false
-                }
+                },
+                "int": {}
               }
             },
             "hasDynamicType": false,
@@ -1572,7 +1580,8 @@
                   "parent": "java.lang.Number",
                   "genericTypes": [],
                   "isMap": false
-                }
+                },
+                "int": {}
               }
             },
             "hasDynamicType": false,
@@ -3041,7 +3050,9 @@
                     "java.util.Collection"
                   ],
                   "parent": "",
-                  "genericTypes": [],
+                  "genericTypes": [
+                    "java.lang.String"
+                  ],
                   "isMap": false
                 }
               },
@@ -3515,7 +3526,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.util.Date"
+                        ],
                         "isMap": false
                       }
                     },
@@ -3563,7 +3576,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.time.LocalDateTime"
+                        ],
                         "isMap": false
                       }
                     },
@@ -4403,7 +4418,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.util.Date"
+                        ],
                         "isMap": false
                       }
                     },
@@ -4451,7 +4468,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.time.LocalDateTime"
+                        ],
                         "isMap": false
                       }
                     },
@@ -5295,7 +5314,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.util.Date"
+                        ],
                         "isMap": false
                       }
                     },
@@ -5343,7 +5364,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.time.LocalDateTime"
+                        ],
                         "isMap": false
                       }
                     },
@@ -6392,7 +6415,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.util.Date"
+                        ],
                         "isMap": false
                       }
                     },
@@ -6440,7 +6465,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.time.LocalDateTime"
+                        ],
                         "isMap": false
                       }
                     },
@@ -7280,7 +7307,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.util.Date"
+                        ],
                         "isMap": false
                       }
                     },
@@ -7328,7 +7357,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.time.LocalDateTime"
+                        ],
                         "isMap": false
                       }
                     },
@@ -9173,7 +9204,8 @@
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -9215,7 +9247,8 @@
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -9772,7 +9805,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "org.mule.test.petstore.extension.Pet"
+              ],
               "isMap": false
             }
           },
@@ -9832,7 +9867,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "org.mule.test.petstore.extension.Pet"
+                    ],
                     "isMap": false
                   }
                 },
@@ -10226,7 +10263,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.lang.String"
+                    ],
                     "isMap": false
                   }
                 },
@@ -10450,7 +10489,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.util.Date"
+                    ],
                     "isMap": false
                   }
                 },
@@ -10498,7 +10539,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.time.LocalDateTime"
+                    ],
                     "isMap": false
                   }
                 },
@@ -11338,7 +11381,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.util.Date"
+                    ],
                     "isMap": false
                   }
                 },
@@ -11386,7 +11431,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.time.LocalDateTime"
+                    ],
                     "isMap": false
                   }
                 },
@@ -12230,7 +12277,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.util.Date"
+                    ],
                     "isMap": false
                   }
                 },
@@ -12278,7 +12327,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.time.LocalDateTime"
+                    ],
                     "isMap": false
                   }
                 },
@@ -13327,7 +13378,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.util.Date"
+                    ],
                     "isMap": false
                   }
                 },
@@ -13375,7 +13428,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.time.LocalDateTime"
+                    ],
                     "isMap": false
                   }
                 },
@@ -14215,7 +14270,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.util.Date"
+                    ],
                     "isMap": false
                   }
                 },
@@ -14263,7 +14320,9 @@
                       "java.util.Collection"
                     ],
                     "parent": "",
-                    "genericTypes": [],
+                    "genericTypes": [
+                      "java.time.LocalDateTime"
+                    ],
                     "isMap": false
                   }
                 },
@@ -15636,7 +15695,8 @@
                 "parent": "java.lang.Number",
                 "genericTypes": [],
                 "isMap": false
-              }
+              },
+              "int": {}
             }
           },
           "annotations": {
@@ -15730,7 +15790,8 @@
                 "parent": "java.lang.Number",
                 "genericTypes": [],
                 "isMap": false
-              }
+              },
+              "int": {}
             }
           },
           "annotations": {
@@ -15759,7 +15820,8 @@
                 "parent": "java.lang.Number",
                 "genericTypes": [],
                 "isMap": false
-              }
+              },
+              "int": {}
             }
           },
           "annotations": {
@@ -15881,7 +15943,8 @@
                   "parent": "java.lang.Number",
                   "genericTypes": [],
                   "isMap": false
-                }
+                },
+                "int": {}
               }
             },
             "fields": []
@@ -15910,7 +15973,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "java.lang.String"
+                ],
                 "isMap": false
               }
             },
@@ -16433,7 +16498,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "java.util.Date"
+                ],
                 "isMap": false
               }
             },
@@ -16503,7 +16570,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "java.time.LocalDateTime"
+                ],
                 "isMap": false
               }
             },
@@ -17062,7 +17131,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "java.lang.String"
+                ],
                 "isMap": false
               }
             },
@@ -17607,7 +17678,8 @@
                         "parent": "java.lang.Number",
                         "genericTypes": [],
                         "isMap": false
-                      }
+                      },
+                      "int": {}
                     }
                   },
                   "fields": []
@@ -17636,7 +17708,9 @@
                         "java.util.Collection"
                       ],
                       "parent": "",
-                      "genericTypes": [],
+                      "genericTypes": [
+                        "java.lang.String"
+                      ],
                       "isMap": false
                     }
                   },
@@ -18143,7 +18217,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "org.mule.test.petstore.extension.PetCage"
+                ],
                 "isMap": false
               }
             },
@@ -18207,7 +18283,8 @@
                           "parent": "java.lang.Number",
                           "genericTypes": [],
                           "isMap": false
-                        }
+                        },
+                        "int": {}
                       }
                     },
                     "fields": []
@@ -18236,7 +18313,9 @@
                           "java.util.Collection"
                         ],
                         "parent": "",
-                        "genericTypes": [],
+                        "genericTypes": [
+                          "java.lang.String"
+                        ],
                         "isMap": false
                       }
                     },
@@ -18812,7 +18891,8 @@
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "int": {}
                   }
                 },
                 "annotations": {
@@ -18841,7 +18921,8 @@
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "int": {}
                   }
                 },
                 "annotations": {
@@ -18981,7 +19062,8 @@
                       "parent": "java.lang.Number",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "int": {}
                   }
                 },
                 "annotations": {
@@ -19074,7 +19156,9 @@
                   "java.util.Collection"
                 ],
                 "parent": "",
-                "genericTypes": [],
+                "genericTypes": [
+                  "java.lang.String"
+                ],
                 "isMap": false
               }
             },
