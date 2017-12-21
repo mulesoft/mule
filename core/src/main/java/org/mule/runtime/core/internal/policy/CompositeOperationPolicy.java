@@ -20,12 +20,12 @@ import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
 
+import org.reactivestreams.Publisher;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.reactivestreams.Publisher;
 
 /**
  * {@link OperationPolicy} created from a list of {@link Policy}.
@@ -50,7 +50,7 @@ public class CompositeOperationPolicy extends
    * next-operation to modify the response. If an empty {@code operationPolicyParametersTransformer} is provided then the policy
    * won't be able to change the response parameters of the source and the original response parameters generated from the source
    * will be usd.
-   * 
+   *
    * @param parameterizedPolicies list of {@link Policy} to chain together.
    * @param operationPolicyParametersTransformer transformer from the operation parameters to a message and vice versa.
    * @param operationPolicyProcessorFactory factory for creating each {@link OperationPolicy} from a {@link Policy}
@@ -114,7 +114,8 @@ public class CompositeOperationPolicy extends
   protected Publisher<CoreEvent> processPolicy(Policy policy, Processor nextProcessor, CoreEvent event) {
     Processor defaultOperationPolicy =
         operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor);
-    return just(event).transform(defaultOperationPolicy).map(policyResponse -> nextOperationResponse);
+    return just(event).transform(defaultOperationPolicy)
+        .map(policyResponse -> nextOperationResponse != null ? nextOperationResponse : policyResponse);
   }
 
   @Override
