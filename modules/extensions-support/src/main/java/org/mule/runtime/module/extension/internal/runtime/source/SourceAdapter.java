@@ -229,7 +229,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
         executor = onErrorExecutor;
       }
 
-      return from(executor.execute(event, parameters, context)).doAfterTerminate(() -> rollback());
+      return from(executor.execute(event, parameters, context)).doAfterTerminate(this::rollback);
     }
 
     @Override
