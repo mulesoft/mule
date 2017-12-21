@@ -8,6 +8,8 @@ package org.mule.endpoint;
 
 import static java.net.URLDecoder.decode;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.mule.api.util.CredentialsMaskUtil.BARE_URL_PATTERN;
+
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
@@ -16,6 +18,7 @@ import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
+import org.mule.api.util.CredentialsMaskUtil;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.ClassUtils;
@@ -440,11 +443,7 @@ public class MuleEndpointURI implements EndpointURI
     @Override
     public String toString()
     {
-        if (StringUtils.isNotEmpty(userInfo) && (userInfo.indexOf(":") > 0))
-        {
-            return createUriStringWithPasswordMasked();
-        }
-        return uri.toASCIIString();
+        return CredentialsMaskUtil.maskUrlPassword(uri.toASCIIString(), BARE_URL_PATTERN);
     }
 
     protected String createUriStringWithPasswordMasked()
