@@ -17,16 +17,11 @@ import org.junit.Test;
 
 public class SourceWithCorrelationIdTestCase extends AbstractExtensionFunctionalTestCase {
 
-  private static String correlationId;
+  private static volatile String correlationId;
 
   @Override
   protected String getConfigFile() {
     return "source-with-correlation-id-config.xml";
-  }
-
-  @Before
-  public void setUp() {
-    correlationId = null;
   }
 
   @Override
