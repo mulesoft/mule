@@ -8,6 +8,7 @@
 package org.mule.test.function.extension;
 
 import static com.google.common.collect.Lists.partition;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -39,6 +40,9 @@ public class GlobalWeaveFunction implements Initialisable {
   public void initialise() throws InitialisationException {
     if (xPathFactory == null) {
       xPathFactory = XPathFactory.newInstance();
+    }
+    if (manager == null) {
+      throw new InitialisationException(createStaticMessage("Expected ExpressionManager to be inected but was null"), this);
     }
   }
 
