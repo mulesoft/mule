@@ -30,7 +30,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withName;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
 import static org.springframework.core.ResolvableType.forType;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -517,17 +516,21 @@ public final class IntrospectionUtils {
   }
 
   public static Optional<Field> getField(Class<?> clazz, String name) {
-    Collection<Field> candidates = getAllFields(clazz, withName(name));
-    if (isEmpty(candidates)) {
-      return empty();
+    for (Field field : clazz.getDeclaredFields()) {
+      if (field.getName().equals(name)) {
+        return Optional.of(field);
+      }
     }
 
-    Field field = candidates.stream()
-        .filter(f -> f.getDeclaringClass().equals(clazz))
-        .findFirst()
-        .orElseGet(() -> candidates.iterator().next());
+    for (Class<?> type : ReflectionUtils.getAllSuperTypes(clazz)) {
+      for (Field field : type.getDeclaredFields()) {
+        if (field.getName().equals(name)) {
+          return Optional.of(field);
+        }
+      }
+    }
 
-    return Optional.of(field);
+    return empty();
   }
 
   /**
@@ -1342,7 +1345,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link FieldSetter} for a field in the {@code target} annotated {@link DefaultEncoding} (if present)
    *
-   * @param target   object in which the fields are going to be set
+   * @param target object in which the fields are going to be set
    * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
    */
   public static Optional<FieldSetter> getDefaultEncodingFieldSetter(Object target) {
