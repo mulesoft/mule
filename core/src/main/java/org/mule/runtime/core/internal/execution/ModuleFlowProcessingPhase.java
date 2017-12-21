@@ -139,10 +139,10 @@ public class ModuleFlowProcessingPhase
             .flatMap(request -> from(policy.process(request)))
             // Perform processing of result by sending success or error response and handle errors that occur.
             // Returns Publisher<Void> to signal when this is complete or if it failed.
-            .flatMap(policyResult -> policyResult.reduce(policyFailure(phaseContext, flowConstruct),
-                                                         policySuccess(phaseContext, flowConstruct)))
+            .flatMap(policyResult -> policyResult.reduce(policyFailure(phaseContext, flowConstruct, messageSource),
+                                                         policySuccess(phaseContext, flowConstruct, messageSource)))
             .doOnSuccess(aVoid -> phaseResultNotifier.phaseSuccessfully())
-            .doOnError(onFailure(phaseResultNotifier, terminateConsumer))
+            .doOnError(onFailure(flowConstruct, messageSource, phaseResultNotifier, terminateConsumer))
             // Complete EventContext via responseCompletion Mono once everything is done.
             .doAfterTerminate(() -> responseCompletion.complete(null))
             .subscribe();
@@ -169,20 +169,22 @@ public class ModuleFlowProcessingPhase
    * Process success by attempting to send a response to client handling the case where response sending fails or the resolution
    * of response parameters fails.
    */
-  private Function<SourcePolicySuccessResult, Mono<Void>> policySuccess(final PhaseContext ctx, FlowConstruct flowConstruct) {
+  private Function<SourcePolicySuccessResult, Mono<Void>> policySuccess(final PhaseContext ctx, FlowConstruct flowConstruct,
+                                                                        MessageSource messageSource) {
     return successResult -> {
       fireNotification(ctx.messageProcessContext.getMessageSource(), successResult.getResult(),
                        flowConstruct, MESSAGE_RESPONSE);
       try {
         return from(ctx.template
             .sendResponseToClient(successResult.getResult(), successResult.getResponseParameters().get()))
-                .doOnSuccess(v -> onTerminate(ctx.terminateConsumer, right(successResult.getResult())))
+                .doOnSuccess(v -> onTerminate(flowConstruct, messageSource, ctx.terminateConsumer,
+                                              right(successResult.getResult())))
                 .onErrorResume(e -> policySuccessError(new SourceErrorException(successResult.getResult(),
                                                                                 sourceResponseSendErrorType, e),
-                                                       successResult, ctx, flowConstruct));
+                                                       successResult, ctx, flowConstruct, messageSource));
       } catch (Exception e) {
         return policySuccessError(new SourceErrorException(successResult.getResult(), sourceResponseGenerateErrorType, e),
-                                  successResult, ctx, flowConstruct);
+                                  successResult, ctx, flowConstruct, messageSource);
       }
     };
   }
@@ -191,13 +193,14 @@ public class ModuleFlowProcessingPhase
    * Process failure success by attempting to send an error response to client handling the case where error response sending
    * fails or the resolution of error response parameters fails.
    */
-  private Function<SourcePolicyFailureResult, Mono<Void>> policyFailure(final PhaseContext ctx, FlowConstruct flowConstruct) {
+  private Function<SourcePolicyFailureResult, Mono<Void>> policyFailure(final PhaseContext ctx, FlowConstruct flowConstruct,
+                                                                        MessageSource messageSource) {
     return failureResult -> {
       fireNotification(ctx.messageProcessContext.getMessageSource(), failureResult.getMessagingException().getEvent(),
                        flowConstruct, MESSAGE_ERROR_RESPONSE);
       return sendErrorResponse(failureResult.getMessagingException(), event -> failureResult.getErrorResponseParameters().get(),
-                               ctx)
-                                   .doOnSuccess(v -> onTerminate(ctx.terminateConsumer,
+                               ctx, flowConstruct)
+                                   .doOnSuccess(v -> onTerminate(flowConstruct, messageSource, ctx.terminateConsumer,
                                                                  left(failureResult.getMessagingException())));
     };
   }
@@ -207,12 +210,16 @@ public class ModuleFlowProcessingPhase
    * and sending an error response.
    */
   private Mono<Void> policySuccessError(SourceErrorException see, SourcePolicySuccessResult successResult, PhaseContext ctx,
-                                        FlowConstruct flowConstruct) {
-    MessagingException messagingException = see.toMessagingException();
+                                        FlowConstruct flowConstruct, MessageSource messageSource) {
+
+    MessagingException messagingException =
+        see.toMessagingException(flowConstruct.getMuleContext().getExceptionContextProviders(), messageSource);
+
     return when(just(messagingException).flatMapMany(flowConstruct.getExceptionListener()).last()
         .onErrorResume(e -> empty()),
-                sendErrorResponse(messagingException, successResult.createErrorResponseParameters(), ctx)
-                    .doOnSuccess(v -> onTerminate(ctx.terminateConsumer, left(messagingException)))).then();
+                sendErrorResponse(messagingException, successResult.createErrorResponseParameters(), ctx, flowConstruct)
+                    .doOnSuccess(v -> onTerminate(flowConstruct, messageSource, ctx.terminateConsumer, left(messagingException))))
+                        .then();
   }
 
   /*
@@ -221,7 +228,7 @@ public class ModuleFlowProcessingPhase
    */
   private Mono<Void> sendErrorResponse(MessagingException messagingException,
                                        Function<CoreEvent, Map<String, Object>> errorParameters,
-                                       final PhaseContext ctx) {
+                                       final PhaseContext ctx, FlowConstruct flowConstruct) {
     CoreEvent event = messagingException.getEvent();
     if (messagingException.inErrorHandler()) {
       return error(new SourceErrorException(event, sourceErrorResponseGenerateErrorType, messagingException.getCause(),
@@ -243,10 +250,11 @@ public class ModuleFlowProcessingPhase
    * Consumer invoked when processing of fails due to an error sending an error response, of because the error originated from
    * within an error handler.
    */
-  private Consumer<Throwable> onFailure(PhaseResultNotifier phaseResultNotifier,
+  private Consumer<Throwable> onFailure(FlowConstruct flowConstruct, MessageSource messageSource,
+                                        PhaseResultNotifier phaseResultNotifier,
                                         Consumer<Either<MessagingException, CoreEvent>> terminateConsumer) {
     return throwable -> {
-      onTerminate(terminateConsumer, left(throwable));
+      onTerminate(flowConstruct, messageSource, terminateConsumer, left(throwable));
       throwable = throwable instanceof SourceErrorException ? throwable.getCause() : throwable;
       Exception failureException = throwable instanceof Exception ? (Exception) throwable : new DefaultMuleException(throwable);
       phaseResultNotifier.phaseFailure(failureException);
@@ -308,18 +316,22 @@ public class ModuleFlowProcessingPhase
   /**
    * This method will not throw any {@link Exception}.
    *
+   * @param flowConstruct the flow being executed.
+   * @param messageSource the source that triggered the flow execution.
    * @param terminateConsumer the action to perform on the transformed result.
    * @param result the outcome of trying to send the response of the source through the source. In the case of error, only
    *        {@link MessagingException} or {@link SourceErrorException} are valid values on the {@code left} side of this
    *        parameter.
    */
-  private void onTerminate(Consumer<Either<MessagingException, CoreEvent>> terminateConsumer,
+  private void onTerminate(FlowConstruct flowConstruct, MessageSource messageSource,
+                           Consumer<Either<MessagingException, CoreEvent>> terminateConsumer,
                            Either<Throwable, CoreEvent> result) {
     safely(() -> terminateConsumer.accept(result.mapLeft(throwable -> {
       if (throwable instanceof MessagingException) {
         return (MessagingException) throwable;
       } else if (throwable instanceof SourceErrorException) {
-        return ((SourceErrorException) throwable).toMessagingException();
+        return ((SourceErrorException) throwable)
+            .toMessagingException(flowConstruct.getMuleContext().getExceptionContextProviders(), messageSource);
       } else {
         return null;
       }

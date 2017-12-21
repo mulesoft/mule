@@ -7,18 +7,23 @@
 package org.mule.runtime.core.internal.execution;
 
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
  * Represents an error that happens when a Source is processing the response of a flow.
- * 
+ *
  * @since 4.0
  */
 public final class SourceErrorException extends MuleRuntimeException {
@@ -55,12 +60,20 @@ public final class SourceErrorException extends MuleRuntimeException {
     return ofNullable(originalCause);
   }
 
-  public MessagingException toMessagingException() {
-    return new MessagingException(CoreEvent.builder(getEvent())
+  public MessagingException toMessagingException(Collection<ExceptionContextProvider> exceptionContextProviders,
+                                                 MessageSource messageSource) {
+    MessagingException messagingException = new MessagingException(CoreEvent.builder(getEvent())
         .error(ErrorBuilder.builder(getCause())
             .errorType(getErrorType())
             .build())
         .build(), getCause());
+
+    EnrichedNotificationInfo notificationInfo = createInfo(messagingException.getEvent(), messagingException, null);
+    exceptionContextProviders.forEach(cp -> {
+      cp.getContextInfo(notificationInfo, messageSource).forEach((k, v) -> messagingException.getInfo().putIfAbsent(k, v));
+    });
+
+    return messagingException;
   }
 
 }

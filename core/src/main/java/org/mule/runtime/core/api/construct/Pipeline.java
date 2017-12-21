@@ -6,15 +6,12 @@
  */
 package org.mule.runtime.core.api.construct;
 
-import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * A pipeline has an ordered list of {@link Processor}'s that are invoked in order to processor new messages received from it's
