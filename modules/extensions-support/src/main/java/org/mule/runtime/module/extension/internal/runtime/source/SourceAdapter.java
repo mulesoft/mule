@@ -221,15 +221,15 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
           .map(e -> sourceOverloadErrorType.equals(e.getErrorType()))
           .orElse(false);
 
+      SourceCallbackExecutor executor;
       if (isOverloadError) {
-        return from(onBackPressureExecutor.execute(event, emptyMap(), context)).doAfterTerminate(() -> {
-          rollback();
-          context.releaseConnection();
-        });
+        executor = onBackPressureExecutor;
+        parameters = emptyMap();
+      } else {
+        executor = onErrorExecutor;
       }
 
-      return from(onErrorExecutor.execute(event, parameters, context))
-          .doAfterTerminate(() -> rollback());
+      return from(executor.execute(event, parameters, context)).doAfterTerminate(() -> rollback());
     }
 
     @Override
