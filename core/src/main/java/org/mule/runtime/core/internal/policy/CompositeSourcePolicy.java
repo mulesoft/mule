@@ -26,13 +26,14 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import org.reactivestreams.Publisher;
 
 /**
  * {@link SourcePolicy} created from a list of {@link Policy}.
