@@ -44,7 +44,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.o
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
-
 import org.mule.metadata.api.builder.NumberTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
@@ -110,6 +109,8 @@ import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
 
+import com.google.common.reflect.TypeToken;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -120,7 +121,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import com.google.common.reflect.TypeToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -764,7 +764,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(source.getName(), is(sourceName));
 
     List<ParameterDeclaration> parameters = source.getAllParameters();
-    assertThat(parameters, hasSize(28));
+    assertThat(parameters, hasSize(29));
 
     assertParameter(parameters, SOURCE_PARAMETER, "", INT_TYPE, true, NOT_SUPPORTED, null);
     assertParameter(parameters, SOURCE_CALLBACK_PARAMETER, "", toMetadataType(Long.class), false, SUPPORTED, "#[payload]");

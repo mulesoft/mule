@@ -7,21 +7,22 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.ast;
 
 import static java.util.stream.Collectors.toList;
-
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
+import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.TypeElement;
-
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.TypeElement;
 
 /**
  * {@link SourceElement} implementation which works with the Java AST.
@@ -50,9 +51,7 @@ class SourceElementAST extends ASTType implements SourceElement {
    */
   @Override
   public Optional<MethodElement> getOnResponseMethod() {
-    return getMethods().stream()
-        .filter(op -> op.isAnnotatedWith(OnSuccess.class))
-        .findFirst();
+    return findMethodAnnotatedWith(OnSuccess.class);
   }
 
   /**
@@ -60,9 +59,7 @@ class SourceElementAST extends ASTType implements SourceElement {
    */
   @Override
   public Optional<MethodElement> getOnErrorMethod() {
-    return getMethods().stream()
-        .filter(op -> op.isAnnotatedWith(OnError.class))
-        .findFirst();
+    return findMethodAnnotatedWith(OnError.class);
   }
 
   /**
@@ -70,8 +67,20 @@ class SourceElementAST extends ASTType implements SourceElement {
    */
   @Override
   public Optional<MethodElement> getOnTerminateMethod() {
+    return findMethodAnnotatedWith(OnTerminate.class);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Optional<MethodElement> getOnBackPressureMethod() {
+    return findMethodAnnotatedWith(OnBackPressure.class);
+  }
+
+  private Optional<MethodElement> findMethodAnnotatedWith(Class<? extends Annotation> annotationClass) {
     return getMethods().stream()
-        .filter(op -> op.isAnnotatedWith(OnTerminate.class))
+        .filter(op -> op.isAnnotatedWith(annotationClass))
         .findFirst();
   }
 }

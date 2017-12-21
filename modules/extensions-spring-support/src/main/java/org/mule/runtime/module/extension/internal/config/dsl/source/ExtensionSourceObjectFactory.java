@@ -10,8 +10,10 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
@@ -19,11 +21,12 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
+import org.mule.runtime.module.extension.internal.loader.java.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceAdapterFactory;
@@ -47,15 +50,12 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   private ConfigurationProvider configurationProvider;
   private RetryPolicyTemplate retryPolicyTemplate;
   private CursorProviderFactory cursorProviderFactory;
+  private BackPressureStrategy backPressureStrategy = null;
 
   public ExtensionSourceObjectFactory(ExtensionModel extensionModel, SourceModel sourceModel, MuleContext muleContext) {
     super(muleContext);
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
-  }
-
-  protected ParametersResolver getParametersResolver(MuleContext muleContext) {
-    return ParametersResolver.fromValues(parameters, muleContext, isLazyModeEnabled());
   }
 
   @Override
@@ -83,8 +83,19 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                         configurationProvider,
                                         getRetryPolicyTemplate(),
                                         cursorProviderFactory,
+                                        getBackPressureStrategy(),
                                         muleContext.getExtensionManager());
     });
+  }
+
+  private BackPressureStrategy getBackPressureStrategy() {
+    if (backPressureStrategy != null) {
+      return backPressureStrategy;
+    }
+
+    return sourceModel.getModelProperty(BackPressureStrategyModelProperty.class)
+        .map(p -> toBackPressureStrategy(p.getDefaultMode()))
+        .orElse(WAIT);
   }
 
   private ResolverSet getNonCallbackParameters() throws ConfigurationException {
@@ -135,5 +146,9 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   public void setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {
     this.cursorProviderFactory = cursorProviderFactory;
+  }
+
+  public void setBackPressureStrategy(BackPressureStrategy backPressureStrategy) {
+    this.backPressureStrategy = backPressureStrategy;
   }
 }

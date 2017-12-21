@@ -364,6 +364,11 @@
         </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="failOnStart"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="failOnException"></xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/petstore" type="petstore-source-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
+          <xs:annotation>
+            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -600,6 +605,11 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/petstore" type="petstore-SentientSource-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
+          <xs:annotation>
+            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -610,6 +620,11 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/petstore" type="petstore-pet-source-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
+          <xs:annotation>
+            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="mammals"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="birds"></xs:attribute>
       </xs:extension>
@@ -847,6 +862,48 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:simpleType name="petstore-source-backPressureStrategyEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL"></xs:enumeration>
+          <xs:enumeration value="WAIT"></xs:enumeration>
+          <xs:enumeration value="DROP"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="petstore-SentientSource-backPressureStrategyEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL"></xs:enumeration>
+          <xs:enumeration value="WAIT"></xs:enumeration>
+          <xs:enumeration value="DROP"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="petstore-pet-source-backPressureStrategyEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="FAIL"></xs:enumeration>
+          <xs:enumeration value="WAIT"></xs:enumeration>
+          <xs:enumeration value="DROP"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
   <xs:simpleType name="org.mule.test.petstore.extension.PetEnumType">
     <xs:union>
       <xs:simpleType>

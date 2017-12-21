@@ -10725,6 +10725,44 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "Metadata-MetadataSource-backPressureStrategy",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "FAIL",
+                          "WAIT",
+                          "DROP"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "WAIT",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "backPressureStrategy",
+                  "description": "The strategy that the runtime will use to apply back pressure",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "RedeliveryPolicy"
@@ -11891,7 +11929,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -11905,7 +11942,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -12909,7 +12947,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -12923,7 +12960,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -13112,7 +13150,6 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
-                  "label": "Person",
                   "classInformation": {
                     "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
@@ -13124,7 +13161,8 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": true
-                  }
+                  },
+                  "label": "Person"
                 },
                 "open": {
                   "type": "Any"
@@ -13318,7 +13356,6 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
-                  "label": "Person",
                   "classInformation": {
                     "classname": "java.io.InputStream",
                     "hasDefaultConstructor": true,
@@ -13332,7 +13369,8 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "label": "Person"
                 },
                 "open": {
                   "type": "Any"
@@ -13496,7 +13534,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -13510,7 +13547,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -16473,6 +16511,44 @@
             {
               "type": {
                 "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "Metadata-MetadataSourceWithMultilevel-backPressureStrategy",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "FAIL",
+                      "WAIT",
+                      "DROP"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "WAIT",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "backPressureStrategy",
+              "description": "The strategy that the runtime will use to apply back pressure",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy"
@@ -16803,7 +16879,6 @@
                   "format": "json",
                   "type": "Object",
                   "annotations": {
-                    "label": "Person",
                     "classInformation": {
                       "classname": "java.io.InputStream",
                       "hasDefaultConstructor": true,
@@ -16817,7 +16892,8 @@
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "label": "Person"
                   },
                   "open": {
                     "type": "Any"
@@ -16920,6 +16996,44 @@
       "parameterGroupModels": [
         {
           "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "Metadata-custom-static-metadata-backPressureStrategy",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "FAIL",
+                      "WAIT",
+                      "DROP"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "WAIT",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "backPressureStrategy",
+              "description": "The strategy that the runtime will use to apply back pressure",
+              "modelProperties": {}
+            },
             {
               "type": {
                 "format": "java",
@@ -17113,6 +17227,44 @@
       "parameterGroupModels": [
         {
           "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "Metadata-xml-static-metadata-backPressureStrategy",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "FAIL",
+                      "WAIT",
+                      "DROP"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "WAIT",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "backPressureStrategy",
+              "description": "The strategy that the runtime will use to apply back pressure",
+              "modelProperties": {}
+            },
             {
               "type": {
                 "format": "java",
@@ -17489,7 +17641,6 @@
       "format": "csv",
       "type": "Object",
       "annotations": {
-        "typeId": "csv-object",
         "classInformation": {
           "classname": "java.lang.Integer",
           "hasDefaultConstructor": false,
@@ -17503,7 +17654,8 @@
           "parent": "java.lang.Number",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "csv-object"
       },
       "fields": []
     },

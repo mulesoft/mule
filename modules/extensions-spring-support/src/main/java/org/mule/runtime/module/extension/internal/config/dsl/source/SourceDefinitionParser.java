@@ -9,10 +9,12 @@ package org.mule.runtime.module.extension.internal.config.dsl.source;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
-
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -62,7 +64,10 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
             .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
                                            fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build())
             .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,
-                                           fromChildConfiguration(CursorProviderFactory.class).build());
+                                           fromChildConfiguration(CursorProviderFactory.class).build())
+            .withSetterParameterDefinition("backPressureStrategy",
+                                           fromSimpleParameter(BACK_PRESSURE_STRATEGY_PARAMETER_NAME,
+                                                               v -> toBackPressureStrategy((String) v)).build());
 
     List<ParameterGroupModel> inlineGroups = getInlineGroups(sourceModel);
     sourceModel.getErrorCallback().ifPresent(cb -> inlineGroups.addAll(getInlineGroups(cb)));

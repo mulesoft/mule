@@ -34,7 +34,9 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.SOURCE_OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
@@ -44,13 +46,14 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
-
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -77,6 +80,7 @@ import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
+import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
@@ -84,7 +88,6 @@ import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
@@ -95,6 +98,9 @@ import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptio
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.resource.spi.work.Work;
 
@@ -108,6 +114,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -194,6 +201,16 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   private SourceCallback sourceCallback;
   private ExtensionMessageSource messageSource;
   private StreamingManager streamingManager = spy(new DefaultStreamingManager());
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    ErrorTypeRepository errorTypeRepository = Mockito.mock(ErrorTypeRepository.class);
+    when(errorTypeRepository.getErrorType(SOURCE_OVERLOAD)).thenReturn(Optional.of(mock(ErrorType.class)));
+
+    Map<String, Object> registryObjects = new HashMap<>();
+    registryObjects.put("errorTypeRepository", errorTypeRepository);
+    return registryObjects;
+  }
 
   @Before
   public void before() throws Exception {
@@ -365,6 +382,11 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   }
 
   @Test
+  public void getBackPressureStrategy() {
+    assertThat(messageSource.getBackPressureStrategy(), is(FAIL));
+  }
+
+  @Test
   public void failOnExceptionWithConnectionExceptionAndGetsReconnected() throws Exception {
     messageSource.initialise();
     messageSource.start();
@@ -494,7 +516,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
     ExtensionMessageSource messageSource =
         new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider,
-                                   retryPolicyTemplate, cursorStreamProviderFactory, extensionManager);
+                                   retryPolicyTemplate, cursorStreamProviderFactory, FAIL, extensionManager);
     messageSource.setListener(messageProcessor);
     messageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
     muleContext.getInjector().inject(messageSource);

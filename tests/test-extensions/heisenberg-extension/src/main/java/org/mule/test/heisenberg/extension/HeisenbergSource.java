@@ -13,6 +13,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_BODY;
@@ -38,8 +40,11 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.RefName;
+import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
+import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
@@ -54,6 +59,7 @@ import javax.inject.Inject;
 @EmitsResponse
 @Streaming
 @MediaType(TEXT_PLAIN)
+@BackPressure(defaultMode = FAIL, supportedModes = {FAIL, DROP})
 public class HeisenbergSource extends Source<String, Object> {
 
   public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
@@ -92,6 +98,10 @@ public class HeisenbergSource extends Source<String, Object> {
   @Parameter
   @Optional(defaultValue = "1")
   private int corePoolSize;
+
+  @Parameter
+  @Optional(defaultValue = "300")
+  private long frequency;
 
   @RefName
   private String refName;
@@ -133,7 +143,7 @@ public class HeisenbergSource extends Source<String, Object> {
       if (result != null) {
         sourceCallback.handle(result);
       }
-    }, 0, 300, MILLISECONDS);
+    }, 0, frequency, MILLISECONDS);
   }
 
   @OnSuccess
@@ -183,6 +193,11 @@ public class HeisenbergSource extends Source<String, Object> {
       });
     }
     executedOnTerminate = true;
+  }
+
+  @OnBackPressure
+  public void onBackPressure(BackPressureContext ctx) {
+    heisenberg.onBackPressure(ctx);
   }
 
   @Override

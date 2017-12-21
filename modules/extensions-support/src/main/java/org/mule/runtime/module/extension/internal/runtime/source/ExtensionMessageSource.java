@@ -91,6 +91,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
   private final RetryPolicyTemplate retryPolicyTemplate;
+  private final BackPressureStrategy backPressureStrategy;
   private final ExceptionHandlerManager exceptionEnricherManager;
   private final AtomicBoolean reconnecting = new AtomicBoolean(false);
 
@@ -110,11 +111,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                 ConfigurationProvider configurationProvider,
                                 RetryPolicyTemplate retryPolicyTemplate,
                                 CursorProviderFactory cursorProviderFactory,
+                                BackPressureStrategy backPressureStrategy,
                                 ExtensionManager managerAdapter) {
     super(extensionModel, sourceModel, configurationProvider, cursorProviderFactory, managerAdapter);
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
     this.retryPolicyTemplate = retryPolicyTemplate;
+    this.backPressureStrategy = backPressureStrategy;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, sourceModel);
   }
 
@@ -463,5 +466,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         ((BaseEventContext) initialiserEvent.getContext()).success();
       }
     }
+  }
+
+  @Override
+  public BackPressureStrategy getBackPressureStrategy() {
+    return backPressureStrategy;
   }
 }

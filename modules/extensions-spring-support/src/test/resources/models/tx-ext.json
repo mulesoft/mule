@@ -3421,6 +3421,44 @@
                     "format": "java",
                     "type": "String",
                     "annotations": {
+                      "typeId": "transactional-TransactionalSource-backPressureStrategy",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "FAIL",
+                          "WAIT",
+                          "DROP"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "WAIT",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "backPressureStrategy",
+                  "description": "The strategy that the runtime will use to apply back pressure",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
                       "typeId": "org.mule.runtime.api.tx.TransactionType",
                       "enum": {
                         "type": "[Ljava.lang.String;",
@@ -3869,6 +3907,44 @@
                   "allowedStereotypeModels": [],
                   "name": "transactionType",
                   "description": "The type of transaction to create. Availability will depend on the runtime version.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "transactional-TransactionalSourceWithTXParameters-backPressureStrategy",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "FAIL",
+                          "WAIT",
+                          "DROP"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "WAIT",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "backPressureStrategy",
+                  "description": "The strategy that the runtime will use to apply back pressure",
                   "modelProperties": {}
                 },
                 {

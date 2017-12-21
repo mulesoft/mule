@@ -3768,6 +3768,44 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "Values-SourceWithConfiguration-backPressureStrategy",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "FAIL",
+                          "WAIT",
+                          "DROP"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "WAIT",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "backPressureStrategy",
+                  "description": "The strategy that the runtime will use to apply back pressure",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "RedeliveryPolicy"
@@ -3996,6 +4034,44 @@
                   "allowedStereotypeModels": [],
                   "name": "channel",
                   "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "Values-SourceWithConnection-backPressureStrategy",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "FAIL",
+                          "WAIT",
+                          "DROP"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "WAIT",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "backPressureStrategy",
+                  "description": "The strategy that the runtime will use to apply back pressure",
                   "modelProperties": {}
                 },
                 {
@@ -5974,6 +6050,44 @@
             {
               "type": {
                 "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "Values-SimpleSource-backPressureStrategy",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "FAIL",
+                      "WAIT",
+                      "DROP"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "WAIT",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "backPressureStrategy",
+              "description": "The strategy that the runtime will use to apply back pressure",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy"
@@ -6207,6 +6321,44 @@
             {
               "type": {
                 "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "Values-SourceMustNotStart-backPressureStrategy",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "FAIL",
+                      "WAIT",
+                      "DROP"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "WAIT",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "backPressureStrategy",
+              "description": "The strategy that the runtime will use to apply back pressure",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy"
@@ -6403,6 +6555,44 @@
       "parameterGroupModels": [
         {
           "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "Values-SourceWithMultiLevelValue-backPressureStrategy",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "FAIL",
+                      "WAIT",
+                      "DROP"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "WAIT",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "backPressureStrategy",
+              "description": "The strategy that the runtime will use to apply back pressure",
+              "modelProperties": {}
+            },
             {
               "type": {
                 "format": "java",
@@ -6791,6 +6981,44 @@
             {
               "type": {
                 "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "Values-SourceWithRequiredParameterInsideShowInDslGroup-backPressureStrategy",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "FAIL",
+                      "WAIT",
+                      "DROP"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "WAIT",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "backPressureStrategy",
+              "description": "The strategy that the runtime will use to apply back pressure",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy"
@@ -7062,6 +7290,44 @@
       "parameterGroupModels": [
         {
           "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "Values-SourceWithRequiredParameterWithAlias-backPressureStrategy",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "FAIL",
+                      "WAIT",
+                      "DROP"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "WAIT",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "backPressureStrategy",
+              "description": "The strategy that the runtime will use to apply back pressure",
+              "modelProperties": {}
+            },
             {
               "type": {
                 "format": "java",
@@ -7338,6 +7604,44 @@
       "parameterGroupModels": [
         {
           "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "Values-SourceWithValuesWithRequiredParameterInsideParamGroup-backPressureStrategy",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "FAIL",
+                      "WAIT",
+                      "DROP"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "WAIT",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "backPressureStrategy",
+              "description": "The strategy that the runtime will use to apply back pressure",
+              "modelProperties": {}
+            },
             {
               "type": {
                 "format": "java",
@@ -7792,6 +8096,44 @@
               "allowedStereotypeModels": [],
               "name": "strings",
               "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "Values-SourceWithValuesWithRequiredParameters-backPressureStrategy",
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "FAIL",
+                      "WAIT",
+                      "DROP"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "WAIT",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "backPressureStrategy",
+              "description": "The strategy that the runtime will use to apply back pressure",
               "modelProperties": {}
             },
             {

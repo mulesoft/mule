@@ -7363,7 +7363,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 13
+                      "order": 14
                     },
                     "allowedStereotypeModels": [],
                     "name": "payment",
@@ -7389,7 +7389,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 14
+                      "order": 15
                     },
                     "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
@@ -7419,7 +7419,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 15
+                      "order": 16
                     },
                     "allowedStereotypeModels": [],
                     "name": "fail",
@@ -7502,7 +7502,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 16
+                      "order": 17
                     },
                     "allowedStereotypeModels": [],
                     "name": "nextDoor",
@@ -7858,7 +7858,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 17
+                      "order": 18
                     },
                     "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
@@ -7884,7 +7884,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 18
+                      "order": 19
                     },
                     "allowedStereotypeModels": [],
                     "name": "methylamine",
@@ -7914,7 +7914,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 19
+                      "order": 20
                     },
                     "allowedStereotypeModels": [],
                     "name": "propagateError",
@@ -7997,7 +7997,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 20
+                      "order": 21
                     },
                     "allowedStereotypeModels": [],
                     "name": "nextDoor",
@@ -8481,6 +8481,86 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Number",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "long",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
+                      "int": {}
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "300",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 10
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "frequency",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "Heisenberg-AsyncListenPayments-backPressureStrategy",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "FAIL",
+                          "WAIT",
+                          "DROP"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "WAIT",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "backPressureStrategy",
+                  "description": "The strategy that the runtime will use to apply back pressure",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Union",
                     "annotations": {
                       "typeId": "ByteStreamingStrategy"
@@ -8646,7 +8726,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 10,
+                    "order": 11,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -8788,7 +8868,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 11,
+                    "order": 12,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -8941,7 +9021,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 12,
+                    "order": 13,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -8975,1661 +9055,6 @@
             }
           ],
           "name": "AsyncListenPayments",
-          "description": "",
-          "modelProperties": {},
-          "kind": "source"
-        },
-        {
-          "hasResponse": true,
-          "successCallback": {
-            "parameterGroupModels": [
-              {
-                "parameters": [
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Number",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "java.lang.Long",
-                          "hasDefaultConstructor": false,
-                          "isInterface": false,
-                          "isInstantiable": false,
-                          "isAbstract": false,
-                          "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
-                          "parent": "java.lang.Number",
-                          "genericTypes": [],
-                          "isMap": false
-                        },
-                        "int": {}
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "#[payload]",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 13
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "payment",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 14
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "sameNameParameter",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Boolean",
-                      "annotations": {
-                        "typeId": "boolean"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "false",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 15
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "fail",
-                    "description": "",
-                    "modelProperties": {}
-                  }
-                ],
-                "exclusiveParametersModels": [],
-                "showInDsl": false,
-                "name": "General",
-                "description": "",
-                "modelProperties": {}
-              },
-              {
-                "parameters": [
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Object",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "java.util.Map",
-                          "hasDefaultConstructor": false,
-                          "isInterface": true,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [],
-                          "parent": "",
-                          "genericTypes": [
-                            "java.lang.String",
-                            "org.mule.test.heisenberg.extension.model.Ricin"
-                          ],
-                          "isMap": true
-                        }
-                      },
-                      "open": {
-                        "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
-                      },
-                      "fields": []
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 1,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "labeledRicin",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 16
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "nextDoor",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Array",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "java.util.Set",
-                          "hasDefaultConstructor": false,
-                          "isInterface": true,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
-                          "parent": "",
-                          "genericTypes": [
-                            "org.mule.test.heisenberg.extension.model.Ricin"
-                          ],
-                          "isMap": false
-                        }
-                      },
-                      "item": {
-                        "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "ricinPacks",
-                    "displayModel": {
-                      "summary": "A set of ricin packs"
-                    },
-                    "description": "",
-                    "modelProperties": {}
-                  }
-                ],
-                "exclusiveParametersModels": [],
-                "layoutModel": {
-                  "password": false,
-                  "text": false,
-                  "query": false
-                },
-                "showInDsl": false,
-                "name": "Dangerous-Ricin",
-                "description": "",
-                "modelProperties": {}
-              },
-              {
-                "parameters": [
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "Heisenberg",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 1,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "myName",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Number",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "java.lang.Integer",
-                          "hasDefaultConstructor": false,
-                          "isInterface": false,
-                          "isInstantiable": false,
-                          "isAbstract": false,
-                          "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
-                          "parent": "java.lang.Number",
-                          "genericTypes": [],
-                          "isMap": false
-                        },
-                        "int": {}
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "50",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "age",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "DateTime",
-                      "annotations": {
-                        "typeId": "java.time.LocalDateTime"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 3,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "dateOfConception",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Date",
-                      "annotations": {
-                        "typeId": "java.util.Date"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 4,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "dateOfBirth",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "DateTime",
-                      "annotations": {
-                        "typeId": "java.util.Calendar"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 5,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "dateOfDeath",
-                    "displayModel": {
-                      "displayName": "Date of decease"
-                    },
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "DateTime",
-                      "annotations": {
-                        "typeId": "java.util.Calendar"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 6,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "dateOfGraduation",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Array",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "java.util.List",
-                          "hasDefaultConstructor": false,
-                          "isInterface": true,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
-                          "parent": "",
-                          "genericTypes": [
-                            "java.lang.String"
-                          ],
-                          "isMap": false
-                        }
-                      },
-                      "item": {
-                        "type": "String"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 7,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "knownAddresses",
-                    "description": "",
-                    "modelProperties": {}
-                  }
-                ],
-                "exclusiveParametersModels": [],
-                "layoutModel": {
-                  "password": false,
-                  "text": false,
-                  "query": false
-                },
-                "showInDsl": true,
-                "name": "Success Info",
-                "description": "",
-                "modelProperties": {}
-              }
-            ],
-            "name": "onSuccess",
-            "description": "",
-            "modelProperties": {}
-          },
-          "errorCallback": {
-            "parameterGroupModels": [
-              {
-                "parameters": [
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 17
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "sameNameParameter",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "@ref:org.mule.test.heisenberg.extension.model.Methylamine"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 18
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "methylamine",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Boolean",
-                      "annotations": {
-                        "typeId": "boolean"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "false",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 19
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "propagateError",
-                    "description": "",
-                    "modelProperties": {}
-                  }
-                ],
-                "exclusiveParametersModels": [],
-                "showInDsl": false,
-                "name": "General",
-                "description": "",
-                "modelProperties": {}
-              },
-              {
-                "parameters": [
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Object",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "java.util.Map",
-                          "hasDefaultConstructor": false,
-                          "isInterface": true,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [],
-                          "parent": "",
-                          "genericTypes": [
-                            "java.lang.String",
-                            "org.mule.test.heisenberg.extension.model.Ricin"
-                          ],
-                          "isMap": true
-                        }
-                      },
-                      "open": {
-                        "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
-                      },
-                      "fields": []
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 1,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "labeledRicin",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 20
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "nextDoor",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Array",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "java.util.Set",
-                          "hasDefaultConstructor": false,
-                          "isInterface": true,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
-                          "parent": "",
-                          "genericTypes": [
-                            "org.mule.test.heisenberg.extension.model.Ricin"
-                          ],
-                          "isMap": false
-                        }
-                      },
-                      "item": {
-                        "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "ricinPacks",
-                    "displayModel": {
-                      "summary": "A set of ricin packs"
-                    },
-                    "description": "",
-                    "modelProperties": {}
-                  }
-                ],
-                "exclusiveParametersModels": [],
-                "layoutModel": {
-                  "password": false,
-                  "text": false,
-                  "query": false
-                },
-                "showInDsl": false,
-                "name": "Dangerous-Ricin",
-                "description": "",
-                "modelProperties": {}
-              },
-              {
-                "parameters": [
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "String"
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "Heisenberg",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 1,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "myName",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Number",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "java.lang.Integer",
-                          "hasDefaultConstructor": false,
-                          "isInterface": false,
-                          "isInstantiable": false,
-                          "isAbstract": false,
-                          "isFinal": true,
-                          "implementedInterfaces": [
-                            "java.lang.Comparable"
-                          ],
-                          "parent": "java.lang.Number",
-                          "genericTypes": [],
-                          "isMap": false
-                        },
-                        "int": {}
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "defaultValue": "50",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 2,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "age",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "DateTime",
-                      "annotations": {
-                        "typeId": "java.time.LocalDateTime"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 3,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "dateOfConception",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Date",
-                      "annotations": {
-                        "typeId": "java.util.Date"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 4,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "dateOfBirth",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "DateTime",
-                      "annotations": {
-                        "typeId": "java.util.Calendar"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 5,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "dateOfDeath",
-                    "displayModel": {
-                      "displayName": "Date of decease"
-                    },
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "DateTime",
-                      "annotations": {
-                        "typeId": "java.util.Calendar"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": false,
-                    "isConfigOverride": false,
-                    "expressionSupport": "NOT_SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 6,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "dateOfGraduation",
-                    "description": "",
-                    "modelProperties": {}
-                  },
-                  {
-                    "type": {
-                      "format": "java",
-                      "type": "Array",
-                      "annotations": {
-                        "classInformation": {
-                          "classname": "java.util.List",
-                          "hasDefaultConstructor": false,
-                          "isInterface": true,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [
-                            "java.util.Collection"
-                          ],
-                          "parent": "",
-                          "genericTypes": [
-                            "java.lang.String"
-                          ],
-                          "isMap": false
-                        }
-                      },
-                      "item": {
-                        "type": "String"
-                      }
-                    },
-                    "hasDynamicType": false,
-                    "required": true,
-                    "isConfigOverride": false,
-                    "expressionSupport": "SUPPORTED",
-                    "role": "BEHAVIOUR",
-                    "dslConfiguration": {
-                      "allowsInlineDefinition": true,
-                      "allowsReferences": true,
-                      "allowTopLevelDefinition": false
-                    },
-                    "layoutModel": {
-                      "password": false,
-                      "text": false,
-                      "query": false,
-                      "order": 7,
-                      "tabName": "General"
-                    },
-                    "allowedStereotypeModels": [],
-                    "name": "knownAddresses",
-                    "description": "",
-                    "modelProperties": {}
-                  }
-                ],
-                "exclusiveParametersModels": [],
-                "layoutModel": {
-                  "password": false,
-                  "text": false,
-                  "query": false
-                },
-                "showInDsl": true,
-                "name": "Error Info",
-                "description": "",
-                "modelProperties": {}
-              }
-            ],
-            "name": "onError",
-            "description": "",
-            "modelProperties": {}
-          },
-          "terminateCallbackModel": {
-            "parameterGroupModels": [],
-            "name": "onTerminate",
-            "description": "",
-            "modelProperties": {}
-          },
-          "output": {
-            "type": {
-              "format": {
-                "id": "text/plain",
-                "label": "text/plain",
-                "validMimeTypes": [
-                  "text/plain"
-                ]
-              },
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "description": "",
-            "modelProperties": {}
-          },
-          "outputAttributes": {
-            "type": {
-              "format": "java",
-              "type": "Object",
-              "annotations": {
-                "typeId": "java.lang.Object",
-                "classInformation": {
-                  "classname": "java.lang.Object",
-                  "hasDefaultConstructor": true,
-                  "isInterface": false,
-                  "isInstantiable": true,
-                  "isAbstract": false,
-                  "isFinal": false,
-                  "implementedInterfaces": [],
-                  "parent": "",
-                  "genericTypes": [],
-                  "isMap": false
-                },
-                "typeAlias": {
-                  "value": "Object"
-                }
-              },
-              "fields": []
-            },
-            "hasDynamicType": false,
-            "description": "",
-            "modelProperties": {}
-          },
-          "transactional": false,
-          "requiresConnection": true,
-          "supportsStreaming": true,
-          "nestedComponents": [],
-          "errors": [],
-          "stereotype": {
-            "type": "SOURCE",
-            "namespace": "MULE"
-          },
-          "parameterGroupModels": [
-            {
-              "parameters": [
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Number",
-                    "annotations": {
-                      "classInformation": {
-                        "classname": "int",
-                        "hasDefaultConstructor": false,
-                        "isInterface": false,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": true,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      },
-                      "int": {}
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 8
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "initialBatchNumber",
-                  "description": "",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Number",
-                    "annotations": {
-                      "classInformation": {
-                        "classname": "int",
-                        "hasDefaultConstructor": false,
-                        "isInterface": false,
-                        "isInstantiable": false,
-                        "isAbstract": true,
-                        "isFinal": true,
-                        "implementedInterfaces": [],
-                        "parent": "",
-                        "genericTypes": [],
-                        "isMap": false
-                      },
-                      "int": {}
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "1",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 9
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "corePoolSize",
-                  "description": "",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Union",
-                    "annotations": {
-                      "typeId": "ByteStreamingStrategy"
-                    },
-                    "of": [
-                      {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "repeatable-in-memory-stream"
-                        },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "initialBufferSize"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "default": "512"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "This is the amount of memory that will be allocated in order to consume the stream and provide random access to it. If the stream contains more data than can be fit into this buffer, then it will be expanded by according to the bufferSizeIncrement attribute, with an upper limit of maxInMemorySize."
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "bufferSizeIncrement"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "default": "512"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "This is by how much will be buffer size by expanded if it exceeds its initial size. Setting a value of zero or lower will mean that the buffer should not expand, meaning that a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised when the buffer gets full."
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "maxBufferSize"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "default": "1024"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised. A value lower or equal to zero means no limit."
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "bufferUnit"
-                            },
-                            "model": {
-                              "type": "String",
-                              "annotations": {
-                                "enum": {
-                                  "type": "[Ljava.lang.String;",
-                                  "values": [
-                                    "BYTE",
-                                    "KB",
-                                    "MB",
-                                    "GB"
-                                  ]
-                                },
-                                "default": "KB"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "The unit in which all these attributes are expressed"
-                              }
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "repeatable-file-store-stream"
-                        },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "maxInMemorySize"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "default": "512"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "Defines the maximum memory that the stream should use to keep data in memory. If more than that is consumed then it will start to buffer the content on disk."
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "bufferUnit"
-                            },
-                            "model": {
-                              "type": "String",
-                              "annotations": {
-                                "enum": {
-                                  "type": "[Ljava.lang.String;",
-                                  "values": [
-                                    "BYTE",
-                                    "KB",
-                                    "MB",
-                                    "GB"
-                                  ]
-                                },
-                                "default": "KB"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "The unit in which maxInMemorySize is expressed"
-                              }
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "non-repeatable-stream",
-                          "description": {
-                            "value": "This configuration allows the input stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
-                          }
-                        },
-                        "fields": []
-                      }
-                    ]
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 10,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "streamingStrategy",
-                  "description": "Configure if repeatable streams should be used and their behaviour",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                      "value": {
-                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-byte-streaming-strategy",
-                        "prefix": "mule"
-                      }
-                    },
-                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                      "sequence": 2
-                    }
-                  }
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "RedeliveryPolicy"
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "maxRedeliveryCount"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "default": "5"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "useSecureHash"
-                        },
-                        "model": {
-                          "type": "Boolean",
-                          "annotations": {
-                            "default": "true"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "Whether to use a secure hash algorithm to identify a redelivered message"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "messageDigestAlgorithm"
-                        },
-                        "model": {
-                          "type": "String"
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "idExpression"
-                        },
-                        "model": {
-                          "type": "String"
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "objectStore"
-                        },
-                        "model": {
-                          "type": "Object",
-                          "annotations": {
-                            "typeId": "org.mule.runtime.api.store.ObjectStore",
-                            "classInformation": {
-                              "classname": "org.mule.runtime.api.store.ObjectStore",
-                              "hasDefaultConstructor": false,
-                              "isInterface": true,
-                              "isInstantiable": false,
-                              "isAbstract": true,
-                              "isFinal": false,
-                              "implementedInterfaces": [],
-                              "parent": "",
-                              "genericTypes": [],
-                              "isMap": false
-                            },
-                            "typeAlias": {
-                              "value": "ObjectStore"
-                            }
-                          },
-                          "fields": []
-                        },
-                        "annotations": {
-                          "stereotype": {
-                            "allowedStereotypes": [
-                              {
-                                "type": "OBJECT_STORE",
-                                "namespace": "OS"
-                              }
-                            ]
-                          },
-                          "description": {
-                            "value": "The object store where the redelivery counter for each message is going to be stored."
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 11,
-                    "tabName": "Redelivery"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "redeliveryPolicy",
-                  "description": "Defines a policy for processing the redelivery of the same message",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                      "value": {
-                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-redelivery-policy",
-                        "prefix": "mule"
-                      }
-                    },
-                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                      "sequence": 1
-                    }
-                  }
-                }
-              ],
-              "exclusiveParametersModels": [],
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "showInDsl": false,
-              "name": "General",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "parameters": [
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Union",
-                    "annotations": {
-                      "typeId": "ReconnectionStrategy"
-                    },
-                    "of": [
-                      {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "reconnect"
-                        },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "classInformation": {
-                                  "classname": "java.lang.Long",
-                                  "hasDefaultConstructor": false,
-                                  "isInterface": false,
-                                  "isInstantiable": false,
-                                  "isAbstract": false,
-                                  "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
-                                  "parent": "java.lang.Number",
-                                  "genericTypes": [],
-                                  "isMap": false
-                                },
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "count"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "default": "2"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How many reconnection attempts to make"
-                              }
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "reconnect-forever"
-                        },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "classInformation": {
-                                  "classname": "java.lang.Long",
-                                  "hasDefaultConstructor": false,
-                                  "isInterface": false,
-                                  "isInstantiable": false,
-                                  "isAbstract": false,
-                                  "isFinal": true,
-                                  "implementedInterfaces": [
-                                    "java.lang.Comparable"
-                                  ],
-                                  "parent": "java.lang.Number",
-                                  "genericTypes": [],
-                                  "isMap": false
-                                },
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 12,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "reconnectionStrategy",
-                  "description": "A retry strategy in case of connectivity errors",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                      "value": {
-                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-reconnection-strategy",
-                        "prefix": "mule"
-                      }
-                    },
-                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    }
-                  }
-                }
-              ],
-              "exclusiveParametersModels": [],
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2
-              },
-              "showInDsl": false,
-              "name": "Connection",
-              "description": "",
-              "modelProperties": {}
-            }
-          ],
-          "name": "ListenPayments",
           "description": "",
           "modelProperties": {},
           "kind": "source"
@@ -11791,16 +10216,28 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Boolean",
+                    "type": "Number",
                     "annotations": {
-                      "typeId": "boolean"
+                      "classInformation": {
+                        "classname": "long",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
+                      "int": {}
                     }
                   },
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "false",
+                  "defaultValue": "300",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -11814,8 +10251,45 @@
                     "order": 10
                   },
                   "allowedStereotypeModels": [],
-                  "name": "reconnectable",
+                  "name": "frequency",
                   "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "Heisenberg-ListenPayments-backPressureStrategy",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "FAIL",
+                          "DROP"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "FAIL",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "backPressureStrategy",
+                  "description": "The strategy that the runtime will use to apply back pressure",
                   "modelProperties": {}
                 },
                 {
@@ -12282,6 +10756,1771 @@
                     "text": false,
                     "query": false,
                     "order": 13,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "ListenPayments",
+          "description": "",
+          "modelProperties": {},
+          "kind": "source"
+        },
+        {
+          "hasResponse": true,
+          "successCallback": {
+            "parameterGroupModels": [
+              {
+                "parameters": [
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Long",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "#[payload]",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 15
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "payment",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 16
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "sameNameParameter",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Boolean",
+                      "annotations": {
+                        "typeId": "boolean"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "false",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 17
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "fail",
+                    "description": "",
+                    "modelProperties": {}
+                  }
+                ],
+                "exclusiveParametersModels": [],
+                "showInDsl": false,
+                "name": "General",
+                "description": "",
+                "modelProperties": {}
+              },
+              {
+                "parameters": [
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Object",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.util.Map",
+                          "hasDefaultConstructor": false,
+                          "isInterface": true,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [],
+                          "parent": "",
+                          "genericTypes": [
+                            "java.lang.String",
+                            "org.mule.test.heisenberg.extension.model.Ricin"
+                          ],
+                          "isMap": true
+                        }
+                      },
+                      "open": {
+                        "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
+                      },
+                      "fields": []
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 1,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "labeledRicin",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 18
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "nextDoor",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Array",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.util.Set",
+                          "hasDefaultConstructor": false,
+                          "isInterface": true,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.util.Collection"
+                          ],
+                          "parent": "",
+                          "genericTypes": [
+                            "org.mule.test.heisenberg.extension.model.Ricin"
+                          ],
+                          "isMap": false
+                        }
+                      },
+                      "item": {
+                        "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 2,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "ricinPacks",
+                    "displayModel": {
+                      "summary": "A set of ricin packs"
+                    },
+                    "description": "",
+                    "modelProperties": {}
+                  }
+                ],
+                "exclusiveParametersModels": [],
+                "layoutModel": {
+                  "password": false,
+                  "text": false,
+                  "query": false
+                },
+                "showInDsl": false,
+                "name": "Dangerous-Ricin",
+                "description": "",
+                "modelProperties": {}
+              },
+              {
+                "parameters": [
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "Heisenberg",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 1,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "myName",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "50",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 2,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "age",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "DateTime",
+                      "annotations": {
+                        "typeId": "java.time.LocalDateTime"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 3,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "dateOfConception",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Date",
+                      "annotations": {
+                        "typeId": "java.util.Date"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 4,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "dateOfBirth",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "DateTime",
+                      "annotations": {
+                        "typeId": "java.util.Calendar"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 5,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "dateOfDeath",
+                    "displayModel": {
+                      "displayName": "Date of decease"
+                    },
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "DateTime",
+                      "annotations": {
+                        "typeId": "java.util.Calendar"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "NOT_SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 6,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "dateOfGraduation",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Array",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.util.List",
+                          "hasDefaultConstructor": false,
+                          "isInterface": true,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.util.Collection"
+                          ],
+                          "parent": "",
+                          "genericTypes": [
+                            "java.lang.String"
+                          ],
+                          "isMap": false
+                        }
+                      },
+                      "item": {
+                        "type": "String"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": true,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 7,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "knownAddresses",
+                    "description": "",
+                    "modelProperties": {}
+                  }
+                ],
+                "exclusiveParametersModels": [],
+                "layoutModel": {
+                  "password": false,
+                  "text": false,
+                  "query": false
+                },
+                "showInDsl": true,
+                "name": "Success Info",
+                "description": "",
+                "modelProperties": {}
+              }
+            ],
+            "name": "onSuccess",
+            "description": "",
+            "modelProperties": {}
+          },
+          "errorCallback": {
+            "parameterGroupModels": [
+              {
+                "parameters": [
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 19
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "sameNameParameter",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "@ref:org.mule.test.heisenberg.extension.model.Methylamine"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 20
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "methylamine",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Boolean",
+                      "annotations": {
+                        "typeId": "boolean"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "false",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 21
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "propagateError",
+                    "description": "",
+                    "modelProperties": {}
+                  }
+                ],
+                "exclusiveParametersModels": [],
+                "showInDsl": false,
+                "name": "General",
+                "description": "",
+                "modelProperties": {}
+              },
+              {
+                "parameters": [
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Object",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.util.Map",
+                          "hasDefaultConstructor": false,
+                          "isInterface": true,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [],
+                          "parent": "",
+                          "genericTypes": [
+                            "java.lang.String",
+                            "org.mule.test.heisenberg.extension.model.Ricin"
+                          ],
+                          "isMap": true
+                        }
+                      },
+                      "open": {
+                        "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
+                      },
+                      "fields": []
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 1,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "labeledRicin",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "@ref:org.mule.test.heisenberg.extension.model.KnockeableDoor"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 22
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "nextDoor",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Array",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.util.Set",
+                          "hasDefaultConstructor": false,
+                          "isInterface": true,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.util.Collection"
+                          ],
+                          "parent": "",
+                          "genericTypes": [
+                            "org.mule.test.heisenberg.extension.model.Ricin"
+                          ],
+                          "isMap": false
+                        }
+                      },
+                      "item": {
+                        "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 2,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "ricinPacks",
+                    "displayModel": {
+                      "summary": "A set of ricin packs"
+                    },
+                    "description": "",
+                    "modelProperties": {}
+                  }
+                ],
+                "exclusiveParametersModels": [],
+                "layoutModel": {
+                  "password": false,
+                  "text": false,
+                  "query": false
+                },
+                "showInDsl": false,
+                "name": "Dangerous-Ricin",
+                "description": "",
+                "modelProperties": {}
+              },
+              {
+                "parameters": [
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "String"
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "Heisenberg",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 1,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "myName",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": [],
+                          "isMap": false
+                        },
+                        "int": {}
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "defaultValue": "50",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 2,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "age",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "DateTime",
+                      "annotations": {
+                        "typeId": "java.time.LocalDateTime"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 3,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "dateOfConception",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Date",
+                      "annotations": {
+                        "typeId": "java.util.Date"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 4,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "dateOfBirth",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "DateTime",
+                      "annotations": {
+                        "typeId": "java.util.Calendar"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 5,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "dateOfDeath",
+                    "displayModel": {
+                      "displayName": "Date of decease"
+                    },
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "DateTime",
+                      "annotations": {
+                        "typeId": "java.util.Calendar"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "NOT_SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 6,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "dateOfGraduation",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Array",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.util.List",
+                          "hasDefaultConstructor": false,
+                          "isInterface": true,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.util.Collection"
+                          ],
+                          "parent": "",
+                          "genericTypes": [
+                            "java.lang.String"
+                          ],
+                          "isMap": false
+                        }
+                      },
+                      "item": {
+                        "type": "String"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": true,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 7,
+                      "tabName": "General"
+                    },
+                    "allowedStereotypeModels": [],
+                    "name": "knownAddresses",
+                    "description": "",
+                    "modelProperties": {}
+                  }
+                ],
+                "exclusiveParametersModels": [],
+                "layoutModel": {
+                  "password": false,
+                  "text": false,
+                  "query": false
+                },
+                "showInDsl": true,
+                "name": "Error Info",
+                "description": "",
+                "modelProperties": {}
+              }
+            ],
+            "name": "onError",
+            "description": "",
+            "modelProperties": {}
+          },
+          "terminateCallbackModel": {
+            "parameterGroupModels": [],
+            "name": "onTerminate",
+            "description": "",
+            "modelProperties": {}
+          },
+          "output": {
+            "type": {
+              "format": {
+                "id": "text/plain",
+                "label": "text/plain",
+                "validMimeTypes": [
+                  "text/plain"
+                ]
+              },
+              "type": "String"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Object",
+              "annotations": {
+                "typeId": "java.lang.Object",
+                "classInformation": {
+                  "classname": "java.lang.Object",
+                  "hasDefaultConstructor": true,
+                  "isInterface": false,
+                  "isInstantiable": true,
+                  "isAbstract": false,
+                  "isFinal": false,
+                  "implementedInterfaces": [],
+                  "parent": "",
+                  "genericTypes": [],
+                  "isMap": false
+                },
+                "typeAlias": {
+                  "value": "Object"
+                }
+              },
+              "fields": []
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
+          "stereotype": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          },
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Number",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "int",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
+                      "int": {}
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 8
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "initialBatchNumber",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Number",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "int",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
+                      "int": {}
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "1",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 9
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "corePoolSize",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Number",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "long",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
+                      "int": {}
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "300",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 10
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "frequency",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "false",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 11
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "reconnectable",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "Heisenberg-ReconnectableListenPayments-backPressureStrategy",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "FAIL",
+                          "WAIT",
+                          "DROP"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "WAIT",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "backPressureStrategy",
+                  "description": "The strategy that the runtime will use to apply back pressure",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "ByteStreamingStrategy"
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "repeatable-in-memory-stream"
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "initialBufferSize"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "default": "512"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is the amount of memory that will be allocated in order to consume the stream and provide random access to it. If the stream contains more data than can be fit into this buffer, then it will be expanded by according to the bufferSizeIncrement attribute, with an upper limit of maxInMemorySize."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "bufferSizeIncrement"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "default": "512"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is by how much will be buffer size by expanded if it exceeds its initial size. Setting a value of zero or lower will mean that the buffer should not expand, meaning that a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised when the buffer gets full."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "maxBufferSize"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "default": "1024"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised. A value lower or equal to zero means no limit."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "bufferUnit"
+                            },
+                            "model": {
+                              "type": "String",
+                              "annotations": {
+                                "enum": {
+                                  "type": "[Ljava.lang.String;",
+                                  "values": [
+                                    "BYTE",
+                                    "KB",
+                                    "MB",
+                                    "GB"
+                                  ]
+                                },
+                                "default": "KB"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The unit in which all these attributes are expressed"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "repeatable-file-store-stream"
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "maxInMemorySize"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "default": "512"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "Defines the maximum memory that the stream should use to keep data in memory. If more than that is consumed then it will start to buffer the content on disk."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "bufferUnit"
+                            },
+                            "model": {
+                              "type": "String",
+                              "annotations": {
+                                "enum": {
+                                  "type": "[Ljava.lang.String;",
+                                  "values": [
+                                    "BYTE",
+                                    "KB",
+                                    "MB",
+                                    "GB"
+                                  ]
+                                },
+                                "default": "KB"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The unit in which maxInMemorySize is expressed"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "non-repeatable-stream",
+                          "description": {
+                            "value": "This configuration allows the input stream to be read only once. It will not allow to seek randomly which will limit the transformations that DW can perform on this stream. Use this option for use cases which just require moving data around from one system to another to get optimum performance."
+                          }
+                        },
+                        "fields": []
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 12,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "streamingStrategy",
+                  "description": "Configure if repeatable streams should be used and their behaviour",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-byte-streaming-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "RedeliveryPolicy"
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "maxRedeliveryCount"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "default": "5"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "useSecureHash"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "default": "true"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "messageDigestAlgorithm"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "idExpression"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "objectStore"
+                        },
+                        "model": {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "classInformation": {
+                              "classname": "org.mule.runtime.api.store.ObjectStore",
+                              "hasDefaultConstructor": false,
+                              "isInterface": true,
+                              "isInstantiable": false,
+                              "isAbstract": true,
+                              "isFinal": false,
+                              "implementedInterfaces": [],
+                              "parent": "",
+                              "genericTypes": [],
+                              "isMap": false
+                            },
+                            "typeAlias": {
+                              "value": "ObjectStore"
+                            }
+                          },
+                          "fields": []
+                        },
+                        "annotations": {
+                          "stereotype": {
+                            "allowedStereotypes": [
+                              {
+                                "type": "OBJECT_STORE",
+                                "namespace": "OS"
+                              }
+                            ]
+                          },
+                          "description": {
+                            "value": "The object store where the redelivery counter for each message is going to be stored."
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 13,
+                    "tabName": "Redelivery"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "redeliveryPolicy",
+                  "description": "Defines a policy for processing the redelivery of the same message",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-redelivery-policy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "ReconnectionStrategy"
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "reconnect"
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "classInformation": {
+                                  "classname": "java.lang.Long",
+                                  "hasDefaultConstructor": false,
+                                  "isInterface": false,
+                                  "isInstantiable": false,
+                                  "isAbstract": false,
+                                  "isFinal": true,
+                                  "implementedInterfaces": [
+                                    "java.lang.Comparable"
+                                  ],
+                                  "parent": "java.lang.Number",
+                                  "genericTypes": [],
+                                  "isMap": false
+                                },
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "reconnect-forever"
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "classInformation": {
+                                  "classname": "java.lang.Long",
+                                  "hasDefaultConstructor": false,
+                                  "isInterface": false,
+                                  "isInstantiable": false,
+                                  "isAbstract": false,
+                                  "isFinal": true,
+                                  "implementedInterfaces": [
+                                    "java.lang.Comparable"
+                                  ],
+                                  "parent": "java.lang.Number",
+                                  "genericTypes": [],
+                                  "isMap": false
+                                },
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 14,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],

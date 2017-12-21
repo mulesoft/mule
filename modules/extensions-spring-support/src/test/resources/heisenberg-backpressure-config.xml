@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                          http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+                          http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+
+    <heisenberg:config name="heisenberg"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="0"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER"
+                       enemies="#[[]]">
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
+    </heisenberg:config>
+
+    <flow name="defaultToFail" initialState="stopped" maxConcurrency="1">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" payment="100" frequency="10">
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+            <heisenberg:success-info age="27">
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="success address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:success-info>
+            <heisenberg:error-info>
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="error address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:error-info>
+        </heisenberg:listen-payments>
+
+        <test:processor waitTime="15000" />
+    </flow>
+
+    <flow name="configuredToDrop" initialState="stopped">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" payment="100" frequency="10" backPressureStrategy="DROP">
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+            <heisenberg:success-info age="27">
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="success address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:success-info>
+            <heisenberg:error-info>
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="error address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:error-info>
+        </heisenberg:listen-payments>
+
+        <test:processor waitTime="15000" />
+    </flow>
+
+    <flow name="defaultCase" initialState="stopped" maxConcurrency="1">
+        <heisenberg:reconnectable-listen-payments config-ref="heisenberg" initialBatchNumber="3" payment="100" reconnectable="true" frequency="1">
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+            <heisenberg:success-info age="27">
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="success address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:success-info>
+            <heisenberg:error-info>
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="error address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:error-info>
+        </heisenberg:reconnectable-listen-payments>
+        
+        <test:processor waitTime="1000" />
+        <test:processor class="org.mule.test.module.extension.source.BackPressureTestCase$Collector" />
+    </flow>
+
+</mule>
