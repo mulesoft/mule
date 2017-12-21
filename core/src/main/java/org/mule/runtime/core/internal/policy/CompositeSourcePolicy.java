@@ -11,6 +11,7 @@ import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_K
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -25,7 +26,6 @@ import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +43,7 @@ import java.util.function.Supplier;
 public class CompositeSourcePolicy extends
     AbstractCompositePolicy<SourcePolicyParametersTransformer, MessageSourceResponseParametersProcessor> implements SourcePolicy {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LoggerFactory.class);
+  private static final Logger LOGGER = getLogger(CompositeSourcePolicy.class);
 
   private final Processor flowExecutionProcessor;
   private final SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
@@ -107,7 +107,7 @@ public class CompositeSourcePolicy extends
                   .fromFailureResponseParametersToMessage(originalFailureResponseParameters))
               .orElse(messagingException.getEvent().getMessage());
           MessagingException flowExecutionException =
-              new FlowExecutionException(CoreEvent.builder(event).message(message).build(),
+              new FlowExecutionException(CoreEvent.builder(messagingException.getEvent()).message(message).build(),
                                          messagingException.getCause(),
                                          messagingException.getFailingComponent());
           if (messagingException.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
