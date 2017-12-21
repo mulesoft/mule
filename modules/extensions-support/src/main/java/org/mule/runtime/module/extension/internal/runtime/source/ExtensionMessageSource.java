@@ -210,12 +210,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   public void onException(ConnectionException exception) {
     if (!reconnecting.compareAndSet(false, true)) {
       throw new MuleRuntimeException(
-          createStaticMessage(format("Message source '%s' on root component '%s' failed to reconnect. Error was: %s",
-                                     // sourceModel's name is used because at this point is very likely that the "sourceAdapter is null
-                                     sourceModel.getName(),
-                                     getLocation().getRootContainerName(),
-                                     exception.getMessage())),
-          exception);
+                                     createStaticMessage(format("Message source '%s' on root component '%s' failed to reconnect. Error was: %s",
+                                                                // sourceModel's name is used because at this point is very likely that the "sourceAdapter is null
+                                                                sourceModel.getName(),
+                                                                getLocation().getRootContainerName(),
+                                                                exception.getMessage())),
+                                     exception);
     }
 
     LOGGER.warn(format("Message source '%s' on root component '%s' threw exception. Attempting to reconnect...",
@@ -390,9 +390,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     transactionConfig.setMuleContext(muleContext);
     TransactionType transactionalType = sourceAdapter.getTransactionalType();
     transactionConfig.setFactory(transactionFactoryLocator.lookUpTransactionFactory(transactionalType)
-                                     .orElseThrow(() -> new IllegalStateException(format(
-                                         "Unable to create Source with Transactions of Type: [%s]. No factory available for this transaction type",
-                                         transactionalType))));
+        .orElseThrow(() -> new IllegalStateException(format(
+                                                            "Unable to create Source with Transactions of Type: [%s]. No factory available for this transaction type",
+                                                            transactionalType))));
 
     return transactionConfig;
   }
@@ -484,10 +484,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     if (!configurationModel.getSourceModel(sourceModel.getName()).isPresent()
         && !configurationProvider.getExtensionModel().getSourceModel(sourceModel.getName()).isPresent()) {
       throw new IllegalSourceException(format(
-          "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
-              + "The selected config does not support that operation.",
-          getLocation().getRootContainerName(), sourceModel.getName(),
-          configurationProvider.getName()));
+                                              "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                                  + "The selected config does not support that operation.",
+                                              getLocation().getRootContainerName(), sourceModel.getName(),
+                                              configurationProvider.getName()));
     }
   }
 

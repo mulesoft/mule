@@ -294,16 +294,16 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     messageSource = getNewExtensionMessageSourceInstance();
 
     sourceCallback = spy(DefaultSourceCallback.builder()
-                             .setSourceModel(sourceModel)
-                             .setProcessingManager(messageProcessingManager)
-                             .setListener(messageProcessor)
-                             .setSource(messageSource)
-                             .setMuleContext(muleContext)
-                             .setProcessContextSupplier(() -> messageProcessContext)
-                             .setCompletionHandlerFactory(completionHandlerFactory)
-                             .setExceptionCallback(exceptionCallback)
-                             .setCursorStreamProviderFactory(cursorStreamProviderFactory)
-                             .build());
+        .setSourceModel(sourceModel)
+        .setProcessingManager(messageProcessingManager)
+        .setListener(messageProcessor)
+        .setSource(messageSource)
+        .setMuleContext(muleContext)
+        .setProcessContextSupplier(() -> messageProcessContext)
+        .setCompletionHandlerFactory(completionHandlerFactory)
+        .setExceptionCallback(exceptionCallback)
+        .setCursorStreamProviderFactory(cursorStreamProviderFactory)
+        .build());
 
     when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);
   }
@@ -613,11 +613,9 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     private String metadataKey;
 
     @Override
-    public void onStart(SourceCallback sourceCallback) throws MuleException {
-    }
+    public void onStart(SourceCallback sourceCallback) throws MuleException {}
 
     @Override
-    public void onStop() {
-    }
+    public void onStop() {}
   }
 }
