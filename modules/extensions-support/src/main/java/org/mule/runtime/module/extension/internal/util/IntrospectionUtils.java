@@ -30,10 +30,8 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withName;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
 import static org.springframework.core.ResolvableType.forType;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -100,18 +98,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.ast.FieldTypeElement;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
+import com.google.common.collect.ImmutableList;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -139,7 +130,15 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import com.google.common.collect.ImmutableList;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
+
 import org.reflections.ReflectionUtils;
 import org.springframework.core.ResolvableType;
 
@@ -517,8 +516,21 @@ public final class IntrospectionUtils {
   }
 
   public static Optional<Field> getField(Class<?> clazz, String name) {
-    Collection<Field> candidates = getAllFields(clazz, withName(name));
-    return isEmpty(candidates) ? empty() : Optional.of(candidates.iterator().next());
+    for (Field field : clazz.getDeclaredFields()) {
+      if (field.getName().equals(name)) {
+        return Optional.of(field);
+      }
+    }
+
+    for (Class<?> type : ReflectionUtils.getAllSuperTypes(clazz)) {
+      for (Field field : type.getDeclaredFields()) {
+        if (field.getName().equals(name)) {
+          return Optional.of(field);
+        }
+      }
+    }
+
+    return empty();
   }
 
   /**
@@ -1333,7 +1345,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link FieldSetter} for a field in the {@code target} annotated {@link DefaultEncoding} (if present)
    *
-   * @param target   object in which the fields are going to be set
+   * @param target object in which the fields are going to be set
    * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
    */
   public static Optional<FieldSetter> getDefaultEncodingFieldSetter(Object target) {

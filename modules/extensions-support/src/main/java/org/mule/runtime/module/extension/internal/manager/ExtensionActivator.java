@@ -15,7 +15,6 @@ import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.regi
 import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.el.ModuleNamespace;
@@ -113,7 +112,7 @@ public final class ExtensionActivator implements Startable, Stoppable {
     functions.forEach(function -> function.getModelProperty(FunctionExecutorModelProperty.class).ifPresent(mp -> {
       FunctionExecutor executor = mp.getExecutorFactory().createExecutor(function, valueResolverFactory);
       lifecycleAwareElements.add(executor);
-      module.addBinding(function.getName(), new TypedValue(executor, fromFunction(executor)));
+      module.addBinding(function.getName(), new TypedValue<>(executor, fromFunction(executor)));
     }));
   }
 
