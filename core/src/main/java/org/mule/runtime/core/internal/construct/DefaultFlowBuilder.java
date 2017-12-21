@@ -45,7 +45,6 @@ import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 
 import java.util.List;
@@ -192,13 +191,9 @@ public class DefaultFlowBuilder implements Builder {
   public Flow build() {
     checkImmutable();
 
-    FlowConstructStatistics flowStatistics = createFlowStatistics(name, muleContext);
-    if (exceptionListener instanceof AbstractExceptionListener) {
-      ((AbstractExceptionListener) exceptionListener).setStatistics(flowStatistics);
-    }
     flow = new DefaultFlow(name, muleContext, source, processors,
                            ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState, maxConcurrency,
-                           flowStatistics);
+                           createFlowStatistics(name, muleContext));
 
     return flow;
   }

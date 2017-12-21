@@ -31,6 +31,7 @@ import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
@@ -187,7 +188,11 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     return statistics;
   }
 
-  protected void doInitialise() throws MuleException {}
+  protected void doInitialise() throws MuleException {
+    if (this.exceptionListener instanceof ErrorHandler) {
+      ((ErrorHandler) this.exceptionListener).setStatistics(statistics);
+    }
+  }
 
   public static FlowConstructStatistics createFlowStatistics(String flowName, MuleContext muleContext) {
     DefaultFlowConstructStatistics statistics = new DefaultFlowConstructStatistics("Flow", flowName);
