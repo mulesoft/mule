@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Un
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.error;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -20,18 +21,20 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
+
+import org.reactivestreams.Publisher;
 
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error
@@ -166,6 +169,14 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
       if (exceptionListener instanceof TemplateOnErrorHandler) {
         ((TemplateOnErrorHandler) exceptionListener).setRootContainerName(rootContainerName);
+      }
+    }
+  }
+
+  public void setStatistics(FlowConstructStatistics flowStatistics) {
+    for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
+      if (exceptionListener instanceof AbstractExceptionListener) {
+        ((AbstractExceptionListener) exceptionListener).setStatistics(flowStatistics);
       }
     }
   }
