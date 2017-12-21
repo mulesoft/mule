@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -22,11 +21,14 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -45,6 +47,9 @@ public class ReflectiveExpressionFunctionExecutor implements Lifecycle, Function
   private final Object componentInstance;
   private final ClassLoader extensionClassLoader;
   private final List<FunctionParameter> functionParameters;
+
+  @Inject
+  MuleContext muleContext;
 
   public ReflectiveExpressionFunctionExecutor(FunctionModel model, DataType returnType,
                                               List<FunctionParameter> functionParameters, Method method,
@@ -74,7 +79,7 @@ public class ReflectiveExpressionFunctionExecutor implements Lifecycle, Function
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(componentInstance);
+    initialiseIfNeeded(componentInstance, muleContext);
   }
 
   @Override

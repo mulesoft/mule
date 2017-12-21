@@ -9,26 +9,31 @@ package org.mule.test.function.extension;
 
 import static com.google.common.collect.Lists.partition;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPathFactory;
+import com.google.common.collect.ImmutableMap;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathFactory;
+
 import org.w3c.dom.Document;
 
 public class GlobalWeaveFunction implements Initialisable {
 
   private XPathFactory xPathFactory;
+
+  @Inject
+  ExpressionManager manager;
 
   @Override
   public void initialise() throws InitialisationException {

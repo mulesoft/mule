@@ -15,7 +15,6 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -38,13 +37,13 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.metadata.MetadataResolverUtils;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Metadata service delegate implementations that handles the resolution
@@ -127,7 +126,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     }
     try {
       MetadataType metadata = resolverFactory.getOutputResolver().getOutputType(context, key);
-      if (isMetadataResolvedCorrectly(metadata, false)) {
+      if (isMetadataResolvedCorrectly(metadata, true)) {
         return success(adaptToListIfNecessary(metadata, key, context));
       }
       MetadataFailure failure = newFailure()
@@ -154,7 +153,7 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     if (isVoid(attributes.getType()) || !attributes.hasDynamicType()) {
       return success(attributes.getType());
     }
-    return resolveOutputAttributesMetadata(context, key, (metadata) -> isMetadataResolvedCorrectly(metadata, false));
+    return resolveOutputAttributesMetadata(context, key, (metadata) -> isMetadataResolvedCorrectly(metadata, true));
   }
 
   private MetadataResult<MetadataType> resolveOutputAttributesMetadata(MetadataContext context, Object key,
