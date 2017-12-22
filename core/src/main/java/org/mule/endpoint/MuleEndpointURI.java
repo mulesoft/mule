@@ -8,7 +8,7 @@ package org.mule.endpoint;
 
 import static java.net.URLDecoder.decode;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.mule.api.util.CredentialsMaskUtil.BARE_URL_PATTERN;
+import static org.mule.api.util.CredentialsMaskUtil.BARE_URL_PASSWORD_PATTERN;
 
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
@@ -55,6 +55,8 @@ public class MuleEndpointURI implements EndpointURI
      * logger used by this class
      */
     protected static final Log logger = LogFactory.getLog(MuleEndpointURI.class);
+
+    public static final String PASSWORD_MASK = "****";
 
     public static boolean isMuleUri(String url)
     {
@@ -443,7 +445,7 @@ public class MuleEndpointURI implements EndpointURI
     @Override
     public String toString()
     {
-        return CredentialsMaskUtil.maskUrlPassword(uri.toASCIIString(), BARE_URL_PATTERN);
+        return CredentialsMaskUtil.maskUrlPasswordWithMask(uri.toASCIIString(), BARE_URL_PASSWORD_PATTERN, PASSWORD_MASK);
     }
 
     protected String createUriStringWithPasswordMasked()

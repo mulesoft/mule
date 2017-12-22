@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.api.util.CredentialsMaskUtil.PASSWORD_MASK;
+import static org.mule.endpoint.MuleEndpointURI.PASSWORD_MASK;
 
 import org.mule.api.MuleException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -161,14 +161,14 @@ public class MuleEndpointURITestCase extends AbstractMuleContextTestCase
     public void testPasswordMasking() throws Exception
     {
         MuleEndpointURI uri = new MuleEndpointURI("test://theUser:password@theHost", muleContext);
-        assertEquals("test://"+PASSWORD_MASK+"@theHost", uri.toString());
+        assertEquals("test://theUser:"+PASSWORD_MASK+"@theHost", uri.toString());
     }
     
     @Test
     public void testPasswordMaskingWithUsernameContainingAtSign() throws Exception
     {
         MuleEndpointURI uri = new MuleEndpointURI("test://theUser%40theEmailHost:password@theHost", muleContext);
-        assertEquals("test://"+PASSWORD_MASK+"@theHost", uri.toString());
+        assertEquals("test://theUser%40theEmailHost:"+PASSWORD_MASK+"@theHost", uri.toString());
     }
 
     @Test
@@ -182,15 +182,15 @@ public class MuleEndpointURITestCase extends AbstractMuleContextTestCase
     @Test
     public void testPasswordMaskingWithInvalidPort() throws Exception
     {
-        MuleEndpointURI uri = new MuleEndpointURI("test://someuser1:somepassword@mydomain.transfer.com:22./somedir1", muleContext);
-        assertEquals("test://"+PASSWORD_MASK+"@mydomain.transfer.com:22./somedir1", uri.toString());
+        MuleEndpointURI uri = new MuleEndpointURI("test://some-user1:somepassword@mydomain.transfer.com:22./somedir1", muleContext);
+        assertEquals("test://some-user1:"+PASSWORD_MASK+"@mydomain.transfer.com:22./somedir1", uri.toString());
     }
 
     @Test
     public void testPasswordMaskingWithInvalidHost() throws Exception
     {
-        MuleEndpointURI uri = new MuleEndpointURI("test://someuser1:somepassword@my_domain.transfer.com:22/somedir1", muleContext);
-        assertEquals("test://"+PASSWORD_MASK+"@my_domain.transfer.com:22/somedir1", uri.toString());
+        MuleEndpointURI uri = new MuleEndpointURI("test://some_user1:somepassword@my_domain.transfer.com:22/somedir1", muleContext);
+        assertEquals("test://some_user1:"+PASSWORD_MASK+"@my_domain.transfer.com:22/somedir1", uri.toString());
     }
 
     @Test

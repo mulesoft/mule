@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 public class CredentialsMaskUtil
 {
-
+    public static final Pattern BARE_URL_PASSWORD_PATTERN = compile("[a-z]*://[a-zA-Z0-9%._-]*:([^@]*)@");
     public static final Pattern BARE_URL_PATTERN = compile("[a-z]*://([^@]*)@");
     public static final Pattern URL_PATTERN = compile("url=\"[a-z]*://([^@]*)@");
     public static final Pattern ADDRESS_PATTERN = compile("address=\"[a-z]*://([^@]*)@");
@@ -62,6 +62,20 @@ public class CredentialsMaskUtil
     public static String maskUrlPassword(String input, Pattern pattern)
     {
         return maskUrlPattern(input, pattern, PASSWORD_MASK);
+    }
+
+    /**
+     * masks password in input
+     *
+     * @param input input for password to be masked
+     * @param pattern password pattern
+     * @param mask string to mask the password with
+     *
+     * @return input with password masked
+     */
+    public static String maskUrlPasswordWithMask(String input, Pattern pattern, String mask)
+    {
+        return maskUrlPattern(input, pattern, mask);
     }
 
     /**
