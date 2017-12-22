@@ -12,6 +12,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+import static org.mule.runtime.extension.api.ExtensionConstants.PRIMARY_NODE_ONLY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
@@ -61,6 +62,7 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
             .withConstructorParameterDefinition(fromFixedValue(sourceModel).build())
             .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
             .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
+            .withSetterParameterDefinition("primaryNodeOnly", fromSimpleParameter(PRIMARY_NODE_ONLY_PARAMETER_NAME).build())
             .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
                                            fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build())
             .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,

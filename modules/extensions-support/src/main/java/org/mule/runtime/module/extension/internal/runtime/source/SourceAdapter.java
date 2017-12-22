@@ -89,7 +89,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public final class SourceAdapter implements Startable, Stoppable, Initialisable {
+public class SourceAdapter implements Startable, Stoppable, Initialisable {
 
   private static final Logger LOGGER = getLogger(SourceAdapter.class);
 

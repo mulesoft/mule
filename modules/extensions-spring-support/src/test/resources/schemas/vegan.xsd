@@ -191,6 +191,11 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/vegan" type="vegan-PaulMcCartneySource-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
@@ -270,6 +275,11 @@
         <xs:attribute type="xs:string" use="optional" name="shouldNotOverride"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="flowName"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="pojoGroupedFood"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/vegan" type="vegan-harvest-apples-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
@@ -745,6 +755,11 @@
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/vegan" type="vegan-harvest-peaches-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">

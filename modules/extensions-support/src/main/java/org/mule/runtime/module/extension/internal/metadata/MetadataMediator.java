@@ -259,6 +259,7 @@ public final class MetadataMediator<T extends ComponentModel> {
         typedModel.set((T) new ImmutableSourceModel(sourceModel.getName(),
                                                     sourceModel.getDescription(),
                                                     sourceModel.hasResponse(),
+                                                    true,
                                                     resolveParameterGroupModelType(sourceModel.getParameterGroupModels(),
                                                                                    inputMetadataDescriptor.getAllParameters()),
                                                     sourceModel.getNestedComponents(),

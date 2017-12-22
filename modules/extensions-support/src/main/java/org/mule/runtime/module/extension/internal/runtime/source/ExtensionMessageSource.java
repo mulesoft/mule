@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
@@ -27,15 +28,20 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
+import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
@@ -44,7 +50,9 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
+import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -78,7 +86,7 @@ import reactor.core.publisher.Mono;
  * @since 4.0
  */
 public class ExtensionMessageSource extends ExtensionComponent<SourceModel> implements MessageSource,
-    ExceptionCallback<ConnectionException>, ParameterizedSource, ConfiguredComponent {
+    ExceptionCallback<ConnectionException>, ParameterizedSource, ConfiguredComponent, LifecycleStateEnabled {
 
   private static final Logger LOGGER = getLogger(ExtensionMessageSource.class);
 
@@ -88,12 +96,17 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Inject
   private SchedulerService schedulerService;
 
+  @Inject
+  private NotificationListenerRegistry notificationListenerRegistry;
+
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
+  private final boolean primaryNodeOnly;
   private final RetryPolicyTemplate retryPolicyTemplate;
   private final BackPressureStrategy backPressureStrategy;
   private final ExceptionHandlerManager exceptionEnricherManager;
   private final AtomicBoolean reconnecting = new AtomicBoolean(false);
+  private final DefaultLifecycleManager<ExtensionMessageSource> lifecycleManager;
 
   private SourceConnectionManager sourceConnectionManager;
   private Processor messageProcessor;
@@ -109,6 +122,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                 SourceModel sourceModel,
                                 SourceAdapterFactory sourceAdapterFactory,
                                 ConfigurationProvider configurationProvider,
+                                boolean primaryNodeOnly,
                                 RetryPolicyTemplate retryPolicyTemplate,
                                 CursorProviderFactory cursorProviderFactory,
                                 BackPressureStrategy backPressureStrategy,
@@ -117,8 +131,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
     this.retryPolicyTemplate = retryPolicyTemplate;
+    this.primaryNodeOnly = primaryNodeOnly;
     this.backPressureStrategy = backPressureStrategy;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, sourceModel);
+    lifecycleManager = new DefaultLifecycleManager<>(sourceModel.getName(), this);
   }
 
   private synchronized void createSource() throws Exception {
@@ -254,44 +270,88 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public void doStart() throws MuleException {
-    startIfNeeded(retryPolicyTemplate);
+    if (shouldRunOnThisNode()) {
+      reallyDoStart();
+    }
+  }
 
-    if (retryScheduler == null) {
-      retryScheduler = schedulerService.ioScheduler();
-    }
-    if (flowTriggerScheduler == null) {
-      flowTriggerScheduler = schedulerService.cpuLightScheduler();
-    }
+  private void reallyDoStart() throws MuleException {
+    lifecycle(() -> lifecycleManager.fireStartPhase((phase, o) -> {
+      startIfNeeded(retryPolicyTemplate);
 
-    synchronized (started) {
-      startSource();
-      started.set(true);
-    }
+      if (retryScheduler == null) {
+        retryScheduler = schedulerService.ioScheduler();
+      }
+      if (flowTriggerScheduler == null) {
+        flowTriggerScheduler = schedulerService.cpuLightScheduler();
+      }
+
+      synchronized (started) {
+        startSource();
+        started.set(true);
+      }
+    }));
   }
 
   @Override
   public void doStop() throws MuleException {
-    synchronized (started) {
-      started.set(false);
-      try {
+    safeLifecycle(() -> lifecycleManager.fireStopPhase((phase, o) -> {
+      synchronized (started) {
+        started.set(false);
         stopSource();
-      } finally {
-        stopSchedulers();
       }
-    }
+
+      stopSchedulers();
+    }));
   }
 
   @Override
   public void doDispose() {
-    disposeSource();
     try {
-      stopIfNeeded(retryPolicyTemplate);
-      disposeIfNeeded(retryPolicyTemplate, LOGGER);
+      safeLifecycle(() -> lifecycleManager.fireDisposePhase((phase, o) -> {
+        disposeSource();
+        stopIfNeeded(retryPolicyTemplate);
+        disposeIfNeeded(retryPolicyTemplate, LOGGER);
+        stopSchedulers();
+      }));
     } catch (MuleException e) {
       LOGGER.warn(format("Failed to dispose message source at root element '%s'. %s",
                          getLocation().getRootContainerName(),
                          e.getMessage()),
                   e);
+    }
+  }
+
+  private void lifecycle(CheckedRunnable runnable) throws MuleException {
+    try {
+      runnable.run();
+    } catch (Throwable e) {
+      handleLifecycleException(e, false);
+    }
+  }
+
+  private void safeLifecycle(CheckedRunnable runnable) throws MuleException {
+    try {
+      runnable.run();
+    } catch (Throwable e) {
+      handleLifecycleException(e, true);
+    }
+  }
+
+  private void handleLifecycleException(Throwable e, boolean unwrapLifecycleException) throws MuleException {
+    e = unwrap(e);
+    if (unwrapLifecycleException && e instanceof LifecycleException && e.getCause() != null) {
+      e = e.getCause();
+    }
+
+    if (e instanceof IllegalStateException) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Skipping lifecycle phase: " + e.getMessage(), e);
+      }
+    } else if (e instanceof MuleException) {
+      throw (MuleException) e;
+    } else {
+      throw new DefaultMuleException(e);
     }
   }
 
@@ -442,12 +502,34 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   protected void doInitialise() throws InitialisationException {
-    initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
-    sourceConnectionManager = new SourceConnectionManager(connectionManager);
+    if (shouldRunOnThisNode()) {
+      reallyDoInitialise();
+    } else {
+      new PrimaryNodeLifecycleNotificationListener(() -> {
+        reallyDoInitialise();
+        reallyDoStart();
+      }, notificationListenerRegistry).register();
+    }
+  }
+
+  private void reallyDoInitialise() throws InitialisationException {
     try {
-      createSource();
-    } catch (Exception e) {
-      throw new InitialisationException(e, this);
+      lifecycle(() -> lifecycleManager.fireInitialisePhase((phase, o) -> {
+        initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
+        sourceConnectionManager = new SourceConnectionManager(connectionManager);
+
+        try {
+          createSource();
+        } catch (Exception e) {
+          throw new InitialisationException(e, this);
+        }
+      }));
+    } catch (MuleException e) {
+      if (e instanceof InitialisationException) {
+        throw (InitialisationException) e;
+      } else {
+        throw new InitialisationException(e, this);
+      }
     }
   }
 
@@ -471,5 +553,14 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public BackPressureStrategy getBackPressureStrategy() {
     return backPressureStrategy;
+  }
+
+  private boolean shouldRunOnThisNode() {
+    return primaryNodeOnly ? muleContext.isPrimaryPollingInstance() : true;
+  }
+
+  @Override
+  public LifecycleState getLifecycleState() {
+    return lifecycleManager.getState();
   }
 }

@@ -175,6 +175,11 @@
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="required" name="channel"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithConfiguration-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
@@ -197,6 +202,11 @@
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="required" name="channel"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithConnection-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
@@ -259,6 +269,11 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="required" name="channel"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SimpleSource-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
@@ -275,6 +290,11 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="required" name="hasBeenStarted"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceMustNotStart-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
@@ -290,6 +310,11 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithMultiLevelValue-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
@@ -321,6 +346,11 @@
           </xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="required" name="values"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithRequiredParameterInsideShowInDslGroup-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
@@ -336,6 +366,11 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithRequiredParameterWithAlias-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
@@ -353,6 +388,11 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithValuesWithRequiredParameterInsideParamGroup-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
@@ -386,6 +426,11 @@
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="requiredBoolean"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="required" name="requiredInteger"></xs:attribute>
         <xs:attribute type="mule:substitutableName" use="optional" name="strings"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithValuesWithRequiredParameters-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>

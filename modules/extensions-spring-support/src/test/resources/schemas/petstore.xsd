@@ -364,6 +364,11 @@
         </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="failOnStart"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="failOnException"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/petstore" type="petstore-source-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
@@ -605,6 +610,11 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/petstore" type="petstore-SentientSource-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
@@ -620,6 +630,11 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/petstore" type="petstore-pet-source-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
           <xs:annotation>
             <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
