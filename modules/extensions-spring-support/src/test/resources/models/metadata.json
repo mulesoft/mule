@@ -10621,6 +10621,7 @@
       "messageSources": [
         {
           "hasResponse": false,
+          "runsOnPrimaryNodeOnly": false,
           "output": {
             "type": {
               "format": "java",
@@ -10721,6 +10722,34 @@
                       "providedByKeyResolver": true
                     }
                   }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": false,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 4,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "primaryNodeOnly",
+                  "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+                  "modelProperties": {}
                 },
                 {
                   "type": {
@@ -11929,6 +11958,7 @@
           "format": "json",
           "type": "Object",
           "annotations": {
+            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -11942,8 +11972,7 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            },
-            "label": "Person"
+            }
           },
           "open": {
             "type": "Any"
@@ -12947,6 +12976,7 @@
           "format": "json",
           "type": "Object",
           "annotations": {
+            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -12960,8 +12990,7 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            },
-            "label": "Person"
+            }
           },
           "open": {
             "type": "Any"
@@ -13150,6 +13179,7 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
+                  "label": "Person",
                   "classInformation": {
                     "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
@@ -13161,8 +13191,7 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": true
-                  },
-                  "label": "Person"
+                  }
                 },
                 "open": {
                   "type": "Any"
@@ -13356,6 +13385,7 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
+                  "label": "Person",
                   "classInformation": {
                     "classname": "java.io.InputStream",
                     "hasDefaultConstructor": true,
@@ -13369,8 +13399,7 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
-                  },
-                  "label": "Person"
+                  }
                 },
                 "open": {
                   "type": "Any"
@@ -13534,6 +13563,7 @@
           "format": "json",
           "type": "Object",
           "annotations": {
+            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -13547,8 +13577,7 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            },
-            "label": "Person"
+            }
           },
           "open": {
             "type": "Any"
@@ -16438,6 +16467,7 @@
   "messageSources": [
     {
       "hasResponse": false,
+      "runsOnPrimaryNodeOnly": false,
       "output": {
         "type": {
           "format": "java",
@@ -16508,6 +16538,34 @@
       "parameterGroupModels": [
         {
           "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": false,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "primaryNodeOnly",
+              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
             {
               "type": {
                 "format": "java",
@@ -16828,6 +16886,7 @@
     },
     {
       "hasResponse": true,
+      "runsOnPrimaryNodeOnly": false,
       "successCallback": {
         "parameterGroupModels": [
           {
@@ -16879,6 +16938,7 @@
                   "format": "json",
                   "type": "Object",
                   "annotations": {
+                    "label": "Person",
                     "classInformation": {
                       "classname": "java.io.InputStream",
                       "hasDefaultConstructor": true,
@@ -16892,8 +16952,7 @@
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
-                    },
-                    "label": "Person"
+                    }
                   },
                   "open": {
                     "type": "Any"
@@ -16996,6 +17055,34 @@
       "parameterGroupModels": [
         {
           "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": false,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "primaryNodeOnly",
+              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
             {
               "type": {
                 "format": "java",
@@ -17197,6 +17284,7 @@
     },
     {
       "hasResponse": false,
+      "runsOnPrimaryNodeOnly": false,
       "output": {
         "type": {
           "format": "xml",
@@ -17227,6 +17315,34 @@
       "parameterGroupModels": [
         {
           "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": false,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "primaryNodeOnly",
+              "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
+              "modelProperties": {}
+            },
             {
               "type": {
                 "format": "java",

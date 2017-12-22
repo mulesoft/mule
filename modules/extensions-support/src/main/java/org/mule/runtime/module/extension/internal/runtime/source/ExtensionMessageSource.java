@@ -271,22 +271,26 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public void doStart() throws MuleException {
     if (shouldRunOnThisNode()) {
-      lifecycle(() -> lifecycleManager.fireStartPhase((phase, o) -> {
-        startIfNeeded(retryPolicyTemplate);
-
-        if (retryScheduler == null) {
-          retryScheduler = schedulerService.ioScheduler();
-        }
-        if (flowTriggerScheduler == null) {
-          flowTriggerScheduler = schedulerService.cpuLightScheduler();
-        }
-
-        synchronized (started) {
-          startSource();
-          started.set(true);
-        }
-      }));
+      reallyDoStart();
     }
+  }
+
+  private void reallyDoStart() throws MuleException {
+    lifecycle(() -> lifecycleManager.fireStartPhase((phase, o) -> {
+      startIfNeeded(retryPolicyTemplate);
+
+      if (retryScheduler == null) {
+        retryScheduler = schedulerService.ioScheduler();
+      }
+      if (flowTriggerScheduler == null) {
+        flowTriggerScheduler = schedulerService.cpuLightScheduler();
+      }
+
+      synchronized (started) {
+        startSource();
+        started.set(true);
+      }
+    }));
   }
 
   @Override
@@ -499,29 +503,33 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   protected void doInitialise() throws InitialisationException {
     if (shouldRunOnThisNode()) {
-      try {
-        lifecycle(() -> lifecycleManager.fireInitialisePhase((phase, o) -> {
-          initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
-          sourceConnectionManager = new SourceConnectionManager(connectionManager);
-
-          try {
-            createSource();
-          } catch (Exception e) {
-            throw new InitialisationException(e, this);
-          }
-        }));
-      } catch (MuleException e) {
-        if (e instanceof InitialisationException) {
-          throw (InitialisationException) e;
-        } else {
-          throw new InitialisationException(e, this);
-        }
-      }
+      reallyDoInitialise();
     } else {
       new PrimaryNodeLifecycleNotificationListener(() -> {
-        doInitialise();
-        doStart();
+        reallyDoInitialise();
+        reallyDoStart();
       }, notificationListenerRegistry).register();
+    }
+  }
+
+  private void reallyDoInitialise() throws InitialisationException {
+    try {
+      lifecycle(() -> lifecycleManager.fireInitialisePhase((phase, o) -> {
+        initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
+        sourceConnectionManager = new SourceConnectionManager(connectionManager);
+
+        try {
+          createSource();
+        } catch (Exception e) {
+          throw new InitialisationException(e, this);
+        }
+      }));
+    } catch (MuleException e) {
+      if (e instanceof InitialisationException) {
+        throw (InitialisationException) e;
+      } else {
+        throw new InitialisationException(e, this);
+      }
     }
   }
 
