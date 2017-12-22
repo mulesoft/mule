@@ -17,10 +17,18 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.extension.api.ExtensionConstants;
 import org.mule.runtime.extension.api.annotation.source.PrimaryNodeOnly;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 
+/**
+ * Adds a #{@link ExtensionConstants#PRIMARY_NODE_ONLY_PARAMETER_NAME} parameter on all sources for which
+ * {@link SourceModel#isRunsOnPrimaryNodeOnly()} is {@code false}
+ *
+ * @since 1.1
+ */
 public class PrimaryNodeEnricher extends AbstractAnnotatedDeclarationEnricher {
 
   private MetadataType booleanType = create(JAVA).booleanType().build();
