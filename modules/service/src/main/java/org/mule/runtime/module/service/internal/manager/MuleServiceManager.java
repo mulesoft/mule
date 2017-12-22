@@ -18,17 +18,19 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.core.api.lifecycle.StartException;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.StartException;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
 
 /**
  * Service manager to use in the Mule container.
@@ -86,6 +88,25 @@ public class MuleServiceManager implements ServiceManager {
         try {
           currentThread().setContextClassLoader(service.getClass().getClassLoader());
           ((Startable) service).start();
+
+          if (!service.splashMessageLines().isEmpty()) {
+            SplashScreen splashScreen = new SplashScreen() {
+
+              @Override
+              protected void doHeader(MuleContext context) {
+                header.add("Started " + service.toString());
+                header.add("");
+
+                for (String splashMessageLine : service.splashMessageLines()) {
+                  header.add(splashMessageLine);
+                }
+              }
+
+            };
+            splashScreen.setHeader(null);
+
+            logger.info(splashScreen.toString());
+          }
         } finally {
           currentThread().setContextClassLoader(originalContextClassLoader);
         }
