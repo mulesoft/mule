@@ -82,7 +82,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                                                 responseCallbackParameters,
                                                                 errorCallbackParameters),
                                         configurationProvider,
-                                        primaryNodeOnly != null ? primaryNodeOnly : sourceModel.isRunsOnPrimaryNodeOnly(),
+                                        primaryNodeOnly != null ? primaryNodeOnly : sourceModel.runsOnPrimaryNodeOnly(),
                                         getRetryPolicyTemplate(),
                                         cursorProviderFactory,
                                         getBackPressureStrategy(),

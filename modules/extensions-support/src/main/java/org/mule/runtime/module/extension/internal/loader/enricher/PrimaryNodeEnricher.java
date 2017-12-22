@@ -25,7 +25,7 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 
 /**
  * Adds a #{@link ExtensionConstants#PRIMARY_NODE_ONLY_PARAMETER_NAME} parameter on all sources for which
- * {@link SourceModel#isRunsOnPrimaryNodeOnly()} is {@code false}
+ * {@link SourceModel#runsOnPrimaryNodeOnly()} is {@code false}
  *
  * @since 1.1
  */
