@@ -8,6 +8,7 @@ package org.mule.runtime.oauth.api.builder;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.client.HttpClient;
+import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -61,6 +62,32 @@ public interface OAuthDancerBuilder<D> {
   OAuthDancerBuilder<D> tokenUrl(String tokenUrl, TlsContextFactory tlsContextFactory);
 
   /**
+   * Mule, after receiving the authentication code from the OAuth server (through the redirectUrl) will call this url to get the
+   * access token.
+   *
+   * @param tokenUrl The OAuth authentication server url to get access to the token.
+   * @param proxyConfig References the proxy configuration which through the HTTP request will go during the request.
+   *
+   * @return this builder
+   */
+  default OAuthDancerBuilder<D> tokenUrl(String tokenUrl, ProxyConfig proxyConfig) {
+    return tokenUrl(tokenUrl);
+  }
+
+  /**
+   * Mule, after receiving the authentication code from the OAuth server (through the redirectUrl) will call this url to get the
+   * access token.
+   *
+   * @param tokenUrl The OAuth authentication server url to get access to the token.
+   * @param tlsContextFactory References a TLS config that will be used to do HTTP request during the OAuth dance.
+   * @param proxyConfig References the proxy configuration which through the HTTP request will go during the request.
+   * @return this builder
+   */
+  default OAuthDancerBuilder<D> tokenUrl(String tokenUrl, TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig) {
+    return tokenUrl(tokenUrl, tlsContextFactory);
+  }
+
+  /**
    * Scopes define permissions over resources.
    * 
    * @param scopes required by this application to execute.
@@ -79,7 +106,6 @@ public interface OAuthDancerBuilder<D> {
   /**
    * @param responseAccessTokenExpr an expression to extract the {@code access token} parameter from the response of the call to
    *        {@link #tokenUrl(String) token-url}.
-   * 
    * @return this builder
    */
   OAuthDancerBuilder<D> responseAccessTokenExpr(String responseAccessTokenExpr);
