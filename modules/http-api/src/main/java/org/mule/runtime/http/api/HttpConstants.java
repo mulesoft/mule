@@ -50,8 +50,6 @@ public abstract class HttpConstants {
 
     ACCEPTED(202, "Accepted"),
 
-    DROPPED(202, "Dropped"),
-
     NON_AUTHORITATIVE_INFORMATION(203, "Non Authoritative Information"),
 
     NO_CONTENT(204, "No Content"),
@@ -124,7 +122,9 @@ public abstract class HttpConstants {
 
     GATEWAY_TIMEOUT(504, "Gateway Timeout"),
 
-    HTTP_VERSION_NOT_SUPPORTED(505, "HTTP Version Not Supported");
+    HTTP_VERSION_NOT_SUPPORTED(505, "HTTP Version Not Supported"),
+
+    DROPPED(202, "Dropped");
 
     private int statusCode;
     private String reasonPhrase;
