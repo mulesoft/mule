@@ -105,7 +105,7 @@ public interface OAuthDancerBuilder<D> {
 
   /**
    * @param responseAccessTokenExpr an expression to extract the {@code access token} parameter from the response of the call to
-   *        {@link #tokenUrl(String) token-url}. !
+   *        {@link #tokenUrl(String) token-url}.
    * @return this builder
    */
   OAuthDancerBuilder<D> responseAccessTokenExpr(String responseAccessTokenExpr);
