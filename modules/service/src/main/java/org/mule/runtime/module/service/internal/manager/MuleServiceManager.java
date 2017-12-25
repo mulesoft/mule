@@ -19,7 +19,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.StartException;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -89,23 +88,8 @@ public class MuleServiceManager implements ServiceManager {
           currentThread().setContextClassLoader(service.getClass().getClassLoader());
           ((Startable) service).start();
 
-          if (!service.splashMessageLines().isEmpty()) {
-            SplashScreen splashScreen = new SplashScreen() {
-
-              @Override
-              protected void doHeader(MuleContext context) {
-                header.add("Started " + service.toString());
-                header.add("");
-
-                for (String splashMessageLine : service.splashMessageLines()) {
-                  header.add(splashMessageLine);
-                }
-              }
-
-            };
-            splashScreen.setHeader(null);
-
-            logger.info(splashScreen.toString());
+          if (service.getSplashMessage() != null) {
+            logger.info(new ServiceSplashScreen(service).toString());
           }
         } finally {
           currentThread().setContextClassLoader(originalContextClassLoader);
