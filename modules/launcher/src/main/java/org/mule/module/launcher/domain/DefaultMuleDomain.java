@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
+import org.mule.api.context.MuleContextFactory;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
@@ -185,7 +186,7 @@ public class DefaultMuleDomain implements Domain
                     builders.add(cfgBuilder);
 
 
-                    DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+                    MuleContextFactory muleContextFactory = getMuleContextFactory();
                     if (deploymentListener != null)
                     {
                         muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
@@ -318,10 +319,19 @@ public class DefaultMuleDomain implements Domain
         {
             logger.info(miniSplash(String.format("Disposing domain '%s'", getArtifactName())));
         }
+
+        ClassLoader originalClassloader = Thread.currentThread().getContextClassLoader();
+
+        if (Thread.currentThread().getContextClassLoader() != deploymentClassLoader.getClassLoader())
+        {
+            Thread.currentThread().setContextClassLoader(deploymentClassLoader.getClassLoader());
+        }
         if (this.muleContext != null)
         {
             this.muleContext.dispose();
         }
+        Thread.currentThread().setContextClassLoader(originalClassloader);
+
         this.deploymentClassLoader.dispose();
     }
 
@@ -373,6 +383,16 @@ public class DefaultMuleDomain implements Domain
     {
         return this.muleContext != null;
     }
+
+    /**
+     * Method created for testing purposes.
+     * @return the muleContextFactory for creating the mule context of the domain.
+     */
+    protected MuleContextFactory getMuleContextFactory ()
+    {
+         return new DefaultMuleContextFactory();
+    }
+
 
     @Override
     public void setDeploymentProperties(Properties deploymentProperties)
