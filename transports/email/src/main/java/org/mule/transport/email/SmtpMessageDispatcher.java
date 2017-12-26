@@ -35,14 +35,14 @@ import javax.mail.Transport;
  */
 public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 {
-    private volatile Transport transport;
+    protected volatile Transport transport;
 
     public SmtpMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
     }
 
-    private SmtpConnector castConnector()
+    protected SmtpConnector castConnector()
     {
         return (SmtpConnector) getConnector();
     }
