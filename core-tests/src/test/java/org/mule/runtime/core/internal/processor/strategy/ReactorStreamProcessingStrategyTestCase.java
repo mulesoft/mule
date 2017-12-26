@@ -114,7 +114,7 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
   }
 
   @Test
-  @Description("When back-pressure strategy is 'DROP' flow rejects requests in the same way away with 'FAIL.=, it' the source that handles FAIL/DROP differently.")
+  @Description("When back-pressure strategy is 'DROP' the flow rejects requests in the same way way with 'FAIL. It is the source that handles FAIL and DROP differently.")
   public void sourceBackPressureDrop() throws Exception {
     if (mode.equals(SOURCE)) {
       testBackPressure(DROP, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
