@@ -12,6 +12,11 @@ import static java.lang.System.lineSeparator;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
 
+/**
+ * Splash screen specific for {@link Service} startup based on the splash message provided by the service implementation.
+ *
+ * @since 4.1
+ */
 final class ServiceSplashScreen extends SplashScreen {
 
   private final Service service;
@@ -21,7 +26,7 @@ final class ServiceSplashScreen extends SplashScreen {
     doHeader();
   }
 
-  protected void doHeader() {
+  private void doHeader() {
     header.add("Started " + service.toString());
     header.add("");
 

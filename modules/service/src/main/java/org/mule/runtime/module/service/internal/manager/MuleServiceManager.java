@@ -9,6 +9,7 @@ package org.mule.runtime.module.service.internal.manager;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableList;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.module.service.internal.manager.LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy;
@@ -20,7 +21,6 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.lifecycle.StartException;
-import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
@@ -88,7 +88,7 @@ public class MuleServiceManager implements ServiceManager {
           currentThread().setContextClassLoader(service.getClass().getClassLoader());
           ((Startable) service).start();
 
-          if (service.getSplashMessage() != null) {
+          if (isNotEmpty(service.getSplashMessage())) {
             logger.info(new ServiceSplashScreen(service).toString());
           }
         } finally {
