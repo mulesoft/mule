@@ -104,9 +104,9 @@ public class WorkQueueStreamProcessingStrategyTestCase extends WorkQueueProcessi
   }
 
   @Test
-  @Description("When back-pressure strategy is 'DROP' some requests fail with and are dropped.")
+  @Description("When back-pressure strategy is 'DROP' flow rejects requests in the same way away with 'FAIL.=, it' the source that handles FAIL/DROP differently.")
   public void sourceBackPressureDrop() throws Exception {
-    testBackPressure(DROP, lessThan(STREAM_ITERATIONS), equalTo(0), lessThan(STREAM_ITERATIONS));
+    testBackPressure(DROP, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
   }
 
 }

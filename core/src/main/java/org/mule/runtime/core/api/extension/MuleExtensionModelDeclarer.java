@@ -41,9 +41,8 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.VALIDATION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.CRITICAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_OVERLOAD;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.SOURCE_OVERLOAD;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
@@ -608,7 +607,7 @@ class MuleExtensionModelDeclarer {
     NestedRouteDeclarer onError = errorHandler.withRoute("onError")
         .describedAs("Error handler used to reference other ones.");
 
-    //TODO: MULE-14110 - Add support for chainless routes in extension model
+    // TODO: MULE-14110 - Add support for chainless routes in extension model
     onError.withChain();
 
     onError.onDefaultParameterGroup()
@@ -704,8 +703,7 @@ class MuleExtensionModelDeclarer {
 
     extensionDeclarer.withErrorModel(criticalError);
     extensionDeclarer.withErrorModel(overloadError);
-    extensionDeclarer.withErrorModel(newError(SOURCE_OVERLOAD).withParent(overloadError).build());
-    extensionDeclarer.withErrorModel(newError(FLOW_OVERLOAD).withParent(overloadError).build());
+    extensionDeclarer.withErrorModel(newError(FLOW_BACK_PRESSURE).withParent(overloadError).build());
     extensionDeclarer.withErrorModel(newError(FATAL).withParent(criticalError).build());
   }
 

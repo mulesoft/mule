@@ -21,8 +21,7 @@ import static org.mule.runtime.api.notification.MessageProcessorNotification.MES
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.FLOW_OVERLOAD_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_OVERLOAD_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.FLOW_BACK_PRESSURE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
@@ -56,6 +55,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
+import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -76,7 +76,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -694,7 +693,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected void expectRejected() {
     expectedException.expect(MessagingException.class);
     expectedException.expect(overloadErrorTypeMatcher());
-    expectedException.expectCause(instanceOf(RejectedExecutionException.class));
+    expectedException.expectCause(instanceOf(FlowBackPressureException.class));
   }
 
   private TypeSafeMatcher<MessagingException> overloadErrorTypeMatcher() {
@@ -710,7 +709,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       @Override
       protected boolean matchesSafely(MessagingException item) {
         errorTypeId = item.getEvent().getError().get().getErrorType().getIdentifier();
-        return mode.getErrorIdentifier().equals(errorTypeId);
+        return FLOW_BACK_PRESSURE_ERROR_IDENTIFIER.equals(errorTypeId);
       }
     };
   }
@@ -742,20 +741,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     /**
      * Test using {@link Flow#process(CoreEvent)}.
      */
-    FLOW(FLOW_OVERLOAD_ERROR_IDENTIFIER),
+    FLOW,
     /**
      * Test using {@link org.mule.runtime.core.api.source.MessageSource}
      */
-    SOURCE(SOURCE_OVERLOAD_ERROR_IDENTIFIER);
-
-    private String errorIdentifier;
-
-    Mode(String errorIdentifier) {
-      this.errorIdentifier = errorIdentifier;
-    }
-
-    String getErrorIdentifier() {
-      return errorIdentifier;
-    }
+    SOURCE
   }
 }

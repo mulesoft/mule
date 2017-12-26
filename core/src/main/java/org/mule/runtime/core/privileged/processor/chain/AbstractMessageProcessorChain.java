@@ -39,7 +39,6 @@ import java.util.function.Function;
 import javax.inject.Inject;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.exception.FlowOverloadException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -156,10 +155,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       if (event instanceof CoreEvent) {
         if (throwable instanceof MessagingException) {
           return resolveMessagingException(processor).apply((MessagingException) throwable);
-        } else if (!(throwable instanceof RejectedExecutionException)) {
-          return resolveException((Component) processor, (CoreEvent) event, new FlowOverloadException(throwable));
         } else {
-          return throwable;
+          return resolveException((Component) processor, (CoreEvent) event, throwable);
         }
       } else {
         return throwable;
@@ -185,11 +182,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
         } else {
           BaseEventContext context = ((BaseEventContext) event.getContext());
-          if (throwable instanceof RejectedExecutionException) {
-            context.error(resolveException((Component) processor, event, new FlowOverloadException(throwable)));
-          } else {
-            context.error(resolveException((Component) processor, event, throwable));
-          }
+          context.error(resolveException((Component) processor, event, throwable));
         }
       }
     };

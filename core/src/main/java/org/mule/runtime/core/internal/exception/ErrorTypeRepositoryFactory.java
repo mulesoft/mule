@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.NOT_PERMITTED;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_OVERLOAD;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.RETRY_EXHAUSTED;
@@ -29,7 +28,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.VALIDATION;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.SOURCE_OVERLOAD;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
@@ -65,8 +64,7 @@ public class ErrorTypeRepositoryFactory {
     errorTypeRepository.addErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED, errorTypeRepository.getAnyErrorType());
 
     errorTypeRepository.addInternalErrorType(OVERLOAD, errorTypeRepository.getCriticalErrorType());
-    errorTypeRepository.addInternalErrorType(SOURCE_OVERLOAD, errorTypeRepository.getErrorType(OVERLOAD).get());
-    errorTypeRepository.addInternalErrorType(FLOW_OVERLOAD, errorTypeRepository.getErrorType(OVERLOAD).get());
+    errorTypeRepository.addInternalErrorType(FLOW_BACK_PRESSURE, errorTypeRepository.getErrorType(OVERLOAD).get());
     errorTypeRepository.addInternalErrorType(FATAL, errorTypeRepository.getCriticalErrorType());
     errorTypeRepository.addErrorType(TIMEOUT, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addErrorType(COMPOSITE_ROUTING, errorTypeRepository.getErrorType(ROUTING).get());

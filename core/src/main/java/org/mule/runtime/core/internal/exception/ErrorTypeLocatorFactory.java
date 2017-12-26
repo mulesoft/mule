@@ -22,15 +22,12 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.VALIDATION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_OVERLOAD;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.SOURCE_OVERLOAD;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
-import org.mule.runtime.api.exception.FlowOverloadException;
 import org.mule.runtime.api.exception.MuleFatalException;
-import org.mule.runtime.api.exception.SourceOverloadException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.security.ClientSecurityException;
 import org.mule.runtime.api.security.NotPermittedException;
@@ -42,6 +39,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.routing.DuplicateMessageException;
 import org.mule.runtime.core.internal.routing.ValidationException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -82,8 +80,7 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(ServerSecurityException.class, errorTypeRepository.lookupErrorType(SERVER_SECURITY).get())
             .addExceptionMapping(NotPermittedException.class, errorTypeRepository.lookupErrorType(NOT_PERMITTED).get())
             .addExceptionMapping(RejectedExecutionException.class, errorTypeRepository.getErrorType(OVERLOAD).get())
-            .addExceptionMapping(SourceOverloadException.class, errorTypeRepository.getErrorType(SOURCE_OVERLOAD).get())
-            .addExceptionMapping(FlowOverloadException.class, errorTypeRepository.getErrorType(FLOW_OVERLOAD).get())
+            .addExceptionMapping(FlowBackPressureException.class, errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE).get())
             .addExceptionMapping(MessageRedeliveredException.class,
                                  errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED).get())
             .addExceptionMapping(Exception.class, unknown)

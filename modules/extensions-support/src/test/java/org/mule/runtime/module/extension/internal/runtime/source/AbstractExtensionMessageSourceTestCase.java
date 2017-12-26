@@ -21,7 +21,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.SOURCE_OVERLOAD;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.tck.MuleTestUtils.spyInjector;
@@ -32,6 +32,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -45,6 +46,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
@@ -176,7 +178,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     ErrorTypeRepository errorTypeRepository = Mockito.mock(ErrorTypeRepository.class);
-    when(errorTypeRepository.getErrorType(SOURCE_OVERLOAD)).thenReturn(Optional.of(mock(ErrorType.class)));
+    when(errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)).thenReturn(Optional.of(mock(ErrorType.class)));
 
     Map<String, Object> registryObjects = new HashMap<>();
     registryObjects.put("errorTypeRepository", errorTypeRepository);
