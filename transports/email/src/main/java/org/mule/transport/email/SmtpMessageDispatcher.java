@@ -57,10 +57,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
                 transport = castConnector().getSessionDetails(endpoint).newTransport();
                 EndpointURI uri = endpoint.getEndpointURI();
-                String encoding = endpoint.getEncoding();
-                String user = (uri.getUser()!=null ? URLDecoder.decode(uri.getUser(), encoding) : null);
-                String pass = (uri.getPassword()!=null ? URLDecoder.decode(uri.getPassword(), encoding) : null);
-                transport.connect(uri.getHost(), uri.getPort(),  user, pass);
+                transport.connect(uri.getHost(), uri.getPort(),  uri.getUser(), uri.getPassword());
             }
             catch (Exception e)
             {
