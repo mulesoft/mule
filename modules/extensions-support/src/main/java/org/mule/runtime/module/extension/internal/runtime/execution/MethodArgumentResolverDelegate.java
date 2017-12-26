@@ -30,6 +30,7 @@ import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
+import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
@@ -60,6 +61,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.SourceComplet
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceResultArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.VoidCallbackArgumentResolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -87,6 +89,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       new CompletionCallbackArgumentResolver();
   private static final ArgumentResolver<RouterCompletionCallback> ROUTER_CALLBACK_ARGUMENT_RESOLVER =
       new RouterCallbackArgumentResolver();
+  private static final ArgumentResolver<VoidCompletionCallback> VOID_CALLBACK_ARGUMENT_RESOLVER =
+      new VoidCallbackArgumentResolver();
   private static final ArgumentResolver<SourceCompletionCallback> ASYNC_SOURCE_COMPLETION_CALLBACK_ARGUMENT_RESOLVER =
       new SourceCompletionCallbackArgumentResolver();
   private static final ArgumentResolver<AuthenticationHandler> SECURITY_CONTEXT_HANDLER =
@@ -165,6 +169,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
       } else if (RouterCompletionCallback.class.equals(parameterType)) {
         argumentResolver = ROUTER_CALLBACK_ARGUMENT_RESOLVER;
+      } else if (VoidCompletionCallback.class.equals(parameterType)) {
+        argumentResolver = VOID_CALLBACK_ARGUMENT_RESOLVER;
       } else if (MediaType.class.equals(parameterType)) {
         argumentResolver = MEDIA_TYPE_ARGUMENT_RESOLVER;
       } else if (AuthenticationHandler.class.equals(parameterType)) {

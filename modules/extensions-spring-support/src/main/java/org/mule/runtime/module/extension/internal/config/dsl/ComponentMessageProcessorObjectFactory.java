@@ -63,7 +63,8 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
       componentModel.getNestedComponents().stream()
           .filter(component -> component instanceof NestedChainModel)
           .findFirst()
-          .ifPresent(chain -> parameters.put(chain.getName(), new ProcessorChainValueResolver(nestedProcessors)));
+          .ifPresent(chain -> parameters.put(chain.getName(),
+                                             new ProcessorChainValueResolver(muleContext, nestedProcessors)));
     }
 
     return getMessageProcessorBuilder()

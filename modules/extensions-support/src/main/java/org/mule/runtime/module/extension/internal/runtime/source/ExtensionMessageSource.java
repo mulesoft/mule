@@ -447,7 +447,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     public void doWork(RetryContext context) throws Exception {
       try {
         createSource();
-        sourceAdapter.initialise();
+        initialiseIfNeeded(sourceAdapter, muleContext);
         sourceAdapter.start();
         reconnecting.set(false);
       } catch (Exception e) {

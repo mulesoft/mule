@@ -32,7 +32,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
-
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -79,9 +78,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -89,6 +85,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -131,6 +129,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected ComponentExecutor componentExecutor;
   protected PolicyManager policyManager;
   protected ReturnDelegate returnDelegate;
+  private boolean initialised = false;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -241,11 +240,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   protected void doInitialise() throws InitialisationException {
-    returnDelegate = createReturnDelegate();
-    initialiseIfNeeded(resolverSet, muleContext);
-    componentExecutor = createComponentExecutor();
-    executionMediator = createExecutionMediator();
-    initialiseIfNeeded(componentExecutor, true, muleContext);
+    if (!initialised) {
+      returnDelegate = createReturnDelegate();
+      initialiseIfNeeded(resolverSet, muleContext);
+      componentExecutor = createComponentExecutor();
+      executionMediator = createExecutionMediator();
+      initialiseIfNeeded(componentExecutor, true, muleContext);
+      initialised = true;
+    }
   }
 
   private ComponentExecutor<T> createComponentExecutor() {
@@ -380,6 +382,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   public void doDispose() {
     disposeIfNeeded(componentExecutor, LOGGER);
+    initialised = false;
   }
 
   protected ExecutionMediator createExecutionMediator() {

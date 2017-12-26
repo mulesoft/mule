@@ -34,6 +34,7 @@ import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENS
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -486,9 +487,10 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   private void setUpOperationReturning(Object payload, Type type) throws InitialisationException {
+    messageProcessor = createOperationMessageProcessor();
     MetadataType mapType = new DefaultExtensionsTypeLoaderFactory().createTypeLoader().load(type);
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("desc", mapType, false, emptySet()));
-    messageProcessor.initialise();
+    initialiseIfNeeded(messageProcessor, muleContext);
     when(operationExecutor.execute(any(ExecutionContext.class)))
         .thenReturn(just(payload));
   }

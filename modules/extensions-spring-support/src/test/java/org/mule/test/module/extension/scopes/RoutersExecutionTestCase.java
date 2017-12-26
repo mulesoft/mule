@@ -56,6 +56,15 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
   }
 
   @Test
+  public void voidRouter() throws Exception {
+    CoreEvent internalEvent = flowRunner("voidRouter").withPayload("message").withAttributes("other").run();
+
+    assertThat(internalEvent.getMessage().getPayload().getValue(), is("message"));
+    assertThat(internalEvent.getMessage().getAttributes().getValue(), is("other"));
+    assertThat(internalEvent.getVariables().get("newAttributes"), is(nullValue()));
+  }
+
+  @Test
   public void fieldParameterInjection() throws Exception {
     Integer value = (Integer) flowRunner("routerField")
         .withVariable("expected", 0)

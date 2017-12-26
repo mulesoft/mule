@@ -20,12 +20,12 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -45,6 +45,7 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
     expressionManager = spy(muleContext.getExpressionManager());
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("_muleExpressionManager", expressionManager);
   }
 
   @Test
@@ -106,6 +107,7 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
     TypeSafeExpressionValueResolver<T> valueResolver = new TypeSafeExpressionValueResolver(expression,
                                                                                            getType(expectedType).orElse(null),
                                                                                            expectedType);
+    muleContext.getInjector().inject(valueResolver);
     valueResolver.setExtendedExpressionManager(expressionManager);
     valueResolver.setTransformationService(muleContext.getTransformationService());
     valueResolver.initialise();

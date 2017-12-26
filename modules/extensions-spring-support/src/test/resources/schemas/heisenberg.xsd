@@ -2084,6 +2084,15 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="LifecycleValidatorType" substitutionGroup="mule:abstract-operator" name="lifecycle-validator"></xs:element>
+  <xs:complexType name="LifecycleValidatorType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="expected"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="LiteralEchoType" substitutionGroup="heisenberg-empire" name="literal-echo"></xs:element>
   <xs:complexType name="LiteralEchoType">
     <xs:complexContent>
@@ -2644,6 +2653,30 @@
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="processorName"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="VoidRouterType" substitutionGroup="mule:abstract-operator" name="void-router"></xs:element>
+  <xs:complexType name="VoidRouterType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="1" maxOccurs="1">
+          <xs:element minOccurs="1" maxOccurs="1" name="when">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence minOccurs="1">
+                    <xs:choice minOccurs="1" maxOccurs="unbounded">
+                      <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+                    </xs:choice>
+                  </xs:sequence>
+                  <xs:attribute type="mule:expressionBoolean" use="optional" name="execute"></xs:attribute>
+                  <xs:attribute type="mule:expressionString" use="required" name="message"></xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

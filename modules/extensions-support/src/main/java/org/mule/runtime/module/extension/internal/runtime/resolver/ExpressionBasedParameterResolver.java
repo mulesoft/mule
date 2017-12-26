@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
@@ -36,6 +38,9 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
   private TransformationService transformationService;
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
+  @Inject
+  private MuleContext muleContext;
+
   private Class<T> type;
 
   ExpressionBasedParameterResolver(String expression, Class<T> type, ValueResolvingContext context, MetadataType metadataType) {
@@ -70,7 +75,7 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
     valueResolver = new TypeSafeExpressionValueResolver<>(expression, type, metadataType);
     valueResolver.setExtendedExpressionManager(extendedExpressionManager);
     valueResolver.setTransformationService(transformationService);
-    valueResolver.initialise();
+    initialiseIfNeeded(valueResolver, muleContext);
   }
 
   public void setTransformationService(TransformationService transformationService) {

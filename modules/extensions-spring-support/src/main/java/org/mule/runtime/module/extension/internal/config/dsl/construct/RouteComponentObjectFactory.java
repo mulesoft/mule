@@ -60,7 +60,8 @@ public class RouteComponentObjectFactory extends AbstractExtensionObjectFactory<
         model.getNestedComponents().stream()
             .filter(component -> component instanceof NestedChainModel)
             .findFirst()
-            .ifPresent(chain -> parameters.put(chain.getName(), new ProcessorChainValueResolver(nestedProcessors)));
+            .ifPresent(chain -> parameters.put(chain.getName(),
+                                               new ProcessorChainValueResolver(muleContext, nestedProcessors)));
       }
 
       resolveParameters(objectType, builder);

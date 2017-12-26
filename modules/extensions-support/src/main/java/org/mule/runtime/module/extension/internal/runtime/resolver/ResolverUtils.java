@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
@@ -139,36 +140,38 @@ public class ResolverUtils {
                                                                   MuleContext muleContext) {
 
     try {
+      ValueResolver resolver;
       if (stackedTypesModelProperty.isPresent()) {
-        return stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(expression,
-                                                                                                         getType(type));
+        resolver = stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(expression,
+                                                                                                             getType(type));
         //TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be removed once implemented
       } else if (isTypedValue.getAsBoolean()) {
         ExpressionTypedValueValueResolver<Object> valueResolver =
             new ExpressionTypedValueValueResolver<>(expression, getType(type));
         valueResolver.setTransformationService(muleContext.getTransformationService());
         valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
-        return valueResolver;
+        resolver = valueResolver;
       } else if (isParameterResolver.getAsBoolean()) {
         ExpressionBasedParameterResolverValueResolver<Object> valueResolver =
             new ExpressionBasedParameterResolverValueResolver<>(expression, getType(type), type);
         valueResolver.setTransformationService(muleContext.getTransformationService());
         valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
-        return valueResolver;
+        resolver = valueResolver;
       } else if (muleContext.getExpressionManager().isExpression(expression)) {
         TypeSafeExpressionValueResolver<Object> valueResolver =
             new TypeSafeExpressionValueResolver<>(expression, getType(type), type);
         valueResolver.setTransformationService(muleContext.getTransformationService());
         valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
-        valueResolver.initialise();
-        return valueResolver;
+        resolver = valueResolver;
       } else {
         TypeSafeValueResolverWrapper typeSafeValueResolverWrapper =
             new TypeSafeValueResolverWrapper<>(new StaticValueResolver<>(expression), getType(type));
         typeSafeValueResolverWrapper.setTransformationService(muleContext.getTransformationService());
-        typeSafeValueResolverWrapper.initialise();
-        return typeSafeValueResolverWrapper;
+        resolver = typeSafeValueResolverWrapper;
       }
+
+      initialiseIfNeeded(resolver, muleContext);
+      return resolver;
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(e);
     }

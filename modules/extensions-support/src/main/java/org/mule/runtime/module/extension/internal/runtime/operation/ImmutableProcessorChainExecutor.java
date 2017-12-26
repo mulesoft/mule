@@ -8,11 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -34,7 +31,7 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-public class ImmutableProcessorChainExecutor implements Chain, Initialisable, HasMessageProcessors {
+public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcessors {
 
   /**
    * Processor that will be executed upon calling process
@@ -90,11 +87,6 @@ public class ImmutableProcessorChainExecutor implements Chain, Initialisable, Ha
                   "An error completion handler is required in order to execute the components chain, but it was null");
     new Executor(chain, originalEvent, event, onSuccess, onError)
         .execute();
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    initialiseIfNeeded(chain);
   }
 
   @Override

@@ -16,12 +16,15 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 /**
  * Default implementation of {@link ObjectBuilder} which creates instances through a provided {@link Class}.
@@ -34,6 +37,9 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
   protected final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
   private String name = null;
   private String encoding = null;
+
+  @Inject
+  private MuleContext muleContext;
 
   /**
    * Creates a new instance that will build instances of {@code prototypeClass}.
@@ -95,4 +101,5 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
   public void setEncoding(String encoding) {
     this.encoding = encoding;
   }
+
 }

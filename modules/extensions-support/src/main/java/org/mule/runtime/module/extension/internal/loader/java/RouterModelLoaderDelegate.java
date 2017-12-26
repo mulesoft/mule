@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.checkDefinition;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
@@ -18,6 +19,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
+import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
@@ -42,8 +44,11 @@ import java.util.Optional;
 final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private static final String CONSTRUCT = "Construct";
+  private static final List<Class<?>> VALID_CALLBACK_PARAMETERS = asList(RouterCompletionCallback.class,
+                                                                         VoidCompletionCallback.class);
 
   private final Map<MethodElement, ConstructDeclarer> constructDeclarers = new HashMap<>();
+
 
   RouterModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
     super(delegate);
@@ -79,27 +84,24 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
     processMimeType(router, routerMethod);
 
     List<ExtensionParameter> callbackParameters = routerMethod.getParameters().stream()
-        .filter(p -> RouterCompletionCallback.class.equals(p.getType().getDeclaringClass()))
+        .filter(p -> VALID_CALLBACK_PARAMETERS.contains(p.getType().getDeclaringClass()))
         .collect(toList());
 
     List<ExtensionParameter> routes = routerMethod.getParameters().stream().filter(this::isRoute).collect(toList());
 
     checkDefinition(!callbackParameters.isEmpty(),
-                    format("Router '%s' does not declare a '%s' parameter. One is required.",
-                           routerMethod.getAlias(),
-                           RouterCompletionCallback.class.getSimpleName()));
+                    format("Router '%s' does not declare a parameter with one of the types '%s'. One is required.",
+                           routerMethod.getAlias(), VALID_CALLBACK_PARAMETERS));
 
     checkDefinition(!routes.isEmpty(),
                     format("Router '%s' does not declare a '%s' parameter. One is required.",
-                           routerMethod.getAlias(),
-                           Route.class.getSimpleName()));
+                           routerMethod.getAlias(), Route.class.getSimpleName()));
 
     checkDefinition(callbackParameters.size() <= 1,
-                    format("Router '%s' defines more than one %s parameters. Only one is allowed",
-                           routerMethod.getAlias(), RouterCompletionCallback.class.getSimpleName()));
+                    format("Router '%s' defines more than one CompletionCallback parameters. Only one is allowed",
+                           routerMethod.getAlias()));
 
-    checkDefinition(isVoid(routerMethod), format("Router '%s' is not declared in a void method.",
-                                                 routerMethod.getAlias()));
+    checkDefinition(isVoid(routerMethod), format("Router '%s' is not declared in a void method.", routerMethod.getAlias()));
 
     List<ExtensionParameter> nonRouteParameters = routerMethod.getParameters().stream()
         .filter(p -> !isRoute(p) && !callbackParameters.contains(p))
