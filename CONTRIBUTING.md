@@ -68,7 +68,7 @@ Before you get started, you need to set yourself up with an environment in which
 
 ### JDK
 
-1. If you are working with **Windows** or **Linux**, install one of the following [Java Development Kits](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your local drive. If you are working on a **Mac**, simply confirm that the JDK shipped with your Mac OS X is *Java SE Development Kit 8 (also known as Java SE 8u152)* or newer using the command `java -version`, then skip to step 4 below: 
+1. If you are working with **Windows** or **Linux**, install Java SE 8u152 or a later update on your local drive. It can be downloaded from [Java Development Kits](http://www.oracle.com/technetwork/java/javase/downloads/index.html). If you are working on a **Mac**, simply confirm that the JDK shipped with your Mac OS X is *Java SE Development Kit 8 (also known as Java SE 8u152)* or a later update using the command `java -version`, then skip to step 4 below: 
 2. Create an environment variable called `JAVA_HOME`, setting it to the directory in which you installed the JDK. 
 3. Update the PATH environment variable so that it includes the path to JDK binaries. Add the following line to the PATH variable:
     - Windows: `%JAVA_HOME%/bin`
