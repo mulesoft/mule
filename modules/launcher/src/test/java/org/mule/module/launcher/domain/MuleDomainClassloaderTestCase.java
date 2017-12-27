@@ -7,6 +7,7 @@
 
 package org.mule.module.launcher.domain;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -54,13 +55,13 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase
         when(artifactClassLoader.findLocalResource(DOMAIN_CONFIG_FILE_LOCATION)).thenReturn(resource);
         when(muleContextFactory.createMuleContext(any(List.class), any(MuleContextBuilder.class))).thenReturn(context);
         domain = new TestMuleDomain(domainClassLoaderRepository, domainDescriptor);
-        Thread.currentThread().setContextClassLoader(originalThreadClassloader);
+        currentThread().setContextClassLoader(originalThreadClassloader);
         doAnswer(new Answer()
         {
             @Override
             public Void answer(InvocationOnMock invocation)
             {
-                classloaderUsedInDispose = Thread.currentThread().getContextClassLoader();
+                classloaderUsedInDispose = currentThread().getContextClassLoader();
                 return null;
             }
         }).when(context).dispose();
@@ -74,7 +75,7 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase
         domain.dispose();
 
         assertThat(classloaderUsedInDispose, sameInstance(domainClassloader));
-        assertThat(Thread.currentThread().getContextClassLoader(), is(originalThreadClassloader));
+        assertThat(currentThread().getContextClassLoader(), is(originalThreadClassloader));
     }
 
     private static final class TestMuleDomain extends DefaultMuleDomain

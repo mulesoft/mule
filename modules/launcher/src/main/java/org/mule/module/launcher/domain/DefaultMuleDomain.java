@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.domain;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.util.SplashScreen.miniSplash;
 
 import org.mule.MuleServer;
@@ -273,17 +274,17 @@ public class DefaultMuleDomain implements Domain
             }
             // null CCL ensures we log at 'system' level
             // TODO create a more usable wrapper for any logger to be logged at sys level
-            final ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+            final ClassLoader oldCl = currentThread().getContextClassLoader();
             try
             {
-                Thread.currentThread().setContextClassLoader(null);
+                currentThread().setContextClassLoader(null);
                 DomainStartedSplashScreen splashScreen = new DomainStartedSplashScreen();
                 splashScreen.createMessage(descriptor);
                 deployLogger.info(splashScreen.toString());
             }
             finally
             {
-                Thread.currentThread().setContextClassLoader(oldCl);
+                currentThread().setContextClassLoader(oldCl);
             }
         }
         catch (Exception e)
@@ -320,17 +321,22 @@ public class DefaultMuleDomain implements Domain
             logger.info(miniSplash(String.format("Disposing domain '%s'", getArtifactName())));
         }
 
-        ClassLoader originalClassloader = Thread.currentThread().getContextClassLoader();
+        ClassLoader originalClassloader = currentThread().getContextClassLoader();
 
-        if (Thread.currentThread().getContextClassLoader() != deploymentClassLoader.getClassLoader())
+        if (originalClassloader != deploymentClassLoader.getClassLoader())
         {
-            Thread.currentThread().setContextClassLoader(deploymentClassLoader.getClassLoader());
+            currentThread().setContextClassLoader(deploymentClassLoader.getClassLoader());
         }
+
         if (this.muleContext != null)
         {
             this.muleContext.dispose();
         }
-        Thread.currentThread().setContextClassLoader(originalClassloader);
+
+        if (originalClassloader != deploymentClassLoader.getClassLoader())
+        {
+            currentThread().setContextClassLoader(originalClassloader);
+        }
 
         this.deploymentClassLoader.dispose();
     }
