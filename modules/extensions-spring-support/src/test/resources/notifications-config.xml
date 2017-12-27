@@ -49,7 +49,7 @@
     </flow>
 
     <flow name="sourceNotifications" initialState="stopped">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="100000">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>

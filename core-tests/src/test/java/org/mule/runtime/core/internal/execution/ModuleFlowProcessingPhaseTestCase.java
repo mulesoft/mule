@@ -37,7 +37,6 @@ import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -64,16 +63,15 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.size.SmallTest;
 
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
@@ -158,6 +156,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     template = mock(ModuleFlowProcessingPhaseTemplate.class);
     when(template.getMessage()).thenReturn(Message.of(null));
+    when(template.getSourceNotification()).thenReturn(empty());
     when(template.sendResponseToClient(any(), any())).thenAnswer(invocation -> Mono.empty());
     when(template.sendFailureResponseToClient(any(), any())).thenAnswer(invocation -> Mono.empty());
 
@@ -281,6 +280,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     reset(template);
     when(template.getMessage()).thenReturn(Message.of(null));
+    when(template.getSourceNotification()).thenReturn(empty());
     when(template.sendFailureResponseToClient(any(), any())).thenAnswer(invocation -> create(sinkReference::set));
 
     configureFailingFlow(mockException);

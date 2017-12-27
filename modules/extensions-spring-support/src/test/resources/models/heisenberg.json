@@ -10170,38 +10170,6 @@
           "notifications": [
             {
               "namespace": "HEISENBERG",
-              "identifier": "BATCH_DELIVERED",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Long",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  }
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_DELIVERY_FAILED",
-              "metadataType": {
-                "format": "java",
-                "type": "@ref:org.mule.test.heisenberg.extension.model.PersonalInfo"
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
               "identifier": "NEW_BATCH",
               "metadataType": {
                 "format": "java",
@@ -10220,8 +10188,42 @@
                     "parent": "java.lang.Number",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "int": {}
                 }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_DELIVERED",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Long",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_DELIVERY_FAILED",
+              "metadataType": {
+                "format": "java",
+                "type": "@ref:org.mule.test.heisenberg.extension.model.PersonalInfo"
               }
             }
           ],
@@ -17853,80 +17855,18 @@
       "notifications": [
         {
           "namespace": "HEISENBERG",
-          "identifier": "KNOCKED_DOOR",
+          "identifier": "KNOCKING_DOOR",
           "metadataType": {
             "format": "java",
-            "type": "Object",
-            "annotations": {
-              "typeId": "org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor",
-              "classInformation": {
-                "classname": "org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor",
-                "hasDefaultConstructor": false,
-                "isInterface": false,
-                "isInstantiable": false,
-                "isAbstract": false,
-                "isFinal": false,
-                "implementedInterfaces": [],
-                "parent": "",
-                "genericTypes": [],
-                "isMap": false
-              },
-              "typeAlias": {
-                "value": "SimpleKnockeableDoor"
-              }
-            },
-            "fields": [
-              {
-                "key": {
-                  "name": "simpleName"
-                },
-                "model": {
-                  "type": "String"
-                },
-                "annotations": {
-                  "visibility": "READ_ONLY"
-                }
-              }
-            ]
+            "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
           }
         },
         {
           "namespace": "HEISENBERG",
-          "identifier": "KNOCKING_DOOR",
+          "identifier": "KNOCKED_DOOR",
           "metadataType": {
             "format": "java",
-            "type": "Object",
-            "annotations": {
-              "typeId": "org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor",
-              "classInformation": {
-                "classname": "org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor",
-                "hasDefaultConstructor": false,
-                "isInterface": false,
-                "isInstantiable": false,
-                "isAbstract": false,
-                "isFinal": false,
-                "implementedInterfaces": [],
-                "parent": "",
-                "genericTypes": [],
-                "isMap": false
-              },
-              "typeAlias": {
-                "value": "SimpleKnockeableDoor"
-              }
-            },
-            "fields": [
-              {
-                "key": {
-                  "name": "simpleName"
-                },
-                "model": {
-                  "type": "String"
-                },
-                "annotations": {
-                  "visibility": "READ_ONLY"
-                }
-              }
-            ]
+            "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
           }
         }
       ],
@@ -23516,7 +23456,8 @@
             "parent": "java.lang.Number",
             "genericTypes": [],
             "isMap": false
-          }
+          },
+          "int": {}
         }
       }
     },
@@ -23540,7 +23481,8 @@
             "parent": "java.lang.Number",
             "genericTypes": [],
             "isMap": false
-          }
+          },
+          "int": {}
         }
       }
     },
@@ -23557,38 +23499,7 @@
       "identifier": "KNOCKING_DOOR",
       "metadataType": {
         "format": "java",
-        "type": "Object",
-        "annotations": {
-          "typeId": "org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor",
-          "classInformation": {
-            "classname": "org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor",
-            "hasDefaultConstructor": false,
-            "isInterface": false,
-            "isInstantiable": false,
-            "isAbstract": false,
-            "isFinal": false,
-            "implementedInterfaces": [],
-            "parent": "",
-            "genericTypes": [],
-            "isMap": false
-          },
-          "typeAlias": {
-            "value": "SimpleKnockeableDoor"
-          }
-        },
-        "fields": [
-          {
-            "key": {
-              "name": "simpleName"
-            },
-            "model": {
-              "type": "String"
-            },
-            "annotations": {
-              "visibility": "READ_ONLY"
-            }
-          }
-        ]
+        "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
       }
     },
     {
@@ -23596,38 +23507,7 @@
       "identifier": "KNOCKED_DOOR",
       "metadataType": {
         "format": "java",
-        "type": "Object",
-        "annotations": {
-          "typeId": "org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor",
-          "classInformation": {
-            "classname": "org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor",
-            "hasDefaultConstructor": false,
-            "isInterface": false,
-            "isInstantiable": false,
-            "isAbstract": false,
-            "isFinal": false,
-            "implementedInterfaces": [],
-            "parent": "",
-            "genericTypes": [],
-            "isMap": false
-          },
-          "typeAlias": {
-            "value": "SimpleKnockeableDoor"
-          }
-        },
-        "fields": [
-          {
-            "key": {
-              "name": "simpleName"
-            },
-            "model": {
-              "type": "String"
-            },
-            "annotations": {
-              "visibility": "READ_ONLY"
-            }
-          }
-        ]
+        "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
       }
     }
   ],
@@ -29349,6 +29229,41 @@
             "expressionSupport": {
               "value": "SUPPORTED"
             }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor",
+        "classInformation": {
+          "classname": "org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor",
+          "hasDefaultConstructor": false,
+          "isInterface": false,
+          "isInstantiable": false,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "SimpleKnockeableDoor"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "simpleName"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
           }
         }
       ]

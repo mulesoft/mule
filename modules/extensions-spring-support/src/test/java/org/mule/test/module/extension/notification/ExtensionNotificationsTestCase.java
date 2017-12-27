@@ -7,8 +7,6 @@
 package org.mule.test.module.extension.notification;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -17,6 +15,7 @@ import org.mule.runtime.api.notification.ExtensionNotification;
 import org.mule.runtime.api.notification.ExtensionNotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
@@ -29,6 +28,8 @@ import javax.inject.Inject;
 import org.junit.Test;
 
 public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalTestCase {
+
+  private static final String HEISENBERG = HeisenbergExtension.HEISENBERG.toUpperCase();
 
   private CountDownLatch latch;
   private TestExtensionNotificationsListener listener;
@@ -51,25 +52,37 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
     assertThat(listener.getNotifications(), hasSize(2));
     listener.getNotifications().forEach(notification -> {
-      assertThat(notification.getAction().getNamespace(), is("HEISENBERG"));
+      assertThat(notification.getAction().getNamespace(), is(HEISENBERG));
       assertThat(notification.getData().getValue(), instanceOf(SimpleKnockeableDoor.class));
       assertThat(((SimpleKnockeableDoor) notification.getData().getValue()).getSimpleName(),
                  is("Top Level Skyler @ 308 Negra Arroyo Lane"));
     });
-    assertThat(listener.getNotifications().stream().map(n -> n.getAction().getId()).collect(toList()),
-               hasItems("KNOCKING_DOOR", "KNOCKED_DOOR"));
+    assertThat(listener.getNotifications().get(0).getAction().getId(), is("KNOCKING_DOOR"));
+    assertThat(listener.getNotifications().get(1).getAction().getId(), is("KNOCKED_DOOR"));
   }
 
   @Test
   public void sourceFiresNotifications() throws Exception {
-    setUpListener(12);
+    setUpListener(2);
 
     Flow flow = (Flow) getFlowConstruct("sourceNotifications");
     flow.start();
 
     latch.await(2000, MILLISECONDS);
 
-    assertThat(listener.getNotifications(), hasSize(12));
+    assertThat(listener.getNotifications(), hasSize(2));
+
+    ExtensionNotification firstNotification = listener.getNotifications().get(0);
+    assertThat(firstNotification.getAction().getNamespace(), is(HEISENBERG));
+    assertThat(firstNotification.getAction().getId(), is("NEW_BATCH"));
+    assertThat(firstNotification.getData().getValue(), instanceOf(Integer.class));
+    assertThat(firstNotification.getData().getValue(), is(1));
+
+    ExtensionNotification secondNotification = listener.getNotifications().get(1);
+    assertThat(secondNotification.getAction().getNamespace(), is(HEISENBERG));
+    assertThat(secondNotification.getAction().getId(), is("BATCH_DELIVERED"));
+    assertThat(secondNotification.getData().getValue(), instanceOf(Long.class));
+    assertThat(secondNotification.getData().getValue(), is(100L));
   }
 
   private void setUpListener(int count) {
