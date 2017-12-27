@@ -131,4 +131,8 @@
         <heisenberg:spy processor="mule:set-payload*"/>
     </flow>
 
+    <flow name="routerField">
+        <heisenberg:router-field expected="#[vars.expected]" newValue="#[vars.newValue]"/>
+    </flow>
+
 </mule>

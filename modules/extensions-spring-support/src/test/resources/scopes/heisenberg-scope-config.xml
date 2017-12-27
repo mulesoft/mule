@@ -103,4 +103,8 @@
     <flow name="getCounter">
         <heisenberg:get-counter/>
     </flow>
+
+    <flow name="scopeField">
+        <heisenberg:scope-field expected="#[vars.expected]" newValue="#[vars.newValue]"/>
+    </flow>
 </mule>

@@ -44,6 +44,21 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
   }
 
   @Test
+  public void fieldParameterInjection() throws Exception {
+    Integer value = (Integer) flowRunner("scopeField")
+        .withVariable("expected", 0)
+        .withVariable("newValue", 1)
+        .run().getMessage().getPayload().getValue();
+    assertThat(value, is(1));
+
+    value = (Integer) flowRunner("scopeField")
+        .withVariable("expected", 1)
+        .withVariable("newValue", 5)
+        .run().getMessage().getPayload().getValue();
+    assertThat(value, is(5));
+  }
+
+  @Test
   public void verifyProcessorInitialise() throws Exception {
     runFlow("getChain").getMessage().getPayload().getValue();
     runFlow("getChain").getMessage().getPayload().getValue();
