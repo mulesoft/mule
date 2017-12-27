@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule-domain xmlns="http://www.mulesoft.org/schema/mule/domain"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:oauth2="http://www.mulesoft.org/schema/mule/oauth2"
+             xmlns:http="http://www.mulesoft.org/schema/mule/http"
+             xsi:schemaLocation="
+             http://www.mulesoft.org/schema/mule/oauth2 http://www.mulesoft.org/schema/mule/oauth2/current/mule-oauth2.xsd
+               http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="sharedRequestConfig" host="localhost" port="${port}">
+        <oauth2:client-credentials-grant-type
+                clientId="someClientId" clientSecret="someClientSecret" >
+            <oauth2:token-request tokenUrl="${tokenUrl}" />
+        </oauth2:client-credentials-grant-type>
+    </http:request-config>
+
+</mule-domain>
