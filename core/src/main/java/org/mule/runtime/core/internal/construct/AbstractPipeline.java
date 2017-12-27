@@ -222,13 +222,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           });
     } else {
       // If back-pressure strategy is FAIL/DROP then using back-pressure aware `accept(Event event)` to dispatch Event
-      return publisher -> from(publisher).flatMap(event -> {
+      return publisher -> Mono.from(publisher).flatMap(event -> {
         if (sink.emit(event)) {
-          return ((BaseEventContext) event.getContext()).getResponsePublisher();
+          return Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher());
         } else {
           // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with an OVERLOAD error.
           FlowBackPressureException rejectedExecutionException = new FlowBackPressureException(getName());
-          return error(exceptionResolver.resolve(new MessagingException(builder(event)
+          return Mono.error(exceptionResolver.resolve(new MessagingException(builder(event)
               .error(ErrorBuilder.builder().errorType(overloadErrorType)
                   .description(format("Flow '%s' Busy.", getName()))
                   .detailedDescription(format(BACK_PRESSURE_ERROR_MESSAGE, getName()))
