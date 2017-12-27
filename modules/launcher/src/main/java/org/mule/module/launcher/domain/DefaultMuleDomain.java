@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.domain;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.util.SplashScreen.miniSplash;
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
@@ -13,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
+import org.mule.api.context.MuleContextFactory;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
@@ -175,7 +177,8 @@ public class DefaultMuleDomain implements Domain
 
                     builders.add(cfgBuilder);
 
-                    DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+
+                    MuleContextFactory muleContextFactory = getMuleContextFactory();
                     if (deploymentListener != null)
                     {
                         muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
@@ -261,17 +264,17 @@ public class DefaultMuleDomain implements Domain
             }
             // null CCL ensures we log at 'system' level
             // TODO create a more usable wrapper for any logger to be logged at sys level
-            final ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+            final ClassLoader oldCl = currentThread().getContextClassLoader();
             try
             {
-                Thread.currentThread().setContextClassLoader(null);
+                currentThread().setContextClassLoader(null);
                 DomainStartedSplashScreen splashScreen = new DomainStartedSplashScreen();
                 splashScreen.createMessage(descriptor);
                 deployLogger.info(splashScreen.toString());
             }
             finally
             {
-                Thread.currentThread().setContextClassLoader(oldCl);
+                currentThread().setContextClassLoader(oldCl);
             }
         }
         catch (Exception e)
@@ -307,10 +310,24 @@ public class DefaultMuleDomain implements Domain
         {
             logger.info(miniSplash(String.format("Disposing domain '%s'", getArtifactName())));
         }
+
+        ClassLoader originalClassloader = currentThread().getContextClassLoader();
+
+        if (originalClassloader != deploymentClassLoader.getClassLoader())
+        {
+            currentThread().setContextClassLoader(deploymentClassLoader.getClassLoader());
+        }
+
         if (this.muleContext != null)
         {
             this.muleContext.dispose();
         }
+
+        if (originalClassloader != deploymentClassLoader.getClassLoader())
+        {
+            currentThread().setContextClassLoader(originalClassloader);
+        }
+
         this.deploymentClassLoader.dispose();
     }
 
@@ -356,5 +373,14 @@ public class DefaultMuleDomain implements Domain
     public boolean containsSharedResources()
     {
         return this.muleContext != null;
+    }
+
+    /**
+     * Method created for testing purposes.
+     * @return the muleContextFactory for creating the mule context of the domain.
+     */
+    protected MuleContextFactory getMuleContextFactory ()
+    {
+         return new DefaultMuleContextFactory();
     }
 }
