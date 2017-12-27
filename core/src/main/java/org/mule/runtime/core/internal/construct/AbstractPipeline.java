@@ -221,7 +221,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             return Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher());
           });
     } else {
-      // If back-pressure strategy is FAIL/DROP then using back-pressure aware `accept(Event event)` to dispatch Event
+      // If back-pressure strategy is FAIL/DROP then using back-pressure aware `emit(Event event)` to dispatch Event
       return publisher -> Mono.from(publisher).flatMap(event -> {
         if (sink.emit(event)) {
           return Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher());
