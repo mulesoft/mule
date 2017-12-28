@@ -58,6 +58,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONF
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
@@ -600,18 +601,7 @@ class MuleExtensionModelDeclarer {
 
     errorHandler.onDefaultParameterGroup()
         .withOptionalParameter("ref")
-        .ofType(typeLoader.load(String.class))
-        .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The name of the error handler to reuse.");
-
-    NestedRouteDeclarer onError = errorHandler.withRoute("onError")
-        .describedAs("Error handler used to reference other ones.");
-
-    // TODO: MULE-14110 - Add support for chainless routes in extension model
-    onError.withChain();
-
-    onError.onDefaultParameterGroup()
-        .withRequiredParameter("ref")
+        .withAllowedStereotypes(singletonList(ERROR_HANDLER))
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the error handler to reuse.");
@@ -624,6 +614,20 @@ class MuleExtensionModelDeclarer {
     NestedRouteDeclarer onErrorPropagate = errorHandler.withRoute("onErrorPropagate")
         .describedAs("Error handler used to propagate errors. It will rollback any transaction and not consume messages.");
     declareOnErrorRoute(typeLoader, onErrorPropagate);
+
+    errorHandler.withOptionalComponent("onError")
+        .withAllowedStereotypes(ON_ERROR)
+        .describedAs("Error handler used to reference other ones.");
+
+    ConstructDeclarer onError = extensionDeclarer.withConstruct("onError")
+        .withStereotype(ON_ERROR)
+        .describedAs("Error handler used to reference other ones.");
+
+    onError.onDefaultParameterGroup()
+        .withRequiredParameter("ref")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The name of the error handler to reuse.");
 
     // TODO MULE-13277 errorHandler.isOneRouteRequired(true);
   }
