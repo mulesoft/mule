@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
@@ -28,6 +29,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
@@ -146,11 +148,11 @@ public class DefaultMuleDomain implements Domain {
     }
 
     try {
-      ArtifactContextBuilder artifactBuilder = newBuilder().setArtifactName(getArtifactName())
+      ArtifactContextBuilder artifactBuilder = getArtifactContextBuilder().setArtifactName(getArtifactName())
           .setDataFolderName(getDescriptor().getDataFolderName())
           .setArtifactPlugins(artifactPlugins)
           .setExecutionClassloader(deploymentClassLoader.getClassLoader())
-          .setArtifactInstallationDirectory(new File(getMuleDomainsDir(), getArtifactName()))
+          .setArtifactInstallationDirectory(getArtifactInstallationDirectory())
           .setExtensionModelLoaderRepository(extensionModelLoaderManager)
           .setArtifactType(DOMAIN)
           .setEnableLazyInit(lazy)
@@ -220,7 +222,17 @@ public class DefaultMuleDomain implements Domain {
         logger.info(miniSplash(format("Stopping domain '%s'", getArtifactName())));
       }
       if (this.artifactContext != null) {
-        this.artifactContext.getMuleContext().stop();
+        Reference<MuleException> error = new Reference<>();
+        withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> {
+          try {
+            artifactContext.getMuleContext().stop();
+          } catch (MuleException e) {
+            error.set(e);
+          }
+        });
+        if (error.get() != null) {
+          throw error.get();
+        }
       }
     } catch (Exception e) {
       throw new DeploymentStopException(createStaticMessage("Failure trying to stop domain " + getArtifactName()), e);
@@ -232,9 +244,21 @@ public class DefaultMuleDomain implements Domain {
     if (logger.isInfoEnabled()) {
       logger.info(miniSplash(format("Disposing domain '%s'", getArtifactName())));
     }
+
+    ClassLoader originalClassloader = currentThread().getContextClassLoader();
+
+    if (originalClassloader != deploymentClassLoader.getClassLoader()) {
+      currentThread().setContextClassLoader(deploymentClassLoader.getClassLoader());
+    }
+
     if (this.artifactContext != null) {
       this.artifactContext.getMuleContext().dispose();
     }
+
+    if (originalClassloader != deploymentClassLoader.getClassLoader()) {
+      currentThread().setContextClassLoader(originalClassloader);
+    }
+
     this.deploymentClassLoader.dispose();
   }
 
@@ -280,4 +304,23 @@ public class DefaultMuleDomain implements Domain {
   public boolean containsSharedResources() {
     return this.artifactContext != null;
   }
+
+  /**
+   * Method created for testing purposes.
+   * 
+   * @return the muleContextFactory for creating the mule context of the domain
+   */
+  protected ArtifactContextBuilder getArtifactContextBuilder() {
+    return newBuilder();
+  }
+
+  /**
+   * Method created for testing purposes.
+   * 
+   * @return the installation directory.
+   */
+  protected File getArtifactInstallationDirectory() {
+    return new File(getMuleDomainsDir(), getArtifactName());
+  }
+
 }
