@@ -10,6 +10,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLA
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Streaming;
+import org.mule.runtime.extension.api.annotation.notification.Fires;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
@@ -18,6 +19,7 @@ import org.mule.runtime.extension.api.runtime.connectivity.ReconnectionCallback;
 
 @Alias("ReconnectableListenPayments")
 @EmitsResponse
+@Fires(SourceNotificationProvider.class)
 @Streaming
 @MediaType(TEXT_PLAIN)
 public class ReconnectableHeisenbergSource extends HeisenbergSource implements Reconnectable {

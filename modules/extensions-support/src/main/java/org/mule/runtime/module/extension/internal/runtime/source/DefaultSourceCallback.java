@@ -6,23 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.privileged.execution.MessageProcessContext;
-import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.core.privileged.execution.MessageProcessContext;
+import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -30,6 +33,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -59,6 +63,10 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       product.defaultMediaType = sourceModel.getModelProperty(MediaTypeModelProperty.class)
           .map(MediaTypeModelProperty::getMediaType)
           .orElse(ANY);
+      product.notificationModelNames = sourceModel.getNotificationModels()
+          .stream()
+          .map(NotificationModel::getIdentifier)
+          .collect(toSet());
 
       return this;
     }
@@ -144,6 +152,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   }
 
   private SourceModel sourceModel;
+  private Set<String> notificationModelNames;
   private ConfigurationInstance configurationInstance;
   private Processor listener;
   private MuleContext muleContext;
@@ -177,6 +186,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
         + "you naughty developer");
 
     SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
+    validateNotifications(contextAdapter);
     MessageProcessContext messageProcessContext = processContextSupplier.get();
 
     SourceResultAdapter resultAdapter =
@@ -188,11 +198,19 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     contextAdapter.dispatched();
   }
 
+  private void validateNotifications(SourceCallbackContextAdapter contextAdapter) {
+    contextAdapter.getSourceNotifications().forEach(sourceNotification -> {
+      String notificationName = ((Enum) sourceNotification.getAction()).name();
+      checkArgument(notificationModelNames.contains(notificationName),
+                    format("Cannot fire notification '%s' since it's not declared by the component.", notificationName));
+    });
+  }
+
   private void executeFlow(SourceCallbackContext context, MessageProcessContext messageProcessContext, Message message) {
     SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     messageProcessingManager.processMessage(
                                             new ModuleFlowProcessingTemplate(message, listener,
-                                                                             contextAdapter.getSourceNotification(),
+                                                                             contextAdapter.getSourceNotifications(),
                                                                              completionHandlerFactory
                                                                                  .createCompletionHandler(contextAdapter)),
                                             messageProcessContext);

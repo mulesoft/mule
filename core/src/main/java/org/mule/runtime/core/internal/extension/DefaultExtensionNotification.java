@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.extension;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.Event;
@@ -20,7 +19,7 @@ import org.mule.runtime.extension.internal.notification.ExtensionAction;
 /**
  * Represents notifications fired by an extension.
  *
- * @since 1.1
+ * @since 4.1
  */
 public class DefaultExtensionNotification implements ExtensionNotification {
 
@@ -33,11 +32,20 @@ public class DefaultExtensionNotification implements ExtensionNotification {
 
   private ExtensionAction action;
 
+  /**
+   * Creates a new {@link DefaultExtensionNotification} validating that the {@code actionDefinition} type information matches the
+   * actual data to use.
+   *
+   * @param event the {@link Event} associated to the notification
+   * @param component the {@link Component} associated to the notification
+   * @param actionDefinition the {@link NotificationActionDefinition} to use
+   * @param data the information to expose
+   */
   public DefaultExtensionNotification(Event event, Component component,
                                       NotificationActionDefinition actionDefinition,
                                       TypedValue<?> data) {
     DataType actualDataType = data.getDataType();
-    DataType expectedDataType = fromType(actionDefinition.getDataType());
+    DataType expectedDataType = actionDefinition.getDataType();
     checkArgument(expectedDataType.isCompatibleWith(actualDataType),
                   format("The action data type (%s) does not match the actual data type received (%s)",
                          expectedDataType,
@@ -74,7 +82,8 @@ public class DefaultExtensionNotification implements ExtensionNotification {
 
   @Override
   public String toString() {
-    return "{action={" + getAction().getNamespace() + ":" + getAction().getId() + "}, location: " + component.getLocation() + "}";
+    return "{action={" + getAction().getNamespace() + ":" + getAction().getIdentifier() + "}, location: "
+        + component.getLocation() + "}";
   }
 
 }

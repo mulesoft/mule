@@ -6,23 +6,38 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static org.mule.runtime.api.metadata.DataType.fromType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor;
 
 public enum HeisenbergNotificationAction implements NotificationActionDefinition<HeisenbergNotificationAction> {
 
-  NEW_BATCH(Integer.class), BATCH_DELIVERED(Long.class), BATCH_DELIVERY_FAILED(PersonalInfo.class), KNOCKING_DOOR(
-      SimpleKnockeableDoor.class), KNOCKED_DOOR(SimpleKnockeableDoor.class);
+  NEW_BATCH(fromType(Integer.class)),
 
-  private final Class<?> dataType;
+  NEXT_BATCH(fromType(Long.class)),
 
-  HeisenbergNotificationAction(Class<?> dataType) {
+  BATCH_DELIVERED(fromType(Long.class)),
+
+  BATCH_DELIVERY_FAILED(fromType(PersonalInfo.class)),
+
+  BATCH_FAILED(fromType(Integer.class)),
+
+  BATCH_TERMINATED(fromType(Integer.class)),
+
+  KNOCKING_DOOR(fromType(SimpleKnockeableDoor.class)),
+
+  KNOCKED_DOOR(fromType(SimpleKnockeableDoor.class));
+
+  private final DataType dataType;
+
+  HeisenbergNotificationAction(DataType dataType) {
     this.dataType = dataType;
   }
 
   @Override
-  public Class<?> getDataType() {
+  public DataType getDataType() {
     return dataType;
   }
 

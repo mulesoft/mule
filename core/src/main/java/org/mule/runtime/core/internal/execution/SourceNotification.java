@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 /**
  * Represents the data to be used when firing {@link org.mule.runtime.api.notification.ExtensionNotification} from a source.
  *
- * @since 1.1
+ * @since 4.1
  */
 public class SourceNotification {
 

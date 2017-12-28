@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -20,9 +21,9 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -64,7 +65,7 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws Exception {
-    template = new ModuleFlowProcessingTemplate(message, messageProcessor, null, completionHandler);
+    template = new ModuleFlowProcessingTemplate(message, messageProcessor, emptyList(), completionHandler);
     when(completionHandler.onCompletion(any(), any())).thenReturn(Mono.empty());
     when(completionHandler.onFailure(any(), any())).thenReturn(Mono.empty());
   }

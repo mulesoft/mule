@@ -15,8 +15,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 
@@ -30,7 +30,11 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    */
   Message getMessage();
 
-  Optional<SourceNotification> getSourceNotification();
+  /**
+   * @return a {@link List} of {@link SourceNotification} to fire
+   * @since 4.1
+   */
+  List<SourceNotification> getSourceNotifications();
 
   /**
    * Routes the {@link CoreEvent} through the processors chain

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
@@ -20,8 +19,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ModuleFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.internal.execution.SourceNotification;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 
@@ -29,15 +28,15 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
 
   private final Message message;
   private final Processor messageProcessor;
-  private final SourceNotification sourceNotification;
+  private final List<SourceNotification> sourceNotifications;
   private final SourceCompletionHandler completionHandler;
 
   ModuleFlowProcessingTemplate(Message message,
                                Processor messageProcessor,
-                               SourceNotification sourceNotification, SourceCompletionHandler completionHandler) {
+                               List<SourceNotification> sourceNotifications, SourceCompletionHandler completionHandler) {
     this.message = message;
     this.messageProcessor = messageProcessor;
-    this.sourceNotification = sourceNotification;
+    this.sourceNotifications = sourceNotifications;
     this.completionHandler = completionHandler;
   }
 
@@ -57,8 +56,8 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public Optional<SourceNotification> getSourceNotification() {
-    return ofNullable(sourceNotification);
+  public List<SourceNotification> getSourceNotifications() {
+    return sourceNotifications;
   }
 
   @Override

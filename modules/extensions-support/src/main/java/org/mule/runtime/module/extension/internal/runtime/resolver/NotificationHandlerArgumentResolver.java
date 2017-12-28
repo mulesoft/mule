@@ -21,10 +21,10 @@ public class NotificationHandlerArgumentResolver implements ArgumentResolver<Not
   @Override
   public NotificationEmitter resolve(ExecutionContext executionContext) {
     ExecutionContextAdapter adaptedExecutionContext = (ExecutionContextAdapter) executionContext;
-    //    adaptedExecutionContext.getC
     return new DefaultNotificationEmitter(adaptedExecutionContext.getMuleContext().getNotificationManager(),
                                           adaptedExecutionContext.getEvent(),
-                                          adaptedExecutionContext.getComponent());
+                                          adaptedExecutionContext.getComponent(),
+                                          adaptedExecutionContext.getComponentModel());
   }
 
 }

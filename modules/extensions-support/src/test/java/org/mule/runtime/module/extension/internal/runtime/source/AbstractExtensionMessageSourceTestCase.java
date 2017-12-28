@@ -211,6 +211,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     when(sourceModel.getModelProperty(MediaTypeModelProperty.class)).thenReturn(empty());
     setRequires(sourceModel, true, true);
     when(sourceModel.getOutput().getType()).thenReturn(TYPE_LOADER.load(String.class));
+    when(sourceModel.getNotificationModels()).thenReturn(emptySet());
     mockExceptionEnricher(extensionModel, null);
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
 

@@ -14,6 +14,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
+import org.mule.runtime.extension.api.annotation.notification.Fires;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -27,6 +28,7 @@ import org.mule.test.heisenberg.extension.stereotypes.AsyncSourceStereotype;
 
 @Alias("AsyncListenPayments")
 @EmitsResponse
+@Fires(SourceNotificationProvider.class)
 @Streaming
 @Stereotype(AsyncSourceStereotype.class)
 @MediaType(TEXT_PLAIN)

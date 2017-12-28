@@ -26,6 +26,8 @@ import org.mule.runtime.module.extension.internal.runtime.transaction.DefaultTra
 import org.mule.runtime.module.extension.internal.runtime.transaction.NullTransactionHandle;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,7 +47,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   private Object connection = null;
   private TransactionHandle transactionHandle = NULL_TRANSACTION_HANDLE;
   private boolean dispatched = false;
-  private SourceNotification sourceNotification = null;
+  private List<SourceNotification> sourceNotifications = new LinkedList<>();
 
   /**
    * Creates a new instance
@@ -170,16 +172,16 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
    * {@inheritDoc}
    */
   @Override
-  public void fire(NotificationActionDefinition<?> action, TypedValue<?> data) {
-    sourceNotification = new SourceNotification(action, data);
+  public void fireOnHandle(NotificationActionDefinition<?> action, TypedValue<?> data) {
+    sourceNotifications.add(new SourceNotification(action, data));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public SourceNotification getSourceNotification() {
-    return sourceNotification;
+  public List<SourceNotification> getSourceNotifications() {
+    return sourceNotifications;
   }
 
   private I18nMessage createWrongConnectionMessage(Object connection) {

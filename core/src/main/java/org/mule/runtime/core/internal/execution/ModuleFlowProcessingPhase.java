@@ -163,7 +163,7 @@ public class ModuleFlowProcessingPhase
                                                 MessageProcessContext messageProcessContext, FlowConstruct flowConstruct) {
     return request -> {
       fireNotification(messageProcessContext.getMessageSource(), request, flowConstruct, MESSAGE_RECEIVED);
-      template.getSourceNotification().ifPresent(sourceNotification -> muleContext.getNotificationManager()
+      template.getSourceNotifications().forEach(sourceNotification -> muleContext.getNotificationManager()
           .fireNotification(new DefaultExtensionNotification(request, messageProcessContext.getMessageSource(),
                                                              sourceNotification.getAction(), sourceNotification.getData())));
     };

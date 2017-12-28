@@ -20,11 +20,11 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
-import org.mule.runtime.api.meta.model.notification.ImmutableNotificationModel;
+import org.mule.runtime.extension.api.model.notification.ImmutableNotificationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.extension.api.annotation.notification.EmitsNotifications;
+import org.mule.runtime.extension.api.annotation.notification.Fires;
 import org.mule.runtime.extension.api.annotation.notification.NotificationActionProvider;
 import org.mule.runtime.extension.api.annotation.notification.NotificationActions;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
@@ -53,7 +53,7 @@ import java.util.Optional;
 
 /**
  * {@link DeclarationEnricher} implementation which enriches the {@link ExtensionModel}, their {@link OperationModel} and
- * {@link SourceModel} from the used {@link NotificationActions} and {@link EmitsNotifications} in an Annotation based extension.
+ * {@link SourceModel} from the used {@link NotificationActions} and {@link Fires} in an Annotation based extension.
  *
  * @since 4.1
  */
@@ -82,13 +82,14 @@ public class NotificationsDeclarationEnricher implements DeclarationEnricher {
 
     if (implementingType.isPresent()) {
       ExtensionElement extensionElement = new ExtensionTypeWrapper<>(implementingType.get().getType());
-      extensionElement.getAnnotation(NotificationActions.class).ifPresent(actionsAnnotation -> {
+      Optional<NotificationActions> annotation = extensionElement.getAnnotation(NotificationActions.class);
+      annotation.ifPresent(actionsAnnotation -> {
         NotificationActionDefinition<?>[] actions =
             (NotificationActionDefinition<?>[]) actionsAnnotation.value().getEnumConstants();
         Map<NotificationActionDefinition, NotificationModel> notificationModels = new HashMap<>();
         stream(actions).forEach(action -> {
           NotificationModel model = new ImmutableNotificationModel(extensionNamespace, ((Enum) action).name(),
-                                                                   typeLoader.load(action.getDataType()));
+                                                                   typeLoader.load(action.getDataType().getType()));
           declaration.addNotificationModel(model);
           notificationModels.put(action, model);
         });
@@ -102,7 +103,7 @@ public class NotificationsDeclarationEnricher implements DeclarationEnricher {
 
             if (modelProperty.isPresent()) {
               MethodWrapper methodWrapper = new MethodWrapper(modelProperty.get().getMethod());
-              Optional<EmitsNotifications> emitsNotifications =
+              Optional<Fires> emitsNotifications =
                   getOperationNotificationDeclaration(methodWrapper, extensionElement, typeWrapperCache);
               includeNotificationDeclarationIfNeeded(declaration, emitsNotifications);
             }
@@ -116,27 +117,27 @@ public class NotificationsDeclarationEnricher implements DeclarationEnricher {
             if (modelProperty.isPresent()) {
               final Class<?> sourceType = modelProperty.get().getType();
               TypeWrapper sourceContainer = typeWrapperCache.getUnchecked(sourceType);
-              Optional<EmitsNotifications> emitsNotifications = getNotificationDeclaration(sourceContainer, extensionElement);
+              Optional<Fires> emitsNotifications = getNotificationDeclaration(sourceContainer, extensionElement);
               includeNotificationDeclarationIfNeeded(declaration, emitsNotifications);
             }
           }
 
-          private Optional<EmitsNotifications> getOperationNotificationDeclaration(MethodElement operationMethod,
-                                                                                   ExtensionElement extensionElement,
-                                                                                   LoadingCache<Class<?>, TypeWrapper> typeWrapperCache) {
+          private Optional<Fires> getOperationNotificationDeclaration(MethodElement operationMethod,
+                                                                      ExtensionElement extensionElement,
+                                                                      LoadingCache<Class<?>, TypeWrapper> typeWrapperCache) {
             TypeWrapper operationContainer = typeWrapperCache.getUnchecked(operationMethod.getDeclaringClass());
-            return ofNullable(operationMethod.getAnnotation(EmitsNotifications.class))
+            return ofNullable(operationMethod.getAnnotation(Fires.class))
                 .orElse(getNotificationDeclaration(operationContainer, extensionElement));
           }
 
-          private Optional<EmitsNotifications> getNotificationDeclaration(Type container, ExtensionElement extensionElement) {
-            return ofNullable(container.getAnnotation(EmitsNotifications.class)
-                .orElseGet(() -> extensionElement.getAnnotation(EmitsNotifications.class)
+          private Optional<Fires> getNotificationDeclaration(Type container, ExtensionElement extensionElement) {
+            return ofNullable(container.getAnnotation(Fires.class)
+                .orElseGet(() -> extensionElement.getAnnotation(Fires.class)
                     .orElse(null)));
           }
 
           private void includeNotificationDeclarationIfNeeded(ExecutableComponentDeclaration declaration,
-                                                              Optional<EmitsNotifications> emitsNotifications) {
+                                                              Optional<Fires> emitsNotifications) {
             emitsNotifications.ifPresent(emits -> {
               Class<? extends NotificationActionProvider>[] providers = emits.value();
               stream(providers).forEach(provider -> {
