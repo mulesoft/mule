@@ -37,6 +37,8 @@ import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.FOR
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
@@ -313,7 +315,8 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     setupConcurrentProcessingStrategy();
     strategy = createStrategy(processingStrategy, 4, true, MAX_VALUE);
 
-    expectedException.expect(RejectedExecutionException.class);
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(RejectedExecutionException.class));
     invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(1));
   }
 
@@ -398,14 +401,28 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
   }
 
   private RoutingPair createRoutingPairWithSleep(Message result, long sleep) throws MuleException {
-    return of(testEvent(), createChain(event -> {
+    return of(testEvent(), createChain(new SleepingProcessor(result, sleep)));
+  }
+
+  static class SleepingProcessor extends AbstractComponent implements Processor {
+
+    long sleep;
+    Message result;
+
+    public SleepingProcessor(Message result, long sleep) {
+      this.result = result;
+      this.sleep = sleep;
+    }
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
       try {
         sleep(sleep);
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
       return CoreEvent.builder(event).message(result).build();
-    }));
+    }
   }
 
   private List<RoutingPair> createRoutingPairs(int number) {

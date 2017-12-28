@@ -12,7 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.SOURCE_OVERLOAD;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
@@ -108,7 +108,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
   private final SourceConnectionManager connectionManager;
   private final MessagingExceptionResolver exceptionResolver;
 
-  private ErrorType sourceOverloadErrorType;
+  private ErrorType flowBackPressueErrorType;
 
   @Inject
   private StreamingManager streamingManager;
@@ -180,8 +180,8 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
-    sourceOverloadErrorType = errorTypeRepository.getErrorType(SOURCE_OVERLOAD)
-        .orElseThrow(() -> new IllegalStateException("SOURCE_OVERLOAD error type not found"));
+    flowBackPressueErrorType = errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)
+        .orElseThrow(() -> new IllegalStateException("FLOW_BACK_PRESSURE error type not found"));
 
     initialiseIfNeeded(this.nonCallbackParameters, true, muleContext);
     initialiseIfNeeded(this.errorCallbackParameters, true, muleContext);
@@ -218,7 +218,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
     public Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters) {
       final CoreEvent event = exception.getEvent();
       final boolean isOverloadError = event.getError()
-          .map(e -> sourceOverloadErrorType.equals(e.getErrorType()))
+          .map(e -> flowBackPressueErrorType.equals(e.getErrorType()))
           .orElse(false);
 
       SourceCallbackExecutor executor;

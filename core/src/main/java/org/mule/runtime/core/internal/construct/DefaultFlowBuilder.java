@@ -23,7 +23,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.exception.FlowOverloadException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
@@ -247,7 +246,7 @@ public class DefaultFlowBuilder implements Builder {
             try {
               getSink().accept(request);
             } catch (RejectedExecutionException ree) {
-              Throwable overloadException = new FlowOverloadException(ree.getMessage(), ree);
+              Throwable overloadException = new FlowBackPressureException(ree.getMessage(), ree);
               MessagingException me = new MessagingException(event, overloadException, this);
               ((BaseEventContext) request.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
             }

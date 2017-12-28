@@ -16,11 +16,10 @@ import static org.mule.runtime.api.notification.PipelineMessageNotification.PROC
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.internal.construct.FlowBackPressureException.BACK_PRESSURE_ERROR_MESSAGE;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 
@@ -31,7 +30,6 @@ import java.util.function.Consumer;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.exception.SourceOverloadException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
@@ -82,7 +80,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final MessageSource source;
   private final List<Processor> processors;
   private MessageProcessorChain pipeline;
-  private static String OVERLOAD_ERROR_MESSAGE = "Flow '%s' is unable to accept new events at this time";
   private final ErrorType overloadErrorType;
 
   private final ProcessingStrategy processingStrategy;
@@ -217,33 +214,27 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             try {
               sink.accept(event);
             } catch (RejectedExecutionException ree) {
-              Throwable overloadException = new SourceOverloadException(format(OVERLOAD_ERROR_MESSAGE, getName(), ree));
+              Throwable overloadException = new FlowBackPressureException(getName(), ree);
               MessagingException me = new MessagingException(event, overloadException, this);
               ((BaseEventContext) event.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
             }
             return Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher());
           });
     } else {
-      // If back-pressure strategy is FAIL/DROP then using back-pressure aware `accept(Event event)` to dispatch Event
-      return publisher -> from(publisher).flatMap(event -> {
+      // If back-pressure strategy is FAIL/DROP then using back-pressure aware `emit(Event event)` to dispatch Event
+      return publisher -> Mono.from(publisher).flatMap(event -> {
         if (sink.emit(event)) {
-          return ((BaseEventContext) event.getContext()).getResponsePublisher();
+          return Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher());
         } else {
-          if (source.getBackPressureStrategy() == DROP) {
-            // If Event is not accepted and the back-pressure strategy is DROP then drop Event.
-            return empty();
-          } else {
-            // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with an OVERLOAD error.
-            RejectedExecutionException rejectedExecutionException =
-                new SourceOverloadException(format(OVERLOAD_ERROR_MESSAGE, getName()));
-            return error(exceptionResolver.resolve(new MessagingException(builder(event)
-                .error(ErrorBuilder.builder().errorType(overloadErrorType)
-                    .description(format("Flow '%s' Busy.", getName()))
-                    .detailedDescription(format(OVERLOAD_ERROR_MESSAGE, getName()))
-                    .exception(rejectedExecutionException)
-                    .build())
-                .build(), rejectedExecutionException, this), muleContext));
-          }
+          // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with an OVERLOAD error.
+          FlowBackPressureException rejectedExecutionException = new FlowBackPressureException(getName());
+          return Mono.error(exceptionResolver.resolve(new MessagingException(builder(event)
+              .error(ErrorBuilder.builder().errorType(overloadErrorType)
+                  .description(format("Flow '%s' Busy.", getName()))
+                  .detailedDescription(format(BACK_PRESSURE_ERROR_MESSAGE, getName()))
+                  .exception(rejectedExecutionException)
+                  .build())
+              .build(), rejectedExecutionException, this), muleContext));
         }
       });
     }
