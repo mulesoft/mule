@@ -31,6 +31,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -123,7 +124,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
     assertThat(coreExtensionModel.getOperationModels(), hasSize(8));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(13));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(14));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -473,24 +474,32 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(ref.getType(), is(instanceOf(StringType.class)));
     assertThat(ref.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(ref.isRequired(), is(false));
+    assertThat(ref.getAllowedStereotypes(), hasSize(1));
+    assertThat(ref.getAllowedStereotypes().iterator().next().getType(), is(ERROR_HANDLER.getType()));
 
     assertThat(errorHandlerModel.getNestedComponents(), hasSize(3));
-    NestedRouteModel onError = (NestedRouteModel) errorHandlerModel.getNestedComponents().get(0);
+    NestedRouteModel onErrorContinue = (NestedRouteModel) errorHandlerModel.getNestedComponents().get(0);
+    verifyOnError(onErrorContinue);
 
+    NestedRouteModel onErrorPropagate = (NestedRouteModel) errorHandlerModel.getNestedComponents().get(1);
+    verifyOnError(onErrorPropagate);
+
+    NestedComponentModel onErrorDelegate = (NestedComponentModel) errorHandlerModel.getNestedComponents().get(2);
+    assertThat(onErrorDelegate.isRequired(), is(false));
+    assertThat(onErrorDelegate.getAllowedStereotypes(), hasSize(1));
+    assertThat(onErrorDelegate.getAllowedStereotypes().iterator().next().getType(), is(ON_ERROR.getType()));
+
+    final ConstructModel onError = coreExtensionModel.getConstructModel("onError").get();
     List<ParameterModel> allParameterModels = onError.getAllParameterModels();
     assertThat(allParameterModels, hasSize(1));
 
     ParameterModel onErrorRef = allParameterModels.get(0);
     assertThat(onErrorRef.getName(), is("ref"));
     assertThat(onErrorRef.getType(), is(instanceOf(DefaultStringType.class)));
-    assertThat(onErrorRef.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(onErrorRef.isRequired(), is(true));
-
-    NestedRouteModel onErrorContinue = (NestedRouteModel) errorHandlerModel.getNestedComponents().get(1);
-    NestedRouteModel onErrorPropagate = (NestedRouteModel) errorHandlerModel.getNestedComponents().get(2);
-
-    verifyOnError(onErrorContinue);
-    verifyOnError(onErrorPropagate);
+    assertThat(onErrorRef.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(onErrorDelegate.getAllowedStereotypes(), hasSize(1));
+    assertThat(onErrorDelegate.getAllowedStereotypes().iterator().next().getType(), is(ON_ERROR.getType()));
   }
 
   void verifyOnError(NestedRouteModel route) {

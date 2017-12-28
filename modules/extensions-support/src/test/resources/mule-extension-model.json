@@ -1,14 +1,14 @@
 {
-  "name": "Mule Core",
+  "name": "mule",
   "description": "Mule Runtime and Integration Platform: Core components",
-  "version": "4.0",
+  "version": "4.1.0",
   "vendor": "MuleSoft, Inc.",
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "mule",
     "namespace": "http://www.mulesoft.org/schema/mule/core",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/core/current/mule.xsd",
-    "schemaVersion": "4.0.0-SNAPSHOT",
+    "schemaVersion": "4.1.0",
     "xsdFileName": "mule.xsd"
   },
   "resources": [],
@@ -16,16 +16,16 @@
     {
       "baseType": {
         "format": "java",
-        "type": "@ref:org.mule.runtime.core.api.source.SchedulingStrategy"
+        "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
       },
       "subTypes": [
         {
           "format": "java",
-          "type": "@ref:org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler"
+          "type": "@ref:org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler"
         },
         {
           "format": "java",
-          "type": "@ref:org.mule.runtime.core.api.source.polling.CronScheduler"
+          "type": "@ref:org.mule.runtime.core.api.source.scheduler.CronScheduler"
         }
       ]
     }
@@ -36,86 +36,6 @@
   "importedTypes": [],
   "configurations": [],
   "operations": [
-    {
-      "blocking": true,
-      "executionType": "CPU_LITE",
-      "output": {
-        "type": {
-          "format": "java",
-          "type": "Void"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "outputAttributes": {
-        "type": {
-          "format": "java",
-          "type": "Void"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "transactional": false,
-      "requiresConnection": false,
-      "supportsStreaming": false,
-      "nestedComponents": [
-        {
-          "isRequired": true,
-          "allowedStereotypes": [
-            {
-              "type": "PROCESSOR",
-              "namespace": "MULE"
-            }
-          ],
-          "name": "processors",
-          "description": "",
-          "modelProperties": {},
-          "kind": "chain"
-        }
-      ],
-      "errors": [],
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "allowedStereotypeModels": [],
-              "name": "name",
-              "description": "Name that will be used to name the async scheduler",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "General",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "async",
-      "description": "Processes the nested list of message processors asynchronously using a thread pool",
-      "modelProperties": {},
-      "kind": "operation"
-    },
     {
       "blocking": true,
       "executionType": "CPU_LITE",
@@ -141,7 +61,9 @@
       "requiresConnection": false,
       "supportsStreaming": false,
       "nestedComponents": [],
-      "errors": [],
+      "errors": [
+        "MULE:ROUTING"
+      ],
       "stereotype": {
         "type": "PROCESSOR",
         "namespace": "MULE"
@@ -274,212 +196,9 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "nestedComponents": [
-        {
-          "isRequired": true,
-          "allowedStereotypes": [
-            {
-              "type": "PROCESSOR",
-              "namespace": "MULE"
-            }
-          ],
-          "name": "processors",
-          "description": "",
-          "modelProperties": {},
-          "kind": "chain"
-        }
-      ],
-      "errors": [],
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "Array",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Iterable",
-                    "hasDefaultConstructor": false,
-                    "isInterface": true,
-                    "isInstantiable": false,
-                    "isAbstract": true,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "",
-                    "genericTypes": []
-                  }
-                },
-                "item": {
-                  "type": "Object",
-                  "annotations": {
-                    "typeId": "java.lang.Object",
-                    "classInformation": {
-                      "classname": "java.lang.Object",
-                      "hasDefaultConstructor": true,
-                      "isInterface": false,
-                      "isInstantiable": true,
-                      "isAbstract": false,
-                      "isFinal": false,
-                      "implementedInterfaces": [],
-                      "parent": "",
-                      "genericTypes": []
-                    },
-                    "typeAlias": {
-                      "value": "Object"
-                    }
-                  },
-                  "fields": []
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "allowedStereotypeModels": [],
-              "name": "collection",
-              "description": "An expression to that returns a java collection, object array, map or DOM nodes.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": []
-                  }
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "allowedStereotypeModels": [],
-              "name": "batchSize",
-              "description": "An expression to that returns a java collection, object array, map or DOM nodes.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "rootMessage",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "allowedStereotypeModels": [],
-              "name": "rootMessageVariableName",
-              "description": "Property name where the parent message is stored.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "counter",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "allowedStereotypeModels": [],
-              "name": "counterVariableName",
-              "description": "Property name used to store the number of message being iterated.",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "General",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "foreach",
-      "description": "The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression, generating a message for each element.",
-      "modelProperties": {},
-      "kind": "operation"
-    },
-    {
-      "blocking": true,
-      "executionType": "CPU_LITE",
-      "output": {
-        "type": {
-          "format": "java",
-          "type": "Void"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "outputAttributes": {
-        "type": {
-          "format": "java",
-          "type": "Void"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "transactional": false,
-      "requiresConnection": false,
-      "supportsStreaming": false,
       "nestedComponents": [],
       "errors": [
-        {
-          "type": "DUPLICATE_MESSAGE",
-          "namespace": "MULE",
-          "parent": {
-            "type": "VALIDATION",
-            "namespace": "MULE",
-            "parent": {
-              "type": "ANY",
-              "namespace": "MULE"
-            }
-          }
-        }
+        "MULE:DUPLICATE_MESSAGE"
       ],
       "stereotype": {
         "type": "PROCESSOR",
@@ -565,7 +284,8 @@
                     "isFinal": false,
                     "implementedInterfaces": [],
                     "parent": "",
-                    "genericTypes": []
+                    "genericTypes": [],
+                    "isMap": false
                   },
                   "typeAlias": {
                     "value": "ObjectStore"
@@ -602,7 +322,7 @@
         }
       ],
       "name": "idempotentMessageValidator",
-      "description": "Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the \u0027idExpression\u0027 attribute. Otherwise, a \u0027FILTERED\u0027 error is generated.",
+      "description": "Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the \u0027idExpression\u0027 attribute. Otherwise, a \u0027DUPLICATE_MESSAGE\u0027 error is generated.",
       "modelProperties": {},
       "kind": "operation"
     },
@@ -724,10 +444,606 @@
       "description": "Performs logging using an expression that determines what should be logged. By default the current messages is logged using the DEBUG level to the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category but the level and category can both be configured to suit your needs. message is specified then the current message is used.",
       "modelProperties": {},
       "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "String"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "PRIMARY_CONTENT",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "content",
+              "description": "Template to be processed.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "location",
+              "description": "The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL or from the classpath.",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "parseTemplate",
+      "description": "A transformer that parses a template defined inline.",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "type",
+              "description": "The error type to raise.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "description",
+              "description": "The description of this error.",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "raiseError",
+      "description": "Throws an error with the specified type and description.",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "variableName",
+              "description": "The variable name.",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "removeVariable",
+      "description": "A processor that remove variables by name or regular expression.",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "encoding",
+              "description": "The encoding of the value assigned to the payload.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "value",
+              "description": "The value to be set on the payload. Supports expressions.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "mimeType",
+              "description": "The mime type, e.g. text/plain or application/json",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "setPayload",
+      "description": "A transformer that sets the payload with the provided value.",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "variableName",
+              "description": "The variable name.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "value",
+              "description": "The variable value.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "encoding",
+              "description": "The encoding of the value assigned to the payload.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "mimeType",
+              "description": "The mime type, e.g. text/plain or application/json",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "setVariable",
+      "description": "A processor that adds variables.",
+      "modelProperties": {},
+      "kind": "operation"
     }
   ],
   "functions": [],
   "constructs": [
+    {
+      "allowsTopLevelDefinition": false,
+      "nestedComponents": [
+        {
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "processors",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        }
+      ],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "name",
+              "description": "Name that will be used to name the async scheduler",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "async",
+      "description": "Processes the nested list of message processors asynchronously using a thread pool",
+      "modelProperties": {},
+      "kind": "construct"
+    },
     {
       "allowsTopLevelDefinition": false,
       "nestedComponents": [
@@ -812,7 +1128,9 @@
           "kind": "route"
         }
       ],
-      "errors": [],
+      "errors": [
+        "MULE:ROUTING"
+      ],
       "stereotype": {
         "type": "PROCESSOR",
         "namespace": "MULE"
@@ -912,8 +1230,10 @@
                       "java.lang.Comparable"
                     ],
                     "parent": "java.lang.Number",
-                    "genericTypes": []
-                  }
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -948,8 +1268,10 @@
                       "java.lang.Comparable"
                     ],
                     "parent": "java.lang.Number",
-                    "genericTypes": []
-                  }
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -986,6 +1308,26 @@
               "allowedStereotypeModels": [],
               "name": "defaultObjectSerializer-ref",
               "description": "An optional reference to an ObjectSerializer to be used as the application\u0027s default",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:DynamicConfigExpiration"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "dynamicConfigExpiration",
+              "description": "Configuration about how should the runtime handle the expiration of dynamic configurations",
               "modelProperties": {}
             }
           ],
@@ -1030,7 +1372,8 @@
                                 "java.lang.Comparable"
                               ],
                               "parent": "java.lang.Number",
-                              "genericTypes": []
+                              "genericTypes": [],
+                              "isMap": false
                             },
                             "default": "2000"
                           }
@@ -1085,7 +1428,8 @@
                                 "java.lang.Comparable"
                               ],
                               "parent": "java.lang.Number",
-                              "genericTypes": []
+                              "genericTypes": [],
+                              "isMap": false
                             },
                             "default": "2000"
                           }
@@ -1179,7 +1523,8 @@
                   "fileExtensions": [
                     "properties"
                   ],
-                  "acceptsUrls": false
+                  "acceptsUrls": false,
+                  "location": "EMBEDDED"
                 }
               },
               "description": " The location of the file with the configuration properties to use. It may be a location in the classpath or an absolute location. The file location\n value may also contains references to properties that will only be resolved based on system properties or properties set at deployment time.",
@@ -1221,26 +1566,6 @@
           "parameterGroupModels": [
             {
               "parameters": [
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "name",
-                  "description": "The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.",
-                  "modelProperties": {}
-                },
                 {
                   "type": {
                     "format": "java",
@@ -1388,26 +1713,6 @@
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "name",
-                  "description": "The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1518,6 +1823,19 @@
           "description": "Error handler used to propagate errors. It will rollback any transaction and not consume messages.",
           "modelProperties": {},
           "kind": "route"
+        },
+        {
+          "isRequired": false,
+          "allowedStereotypes": [
+            {
+              "type": "ON_ERROR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "onError",
+          "description": "Error handler used to reference other ones.",
+          "modelProperties": {},
+          "kind": "component"
         }
       ],
       "errors": [],
@@ -1525,9 +1843,82 @@
         "type": "ERROR_HANDLER",
         "namespace": "MULE"
       },
-      "parameterGroupModels": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [
+                {
+                  "type": "ERROR_HANDLER",
+                  "namespace": "MULE"
+                }
+              ],
+              "name": "ref",
+              "description": "The name of the error handler to reuse.",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
       "name": "errorHandler",
       "description": "Allows the definition of internal selective handlers. It will route the error to the first handler that matches it. If there\u0027s no match, then a default error handler will be executed.",
+      "modelProperties": {},
+      "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": false,
+      "nestedComponents": [
+        {
+          "minOccurs": 0,
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
+          "parameterGroupModels": [],
+          "name": "route",
+          "description": "",
+          "modelProperties": {},
+          "kind": "route"
+        }
+      ],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [],
+      "name": "firstSuccessful",
+      "description": "Sends a message to a list of message processors until one processes it successfully.",
       "modelProperties": {},
       "kind": "construct"
     },
@@ -1628,8 +2019,10 @@
                       "java.lang.Comparable"
                     ],
                     "parent": "java.lang.Number",
-                    "genericTypes": []
-                  }
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -1664,7 +2057,227 @@
       "allowsTopLevelDefinition": false,
       "nestedComponents": [
         {
-          "minOccurs": 2,
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "processors",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        }
+      ],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Iterable",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.Object"
+                    ],
+                    "isMap": false
+                  }
+                },
+                "item": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "java.lang.Object",
+                    "classInformation": {
+                      "classname": "java.lang.Object",
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    },
+                    "typeAlias": {
+                      "value": "Object"
+                    }
+                  },
+                  "fields": []
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "collection",
+              "description": "An expression to that returns a java collection, object array, map or DOM nodes.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "batchSize",
+              "description": "An expression to that returns a java collection, object array, map or DOM nodes.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "rootMessage",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "rootMessageVariableName",
+              "description": "Property name where the parent message is stored.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "counter",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "counterVariableName",
+              "description": "Property name used to store the number of message being iterated.",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "foreach",
+      "description": "The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression, generating a message for each element.",
+      "modelProperties": {},
+      "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": false,
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "ON_ERROR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "ref",
+              "description": "The name of the error handler to reuse.",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "onError",
+      "description": "Error handler used to reference other ones.",
+      "modelProperties": {},
+      "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": false,
+      "nestedComponents": [
+        {
+          "minOccurs": 0,
           "childComponents": [
             {
               "isRequired": true,
@@ -1692,6 +2305,46 @@
         "type": "PROCESSOR",
         "namespace": "MULE"
       },
+      "parameterGroupModels": [],
+      "name": "roundRobin",
+      "description": "Send each message received to the next message processor in the circular list of targets.",
+      "modelProperties": {},
+      "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": false,
+      "nestedComponents": [
+        {
+          "minOccurs": 2,
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
+          "parameterGroupModels": [],
+          "name": "route",
+          "description": "",
+          "modelProperties": {},
+          "kind": "route"
+        }
+      ],
+      "errors": [
+        "MULE:COMPOSITE_ROUTING"
+      ],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1711,8 +2364,10 @@
                       "java.lang.Comparable"
                     ],
                     "parent": "java.lang.Number",
-                    "genericTypes": []
-                  }
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -1747,8 +2402,10 @@
                       "java.lang.Comparable"
                     ],
                     "parent": "java.lang.Number",
-                    "genericTypes": []
-                  }
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
                 }
               },
               "hasDynamicType": false,
@@ -1781,6 +2438,12 @@
                 "allowsInlineDefinition": true,
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
               "name": "target",
@@ -1827,6 +2490,34 @@
       ],
       "name": "scatterGather",
       "description": "Sends the same message to multiple message processors in parallel.",
+      "modelProperties": {},
+      "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": true,
+      "nestedComponents": [
+        {
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "processors",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        }
+      ],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [],
+      "name": "subFlow",
+      "description": "",
       "modelProperties": {},
       "kind": "construct"
     },
@@ -1947,12 +2638,127 @@
       "description": "Processes the nested list of message processors, within a transaction and with it\u0027s own error handler if required.",
       "modelProperties": {},
       "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": false,
+      "nestedComponents": [
+        {
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "processors",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        }
+      ],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": 5,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "maxRetries",
+              "description": "Specifies the maximum number of processing retries that will be performed.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": 60000,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "millisBetweenRetries",
+              "description": "Specifies the minimum time interval between two process retries in milliseconds.\n The actual time interval depends on the previous execution but should not exceed twice this number.\n Default value is 60000 (one minute)",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "untilSuccessful",
+      "description": "Attempts to route a message to the message processor it contains in an asynchronous manner. Routing is considered successful if no exception has been raised and, optionally, if the response matches an expression",
+      "modelProperties": {},
+      "kind": "construct"
     }
   ],
   "connectionProviders": [],
   "messageSources": [
     {
       "hasResponse": false,
+      "runsOnPrimaryNodeOnly": false,
       "output": {
         "type": {
           "format": "java",
@@ -1968,7 +2774,8 @@
               "isFinal": false,
               "implementedInterfaces": [],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             },
             "typeAlias": {
               "value": "Object"
@@ -1995,7 +2802,8 @@
               "isFinal": false,
               "implementedInterfaces": [],
               "parent": "",
-              "genericTypes": []
+              "genericTypes": [],
+              "isMap": false
             },
             "typeAlias": {
               "value": "Object"
@@ -2022,7 +2830,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "@ref:org.mule.runtime.core.api.source.SchedulingStrategy"
+                "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
               },
               "hasDynamicType": false,
               "required": true,
@@ -2045,150 +2853,6 @@
           "name": "General",
           "description": "",
           "modelProperties": {}
-        },
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "Union",
-                "annotations": {
-                  "typeId": "ReconnectionStrategy"
-                },
-                "of": [
-                  {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "reconnect"
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "frequency"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "classInformation": {
-                              "classname": "java.lang.Long",
-                              "hasDefaultConstructor": false,
-                              "isInterface": false,
-                              "isInstantiable": false,
-                              "isAbstract": false,
-                              "isFinal": true,
-                              "implementedInterfaces": [
-                                "java.lang.Comparable"
-                              ],
-                              "parent": "java.lang.Number",
-                              "genericTypes": []
-                            },
-                            "default": "2000"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How often (in ms) to reconnect"
-                          }
-                        }
-                      },
-                      {
-                        "key": {
-                          "name": "count"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "default": "2"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How many reconnection attempts to make"
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Object",
-                    "annotations": {
-                      "typeId": "reconnect-forever"
-                    },
-                    "fields": [
-                      {
-                        "key": {
-                          "name": "frequency"
-                        },
-                        "model": {
-                          "type": "Number",
-                          "annotations": {
-                            "int": {},
-                            "classInformation": {
-                              "classname": "java.lang.Long",
-                              "hasDefaultConstructor": false,
-                              "isInterface": false,
-                              "isInstantiable": false,
-                              "isAbstract": false,
-                              "isFinal": true,
-                              "implementedInterfaces": [
-                                "java.lang.Comparable"
-                              ],
-                              "parent": "java.lang.Number",
-                              "genericTypes": []
-                            },
-                            "default": "2000"
-                          }
-                        },
-                        "annotations": {
-                          "description": {
-                            "value": "How often (in ms) to reconnect"
-                          }
-                        }
-                      }
-                    ]
-                  }
-                ]
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "reconnectionStrategy",
-              "description": "A retry strategy in case of connectivity errors",
-              "modelProperties": {
-                "org.mule.runtime.extension.api.property.QNameModelProperty": {
-                  "value": {
-                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                    "localPart": "abstract-reconnection-strategy",
-                    "prefix": "mule"
-                  }
-                },
-                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                  "sequence": 3
-                }
-              }
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "Connection",
-          "description": "",
-          "modelProperties": {}
         }
       ],
       "name": "scheduler",
@@ -2199,240 +2863,110 @@
   ],
   "errors": [
     {
-      "type": "ANY",
-      "namespace": "MULE"
+      "error": "MULE:NOT_PERMITTED",
+      "parent": "MULE:SECURITY"
     },
     {
-      "type": "EXPRESSION",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:ANY"
     },
     {
-      "type": "TRANSFORMATION",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:REDELIVERY_EXHAUSTED",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "CONNECTIVITY",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:SOURCE_RESPONSE_GENERATE",
+      "parent": "MULE:SOURCE_RESPONSE"
     },
     {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:VALIDATION",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "REDELIVERY_EXHAUSTED",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:EXPRESSION",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "STREAM_MAXIMUM_SIZE_EXCEEDED",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:SOURCE",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "TIMEOUT",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:STREAM_MAXIMUM_SIZE_EXCEEDED",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "UNKNOWN",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:UNKNOWN",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "ROUTING",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:SECURITY",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "COMPOSITE_ROUTING",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ROUTING",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "MULE:DUPLICATE_MESSAGE",
+      "parent": "MULE:VALIDATION"
     },
     {
-      "type": "VALIDATION",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:SERVER_SECURITY",
+      "parent": "MULE:SECURITY"
     },
     {
-      "type": "DUPLICATE_MESSAGE",
-      "namespace": "MULE",
-      "parent": {
-        "type": "VALIDATION",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "MULE:FATAL_JVM_ERROR",
+      "parent": "MULE:CRITICAL"
     },
     {
-      "type": "SECURITY",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:SOURCE_RESPONSE_SEND",
+      "parent": "MULE:SOURCE_RESPONSE"
     },
     {
-      "type": "SERVER_SECURITY",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SECURITY",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "CLIENT_SECURITY",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SECURITY",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "MULE:ROUTING",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "NOT_PERMITTED",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SECURITY",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "MULE:SOURCE_RESPONSE",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "SOURCE",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:FLOW_BACK_PRESSURE",
+      "parent": "MULE:OVERLOAD"
     },
     {
-      "type": "SOURCE_RESPONSE",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MULE:TIMEOUT",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "SOURCE_ERROR_RESPONSE_GENERATE",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SOURCE",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "MULE:SOURCE_ERROR_RESPONSE_SEND",
+      "parent": "MULE:SOURCE"
     },
     {
-      "type": "SOURCE_ERROR_RESPONSE_SEND",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SOURCE",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "MULE:COMPOSITE_ROUTING",
+      "parent": "MULE:ROUTING"
     },
     {
-      "type": "SOURCE_RESPONSE_GENERATE",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SOURCE_RESPONSE",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "MULE:SOURCE_ERROR_RESPONSE_GENERATE",
+      "parent": "MULE:SOURCE"
     },
     {
-      "type": "SOURCE_RESPONSE_SEND",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SOURCE_RESPONSE",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "CRITICAL",
-      "namespace": "MULE"
+      "error": "MULE:CRITICAL"
     },
     {
-      "type": "OVERLOAD",
-      "namespace": "MULE",
-      "parent": {
-        "type": "CRITICAL",
-        "namespace": "MULE"
-      }
+      "error": "MULE:OVERLOAD",
+      "parent": "MULE:CRITICAL"
     },
     {
-      "type": "FATAL_JVM_ERROR",
-      "namespace": "MULE",
-      "parent": {
-        "type": "CRITICAL",
-        "namespace": "MULE"
-      }
+      "error": "MULE:CLIENT_SECURITY",
+      "parent": "MULE:SECURITY"
+    },
+    {
+      "error": "MULE:TRANSFORMATION",
+      "parent": "MULE:ANY"
     }
   ],
   "modelProperties": {},
@@ -2441,39 +2975,191 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "org.mule.runtime.core.api.source.SchedulingStrategy",
-        "classInformation": {
-          "classname": "org.mule.runtime.core.api.source.SchedulingStrategy",
-          "hasDefaultConstructor": false,
-          "isInterface": true,
-          "isInstantiable": false,
-          "isAbstract": true,
-          "isFinal": false,
-          "implementedInterfaces": [],
-          "parent": "",
-          "genericTypes": []
+        "typeId": "DynamicConfigExpiration",
+        "description": {
+          "value": "Configuration about how should the runtime handle the expiration of dynamic configurations"
         },
-        "typeAlias": {
-          "value": "SchedulingStrategy"
+        "typeDsl": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": false
         }
       },
-      "fields": []
+      "fields": [
+        {
+          "key": {
+            "name": "expirationPolicy"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.runtime.extension.api.runtime.ExpirationPolicy",
+              "description": {
+                "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
+              },
+              "typeDsl": {
+                "allowInlineDefinition": true,
+                "allowTopLevelDefinition": false
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "maxIdleTime"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "int": {},
+                    "classInformation": {
+                      "classname": "java.lang.Long",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": false,
+                      "isFinal": true,
+                      "implementedInterfaces": [
+                        "java.lang.Comparable"
+                      ],
+                      "parent": "java.lang.Number",
+                      "genericTypes": [],
+                      "isMap": false
+                    },
+                    "default": "5"
+                  }
+                },
+                "annotations": {
+                  "description": {
+                    "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it\u0027s considered eligible for expiration"
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "timeUnit"
+                },
+                "model": {
+                  "type": "String",
+                  "annotations": {
+                    "enum": {
+                      "type": "[Ljava.lang.String;",
+                      "values": [
+                        "NANOSECONDS",
+                        "MICROSECONDS",
+                        "MILLISECONDS",
+                        "SECONDS",
+                        "MINUTES",
+                        "HOURS",
+                        "DAYS"
+                      ]
+                    },
+                    "default": "MINUTES"
+                  }
+                },
+                "annotations": {
+                  "description": {
+                    "value": "A time unit that qualifies the maxIdleTime attribute"
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "expressionSupport": {
+              "value": "NOT_SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "frequency"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "int": {},
+              "classInformation": {
+                "classname": "java.lang.Long",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [
+                  "java.lang.Comparable"
+                ],
+                "parent": "java.lang.Number",
+                "genericTypes": [],
+                "isMap": false
+              },
+              "default": "5"
+            }
+          },
+          "annotations": {
+            "description": {
+              "value": "A scalar time value for how often should the platform check for expirable dynamic configs"
+            },
+            "expressionSupport": {
+              "value": "NOT_SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "timeUnit"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "enum": {
+                "type": "[Ljava.lang.String;",
+                "values": [
+                  "NANOSECONDS",
+                  "MICROSECONDS",
+                  "MILLISECONDS",
+                  "SECONDS",
+                  "MINUTES",
+                  "HOURS",
+                  "DAYS"
+                ]
+              },
+              "default": "MINUTES"
+            }
+          },
+          "annotations": {
+            "description": {
+              "value": "A time unit that qualifies the frequency attribute"
+            },
+            "expressionSupport": {
+              "value": "NOT_SUPPORTED"
+            }
+          }
+        }
+      ]
     },
     {
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "org.mule.runtime.core.api.source.polling.CronScheduler",
+        "typeId": "org.mule.runtime.core.api.source.scheduler.CronScheduler",
         "classInformation": {
-          "classname": "org.mule.runtime.core.api.source.polling.CronScheduler",
+          "classname": "org.mule.runtime.core.api.source.scheduler.CronScheduler",
           "hasDefaultConstructor": true,
           "isInterface": false,
           "isInstantiable": true,
           "isAbstract": false,
           "isFinal": false,
-          "implementedInterfaces": [],
-          "parent": "org.mule.runtime.core.api.source.polling.PeriodicScheduler",
-          "genericTypes": []
+          "implementedInterfaces": [
+            "org.mule.runtime.api.source.CronSchedulerConfiguration"
+          ],
+          "parent": "org.mule.runtime.core.api.source.scheduler.PeriodicScheduler",
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "cron"
@@ -2514,17 +3200,20 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler",
+        "typeId": "org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler",
         "classInformation": {
-          "classname": "org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler",
+          "classname": "org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler",
           "hasDefaultConstructor": true,
           "isInterface": false,
           "isInstantiable": true,
           "isAbstract": false,
           "isFinal": false,
-          "implementedInterfaces": [],
-          "parent": "org.mule.runtime.core.api.source.polling.PeriodicScheduler",
-          "genericTypes": []
+          "implementedInterfaces": [
+            "org.mule.runtime.api.source.FixedFrequencySchedulerConfiguration"
+          ],
+          "parent": "org.mule.runtime.core.api.source.scheduler.PeriodicScheduler",
+          "genericTypes": [],
+          "isMap": false
         },
         "typeAlias": {
           "value": "fixed-frequency"
@@ -2576,7 +3265,8 @@
                 "isFinal": true,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "int": {}
             }
@@ -2604,7 +3294,8 @@
                 "isFinal": true,
                 "implementedInterfaces": [],
                 "parent": "",
-                "genericTypes": []
+                "genericTypes": [],
+                "isMap": false
               },
               "int": {}
             }
@@ -2617,6 +3308,29 @@
           }
         }
       ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.runtime.core.api.source.scheduler.Scheduler",
+        "classInformation": {
+          "classname": "org.mule.runtime.core.api.source.scheduler.Scheduler",
+          "hasDefaultConstructor": false,
+          "isInterface": true,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "Scheduler"
+        }
+      },
+      "fields": []
     }
   ]
 }
