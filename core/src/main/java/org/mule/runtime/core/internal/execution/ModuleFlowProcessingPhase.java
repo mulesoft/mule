@@ -163,6 +163,7 @@ public class ModuleFlowProcessingPhase
                                                 MessageProcessContext messageProcessContext, FlowConstruct flowConstruct) {
     return request -> {
       fireNotification(messageProcessContext.getMessageSource(), request, flowConstruct, MESSAGE_RECEIVED);
+      //TODO: MULE-14333 - Decouple ModuleProcessingPhase from extension notifications
       template.getSourceNotifications().forEach(sourceNotification -> muleContext.getNotificationManager()
           .fireNotification(new DefaultExtensionNotification(request, messageProcessContext.getMessageSource(),
                                                              sourceNotification.getAction(), sourceNotification.getData())));

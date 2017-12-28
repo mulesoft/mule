@@ -19,6 +19,7 @@ import org.mule.runtime.extension.internal.notification.ExtensionAction;
 /**
  * Represents notifications fired by an extension.
  *
+ * TODO: MULE-14333 - Move to ext-support
  * @since 4.1
  */
 public class DefaultExtensionNotification implements ExtensionNotification {
@@ -40,6 +41,7 @@ public class DefaultExtensionNotification implements ExtensionNotification {
    * @param component the {@link Component} associated to the notification
    * @param actionDefinition the {@link NotificationActionDefinition} to use
    * @param data the information to expose
+   * @throws IllegalArgumentException when the {@code actionDefinition} type doesn't match {@code data}
    */
   public DefaultExtensionNotification(Event event, Component component,
                                       NotificationActionDefinition actionDefinition,

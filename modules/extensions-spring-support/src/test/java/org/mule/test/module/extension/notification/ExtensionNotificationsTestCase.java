@@ -18,13 +18,10 @@ import org.mule.runtime.api.notification.ExtensionNotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
-import org.mule.tck.junit4.FlakyTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +32,6 @@ import javax.inject.Inject;
 
 import org.junit.Test;
 
-@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
 public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final String HEISENBERG = HeisenbergExtension.HEISENBERG.toUpperCase();
@@ -79,7 +75,6 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
-  @FlakyTest
   public void sourceFiresNotificationsOnSuccess() throws Exception {
     CountDownLatch latch = new CountDownLatch(4);
     setUpListener(notification -> latch.countDown());
@@ -110,7 +105,6 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
-  @FlakyTest
   public void sourceFiresNotificationsOnError() throws Exception {
     CountDownLatch latch = new CountDownLatch(4);
     setUpListener(notification -> latch.countDown());
@@ -144,7 +138,6 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
-  @FlakyTest
   public void sourceFiresNotificationsOnBackPressure() throws Exception {
     Latch latch = new Latch();
     String batchFailed = "BATCH_FAILED";
