@@ -32,7 +32,6 @@
         <module>http-api</module>
         <module>http-policy-api</module>
         <module>oauth-api</module>
-        <module>policy-api</module>
         <module>reboot</module>
         <module>spring-config</module>
         <module>service</module>
