@@ -2,6 +2,7 @@ package org.mule.transport.email.functional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant.FLOW;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -34,7 +35,7 @@ public class SmtpTransportConfigTestCase extends AbstractEmailFunctionalTestCase
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-                {ConfigVariant.FLOW, "smtp-transport-config-test.xml"}
+                {FLOW, "smtp-transport-config-test.xml"}
         });
     }
 
@@ -70,7 +71,5 @@ public class SmtpTransportConfigTestCase extends AbstractEmailFunctionalTestCase
             return new TestSmtpTransportDispatcher(endpoint);
         }
     }
-
-
 
 }

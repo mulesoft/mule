@@ -11,7 +11,7 @@
     </smtp:connector>
 
     <flow name="endpointTransportConfigFlow">
-        <smtp:outbound-endpoint host="localhost"  user="test%40@test.com" password="test" port="${port1}" to="test@example.com"  connector-ref="smtpConnector"/>
+        <smtp:outbound-endpoint host="localhost"  user="test%40@test.com" password="test%@#encoded" port="${port1}" to="test@example.com"  connector-ref="smtpConnector"/>
     </flow>
 
 </mule>
