@@ -4,7 +4,7 @@
       {
         "code": "java.method.addedToInterface",
         "new": "method org.mule.runtime.http.api.domain.request.ServerConnection org.mule.runtime.http.api.domain.request.HttpRequestContext::getServerConnection()",
-        "justification": "MULE-14281: API broken by MULE-10912"
+        "justification": "Services implementations should match container API"
       }
     ]
   }
