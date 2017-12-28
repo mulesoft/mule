@@ -16,6 +16,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIG
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;

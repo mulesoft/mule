@@ -8,11 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.client;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -26,7 +26,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -141,7 +140,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
                 .setParameters(resolvedParams)
                 .build();
 
-        processor.initialise();
+        initialiseIfNeeded(processor, muleContext);
         processor.start();
         return processor;
       } catch (Exception e) {
@@ -162,7 +161,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
         DefaultObjectBuilder<?> builder = new DefaultObjectBuilder<>(complex.getType());
         resolveParameters(complex.getParameters(), event).forEach((propertyName, valueResolver) -> {
           try {
-            LifecycleUtils.initialiseIfNeeded(valueResolver, true, muleContext);
+            initialiseIfNeeded(valueResolver, true, muleContext);
             builder.addPropertyResolver(propertyName, valueResolver);
           } catch (InitialisationException e) {
             throw new MuleRuntimeException(e);

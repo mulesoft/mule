@@ -8,13 +8,19 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
-
+import org.mule.runtime.api.component.execution.ExecutionResult;
+import org.mule.runtime.api.component.execution.InputEvent;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.util.ObjectNameHelper;
@@ -22,9 +28,10 @@ import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-import javax.inject.Inject;
+import javax.xml.namespace.QName;
 
 /**
  * An {@link ValueResolver} which wraps the given {@link Processor} in a {@link Chain},
@@ -37,17 +44,18 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
 
   private final MessageProcessorChain chain;
 
-  private AtomicBoolean initialised = new AtomicBoolean(false);
+  public ProcessorChainValueResolver(MuleContext ctx, final MessageProcessorChain delegate) {
+    this.chain = new LazyInitializerChainDecorator(ctx, delegate);
 
-  @Inject
-  private MuleContext muleContext;
-
-  public ProcessorChainValueResolver(MessageProcessorChain chain) {
-    this.chain = chain;
+    try {
+      registerObject(ctx, new ObjectNameHelper(ctx).getUniqueName(""), this.chain);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not register nested MessageProcessorChain"), e);
+    }
   }
 
-  public ProcessorChainValueResolver(List<Processor> processors) {
-    chain = newChain(empty(), processors);
+  public ProcessorChainValueResolver(MuleContext ctx, List<Processor> processors) {
+    this(ctx, newChain(empty(), processors));
   }
 
   /**
@@ -59,7 +67,6 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
    */
   @Override
   public Chain resolve(ValueResolvingContext context) throws MuleException {
-    initialiseIfNeeded();
     return new ImmutableProcessorChainExecutor(context.getEvent(), chain);
   }
 
@@ -71,15 +78,90 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
     return false;
   }
 
-  private void initialiseIfNeeded() {
-    if (!initialised.get()) {
-      try {
-        registerObject(muleContext, new ObjectNameHelper(muleContext).getUniqueName(""), chain);
-        LifecycleUtils.initialiseIfNeeded(chain, muleContext);
-      } catch (Exception e) {
-        throw new MuleRuntimeException(createStaticMessage("Could not register nested operation message processor"), e);
+  private static final class LazyInitializerChainDecorator implements MessageProcessorChain {
+
+    private final MessageProcessorChain delegate;
+    private final MuleContext muleContext;
+    private boolean initialised = false;
+
+    LazyInitializerChainDecorator(MuleContext ctx, MessageProcessorChain chain) {
+      this.delegate = chain;
+      this.muleContext = ctx;
+    }
+
+    @Override
+    public void initialise() throws InitialisationException {
+      if (!initialised) {
+        initialiseIfNeeded(delegate, muleContext);
+        initialised = true;
       }
-      initialised.set(true);
+    }
+
+    @Override
+    public void start() throws MuleException {
+      initialise();
+      this.delegate.start();
+    }
+
+    @Override
+    public void stop() throws MuleException {
+      this.delegate.stop();
+    }
+
+    @Override
+    public void dispose() {
+      this.delegate.dispose();
+      initialised = false;
+    }
+
+    @Override
+    public List<Processor> getMessageProcessors() {
+      return this.delegate.getMessageProcessors();
+    }
+
+    @Override
+    public CompletableFuture<ExecutionResult> execute(InputEvent inputEvent) {
+      return this.delegate.execute(inputEvent);
+    }
+
+    @Override
+    public CompletableFuture<Event> execute(Event event) {
+      return this.delegate.execute(event);
+    }
+
+    @Override
+    public Object getAnnotation(QName name) {
+      return this.delegate.getAnnotation(name);
+    }
+
+    @Override
+    public Map<QName, Object> getAnnotations() {
+      return this.delegate.getAnnotations();
+    }
+
+    @Override
+    public void setAnnotations(Map<QName, Object> annotations) {
+      this.delegate.setAnnotations(annotations);
+    }
+
+    @Override
+    public ComponentLocation getLocation() {
+      return this.delegate.getLocation();
+    }
+
+    @Override
+    public Location getRootContainerLocation() {
+      return this.delegate.getRootContainerLocation();
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context) {
+      this.delegate.setMuleContext(context);
+    }
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      return this.delegate.process(event);
     }
   }
 

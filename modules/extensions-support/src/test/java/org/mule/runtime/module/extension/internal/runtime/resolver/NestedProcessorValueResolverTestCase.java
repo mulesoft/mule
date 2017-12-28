@@ -44,8 +44,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
 
   @Test
   public void yieldsNestedProcessor() throws Exception {
-    ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(messageProcessor);
-    muleContext.getInjector().inject(resolver);
+    ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(muleContext, messageProcessor);
     final CoreEvent event = testEvent();
 
     Chain nestedProcessor = resolver.resolve(ValueResolvingContext.from(event));
@@ -66,8 +65,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
 
   @Test
   public void alwaysGivesDifferentInstances() throws Exception {
-    ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(messageProcessor);
-    muleContext.getInjector().inject(resolver);
+    ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(muleContext, messageProcessor);
     Chain resolved1 = resolver.resolve(ValueResolvingContext.from(testEvent()));
     Chain resolved2 = resolver.resolve(ValueResolvingContext.from(testEvent()));
 

@@ -8,7 +8,14 @@ package org.mule.test.heisenberg.extension;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -18,6 +25,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
+import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.test.heisenberg.extension.model.Attribute;
 import org.mule.test.heisenberg.extension.route.AfterCall;
@@ -31,7 +39,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class HeisenbergRouters {
+public class HeisenbergRouters implements Initialisable, Startable, Stoppable, Disposable {
+
+  public static final String NOT_INITIALISED = "not_initialised";
+  private String state = NOT_INITIALISED;
+
+  public void voidRouter(WhenRoute when, VoidCompletionCallback callback) {
+    when.getChain()
+        .process(state, null, r -> callback.success(), (e, r) -> callback.error(e));
+  }
 
   @Parameter
   @Optional(defaultValue = "0")
@@ -130,6 +146,41 @@ public class HeisenbergRouters {
           .process(attr, null, callback::success, (t, e) -> callback.error(t));
     } else {
       callback.success(Result.builder().build());
+    }
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    checkState(NOT_INITIALISED);
+    state = Initialisable.PHASE_NAME;
+  }
+
+  @Override
+  public void start() throws MuleException {
+    checkState(Initialisable.PHASE_NAME);
+    state = Startable.PHASE_NAME;
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    checkState(Startable.PHASE_NAME);
+    state = Stoppable.PHASE_NAME;
+  }
+
+  @Override
+  public void dispose() {
+    try {
+      checkState(Stoppable.PHASE_NAME);
+    } catch (InitialisationException e) {
+      throw new RuntimeException(e);
+    }
+    state = Disposable.PHASE_NAME;
+  }
+
+  private void checkState(String expected) throws InitialisationException {
+    if (!state.equals(expected)) {
+      throw new InitialisationException(
+                                        createStaticMessage("Invalid state: expected %s but as %s", expected, state), this);
     }
   }
 

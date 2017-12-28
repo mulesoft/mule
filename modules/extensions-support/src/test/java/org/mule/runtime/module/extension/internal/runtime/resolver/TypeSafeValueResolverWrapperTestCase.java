@@ -16,6 +16,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.transformation.TransformationService;
@@ -49,10 +50,10 @@ public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
     dynamicResolver = new TypeSafeValueResolverWrapper<>(dynamicValueResolver, Integer.class);
     dynamicResolver.setTransformationService(transformationService);
-    dynamicResolver.initialise();
+    initialiseIfNeeded(dynamicResolver, muleContext);
     staticResolver = new TypeSafeValueResolverWrapper<>(staticValueResolver, Integer.class);
     staticResolver.setTransformationService(transformationService);
-    staticResolver.initialise();
+    initialiseIfNeeded(staticResolver, muleContext);
 
     when(transformationService.transform(eq("123"), any(DataType.class), any(DataType.class))).thenReturn(123);
   }

@@ -22,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
@@ -29,10 +30,10 @@ import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * A contract for any kind of component from which an extension's parameter can be derived
@@ -45,6 +46,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(Error.class)
       .add(SourceCallbackContext.class)
       .add(CompletionCallback.class)
+      .add(VoidCompletionCallback.class)
       .add(SourceCompletionCallback.class)
       .add(MediaType.class)
       .add(AuthenticationHandler.class)

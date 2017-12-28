@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
@@ -29,6 +31,10 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
 
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
+
+  @Inject
+  private MuleContext muleContext;
+
   private Class<T> type;
 
   public ExpressionBasedParameterResolverValueResolver(String expression, Class<T> type, MetadataType metadataType) {
@@ -46,7 +52,7 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
         new ExpressionBasedParameterResolver<>(expression, type, context, metadataType);
     resolver.setTransformationService(transformationService);
     resolver.setExtendedExpressionManager(extendedExpressionManager);
-    resolver.initialise();
+    initialiseIfNeeded(resolver, muleContext);
     return resolver;
   }
 

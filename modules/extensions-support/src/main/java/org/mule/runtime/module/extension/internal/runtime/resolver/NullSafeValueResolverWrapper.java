@@ -188,14 +188,8 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
   @Override
   public void initialise() throws InitialisationException {
-    try {
-      muleContext.getInjector().inject(delegate);
-      muleContext.getInjector().inject(fallback);
-      initialiseIfNeeded(delegate, muleContext);
-      initialiseIfNeeded(fallback, muleContext);
-    } catch (MuleException e) {
-      throw new InitialisationException(e, this);
-    }
+    initialiseIfNeeded(delegate, muleContext);
+    initialiseIfNeeded(fallback, muleContext);
   }
 
 }

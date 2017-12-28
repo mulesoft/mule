@@ -7,13 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
 import com.google.common.collect.ImmutableMap;
@@ -131,16 +131,9 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
     return ImmutableMap.copyOf(resolvers);
   }
 
-  public void initialise() {
-
-    try {
-      for (ValueResolver valueResolver : resolvers.values()) {
-        muleContext.getInjector().inject(valueResolver);
-        LifecycleUtils.initialiseIfNeeded(valueResolver);
-      }
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(e);
-    }
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(resolvers.values(), muleContext);
   }
 
   ResolverSetResult.Builder getResolverSetBuilder() {

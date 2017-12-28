@@ -18091,6 +18091,84 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [],
+              "name": "expected",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "lifecycleValidator",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
           "format": {
             "id": "text/plain",
             "label": "text/plain",
@@ -21804,6 +21882,158 @@
         }
       ],
       "name": "twoRoutesRouter",
+      "description": "",
+      "modelProperties": {},
+      "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": false,
+      "nestedComponents": [
+        {
+          "minOccurs": 1,
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "execute",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "message",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "when",
+          "description": "",
+          "modelProperties": {},
+          "kind": "route"
+        }
+      ],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "int",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "0",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "fieldParam",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "voidRouter",
       "description": "",
       "modelProperties": {},
       "kind": "construct"

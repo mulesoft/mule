@@ -198,7 +198,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       if (parameters.containsKey(parameterName)) {
         resolver = toValueResolver(parameters.get(parameterName), p.getModelProperties());
       } else {
-        // TODO MULE-13066
+        // TODO MULE-13066 Extract ParameterResolver logic into a centralized resolver
         resolver = getDefaultValueResolver(p, muleContext);
       }
 
