@@ -26,6 +26,7 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -104,7 +105,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
   private final ResolverSet nonCallbackParameters;
   private final ResolverSet successCallbackParameters;
   private final ResolverSet errorCallbackParameters;
-  private final ComponentLocation componentLocation;
+  private final Component component;
   private final SourceConnectionManager connectionManager;
   private final MessagingExceptionResolver exceptionResolver;
 
@@ -124,7 +125,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
                        Optional<ConfigurationInstance> configurationInstance,
                        CursorProviderFactory cursorProviderFactory,
                        SourceCallbackFactory sourceCallbackFactory,
-                       ComponentLocation componentLocation,
+                       Component component,
                        SourceConnectionManager connectionManager,
                        ResolverSet nonCallbackParameters,
                        ResolverSet successCallbackParameters,
@@ -136,7 +137,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
     this.cursorProviderFactory = cursorProviderFactory;
     this.configurationInstance = configurationInstance;
     this.sourceCallbackFactory = sourceCallbackFactory;
-    this.componentLocation = componentLocation;
+    this.component = component;
     this.connectionManager = connectionManager;
     this.nonCallbackParameters = nonCallbackParameters;
     this.successCallbackParameters = successCallbackParameters;
@@ -172,7 +173,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
                                                                                          sourceModel, source, m,
                                                                                          cursorProviderFactory,
                                                                                          streamingManager,
-                                                                                         componentLocation,
+                                                                                         component,
                                                                                          muleContext,
                                                                                          sourceCallbackModel))
         .orElse(new NullSourceCallbackExecutor());
@@ -245,7 +246,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
         context.getTransactionHandle().commit();
       } catch (TransactionException e) {
         LOGGER.error(format("Failed to commit transaction for message source at '%s': %s",
-                            componentLocation.toString(),
+                            component.getLocation().toString(),
                             e.getMessage()),
                      e);
       }
@@ -256,7 +257,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
         context.getTransactionHandle().rollback();
       } catch (TransactionException e) {
         LOGGER.error(format("Failed to rollback transaction for message source at '%s': %s",
-                            componentLocation.toString(),
+                            component.getLocation().toString(),
                             e.getMessage()),
                      e);
       }
@@ -304,7 +305,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
       return;
     }
 
-    new FieldSetter<>(fields.get(0)).set(source, componentLocation);
+    new FieldSetter<>(fields.get(0)).set(source, component.getLocation());
   }
 
   @Override
@@ -331,14 +332,16 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
     ConfigurationInstance config = configurationInstance.orElseThrow(() -> new DefaultMuleException(createStaticMessage(
                                                                                                                         "Message Source on root component '%s' requires a connection but it doesn't point to any configuration. Please review your "
                                                                                                                             + "application",
-                                                                                                                        componentLocation
+                                                                                                                        component
+                                                                                                                            .getLocation()
                                                                                                                             .getRootContainerName())));
 
     if (!config.getConnectionProvider().isPresent()) {
       throw new DefaultMuleException(createStaticMessage(format(
                                                                 "Message Source on root component '%s' requires a connection, but points to config '%s' which doesn't specify any. "
                                                                     + "Please review your application",
-                                                                componentLocation.getRootContainerName(), config.getName())));
+                                                                component.getLocation().getRootContainerName(),
+                                                                config.getName())));
     }
 
     ConnectionProvider<Object> connectionProvider = new SourceConnectionProvider(connectionManager, config);

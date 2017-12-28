@@ -10,13 +10,15 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.internal.execution.SourceNotification;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
+import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
@@ -24,10 +26,10 @@ import org.mule.runtime.module.extension.internal.runtime.transaction.DefaultTra
 import org.mule.runtime.module.extension.internal.runtime.transaction.NullTransactionHandle;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import javax.transaction.TransactionManager;
 
 /**
  * Default implementation of {@link SourceCallbackContext}
@@ -45,6 +47,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   private Object connection = null;
   private TransactionHandle transactionHandle = NULL_TRANSACTION_HANDLE;
   private boolean dispatched = false;
+  private List<SourceNotification> sourceNotifications = new LinkedList<>();
 
   /**
    * Creates a new instance
@@ -165,9 +168,26 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
     return sourceCallback;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void fireOnHandle(NotificationActionDefinition<?> action, TypedValue<?> data) {
+    sourceNotifications.add(new SourceNotification(action, data));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<SourceNotification> getSourceNotifications() {
+    return sourceNotifications;
+  }
+
   private I18nMessage createWrongConnectionMessage(Object connection) {
     return createStaticMessage(format("Internal Error. The transacted source [%s] from the Extension [%s] tried to bind an " +
         "connection of type [%s] which is not a connection created by this extension. ", sourceCallback.getOwningSourceName(),
                                       sourceCallback.getOwningExtensionName(), connection.getClass().getName()));
   }
+
 }

@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import org.mule.runtime.core.internal.execution.SourceNotification;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+
+import java.util.List;
 
 /**
  * Augments the {@link SourceCallbackContext} contract with internal behavior we don't want exposed
@@ -27,4 +30,11 @@ public interface SourceCallbackContextAdapter extends SourceCallbackContext {
    * @since 1.1
    */
   void dispatched();
+
+  /**
+   * Retrieves the notification data, if any.
+   *
+   * @return a {@link SourceNotification} if a notification should be fire, {@code null} otherwise
+   */
+  List<SourceNotification> getSourceNotifications();
 }

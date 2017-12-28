@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.runtime.privileged;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -28,6 +29,9 @@ import java.util.Optional;
  * to the operation but to the extensions framework itself. It's not to contain operation parameters as its
  * {@link #getParameter(String)} counter part. It's meant for things like connection pointers, state to be shared between
  * {@link Interceptor interceptors} and {@link ComponentExecutor operation executors}, etc.
+ *
+ * Do not create custom implementations of this interface. The Mule Runtime should be the only one providing implementations
+ * of it.
  *
  * @since 3.7.0
  */
@@ -81,8 +85,16 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
   StreamingManager getStreamingManager();
 
   /**
-   * @return The {@link ComponentLocation} of the executing component
+   * @return The {@link Component} executing
+   * @since 4.1
    */
+  Component getComponent();
+
+  /**
+   * @return The {@link ComponentLocation} of the executing component
+   * @deprecated use {@link #getComponent().getLocation()}
+   */
+  @Deprecated
   ComponentLocation getComponentLocation();
 
   /**

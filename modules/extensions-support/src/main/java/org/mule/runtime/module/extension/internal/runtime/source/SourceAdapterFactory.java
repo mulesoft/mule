@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getSourceFactory;
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -60,13 +60,14 @@ public class SourceAdapterFactory {
    */
   public SourceAdapter createAdapter(Optional<ConfigurationInstance> configurationInstance,
                                      SourceCallbackFactory sourceCallbackFactory,
-                                     ComponentLocation location,
+                                     Component component,
                                      SourceConnectionManager connectionManager,
                                      MessagingExceptionResolver exceptionResolver) {
     Source source = getSourceFactory(sourceModel).createSource();
     try {
       source =
-          new SourceConfigurer(sourceModel, location, sourceParameters, muleContext).configure(source, configurationInstance);
+          new SourceConfigurer(sourceModel, component.getLocation(), sourceParameters, muleContext)
+              .configure(source, configurationInstance);
 
       return new SourceAdapter(extensionModel,
                                sourceModel,
@@ -74,7 +75,7 @@ public class SourceAdapterFactory {
                                configurationInstance,
                                cursorProviderFactory,
                                sourceCallbackFactory,
-                               location,
+                               component,
                                connectionManager,
                                sourceParameters,
                                successCallbackParameters,

@@ -17,7 +17,9 @@ import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ModuleFlowProcessingPhaseTemplate;
+import org.mule.runtime.core.internal.execution.SourceNotification;
 
+import java.util.List;
 import java.util.Map;
 
 import org.reactivestreams.Publisher;
@@ -26,13 +28,15 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
 
   private final Message message;
   private final Processor messageProcessor;
+  private final List<SourceNotification> sourceNotifications;
   private final SourceCompletionHandler completionHandler;
 
   ModuleFlowProcessingTemplate(Message message,
                                Processor messageProcessor,
-                               SourceCompletionHandler completionHandler) {
+                               List<SourceNotification> sourceNotifications, SourceCompletionHandler completionHandler) {
     this.message = message;
     this.messageProcessor = messageProcessor;
+    this.sourceNotifications = sourceNotifications;
     this.completionHandler = completionHandler;
   }
 
@@ -49,6 +53,11 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   @Override
   public Message getMessage() {
     return message;
+  }
+
+  @Override
+  public List<SourceNotification> getSourceNotifications() {
+    return sourceNotifications;
   }
 
   @Override

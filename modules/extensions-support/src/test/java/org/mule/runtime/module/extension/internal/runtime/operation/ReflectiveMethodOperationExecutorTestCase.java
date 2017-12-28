@@ -23,7 +23,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static reactor.core.publisher.Mono.from;
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -39,9 +39,9 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -93,7 +93,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   private StreamingManager streamingManager;
 
   @Mock
-  private ComponentLocation location;
+  private Component component;
 
   @Mock
   private ConfigurationState configurationState;
@@ -126,7 +126,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     when(muleEvent.getMessage().getPayload()).thenReturn(new TypedValue<>(null, DATA_TYPE));
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     operationContext = new DefaultExecutionContext(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
-                                                   muleEvent, cursorProviderFactory, streamingManager, location,
+                                                   muleEvent, cursorProviderFactory, streamingManager, component,
                                                    retryPolicyTemplate, muleContext);
     operationContext = spy(operationContext);
   }

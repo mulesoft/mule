@@ -35,7 +35,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.s
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
@@ -211,6 +211,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     when(sourceModel.getModelProperty(MediaTypeModelProperty.class)).thenReturn(empty());
     setRequires(sourceModel, true, true);
     when(sourceModel.getOutput().getType()).thenReturn(TYPE_LOADER.load(String.class));
+    when(sourceModel.getNotificationModels()).thenReturn(emptySet());
     mockExceptionEnricher(extensionModel, null);
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
 
@@ -283,7 +284,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
                              of(configurationInstance),
                              new NullCursorStreamProviderFactory(new SimpleByteBufferManager(), streamingManager),
                              sourceCallbackFactory,
-                             mock(ComponentLocation.class),
+                             mock(Component.class),
                              mock(SourceConnectionManager.class),
                              null, callbackParameters, null,
                              mock(MessagingExceptionResolver.class));

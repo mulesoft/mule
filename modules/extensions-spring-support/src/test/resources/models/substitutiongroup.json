@@ -225,6 +225,7 @@
   "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
+  "notifications": [],
   "errors": [
     {
       "error": "SG:RETRY_EXHAUSTED",

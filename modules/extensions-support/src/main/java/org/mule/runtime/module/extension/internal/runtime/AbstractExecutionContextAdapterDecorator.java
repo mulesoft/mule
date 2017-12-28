@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -121,8 +122,13 @@ public abstract class AbstractExecutionContextAdapterDecorator<M extends Compone
   }
 
   @Override
+  public Component getComponent() {
+    return decorated.getComponent();
+  }
+
+  @Override
   public ComponentLocation getComponentLocation() {
-    return decorated.getComponentLocation();
+    return decorated.getComponent().getLocation();
   }
 
   @Override

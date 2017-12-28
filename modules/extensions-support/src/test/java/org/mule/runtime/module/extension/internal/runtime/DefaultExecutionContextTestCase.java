@@ -15,7 +15,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -75,7 +75,7 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   private CursorProviderFactory<Object> cursorProviderFactory;
 
   @Mock
-  private ComponentLocation location;
+  private Component component;
 
   @Mock
   private StreamingManager streamingManager;
@@ -106,7 +106,7 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
 
     operationContext =
         new DefaultExecutionContext<>(extensionModel, of(configuration), resolverSetResult.asMap(), operationModel,
-                                      event, cursorProviderFactory, streamingManager, location, retryPolicyTemplate,
+                                      event, cursorProviderFactory, streamingManager, component, retryPolicyTemplate,
                                       muleContext);
   }
 

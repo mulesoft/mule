@@ -145,7 +145,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         sourceAdapter =
             sourceAdapterFactory.createAdapter(getConfiguration(initialiserEvent),
                                                createSourceCallbackFactory(),
-                                               getLocation(),
+                                               this,
                                                sourceConnectionManager,
                                                new MessagingExceptionResolver(this));
         muleContext.getInjector().inject(sourceAdapter);

@@ -8,8 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
-
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.exception.TypedException;
@@ -19,6 +17,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.Set;
 
@@ -44,7 +43,7 @@ public class ModuleExceptionHandler {
     this.typeRepository = typeRepository;
 
     allowedErrorTypes = componentModel.getErrorModels();
-    extensionNamespace = getExtensionsErrorNamespace(extensionModel);
+    extensionNamespace = MuleExtensionUtils.getExtensionsNamespace(extensionModel);
   }
 
   /**

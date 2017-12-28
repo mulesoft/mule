@@ -17,6 +17,12 @@ import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DRO
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
+import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.BATCH_DELIVERED;
+import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.BATCH_DELIVERY_FAILED;
+import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.BATCH_FAILED;
+import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.BATCH_TERMINATED;
+import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.NEW_BATCH;
+import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.NEXT_BATCH;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_BODY;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.NONE;
@@ -26,6 +32,8 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -33,6 +41,7 @@ import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
+import org.mule.runtime.extension.api.annotation.notification.Fires;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -43,10 +52,12 @@ import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
+import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
@@ -57,6 +68,7 @@ import javax.inject.Inject;
 
 @Alias("ListenPayments")
 @EmitsResponse
+@Fires(SourceNotificationProvider.class)
 @Streaming
 @MediaType(TEXT_PLAIN)
 @BackPressure(defaultMode = FAIL, supportedModes = {FAIL, DROP})
@@ -64,6 +76,7 @@ public class HeisenbergSource extends Source<String, Object> {
 
   public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
   public static final String INITIAL_BATCH_NUMBER_ERROR_MESSAGE = "initialBatchNumber cannot be a negative value";
+  private static final String BATCH_NUMBER = "batchNumber";
 
   public static boolean receivedGroupOnSource;
   public static boolean receivedInlineOnSuccess;
@@ -141,7 +154,11 @@ public class HeisenbergSource extends Source<String, Object> {
     scheduledFuture = executor.scheduleAtFixedRate(() -> {
       final Result<String, Object> result = makeResult(sourceCallback);
       if (result != null) {
-        sourceCallback.handle(result);
+        SourceCallbackContext context = sourceCallback.createContext();
+        context.addVariable(BATCH_NUMBER, initialBatchNumber);
+        context.fireOnHandle(NEW_BATCH, TypedValue.of(initialBatchNumber));
+        context.fireOnHandle(NEXT_BATCH, TypedValue.of(frequency));
+        sourceCallback.handle(result, context);
       }
     }, 0, frequency, MILLISECONDS);
   }
@@ -150,12 +167,15 @@ public class HeisenbergSource extends Source<String, Object> {
   public void onSuccess(@Optional(defaultValue = PAYLOAD) Long payment, @Optional String sameNameParameter,
                         @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin,
                         @ParameterGroup(name = "Success Info", showInDsl = true) PersonalInfo successInfo,
-                        @Optional boolean fail) {
+                        @Optional boolean fail,
+                        NotificationEmitter notificationEmitter) {
 
     gatheredMoney += payment;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnSuccess = successInfo != null && successInfo.getAge() != null && successInfo.getKnownAddresses() != null;
     executedOnSuccess = true;
+
+    notificationEmitter.fire(BATCH_DELIVERED, TypedValue.of(payment));
 
     if (fail) {
       throw new RuntimeException("Some internal exception");
@@ -166,18 +186,20 @@ public class HeisenbergSource extends Source<String, Object> {
   public void onError(Error error, @Optional String sameNameParameter, @Optional Methylamine methylamine,
                       @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin,
                       @ParameterGroup(name = "Error Info", showInDsl = true) PersonalInfo infoError,
-                      @Optional boolean propagateError) {
+                      @Optional boolean propagateError,
+                      NotificationEmitter notificationEmitter) {
     gatheredMoney = -1;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG);
     executedOnError = true;
+    notificationEmitter.fire(BATCH_DELIVERY_FAILED, new TypedValue<>(infoError, DataType.fromObject(infoError)));
     if (propagateError) {
       throw new RuntimeException("Some internal exception");
     }
   }
 
   @OnTerminate
-  public void onTerminate(SourceResult sourceResult) {
+  public void onTerminate(SourceResult sourceResult, NotificationEmitter notificationEmitter) {
     if (sourceResult.isSuccess()) {
       terminateStatus = SUCCESS;
       error = empty();
@@ -193,10 +215,13 @@ public class HeisenbergSource extends Source<String, Object> {
       });
     }
     executedOnTerminate = true;
+    notificationEmitter.fire(BATCH_TERMINATED,
+                             TypedValue.of(sourceResult.getSourceCallbackContext().getVariable(BATCH_NUMBER).get()));
   }
 
   @OnBackPressure
-  public void onBackPressure(BackPressureContext ctx) {
+  public void onBackPressure(BackPressureContext ctx, NotificationEmitter notificationEmitter) {
+    notificationEmitter.fire(BATCH_FAILED, TypedValue.of(ctx.getSourceCallbackContext().getVariable(BATCH_NUMBER).get()));
     heisenberg.onBackPressure(ctx);
   }
 

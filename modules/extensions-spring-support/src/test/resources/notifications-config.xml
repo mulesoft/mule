@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+                http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+
+    <configuration-properties file="heisenberg.properties"/>
+
+    <heisenberg:door victim="Top Level Skyler" address="308 Negra Arroyo Lane" name="door"/>
+
+    <heisenberg:ricin microgramsPerKilo="22" name="ricin-weapon">
+        <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+    </heisenberg:ricin>
+
+    <heisenberg:config name="heisenberg"
+                       myName="heisenberg"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="1000000"
+                       finalHealth="CANCER">
+        <heisenberg:enemies>
+            <heisenberg:enemy value="Gustavo Fring"/>
+            <heisenberg:enemy value="Hank"/>
+        </heisenberg:enemies>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+        </heisenberg:next-door>
+        <heisenberg:ricin-packs>
+            <heisenberg:ricin microgramsPerKilo="22">
+                <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+            </heisenberg:ricin>
+        </heisenberg:ricin-packs>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
+        <heisenberg:inline-barber-preferences beardTrimming="MUSTACHE" fullyBald="false"/>
+    </heisenberg:config>
+
+
+    <flow name="operationNotification">
+        <heisenberg:knock knockedDoor="door"/>
+    </flow>
+
+    <flow name="sourceNotifications" initialState="stopped">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="100000">
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+            <heisenberg:success-info age="27">
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="success address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:success-info>
+            <heisenberg:error-info knownAddresses="#[[]]"/>
+        </heisenberg:listen-payments>
+
+        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+    </flow>
+
+    <flow name="sourceNotificationsError" initialState="stopped">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="100000">
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+            <heisenberg:success-info knownAddresses="#[[]]"/>
+            <heisenberg:error-info age="27">
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="error address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:error-info>
+        </heisenberg:listen-payments>
+
+        <raise-error type="CONNECTIVITY"/>
+    </flow>
+
+    <flow name="sourceNotificationsBackPressure" initialState="stopped" maxConcurrency="1">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="10">
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+            <heisenberg:success-info knownAddresses="#[[]]"/>
+            <heisenberg:error-info age="27">
+                <heisenberg:known-addresses>
+                    <heisenberg:known-address value="error address"/>
+                </heisenberg:known-addresses>
+            </heisenberg:error-info>
+        </heisenberg:listen-payments>
+
+        <test:processor waitTime="15000" />
+    </flow>
+
+</mule>

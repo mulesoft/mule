@@ -234,7 +234,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       throws MuleException {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, componentModel, event,
-                                         getCursorProviderFactory(), streamingManager, getLocation(), retryPolicyTemplate,
+                                         getCursorProviderFactory(), streamingManager, this, retryPolicyTemplate,
                                          muleContext);
   }
 

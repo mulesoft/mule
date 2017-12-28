@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 import static reactor.core.publisher.Mono.from;
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
@@ -75,7 +75,7 @@ public class OperationExecutorFactoryWrapperTestCase extends AbstractMuleTestCas
                                           mock(CoreEvent.class),
                                           mock(CursorProviderFactory.class),
                                           mock(StreamingManager.class),
-                                          mock(ComponentLocation.class),
+                                          mock(Component.class),
                                           mock(RetryPolicyTemplate.class),
                                           mock(MuleContext.class)));
 

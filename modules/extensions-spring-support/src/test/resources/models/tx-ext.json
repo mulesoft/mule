@@ -185,6 +185,7 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "TX:RETRY_EXHAUSTED",
@@ -519,6 +520,7 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "TX:RETRY_EXHAUSTED",
@@ -876,6 +878,7 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -1358,6 +1361,7 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "TX:RETRY_EXHAUSTED",
@@ -1605,6 +1609,7 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "TX:RETRY_EXHAUSTED",
@@ -1879,6 +1884,7 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "TX:RETRY_EXHAUSTED",
@@ -2126,6 +2132,7 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "TX:RETRY_EXHAUSTED",
@@ -2373,6 +2380,7 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "TX:RETRY_EXHAUSTED",
@@ -3370,6 +3378,7 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -3892,6 +3901,7 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -4392,6 +4402,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -5119,6 +5130,7 @@
     }
   ],
   "messageSources": [],
+  "notifications": [],
   "errors": [
     {
       "error": "TX:RETRY_EXHAUSTED",

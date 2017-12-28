@@ -1584,6 +1584,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "HEISENBERG:RETRY_EXHAUSTED",
@@ -1857,6 +1858,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -1914,6 +1916,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -2378,6 +2381,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -2867,6 +2871,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -2984,6 +2989,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -3101,6 +3107,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "HEISENBERG:RETRY_EXHAUSTED",
@@ -3380,6 +3387,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -3571,6 +3579,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -4024,6 +4033,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [
             "HEISENBERG:RETRY_EXHAUSTED",
@@ -4314,6 +4324,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -4509,6 +4520,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -4899,6 +4911,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -5346,6 +5359,7 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -5726,6 +5740,7 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -8383,6 +8398,141 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "NEW_BATCH",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "NEXT_BATCH",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Long",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_DELIVERED",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Long",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_DELIVERY_FAILED",
+              "metadataType": {
+                "format": "java",
+                "type": "@ref:org.mule.test.heisenberg.extension.model.PersonalInfo"
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_FAILED",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_TERMINATED",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            }
+          ],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -10151,6 +10301,141 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "NEW_BATCH",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "NEXT_BATCH",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Long",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_DELIVERED",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Long",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_DELIVERY_FAILED",
+              "metadataType": {
+                "format": "java",
+                "type": "@ref:org.mule.test.heisenberg.extension.model.PersonalInfo"
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_FAILED",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_TERMINATED",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            }
+          ],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -11914,6 +12199,141 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "notifications": [
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "NEW_BATCH",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "NEXT_BATCH",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Long",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_DELIVERED",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Long",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_DELIVERY_FAILED",
+              "metadataType": {
+                "format": "java",
+                "type": "@ref:org.mule.test.heisenberg.extension.model.PersonalInfo"
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_FAILED",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            },
+            {
+              "namespace": "HEISENBERG",
+              "identifier": "BATCH_TERMINATED",
+              "metadataType": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              }
+            }
+          ],
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
@@ -12682,6 +13102,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -13102,6 +13523,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [
         {
           "isRequired": true,
@@ -13210,6 +13632,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -13467,6 +13890,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -13657,6 +14081,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -13780,6 +14205,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [
         "HEISENBERG:OAUTH2",
@@ -13900,6 +14326,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -14126,6 +14553,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -14308,6 +14736,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -14469,6 +14898,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [
         {
           "isRequired": true,
@@ -14577,6 +15007,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [
         {
           "isRequired": true,
@@ -14685,6 +15116,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -14744,6 +15176,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [
         {
           "isRequired": true,
@@ -14943,6 +15376,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15168,6 +15602,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15401,6 +15836,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15518,6 +15954,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -15717,6 +16154,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -16125,6 +16563,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -16321,6 +16760,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -16516,6 +16956,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -16722,6 +17163,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -16920,6 +17362,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -17124,6 +17567,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -17329,6 +17773,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -17519,6 +17964,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -17749,6 +18195,24 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [
+        {
+          "namespace": "HEISENBERG",
+          "identifier": "KNOCKING_DOOR",
+          "metadataType": {
+            "format": "java",
+            "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
+          }
+        },
+        {
+          "namespace": "HEISENBERG",
+          "identifier": "KNOCKED_DOOR",
+          "metadataType": {
+            "format": "java",
+            "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
+          }
+        }
+      ],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -17928,6 +18392,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -18194,6 +18659,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -18377,6 +18843,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [
         {
           "isRequired": false,
@@ -18567,6 +19034,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -18780,6 +19248,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [
         {
           "isRequired": true,
@@ -19077,6 +19546,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -19277,6 +19747,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -19456,6 +19927,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -19635,6 +20107,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -19835,6 +20308,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -20015,6 +20489,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -20180,6 +20655,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -20356,6 +20832,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -20623,6 +21100,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -20875,6 +21353,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -20915,6 +21394,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [
         "HEISENBERG:VALIDATION"
@@ -23330,6 +23810,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -23527,6 +24008,157 @@
       "description": "",
       "modelProperties": {},
       "kind": "source"
+    }
+  ],
+  "notifications": [
+    {
+      "namespace": "HEISENBERG",
+      "identifier": "NEW_BATCH",
+      "metadataType": {
+        "format": "java",
+        "type": "Number",
+        "annotations": {
+          "classInformation": {
+            "classname": "java.lang.Integer",
+            "hasDefaultConstructor": false,
+            "isInterface": false,
+            "isInstantiable": false,
+            "isAbstract": false,
+            "isFinal": true,
+            "implementedInterfaces": [
+              "java.lang.Comparable"
+            ],
+            "parent": "java.lang.Number",
+            "genericTypes": [],
+            "isMap": false
+          },
+          "int": {}
+        }
+      }
+    },
+    {
+      "namespace": "HEISENBERG",
+      "identifier": "NEXT_BATCH",
+      "metadataType": {
+        "format": "java",
+        "type": "Number",
+        "annotations": {
+          "classInformation": {
+            "classname": "java.lang.Long",
+            "hasDefaultConstructor": false,
+            "isInterface": false,
+            "isInstantiable": false,
+            "isAbstract": false,
+            "isFinal": true,
+            "implementedInterfaces": [
+              "java.lang.Comparable"
+            ],
+            "parent": "java.lang.Number",
+            "genericTypes": [],
+            "isMap": false
+          },
+          "int": {}
+        }
+      }
+    },
+    {
+      "namespace": "HEISENBERG",
+      "identifier": "BATCH_DELIVERED",
+      "metadataType": {
+        "format": "java",
+        "type": "Number",
+        "annotations": {
+          "classInformation": {
+            "classname": "java.lang.Long",
+            "hasDefaultConstructor": false,
+            "isInterface": false,
+            "isInstantiable": false,
+            "isAbstract": false,
+            "isFinal": true,
+            "implementedInterfaces": [
+              "java.lang.Comparable"
+            ],
+            "parent": "java.lang.Number",
+            "genericTypes": [],
+            "isMap": false
+          },
+          "int": {}
+        }
+      }
+    },
+    {
+      "namespace": "HEISENBERG",
+      "identifier": "BATCH_DELIVERY_FAILED",
+      "metadataType": {
+        "format": "java",
+        "type": "@ref:org.mule.test.heisenberg.extension.model.PersonalInfo"
+      }
+    },
+    {
+      "namespace": "HEISENBERG",
+      "identifier": "BATCH_FAILED",
+      "metadataType": {
+        "format": "java",
+        "type": "Number",
+        "annotations": {
+          "classInformation": {
+            "classname": "java.lang.Integer",
+            "hasDefaultConstructor": false,
+            "isInterface": false,
+            "isInstantiable": false,
+            "isAbstract": false,
+            "isFinal": true,
+            "implementedInterfaces": [
+              "java.lang.Comparable"
+            ],
+            "parent": "java.lang.Number",
+            "genericTypes": [],
+            "isMap": false
+          },
+          "int": {}
+        }
+      }
+    },
+    {
+      "namespace": "HEISENBERG",
+      "identifier": "BATCH_TERMINATED",
+      "metadataType": {
+        "format": "java",
+        "type": "Number",
+        "annotations": {
+          "classInformation": {
+            "classname": "java.lang.Integer",
+            "hasDefaultConstructor": false,
+            "isInterface": false,
+            "isInstantiable": false,
+            "isAbstract": false,
+            "isFinal": true,
+            "implementedInterfaces": [
+              "java.lang.Comparable"
+            ],
+            "parent": "java.lang.Number",
+            "genericTypes": [],
+            "isMap": false
+          },
+          "int": {}
+        }
+      }
+    },
+    {
+      "namespace": "HEISENBERG",
+      "identifier": "KNOCKING_DOOR",
+      "metadataType": {
+        "format": "java",
+        "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
+      }
+    },
+    {
+      "namespace": "HEISENBERG",
+      "identifier": "KNOCKED_DOOR",
+      "metadataType": {
+        "format": "java",
+        "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
+      }
     }
   ],
   "errors": [
@@ -29247,6 +29879,41 @@
             "expressionSupport": {
               "value": "SUPPORTED"
             }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor",
+        "classInformation": {
+          "classname": "org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor",
+          "hasDefaultConstructor": false,
+          "isInterface": false,
+          "isInstantiable": false,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "SimpleKnockeableDoor"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "simpleName"
+          },
+          "model": {
+            "type": "String"
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
           }
         }
       ]

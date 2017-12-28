@@ -12,7 +12,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -29,6 +28,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.SingleExtensionImportTypesStrategy;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.Optional;
 import java.util.Set;
@@ -65,7 +65,7 @@ class ExtensionErrorsRegistrant {
   void registerErrors(ExtensionModel extensionModel) {
     Set<ErrorModel> errorTypes = extensionModel.getErrorModels();
     String extensionNamespace = extensionModel.getXmlDslModel().getPrefix();
-    String errorExtensionNamespace = getExtensionsErrorNamespace(extensionModel);
+    String errorExtensionNamespace = MuleExtensionUtils.getExtensionsNamespace(extensionModel);
     DslSyntaxResolver syntaxResolver = DslSyntaxResolver.getDefault(extensionModel, new SingleExtensionImportTypesStrategy());
 
     ErrorModel connectivityErrorModel = newError(CONNECTIVITY_ERROR_IDENTIFIER, errorExtensionNamespace)
