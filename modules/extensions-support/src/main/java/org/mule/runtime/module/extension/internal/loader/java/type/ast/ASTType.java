@@ -173,7 +173,9 @@ public class ASTType implements Type {
 
   @Override
   public MetadataType asMetadataType() {
-    return typeLoader.load(typeMirror).orElseThrow(RuntimeException::new);
+    return typeLoader.load(typeMirror)
+        .orElseThrow(() -> new RuntimeException("Unable to obtain the MetadataType for the current type: "
+            + typeMirror.toString()));
   }
 
   /**
@@ -261,8 +263,9 @@ public class ASTType implements Type {
 
   @Override
   public boolean isAnyType() {
-    //TODO REVIEW
-    return typeMirror instanceof WildcardType;
+    return typeMirror instanceof WildcardType
+        && ((WildcardType) typeMirror).getSuperBound() == null
+        && ((WildcardType) typeMirror).getExtendsBound() == null;
   }
 
   public List<OperationElement> getMethods() {

@@ -246,8 +246,11 @@ public final class IntrospectionUtils {
     Type type = returnType;
 
     if (returnType.isAssignableTo(Result.class)) {
-      Type payloadType =
-          returnType.getGenerics().get(0).getConcreteType();
+      List<TypeGeneric> generics = returnType.getGenerics();
+      if (generics.isEmpty()) {
+        return typeBuilder().anyType().build();
+      }
+      Type payloadType = generics.get(0).getConcreteType();
       if (!payloadType.isAnyType()) {
         type = payloadType;
       } else {

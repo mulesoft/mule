@@ -7,28 +7,31 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.ast;
 
 import org.mule.metadata.api.builder.TypeBuilder;
-import org.mule.metadata.ast.internal.IntrospectionContext;
 import org.mule.metadata.ast.api.TypeHandler;
+import org.mule.metadata.ast.internal.IntrospectionContext;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVisitor;
+import javax.lang.model.util.Types;
 
 import java.util.List;
 
+/**
+ * {@link TypeHandler} implementation for Extension Types.
+ *
+ * @since 4.1
+ */
 public class ExtensionTypeHandler implements TypeHandler {
 
   private ProcessingEnvironment processingEnvironment;
-  private TypeElement typedValueElement;
 
   public ExtensionTypeHandler(ProcessingEnvironment processingEnvironment) {
     this.processingEnvironment = processingEnvironment;
-    this.typedValueElement = processingEnvironment.getElementUtils().getTypeElement(TypedValue.class.getName());
   }
 
   @Override
@@ -49,19 +52,18 @@ public class ExtensionTypeHandler implements TypeHandler {
     if (typeMirror instanceof DeclaredType && isHandled(typeMirror)) {
       List<? extends TypeMirror> typeArguments = ((DeclaredType) typeMirror).getTypeArguments();
       if (typeArguments.isEmpty()) {
-        throw new RuntimeException();
+        throw new IllegalArgumentException("The given TypeMirror " + typeMirror + " doesn't provide generics");
       }
       return typeArguments.get(0).accept(typeVisitor, context);
     }
-    throw new RuntimeException();
+    throw new IllegalArgumentException("The given TypeMirror " + typeMirror + " it's not supported by this Handler");
   }
 
   public boolean isSameType(TypeMirror typeMirror, Class aClass) {
-    TypeMirror erasure = processingEnvironment.getTypeUtils().erasure(typeMirror);
-    TypeMirror clazz = processingEnvironment.getTypeUtils()
-        .erasure(processingEnvironment.getElementUtils().getTypeElement(aClass.getName()).asType());
+    Types types = processingEnvironment.getTypeUtils();
+    TypeMirror erasure = types.erasure(typeMirror);
+    TypeMirror clazz = types.erasure(processingEnvironment.getElementUtils().getTypeElement(aClass.getName()).asType());
 
-    return processingEnvironment.getTypeUtils().isSameType(erasure, clazz);
-
+    return types.isSameType(erasure, clazz);
   }
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 
@@ -119,5 +120,9 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
    */
   ClassInformationAnnotation getClassInformation();
 
+  /**
+   * @return A boolean indicating if this type may be considered as an {@link AnyType}
+   * @since 4.1
+   */
   boolean isAnyType();
 }

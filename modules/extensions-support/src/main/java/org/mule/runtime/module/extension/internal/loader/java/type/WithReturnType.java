@@ -20,7 +20,15 @@ interface WithReturnType {
    */
   Type getReturnType();
 
+  /**
+   * @return The {@link MetadataType} of the return type of the current element
+   * @since 4.1
+   */
   MetadataType getReturnMetadataType();
 
+  /**
+   * @return The {@link MetadataType} of the attributes type of the current element
+   * @since 4.1
+   */
   MetadataType getAttributesMetadataType();
 }

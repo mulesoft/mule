@@ -24,10 +24,8 @@ import javax.lang.model.element.TypeElement;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * {@link MethodElement} implementation which works with the Java AST
@@ -36,11 +34,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class MethodElementAST<T extends Type> implements MethodElement<T> {
 
-  private final ExecutableElement method;
-  private final ProcessingEnvironment processingEnvironment;
   private final LazyValue<List<ExtensionParameter>> parameters;
   private final LazyValue<List<ExtensionParameter>> parameterGroups;
   private final ASTUtils astUtils;
+  protected final ProcessingEnvironment processingEnvironment;
+  protected final ExecutableElement method;
 
   MethodElementAST(ExecutableElement method, ProcessingEnvironment processingEnvironment) {
     this.method = method;
@@ -132,12 +130,11 @@ public class MethodElementAST<T extends Type> implements MethodElement<T> {
    */
   @Override
   public Optional<Class<?>> getDeclaringClass() {
-    //TODO This will be removed soon.
+    //TODO - MULE-14311 - Remove classes references
     try {
       return Optional.ofNullable(Class
           .forName(processingEnvironment.getElementUtils().getBinaryName((TypeElement) method.getEnclosingElement()).toString()));
     } catch (ClassNotFoundException e) {
-      //nothing
     }
     return empty();
   }
@@ -157,9 +154,7 @@ public class MethodElementAST<T extends Type> implements MethodElement<T> {
 
     MethodElementAST that = (MethodElementAST) o;
 
-    return new EqualsBuilder()
-        .append(method, that.method)
-        .isEquals();
+    return Objects.equals(that.method, this.method);
   }
 
   /**
@@ -167,9 +162,7 @@ public class MethodElementAST<T extends Type> implements MethodElement<T> {
    */
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37)
-        .append(method)
-        .toHashCode();
+    return method.hashCode();
   }
 
   public ExecutableElement getExecutableElement() {

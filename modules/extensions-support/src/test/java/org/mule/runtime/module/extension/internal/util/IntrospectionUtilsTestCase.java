@@ -36,6 +36,7 @@ import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.builder.StringTypeBuilder;
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -201,6 +202,15 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertThat(interfaceGenerics.size(), is(1));
     Type type = interfaceGenerics.get(0);
     assertThat(type.isSameType(TransactionalPetStoreClient.class), is(true));
+  }
+
+  @Test
+  public void resultWithNoGenericsIsAnyType() throws Exception {
+    MetadataType resultWithNoGenerics = getMethod("resultWithNoGenerics").getReturnMetadataType();
+    MetadataType resultWithWildcardGenerics = getMethod("resultWithWildcardGenerics").getReturnMetadataType();
+
+    assertThat(resultWithNoGenerics, is(instanceOf(AnyType.class)));
+    assertThat(resultWithWildcardGenerics, is(instanceOf(AnyType.class)));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -376,6 +386,14 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   public Result<String, Object> operationResult() {
+    return null;
+  }
+
+  public Result resultWithNoGenerics() {
+    return null;
+  }
+
+  public Result<?, ?> resultWithWildcardGenerics() {
     return null;
   }
 

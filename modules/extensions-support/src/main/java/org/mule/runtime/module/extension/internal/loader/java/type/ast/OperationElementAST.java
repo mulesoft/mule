@@ -20,13 +20,8 @@ import javax.lang.model.element.TypeElement;
  */
 public class OperationElementAST extends MethodElementAST<OperationContainerElement> implements OperationElement {
 
-  private final ExecutableElement method;
-  private final ProcessingEnvironment processingEnvironment;
-
   public OperationElementAST(ExecutableElement method, ProcessingEnvironment processingEnvironment) {
     super(method, processingEnvironment);
-    this.method = method;
-    this.processingEnvironment = processingEnvironment;
   }
 
   /**

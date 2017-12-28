@@ -31,7 +31,6 @@ public class PagedOperationModelValidator implements ExtensionModelValidator {
 
       @Override
       protected void onOperation(OperationModel operationModel) {
-        //TODO CHECK
         boolean hasConnectionParameter = operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
             .map(property -> property.getOperationMethod()
                 .getParametersAnnotatedWith(Connection.class).size() > 0)

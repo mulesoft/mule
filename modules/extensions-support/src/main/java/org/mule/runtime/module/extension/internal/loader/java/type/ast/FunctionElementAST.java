@@ -21,13 +21,8 @@ import javax.lang.model.element.TypeElement;
  */
 public class FunctionElementAST extends MethodElementAST<FunctionContainerElement> implements FunctionElement {
 
-  private ExecutableElement method;
-  private ProcessingEnvironment processingEnvironment;
-
   FunctionElementAST(ExecutableElement method, ProcessingEnvironment processingEnvironment) {
     super(method, processingEnvironment);
-    this.method = method;
-    this.processingEnvironment = processingEnvironment;
   }
 
   /**
