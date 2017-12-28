@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.checkDefinition;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.processNonBlockingOperation;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
@@ -19,7 +18,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
@@ -97,17 +95,8 @@ final class ScopeModelLoaderDelegate extends AbstractModelLoaderDelegate {
                            Chain.class.getSimpleName(),
                            processorChain.stream().map(ExtensionParameter::getName).collect(toList())));
 
-
-    ParameterDeclarationContext declarationContext = new ParameterDeclarationContext(SCOPE, scope.getDeclaration());
-    loader.getMethodParametersLoader().declare(scope,
-                                               scopeMethod.getParameters(),
-                                               declarationContext);
-
-    final List<ExtensionParameter> fieldParameters = scopeMethod.getEnclosingType().getParameters();
-    loader.getFieldParametersLoader().declare(scope, fieldParameters, declarationContext).forEach(p -> {
-      p.withExpressionSupport(NOT_SUPPORTED);
-      p.withModelProperty(new FieldOperationParameterModelProperty());
-    });
+    declareParameters(scope, scopeMethod.getParameters(), scopeMethod.getEnclosingType().getParameters(),
+                      new ParameterDeclarationContext(SCOPE, scope.getDeclaration()));
 
     loader.addExceptionEnricher(scopeMethod, scope);
 

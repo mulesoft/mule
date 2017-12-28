@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.handleByteStreaming;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isAutoPaging;
@@ -18,7 +17,6 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
@@ -32,14 +30,13 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
+import org.mule.runtime.module.extension.internal.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
@@ -127,31 +124,22 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       loader.addExceptionEnricher(operationMethod, operationDeclarer);
 
       final List<ExtensionParameter> fieldParameters = methodOwner.getParameters();
-      declareParameters(operationDeclarer, supportsConfig, operationMethod, fieldParameters);
+      processComponentConnectivity(operationDeclarer, operationMethod, operationMethod);
+
+      if (isNonBlocking(operationMethod)) {
+        processNonBlockingOperation(operationDeclarer, operationMethod, true, loader.getTypeLoader());
+      } else {
+        processBlockingOperation(supportsConfig, operationMethod, operationDeclarer);
+      }
+
+      addExecutionType(operationDeclarer, operationMethod);
+
+      ParameterDeclarationContext declarationContext = new ParameterDeclarationContext(OPERATION,
+                                                                                       operationDeclarer.getDeclaration());
+      processMimeType(operationDeclarer, operationMethod);
+      declareParameters(operationDeclarer, operationMethod.getParameters(), fieldParameters, declarationContext);
       operationDeclarers.put(operationMethod, operationDeclarer);
     }
-  }
-
-  private void declareParameters(OperationDeclarer operation,
-                                 boolean supportsConfig,
-                                 MethodElement operationMethod,
-                                 List<ExtensionParameter> fieldParameters) {
-    processComponentConnectivity(operation, operationMethod, operationMethod);
-
-    if (isNonBlocking(operationMethod)) {
-      processNonBlockingOperation(operation, operationMethod, true, loader.getTypeLoader());
-    } else {
-      processBlockingOperation(supportsConfig, operationMethod, operation);
-    }
-
-    processMimeType(operation, operationMethod);
-    addExecutionType(operation, operationMethod);
-    ParameterDeclarationContext declarationContext = new ParameterDeclarationContext(OPERATION, operation.getDeclaration());
-    loader.getMethodParametersLoader().declare(operation, operationMethod.getParameters(), declarationContext);
-    loader.getFieldParametersLoader().declare(operation, fieldParameters, declarationContext).forEach(p -> {
-      p.withExpressionSupport(NOT_SUPPORTED);
-      p.withModelProperty(new FieldOperationParameterModelProperty());
-    });
   }
 
   private void processBlockingOperation(boolean supportsConfig, MethodElement operationMethod,

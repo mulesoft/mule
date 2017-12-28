@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.checkDefinition;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
@@ -21,7 +20,6 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
@@ -103,17 +101,12 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
     checkDefinition(isVoid(routerMethod), format("Router '%s' is not declared in a void method.",
                                                  routerMethod.getAlias()));
 
-    ParameterDeclarationContext declarationContext = new ParameterDeclarationContext(CONSTRUCT, router.getDeclaration());
-    loader.getMethodParametersLoader().declare(router,
-                                               routerMethod.getParameters().stream()
-                                                   .filter(p -> !isRoute(p) && !callbackParameters.contains(p))
-                                                   .collect(toList()),
-                                               declarationContext);
-    final List<ExtensionParameter> fieldParameters = routerMethod.getEnclosingType().getParameters();
-    loader.getFieldParametersLoader().declare(router, fieldParameters, declarationContext).forEach(p -> {
-      p.withExpressionSupport(NOT_SUPPORTED);
-      p.withModelProperty(new FieldOperationParameterModelProperty());
-    });
+    List<ExtensionParameter> nonRouteParameters = routerMethod.getParameters().stream()
+        .filter(p -> !isRoute(p) && !callbackParameters.contains(p))
+        .collect(toList());
+
+    declareParameters(router, nonRouteParameters, routerMethod.getEnclosingType().getParameters(),
+                      new ParameterDeclarationContext(CONSTRUCT, router.getDeclaration()));
 
     declareRoutes(router, routes);
   }
