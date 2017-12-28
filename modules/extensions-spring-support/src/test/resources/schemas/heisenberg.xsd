@@ -2677,6 +2677,7 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
