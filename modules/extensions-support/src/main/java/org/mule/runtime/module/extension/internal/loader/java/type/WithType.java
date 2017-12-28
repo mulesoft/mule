@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
-import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
 /**
@@ -22,11 +20,4 @@ interface WithType {
    */
   Type getType();
 
-  /**
-   * @param typeLoader {@link ClassTypeLoader} that will load the {@link Class} and represent it as a {@link MetadataType}
-   * @return The {@link MetadataType} representation of the component type
-   */
-  default MetadataType getMetadataType(ClassTypeLoader typeLoader) {
-    return typeLoader.load(getType().getReflectType());
-  }
 }

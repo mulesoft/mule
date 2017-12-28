@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -20,6 +19,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.FunctionE
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.FunctionContainerElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.FunctionElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithFunctionContainers;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
@@ -53,51 +53,57 @@ final class FunctionModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   void declareFunctions(ExtensionDeclarer extensionDeclarer, HasFunctionDeclarer declarer,
                         FunctionContainerElement functionContainerElement) {
-    declareFunctions(extensionDeclarer, declarer, functionContainerElement.getDeclaringClass(),
+    declareFunctions(extensionDeclarer, declarer, functionContainerElement,
                      functionContainerElement.getFunctions());
   }
 
   void declareFunctions(ExtensionDeclarer extensionDeclarer,
                         HasFunctionDeclarer declarer,
-                        final Class<?> methodOwnerClass,
-                        List<MethodElement> functions) {
+                        FunctionContainerElement methodOwnerClass,
+                        List<FunctionElement> functions) {
 
-    for (MethodElement methodElement : functions) {
-      Class<?> declaringClass = methodOwnerClass != null ? methodOwnerClass : methodElement.getDeclaringClass();
-      checkIsNotAnExtension(declaringClass);
+    for (FunctionElement function : functions) {
 
-      final Optional<ExtensionParameter> configParameter = loader.getConfigParameter(methodElement);
+      FunctionContainerElement functionOwner = methodOwnerClass != null ? methodOwnerClass : function.getEnclosingType();
+
+      checkIsNotAnExtension(functionOwner);
+
+      final Optional<ExtensionParameter> configParameter = loader.getConfigParameter(function);
 
       if (configParameter.isPresent()) {
         throw new IllegalModelDefinitionException(format("Function '%s' requires a config parameter, but that is not allowed. "
             + "Remove such parameter.",
-                                                         methodElement.getName()));
+                                                         function.getName()));
       }
 
       HasFunctionDeclarer actualDeclarer =
           (HasFunctionDeclarer) loader.selectDeclarerBasedOnConfig(extensionDeclarer, (Declarer) declarer, configParameter,
                                                                    empty());
 
-      if (functionDeclarers.containsKey(methodElement)) {
-        actualDeclarer.withFunction(functionDeclarers.get(methodElement));
+      if (functionDeclarers.containsKey(function)) {
+        actualDeclarer.withFunction(functionDeclarers.get(function));
         continue;
       }
 
-      final FunctionDeclarer function = actualDeclarer.withFunction(methodElement.getAlias());
-      methodElement.getMethod().ifPresent(method -> function
-          .withModelProperty(new ImplementingMethodModelProperty(method))
-          .withModelProperty(new FunctionExecutorModelProperty(new ReflectiveFunctionExecutorFactory<>(declaringClass, method))));
+      final FunctionDeclarer functionDeclarer = actualDeclarer.withFunction(function.getAlias());
+      function.getMethod().ifPresent(method -> {
+        functionDeclarer
+            .withModelProperty(new ImplementingMethodModelProperty(method));
+        function.getDeclaringClass().ifPresent(clazz -> functionDeclarer
+            .withModelProperty(new FunctionExecutorModelProperty(new ReflectiveFunctionExecutorFactory<>(clazz, method))));
+      });
 
-      function.withOutput().ofType(getMethodReturnType(methodElement, loader.getTypeLoader()));
+      functionDeclarer.withOutput().ofType(function.getReturnMetadataType());
 
-      ParameterDeclarationContext declarationContext = new ParameterDeclarationContext(FUNCTION, function.getDeclaration());
-      loader.getMethodParametersLoader().declare(function, methodElement.getParameters(), declarationContext);
-      functionDeclarers.put(methodElement, function);
+      ParameterDeclarationContext declarationContext =
+          new ParameterDeclarationContext(FUNCTION, functionDeclarer.getDeclaration());
+      loader.getMethodParametersLoader().declare(functionDeclarer, function.getParameters(), declarationContext);
+      functionDeclarers.put(function, functionDeclarer);
     }
   }
 
-  private void checkIsNotAnExtension(Class<?> type) {
-    if (type.isAssignableFrom(getExtensionType()) || getExtensionType().isAssignableFrom(type)) {
+  private void checkIsNotAnExtension(FunctionContainerElement type) {
+    if (type.isAssignableFrom(getExtensionType()) || getExtensionElement().isAssignableFrom(type)) {
       throw new IllegalOperationModelDefinitionException(
                                                          format("Function class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
                                                                 type.getName(), getExtensionType().getName()));

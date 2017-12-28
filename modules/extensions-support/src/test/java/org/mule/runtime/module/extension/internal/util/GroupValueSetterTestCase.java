@@ -11,6 +11,8 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+
+import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
@@ -48,7 +50,8 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase {
   public void before() throws Exception {
     final String personalInfo = "personalInfo";
     ParameterGroupDescriptor group =
-        new ParameterGroupDescriptor("group", new TypeWrapper(PersonalInfo.class),
+        new ParameterGroupDescriptor("group", new TypeWrapper(PersonalInfo.class,
+                                                              new JavaTypeLoader(Thread.currentThread().getContextClassLoader())),
                                      ExtensionsTypeLoaderFactory.getDefault().createTypeLoader().load(PersonalInfo.class),
                                      getField(HeisenbergExtension.class, personalInfo).get(), null);
 

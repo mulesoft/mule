@@ -6,7 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
+
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.NamedObject;
+
+import javax.lang.model.element.ExecutableElement;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
@@ -16,7 +22,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public interface MethodElement
+public interface MethodElement<T extends Type>
     extends WithParameters, WithReturnType, NamedObject, WithAnnotations, WithAlias, WithDeclaringClass {
 
   /**
@@ -27,5 +33,17 @@ public interface MethodElement
   /**
    * @return The {@link OperationContainerElement} which contains the current {@link MethodElement}
    */
-  OperationContainerElement getEnclosingType();
+  T getEnclosingType();
+
+  ExecutableElement getExecutableElement();
+
+  @Override
+  default MetadataType getReturnMetadataType() {
+    return getMethodReturnType(this);
+  }
+
+  @Override
+  default MetadataType getAttributesMetadataType() {
+    return getMethodReturnAttributesType(this);
+  }
 }

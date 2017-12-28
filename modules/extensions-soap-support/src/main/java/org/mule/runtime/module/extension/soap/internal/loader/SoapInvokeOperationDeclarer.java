@@ -32,11 +32,14 @@ import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueType
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.soap.SoapAttributes;
+import org.mule.runtime.extension.api.soap.SoapOutputPayload;
+import org.mule.runtime.extension.api.soap.WebServiceTypeKey;
+import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeInputAttachmentsTypeResolver;
@@ -44,16 +47,15 @@ import org.mule.runtime.module.extension.soap.internal.metadata.InvokeInputHeade
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeKeysResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeOutputTypeResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeRequestTypeResolver;
-import org.mule.runtime.extension.api.soap.WebServiceTypeKey;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.module.extension.soap.internal.runtime.operation.SoapOperationExecutorFactory;
-import org.mule.runtime.extension.api.soap.SoapAttributes;
-import org.mule.runtime.extension.api.soap.SoapOutputPayload;
-import com.google.common.collect.ImmutableMap;
+
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Declares the invoke operation for a given Soap Extension {@link ExtensionDeclarer}.
@@ -98,7 +100,7 @@ public class SoapInvokeOperationDeclarer {
     soapErrors.forEach(operation::withErrorModel);
     declareMetadata(operation, loader);
     declareOutput(operation, loader);
-    declareMetadataKeyParameters(operation);
+    declareMetadataKeyParameters(operation, loader);
     declareRequestParameters(operation, loader);
   }
 
@@ -181,8 +183,8 @@ public class SoapInvokeOperationDeclarer {
    *
    * @param operation the invoke operation declarer.
    */
-  private void declareMetadataKeyParameters(OperationDeclarer operation) {
-    TypeWrapper keyType = new TypeWrapper(WebServiceTypeKey.class);
+  private void declareMetadataKeyParameters(OperationDeclarer operation, ClassTypeLoader loader) {
+    TypeWrapper keyType = new TypeWrapper(WebServiceTypeKey.class, loader);
     ParameterGroupDeclarer group = operation
         .onParameterGroup(KEYS_GROUP)
         .withModelProperty(

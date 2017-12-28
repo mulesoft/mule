@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import org.mule.metadata.api.model.MetadataType;
+
 /**
  * A generic contract for any kind of component that could contain a return type
  *
@@ -17,4 +19,8 @@ interface WithReturnType {
    * @return the return type {@link Type} of the implementer component
    */
   Type getReturnType();
+
+  MetadataType getReturnMetadataType();
+
+  MetadataType getAttributesMetadataType();
 }

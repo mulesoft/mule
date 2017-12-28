@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
-import org.mule.metadata.api.ClassTypeLoader;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -31,7 +30,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.annotation.values.ValuePart;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.values.ValueProvider;
@@ -66,30 +65,27 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     Optional<ImplementingTypeModelProperty> implementingType =
         extractImplementingTypeProperty(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
 
-    ClassTypeLoader typeLoader =
-        ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(currentThread().getContextClassLoader());
-
     if (implementingType.isPresent()) {
       new IdempotentDeclarationWalker() {
 
         @Override
         public void onSource(SourceDeclaration declaration) {
-          enrichContainerModel(declaration, typeLoader);
+          enrichContainerModel(declaration);
         }
 
         @Override
         public void onOperation(OperationDeclaration declaration) {
-          enrichContainerModel(declaration, typeLoader);
+          enrichContainerModel(declaration);
         }
 
         @Override
         protected void onConfiguration(ConfigurationDeclaration declaration) {
-          enrichContainerModel(declaration, typeLoader);
+          enrichContainerModel(declaration);
         }
 
         @Override
         protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
-          enrichContainerModel(declaration, typeLoader);
+          enrichContainerModel(declaration);
         }
       }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
     }
@@ -104,9 +100,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
    * enriched.
    *
    * @param containerDeclaration declaration to introspect their parameters
-   * @param typeLoader
    */
-  private void enrichContainerModel(ParameterizedDeclaration<?> containerDeclaration, ClassTypeLoader typeLoader) {
+  private void enrichContainerModel(ParameterizedDeclaration<?> containerDeclaration) {
     List<ParameterDeclaration> allParameters = containerDeclaration.getAllParameters();
 
     Map<String, String> parameterNames = getContainerParameterNames(allParameters);
@@ -118,35 +113,35 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                                                                 paramDeclaration,
                                                                                 paramDeclaration::setValueProviderModel,
                                                                                 1,
-                                                                                parameterNames, paramDeclaration.getName(),
-                                                                                typeLoader));
+                                                                                parameterNames, paramDeclaration.getName()));
 
     dynamicGroupOptions
         .forEach((paramGroupDeclaration, resolverClass) -> getParts(paramGroupDeclaration)
             .forEach((paramDeclaration, order) -> enrichParameter(resolverClass, paramDeclaration,
                                                                   paramDeclaration::setValueProviderModel, order, parameterNames,
-                                                                  paramGroupDeclaration.getName(), typeLoader)));
+                                                                  paramGroupDeclaration.getName())));
   }
 
   /**
    * Enriches a parameter that has an associated {@link ValueProvider}
-   *  @param resolverClass           the class of the {@link ValueProvider}
+   *
+   * @param resolverClass           the class of the {@link ValueProvider}
    * @param paramDeclaration        {@link ParameterDeclaration} or {@link ParameterGroupDeclaration} paramDeclaration
    * @param containerParameterNames parameters container's names
-   * @param typeLoader
    */
   private void enrichParameter(OfValues resolverClass,
                                BaseDeclaration paramDeclaration,
                                Consumer<ValueProviderModel> valueProviderModelConsumer, Integer partOrder,
-                               Map<String, String> containerParameterNames, String name, ClassTypeLoader typeLoader) {
+                               Map<String, String> containerParameterNames, String name) {
 
     ValueProviderFactoryModelPropertyBuilder propertyBuilder =
         ValueProviderFactoryModelProperty.builder(resolverClass.value());
-    ParameterizableTypeWrapper resolverClassWrapper = new ParameterizableTypeWrapper(resolverClass.value());
+    ParameterizableTypeWrapper resolverClassWrapper =
+        new ParameterizableTypeWrapper(resolverClass.value(), new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
     List<ExtensionParameter> resolverParameters = resolverClassWrapper.getParametersAnnotatedWith(Parameter.class);
 
     resolverParameters.forEach(param -> propertyBuilder
-        .withInjectableParameter(param.getName(), param.getMetadataType(typeLoader), param.isRequired()));
+        .withInjectableParameter(param.getName(), param.getType().asMetadataType(), param.isRequired()));
 
     Reference<Boolean> requiresConfiguration = new Reference<>(false);
     Reference<Boolean> requiresConnection = new Reference<>(false);

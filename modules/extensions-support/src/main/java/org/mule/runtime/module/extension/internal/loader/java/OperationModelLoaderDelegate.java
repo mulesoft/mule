@@ -14,10 +14,8 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isRouter;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isScope;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
-import org.mule.metadata.api.ClassTypeLoader;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -34,6 +32,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithOperationContainers;
@@ -41,6 +40,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,30 +73,32 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   void declareOperations(ExtensionDeclarer extensionDeclarer, HasOperationDeclarer declarer,
                          OperationContainerElement operationsContainer) {
-    declareOperations(extensionDeclarer, declarer, operationsContainer.getDeclaringClass(), operationsContainer.getOperations(),
+    declareOperations(extensionDeclarer, declarer, operationsContainer,
+                      operationsContainer.getOperations(),
                       true);
   }
 
   void declareOperations(ExtensionDeclarer extensionDeclarer,
                          HasOperationDeclarer ownerDeclarer,
-                         final Class<?> methodOwnerClass,
-                         List<MethodElement> operations,
+                         OperationContainerElement methodOwnerClass,
+                         List<OperationElement> operations,
                          boolean supportsConfig) {
 
-    for (MethodElement operationMethod : operations) {
+    for (OperationElement operationMethod : operations) {
       OperationContainerElement methodOwner = operationMethod.getEnclosingType();
-      Class<?> declaringClass = methodOwnerClass != null ? methodOwnerClass : methodOwner.getDeclaringClass();
-      checkOperationIsNotAnExtension(declaringClass);
+
+      OperationContainerElement enclosingType = methodOwnerClass != null ? methodOwnerClass : methodOwner;
+      checkOperationIsNotAnExtension(methodOwner);
 
       final Optional<ExtensionParameter> configParameter = loader.getConfigParameter(operationMethod);
       final Optional<ExtensionParameter> connectionParameter = loader.getConnectionParameter(operationMethod);
 
       if (isScope(operationMethod)) {
-        scopesDelegate.declareScope(extensionDeclarer, ownerDeclarer, declaringClass, operationMethod, configParameter,
+        scopesDelegate.declareScope(extensionDeclarer, ownerDeclarer, enclosingType, operationMethod, configParameter,
                                     connectionParameter);
         continue;
       } else if (isRouter(operationMethod)) {
-        routersDelegate.declareRouter(extensionDeclarer, ownerDeclarer, declaringClass, operationMethod,
+        routersDelegate.declareRouter(extensionDeclarer, ownerDeclarer, enclosingType, operationMethod,
                                       configParameter,
                                       connectionParameter);
         continue;
@@ -116,10 +118,16 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       final OperationDeclarer operationDeclarer = actualDeclarer.withOperation(operationMethod.getAlias());
       operationDeclarer.withModelProperty(new ExtensionOperationDescriptorModelProperty(operationMethod));
-      operationMethod.getMethod().ifPresent(method -> operationDeclarer
-          .withModelProperty(new ImplementingMethodModelProperty(method))
-          .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass,
-                                                                                                         method))));
+
+      Optional<Method> method = operationMethod.getMethod();
+      Optional<Class<?>> declaringClass = enclosingType.getDeclaringClass();
+
+      if (method.isPresent() && declaringClass.isPresent()) {
+        operationDeclarer
+            .withModelProperty(new ImplementingMethodModelProperty(method.get()))
+            .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass.get(),
+                                                                                                           method.get())));
+      }
 
       loader.addExceptionEnricher(operationMethod, operationDeclarer);
 
@@ -127,7 +135,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       processComponentConnectivity(operationDeclarer, operationMethod, operationMethod);
 
       if (isNonBlocking(operationMethod)) {
-        processNonBlockingOperation(operationDeclarer, operationMethod, true, loader.getTypeLoader());
+        processNonBlockingOperation(operationDeclarer, operationMethod, true);
       } else {
         processBlockingOperation(supportsConfig, operationMethod, operationDeclarer);
       }
@@ -145,9 +153,9 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
   private void processBlockingOperation(boolean supportsConfig, MethodElement operationMethod,
                                         OperationDeclarer operation) {
     operation.blocking(true);
-    operation.withOutputAttributes().ofType(getMethodReturnAttributesType(operationMethod, loader.getTypeLoader()));
+    operation.withOutputAttributes().ofType(operationMethod.getAttributesMetadataType());
 
-    final MetadataType outputType = getMethodReturnType(operationMethod, loader.getTypeLoader());
+    final MetadataType outputType = operationMethod.getReturnMetadataType();
 
     if (isAutoPaging(operationMethod)) {
       operation.supportsStreaming(true).withOutput().ofType(outputType);
@@ -171,10 +179,9 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
                                                                      connectionParameter);
   }
 
-  static void processNonBlockingOperation(OperationDeclarer operation, MethodElement operationMethod, boolean allowStreaming,
-                                          ClassTypeLoader typeLoader) {
+  static void processNonBlockingOperation(OperationDeclarer operation, MethodElement operationMethod, boolean allowStreaming) {
     List<ExtensionParameter> callbackParameters = operationMethod.getParameters().stream()
-        .filter(p -> CompletionCallback.class.equals(p.getType().getDeclaringClass()))
+        .filter(p -> p.getType().isSameType(CompletionCallback.class))
         .collect(toList());
 
     checkDefinition(!callbackParameters.isEmpty(),
@@ -197,7 +204,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
     List<MetadataType> genericTypes = callbackParameter.getType()
         .getGenerics()
         .stream()
-        .map(generic -> typeLoader.load(generic.getConcreteType().getReflectType()))
+        .map(generic -> generic.getConcreteType().asMetadataType())
         .collect(toList());
 
     if (genericTypes.isEmpty()) {
@@ -221,8 +228,8 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
     operationMethod.getAnnotation(Execution.class).ifPresent(a -> operationDeclarer.withExecutionType(a.value()));
   }
 
-  private void checkOperationIsNotAnExtension(Class<?> operationType) {
-    if (operationType.isAssignableFrom(getExtensionType()) || getExtensionType().isAssignableFrom(operationType)) {
+  private void checkOperationIsNotAnExtension(OperationContainerElement operationType) {
+    if (operationType.isAssignableFrom(getExtensionElement()) || getExtensionElement().isAssignableFrom(operationType)) {
       throw new IllegalOperationModelDefinitionException(
                                                          format("Operation class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
                                                                 operationType.getName(), getExtensionType().getName()));

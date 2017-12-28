@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.soap.internal.loader;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapExtensionTypeWrapper;
@@ -22,10 +23,11 @@ class SoapExtensionTypeFactory {
    * Creates a {@link ExtensionElement} from a given {@link Class} that will help to introspect an extension.
    *
    * @param extensionType SOAP {@link Extension} annotated {@link Class}
+   * @param typeLoader
    * @return an {@link ExtensionElement} wrapping the extension {@link Class} structure
    */
 
-  static SoapExtensionTypeWrapper getSoapExtensionType(Class<?> extensionType) {
-    return new SoapExtensionTypeWrapper<>(extensionType);
+  static SoapExtensionTypeWrapper getSoapExtensionType(Class<?> extensionType, ClassTypeLoader typeLoader) {
+    return new SoapExtensionTypeWrapper<>(extensionType, typeLoader);
   }
 }

@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.java.type.ast;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.extension.api.annotation.Ignore;
-import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.OperationElement;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
@@ -37,7 +37,7 @@ public class OperationContainerElementAST extends ASTType implements OperationCo
    * {@inheritDoc}
    */
   @Override
-  public List<MethodElement> getOperations() {
+  public List<OperationElement> getOperations() {
     return getMethods().stream()
         .filter(elem -> !elem.isAnnotatedWith(Ignore.class))
         .collect(toList());

@@ -31,8 +31,9 @@ public class InfrastructureFieldContributor implements ParameterDeclarerContribu
   @Override
   public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer,
                          ParameterDeclarationContext declarationContext) {
+    //TODO REVIEW
     InfrastructureTypeMapping.InfrastructureType infrastructureType =
-        InfrastructureTypeMapping.getMap().get(parameter.getType().getDeclaringClass());
+        InfrastructureTypeMapping.getMap().get(parameter.getType().getDeclaringClass().get());
     if (infrastructureType != null && !isBlank(infrastructureType.getName())) {
       declarer.withModelProperty(new InfrastructureParameterModelProperty(infrastructureType.getSequence()));
       declarer.withExpressionSupport(NOT_SUPPORTED);

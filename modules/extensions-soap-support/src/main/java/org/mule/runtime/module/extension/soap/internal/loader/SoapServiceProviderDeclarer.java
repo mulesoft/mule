@@ -10,6 +10,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_GROUP;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
@@ -27,9 +28,10 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapServiceProviderWrapper;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
-import com.google.common.collect.ImmutableList;
 
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Declares a Connection Provider of {@link ForwardingSoapClient} instances given a {@link SoapServiceProvider}.
@@ -43,8 +45,8 @@ public class SoapServiceProviderDeclarer {
   private final ParameterModelsLoaderDelegate parametersLoader;
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  SoapServiceProviderDeclarer(ClassTypeLoader loader) {
-    parametersLoader = new ParameterModelsLoaderDelegate(getContributors(), loader);
+  SoapServiceProviderDeclarer() {
+    parametersLoader = new ParameterModelsLoaderDelegate(getContributors(), typeLoader);
   }
 
   /**
@@ -61,7 +63,8 @@ public class SoapServiceProviderDeclarer {
     ConnectionProviderDeclarer providerDeclarer = configDeclarer.withConnectionProvider(provider.getAlias())
         .describedAs(description)
         .withModelProperty(new ConnectionTypeModelProperty(ForwardingSoapClient.class))
-        .withModelProperty(new ImplementingTypeModelProperty(provider.getDeclaringClass()))
+        //TODO - MULE-14311 - Make loader work in compile time
+        .withModelProperty(new ImplementingTypeModelProperty(provider.getDeclaringClass().get()))
         .withConnectionManagementType(POOLING)
         .supportsConnectivityTesting(false);
 

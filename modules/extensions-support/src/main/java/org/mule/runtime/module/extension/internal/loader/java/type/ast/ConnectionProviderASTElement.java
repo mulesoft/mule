@@ -21,14 +21,4 @@ public class ConnectionProviderASTElement extends ASTType implements ConnectionP
   public ConnectionProviderASTElement(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
     super(typeElement, processingEnvironment);
   }
-
-  public List<org.mule.runtime.module.extension.internal.loader.java.type.Type> getInterfaceGenerics(Class clazz) {
-    return IntrospectionUtils
-        .getInterfaceGenerics(typeElement, processingEnvironment.getElementUtils().getTypeElement(clazz.getName()),
-                              processingEnvironment)
-        .stream()
-        .map(typeMirror -> new ASTType(typeMirror, processingEnvironment))
-        .collect(toList());
-  }
-
 }

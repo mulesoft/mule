@@ -9,9 +9,13 @@ package org.mule.runtime.module.extension.soap.internal.loader.type.runtime;
 
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+
+import java.util.Optional;
 
 /**
  * {@link SoapComponentWrapper} implementation for classes that implements the {@link SoapServiceProvider} interface.
@@ -20,16 +24,16 @@ import org.mule.runtime.module.extension.internal.loader.java.type.Type;
  */
 public class SoapServiceProviderWrapper extends SoapComponentWrapper implements ParameterizableTypeElement {
 
-  SoapServiceProviderWrapper(Class<? extends SoapServiceProvider> aClass) {
-    super(aClass);
+  SoapServiceProviderWrapper(Class<? extends SoapServiceProvider> aClass, ClassTypeLoader typeLoader) {
+    super(aClass, typeLoader);
   }
 
   /**
    * @return a {@link Class} that implements the {@link SoapServiceProvider} interface which this {@link Type} represents.
    */
   @Override
-  public Class<? extends SoapServiceProvider> getDeclaringClass() {
-    return (Class<? extends SoapServiceProvider>) super.getDeclaringClass();
+  public Optional<Class<?>> getDeclaringClass() {
+    return super.getDeclaringClass();
   }
 
   @Override

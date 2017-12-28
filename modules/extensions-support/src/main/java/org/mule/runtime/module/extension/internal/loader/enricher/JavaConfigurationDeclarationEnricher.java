@@ -18,12 +18,12 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithParameters;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,14 +47,14 @@ public class JavaConfigurationDeclarationEnricher extends AbstractAnnotatedDecla
 
         @Override
         protected void onOperation(OperationDeclaration declaration) {
-          enrich(declaration, ImplementingMethodModelProperty.class,
-                 (operation, property) -> enrich(operation, new MethodWrapper(property.getMethod())));
+          enrich(declaration, ExtensionOperationDescriptorModelProperty.class,
+                 (operation, property) -> enrich(operation, property.getOperationMethod()));
         }
 
         @Override
         public void onSource(SourceDeclaration declaration) {
-          enrich(declaration, ImplementingTypeModelProperty.class,
-                 (source, property) -> enrich(source, new ParameterizableTypeWrapper(property.getType())));
+          enrich(declaration, ExtensionTypeDescriptorModelProperty.class,
+                 (source, property) -> enrich(source, (SourceElement) property.getType()));
         }
       }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
     }
@@ -68,7 +68,9 @@ public class JavaConfigurationDeclarationEnricher extends AbstractAnnotatedDecla
   private void enrich(BaseDeclaration declaration, WithParameters methodWrapper) {
     final List<ExtensionParameter> configParameters = methodWrapper.getParametersAnnotatedWith(Config.class);
     if (!configParameters.isEmpty()) {
-      declaration.addModelProperty(new ConfigTypeModelProperty(configParameters.get(0).getType().getDeclaringClass()));
+      configParameters.get(0).getType().getDeclaringClass()
+          .ifPresent(declaringClass -> declaration.addModelProperty(new ConfigTypeModelProperty(declaringClass)));
+
     }
   }
 }

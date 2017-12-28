@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -40,7 +40,7 @@ public final class ParameterGroupModelValidator implements ExtensionModelValidat
   private void validateParameterGroup(ParameterGroupModel groupModel, ProblemsReporter problemsReporter) {
     groupModel.getModelProperty(ParameterGroupModelProperty.class).map(ParameterGroupModelProperty::getDescriptor)
         .ifPresent(group -> {
-          if (!isInstantiable(group.getType().getDeclaringClass())) {
+          if (!group.getType().isInstantiable()) {
             problemsReporter
                 .addError(new Problem(groupModel,
                                       format("The parameter group of type '%s' should be non abstract with a default constructor.",

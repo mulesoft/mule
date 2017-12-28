@@ -10,6 +10,7 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -18,7 +19,8 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.module.extension.internal.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.FunctionElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
 
 import java.util.List;
@@ -34,8 +36,8 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
 
   private LazyValue<Extension> extensionAnnotation = new LazyValue<>(() -> getAnnotation(Extension.class).get());
 
-  public ExtensionTypeWrapper(Class<T> aClass) {
-    super(aClass);
+  public ExtensionTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
+    super(aClass, typeLoader);
   }
 
   /**
@@ -45,7 +47,8 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
     final Optional<Configurations> optionalConfigurations = this.getAnnotation(Configurations.class);
     if (optionalConfigurations.isPresent()) {
       final Configurations configurations = optionalConfigurations.get();
-      return Stream.of(configurations.value()).map(ConfigurationWrapper::new).collect(toList());
+      return Stream.of(configurations.value()).map((Class<?> aClass) -> new ConfigurationWrapper(aClass, typeLoader))
+          .collect(toList());
     }
     return emptyList();
   }
@@ -54,11 +57,11 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
    * {@inheritDoc}
    */
   @Override
-  public List<MethodElement> getOperations() {
+  public List<OperationElement> getOperations() {
     return getAnnotation(Operations.class)
         .map(classes -> Stream.of(classes.value())
             .flatMap(clazz -> getApiMethods(clazz).stream())
-            .map(clazz -> (MethodElement) new MethodWrapper(clazz))
+            .map(clazz -> (OperationElement) new OperationWrapper(clazz, typeLoader))
             .collect(toList()))
         .orElse(emptyList());
   }
@@ -67,11 +70,11 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
    * {@inheritDoc}
    */
   @Override
-  public List<MethodElement> getFunctions() {
+  public List<FunctionElement> getFunctions() {
     return getAnnotation(ExpressionFunctions.class)
         .map(classes -> Stream.of(classes.value())
             .flatMap(clazz -> getApiMethods(clazz).stream())
-            .map(clazz -> (MethodElement) new MethodWrapper(clazz))
+            .map(clazz -> (FunctionElement) new FunctionWrapper(clazz, typeLoader))
             .collect(toList()))
         .orElse(emptyList());
   }

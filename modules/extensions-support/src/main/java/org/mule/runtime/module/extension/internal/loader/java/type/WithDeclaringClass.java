@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import java.util.Optional;
+
 /**
  * A generic contract for any kind of component which is derived from a declaration inside a {@link Class}
  *
@@ -16,6 +18,5 @@ public interface WithDeclaringClass {
   /**
    * @return the class that this {@link Type} represents
    */
-  // TODO MULE-10137 - Adapt logic to AST
-  Class getDeclaringClass();
+  Optional<Class<?>> getDeclaringClass();
 }

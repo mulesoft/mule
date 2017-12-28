@@ -9,12 +9,15 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+
+import javax.lang.model.element.ExecutableElement;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -29,12 +32,14 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class MethodWrapper implements MethodElement {
+public class MethodWrapper<T extends Type> implements MethodElement<T> {
 
   private final Method method;
+  private ClassTypeLoader typeLoader;
 
-  public MethodWrapper(Method method) {
+  public MethodWrapper(Method method, ClassTypeLoader typeLoader) {
     this.method = method;
+    this.typeLoader = typeLoader;
   }
 
   /**
@@ -46,16 +51,21 @@ public final class MethodWrapper implements MethodElement {
   }
 
   @Override
-  public OperationContainerElement getEnclosingType() {
-    return new OperationContainerWrapper(getDeclaringClass());
+  public T getEnclosingType() {
+    return (T) new TypeWrapper(getDeclaringClass().get(), typeLoader);
+  }
+
+  @Override
+  public ExecutableElement getExecutableElement() {
+    return null;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Class getDeclaringClass() {
-    return method.getDeclaringClass();
+  public Optional<Class<?>> getDeclaringClass() {
+    return Optional.ofNullable(method.getDeclaringClass());
   }
 
   /**
@@ -66,7 +76,7 @@ public final class MethodWrapper implements MethodElement {
     final Parameter[] parameters = method.getParameters();
     List<ExtensionParameter> extensionParameters = new ArrayList<>(parameters.length);
     for (int i = 0; i < parameters.length; i++) {
-      extensionParameters.add(new ParameterWrapper(method, i));
+      extensionParameters.add(new ParameterWrapper(method, i, typeLoader));
     }
     return extensionParameters;
   }
@@ -88,7 +98,7 @@ public final class MethodWrapper implements MethodElement {
     final Parameter[] parameters = method.getParameters();
     for (int i = 0; i < parameters.length; i++) {
       if (parameters[i].getAnnotation(annotationClass) != null) {
-        extensionParameters.add(new ParameterWrapper(method, i));
+        extensionParameters.add(new ParameterWrapper(method, i, typeLoader));
       }
     }
     return extensionParameters;
@@ -112,13 +122,14 @@ public final class MethodWrapper implements MethodElement {
 
   @Override
   public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
-    return isAnnotatedWith(annotationClass) ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, method))
+    return isAnnotatedWith(annotationClass)
+        ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, method, typeLoader))
         : Optional.empty();
   }
 
   @Override
   public Type getReturnType() {
-    return new TypeWrapper(forMethodReturnType(method));
+    return new TypeWrapper(forMethodReturnType(method), typeLoader);
   }
 
   @Override

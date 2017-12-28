@@ -56,10 +56,10 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAlias;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
@@ -125,7 +125,7 @@ public final class ParameterModelsLoaderDelegate {
             .defaultingTo(extensionParameter.defaultValue().isPresent() ? extensionParameter.defaultValue().get() : null);
       }
 
-      parameter.ofType(extensionParameter.getMetadataType(typeLoader)).describedAs(extensionParameter.getDescription());
+      parameter.ofType(extensionParameter.getType().asMetadataType()).describedAs(extensionParameter.getDescription());
       parseParameterRole(extensionParameter, parameter);
       parseExpressionSupport(extensionParameter, parameter);
       parseConfigOverride(extensionParameter, parameter);
@@ -215,8 +215,8 @@ public final class ParameterModelsLoaderDelegate {
     } else {
       declarer.withModelProperty(new ParameterGroupModelProperty(
                                                                  new ParameterGroupDescriptor(groupName, type,
-                                                                                              groupParameter
-                                                                                                  .getMetadataType(typeLoader),
+                                                                                              groupParameter.getType()
+                                                                                                  .asMetadataType(),
                                                                                               //TODO: Eliminate dependency to Annotated Elements
                                                                                               groupParameter.getDeclaringElement()
                                                                                                   .orElse(null),
@@ -240,8 +240,12 @@ public final class ParameterModelsLoaderDelegate {
     if (!annotatedParameters.isEmpty()) {
       return declare(component, annotatedParameters, declarationContext, declarer);
     } else {
-      Class declaringClass = type.getDeclaringClass();
-      List<FieldWrapper> fields = getFieldsWithGetters(declaringClass).stream().map(FieldWrapper::new).collect(toList());
+      //TODO - MULE-14311 - Remove class references
+      Class declaringClass = type.getDeclaringClass().get();
+      List<FieldWrapper> fields = getFieldsWithGetters(declaringClass)
+          .stream()
+          .map(field -> new FieldWrapper(field, typeLoader))
+          .collect(toList());
       return declare(component, fields, declarationContext, declarer);
     }
   }
@@ -271,10 +275,10 @@ public final class ParameterModelsLoaderDelegate {
 
       Type nullSafeAnnotationType =
           extensionParameter.getValueFromAnnotation(NullSafe.class).get().getClassValue(NullSafe::defaultImplementingType);
-      final boolean hasDefaultOverride = !nullSafeAnnotationType.getDeclaringClass().equals(Object.class);
+      final boolean hasDefaultOverride = !nullSafeAnnotationType.isSameType(Object.class);
 
       MetadataType nullSafeType =
-          hasDefaultOverride ? typeLoader.load(nullSafeAnnotationType.getReflectType()) : parameter.getDeclaration().getType();
+          hasDefaultOverride ? nullSafeAnnotationType.asMetadataType() : parameter.getDeclaration().getType();
 
       parameter.getDeclaration().getType().accept(new BasicTypeMetadataVisitor() {
 

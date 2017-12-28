@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isInputStream;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLifecycle;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -23,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
@@ -31,6 +31,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement
 import org.mule.runtime.module.extension.internal.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithMessageSources;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFactory;
 
@@ -49,7 +50,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private static final String SOURCE = "Source";
 
-  private final Map<Class<?>, SourceDeclarer> sourceDeclarers = new HashMap<>();
+  private final Map<SourceElement, SourceDeclarer> sourceDeclarers = new HashMap<>();
 
   SourceModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
     super(delegate);
@@ -66,11 +67,10 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
                             SourceElement sourceType,
                             boolean supportsConfig) {
     // TODO: MULE-9220 - Add a syntax validator which checks that the sourceType doesn't implement
-
-    if (isLifecycle(sourceType.getDeclaringClass())) {
+    if (isLifecycle(sourceType)) {
       throw new IllegalSourceModelDefinitionException(
                                                       format("Source class '%s' implements a lifecycle interface. Sources are not allowed to",
-                                                             sourceType.getDeclaringClass().getName()));
+                                                             sourceType.getName()));
     }
 
     final Optional<ExtensionParameter> configParameter = loader.getConfigParameter(sourceType);
@@ -87,13 +87,14 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
         (HasSourceDeclarer) loader.selectDeclarerBasedOnConfig(extensionDeclarer, (Declarer) declarer, configParameter,
                                                                connectionParameter);
 
-    SourceDeclarer source = sourceDeclarers.get(sourceType.getDeclaringClass());
-    if (source != null) {
-      actualDeclarer.withMessageSource(source);
+    SourceDeclarer existingDeclarer = sourceDeclarers.get(sourceType);
+    if (existingDeclarer != null) {
+      actualDeclarer.withMessageSource(existingDeclarer);
       return;
     }
 
-    source = actualDeclarer.withMessageSource(sourceType.getAlias());
+    SourceDeclarer sourceDeclarer = actualDeclarer.withMessageSource(sourceType.getAlias());
+    sourceDeclarer.withModelProperty(new ExtensionTypeDescriptorModelProperty(sourceType));
     List<Type> sourceGenerics = sourceType.getSuperClassGenerics();
 
     if (sourceGenerics.size() != 2) {
@@ -104,29 +105,32 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
                                                        sourceGenerics.size()));
     }
 
-    source
+    sourceDeclarer
         .hasResponse(sourceType.isAnnotatedWith(EmitsResponse.class))
-        .requiresConnection(connectionParameter.isPresent())
-        .withModelProperty(new SourceFactoryModelProperty(new DefaultSourceFactory(sourceType.getDeclaringClass())))
-        .withModelProperty(new ImplementingTypeModelProperty(sourceType.getDeclaringClass()));
+        .requiresConnection(connectionParameter.isPresent());
 
-    processMimeType(source, sourceType);
-    processComponentConnectivity(source, sourceType, sourceType);
+    sourceType.getDeclaringClass()
+        .ifPresent(clazz -> sourceDeclarer
+            .withModelProperty(new SourceFactoryModelProperty(new DefaultSourceFactory((Class<? extends Source>) clazz)))
+            .withModelProperty(new ImplementingTypeModelProperty(clazz)));
 
-    resolveOutputTypes(source, sourceGenerics, sourceType);
+    processMimeType(sourceDeclarer, sourceType);
+    processComponentConnectivity(sourceDeclarer, sourceType, sourceType);
 
-    loader.addExceptionEnricher(sourceType, source);
+    resolveOutputTypes(sourceDeclarer, sourceType);
 
-    declareSourceParameters(sourceType, source);
-    declareSourceCallback(sourceType, source);
-    sourceDeclarers.put(sourceType.getDeclaringClass(), source);
+    loader.addExceptionEnricher(sourceType, sourceDeclarer);
+
+    declareSourceParameters(sourceType, sourceDeclarer);
+    declareSourceCallback(sourceType, sourceDeclarer);
+    sourceDeclarers.put(sourceType, sourceDeclarer);
   }
 
-  private void resolveOutputTypes(SourceDeclarer source, List<Type> sourceGenerics, SourceElement sourceType) {
-    final MetadataType outputTtype = getSourceReturnType(sourceGenerics.get(0).getReflectType(), getTypeLoader());
-    source.withOutput().ofType(outputTtype);
-    source.withOutputAttributes().ofType(getTypeLoader().load(sourceGenerics.get(1).getDeclaringClass()));
-    source.supportsStreaming(isInputStream(outputTtype) || sourceType.getAnnotation(Streaming.class).isPresent());
+  private void resolveOutputTypes(SourceDeclarer source, SourceElement sourceType) {
+    MetadataType returnMetadataType = sourceType.getReturnMetadataType();
+    source.withOutput().ofType(returnMetadataType);
+    source.withOutputAttributes().ofType(sourceType.getAttributesMetadataType());
+    source.supportsStreaming(isInputStream(returnMetadataType) || sourceType.getAnnotation(Streaming.class).isPresent());
   }
 
   /**

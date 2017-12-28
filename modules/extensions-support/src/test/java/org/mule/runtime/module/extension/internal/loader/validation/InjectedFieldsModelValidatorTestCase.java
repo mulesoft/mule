@@ -12,11 +12,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockImplementingType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -30,7 +32,8 @@ import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -220,9 +223,11 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   private void withMethod(OperationModel operationModel, String operationName) {
-    when(operationModel.getModelProperty(ImplementingMethodModelProperty.class))
+    when(operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class))
         .thenReturn(getApiMethods(Operations.class).stream()
             .filter(m -> m.getName().equals(operationName))
-            .findFirst().map(ImplementingMethodModelProperty::new));
+            .findFirst()
+            .map(operationMethod -> new ExtensionOperationDescriptorModelProperty(new OperationWrapper(operationMethod,
+                                                                                                       TYPE_LOADER))));
   }
 }

@@ -178,7 +178,7 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
                                                                group.getName(), config.getName())));
 
     Field groupField = (Field) descriptor.getContainer();
-    Field parameterField = getField(descriptor.getType().getDeclaringClass(), fieldName)
+    Field parameterField = getField(descriptor.getType().getDeclaringClass().get(), fieldName)
         .orElseThrow(() -> new IllegalArgumentException("Missing field with name [" + fieldName
             + "] in group [" + descriptor.getName() + "] of config ["
             + config.getName() + "]"));

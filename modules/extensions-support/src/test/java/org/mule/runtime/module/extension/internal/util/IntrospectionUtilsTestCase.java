@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static javax.lang.model.element.ElementKind.METHOD;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static org.apache.commons.collections.CollectionUtils.find;
@@ -15,10 +16,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPagingProviderTypes;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
@@ -26,6 +31,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.a
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 
+import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
@@ -37,13 +43,22 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
+import org.mule.metadata.message.api.MessageMetadataType;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.module.extension.internal.loader.java.type.OperationElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.ast.ASTType;
+import org.mule.runtime.module.extension.internal.loader.java.type.ast.OperationElementAST;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -53,9 +68,15 @@ import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBox;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.test.petstore.extension.PhoneNumber;
+import org.mule.test.petstore.extension.TransactionalPetStoreClient;
+import org.mule.test.petstore.extension.TransactionalPetStoreConnectionProvider;
+
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,22 +84,66 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
+import com.google.testing.compile.CompilationRule;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.springframework.core.ResolvableType;
 
 @SmallTest
+@RunWith(Parameterized.class)
 public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
+  private static final String CLASS = "CLASS";
+  private static final String AST = "AST";
   public static final String OPERATION_RESULT = "operationResult";
   public static final String PAGING_PROVIDER = "pagingProvider";
   public static final String PAGING_PROVIDER_OPERATION_RESULT = "pagingProviderOperationResult";
   public static final String FOO = "foo";
+  private static ProcessingEnvironment processingEnvironment;
   private List<FruitBasket> baskets;
+
+  @Rule
+  public CompilationRule compilationRule = new CompilationRule();
+
+  @Parameterized.Parameter
+  public String mode;
+
+  @Parameterized.Parameter(1)
+  public BiFunction<String, Class[], OperationElement> operationSupplier;
+
+  @Parameterized.Parameter(2)
+  public Function<Class, Type> typeSupplier;
+
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    List<Object[]> objects = new ArrayList<>();
+
+    Function<Class, Type> javaTypeSupplier =
+        aClass -> new TypeWrapper(aClass, new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
+    Function<Class, Type> astTypeSupplier =
+        aClass -> new ASTType(processingEnvironment.getElementUtils().getTypeElement(aClass.getName()), processingEnvironment);
+
+    objects.add(new Object[] {AST, new ASTOperationSupplier(), astTypeSupplier});
+    objects.add(new Object[] {CLASS, new ClassOperationSupplier(), javaTypeSupplier});
+    return objects;
+  }
+
+  @Before
+  public void setUp() {
+    processingEnvironment = mock(ProcessingEnvironment.class);
+    when(processingEnvironment.getTypeUtils()).thenReturn(compilationRule.getTypes());
+    when(processingEnvironment.getElementUtils()).thenReturn(compilationRule.getElements());
+  }
 
   @Test
   public void getMethodReturnType() throws Exception {
-    MetadataType metadataType = IntrospectionUtils.getMethodReturnType(getMethod(FOO), TYPE_LOADER);
+    MetadataType metadataType = IntrospectionUtils.getMethodReturnType(getMethod(FOO));
     assertDictionary(metadataType, Apple.class);
   }
 
@@ -102,20 +167,23 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void getNullMethodReturnType() throws Exception {
-    IntrospectionUtils.getMethodReturnType((Method) null, TYPE_LOADER);
+    IntrospectionUtils.getMethodReturnType(null);
   }
 
   @Test
   public void getArgumentlessMethodArgumentTypes() throws Exception {
-    MetadataType[] types = IntrospectionUtils.getMethodArgumentTypes(getMethod(FOO), TYPE_LOADER);
+    assumeThat(mode, is(CLASS));
+    MetadataType[] types = IntrospectionUtils.getMethodArgumentTypes(getMethod(FOO).getMethod().get(), TYPE_LOADER);
     assertNotNull(types);
     assertEquals(0, types.length);
   }
 
   @Test
   public void getMethodArgumentTypes() throws Exception {
+    assumeThat(mode, is(CLASS));
     MetadataType[] types = IntrospectionUtils
-        .getMethodArgumentTypes(getMethod("bar", String.class, Long.class, Apple.class, Map.class), TYPE_LOADER);
+        .getMethodArgumentTypes(getMethod("bar", String.class, Long.class, Apple.class, Map.class).getMethod().get(),
+                                TYPE_LOADER);
     assertNotNull(types);
     assertEquals(4, types.length);
 
@@ -123,6 +191,16 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertType(types[1], Long.class);
     assertType(types[2], Apple.class);
     assertDictionary(types[3], Kiwi.class);
+  }
+
+  @Test
+  public void getInterfaceGenerics() {
+    Type connectionProvider = typeSupplier.apply(TransactionalPetStoreConnectionProvider.class);
+    List<Type> interfaceGenerics = connectionProvider.getInterfaceGenerics(ConnectionProvider.class);
+
+    assertThat(interfaceGenerics.size(), is(1));
+    Type type = interfaceGenerics.get(0);
+    assertThat(type.isSameType(TransactionalPetStoreClient.class), is(true));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -233,10 +311,29 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void getPagingProviderImplementationTypes() {
     ResolvableType pagingProvider = ResolvableType.forClass(TestPagingProvider.class);
-    Pair<ResolvableType, ResolvableType> pagingProviderTypes = IntrospectionUtils.getPagingProviderTypes(pagingProvider);
+    Pair<Type, Type> pagingProviderTypes = getPagingProviderTypes(new TypeWrapper(pagingProvider, TYPE_LOADER));
 
-    assertThat(pagingProviderTypes.getFirst().getRawClass(), equalTo(Object.class));
-    assertThat(pagingProviderTypes.getSecond().getRawClass(), equalTo((Banana.class)));
+    assertThat(pagingProviderTypes.getFirst().getDeclaringClass().get(), equalTo(Object.class));
+    assertThat(pagingProviderTypes.getSecond().getDeclaringClass().get(), equalTo(Result.class));
+  }
+
+  @Test
+  public void getPagingProviderImplementationTypesReturnType() throws Exception {
+    OperationElement getPagingProvider = getMethod("getPagingProvider");
+    MetadataType methodReturnType = IntrospectionUtils.getMethodReturnType(getPagingProvider);
+    assertThat(methodReturnType, instanceOf(ArrayType.class));
+
+    MetadataType valueType = ((ArrayType) methodReturnType).getType();
+    assertThat(valueType, instanceOf(MessageMetadataType.class));
+
+    MessageMetadataType messageType = (MessageMetadataType) valueType;
+    MetadataType payloadType = messageType.getPayloadType().get();
+    MetadataType attributesTypes = messageType.getAttributesType().get();
+
+    //These assertions are too simple, but AST Loader doesn't enrich with the same annotations as the Java does
+    //making impossible to do an equals assertion.
+    assertThat(payloadType.getAnnotation(TypeIdAnnotation.class).get().getValue(), is(Banana.class.getName()));
+    assertThat(attributesTypes.getAnnotation(TypeIdAnnotation.class).get().getValue(), is(Apple.class.getName()));
   }
 
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {
@@ -254,8 +351,8 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertThat(rawType.isAssignableFrom(JavaTypeUtils.getType(type)), is(true));
   }
 
-  private Method getMethod(String methodName, Class<?>... parameterTypes) throws Exception {
-    return getClass().getMethod(methodName, parameterTypes);
+  private OperationElement getMethod(String methodName, Class<?>... parameterTypes) throws Exception {
+    return operationSupplier.apply(methodName, parameterTypes);
   }
 
   private void assertDictionary(MetadataType metadataType, Class<?> valueType) {
@@ -294,6 +391,9 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     return Objects.hash(s, l, apple, fruits);
   }
 
+  public TestPagingProvider getPagingProvider() {
+    return null;
+  }
 
   public List<FruitBasket> getBaskets() {
     return baskets;
@@ -304,25 +404,25 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   private void assertAttributesType(String method) throws Exception {
-    MetadataType attributesType = IntrospectionUtils.getMethodReturnAttributesType(getMethod(method), TYPE_LOADER);
+    MetadataType attributesType = IntrospectionUtils.getMethodReturnAttributesType(getMethod(method));
     assertThat(attributesType, is(instanceOf(ObjectType.class)));
     assertType(attributesType, Object.class);
   }
 
   private void assertVoidAttributesType(String method) throws Exception {
-    MetadataType attributesType = IntrospectionUtils.getMethodReturnAttributesType(getMethod(method), TYPE_LOADER);
+    MetadataType attributesType = IntrospectionUtils.getMethodReturnAttributesType(getMethod(method));
     assertThat(attributesType, is(instanceOf(VoidType.class)));
 
   }
 
   private void assertReturnType(String method) throws Exception {
-    MetadataType returnType = IntrospectionUtils.getMethodReturnType(getMethod(method), TYPE_LOADER);
+    MetadataType returnType = IntrospectionUtils.getMethodReturnType(getMethod(method));
     assertThat(returnType, is(instanceOf(StringType.class)));
     assertType(returnType, String.class);
   }
 
   private void assertPagingProviderReturnType(String method) throws Exception {
-    MetadataType returnType = IntrospectionUtils.getMethodReturnType(getMethod(method), TYPE_LOADER);
+    MetadataType returnType = IntrospectionUtils.getMethodReturnType(getMethod(method));
 
     assertThat(returnType, is(instanceOf(ArrayType.class)));
     assertThat(((ArrayType) returnType).getType(), is(instanceOf(StringType.class)));
@@ -330,16 +430,16 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   private void assertPagingProviderReturnResultType(String method) throws Exception {
-    MetadataType returnType = IntrospectionUtils.getMethodReturnType(getMethod(method), TYPE_LOADER);
+    MetadataType returnType = IntrospectionUtils.getMethodReturnType(getMethod(method));
 
     assertThat(returnType, is(instanceOf(ArrayType.class)));
     assertMessageType(((ArrayType) returnType).getType(), is(instanceOf(StringType.class)), is(instanceOf(ObjectType.class)));
   }
 
-  private class TestPagingProvider implements PagingProvider<Object, Banana> {
+  private class TestPagingProvider implements PagingProvider<Object, Result<Banana, Apple>> {
 
     @Override
-    public List<Banana> getPage(Object connection) {
+    public List<Result<Banana, Apple>> getPage(Object connection) {
       return null;
     }
 
@@ -350,5 +450,34 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
     @Override
     public void close(Object connection) throws MuleException {}
+  }
+
+  private static class ASTOperationSupplier implements BiFunction<String, Class[], OperationElement> {
+
+    @Override
+    public OperationElement apply(String methodName, Class[] paramTypes) {
+
+      TypeElement typeElement =
+          processingEnvironment.getElementUtils().getTypeElement(IntrospectionUtilsTestCase.class.getName());
+      Optional<OperationElementAST> first =
+          typeElement.getEnclosedElements().stream().filter(elem -> elem.getKind().equals(METHOD))
+              .map(elem -> (ExecutableElement) elem)
+              .filter(elem -> elem.getSimpleName().toString().equals(methodName))
+              .map(elem -> new OperationElementAST(elem, processingEnvironment))
+              .findFirst();
+      return first.orElseThrow(RuntimeException::new);
+    }
+  }
+
+  private static class ClassOperationSupplier implements BiFunction<String, Class[], OperationElement> {
+
+    @Override
+    public OperationElement apply(String methodName, Class[] paramTypes) {
+      try {
+        return new OperationWrapper(IntrospectionUtilsTestCase.class.getMethod(methodName, paramTypes), TYPE_LOADER);
+      } catch (NoSuchMethodException e) {
+        throw new RuntimeException();
+      }
+    }
   }
 }

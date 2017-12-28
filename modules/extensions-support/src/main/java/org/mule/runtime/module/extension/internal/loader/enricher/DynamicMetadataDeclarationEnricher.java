@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -29,7 +27,6 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Query;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -37,18 +34,20 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.metadata.MetadataScopeAdapter;
 import org.mule.runtime.module.extension.internal.metadata.QueryMetadataResolverFactory;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -68,16 +67,15 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
 
   private class EnricherDelegate extends AbstractAnnotatedDeclarationEnricher {
 
-    private Class<?> extensionType;
-    private ClassTypeLoader typeLoader;
+    private Type extensionType;
 
     @Override
     public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-      Optional<ImplementingTypeModelProperty> implementingType =
-          extractImplementingTypeProperty(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
-      if (implementingType.isPresent()) {
-        extensionType = implementingType.get().getType();
-        typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(currentThread().getContextClassLoader());
+      Optional<ExtensionTypeDescriptorModelProperty> property = extensionLoadingContext.getExtensionDeclarer().getDeclaration()
+          .getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+
+      if (property.isPresent()) {
+        extensionType = property.get().getType();
 
         new IdempotentDeclarationWalker() {
 
@@ -96,9 +94,9 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
     }
 
     private void enrichSourceMetadata(SourceDeclaration declaration) {
-      declaration.getModelProperty(ImplementingTypeModelProperty.class)
+      declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
           .ifPresent(prop -> {
-            final Class<?> sourceType = prop.getType();
+            final Type sourceType = prop.getType();
             MetadataScopeAdapter metadataScope = new MetadataScopeAdapter(extensionType, sourceType, declaration);
             declareMetadataResolverFactory(declaration, metadataScope);
             enrichMetadataKeyParameters(declaration, metadataScope.getKeysResolver().get());
@@ -213,9 +211,9 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                                            ComponentDeclaration<? extends ComponentDeclaration> component) {
       return component.getParameterGroups().stream()
           .map(group -> group.getModelProperty(ParameterGroupModelProperty.class).orElse(null))
-          .filter(group -> group != null)
+          .filter(Objects::nonNull)
           .filter(group -> group.getDescriptor().getAnnotatedContainer().isAnnotatedWith(MetadataKeyId.class))
-          .map(group -> new MetadataKeyIdModelProperty(typeLoader.load(group.getDescriptor().getType().getDeclaringClass()),
+          .map(group -> new MetadataKeyIdModelProperty(group.getDescriptor().getMetadataType(),
                                                        group.getDescriptor().getName()))
           .findFirst();
     }

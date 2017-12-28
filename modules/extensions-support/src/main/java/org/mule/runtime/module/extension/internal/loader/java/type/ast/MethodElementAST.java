@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
@@ -34,7 +34,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  *
  * @since 4.1.0
  */
-public class MethodElementAST implements MethodElement {
+public class MethodElementAST<T extends Type> implements MethodElement<T> {
 
   private final ExecutableElement method;
   private final ProcessingEnvironment processingEnvironment;
@@ -65,8 +65,8 @@ public class MethodElementAST implements MethodElement {
    * {@inheritDoc}
    */
   @Override
-  public OperationContainerElement getEnclosingType() {
-    return new OperationContainerElementAST((TypeElement) method.getEnclosingElement(), processingEnvironment);
+  public T getEnclosingType() {
+    return (T) new OperationContainerElementAST((TypeElement) method.getEnclosingElement(), processingEnvironment);
   }
 
   /**
@@ -131,13 +131,15 @@ public class MethodElementAST implements MethodElement {
    * {@inheritDoc}
    */
   @Override
-  public Class getDeclaringClass() {
+  public Optional<Class<?>> getDeclaringClass() {
+    //TODO This will be removed soon.
     try {
-      return Class
-          .forName(processingEnvironment.getElementUtils().getBinaryName((TypeElement) method.getEnclosingElement()).toString());
+      return Optional.ofNullable(Class
+          .forName(processingEnvironment.getElementUtils().getBinaryName((TypeElement) method.getEnclosingElement()).toString()));
     } catch (ClassNotFoundException e) {
-      throw new RuntimeException(e);
+      //nothing
     }
+    return empty();
   }
 
   /**
@@ -145,11 +147,13 @@ public class MethodElementAST implements MethodElement {
    */
   @Override
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
+    }
 
-    if (o == null || getClass() != o.getClass())
+    if (o == null || getClass() != o.getClass()) {
       return false;
+    }
 
     MethodElementAST that = (MethodElementAST) o;
 
@@ -166,5 +170,9 @@ public class MethodElementAST implements MethodElement {
     return new HashCodeBuilder(17, 37)
         .append(method)
         .toHashCode();
+  }
+
+  public ExecutableElement getExecutableElement() {
+    return method;
   }
 }

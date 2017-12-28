@@ -11,7 +11,6 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
@@ -31,12 +30,13 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
-import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
-import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
+import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.WithDeclaringClass;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,9 +59,9 @@ public final class MetadataScopeAdapter {
   private Supplier<? extends OutputTypeResolver> outputResolver = nullMetadataResolverSupplier;
   private Map<String, Supplier<? extends InputTypeResolver>> inputResolvers = new HashMap<>();
   private Supplier<? extends AttributesTypeResolver> attributesResolver = nullMetadataResolverSupplier;
-  private ClassTypeLoader typeLoader = new DefaultExtensionsTypeLoaderFactory().createTypeLoader();
 
-  public MetadataScopeAdapter(Class<?> extensionType, MethodElement operation, OperationDeclaration declaration) {
+  public MetadataScopeAdapter(Type extensionElement, MethodElement operation, OperationDeclaration declaration) {
+    operation.getValueFromAnnotation(OutputResolver.class);
     Optional<OutputResolver> outputResolverDeclaration = operation.getAnnotation(OutputResolver.class);
     Optional<Pair<MetadataKeyId, MetadataType>> keyId = locateMetadataKeyId(declaration);
 
@@ -84,23 +84,28 @@ public final class MetadataScopeAdapter {
                                                              () -> getCategoryName(outputResolver, attributesResolver,
                                                                                    inputResolvers)));
     } else {
-      initializeFromClass(extensionType, operation.getDeclaringClass(), declaration);
+      initializeFromClass(extensionElement, operation, declaration);
     }
   }
 
-  public MetadataScopeAdapter(Class<?> extensionType, Class<?> source, SourceDeclaration sourceDeclaration) {
-    initializeFromClass(extensionType, source, sourceDeclaration);
+  public MetadataScopeAdapter(Type extensionElement, WithDeclaringClass source, SourceDeclaration sourceDeclaration) {
+    initializeFromClass(extensionElement, source, sourceDeclaration);
   }
 
-  private void initializeFromClass(Class<?> extensionType, Class<?> source, WithOutputDeclaration declaration) {
+  private void initializeFromClass(Type extensionType, WithDeclaringClass annotatedType, WithOutputDeclaration declaration) {
     // TODO MULE-10891: Add support for Source Callback parameters
-    MetadataScope scope = getAnnotation(source, MetadataScope.class);
-    scope = scope != null ? scope : getAnnotation(extensionType, MetadataScope.class);
+    Optional<Class<?>> extensionClass = extensionType.getDeclaringClass();
+    Optional<Class<?>> componentClass = annotatedType.getDeclaringClass();
 
-    if (scope != null && !hasCustomStaticType(declaration.getOutput())) {
-      this.keysResolver = ResolverSupplier.of(scope.keysResolver());
-      this.outputResolver = ResolverSupplier.of(scope.outputResolver());
-      this.attributesResolver = ResolverSupplier.of(scope.attributesResolver());
+    if (componentClass.isPresent() && extensionClass.isPresent()) {
+      MetadataScope scope = getAnnotation(componentClass.get(), MetadataScope.class);
+      scope = scope != null ? scope : getAnnotation(extensionClass.get(), MetadataScope.class);
+
+      if (scope != null && !hasCustomStaticType(declaration.getOutput())) {
+        this.keysResolver = ResolverSupplier.of(scope.keysResolver());
+        this.outputResolver = ResolverSupplier.of(scope.outputResolver());
+        this.attributesResolver = ResolverSupplier.of(scope.attributesResolver());
+      }
     }
   }
 
@@ -120,7 +125,7 @@ public final class MetadataScopeAdapter {
             .map(ParameterGroupModelProperty::getDescriptor)
             .filter(g -> g.getAnnotatedContainer().isAnnotatedWith(MetadataKeyId.class))
             .map(g -> new ImmutablePair<>(g.getContainer().getAnnotation(MetadataKeyId.class),
-                                          typeLoader.load(g.getType().getDeclaringClass())));
+                                          g.getType().asMetadataType()));
 
         if (keyId.isPresent()) {
           break;

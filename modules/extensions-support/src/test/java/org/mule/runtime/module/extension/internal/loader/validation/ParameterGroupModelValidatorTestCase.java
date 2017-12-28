@@ -11,6 +11,8 @@ import static java.util.Optional.of;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+
+import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -58,9 +60,11 @@ public class ParameterGroupModelValidatorTestCase {
 
   @Test(expected = IllegalModelDefinitionException.class)
   public void invalidModelDueToNonInstantiableParameterGroup() {
-    ParameterGroupDescriptor descriptor = new ParameterGroupDescriptor("name", new TypeWrapper(Serializable.class),
-                                                                       null,
-                                                                       mock(AnnotatedElement.class), null);
+    ParameterGroupDescriptor descriptor =
+        new ParameterGroupDescriptor("name", new TypeWrapper(Serializable.class,
+                                                             new JavaTypeLoader(Thread.currentThread().getContextClassLoader())),
+                                     null,
+                                     mock(AnnotatedElement.class), null);
     when(groupModel.getModelProperty(ParameterGroupModelProperty.class))
         .thenReturn(of(new ParameterGroupModelProperty(descriptor)));
 

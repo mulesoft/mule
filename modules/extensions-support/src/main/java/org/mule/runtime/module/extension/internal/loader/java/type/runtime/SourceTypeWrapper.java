@@ -13,6 +13,8 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodsAnnotatedWith;
 
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
@@ -39,18 +41,15 @@ import java.util.Optional;
 final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements SourceElement, ParameterizableTypeElement {
 
   private final Class<T> aClass;
+  private LazyValue<List<Type>> sourceGenerics;
 
-  SourceTypeWrapper(Class<T> aClass) {
-    super(aClass);
+  SourceTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
+    super(aClass, typeLoader);
     this.aClass = aClass;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Class<? extends Source> getDeclaringClass() {
-    return aClass;
+    this.sourceGenerics = new LazyValue<>(() -> IntrospectionUtils.getSuperClassGenerics(aClass, Source.class)
+        .stream()
+        .map(e -> new TypeWrapper(e, typeLoader))
+        .collect(toList()));
   }
 
   /**
@@ -58,10 +57,7 @@ final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements S
    */
   @Override
   public List<Type> getSuperClassGenerics() {
-    return IntrospectionUtils.getSuperClassGenerics(aClass, Source.class)
-        .stream()
-        .map(TypeWrapper::new)
-        .collect(toList());
+    return sourceGenerics.get();
   }
 
   @Override
@@ -103,7 +99,7 @@ final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements S
                                                       format("Source declared in class '%s' declares more than one method annotated with '%s'",
                                                              aClass.getName(), annotationType.getSimpleName()));
     } else {
-      return of(new MethodWrapper(methods.iterator().next()));
+      return of(new MethodWrapper(methods.iterator().next(), typeLoader));
     }
   }
 }

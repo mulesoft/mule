@@ -11,7 +11,7 @@ import static javax.lang.model.element.ElementKind.METHOD;
 
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.module.extension.internal.loader.java.type.FunctionContainerElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.FunctionElement;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
@@ -45,12 +45,12 @@ public class FunctionContainerASTElement extends ASTType implements FunctionCont
    * {@inheritDoc}
    */
   @Override
-  public List<MethodElement> getFunctions() {
+  public List<FunctionElement> getFunctions() {
     return typeElement.getEnclosedElements()
         .stream()
         .filter(elem -> elem.getKind().equals(METHOD))
         .filter(elem -> elem.getAnnotation(Ignore.class) == null)
-        .map(elem -> new MethodElementAST((ExecutableElement) elem, processingEnvironment))
+        .map(elem -> new FunctionElementAST((ExecutableElement) elem, processingEnvironment))
         .collect(toList());
   }
 }
