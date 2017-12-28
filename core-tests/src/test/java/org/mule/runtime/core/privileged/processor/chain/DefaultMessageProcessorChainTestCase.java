@@ -15,6 +15,9 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -30,6 +33,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
+import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -43,11 +48,16 @@ import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKIN
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import static reactor.core.publisher.Flux.from;
 
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.notification.MessageProcessorNotification;
+import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -58,6 +68,7 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.util.ObjectUtils;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
@@ -85,7 +96,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -98,6 +111,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   private AtomicInteger nonBlockingProcessorsExecuted = new AtomicInteger(0);
   private ProcessingStrategyFactory processingStrategyFactory;
+  private final RuntimeException illegalStateException = new IllegalStateException();
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -724,33 +738,122 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Test
   public void testExceptionAfter() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor());
-    expectedException.expect(IllegalStateException.class);
+    builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor(illegalStateException));
+    expectedException.expect(is(illegalStateException));
     process(builder.build(), getTestEventUsingFlow("0"));
   }
 
   @Test
   public void testExceptionBefore() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    builder.chain(new ExceptionThrowingMessageProcessor(), getAppendingMP("1"));
-    expectedException.expect(IllegalStateException.class);
+    builder.chain(new ExceptionThrowingMessageProcessor(illegalStateException), getAppendingMP("1"));
+    expectedException.expect(is(illegalStateException));
     process(builder.build(), getTestEventUsingFlow("0"));
   }
 
   @Test
   public void testExceptionBetween() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor(), getAppendingMP("2"));
-    expectedException.expect(IllegalStateException.class);
+    builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor(illegalStateException), getAppendingMP("2"));
+    expectedException.expect(is(illegalStateException));
     process(builder.build(), getTestEventUsingFlow("0"));
   }
 
   @Test
   public void testExceptionInResponse() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    builder.chain(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor()), getAppendingMP("1"));
-    expectedException.expect(IllegalStateException.class);
+    builder.chain(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor(illegalStateException)),
+                  getAppendingMP("1"));
+    expectedException.expect(is(illegalStateException));
     process(builder.build(), getTestEventUsingFlow("0"));
+  }
+
+  @Test
+  public void testSuccessNotifications() throws Exception {
+    List<MessageProcessorNotification> notificationList = new ArrayList<>();
+    setupMessageProcessorNotificationListener(notificationList);
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    builder.chain(getAppendingMP("1"));
+    final CoreEvent inEvent = getTestEventUsingFlow("0");
+    final String resultPayload = "01";
+    assertThat(process(builder.build(), inEvent).getMessage().getPayload().getValue(), equalTo(resultPayload));
+    assertThat(notificationList, hasSize(2));
+    MessageProcessorNotification preNotification = notificationList.get(0);
+    MessageProcessorNotification postNotification = notificationList.get(1);
+    assertPreNotification(inEvent, preNotification);
+    assertThat(postNotification.getAction().getActionId(), equalTo(MESSAGE_PROCESSOR_POST_INVOKE));
+    assertThat(postNotification.getEventContext(), equalTo(inEvent.getContext()));
+    assertThat(postNotification.getEvent(), not(equalTo(inEvent)));
+    assertThat(postNotification.getEvent().getMessage().getPayload().getValue(), equalTo(resultPayload));
+    assertThat(postNotification.getException(), is(nullValue()));
+  }
+
+  @Test
+  public void testErrorNotifications() throws Exception {
+    List<MessageProcessorNotification> notificationList = new ArrayList<>();
+    setupMessageProcessorNotificationListener(notificationList);
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    builder.chain(new ExceptionThrowingMessageProcessor(illegalStateException));
+    final CoreEvent inEvent = getTestEventUsingFlow("0");
+    try {
+      process(builder.build(), inEvent);
+    } catch (Throwable t) {
+      assertThat(t, is(illegalStateException));
+      assertThat(notificationList, hasSize(2));
+      MessageProcessorNotification preNotification = notificationList.get(0);
+      MessageProcessorNotification postNotification = notificationList.get(1);
+      assertPreNotification(inEvent, preNotification);
+      assertThat(postNotification.getAction().getActionId(), equalTo(MESSAGE_PROCESSOR_POST_INVOKE));
+      assertThat(postNotification.getEventContext(), equalTo(inEvent.getContext()));
+      assertPostErrorNotification(inEvent, postNotification);
+    }
+  }
+
+  @Test
+  public void testErrorNotificationsMessagingException() throws Exception {
+    List<MessageProcessorNotification> notificationList = new ArrayList<>();
+    setupMessageProcessorNotificationListener(notificationList);
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+    final CoreEvent messagingExceptionEvent = getTestEventUsingFlow("other");
+    final MessagingException messagingException = new MessagingException(messagingExceptionEvent, illegalStateException);
+    builder.chain(new ExceptionThrowingMessageProcessor(messagingException));
+    final CoreEvent inEvent = getTestEventUsingFlow("0");
+    try {
+      process(builder.build(), inEvent);
+    } catch (Throwable t) {
+      assertThat(t, instanceOf(IllegalStateException.class));
+      assertThat(notificationList, hasSize(2));
+      MessageProcessorNotification preNotification = notificationList.get(0);
+      MessageProcessorNotification postNotification = notificationList.get(1);
+      assertPreNotification(inEvent, preNotification);
+      assertThat(postNotification.getAction().getActionId(), equalTo(MESSAGE_PROCESSOR_POST_INVOKE));
+      // Existing MessagingException.event is updated to include error
+      assertThat(postNotification.getEvent(), not(messagingExceptionEvent));
+      assertPostErrorNotification(inEvent, postNotification);
+    }
+  }
+
+  private void setupMessageProcessorNotificationListener(List<MessageProcessorNotification> notificationList) {
+    muleContext.getNotificationManager().addInterfaceToType(MessageProcessorNotificationListener.class,
+                                                            MessageProcessorNotification.class);
+    muleContext.getNotificationManager().addListener((MessageProcessorNotificationListener) notification -> {
+      notificationList.add((MessageProcessorNotification) notification);
+    });
+  }
+
+  private void assertPreNotification(CoreEvent inEvent, MessageProcessorNotification preNotification) {
+    assertThat(preNotification.getAction().getActionId(), equalTo(MESSAGE_PROCESSOR_PRE_INVOKE));
+    assertThat(preNotification.getEventContext(), equalTo(inEvent.getContext()));
+    assertThat(preNotification.getEvent(), equalTo(inEvent));
+    assertThat(preNotification.getException(), is(nullValue()));
+  }
+
+  private void assertPostErrorNotification(CoreEvent inEvent, MessageProcessorNotification postNotification) {
+    assertThat(postNotification.getEvent(), not(equalTo(inEvent)));
+    assertThat(postNotification.getEvent().getError().isPresent(), is(true));
+    assertThat(postNotification.getEvent().getError().get().getCause(), is(illegalStateException));
+    assertThat(postNotification.getException(), is(instanceOf(MessagingException.class)));
+    assertThat(postNotification.getException().getCause(), is(illegalStateException));
   }
 
   @Override
@@ -815,7 +918,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     }
   }
 
-  class AppendingMP implements Processor, Lifecycle, MuleContextAware {
+  class AppendingMP extends AbstractComponent implements Processor, Lifecycle, MuleContextAware {
 
     String appendString;
     boolean muleContextInjected;
@@ -874,6 +977,10 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       this.muleContextInjected = true;
     }
 
+    @Override
+    public ComponentLocation getLocation() {
+      return mock(ComponentLocation.class);
+    }
   }
 
   class AppendingInterceptingMP extends AbstractInterceptingMessageProcessor implements Lifecycle {
@@ -1002,12 +1109,30 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     return CoreEvent.builder(create(flow, TEST_CONNECTOR_LOCATION)).message(of(data)).build();
   }
 
-  public static class ExceptionThrowingMessageProcessor implements Processor, InternalProcessor {
+  public static class ExceptionThrowingMessageProcessor extends AbstractComponent implements Processor, InternalProcessor {
+
+    private Exception exception;
+
+    public ExceptionThrowingMessageProcessor(Exception exception) {
+      this.exception = exception;
+    }
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
-      throw new IllegalStateException();
+      if (exception instanceof MuleException) {
+        throw (MuleException) exception;
+      } else if (exception instanceof RuntimeException) {
+        throw (RuntimeException) exception;
+      } else {
+        throw new MuleRuntimeException(exception);
+      }
     }
+
+    @Override
+    public ComponentLocation getLocation() {
+      return mock(ComponentLocation.class);
+    }
+
   }
 
 }

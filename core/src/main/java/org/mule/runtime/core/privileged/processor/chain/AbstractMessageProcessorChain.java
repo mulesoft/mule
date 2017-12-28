@@ -175,14 +175,16 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         // Give priority to failed event from reactor over MessagingException event.
         BaseEventContext context = (BaseEventContext) (event != null ? event.getContext()
             : ((MessagingException) throwable).getEvent().getContext());
-        context.error(resolveMessagingException(processor).apply((MessagingException) throwable));
+        errorNotification(processor).andThen(e -> context.error(e))
+            .accept(resolveMessagingException(processor).apply((MessagingException) throwable));
       } else {
         if (event == null) {
           LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
           throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
         } else {
           BaseEventContext context = ((BaseEventContext) event.getContext());
-          context.error(resolveException((Component) processor, event, throwable));
+          errorNotification(processor).andThen(e -> context.error(e))
+              .accept(resolveException((Component) processor, event, throwable));
         }
       }
     };
@@ -239,7 +241,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           // If the processor returns a CursorProvider, then have the StreamingManager manage it
           return updateEventForStreaming(streamingManager).apply(result);
         })
-        .doOnError(MessagingException.class, errorNotification(processor))
         .cast(CoreEvent.class));
 
     // #5 Apply processor interceptors around processor and other core logic
