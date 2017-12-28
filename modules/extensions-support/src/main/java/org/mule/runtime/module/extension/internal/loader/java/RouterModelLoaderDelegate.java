@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.checkDefinition;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -102,11 +101,12 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
     checkDefinition(isVoid(routerMethod), format("Router '%s' is not declared in a void method.",
                                                  routerMethod.getAlias()));
 
-    loader.getMethodParametersLoader().declare(router,
-                                               routerMethod.getParameters().stream()
-                                                   .filter(p -> !isRoute(p) && !callbackParameters.contains(p))
-                                                   .collect(toList()),
-                                               new ParameterDeclarationContext(CONSTRUCT, router.getDeclaration()));
+    List<ExtensionParameter> nonRouteParameters = routerMethod.getParameters().stream()
+        .filter(p -> !isRoute(p) && !callbackParameters.contains(p))
+        .collect(toList());
+
+    declareParameters(router, nonRouteParameters, routerMethod.getEnclosingType().getParameters(),
+                      new ParameterDeclarationContext(CONSTRUCT, router.getDeclaration()));
 
     declareRoutes(router, routes);
   }

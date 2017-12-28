@@ -9,11 +9,12 @@ package org.mule.test.heisenberg.extension;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
@@ -32,8 +33,11 @@ import java.util.function.Consumer;
 
 public class HeisenbergRouters {
 
+  @Parameter
+  @Optional(defaultValue = "0")
+  private int fieldParam;
+  
   public void concurrentRouteExecutor(WhenRoute when, RouterCompletionCallback callback) {
-
     Consumer<Chain> processor = (chain) -> {
       final Latch latch = new Latch();
       chain.process((result -> latch.release()), (error, result) -> latch.release());
@@ -97,7 +101,6 @@ public class HeisenbergRouters {
                   @Optional BeforeCall beforeCallAssertions,
                   @Optional AfterCall afterCallAssertions,
                   RouterCompletionCallback callback) {
-
     Map<String, Object> attr = withAttributes.stream().collect(toMap(Attribute::getName, r -> r));
 
     if (beforeCallAssertions == null && afterCallAssertions == null) {
@@ -128,6 +131,12 @@ public class HeisenbergRouters {
     } else {
       callback.success(Result.builder().build());
     }
+  }
+
+  public int routerField(int expected, int newValue) {
+    checkArgument(expected == fieldParam, "Expected " + expected + " but was " + fieldParam);
+    fieldParam = newValue;
+    return fieldParam;
   }
 
 }

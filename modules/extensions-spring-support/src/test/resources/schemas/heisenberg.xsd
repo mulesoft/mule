@@ -1415,6 +1415,7 @@
             <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
           </xs:choice>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1613,6 +1614,7 @@
             <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
           </xs:choice>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1625,6 +1627,7 @@
             <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
           </xs:choice>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1645,6 +1648,7 @@
             <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
           </xs:choice>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1663,6 +1667,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -2107,6 +2112,7 @@
             <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
           </xs:choice>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -2161,6 +2167,7 @@
         </xs:sequence>
         <xs:attribute type="xs:string" use="required" name="payload"></xs:attribute>
         <xs:attribute type="mule:expressionMap" use="required" name="attributes"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -2391,6 +2398,48 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="RouterFieldType" substitutionGroup="mule:abstract-operator" name="router-field"></xs:element>
+  <xs:complexType name="RouterFieldType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionInt" use="required" name="expected"></xs:attribute>
+        <xs:attribute type="mule:expressionInt" use="required" name="newValue"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ScopeFieldType" substitutionGroup="mule:abstract-operator" name="scope-field"></xs:element>
+  <xs:complexType name="ScopeFieldType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionInt" use="required" name="expected"></xs:attribute>
+        <xs:attribute type="mule:expressionInt" use="required" name="newValue"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="ThrowErrorType" substitutionGroup="heisenberg-empire" name="throw-error"></xs:element>
   <xs:complexType name="ThrowErrorType">
     <xs:complexContent>
@@ -2429,6 +2478,7 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -2453,6 +2503,7 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -2497,6 +2548,7 @@
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="processor"></xs:attribute>
         <xs:attribute type="mule:substitutableName" use="optional" name="withAttributes"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -2551,6 +2603,7 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -2590,6 +2643,7 @@
           </xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="processorName"></xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

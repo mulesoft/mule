@@ -11,7 +11,6 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.checkDefinition;
 import static org.mule.runtime.module.extension.internal.loader.java.OperationModelLoaderDelegate.processNonBlockingOperation;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
@@ -96,9 +95,8 @@ final class ScopeModelLoaderDelegate extends AbstractModelLoaderDelegate {
                            Chain.class.getSimpleName(),
                            processorChain.stream().map(ExtensionParameter::getName).collect(toList())));
 
-    loader.getMethodParametersLoader().declare(scope,
-                                               scopeMethod.getParameters(),
-                                               new ParameterDeclarationContext(SCOPE, scope.getDeclaration()));
+    declareParameters(scope, scopeMethod.getParameters(), scopeMethod.getEnclosingType().getParameters(),
+                      new ParameterDeclarationContext(SCOPE, scope.getDeclaration()));
 
     loader.addExceptionEnricher(scopeMethod, scope);
 
