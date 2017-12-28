@@ -55,8 +55,8 @@ public class ObjectFactoryClassRepository {
    * @param objectFactoryType the {@link ObjectFactory} of the component
    * @param createdObjectType the type of object created by the {@code ObjectFactory}
    * @param isLazyInitFunction function that defines if the object created by the component can be created lazily
-   * @param instancePostCreationFunctionOptional function to do custom processing of the created instance by the
-   *        {@code ObjectFactory}. When there's no need for post processing this value must be {@link Optional#empty()}
+   * @param instancePostCreationFunctionOptional function to do custom processing of the created instance by the {@code ObjectFactory}.
+   *        When there's no need for post processing this value must be {@link Optional#empty()}
    * @return the {@code FactoryBean} class to be used by spring for the provided configuration.
    */
   public Class<ObjectFactory> getObjectFactoryClass(ComponentBuildingDefinition componentBuildingDefinition,
@@ -111,29 +111,18 @@ public class ObjectFactoryClassRepository {
           if (method.getName().equals("getObjectType") && !ObjectTypeProvider.class.isAssignableFrom(obj.getClass())) {
             return createdObjectType;
           }
+          if (method.getName().equals("getObject")) {
+            Object createdInstance = proxy.invokeSuper(obj, args);
+            instancePostCreationFunction.accept(createdInstance);
+            return createdInstance;
+          }
           if (method.getName().equals("isPrototype")) {
             return componentBuildingDefinition.isPrototype();
           }
           if (method.getName().equals("isEagerInit")) {
             return !isLazyInitFunction.get();
           }
-
-          ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-
-          try {
-            if (!obj.getClass().getClassLoader().equals(originalClassLoader)) {
-              Thread.currentThread()
-                  .setContextClassLoader(new CompositeClassLoader(originalClassLoader, obj.getClass().getClassLoader()));
-            }
-
-            Object createdInstance = proxy.invokeSuper(obj, args);
-            if (method.getName().equals("getObject")) {
-              instancePostCreationFunction.accept(createdInstance);
-            }
-            return createdInstance;
-          } finally {
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
-          }
+          return proxy.invokeSuper(obj, args);
         }
     });
     return factoryBeanClass;
