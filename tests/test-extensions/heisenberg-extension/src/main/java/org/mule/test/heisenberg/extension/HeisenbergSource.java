@@ -96,8 +96,8 @@ public class HeisenbergSource extends Source<String, Object> {
   public static String configName;
   public static String location;
 
-  public static boolean receivedDebtProperties;
-  public static boolean receivedUsableWeapons;
+  public static Map<String, Object> receivedDebtProperties;
+  public static Map<String, Weapon> receivedUsableWeapons;
 
   @Inject
   private SchedulerService schedulerService;
@@ -144,6 +144,9 @@ public class HeisenbergSource extends Source<String, Object> {
     receivedInlineOnSuccess = false;
     receivedInlineOnError = false;
 
+    receivedDebtProperties = null;
+    receivedUsableWeapons = null;
+
     terminateStatus = NONE;
 
     executedOnSuccess = false;
@@ -164,6 +167,9 @@ public class HeisenbergSource extends Source<String, Object> {
     if (corePoolSize < 0) {
       throw new RuntimeException(CORE_POOL_SIZE_ERROR_MESSAGE);
     }
+
+    receivedDebtProperties = debtProperties;
+    receivedUsableWeapons = usableWeapons;
 
     executor = schedulerService.cpuLightScheduler();
     connection = connectionProvider.connect();
