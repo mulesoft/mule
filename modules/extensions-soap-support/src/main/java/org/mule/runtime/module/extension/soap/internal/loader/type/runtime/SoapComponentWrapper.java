@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.soap.internal.loader.type.runtime;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
 /**
@@ -15,7 +16,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeW
  */
 abstract class SoapComponentWrapper extends TypeWrapper {
 
-  SoapComponentWrapper(Class<?> aClass) {
-    super(aClass);
+  SoapComponentWrapper(Class<?> aClass, ClassTypeLoader typeLoader) {
+    super(aClass, typeLoader);
   }
 }

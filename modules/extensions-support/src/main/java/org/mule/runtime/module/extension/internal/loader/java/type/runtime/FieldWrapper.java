@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forField;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
@@ -26,9 +27,11 @@ import java.util.Optional;
 public class FieldWrapper implements FieldElement {
 
   private final Field field;
+  private ClassTypeLoader typeLoader;
 
-  public FieldWrapper(Field field) {
+  public FieldWrapper(Field field, ClassTypeLoader typeLoader) {
     this.field = field;
+    this.typeLoader = typeLoader;
   }
 
   /**
@@ -60,7 +63,7 @@ public class FieldWrapper implements FieldElement {
    */
   @Override
   public TypeWrapper getType() {
-    return new TypeWrapper(forField(field));
+    return new TypeWrapper(forField(field), typeLoader);
   }
 
   /**
@@ -90,7 +93,8 @@ public class FieldWrapper implements FieldElement {
 
   @Override
   public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
-    return isAnnotatedWith(annotationClass) ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, field))
+    return isAnnotatedWith(annotationClass)
+        ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, field, typeLoader))
         : Optional.empty();
   }
 

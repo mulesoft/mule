@@ -21,13 +21,13 @@ import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionE
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAlias;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
-
 import java.util.List;
 
 /**
@@ -45,6 +45,10 @@ abstract class AbstractModelLoaderDelegate {
 
   protected Class<?> getExtensionType() {
     return loader.getExtensionType();
+  }
+
+  protected ExtensionElement getExtensionElement() {
+    return loader.getExtensionElement();
   }
 
   ConfigModelLoaderDelegate getConfigLoaderDelegate() {
@@ -111,11 +115,11 @@ abstract class AbstractModelLoaderDelegate {
                                                                   alias.getAlias(),
                                                                   ConnectionProvider.class.getSimpleName()));
       }
-
-      return generics.get(0).getConcreteType().getDeclaringClass();
+      //TODO - MULE-14311 - Remove classes references
+      return generics.get(0).getConcreteType().getDeclaringClass().get();
     }
-
-    return connectionType.getDeclaringClass();
+    //TODO - MULE-14311 - Remove classes references
+    return connectionType.getDeclaringClass().get();
   }
 
   void processMimeType(HasModelProperties declarer, WithAnnotations element) {

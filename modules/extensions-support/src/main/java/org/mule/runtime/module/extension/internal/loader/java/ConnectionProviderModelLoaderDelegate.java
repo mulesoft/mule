@@ -45,7 +45,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
 
   private static final String CONNECTION_PROVIDER = "Connection Provider";
 
-  private final Map<Class<?>, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
+  private final Map<ConnectionProviderElement, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
 
   ConnectionProviderModelLoaderDelegate(DefaultJavaModelLoaderDelegate loader) {
     super(loader);
@@ -57,8 +57,9 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
   }
 
   private void declareConnectionProvider(HasConnectionProviderDeclarer declarer, ConnectionProviderElement providerType) {
-    final Class<?> providerClass = providerType.getDeclaringClass();
-    ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(providerClass);
+    //TODO - MULE-14311 - Remove class reference
+    final Class<?> providerClass = providerType.getDeclaringClass().get();
+    ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(providerType);
     if (providerDeclarer != null) {
       declarer.withConnectionProvider(providerDeclarer);
       return;
@@ -86,7 +87,8 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
                                                                                                              providerClass,
                                                                                                              getExtensionType()
                                                                                                                  .getClassLoader())))
-        .withModelProperty(new ConnectionTypeModelProperty(providerGenerics.get(0).getDeclaringClass()))
+        //TODO - MULE-14311 - Remove class reference
+        .withModelProperty(new ConnectionTypeModelProperty(providerGenerics.get(0).getDeclaringClass().get()))
         .withModelProperty(new ImplementingTypeModelProperty(providerClass));
 
     providerDeclarer.withModelProperty(new ExtensionTypeDescriptorModelProperty(providerType));
@@ -94,17 +96,17 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
     loader.parseExternalLibs(providerType, providerDeclarer);
 
     ConnectionManagementType managementType = NONE;
-    if (PoolingConnectionProvider.class.isAssignableFrom(providerClass)) {
+    if (providerType.isAssignableTo(PoolingConnectionProvider.class)) {
       managementType = POOLING;
-    } else if (CachedConnectionProvider.class.isAssignableFrom(providerClass)) {
+    } else if (providerType.isAssignableTo(CachedConnectionProvider.class)) {
       managementType = CACHED;
     }
 
     parseOAuthGrantType(providerType, providerDeclarer);
 
     providerDeclarer.withConnectionManagementType(managementType);
-    providerDeclarer.supportsConnectivityTesting(!NoConnectivityTest.class.isAssignableFrom(providerType.getDeclaringClass()));
-    connectionProviderDeclarers.put(providerClass, providerDeclarer);
+    providerDeclarer.supportsConnectivityTesting(!providerType.isAssignableTo(NoConnectivityTest.class));
+    connectionProviderDeclarers.put(providerType, providerDeclarer);
     ParameterDeclarationContext context = new ParameterDeclarationContext(CONNECTION_PROVIDER, providerDeclarer.getDeclaration());
     loader.getFieldParametersLoader().declare(providerDeclarer, providerType.getParameters(), context);
   }

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
@@ -15,8 +16,7 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 
 /**
  * Validates that all the paged {@link OperationModel operations} don't receive a {@link Connection} parameter.
@@ -31,8 +31,8 @@ public class PagedOperationModelValidator implements ExtensionModelValidator {
 
       @Override
       protected void onOperation(OperationModel operationModel) {
-        boolean hasConnectionParameter = operationModel.getModelProperty(ImplementingMethodModelProperty.class)
-            .map(implementingMethodModelProperty -> new MethodWrapper(implementingMethodModelProperty.getMethod())
+        boolean hasConnectionParameter = operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+            .map(property -> property.getOperationMethod()
                 .getParametersAnnotatedWith(Connection.class).size() > 0)
             .orElse(false);
         if (hasConnectionParameter && operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {

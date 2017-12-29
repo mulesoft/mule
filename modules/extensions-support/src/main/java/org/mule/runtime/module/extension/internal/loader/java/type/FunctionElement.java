@@ -6,17 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
-import java.util.List;
-
 /**
- * A generic contract for any kind of component from which, a list of operations can be derived
+ * {@link MethodElement} specification for Functions
  *
- * @since 4.0
+ * @since 4.1
  */
-interface WithOperations {
+public interface FunctionElement extends MethodElement<FunctionContainerElement> {
 
   /**
-   * @return a list of {@link MethodElement}
+   * {@inheritDoc}
    */
-  List<OperationElement> getOperations();
+  FunctionContainerElement getEnclosingType();
+
 }

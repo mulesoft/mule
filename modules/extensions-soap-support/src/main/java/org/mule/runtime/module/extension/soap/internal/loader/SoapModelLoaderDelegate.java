@@ -13,25 +13,26 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapExtensi
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
-import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsModelFactory;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsModelFactory;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.TypeAwareConfigurationFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.MessageDispatcherProviderTypeWrapper;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapExtensionTypeWrapper;
 import org.mule.runtime.soap.api.exception.error.SoapErrors;
+
 import java.util.List;
 import java.util.Set;
 
@@ -51,8 +52,8 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
   public SoapModelLoaderDelegate(Class<?> extensionType, String version) {
     this.extensionType = extensionType;
     this.version = version;
-    this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-    this.serviceProviderDeclarer = new SoapServiceProviderDeclarer(typeLoader);
+    this.typeLoader = new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionType.getClassLoader());
+    this.serviceProviderDeclarer = new SoapServiceProviderDeclarer();
     this.operationDeclarer = new SoapInvokeOperationDeclarer();
   }
 
@@ -60,7 +61,7 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
    * {@inheritDoc}
    */
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
-    final SoapExtensionTypeWrapper<?> extension = getSoapExtensionType(this.extensionType);
+    final SoapExtensionTypeWrapper<?> extension = getSoapExtensionType(this.extensionType, typeLoader);
     List<MessageDispatcherProviderTypeWrapper> customTransportProviders = extension.getDispatcherProviders();
     ExtensionDeclarer extensionDeclarer = getExtensionDeclarer(context);
     declareSubtypes(extensionDeclarer, customTransportProviders);
@@ -74,7 +75,7 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
 
   private void declareSubtypes(ExtensionDeclarer extension, List<MessageDispatcherProviderTypeWrapper> transportProviders) {
     if (!transportProviders.isEmpty()) {
-      List<MetadataType> types = transportProviders.stream().map(tp -> typeLoader.load(tp.getDeclaringClass())).collect(toList());
+      List<MetadataType> types = transportProviders.stream().map(TypeWrapper::asMetadataType).collect(toList());
       extension.withSubTypes(typeLoader.load(MessageDispatcherProvider.class), types);
     }
   }
@@ -93,7 +94,8 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
   private ConfigurationDeclarer getConfigDeclarer(ExtensionDeclarer declarer,
                                                   SoapExtensionTypeWrapper<?> extension,
                                                   Set<ErrorModel> soapErrors) {
-    Class<?> clazz = extension.getDeclaringClass();
+    //TODO - MULE-14311 - Make loader work in compile time
+    Class<?> clazz = extension.getDeclaringClass().get();
     TypeAwareConfigurationFactory configurationFactory = new TypeAwareConfigurationFactory(clazz, clazz.getClassLoader());
 
     ConfigurationDeclarer configDeclarer = declarer.withConfig(DEFAULT_CONFIG_NAME)

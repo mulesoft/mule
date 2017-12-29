@@ -21,11 +21,14 @@ import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecu
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +51,8 @@ final class ScopeModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   void declareScope(ExtensionDeclarer extensionDeclarer,
                     HasOperationDeclarer ownerDeclarer,
-                    Class<?> declaringClass,
-                    MethodElement scopeMethod,
+                    OperationContainerElement enclosingType,
+                    OperationElement scopeMethod,
                     Optional<ExtensionParameter> configParameter,
                     Optional<ExtensionParameter> connectionParameter) {
 
@@ -78,12 +81,18 @@ final class ScopeModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     final OperationDeclarer scope = actualDeclarer.withOperation(scopeMethod.getAlias());
     scope.withModelProperty(new ExtensionOperationDescriptorModelProperty(scopeMethod));
-    scopeMethod.getMethod().ifPresent(method -> scope
-        .withModelProperty(new ImplementingMethodModelProperty(method))
-        .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass, method))));
+
+    Optional<Method> method = scopeMethod.getMethod();
+    Optional<Class<?>> declaringClass = enclosingType.getDeclaringClass();
+
+    if (method.isPresent() && declaringClass.isPresent()) {
+      scope.withModelProperty(new ImplementingMethodModelProperty(method.get()))
+          .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass.get(),
+                                                                                                         method.get())));
+    }
 
     processMimeType(scope, scopeMethod);
-    processNonBlockingOperation(scope, scopeMethod, false, loader.getTypeLoader());
+    processNonBlockingOperation(scope, scopeMethod, false);
 
     List<ExtensionParameter> processorChain =
         scopeMethod.getParameters().stream().filter(ModelLoaderUtils::isProcessorChain).collect(toList());

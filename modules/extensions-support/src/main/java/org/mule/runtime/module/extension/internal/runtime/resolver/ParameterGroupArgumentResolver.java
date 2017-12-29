@@ -7,11 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
+import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
+import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ParameterGroupObjectBuilder;
 
 public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver<T> {
@@ -19,7 +20,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
   private final ParameterGroupDescriptor group;
 
   public ParameterGroupArgumentResolver(ParameterGroupDescriptor group) {
-    checkInstantiable(group.getType().getDeclaringClass());
+    checkState(group.getType().isInstantiable(), "Class %s cannot be instantiated.");
     this.group = group;
   }
 

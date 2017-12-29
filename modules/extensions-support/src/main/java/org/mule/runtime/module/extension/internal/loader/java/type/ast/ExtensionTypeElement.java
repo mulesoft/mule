@@ -18,7 +18,8 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.FunctionElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.OperationElement;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
@@ -63,7 +64,7 @@ public class ExtensionTypeElement extends ConfigurationASTElement implements Ext
    * {@inheritDoc}
    */
   @Override
-  public List<MethodElement> getFunctions() {
+  public List<FunctionElement> getFunctions() {
     return getValueFromAnnotation(ExpressionFunctions.class).map(valFetcher -> valFetcher
         .<ASTType>getClassArrayValue(ExpressionFunctions::value)
         .stream()
@@ -78,7 +79,7 @@ public class ExtensionTypeElement extends ConfigurationASTElement implements Ext
    * {@inheritDoc}
    */
   @Override
-  public List<MethodElement> getOperations() {
+  public List<OperationElement> getOperations() {
     return getValueFromAnnotation(Operations.class).map(valFetcher -> valFetcher
         .<ASTType>getClassArrayValue(Operations::value)
         .stream()

@@ -27,10 +27,13 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,8 +57,11 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
     super(delegate);
   }
 
-  void declareRouter(ExtensionDeclarer extensionDeclarer, HasOperationDeclarer ownerDeclarer, Class<?> declaringClass,
-                     MethodElement routerMethod, Optional<ExtensionParameter> configParameter,
+  void declareRouter(ExtensionDeclarer extensionDeclarer,
+                     HasOperationDeclarer ownerDeclarer,
+                     OperationContainerElement enclosingType,
+                     OperationElement routerMethod,
+                     Optional<ExtensionParameter> configParameter,
                      Optional<ExtensionParameter> connectionParameter) {
 
     checkDefinition(!configParameter.isPresent(),
@@ -77,14 +83,21 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     final ConstructDeclarer router = actualDeclarer.withConstruct(routerMethod.getAlias());
     router.withModelProperty(new ExtensionOperationDescriptorModelProperty(routerMethod));
-    routerMethod.getMethod().ifPresent(method -> router
-        .withModelProperty(new ImplementingMethodModelProperty(method))
-        .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass, method))));
+    Optional<Method> method = routerMethod.getMethod();
+    Optional<Class<?>> declaringClass = enclosingType.getDeclaringClass();
+
+    if (method.isPresent() && declaringClass.isPresent()) {
+      router
+          .withModelProperty(new ImplementingMethodModelProperty(method.get()))
+          .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass.get(),
+                                                                                                         method.get())));
+    }
+
 
     processMimeType(router, routerMethod);
 
     List<ExtensionParameter> callbackParameters = routerMethod.getParameters().stream()
-        .filter(p -> VALID_CALLBACK_PARAMETERS.contains(p.getType().getDeclaringClass()))
+        .filter(p -> VALID_CALLBACK_PARAMETERS.stream().anyMatch(validType -> p.getType().isSameType(validType)))
         .collect(toList());
 
     List<ExtensionParameter> routes = routerMethod.getParameters().stream().filter(this::isRoute).collect(toList());
@@ -120,7 +133,8 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
           .describedAs(route.getDescription())
           .withMinOccurs(route.isRequired() ? 1 : 0);
 
-      routeDeclarer.withModelProperty(new ImplementingTypeModelProperty(route.getType().getDeclaringClass()));
+      route.getType().getDeclaringClass()
+          .ifPresent(clazz -> routeDeclarer.withModelProperty(new ImplementingTypeModelProperty(clazz)));
 
       final List<FieldElement> parameters = route.getType().getAnnotatedFields(Parameter.class);
       loader.getFieldParametersLoader().declare(routeDeclarer, parameters,
@@ -129,7 +143,7 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
   }
 
   private boolean isRoute(ExtensionParameter parameter) {
-    return Route.class.isAssignableFrom(parameter.getType().getDeclaringClass());
+    return parameter.getType().isAssignableTo(Route.class);
   }
 
 }

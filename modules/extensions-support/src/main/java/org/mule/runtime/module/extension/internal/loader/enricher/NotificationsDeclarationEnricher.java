@@ -12,6 +12,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.INITIALIZE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -20,7 +21,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
-import org.mule.runtime.extension.api.model.notification.ImmutableNotificationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -33,19 +33,12 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.model.notification.ImmutableNotificationModel;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,21 +60,13 @@ public class NotificationsDeclarationEnricher implements DeclarationEnricher {
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     ExtensionDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
-    Optional<ImplementingTypeModelProperty> implementingType = declaration.getModelProperty(ImplementingTypeModelProperty.class);
+    Optional<ExtensionTypeDescriptorModelProperty> extensionType =
+        declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
     String extensionNamespace = getExtensionsNamespace(declaration);
-    LoadingCache<Class<?>, TypeWrapper> typeWrapperCache =
-        CacheBuilder.newBuilder().build(new CacheLoader<Class<?>, TypeWrapper>() {
-
-          @Override
-          public TypeWrapper load(Class<?> clazz) throws Exception {
-            return new TypeWrapper(clazz);
-          }
-        });
-
     ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-    if (implementingType.isPresent()) {
-      ExtensionElement extensionElement = new ExtensionTypeWrapper<>(implementingType.get().getType());
+    if (extensionType.isPresent()) {
+      Type extensionElement = extensionType.get().getType();
       Optional<NotificationActions> annotation = extensionElement.getAnnotation(NotificationActions.class);
       annotation.ifPresent(actionsAnnotation -> {
         NotificationActionDefinition<?>[] actions =
@@ -98,39 +83,37 @@ public class NotificationsDeclarationEnricher implements DeclarationEnricher {
 
           @Override
           public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration) {
-            Optional<ImplementingMethodModelProperty> modelProperty =
-                declaration.getModelProperty(ImplementingMethodModelProperty.class);
+            Optional<ExtensionOperationDescriptorModelProperty> modelProperty =
+                declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class);
 
             if (modelProperty.isPresent()) {
-              MethodWrapper methodWrapper = new MethodWrapper(modelProperty.get().getMethod());
+              MethodElement method = modelProperty.get().getOperationMethod();
               Optional<Fires> emitsNotifications =
-                  getOperationNotificationDeclaration(methodWrapper, extensionElement, typeWrapperCache);
+                  getOperationNotificationDeclaration(method, extensionElement);
               includeNotificationDeclarationIfNeeded(declaration, emitsNotifications);
             }
           }
 
           @Override
           public void onSource(SourceDeclaration declaration) {
-            Optional<ImplementingTypeModelProperty> modelProperty =
-                declaration.getModelProperty(ImplementingTypeModelProperty.class);
+            Optional<ExtensionTypeDescriptorModelProperty> modelProperty =
+                declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
 
             if (modelProperty.isPresent()) {
-              final Class<?> sourceType = modelProperty.get().getType();
-              TypeWrapper sourceContainer = typeWrapperCache.getUnchecked(sourceType);
+              Type sourceContainer = modelProperty.get().getType();
               Optional<Fires> emitsNotifications = getNotificationDeclaration(sourceContainer, extensionElement);
               includeNotificationDeclarationIfNeeded(declaration, emitsNotifications);
             }
           }
 
           private Optional<Fires> getOperationNotificationDeclaration(MethodElement operationMethod,
-                                                                      ExtensionElement extensionElement,
-                                                                      LoadingCache<Class<?>, TypeWrapper> typeWrapperCache) {
-            TypeWrapper operationContainer = typeWrapperCache.getUnchecked(operationMethod.getDeclaringClass());
+                                                                      Type extensionElement) {
+            Type operationContainer = operationMethod.getEnclosingType();
             return ofNullable(operationMethod.getAnnotation(Fires.class))
                 .orElse(getNotificationDeclaration(operationContainer, extensionElement));
           }
 
-          private Optional<Fires> getNotificationDeclaration(Type container, ExtensionElement extensionElement) {
+          private Optional<Fires> getNotificationDeclaration(Type container, Type extensionElement) {
             return ofNullable(container.getAnnotation(Fires.class)
                 .orElseGet(() -> extensionElement.getAnnotation(Fires.class)
                     .orElse(null)));

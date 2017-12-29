@@ -43,6 +43,8 @@ import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionPara
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionTypeFactory;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithParameters;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,6 +60,7 @@ import com.google.common.collect.ImmutableList;
 public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   protected final Class<?> extensionType;
+  protected final ExtensionElement extensionElement;
   protected final ClassTypeLoader typeLoader;
   protected final String version;
 
@@ -76,6 +79,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     this.extensionType = extensionType;
     this.version = version;
     this.typeLoader = getDefault().createTypeLoader(extensionType.getClassLoader());
+    this.extensionElement = new ExtensionTypeWrapper<>(extensionType, typeLoader);
 
     this.fieldParametersLoader = new ParameterModelsLoaderDelegate(getParameterFieldsContributors(), typeLoader);
     this.methodParametersLoader = new ParameterModelsLoaderDelegate(getParameterMethodsContributors(), typeLoader);
@@ -97,14 +101,15 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
    */
   @Override
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
-    final ExtensionElement extensionElement = ExtensionTypeFactory.getExtensionType(extensionType);
+    final ExtensionElement extensionElement = ExtensionTypeFactory.getExtensionType(extensionType, typeLoader);
     ExtensionDeclarer declarer =
         context.getExtensionDeclarer()
             .named(extensionElement.getName())
             .onVersion(version)
             .fromVendor(extensionElement.getVendor())
             .withCategory(extensionElement.getCategory())
-            .withModelProperty(new ImplementingTypeModelProperty(extensionType));
+            .withModelProperty(new ImplementingTypeModelProperty(extensionType))
+            .withModelProperty(new ExtensionTypeDescriptorModelProperty(extensionElement));
 
     processLicenseRequirements(declarer);
     parseExternalLibs(extensionElement, declarer);
@@ -227,6 +232,10 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   Class<?> getExtensionType() {
     return extensionType;
+  }
+
+  ExtensionElement getExtensionElement() {
+    return extensionElement;
   }
 
   protected ParameterModelsLoaderDelegate getFieldParametersLoader() {

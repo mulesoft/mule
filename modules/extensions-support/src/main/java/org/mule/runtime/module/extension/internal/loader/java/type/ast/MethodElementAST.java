@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
@@ -24,23 +24,21 @@ import javax.lang.model.element.TypeElement;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * {@link MethodElement} implementation which works with the Java AST
  *
  * @since 4.1.0
  */
-public class MethodElementAST implements MethodElement {
+public class MethodElementAST<T extends Type> implements MethodElement<T> {
 
-  private final ExecutableElement method;
-  private final ProcessingEnvironment processingEnvironment;
   private final LazyValue<List<ExtensionParameter>> parameters;
   private final LazyValue<List<ExtensionParameter>> parameterGroups;
   private final ASTUtils astUtils;
+  protected final ProcessingEnvironment processingEnvironment;
+  protected final ExecutableElement method;
 
   MethodElementAST(ExecutableElement method, ProcessingEnvironment processingEnvironment) {
     this.method = method;
@@ -65,8 +63,8 @@ public class MethodElementAST implements MethodElement {
    * {@inheritDoc}
    */
   @Override
-  public OperationContainerElement getEnclosingType() {
-    return new OperationContainerElementAST((TypeElement) method.getEnclosingElement(), processingEnvironment);
+  public T getEnclosingType() {
+    return (T) new OperationContainerElementAST((TypeElement) method.getEnclosingElement(), processingEnvironment);
   }
 
   /**
@@ -131,13 +129,14 @@ public class MethodElementAST implements MethodElement {
    * {@inheritDoc}
    */
   @Override
-  public Class getDeclaringClass() {
+  public Optional<Class<?>> getDeclaringClass() {
+    //TODO - MULE-14311 - Remove classes references
     try {
-      return Class
-          .forName(processingEnvironment.getElementUtils().getBinaryName((TypeElement) method.getEnclosingElement()).toString());
+      return Optional.ofNullable(Class
+          .forName(processingEnvironment.getElementUtils().getBinaryName((TypeElement) method.getEnclosingElement()).toString()));
     } catch (ClassNotFoundException e) {
-      throw new RuntimeException(e);
     }
+    return empty();
   }
 
   /**
@@ -145,17 +144,17 @@ public class MethodElementAST implements MethodElement {
    */
   @Override
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
+    }
 
-    if (o == null || getClass() != o.getClass())
+    if (o == null || getClass() != o.getClass()) {
       return false;
+    }
 
     MethodElementAST that = (MethodElementAST) o;
 
-    return new EqualsBuilder()
-        .append(method, that.method)
-        .isEquals();
+    return Objects.equals(that.method, this.method);
   }
 
   /**
@@ -163,8 +162,10 @@ public class MethodElementAST implements MethodElement {
    */
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37)
-        .append(method)
-        .toHashCode();
+    return method.hashCode();
+  }
+
+  public ExecutableElement getExecutableElement() {
+    return method;
   }
 }

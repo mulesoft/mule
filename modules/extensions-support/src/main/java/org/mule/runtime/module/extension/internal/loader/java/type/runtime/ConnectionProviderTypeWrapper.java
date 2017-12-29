@@ -6,13 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
-import static java.util.stream.Collectors.toList;
-
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.module.extension.internal.loader.java.type.ConnectionProviderElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
-
-import java.util.List;
 
 /**
  * {@link TypeWrapper} specification for classes that are considered as Connection Providers
@@ -21,18 +17,7 @@ import java.util.List;
  */
 class ConnectionProviderTypeWrapper<T> extends TypeWrapper implements ConnectionProviderElement, ParameterizableTypeElement {
 
-  ConnectionProviderTypeWrapper(Class<T> aClass) {
-    super(aClass);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public List<org.mule.runtime.module.extension.internal.loader.java.type.Type> getInterfaceGenerics(Class clazz) {
-    return IntrospectionUtils.getInterfaceGenerics(getDeclaringClass(), clazz)
-        .stream()
-        .map(TypeWrapper::new)
-        .collect(toList());
+  ConnectionProviderTypeWrapper(Class<T> aClass, ClassTypeLoader classTypeLoader) {
+    super(aClass, classTypeLoader);
   }
 }

@@ -8,22 +8,30 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.of;
 
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
+import org.mule.runtime.module.extension.internal.loader.java.type.ast.ASTType;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.core.ResolvableType;
 
 /**
@@ -33,27 +41,32 @@ import org.springframework.core.ResolvableType;
  */
 public class TypeWrapper implements Type {
 
-  private final Class<?> aClass;
   private final java.lang.reflect.Type type;
+  final Class<?> aClass;
   private List<TypeGeneric> generics = emptyList();
+  private ResolvableType[] resolvableTypeGenerics;
+  ClassTypeLoader typeLoader;
 
-  public TypeWrapper(Class<?> aClass) {
+  public TypeWrapper(Class<?> aClass, ClassTypeLoader typeLoader) {
     this.aClass = aClass;
     this.type = aClass;
+    this.typeLoader = typeLoader;
   }
 
-  public TypeWrapper(ResolvableType resolvableType) {
+  public TypeWrapper(ResolvableType resolvableType, ClassTypeLoader typeLoader) {
     this.aClass = resolvableType.getRawClass();
     this.type = resolvableType.getType();
-    generics = new ArrayList<>();
-    for (ResolvableType type : resolvableType.getGenerics()) {
-      TypeWrapper concreteType = new TypeWrapper(type);
+    this.generics = new ArrayList<>();
+    this.typeLoader = typeLoader;
+    resolvableTypeGenerics = resolvableType.getGenerics();
+    for (ResolvableType type : resolvableTypeGenerics) {
+      TypeWrapper concreteType = new TypeWrapper(type, typeLoader);
       generics.add(new TypeGeneric(concreteType, concreteType.getGenerics()));
     }
   }
 
-  public TypeWrapper(java.lang.reflect.Type type) {
-    this(ResolvableType.forType(type));
+  public TypeWrapper(java.lang.reflect.Type type, ClassTypeLoader typeLoader) {
+    this(ResolvableType.forType(type), typeLoader);
   }
 
   /**
@@ -74,7 +87,9 @@ public class TypeWrapper implements Type {
 
   @Override
   public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
-    return isAnnotatedWith(annotationClass) ? of(new ClassBasedAnnotationValueFetcher<>(annotationClass, aClass)) : empty();
+    return isAnnotatedWith(annotationClass)
+        ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, aClass, typeLoader))
+        : empty();
   }
 
   /**
@@ -82,7 +97,8 @@ public class TypeWrapper implements Type {
    */
   @Override
   public List<FieldElement> getFields() {
-    return IntrospectionUtils.getFields(aClass).stream().map(FieldWrapper::new).collect(toList());
+    return IntrospectionUtils.getFields(aClass).stream().map((Field field) -> new FieldWrapper(field, typeLoader))
+        .collect(toList());
   }
 
   /**
@@ -90,15 +106,15 @@ public class TypeWrapper implements Type {
    */
   @Override
   public List<FieldElement> getAnnotatedFields(Class<? extends Annotation>... annotations) {
-    return getFields().stream().filter(field -> Stream.of(annotations).anyMatch(field::isAnnotatedWith)).collect(toList());
+    return getFields().stream().filter(field -> of(annotations).anyMatch(field::isAnnotatedWith)).collect(toList());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Class<?> getDeclaringClass() {
-    return aClass;
+  public Optional<Class<?>> getDeclaringClass() {
+    return Optional.ofNullable(aClass);
   }
 
 
@@ -108,13 +124,42 @@ public class TypeWrapper implements Type {
   }
 
   @Override
+  public boolean isAssignableFrom(Type type) {
+    if (type instanceof TypeWrapper) {
+      return type.getDeclaringClass().get().isAssignableFrom(aClass);
+    } else if (type instanceof ASTType) {
+      return type.isAssignableTo(this);
+    }
+    return false;
+  }
+
+  @Override
   public boolean isAssignableTo(Class<?> clazz) {
     return aClass != null && clazz.isAssignableFrom(aClass);
   }
 
   @Override
-  public java.lang.reflect.Type getReflectType() {
-    return type;
+  public boolean isAssignableTo(Type type) {
+    return type.isAssignableFrom(this);
+  }
+
+  @Override
+  public boolean isSameType(Type type) {
+    if (type instanceof TypeWrapper) {
+      Class<?> aClass = ((TypeWrapper) type).aClass;
+      return type.isSameType(aClass);
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isSameType(Class<?> clazz) {
+    return aClass.equals(clazz);
+  }
+
+  @Override
+  public boolean isInstantiable() {
+    return IntrospectionUtils.isInstantiable(aClass);
   }
 
   @Override
@@ -123,7 +168,66 @@ public class TypeWrapper implements Type {
   }
 
   @Override
+  public ClassInformationAnnotation getClassInformation() {
+    return new ClassInformationAnnotation(aClass, of(resolvableTypeGenerics)
+        .map(ResolvableType::getType)
+        .collect(toList()));
+  }
+
+  @Override
+  public boolean isAnyType() {
+    if (type instanceof TypeVariable) {
+      java.lang.reflect.Type[] bounds = ((TypeVariable) type).getBounds();
+      if (bounds.length > 0) {
+        return bounds[0].equals(Object.class);
+      }
+    }
+
+    return type instanceof WildcardType && type.getTypeName().equals("?");
+  }
+
+  @Override
   public List<TypeGeneric> getGenerics() {
     return generics;
+  }
+
+  @Override
+  public MetadataType asMetadataType() {
+    return typeLoader.load(type);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<org.mule.runtime.module.extension.internal.loader.java.type.Type> getInterfaceGenerics(Class interfaceClass) {
+    return IntrospectionUtils.getInterfaceGenerics(type, interfaceClass)
+        .stream()
+        .map(e -> new TypeWrapper(e, typeLoader))
+        .collect(toList());
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+
+    if (o == null || getClass() != o.getClass())
+      return false;
+
+    TypeWrapper that = (TypeWrapper) o;
+
+    return new EqualsBuilder()
+        .append(type, that.type)
+        .append(aClass, that.aClass)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .append(type)
+        .append(aClass)
+        .toHashCode();
   }
 }

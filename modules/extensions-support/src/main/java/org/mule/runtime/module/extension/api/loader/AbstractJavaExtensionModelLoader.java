@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
@@ -40,15 +41,16 @@ import org.mule.runtime.module.extension.internal.loader.enricher.MimeTypeParame
 import org.mule.runtime.module.extension.internal.loader.enricher.NotificationsDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterAllowedStereotypesDeclarionEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.PrimaryNodeEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RedeliveryPolicyDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.PrimaryNodeEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.InjectedFieldsModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.InputParametersTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.JavaSubtypesModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.MetadataComponentModelValidator;
@@ -89,7 +91,8 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new OAuthConnectionProviderModelValidator(),
                                                                                          new ValueProviderModelValidator(),
                                                                                          new PrivilegedApiValidator(),
-                                                                                         new ComponentLocationModelValidator()));
+                                                                                         new ComponentLocationModelValidator(),
+                                                                                         new InjectedFieldsModelValidator()));
 
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
                                                                                                new JavaXmlDeclarationEnricher(),

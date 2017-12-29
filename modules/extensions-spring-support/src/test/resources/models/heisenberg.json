@@ -1892,7 +1892,10 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": [],
+                  "genericTypes": [
+                    "org.mule.test.heisenberg.extension.HeisenbergConnection",
+                    "java.lang.String"
+                  ],
                   "isMap": false
                 }
               },
@@ -2357,7 +2360,10 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": [],
+                  "genericTypes": [
+                    "org.mule.test.heisenberg.extension.HeisenbergConnection",
+                    "java.lang.String"
+                  ],
                   "isMap": false
                 }
               },
@@ -2824,7 +2830,9 @@
                     "java.util.Collection"
                   ],
                   "parent": "",
-                  "genericTypes": [],
+                  "genericTypes": [
+                    "org.mule.runtime.extension.api.runtime.operation.Result"
+                  ],
                   "isMap": false
                 }
               },
@@ -3555,7 +3563,10 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": [],
+                  "genericTypes": [
+                    "org.mule.test.heisenberg.extension.HeisenbergConnection",
+                    "org.mule.test.heisenberg.extension.model.PersonalInfo"
+                  ],
                   "isMap": false
                 }
               },
@@ -4887,7 +4898,10 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": [],
+                  "genericTypes": [
+                    "org.mule.test.heisenberg.extension.HeisenbergConnection",
+                    "java.lang.String"
+                  ],
                   "isMap": false
                 }
               },
@@ -5699,7 +5713,10 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": [],
+                  "genericTypes": [
+                    "org.mule.test.heisenberg.extension.HeisenbergConnection",
+                    "java.lang.Integer"
+                  ],
                   "isMap": false
                 }
               },
@@ -24048,7 +24065,9 @@
                 "java.util.Collection"
               ],
               "parent": "",
-              "genericTypes": [],
+              "genericTypes": [
+                "org.mule.runtime.extension.api.runtime.operation.Result"
+              ],
               "isMap": false
             }
           },

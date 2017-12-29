@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
@@ -200,10 +201,8 @@ public final class MuleExtensionAnnotationParser {
   static java.util.Optional<ExceptionHandlerFactory> getExceptionEnricherFactory(WithAnnotations element) {
     if (element.isAnnotatedWith(OnException.class)) {
       Type classValue = element.getValueFromAnnotation(OnException.class).get().getClassValue(OnException::value);
-      Class declaringClass = classValue.getDeclaringClass();
-      if (declaringClass != null) {
-        return of(new DefaultExceptionHandlerFactory(declaringClass));
-      }
+      return classValue.getDeclaringClass()
+          .map(clazz -> new DefaultExceptionHandlerFactory((Class<? extends ExceptionHandler>) clazz));
     }
     return java.util.Optional.empty();
   }

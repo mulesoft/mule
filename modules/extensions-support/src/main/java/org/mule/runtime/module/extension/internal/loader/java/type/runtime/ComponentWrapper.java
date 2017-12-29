@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.ExpressionFunctions;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
@@ -29,8 +31,8 @@ import java.util.Optional;
  */
 abstract class ComponentWrapper extends TypeWrapper implements ComponentElement {
 
-  ComponentWrapper(Class<?> aClass) {
-    super(aClass);
+  ComponentWrapper(Class<?> aClass, ClassTypeLoader typeLoader) {
+    super(aClass, typeLoader);
   }
 
   /**
@@ -40,7 +42,7 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
   public List<SourceElement> getSources() {
     final Optional<Sources> optionalSources = this.getAnnotation(Sources.class);
     if (optionalSources.isPresent()) {
-      return stream(optionalSources.get().value()).map(s -> new SourceTypeWrapper(s)).collect(toList());
+      return stream(optionalSources.get().value()).map(s -> new SourceTypeWrapper(s, typeLoader)).collect(toList());
     }
     return emptyList();
   }
@@ -53,7 +55,8 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
 
     final Optional<Operations> optionalOperations = this.getAnnotation(Operations.class);
     if (optionalOperations.isPresent()) {
-      return stream(optionalOperations.get().value()).map(OperationContainerWrapper::new).collect(toList());
+      return stream(optionalOperations.get().value()).map((Class<?> aClass) -> new OperationContainerWrapper(aClass, typeLoader))
+          .collect(toList());
     }
     return emptyList();
   }
@@ -66,7 +69,8 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
 
     final Optional<ExpressionFunctions> functions = this.getAnnotation(ExpressionFunctions.class);
     if (functions.isPresent()) {
-      return stream(functions.get().value()).map(FunctionContainerWrapper::new).collect(toList());
+      return stream(functions.get().value()).map((Class<?> aClass) -> new FunctionContainerWrapper(aClass, typeLoader))
+          .collect(toList());
     }
     return emptyList();
   }
@@ -79,7 +83,7 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
 
     final Optional<ConnectionProviders> optionalProviders = this.getAnnotation(ConnectionProviders.class);
     if (optionalProviders.isPresent()) {
-      return stream(optionalProviders.get().value()).map(c -> new ConnectionProviderTypeWrapper(c)).collect(toList());
+      return stream(optionalProviders.get().value()).map(c -> new ConnectionProviderTypeWrapper(c, typeLoader)).collect(toList());
     }
     return emptyList();
   }

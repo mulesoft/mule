@@ -461,7 +461,10 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": [],
+                  "genericTypes": [
+                    "org.mule.test.marvel.drstrange.MysticConnection",
+                    "java.lang.String"
+                  ],
                   "isMap": false
                 }
               },

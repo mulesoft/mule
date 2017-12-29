@@ -19,8 +19,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +52,7 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
   }
 
   private void declareConfiguration(ExtensionDeclarer declarer, ExtensionElement extensionType, ComponentElement configType) {
-    checkConfigurationIsNotAnOperation(configType);
+    checkConfigurationIsNotAnOperation(extensionType, configType);
     ConfigurationDeclarer configurationDeclarer;
 
     Optional<Configuration> configurationAnnotation = configType.getAnnotation(Configuration.class);
@@ -61,11 +64,20 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
           declarer.withConfig(DEFAULT_CONFIG_NAME).describedAs(DEFAULT_CONFIG_DESCRIPTION);
     }
 
+    Class<?> extensionClass = extensionType.getDeclaringClass().orElse(Object.class);
+    Class<?> configClass = configType.getDeclaringClass().orElse(Object.class);
+
+    ClassLoader classLoader = extensionClass.getClassLoader() != null ? extensionClass.getClassLoader()
+        : Thread.currentThread().getContextClassLoader();
+
     TypeAwareConfigurationFactory typeAwareConfigurationFactory =
-        new TypeAwareConfigurationFactory(configType.getDeclaringClass(), extensionType.getDeclaringClass().getClassLoader());
+        new TypeAwareConfigurationFactory(configClass, classLoader);
+
     configurationDeclarer
         .withModelProperty(new ConfigurationFactoryModelProperty(typeAwareConfigurationFactory))
-        .withModelProperty(new ImplementingTypeModelProperty(configType.getDeclaringClass()));
+        .withModelProperty(new ImplementingTypeModelProperty(configClass));
+
+    configurationDeclarer.withModelProperty(new ExtensionTypeDescriptorModelProperty(configType));
 
     loader.parseExternalLibs(configType, configurationDeclarer);
     ParameterDeclarationContext context = new ParameterDeclarationContext(CONFIGURATION, configurationDeclarer.getDeclaration());
@@ -77,9 +89,12 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     getConnectionProviderModelLoaderDelegate().declareConnectionProviders(configurationDeclarer, configType);
   }
 
-  private void checkConfigurationIsNotAnOperation(ComponentElement configurationType) {
-    Class<?>[] operationClasses = loader.getOperationClasses(getExtensionType());
-    for (Class<?> operationClass : operationClasses) {
+  private void checkConfigurationIsNotAnOperation(ExtensionElement extensionElement, ComponentElement configurationType) {
+    List<OperationContainerElement> allOperations = new ArrayList<>();
+    allOperations.addAll(extensionElement.getOperationContainers());
+    allOperations.addAll(configurationType.getOperationContainers());
+
+    for (OperationContainerElement operationClass : allOperations) {
       if (configurationType.isAssignableFrom(operationClass)
           || configurationType.isAssignableTo(operationClass)) {
         throw new IllegalConfigurationModelDefinitionException(

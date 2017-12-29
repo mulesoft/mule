@@ -44,7 +44,7 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
    * @param groupDescriptor the descriptor for the group being built
    */
   public ParameterGroupObjectBuilder(ParameterGroupDescriptor groupDescriptor) {
-    super(groupDescriptor.getType().getDeclaringClass());
+    super((Class<T>) groupDescriptor.getType().getDeclaringClass().get());
     this.groupDescriptor = groupDescriptor;
   }
 
@@ -68,7 +68,7 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
 
   private T doBuild(Predicate<String> hasParameter, Function<String, Object> parameters, ValueResolvingContext context)
       throws MuleException {
-    fieldsCache.computeIfAbsent(groupDescriptor.getType().getDeclaringClass(), k -> groupDescriptor.getType().getFields())
+    fieldsCache.computeIfAbsent(groupDescriptor.getType().getDeclaringClass().get(), k -> groupDescriptor.getType().getFields())
         .forEach(field -> {
           String name = field.getName();
           if (hasParameter.test(name)) {

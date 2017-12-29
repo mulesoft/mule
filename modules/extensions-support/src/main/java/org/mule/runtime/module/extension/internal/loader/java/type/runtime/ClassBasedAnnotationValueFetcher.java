@@ -8,7 +8,9 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.util.stream.Collectors.toList;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 
@@ -28,11 +30,13 @@ public class ClassBasedAnnotationValueFetcher<T extends Annotation> implements A
 
   private Class<T> annotationClass;
   private AnnotatedElement annotatedElement;
+  private ClassTypeLoader typeLoader;
   private LazyValue<T> annotation = new LazyValue<>(() -> annotatedElement.getAnnotation(annotationClass));
 
-  ClassBasedAnnotationValueFetcher(Class<T> annotationClass, AnnotatedElement annotatedElement) {
+  ClassBasedAnnotationValueFetcher(Class<T> annotationClass, AnnotatedElement annotatedElement, ClassTypeLoader typeLoader) {
     this.annotationClass = annotationClass;
     this.annotatedElement = annotatedElement;
+    this.typeLoader = typeLoader;
   }
 
   /**
@@ -49,7 +53,7 @@ public class ClassBasedAnnotationValueFetcher<T extends Annotation> implements A
   @Override
   public List<Type> getClassArrayValue(Function<T, Class[]> function) {
     return Stream.of(function.apply(annotation.get()))
-        .map(TypeWrapper::new)
+        .map(e -> new TypeWrapper(e, typeLoader))
         .collect(toList());
   }
 
@@ -58,7 +62,7 @@ public class ClassBasedAnnotationValueFetcher<T extends Annotation> implements A
    */
   @Override
   public TypeWrapper getClassValue(Function<T, Class> function) {
-    return new TypeWrapper(function.apply(annotation.get()));
+    return new TypeWrapper(function.apply(annotation.get()), new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
   }
 
   /**

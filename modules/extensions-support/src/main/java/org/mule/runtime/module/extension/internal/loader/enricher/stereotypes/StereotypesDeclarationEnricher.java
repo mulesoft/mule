@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher.stereotypes;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
-import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.ifPresent;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
@@ -18,6 +15,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTI
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.IntersectionType;
 import org.mule.metadata.api.model.MetadataType;
@@ -41,6 +39,7 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
+import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
@@ -48,9 +47,11 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -83,6 +84,8 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
 
     public void apply(ExtensionLoadingContext extensionLoadingContext) {
       ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
+      ClassTypeLoader typeLoader =
+          new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionLoadingContext.getExtensionClassLoader());
       ExtensionDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
       Optional<ImplementingTypeModelProperty> implementingType =
           declaration.getModelProperty(ImplementingTypeModelProperty.class);
@@ -97,10 +100,10 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
             final StereotypeModel defaultConfigStereotype = newStereotype(declaration.getName(), namespace)
                 .withParent(CONFIG).build();
             ifPresent(
-                      declaration.getModelProperty(ImplementingTypeModelProperty.class)
-                          .map(ImplementingTypeModelProperty::getType),
-                      declaringType -> new ClassStereotypeResolver(new TypeWrapper(declaringType), declaration, namespace,
-                                                                   defaultConfigStereotype, stereotypes).resolveStereotype(),
+                      declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+                          .map(ExtensionTypeDescriptorModelProperty::getType),
+                      type -> new ClassStereotypeResolver(type, declaration, namespace,
+                                                          defaultConfigStereotype, stereotypes).resolveStereotype(),
                       () -> declaration.withStereotype(defaultConfigStereotype));
           }
 
@@ -109,10 +112,10 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
             final StereotypeModel defaultConnectionStereotype = newStereotype(declaration.getName(), namespace)
                 .withParent(CONNECTION).build();
             ifPresent(
-                      declaration.getModelProperty(ImplementingTypeModelProperty.class)
-                          .map(ImplementingTypeModelProperty::getType),
-                      declaringType -> new ClassStereotypeResolver(new TypeWrapper(declaringType), declaration, namespace,
-                                                                   defaultConnectionStereotype, stereotypes).resolveStereotype(),
+                      declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+                          .map(ExtensionTypeDescriptorModelProperty::getType),
+                      type -> new ClassStereotypeResolver(type, declaration, namespace,
+                                                          defaultConnectionStereotype, stereotypes).resolveStereotype(),
                       () -> declaration.withStereotype(defaultConnectionStereotype));
           }
 
@@ -120,7 +123,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
           protected void onConstruct(WithConstructsDeclaration owner, ConstructDeclaration declaration) {
             declaration.getModelProperty(ImplementingMethodModelProperty.class)
                 .map(ImplementingMethodModelProperty::getMethod)
-                .map(MethodWrapper::new)
+                .map((Method method) -> new MethodWrapper(method, typeLoader))
                 .ifPresent(methodElement -> new MethodStereotypeResolver(methodElement, declaration, namespace, PROCESSOR,
                                                                          stereotypes)
                                                                              .resolveStereotype());
@@ -130,7 +133,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
           public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration) {
             declaration.getModelProperty(ImplementingMethodModelProperty.class)
                 .map(ImplementingMethodModelProperty::getMethod)
-                .map(MethodWrapper::new)
+                .map((Method method) -> new MethodWrapper(method, typeLoader))
                 .ifPresent(methodElement -> new MethodStereotypeResolver(methodElement, declaration, namespace, PROCESSOR,
                                                                          stereotypes)
                                                                              .resolveStereotype());
@@ -140,7 +143,8 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
           protected void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
             declaration.getModelProperty(ImplementingTypeModelProperty.class)
                 .map(ImplementingTypeModelProperty::getType)
-                .ifPresent(declaringType -> new ClassStereotypeResolver(new TypeWrapper(declaringType), declaration, namespace,
+                .ifPresent(declaringType -> new ClassStereotypeResolver(new TypeWrapper(declaringType, typeLoader), declaration,
+                                                                        namespace,
                                                                         SOURCE,
                                                                         stereotypes)
                                                                             .resolveStereotype());

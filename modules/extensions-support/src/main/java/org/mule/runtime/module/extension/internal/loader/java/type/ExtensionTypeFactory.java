@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.extension.internal.loader.java.type.ast.ExtensionTypeElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
@@ -26,8 +27,8 @@ public class ExtensionTypeFactory {
    * @param extensionClass {@link Extension} annotated {@link Class}
    * @return an {@link ExtensionElement} wrapping the extension {@link Class} structure
    */
-  public static ExtensionElement getExtensionType(Class<?> extensionClass) {
-    return new ExtensionTypeWrapper<>(extensionClass);
+  public static ExtensionElement getExtensionType(Class<?> extensionClass, ClassTypeLoader classTypeLoader) {
+    return new ExtensionTypeWrapper<>(extensionClass, classTypeLoader);
   }
 
   /**

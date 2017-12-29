@@ -11,6 +11,6 @@ package org.mule.runtime.module.extension.internal.loader.java.type;
  *
  * @since 4.0
  */
-public interface ConnectionProviderElement extends ParameterizableTypeElement, WithParameters, WithGenerics {
+public interface ConnectionProviderElement extends ParameterizableTypeElement, WithParameters {
 
 }

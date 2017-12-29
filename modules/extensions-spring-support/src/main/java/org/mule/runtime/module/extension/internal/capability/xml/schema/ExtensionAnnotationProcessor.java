@@ -103,6 +103,7 @@ public final class ExtensionAnnotationProcessor {
 
   public <T> T getAnnotationFromType(ProcessingEnvironment processingEnvironment, TypeElement rootElement,
                                      Class<? extends Annotation> annotationClass) {
+    //TODO - MULE-14311 - Make loader work in compile time
     return (T) classFor(rootElement, processingEnvironment).get().getAnnotation(annotationClass);
   }
 

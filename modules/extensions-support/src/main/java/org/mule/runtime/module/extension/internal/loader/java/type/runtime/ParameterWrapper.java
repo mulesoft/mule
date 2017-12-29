@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forMethodParameter;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterElement;
@@ -30,9 +31,11 @@ public final class ParameterWrapper implements ParameterElement {
   private final Parameter parameter;
   private final Method owner;
   private final int index;
+  private final ClassTypeLoader typeLoader;
 
-  public ParameterWrapper(Method owner, int index) {
+  public ParameterWrapper(Method owner, int index, ClassTypeLoader typeLoader) {
     this.index = index;
+    this.typeLoader = typeLoader;
     this.parameter = owner.getParameters()[index];
     this.owner = owner;
   }
@@ -50,7 +53,7 @@ public final class ParameterWrapper implements ParameterElement {
    */
   @Override
   public TypeWrapper getType() {
-    return new TypeWrapper(forMethodParameter(owner, index));
+    return new TypeWrapper(forMethodParameter(owner, index), typeLoader);
   }
 
   /**
@@ -63,7 +66,8 @@ public final class ParameterWrapper implements ParameterElement {
 
   @Override
   public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
-    return isAnnotatedWith(annotationClass) ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, parameter))
+    return isAnnotatedWith(annotationClass)
+        ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, parameter, typeLoader))
         : Optional.empty();
   }
 

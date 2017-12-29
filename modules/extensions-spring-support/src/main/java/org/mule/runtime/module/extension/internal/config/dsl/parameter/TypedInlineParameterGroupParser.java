@@ -50,7 +50,7 @@ public class TypedInlineParameterGroupParser extends ParameterGroupParser {
                                          DslSyntaxResolver dslResolver,
                                          ExtensionParsingContext context) {
     super(definition, group, classLoader, groupDsl, dslResolver, context);
-    MetadataType type = getDefault().createTypeLoader(classLoader).load(groupDescriptor.getType().getDeclaringClass());
+    MetadataType type = getDefault().createTypeLoader(classLoader).load(groupDescriptor.getType().getDeclaringClass().get());
 
     checkArgument(isObjectType(type), format("Only an ObjectType can be parsed as a TypedParameterGroup, found [%s] instead",
                                              type.getClass().getName()));

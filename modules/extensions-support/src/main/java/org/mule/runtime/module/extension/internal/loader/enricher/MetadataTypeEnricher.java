@@ -26,20 +26,17 @@ import org.mule.metadata.api.model.LocalDateTimeType;
 import org.mule.metadata.api.model.LocalTimeType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NothingType;
-import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectKeyType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.PeriodType;
-import org.mule.metadata.api.model.RegexType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.TimeType;
 import org.mule.metadata.api.model.TimeZoneType;
 import org.mule.metadata.api.model.TupleType;
 import org.mule.metadata.api.model.TypeParameterType;
 import org.mule.metadata.api.model.UnionType;
-import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.api.model.impl.DefaultAttributeFieldType;
 import org.mule.metadata.api.model.impl.DefaultAttributeKeyType;
 import org.mule.metadata.api.model.impl.DefaultFunctionType;
@@ -216,7 +213,9 @@ class MetadataTypeEnricher {
 
     private <T extends TypeBuilder & WithAnnotation> MetadataType withNewAnnotations(T builder) {
       Set<TypeAnnotation> all = getAllTypeAnnotations();
-      all.forEach(builder::with);
+      for (TypeAnnotation typeAnnotation : all) {
+        builder.with(typeAnnotation);
+      }
       return builder.build();
     }
 

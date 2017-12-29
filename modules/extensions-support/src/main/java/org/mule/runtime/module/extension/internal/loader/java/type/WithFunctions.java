@@ -18,5 +18,5 @@ interface WithFunctions {
   /**
    * @return a list of {@link MethodElement}
    */
-  List<MethodElement> getFunctions();
+  List<FunctionElement> getFunctions();
 }

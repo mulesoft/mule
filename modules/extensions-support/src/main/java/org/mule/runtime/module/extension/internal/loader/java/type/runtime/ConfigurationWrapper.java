@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.java.type.ConfigurationElement;
@@ -25,8 +27,8 @@ class ConfigurationWrapper extends ComponentWrapper implements ConfigurationElem
 
   private final List<ExtensionParameter> parameters;
 
-  ConfigurationWrapper(Class aClass) {
-    super(aClass);
+  ConfigurationWrapper(Class aClass, ClassTypeLoader typeLoader) {
+    super(aClass, typeLoader);
     this.parameters = Stream.concat(getAnnotatedFields(Parameter.class).stream(),
                                     getAnnotatedFields(ParameterGroup.class).stream())
         .distinct()

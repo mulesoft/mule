@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.NamedObject;
@@ -27,14 +28,15 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.RefName;
+import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -76,7 +78,8 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
 
         @Override
         protected void onOperation(HasOperationModels owner, OperationModel model) {
-          validateArguments(model, model.getModelProperty(ImplementingMethodModelProperty.class), DefaultEncoding.class);
+          validateArguments(model, model.getModelProperty(ExtensionOperationDescriptorModelProperty.class),
+                            DefaultEncoding.class);
         }
 
         @Override
@@ -92,24 +95,26 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
 
               @Override
               public void visitObject(ObjectType objectType) {
-                try {
-                  Class<?> type = getType(objectType, classLoaderModelProperty.getClassLoader());
-                  if (validatedTypes.add(type)) {
-                    validateType(model, type, DefaultEncoding.class);
+                if (!objectType.getAnnotation(InfrastructureTypeAnnotation.class).isPresent()) {
+                  try {
+                    Class<?> type = getType(objectType, classLoaderModelProperty.getClassLoader());
+                    if (validatedTypes.add(type)) {
+                      validateType(model, type, DefaultEncoding.class);
+                    }
+                  } catch (Exception e) {
+                    problemsReporter.addWarning(new Problem(model, "Could not validate Class: " + e.getMessage()));
                   }
-                } catch (Exception e) {
-                  problemsReporter.addWarning(new Problem(model, "Could not validate Class: " + e.getMessage()));
                 }
               }
             });
           }
         }
 
-        private void validateArguments(NamedObject model, Optional<ImplementingMethodModelProperty> modelProperty,
+        private void validateArguments(NamedObject model, Optional<ExtensionOperationDescriptorModelProperty> modelProperty,
                                        Class<? extends Annotation> annotationClass) {
-          modelProperty.ifPresent(implementingMethodModelProperty -> {
-            MethodWrapper methodWrapper = new MethodWrapper(implementingMethodModelProperty.getMethod());
-            int size = methodWrapper.getParametersAnnotatedWith(annotationClass).size();
+          modelProperty.ifPresent(operationDescriptorModelProperty -> {
+            MethodElement operation = operationDescriptorModelProperty.getOperationMethod();
+            int size = operation.getParametersAnnotatedWith(annotationClass).size();
 
             if (size == 0) {
               return;
@@ -117,17 +122,17 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
               problemsReporter
                   .addError(new Problem(model,
                                         format("Operation method '%s' has %d arguments annotated with @%s. Only one argument may carry that annotation",
-                                               methodWrapper.getName(), size,
+                                               operation.getName(), size,
                                                annotationClass.getSimpleName())));
             }
 
-            ExtensionParameter argument = methodWrapper.getParametersAnnotatedWith(annotationClass).get(0);
-            if (!String.class.equals(argument.getJavaType())) {
+            ExtensionParameter argument = operation.getParametersAnnotatedWith(annotationClass).get(0);
+            if (!argument.getType().isSameType(String.class)) {
               problemsReporter
                   .addError(new Problem(model,
                                         format("Operation method '%s' declares an argument '%s' which is annotated with @%s and is of type '%s'. Only "
                                             + "arguments of type String are allowed to carry such annotation",
-                                               methodWrapper.getName(),
+                                               operation.getName(),
                                                argument.getName(), annotationClass.getSimpleName(),
                                                argument.getType().getName())));
             }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
 
 /**
@@ -15,7 +16,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.Parameterizab
  */
 public class ParameterizableTypeWrapper extends TypeWrapper implements ParameterizableTypeElement {
 
-  public ParameterizableTypeWrapper(Class aClass) {
-    super(aClass);
+  public ParameterizableTypeWrapper(Class aClass, ClassTypeLoader typeLoader) {
+    super(aClass, typeLoader);
   }
 }

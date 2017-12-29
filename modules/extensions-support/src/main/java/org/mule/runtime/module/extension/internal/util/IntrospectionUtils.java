@@ -9,9 +9,11 @@ package org.mule.runtime.module.extension.internal.util;
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.reverse;
+import static java.util.Objects.isNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toCollection;
@@ -30,11 +32,9 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.reflections.ReflectionUtils.getAllFields;
-import static org.springframework.core.ResolvableType.forMethodReturnType;
-import static org.springframework.core.ResolvableType.forType;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
@@ -99,10 +99,20 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.type.ast.FieldTypeElement;
 
-import com.google.common.collect.ImmutableList;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
+import javax.lang.model.util.Types;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -115,9 +125,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -130,15 +138,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
-
+import com.google.common.collect.ImmutableList;
 import org.reflections.ReflectionUtils;
 import org.springframework.core.ResolvableType;
 
@@ -224,25 +224,9 @@ public final class IntrospectionUtils {
     return dataType.get();
   }
 
-  /**
-   * Returns a {@link MetadataType} representing the given {@link Method}'s return type. If the {@code method} returns an
-   * {@link Result}, then it returns the type of the first generic. If the {@link Result} type is being used in its raw form, then
-   * an {@link AnyType} will be returned.
-   * <p>
-   * If the {@code method} returns a collection of {@link Result} instances, then it will return an {@link ArrayType} which inner
-   * value represent a {@link Message} which payload and attributes matches the types of the Result generics.
-   *
-   * @param method     the {@link Method} being introspected
-   * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
-   * @return a {@link MetadataType}
-   * @throws IllegalArgumentException is method is {@code null}
-   */
-  public static MetadataType getMethodReturnType(Method method, ClassTypeLoader typeLoader) {
-    return getReturnType(getMethodType(method), typeLoader);
-  }
-
-  public static MetadataType getMethodReturnType(MethodElement method, ClassTypeLoader typeLoader) {
-    return getReturnType(getMethodType(method), typeLoader);
+  public static MetadataType getMethodReturnType(MethodElement method) {
+    checkArgument(method != null, "Can't introspect a null method");
+    return getReturnType(method.getReturnType());
   }
 
   /**
@@ -252,84 +236,91 @@ public final class IntrospectionUtils {
    * represent a {@link Message} which payload and attributes matches the types of the Result generics.
    *
    * @param returnType the source output type
-   * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    */
-  public static MetadataType getSourceReturnType(Type returnType, ClassTypeLoader typeLoader) {
-    return getReturnType(forType(returnType), typeLoader);
+  public static MetadataType getSourceReturnType(Type returnType) {
+    return getReturnType(returnType);
   }
 
-  private static MetadataType getReturnType(ResolvableType returnType, ClassTypeLoader typeLoader) {
-    Type type = returnType.getType();
-    final Class<?> rawClass = returnType.getRawClass();
+  private static MetadataType getReturnType(Type returnType) {
+    Type type = returnType;
 
-    if (rawClass.equals(Result.class)) {
-      ResolvableType genericType = returnType.getGenerics()[0];
-      if (genericType.getRawClass() != null) {
-        type = genericType.getType();
+    if (returnType.isAssignableTo(Result.class)) {
+      List<TypeGeneric> generics = returnType.getGenerics();
+      if (generics.isEmpty()) {
+        return typeBuilder().anyType().build();
+      }
+      Type payloadType = generics.get(0).getConcreteType();
+      if (!payloadType.isAnyType()) {
+        type = payloadType;
       } else {
         type = null;
       }
     }
 
     if (isPagingProvider(returnType)) {
-      ResolvableType itemType = getPagingProviderTypes(returnType).getSecond();
-      if (Result.class.equals(itemType.getRawClass())) {
-        return returnListOfMessagesType(returnType, typeLoader, itemType);
+      Type itemType = getPagingProviderTypes(returnType).getSecond();
+
+      if (itemType.isSameType(Result.class)) {
+        return returnListOfMessagesType(returnType, itemType);
       } else {
         return typeBuilder().arrayType()
-            .of(typeLoader.load(itemType.getType()))
-            .with(new ClassInformationAnnotation(rawClass))
+            .of(itemType.asMetadataType())
+            .with(returnType.getClassInformation())
             .build();
       }
     }
 
-    if (ParameterResolver.class.isAssignableFrom(rawClass) ||
-        TypedValue.class.isAssignableFrom(rawClass) ||
-        Literal.class.isAssignableFrom(rawClass)) {
-      type = returnType.getGenerics()[0].getType();
+    if (returnType.isAssignableTo(ParameterResolver.class) ||
+        returnType.isAssignableTo(TypedValue.class) ||
+        returnType.isAssignableTo(Literal.class)) {
+      type = returnType.getGenerics().get(0).getConcreteType();
     }
 
     if (isCollection(returnType)) {
-      ResolvableType itemType = returnType.getGenerics()[0];
-      if (Result.class.equals(itemType.getRawClass())) {
-        return returnListOfMessagesType(returnType, typeLoader, itemType);
+      Type itemType =
+          returnType.getGenerics().get(0).getConcreteType();
+      if (itemType.isAssignableTo(Result.class)) {
+        return returnListOfMessagesType(returnType, itemType);
       }
     }
 
-    return type != null ? typeLoader.load(type) : typeBuilder().anyType().build();
+    return type != null ? type.asMetadataType() : typeBuilder().anyType().build();
   }
 
-  private static MetadataType returnListOfMessagesType(ResolvableType returnType, ClassTypeLoader typeLoader,
-                                                       ResolvableType itemType) {
-    ResolvableType genericType = itemType.getGenerics()[0];
+  private static MetadataType returnListOfMessagesType(Type returnType,
+                                                       Type resultType) {
+    TypeGeneric genericType = resultType.getGenerics().get(0);
+    Type payloadType = genericType.getConcreteType();
 
-    Class<?> rawClass = genericType.getRawClass();
+    MetadataType outputType;
 
-    if (rawClass != null && TypedValue.class.isAssignableFrom(rawClass)) {
-      genericType = genericType.getGenerics()[0];
+    if (payloadType.isAnyType()) {
+      outputType = typeBuilder().anyType().build();
+    } else {
+      if (payloadType.isAssignableTo(TypedValue.class)) {
+        payloadType = payloadType.getGenerics().get(0).getConcreteType();
+      }
+      outputType = payloadType.asMetadataType();
     }
 
-    MetadataType outputType = rawClass != null
-        ? typeLoader.load(genericType.getType())
-        : typeBuilder().anyType().build();
+    Type attributesType =
+        resultType.getGenerics().get(1).getConcreteType();
 
-    genericType = itemType.getGenerics()[1];
-    MetadataType attributesType = genericType.getRawClass() != null
-        ? typeLoader.load(genericType.getType())
-        : typeBuilder().anyType().build();
+    MetadataType attributesOutputType = attributesType.isAnyType()
+        ? typeBuilder().anyType().build()
+        : attributesType.asMetadataType();
 
     return typeBuilder().arrayType()
-        .of(new MessageMetadataTypeBuilder().payload(outputType).attributes(attributesType).build())
-        .with(new ClassInformationAnnotation(returnType.getRawClass()))
+        .of(new MessageMetadataTypeBuilder()
+            .payload(outputType)
+            .attributes(attributesOutputType)
+            .build())
+        .with(returnType.getClassInformation())
         .build();
   }
 
-  private static boolean isCollection(ResolvableType type) {
-    return Collection.class.isAssignableFrom(type.getRawClass());
-  }
-
-  private static boolean isCollection(org.mule.runtime.module.extension.internal.loader.java.type.Type type) {
+  private static boolean isCollection(Type type) {
     return type.isAssignableTo(Collection.class);
   }
 
@@ -344,49 +335,23 @@ public final class IntrospectionUtils {
    * {@link VoidType} since the messages in the main output already contain an attributes for each item.
    *
    * @param method     the {@link Method} being introspected
-   * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    * @throws IllegalArgumentException is method is {@code null}
    */
-  public static MetadataType getMethodReturnAttributesType(Method method, ClassTypeLoader typeLoader) {
-    ResolvableType outputType = getMethodType(method);
-    Type type = null;
-
-    if (Result.class.equals(outputType.getRawClass())) {
-      ResolvableType genericType = outputType.getGenerics()[1];
-      if (genericType.getRawClass() != null) {
-        type = genericType.getType();
-      }
-    }
-
-    if (isPagingProvider(outputType)) {
-      ResolvableType itemType = getPagingProviderTypes(outputType).getSecond();
-      if (Result.class.equals(itemType.getRawClass())) {
-        type = null;
-      }
-    }
-
-    if (isCollection(outputType)) {
-      ResolvableType itemType = outputType.getGenerics()[0];
-      if (Result.class.equals(itemType.getRawClass())) {
-        type = null;
-      }
-    }
-
-    return type != null ? typeLoader.load(type) : typeBuilder().voidType().build();
-  }
-
-  public static MetadataType getMethodReturnAttributesType(MethodElement method, ClassTypeLoader typeLoader) {
-    org.mule.runtime.module.extension.internal.loader.java.type.Type returnType = method.getReturnType();
-    Type type = null;
-    ResolvableType outputType = ResolvableType.forType(method.getReturnType().getReflectType());
+  public static MetadataType getMethodReturnAttributesType(MethodElement method) {
+    Type returnType = method.getReturnType();
+    Type attributesType = null;
 
     if (returnType.isAssignableTo(Result.class)) {
       List<TypeGeneric> generics = returnType.getGenerics();
       if (generics.size() == 2) {
-        ResolvableType resolvableType = ResolvableType.forType(generics.get(1).getConcreteType().getReflectType());
-        if (resolvableType.getRawClass() != null) {
-          type = resolvableType.getType();
+        Type genericType = generics.get(1).getConcreteType();
+        if (genericType != null) {
+          if (genericType.isAnyType()) {
+            return typeBuilder().anyType().build();
+          } else {
+            attributesType = genericType;
+          }
         } else {
           return typeBuilder().anyType().build();
         }
@@ -394,9 +359,9 @@ public final class IntrospectionUtils {
     }
 
     if (isPagingProvider(returnType)) {
-      ResolvableType itemType = getPagingProviderTypes(outputType).getSecond();
-      if (Result.class.equals(itemType.getRawClass())) {
-        type = null;
+      Type second = getPagingProviderTypes(returnType).getSecond();
+      if (second.isSameType(Result.class)) {
+        attributesType = null;
       }
     }
 
@@ -404,35 +369,24 @@ public final class IntrospectionUtils {
       List<TypeGeneric> generics = returnType.getGenerics();
 
       if (generics.size() > 0) {
-        org.mule.runtime.module.extension.internal.loader.java.type.Type genericType =
-            generics.get(0).getConcreteType();
+        Type genericType = generics.get(0).getConcreteType();
         if (genericType.isAssignableTo(Result.class)) {
-          type = null;
+          attributesType = null;
         }
       }
     }
 
-    return type != null ? typeLoader.load(type) : typeBuilder().voidType().build();
+    return attributesType != null ? attributesType.asMetadataType() : typeBuilder().voidType().build();
   }
 
-  public static List<MetadataType> getGenerics(Type type, ClassTypeLoader typeLoader) {
+  public static List<MetadataType> getGenerics(java.lang.reflect.Type type, ClassTypeLoader typeLoader) {
     if (type instanceof ParameterizedType) {
       ParameterizedType parameterizedType = (ParameterizedType) type;
-      Type[] generics = parameterizedType.getActualTypeArguments();
+      java.lang.reflect.Type[] generics = parameterizedType.getActualTypeArguments();
       return Stream.of(generics).map(typeLoader::load).collect(toList());
     }
 
     return new LinkedList<>();
-  }
-
-  private static ResolvableType getMethodType(Method method) {
-    checkArgument(method != null, "Can't introspect a null method");
-    return forMethodReturnType(method);
-  }
-
-  private static ResolvableType getMethodType(MethodElement method) {
-    checkArgument(method != null, "Can't introspect a null method");
-    return ResolvableType.forType(method.getReturnType().getReflectType());
   }
 
   /**
@@ -448,11 +402,20 @@ public final class IntrospectionUtils {
         || Disposable.class.isAssignableFrom(type);
   }
 
-  private static boolean isPagingProvider(ResolvableType type) {
-    return PagingProvider.class.isAssignableFrom(type.getRawClass());
+  /**
+   * Determines if the given {@code type} implements any of the lifecycle annotations
+   *
+   * @param type the class to evaluate
+   * @return whether it implements lifecycle or not
+   */
+  public static boolean isLifecycle(Type type) {
+    return type.isAssignableTo(Initialisable.class)
+        || type.isAssignableTo(Startable.class)
+        || type.isAssignableTo(Stoppable.class)
+        || type.isAssignableTo(Disposable.class);
   }
 
-  private static boolean isPagingProvider(org.mule.runtime.module.extension.internal.loader.java.type.Type type) {
+  private static boolean isPagingProvider(Type type) {
     return type.isAssignableTo(PagingProvider.class);
   }
 
@@ -567,39 +530,62 @@ public final class IntrospectionUtils {
   }
 
 
-  public static List<TypeMirror> getInterfaceGenerics(TypeElement type, TypeElement implementedInterface,
+  public static List<TypeMirror> getInterfaceGenerics(TypeMirror type, TypeElement implementedInterface,
                                                       ProcessingEnvironment processingEnvironment) {
-    TypeMirror erasure = processingEnvironment.getTypeUtils().erasure(implementedInterface.asType());
+    Types types = processingEnvironment.getTypeUtils();
+    TypeMirror erasure = types.erasure(implementedInterface.asType());
+    TypeMirror searchType = types.erasure(type);
 
-    for (TypeMirror interfaze : type.getInterfaces()) {
-      if (processingEnvironment.getTypeUtils().isAssignable(processingEnvironment.getTypeUtils().erasure(interfaze), erasure)) {
+    if (types.isSameType(erasure, searchType)) {
+      if (type instanceof DeclaredType) {
+        return (List<TypeMirror>) ((DeclaredType) type).getTypeArguments();
+      }
+    }
+
+    for (TypeMirror interfaceType : ((TypeElement) types.asElement(type)).getInterfaces()) {
+      if (types.isAssignable(types.erasure(interfaceType),
+                             erasure)) {
         List<TypeMirror> generics = new ArrayList<>();
-        List<? extends TypeMirror> typeArguments = ((DeclaredType) interfaze).getTypeArguments();
+        List<? extends TypeMirror> typeArguments = ((DeclaredType) interfaceType).getTypeArguments();
 
         for (TypeMirror typeArgument : typeArguments) {
-          Element element = processingEnvironment.getTypeUtils().asElement(typeArgument);
-          if (element != null && element instanceof TypeElement) {
+          if (typeArgument instanceof DeclaredType) {
             generics.add(typeArgument);
+          } else if (typeArgument instanceof TypeVariable) {
+            DeclaredType declaredType = (DeclaredType) ((DeclaredType) type).asElement().asType();
+            List<? extends TypeMirror> typeTypeArguments = declaredType.getTypeArguments();
+            int i = typeTypeArguments.indexOf(typeArgument);
+            generics.add(((DeclaredType) type).getTypeArguments().get(i));
           }
         }
         return generics;
       }
     }
 
-    if (processingEnvironment.getTypeUtils().isAssignable(type.getSuperclass(), erasure)) {
-      Element element = processingEnvironment.getTypeUtils().asElement(type.getSuperclass());
-      return getInterfaceGenerics((TypeElement) element, implementedInterface, processingEnvironment);
+    if (type instanceof DeclaredType) {
+      Element element = ((DeclaredType) type).asElement();
+      if (element instanceof TypeElement) {
+        TypeMirror superclass = ((TypeElement) element).getSuperclass();
+        if (types.isAssignable(types.erasure(superclass), erasure)) {
+          return getInterfaceGenerics(superclass, implementedInterface, processingEnvironment);
+        }
+      }
     }
 
     return emptyList();
   }
 
-  public static List<Class<?>> getInterfaceGenerics(final Class<?> type, final Class<?> implementedInterface) {
+  public static List<ResolvableType> getInterfaceGenerics(final java.lang.reflect.Type type,
+                                                          final Class<?> implementedInterface) {
     ResolvableType interfaceType = null;
-    Class<?> searchClass = type;
+    ResolvableType searchClass = ResolvableType.forType(type);
 
-    while (!Object.class.equals(searchClass)) {
-      for (ResolvableType iType : ResolvableType.forClass(searchClass).getInterfaces()) {
+    if (searchClass.getRawClass().equals(implementedInterface)) {
+      return asList(ResolvableType.forType(type).getGenerics());
+    }
+
+    while (!Object.class.equals(searchClass.getRawClass())) {
+      for (ResolvableType iType : searchClass.getInterfaces()) {
         if (implementedInterface.isAssignableFrom(iType.getRawClass())) {
           interfaceType = iType;
           break;
@@ -609,21 +595,23 @@ public final class IntrospectionUtils {
       if (interfaceType != null) {
         break;
       } else {
-        searchClass = searchClass.getSuperclass();
+        searchClass = searchClass.getSuperType();
       }
     }
 
     if (interfaceType == null) {
-      throw new IllegalArgumentException(format("Class '%s' does not implement the '%s' interface", type.getName(),
+      throw new IllegalArgumentException(format("Class '%s' does not implement the '%s' interface", type.getTypeName(),
                                                 implementedInterface.getName()));
     }
 
-    List<? super Class<?>> generics = toRawClasses(interfaceType.getGenerics());
-    if (generics.stream().anyMatch(c -> c == null)) {
-      return findGenericsInSuperHierarchy(type);
+    List<ResolvableType> generics = asList(interfaceType.getGenerics());
+
+    if (generics.stream().anyMatch(obj -> isNull(obj.getRawClass()))) {
+      return findGenericsInSuperHierarchy(ResolvableType.forType(type).getRawClass()).stream().map(ResolvableType::forClass)
+          .collect(toList());
     }
 
-    return (List<Class<?>>) generics;
+    return generics;
   }
 
   public static List<Class<?>> findGenericsInSuperHierarchy(final Class<?> type) {
@@ -633,7 +621,7 @@ public final class IntrospectionUtils {
 
     Class<?> superClass = type.getSuperclass();
 
-    List<Type> generics = getSuperClassGenerics(type, superClass);
+    List<java.lang.reflect.Type> generics = getSuperClassGenerics(type, superClass);
 
     if (isEmpty(generics) && !Object.class.equals(superClass)) {
       return findGenericsInSuperHierarchy(superClass);
@@ -643,7 +631,13 @@ public final class IntrospectionUtils {
   }
 
   private static List<Class<?>> toRawClasses(ResolvableType... types) {
-    return stream(types).map(ResolvableType::getRawClass).collect(toList());
+    return stream(types).map(type -> {
+      Class<?> rawClass = type.getRawClass();
+      if (rawClass == null) {
+        rawClass = type.getSuperType().getRawClass();
+      }
+      return rawClass;
+    }).collect(toList());
   }
 
   public static List<TypeMirror> getSuperClassGenerics(TypeElement type, Class superClass,
@@ -676,7 +670,7 @@ public final class IntrospectionUtils {
     return emptyList();
   }
 
-  public static List<Type> getSuperClassGenerics(Class<?> type, Class<?> superClass) {
+  public static List<java.lang.reflect.Type> getSuperClassGenerics(Class<?> type, Class<?> superClass) {
     if (!superClass.isAssignableFrom(type)) {
       throw new IllegalArgumentException(
                                          format("Class '%s' does not extend the '%s' class", type.getName(),
@@ -686,7 +680,7 @@ public final class IntrospectionUtils {
     Class<?> searchClass = type;
     while (!Object.class.equals(searchClass)) {
       if (searchClass.getSuperclass().equals(superClass)) {
-        Type superType = searchClass.getGenericSuperclass();
+        java.lang.reflect.Type superType = searchClass.getGenericSuperclass();
         if (superType instanceof ParameterizedType) {
           return stream(((ParameterizedType) superType).getActualTypeArguments()).collect(toList());
         }
@@ -754,7 +748,7 @@ public final class IntrospectionUtils {
   }
 
   public static boolean isVoid(MethodElement methodElement) {
-    org.mule.runtime.module.extension.internal.loader.java.type.Type returnTypeElement = methodElement.getReturnType();
+    Type returnTypeElement = methodElement.getReturnType();
     return returnTypeElement.isAssignableFrom(void.class) || returnTypeElement.isAssignableFrom(Void.class);
   }
 
@@ -792,7 +786,6 @@ public final class IntrospectionUtils {
 
   private static boolean isLifecycleMethod(ExecutableElement method, Class<?> lifecycleClass, String lifecycleMethodName,
                                            ProcessingEnvironment processingEnvironment) {
-    //TODO REVIEW
     TypeElement lifecycleElement = processingEnvironment.getElementUtils().getTypeElement(lifecycleClass.getTypeName());
     return ((TypeElement) method.getEnclosingElement()).getInterfaces().contains(lifecycleElement.asType())
         && method.getSimpleName().toString().equals(lifecycleMethodName);
@@ -962,7 +955,7 @@ public final class IntrospectionUtils {
   private static List<PropertyDescriptor> getPropertyDescriptors(Class<?> extensionType) {
     try {
       PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(extensionType).getPropertyDescriptors();
-      return Arrays.asList(propertyDescriptors);
+      return asList(propertyDescriptors);
     } catch (IntrospectionException e) {
       throw new IllegalModelDefinitionException("Could not introspect POJO: " + extensionType.getName(), e);
     }
@@ -1398,5 +1391,21 @@ public final class IntrospectionUtils {
     return new Pair<>(connectionType, returnType);
   }
 
+  /**
+   * Introspects a {@link PagingProvider} type and returns their generics.
+   *
+   * @return The {@link PagingProvider} generics.
+   */
+  public static Pair<Type, Type> getPagingProviderTypes(Type type) {
+    if (!type.isAssignableTo(PagingProvider.class)) {
+      throw new IllegalArgumentException("The given OutputType is not a PagingProvider");
+    }
 
+    List<Type> interfaceGenerics = type.getInterfaceGenerics(PagingProvider.class);
+    if (interfaceGenerics.size() == 2) {
+      return new Pair<>(interfaceGenerics.get(0), interfaceGenerics.get(1));
+    } else {
+      throw new IllegalStateException("PagingProvider must provide their generics");
+    }
+  }
 }

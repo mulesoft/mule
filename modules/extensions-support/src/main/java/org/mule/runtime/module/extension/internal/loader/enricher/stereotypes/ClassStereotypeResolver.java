@@ -34,7 +34,7 @@ class ClassStereotypeResolver extends StereotypeResolver<Type> {
   @Override
   protected <T extends Annotation> T getAnnotation(Class<T> annotationType) {
     return annotatedElement.getAnnotation(annotationType).orElseGet(() -> {
-      Class<?> declaringClass = annotatedElement.getDeclaringClass();
+      Class<?> declaringClass = annotatedElement.getDeclaringClass().orElse(null);
       if (declaringClass != null) {
         return IntrospectionUtils.getAnnotation(declaringClass, annotationType);
       }

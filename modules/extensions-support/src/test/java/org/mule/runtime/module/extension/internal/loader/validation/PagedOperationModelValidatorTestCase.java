@@ -11,7 +11,9 @@ import static java.util.Collections.emptySet;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -19,7 +21,8 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -64,10 +67,11 @@ public class PagedOperationModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   private void mockOperationModel(String method) {
-    when(operationModel.getModelProperty(ImplementingMethodModelProperty.class))
+    when(operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class))
         .thenReturn(getApiMethods(PagedOperations.class).stream()
             .filter(m -> m.getName().equals(method))
-            .findFirst().map(ImplementingMethodModelProperty::new));
+            .findFirst()
+            .map(pagedMethod -> new ExtensionOperationDescriptorModelProperty(new OperationWrapper(pagedMethod, TYPE_LOADER))));
   }
 
   private static class PagedOperations {

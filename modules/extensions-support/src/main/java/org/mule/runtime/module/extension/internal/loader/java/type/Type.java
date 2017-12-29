@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import org.mule.metadata.api.model.AnyType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -30,7 +34,7 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
   List<FieldElement> getAnnotatedFields(Class<? extends Annotation>... annotations);
 
   /**
-   * Checks the assignability of the current type from the given class
+   * Checks the assignability of the current type from the given {@link Class}
    *
    * @param clazz The class to check
    * @return a boolean indicating whether the type is assignable or not from the given class
@@ -39,7 +43,16 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
   boolean isAssignableFrom(Class<?> clazz);
 
   /**
-   * Checks the assignability of the current type to the given class
+   * Checks the assignability of the current type from the given {@link Type}
+   *
+   * @param type The type to check
+   * @return a boolean indicating whether the type is assignable or not to the given {@link Type}
+   * @since 4.1
+   */
+  boolean isAssignableFrom(Type type);
+
+  /**
+   * Checks the assignability of the current type to the given {@link Class}
    *
    * @param clazz The class to check
    * @return a boolean indicating whether the type is assignable or not to the given class
@@ -48,13 +61,68 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
   boolean isAssignableTo(Class<?> clazz);
 
   /**
+   * Checks the assignability of the current type to the given {@link Type}
+   *
+   * @param type The type to check
+   * @return a boolean indicating whether the type is assignable or not to the given {@link Type}
+   * @since 4.1
+   */
+  boolean isAssignableTo(Type type);
+
+  /**
+   * Checks equality of the current type to the given {@link Type}
+   *
+   * @param type The type to check equality
+   * @return a boolean indicating whether the type is the same type or not
+   * @since 4.1
+   */
+  boolean isSameType(Type type);
+
+  /**
+   * Checks equality of the current type to the given {@link Class}
+   *
+   * @param clazz The type to check equality
+   * @return a boolean indicating whether the type is the same type or not
+   * @since 4.1
+   */
+  boolean isSameType(Class<?> clazz);
+
+  /**
+   * @return a boolean indicating if the current type is instantiable or not.
+   * @since 4.1
+   */
+  boolean isInstantiable();
+
+  /**
    * @return The generics for the current type.
    * @since 4.1
    */
   List<TypeGeneric> getGenerics();
 
-  //TODO: Remove once the type loader exists MULE-14040
-  java.lang.reflect.Type getReflectType();
+  /**
+   * @param interfaceClass The {@link Class} with generics
+   * @return The list of generics types from the given interface class.
+   * @since 4.1
+   */
+  List<Type> getInterfaceGenerics(Class interfaceClass);
+
+  /**
+   * @return The current type described as a {@link MetadataType}
+   * @since 4.1
+   */
+  MetadataType asMetadataType();
 
   String getTypeName();
+
+  /**
+   * @return The {@link ClassInformationAnnotation} describing the current {@link Type}
+   * @since 4.1
+   */
+  ClassInformationAnnotation getClassInformation();
+
+  /**
+   * @return A boolean indicating if this type may be considered as an {@link AnyType}
+   * @since 4.1
+   */
+  boolean isAnyType();
 }

@@ -837,7 +837,10 @@
                   "isFinal": false,
                   "implementedInterfaces": [],
                   "parent": "",
-                  "genericTypes": [],
+                  "genericTypes": [
+                    "org.mule.test.transactional.connection.TestTransactionalConnection",
+                    "java.lang.Integer"
+                  ],
                   "isMap": false
                 }
               },

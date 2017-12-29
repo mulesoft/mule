@@ -24,7 +24,6 @@ import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -58,14 +57,14 @@ class MethodStereotypeResolver extends StereotypeResolver<MethodElement> {
 
   @Override
   protected void addFallbackStereotype() {
-    new ClassStereotypeResolver(new TypeWrapper(annotatedElement.getDeclaringClass()),
+    new ClassStereotypeResolver(annotatedElement.getEnclosingType(),
                                 declaration,
                                 namespace,
                                 fallbackStereotype,
                                 stereotypesCache).resolveStereotype();
   }
 
-  private void addAllowedStereotypes(String namespace, ComponentDeclaration<?> declaration, MethodWrapper methodElement) {
+  private void addAllowedStereotypes(String namespace, ComponentDeclaration<?> declaration, MethodElement methodElement) {
 
     Map<String, NestableElementDeclaration<?>> nested = declaration.getNestedComponents().stream()
         .collect(toMap(NamedDeclaration::getName, n -> n));

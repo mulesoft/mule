@@ -8,10 +8,12 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
@@ -25,8 +27,8 @@ final class OperationContainerWrapper extends TypeWrapper implements OperationCo
 
   private final Class aClass;
 
-  OperationContainerWrapper(Class aClass) {
-    super(aClass);
+  OperationContainerWrapper(Class aClass, ClassTypeLoader typeLoader) {
+    super(aClass, typeLoader);
     this.aClass = aClass;
   }
 
@@ -34,8 +36,9 @@ final class OperationContainerWrapper extends TypeWrapper implements OperationCo
    * @return The list of {@link MethodWrapper} that the this type holds
    */
   @Override
-  public List<MethodElement> getOperations() {
-    return Stream.of(aClass).map(IntrospectionUtils::getApiMethods).flatMap(Collection::stream).map(MethodWrapper::new)
+  public List<OperationElement> getOperations() {
+    return Stream.of(aClass).map(IntrospectionUtils::getApiMethods).flatMap(Collection::stream)
+        .map((Method method) -> new OperationWrapper(method, typeLoader))
         .collect(toList());
   }
 }

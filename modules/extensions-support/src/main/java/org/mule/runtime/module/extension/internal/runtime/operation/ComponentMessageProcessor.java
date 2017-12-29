@@ -311,7 +311,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private ObjectBuilder createFieldParameterGroupBuilder(ParameterGroupDescriptor groupDescriptor,
                                                          List<ParameterModel> fieldParameters) {
-    DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(groupDescriptor.getType().getDeclaringClass());
+    DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(groupDescriptor.getType().getDeclaringClass().get());
 
     fieldParameters.forEach(p -> {
       ValueResolver resolver = resolverSet.getResolvers().get(p.getName());

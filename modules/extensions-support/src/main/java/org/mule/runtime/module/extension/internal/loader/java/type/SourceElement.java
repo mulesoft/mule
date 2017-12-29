@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceReturnType;
+
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.extension.api.runtime.source.Source;
 
 import java.util.List;
@@ -16,15 +19,12 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public interface SourceElement extends ParameterizableTypeElement {
+public interface SourceElement extends ParameterizableTypeElement, WithReturnType {
 
   /**
    * @return The list of generics of the super class {@link Source}
    */
   List<Type> getSuperClassGenerics();
-
-  @Override
-  Class<? extends Source> getDeclaringClass();
 
   //TODO: MULE-9220 not more than one
   Optional<MethodElement> getOnResponseMethod();
@@ -35,5 +35,20 @@ public interface SourceElement extends ParameterizableTypeElement {
   Optional<MethodElement> getOnTerminateMethod();
 
   Optional<MethodElement> getOnBackPressureMethod();
+
+  @Override
+  default Type getReturnType() {
+    return getSuperClassGenerics().get(0);
+  }
+
+  @Override
+  default MetadataType getReturnMetadataType() {
+    return getSourceReturnType(getSuperClassGenerics().get(0));
+  }
+
+  @Override
+  default MetadataType getAttributesMetadataType() {
+    return getSourceReturnType(getSuperClassGenerics().get(1));
+  }
 
 }
