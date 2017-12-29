@@ -124,6 +124,18 @@ public class MavenUtils {
   }
 
   /**
+   * @param artifact a maven artifact that may be a directory following the mule deployable archive structure or a compressed
+   *        file.
+   * @return the pom model for the artifact.
+   */
+  public static Model getPomModel(File artifact) {
+    if (artifact.isDirectory()) {
+      return getPomModelFolder(artifact);
+    }
+    return getPomModelFromJar(artifact);
+  }
+
+  /**
    * Updates the pom file from an artifact.
    * 
    * @param artifactFolder the artifact folder
@@ -161,7 +173,7 @@ public class MavenUtils {
   }
 
 
-  private static File lookupPomFromMavenLocation(File artifactFolder) {
+  public static File lookupPomFromMavenLocation(File artifactFolder) {
     File mulePluginPom = null;
     File lookupFolder = new File(artifactFolder, "META-INF" + separator + "maven");
     while (lookupFolder != null && lookupFolder.exists()) {

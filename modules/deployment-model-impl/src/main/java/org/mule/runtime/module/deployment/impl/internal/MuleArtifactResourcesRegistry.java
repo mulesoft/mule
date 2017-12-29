@@ -36,13 +36,16 @@ import org.mule.runtime.module.artifact.api.classloader.TrackingDeployableArtifa
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactory;
+import org.mule.runtime.module.deployment.impl.internal.application.ApplicationPluginDescriptorsResolver;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationPluginDescriptorsResolver;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.MuleExtensionModelLoaderManager;
@@ -169,13 +172,16 @@ public class MuleArtifactResourcesRegistry {
     PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
         new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory);
 
+    ApplicationPluginDescriptorsResolver applicationPluginDescriptorsResolver = new DefaultApplicationPluginDescriptorsResolver();
+
     applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
                                                        domainManager, serviceManager,
                                                        extensionModelLoaderManager,
                                                        artifactClassLoaderManager, policyTemplateClassLoaderBuilderFactory,
                                                        pluginDependenciesResolver,
                                                        artifactPluginDescriptorLoader,
-                                                       licenseValidator);
+                                                       licenseValidator,
+                                                       applicationPluginDescriptorsResolver);
   }
 
   private <T extends ArtifactDescriptor> ArtifactClassLoaderFactory<T> trackArtifactClassLoaderFactory(ArtifactClassLoaderFactory<T> artifactClassLoaderFactory) {
@@ -199,6 +205,20 @@ public class MuleArtifactResourcesRegistry {
    */
   public DefaultDomainFactory getDomainFactory() {
     return domainFactory;
+  }
+
+  /**
+   * @return the domain repository where domains are registered once deployed.
+   */
+  public DomainRepository getDomainRepository() {
+    return domainManager;
+  }
+
+  /**
+   * @return the domain descriptor factory used to created domains.
+   */
+  public DomainDescriptorFactory getDomainDescriptorFactory() {
+    return domainDescriptorFactory;
   }
 
   /**

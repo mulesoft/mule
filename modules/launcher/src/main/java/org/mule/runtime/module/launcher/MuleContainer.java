@@ -123,7 +123,10 @@ public class MuleContainer {
                                                        () -> findSchedulerService(serviceManager));
     this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
 
-    this.toolingService = new DefaultToolingService(artifactResourcesRegistry.getApplicationFactory());
+    this.toolingService = new DefaultToolingService(artifactResourcesRegistry.getDomainRepository(),
+                                                    artifactResourcesRegistry.getDomainFactory(),
+                                                    artifactResourcesRegistry.getApplicationFactory(),
+                                                    artifactResourcesRegistry.getApplicationDescriptorFactory());
     this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(
                                                                           new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
                                                                               .getContainerClassLoader()),
@@ -211,6 +214,8 @@ public class MuleContainer {
       coreExtensionManager.initialise();
       coreExtensionManager.start();
 
+      toolingService.initialise();
+
       extensionModelLoaderManager.start();
 
       deploymentService.start();
@@ -291,6 +296,10 @@ public class MuleContainer {
 
     if (serviceManager != null) {
       serviceManager.stop();
+    }
+
+    if (toolingService != null) {
+      toolingService.stop();
     }
 
     if (LogManager.getFactory() instanceof MuleLog4jContextFactory) {

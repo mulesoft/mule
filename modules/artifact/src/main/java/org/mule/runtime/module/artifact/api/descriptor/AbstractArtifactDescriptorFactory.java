@@ -60,15 +60,23 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
   @Override
   public T create(File artifactFolder, Optional<Properties> deploymentProperties) throws ArtifactDescriptorCreateException {
+    final M artifactModel = createArtifactModel(artifactFolder);
+    return createArtifact(artifactFolder, deploymentProperties, artifactModel);
+  }
+
+  public T createArtifact(File artifactFolder, Optional<Properties> deploymentProperties, M artifactModel) {
+    T artifactDescriptor =
+        loadFromJsonDescriptor(artifactFolder, artifactModel, deploymentProperties);
+    return artifactDescriptor;
+  }
+
+  public M createArtifactModel(File artifactFolder) {
     final File artifactJsonFile = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + getDescriptorFileName());
     if (!artifactJsonFile.exists()) {
       throw new ArtifactDescriptorCreateException(ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR + artifactJsonFile);
     }
 
-    T artifactDescriptor =
-        loadFromJsonDescriptor(artifactFolder, loadModelFromJson(getDescriptorContent(artifactJsonFile)), deploymentProperties);
-
-    return artifactDescriptor;
+    return loadModelFromJson(getDescriptorContent(artifactJsonFile));
   }
 
   /**

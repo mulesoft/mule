@@ -7,15 +7,11 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -29,7 +25,6 @@ import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResol
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
@@ -44,7 +39,6 @@ import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -67,6 +61,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
   private final LicenseValidator licenseValidator;
+  private final ApplicationPluginDescriptorsResolver applicationPluginDescriptorsResolver;
 
   public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                    ApplicationDescriptorFactory applicationDescriptorFactory,
@@ -77,7 +72,8 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
                                    PluginDependenciesResolver pluginDependenciesResolver,
                                    ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
-                                   LicenseValidator licenseValidator) {
+                                   LicenseValidator licenseValidator,
+                                   ApplicationPluginDescriptorsResolver applicationPluginDescriptorsResolver) {
     super(licenseValidator);
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
     checkArgument(applicationDescriptorFactory != null, "Application descriptor factory cannot be null");
@@ -88,6 +84,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     checkArgument(policyTemplateClassLoaderBuilderFactory != null, "policyClassLoaderBuilderFactory cannot be null");
     checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
     checkArgument(artifactPluginDescriptorLoader != null, "artifactPluginDescriptorLoader cannot be null");
+    checkArgument(applicationPluginDescriptorsResolver != null, "applicationPluginDescriptorsResolver cannot be null");
 
     this.classLoaderRepository = classLoaderRepository;
     this.applicationClassLoaderBuilderFactory = applicationClassLoaderBuilderFactory;
@@ -99,6 +96,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     this.pluginDependenciesResolver = pluginDependenciesResolver;
     this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
     this.licenseValidator = licenseValidator;
+    this.applicationPluginDescriptorsResolver = applicationPluginDescriptorsResolver;
   }
 
   @Override
@@ -127,7 +125,8 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     Domain domain = getApplicationDomain(descriptor);
 
     List<ArtifactPluginDescriptor> applicationPluginDescriptors =
-        getArtifactPluginDescriptors(domain.getDescriptor().getPlugins(), descriptor);
+        applicationPluginDescriptorsResolver.resolveArtifactPluginDescriptors(domain.getDescriptor().getPlugins(),
+                                                                              getArtifactPluginDescriptors(descriptor));
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(applicationPluginDescriptors);
 
@@ -163,46 +162,13 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   }
 
   private Domain getApplicationDomain(ApplicationDescriptor descriptor) {
-    Optional<BundleDescriptor> domainDescriptor = descriptor.getDomainDescriptor();
-
-    Domain domain;
-    if (domainDescriptor.isPresent()) {
-      domain = domainRepository.getDomain(domainDescriptor.get().getArtifactFileName());
-    } else {
-
-      domain = domainRepository.getDomain(DEFAULT_DOMAIN_NAME);
-    }
-
+    Domain domain = domainRepository.getDomain(descriptor.getDomainName());
     if (domain == null) {
       throw new DeploymentException(createStaticMessage(format("Domain '%s' "
-          + "has to be deployed in order to deploy Application '%s'",
-                                                               domainDescriptor.isPresent()
-                                                                   ? domainDescriptor.get().getArtifactId() : DEFAULT_DOMAIN_NAME,
-                                                               descriptor.getName())));
+          + "has to be deployed in order to deploy Application '%s'", descriptor.getDomainName(), descriptor.getName())));
     }
 
     return domain;
-  }
-
-  private List<ArtifactPluginDescriptor> getArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> plugins,
-                                                                      ApplicationDescriptor descriptor) {
-    List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
-
-    for (ArtifactPluginDescriptor appPluginDescriptor : getArtifactPluginDescriptors(descriptor)) {
-      Optional<ArtifactPluginDescriptor> pluginDescriptor = findPlugin(plugins, appPluginDescriptor.getBundleDescriptor());
-
-      if (!pluginDescriptor.isPresent()) {
-        artifactPluginDescriptors.add(appPluginDescriptor);
-      } else if (!isCompatibleVersion(pluginDescriptor.get().getBundleDescriptor().getVersion(),
-                                      appPluginDescriptor.getBundleDescriptor().getVersion())) {
-        throw new IllegalStateException(
-                                        format("Incompatible version of plugin '%s' found. Application requires version'%s' but domain provides version'%s'",
-                                               appPluginDescriptor.getName(),
-                                               appPluginDescriptor.getBundleDescriptor().getVersion(),
-                                               pluginDescriptor.get().getBundleDescriptor().getVersion()));
-      }
-    }
-    return artifactPluginDescriptors;
   }
 
   private Set<ArtifactPluginDescriptor> getArtifactPluginDescriptors(ApplicationDescriptor descriptor) {
@@ -225,18 +191,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     }
   }
 
-  private Optional<ArtifactPluginDescriptor> findPlugin(Set<ArtifactPluginDescriptor> appPlugins,
-                                                        BundleDescriptor bundleDescriptor) {
-    for (ArtifactPluginDescriptor appPlugin : appPlugins) {
-      if (appPlugin.getBundleDescriptor().getArtifactId().equals(bundleDescriptor.getArtifactId())
-          && appPlugin.getBundleDescriptor().getGroupId().equals(bundleDescriptor.getGroupId())) {
-        return of(appPlugin);
-      }
-    }
-
-    return empty();
-  }
-
   private List<ArtifactPlugin> createArtifactPluginList(MuleDeployableArtifactClassLoader applicationClassLoader,
                                                         List<ArtifactPluginDescriptor> plugins) {
     return plugins.stream()
@@ -255,4 +209,5 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                                                        .findFirst().get()))
         .collect(toList());
   }
+
 }

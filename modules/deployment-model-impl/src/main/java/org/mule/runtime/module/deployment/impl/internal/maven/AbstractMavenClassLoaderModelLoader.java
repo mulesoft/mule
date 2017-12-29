@@ -11,6 +11,7 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.mule.maven.client.api.model.BundleScope.PROVIDED;
@@ -28,6 +29,7 @@ import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.isS
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
+import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -71,6 +73,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
       Paths.get("META-INF", "mule-artifact", CLASSLOADER_MODEL_JSON_DESCRIPTOR).toString();
   public static final String CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR_LOCATION =
       Paths.get("META-INF", "mule-artifact", CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR).toString();
+
+  public static final String CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER = "_classLoaderModelMavenReactorResolver";
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final LocalRepositorySupplierFactory localRepositorySupplierFactory;
@@ -242,6 +246,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
       List<org.mule.maven.client.api.model.BundleDependency> dependencies =
           mavenClient.resolveArtifactDependencies(artifactFile, includeTestDependencies(attributes),
                                                   includeProvidedDependencies(artifactType), of(mavenRepository),
+                                                  ofNullable((MavenReactorResolver) attributes
+                                                      .get(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER)),
                                                   of(temporaryDirectory));
       final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
       classLoaderModelBuilder

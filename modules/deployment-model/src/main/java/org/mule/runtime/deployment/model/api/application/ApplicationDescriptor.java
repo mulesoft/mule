@@ -9,8 +9,8 @@ package org.mule.runtime.deployment.model.api.application;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
-
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -36,6 +36,7 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   private File logConfigFile;
   private ArtifactDeclaration artifactDeclaration;
   private volatile Optional<BundleDescriptor> domainDescriptor;
+  private String domainName;
 
   /**
    * Creates a new application descriptor
@@ -66,8 +67,15 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
     this.appProperties = appProperties;
   }
 
+  public String getDomainName() {
+    if (domainName != null) {
+      return domainName;
+    }
+    return getDomainDescriptor().map(bundleDescriptor -> bundleDescriptor.getArtifactFileName()).orElse(DEFAULT_DOMAIN_NAME);
+  }
+
   /**
-   * @return the optional descriptor of the domain on wich the application is deployed into
+   * @return the optional descriptor of the domain on which the application is deployed into
    */
   public Optional<BundleDescriptor> getDomainDescriptor() {
     if (domainDescriptor == null) {
@@ -86,6 +94,10 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
     }
 
     return domainDescriptor;
+  }
+
+  public void setDomainName(String domainName) {
+    this.domainName = domainName;
   }
 
   public void setLogConfigFile(File logConfigFile) {

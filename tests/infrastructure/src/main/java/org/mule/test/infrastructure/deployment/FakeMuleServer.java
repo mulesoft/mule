@@ -118,7 +118,10 @@ public class FakeMuleServer {
 
     repositoryService = new RepositoryServiceFactory().createRepositoryService();
 
-    toolingService = new DefaultToolingService(muleArtifactResourcesRegistry.getApplicationFactory());
+    toolingService = new DefaultToolingService(muleArtifactResourcesRegistry.getDomainRepository(),
+                                               muleArtifactResourcesRegistry.getDomainFactory(),
+                                               muleArtifactResourcesRegistry.getApplicationFactory(),
+                                               muleArtifactResourcesRegistry.getApplicationDescriptorFactory());
     deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
                                                   muleArtifactResourcesRegistry.getApplicationFactory(),
                                                   () -> findSchedulerService(serviceManager));

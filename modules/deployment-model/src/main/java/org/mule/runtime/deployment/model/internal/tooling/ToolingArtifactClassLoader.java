@@ -54,6 +54,13 @@ public class ToolingArtifactClassLoader implements ArtifactClassLoader {
     return regionClassLoader.getArtifactPluginClassLoaders();
   }
 
+  /**
+   * @return {@link RegionClassLoader} that this artifact class loader belongs too.
+   */
+  public RegionClassLoader getRegionClassLoader() {
+    return this.regionClassLoader;
+  }
+
   @Override
   public String getArtifactId() {
     return delegateArtifactClassLoader.getArtifactId();

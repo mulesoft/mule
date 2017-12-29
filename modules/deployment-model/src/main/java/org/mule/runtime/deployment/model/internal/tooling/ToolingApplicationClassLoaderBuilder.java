@@ -11,19 +11,26 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@link ArtifactClassLoader} builder for class loaders required by {@link Application} artifacts for Tooling.
@@ -38,6 +45,7 @@ public class ToolingApplicationClassLoaderBuilder
 
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private ArtifactClassLoader parentClassLoader;
+  private boolean usesCustomDomain = false;
 
   /**
    * Creates a new builder for creating {@link Application} artifacts.
@@ -80,6 +88,9 @@ public class ToolingApplicationClassLoaderBuilder
 
   @Override
   protected String getArtifactId(ArtifactDescriptor artifactDescriptor) {
+    if (usesCustomDomain) {
+      return getApplicationId(artifactDescriptor.getName(), parentClassLoader.getArtifactId());
+    }
     return getApplicationId(artifactDescriptor.getName());
   }
 
@@ -92,6 +103,36 @@ public class ToolingApplicationClassLoaderBuilder
   public ToolingApplicationClassLoaderBuilder setParentClassLoader(ArtifactClassLoader parentClassLoader) {
     this.parentClassLoader = parentClassLoader;
     return this;
+  }
+
+  /**
+   * @param domainArtifactClassLoader domain parent class loader for the artifact class loader. It will check for plugins to define
+   *                                  the parent lookup policy if a domain parent artifact class loader has been set.
+   * @return the builder
+   */
+  public ToolingApplicationClassLoaderBuilder setDomainParentClassLoader(ArtifactClassLoader domainArtifactClassLoader) {
+    this.parentClassLoader = domainArtifactClassLoader;
+    this.usesCustomDomain = true;
+    return this;
+  }
+
+  @Override
+  protected ClassLoaderLookupPolicy getParentLookupPolicy(ArtifactClassLoader parentClassLoader) {
+    if (!usesCustomDomain) {
+      return super.getParentLookupPolicy(parentClassLoader);
+    }
+
+    Map<String, LookupStrategy> lookupStrategies = new HashMap<>();
+
+    DomainDescriptor descriptor = parentClassLoader.getArtifactDescriptor();
+    descriptor.getClassLoaderModel().getExportedPackages().forEach(p -> lookupStrategies.put(p, PARENT_FIRST));
+
+    for (ArtifactPluginDescriptor artifactPluginDescriptor : descriptor.getPlugins()) {
+      artifactPluginDescriptor.getClassLoaderModel().getExportedPackages()
+          .forEach(p -> lookupStrategies.put(p, PARENT_FIRST));
+    }
+
+    return parentClassLoader.getClassLoaderLookupPolicy().extend(lookupStrategies);
   }
 
   @Override
@@ -107,6 +148,17 @@ public class ToolingApplicationClassLoaderBuilder
     checkArgument(!isEmpty(applicationName), "applicationName cannot be empty");
 
     return "tooling-application/" + applicationName;
+  }
+
+  /**
+   * @param applicationName name of the application. Non empty.
+   * @return the unique identifier for the application in the container.
+   */
+  public static String getApplicationId(String applicationName, String domainId) {
+    checkArgument(!isEmpty(applicationName), "applicationName cannot be empty");
+    checkArgument(!isEmpty(domainId), "domainId  cannot be empty");
+
+    return domainId + "tooling-application/" + applicationName;
   }
 
 }

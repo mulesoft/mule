@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
@@ -86,13 +85,13 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
     this.extensionModelLoaderManager = extensionModelLoaderManager;
   }
 
-  private DomainDescriptor findDomain(String domainName, Optional<Properties> deploymentProperties) throws IOException {
+  private DomainDescriptor findDomain(String domainName, File domainLocation, Optional<Properties> deploymentProperties)
+      throws IOException {
     if (DEFAULT_DOMAIN_NAME.equals(domainName)) {
       return new EmptyDomainDescriptor(new File(getMuleDomainsDir(), DEFAULT_DOMAIN_NAME));
     }
 
-    File domainFolder = getDomainFolder(domainName);
-    DomainDescriptor descriptor = domainDescriptorFactory.create(domainFolder, deploymentProperties);
+    DomainDescriptor descriptor = domainDescriptorFactory.create(domainLocation, deploymentProperties);
 
     return descriptor;
   }
@@ -140,7 +139,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
       throw new IllegalArgumentException("Mule domain name may not contain spaces: " + domainName);
     }
 
-    DomainDescriptor domainDescriptor = findDomain(domainName, deploymentProperties);
+    DomainDescriptor domainDescriptor = findDomain(domainName, domainLocation, deploymentProperties);
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors =
         domainDescriptor.getPlugins().stream().collect(toList());
