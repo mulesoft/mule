@@ -145,11 +145,11 @@ public class DefaultMuleDomain implements Domain {
     }
 
     try {
-      ArtifactContextBuilder artifactBuilder = newBuilder().setArtifactName(getArtifactName())
+      ArtifactContextBuilder artifactBuilder = getArtifactContextBuilder().setArtifactName(getArtifactName())
           .setDataFolderName(getDescriptor().getDataFolderName())
           .setArtifactPlugins(artifactPlugins)
           .setExecutionClassloader(deploymentClassLoader.getClassLoader())
-          .setArtifactInstallationDirectory(new File(getMuleDomainsDir(), getArtifactName()))
+          .setArtifactInstallationDirectory(getArtifactInstallationDirectory())
           .setExtensionModelLoaderRepository(extensionModelLoaderManager)
           .setArtifactType(DOMAIN)
           .setEnableLazyInit(lazy)
@@ -219,7 +219,10 @@ public class DefaultMuleDomain implements Domain {
         logger.info(miniSplash(format("Stopping domain '%s'", getArtifactName())));
       }
       if (this.artifactContext != null) {
-        this.artifactContext.getMuleContext().stop();
+        withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> {
+          this.artifactContext.getMuleContext().stop();
+          return null;
+        });
       }
     } catch (Exception e) {
       throw new DeploymentStopException(createStaticMessage("Failure trying to stop domain " + getArtifactName()), e);
@@ -232,7 +235,7 @@ public class DefaultMuleDomain implements Domain {
       logger.info(miniSplash(format("Disposing domain '%s'", getArtifactName())));
     }
     if (this.artifactContext != null) {
-      this.artifactContext.getMuleContext().dispose();
+      withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> this.artifactContext.getMuleContext().dispose());
     }
     this.deploymentClassLoader.dispose();
   }
@@ -279,4 +282,23 @@ public class DefaultMuleDomain implements Domain {
   public boolean containsSharedResources() {
     return this.artifactContext != null;
   }
+
+  /**
+   * Method created for testing purposes.
+   *
+   * @return the muleContextFactory for creating the mule context of the domain
+   */
+  protected ArtifactContextBuilder getArtifactContextBuilder() {
+    return newBuilder();
+  }
+
+  /**
+   * Method created for testing purposes.
+   *
+   * @return the installation directory.
+   */
+  protected File getArtifactInstallationDirectory() {
+    return new File(getMuleDomainsDir(), getArtifactName());
+  }
+
 }
