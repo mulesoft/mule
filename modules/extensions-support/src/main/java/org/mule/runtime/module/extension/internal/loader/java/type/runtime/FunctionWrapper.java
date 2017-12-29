@@ -19,13 +19,8 @@ import java.lang.reflect.Method;
  */
 public class FunctionWrapper extends MethodWrapper<FunctionContainerElement> implements FunctionElement {
 
-  private Method method;
-  private ClassTypeLoader typeLoader;
-
   public FunctionWrapper(Method method, ClassTypeLoader typeLoader) {
     super(method, typeLoader);
-    this.method = method;
-    this.typeLoader = typeLoader;
   }
 
   /**

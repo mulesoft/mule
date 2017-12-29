@@ -34,8 +34,8 @@ import java.util.Optional;
  */
 public class MethodWrapper<T extends Type> implements MethodElement<T> {
 
-  private final Method method;
-  private ClassTypeLoader typeLoader;
+  protected final Method method;
+  protected ClassTypeLoader typeLoader;
 
   public MethodWrapper(Method method, ClassTypeLoader typeLoader) {
     this.method = method;

@@ -19,13 +19,8 @@ import java.lang.reflect.Method;
  */
 public class OperationWrapper extends MethodWrapper<OperationContainerElement> implements OperationElement {
 
-  private Method method;
-  private ClassTypeLoader typeLoader;
-
   public OperationWrapper(Method method, ClassTypeLoader typeLoader) {
     super(method, typeLoader);
-    this.method = method;
-    this.typeLoader = typeLoader;
   }
 
   /**
