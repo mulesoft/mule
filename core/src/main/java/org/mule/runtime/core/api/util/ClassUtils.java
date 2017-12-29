@@ -842,11 +842,15 @@ public class ClassUtils {
       throws E {
     final Thread currentThread = Thread.currentThread();
     final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-    currentThread.setContextClassLoader(classLoader);
+    if (currentClassLoader != classLoader) {
+      currentThread.setContextClassLoader(classLoader);
+    }
     try {
       return tryExpecting(expectedExceptionType, callable, exceptionHandler);
     } finally {
-      currentThread.setContextClassLoader(currentClassLoader);
+      if (currentClassLoader != classLoader) {
+        currentThread.setContextClassLoader(currentClassLoader);
+      }
     }
   }
 
