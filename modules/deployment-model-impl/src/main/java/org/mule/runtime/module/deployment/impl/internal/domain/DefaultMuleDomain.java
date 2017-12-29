@@ -222,7 +222,10 @@ public class DefaultMuleDomain implements Domain {
         logger.info(miniSplash(format("Stopping domain '%s'", getArtifactName())));
       }
       if (this.artifactContext != null) {
-        artifactContext.getMuleContext().stop();
+        withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> {
+          this.artifactContext.getMuleContext().stop();
+          return null;
+        });
       }
     } catch (Exception e) {
       throw new DeploymentStopException(createStaticMessage("Failure trying to stop domain " + getArtifactName()), e);
@@ -234,8 +237,9 @@ public class DefaultMuleDomain implements Domain {
     if (logger.isInfoEnabled()) {
       logger.info(miniSplash(format("Disposing domain '%s'", getArtifactName())));
     }
-
-    withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> this.artifactContext.getMuleContext().dispose());
+    if (this.artifactContext != null) {
+      withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> this.artifactContext.getMuleContext().dispose());
+    }
 
     this.deploymentClassLoader.dispose();
   }

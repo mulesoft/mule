@@ -17,6 +17,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.mockito.answer.BuilderAnswer.BUILDER_ANSWER;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -63,17 +64,31 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
     when(domainDescriptor.getDataFolderName()).thenReturn("dataFolderName");
     when(artifactContextBuilder.build()).thenReturn(artifactContext);
     when(artifactContext.getMuleContext()).thenReturn(muleContext);
-    doAnswer(invocation -> {
-      classloaderUsedInDispose = currentThread().getContextClassLoader();
-      return null;
-    }).when(muleContext).dispose();
     domain.init();
     when(artifactClassLoader.getClassLoader()).thenReturn(domainClassloader);
   }
 
   @Test
   public void disposeWithDomainClassloader() {
+    doAnswer(invocation -> {
+      classloaderUsedInDispose = currentThread().getContextClassLoader();
+      return null;
+    }).when(muleContext).dispose();
+
     domain.dispose();
+
+    assertThat(classloaderUsedInDispose, sameInstance(domainClassloader));
+    assertThat(currentThread().getContextClassLoader(), is(originalThreadClassloader));
+  }
+
+  @Test
+  public void stopWithDomainClassloader() throws Exception {
+    doAnswer(invocation -> {
+      classloaderUsedInDispose = currentThread().getContextClassLoader();
+      return null;
+    }).when(muleContext).stop();
+
+    domain.stop();
 
     assertThat(classloaderUsedInDispose, sameInstance(domainClassloader));
     assertThat(currentThread().getContextClassLoader(), is(originalThreadClassloader));
