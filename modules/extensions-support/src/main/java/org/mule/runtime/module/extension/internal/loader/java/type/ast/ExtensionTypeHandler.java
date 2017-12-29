@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.ast;
 
 import org.mule.metadata.api.builder.TypeBuilder;
+import org.mule.metadata.ast.api.IntrospectionContext;
 import org.mule.metadata.ast.api.TypeHandler;
-import org.mule.metadata.ast.internal.IntrospectionContext;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
