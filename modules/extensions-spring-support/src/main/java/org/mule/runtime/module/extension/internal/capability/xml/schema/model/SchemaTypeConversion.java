@@ -22,7 +22,6 @@ import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE_DECIMAL;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE_INT;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE_LONG;
-import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE_MAP;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
@@ -100,7 +99,7 @@ public final class SchemaTypeConversion {
       @Override
       public void visitObject(ObjectType objectType) {
         if (isMap(objectType)) {
-          qName.set(dynamic ? EXPRESSION_MAP : SUBSTITUTABLE_MAP);
+          qName.set(dynamic ? EXPRESSION_MAP : SUBSTITUTABLE_NAME);
         } else {
           defaultVisit(objectType);
         }

@@ -88,11 +88,11 @@
           </xs:sequence>
           <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="requiredMapDefaults"></xs:attribute>
-          <xs:attribute type="mule:mapType" use="optional" name="requiredMapNoExpressions"></xs:attribute>
+          <xs:attribute type="mule:substitutableName" use="optional" name="requiredMapNoExpressions"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="required" name="requiredMapExpressionRequireds"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="requiredMapExpressionSupporteds"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="optionalMapDefaults"></xs:attribute>
-          <xs:attribute type="mule:mapType" use="optional" name="optionalMapNoExpressions"></xs:attribute>
+          <xs:attribute type="mule:substitutableName" use="optional" name="optionalMapNoExpressions"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="optionalMapExpressionRequireds"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="optionalMapExpressionSupporteds"></xs:attribute>
         </xs:extension>

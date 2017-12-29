@@ -764,7 +764,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(source.getName(), is(sourceName));
 
     List<ParameterDeclaration> parameters = source.getAllParameters();
-    assertThat(parameters, hasSize(29));
+    assertThat(parameters, hasSize(31));
 
     assertParameter(parameters, SOURCE_PARAMETER, "", INT_TYPE, true, NOT_SUPPORTED, null);
     assertParameter(parameters, SOURCE_CALLBACK_PARAMETER, "", toMetadataType(Long.class), false, SUPPORTED, "#[payload]");

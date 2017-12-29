@@ -584,6 +584,34 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="debt-properties">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="debt-property">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="usable-weapons">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="usable-weapon">
+                  <xs:complexType>
+                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                      <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                      <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                    </xs:choice>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="labeled-ricins">
             <xs:complexType>
               <xs:sequence>
@@ -685,6 +713,8 @@
         <xs:attribute type="mule:substitutableInt" use="required" name="initialBatchNumber"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
         <xs:attribute type="mule:substitutableLong" use="optional" default="300" name="frequency"></xs:attribute>
+        <xs:attribute type="mule:substitutableName" use="optional" name="debtProperties"></xs:attribute>
+        <xs:attribute type="mule:substitutableName" use="optional" name="usableWeapons"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
@@ -722,6 +752,34 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="debt-properties">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="debt-property">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="usable-weapons">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="usable-weapon">
+                  <xs:complexType>
+                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                      <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                      <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                    </xs:choice>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="labeled-ricins">
             <xs:complexType>
               <xs:sequence>
@@ -823,6 +881,8 @@
         <xs:attribute type="mule:substitutableInt" use="required" name="initialBatchNumber"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
         <xs:attribute type="mule:substitutableLong" use="optional" default="300" name="frequency"></xs:attribute>
+        <xs:attribute type="mule:substitutableName" use="optional" name="debtProperties"></xs:attribute>
+        <xs:attribute type="mule:substitutableName" use="optional" name="usableWeapons"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
@@ -852,6 +912,34 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="debt-properties">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="debt-property">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="usable-weapons">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="usable-weapon">
+                  <xs:complexType>
+                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                      <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                      <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                    </xs:choice>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="labeled-ricins">
             <xs:complexType>
               <xs:sequence>
@@ -953,6 +1041,8 @@
         <xs:attribute type="mule:substitutableInt" use="required" name="initialBatchNumber"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
         <xs:attribute type="mule:substitutableLong" use="optional" default="300" name="frequency"></xs:attribute>
+        <xs:attribute type="mule:substitutableName" use="optional" name="debtProperties"></xs:attribute>
+        <xs:attribute type="mule:substitutableName" use="optional" name="usableWeapons"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="reconnectable"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>

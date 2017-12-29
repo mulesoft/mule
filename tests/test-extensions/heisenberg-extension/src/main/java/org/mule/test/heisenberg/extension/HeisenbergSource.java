@@ -45,6 +45,7 @@ import org.mule.runtime.extension.api.annotation.notification.Fires;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -61,7 +62,9 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
+import org.mule.test.heisenberg.extension.model.Weapon;
 
+import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
 import javax.inject.Inject;
@@ -93,6 +96,9 @@ public class HeisenbergSource extends Source<String, Object> {
   public static String configName;
   public static String location;
 
+  public static boolean receivedDebtProperties;
+  public static boolean receivedUsableWeapons;
+
   @Inject
   private SchedulerService schedulerService;
 
@@ -118,6 +124,16 @@ public class HeisenbergSource extends Source<String, Object> {
 
   @RefName
   private String refName;
+
+  @Parameter
+  @Optional
+  @NullSafe
+  private Map<String, Object> debtProperties;
+
+  @Parameter
+  @Optional
+  @NullSafe
+  private Map<String, Weapon> usableWeapons;
 
   private ComponentLocation componentLocation;
 
