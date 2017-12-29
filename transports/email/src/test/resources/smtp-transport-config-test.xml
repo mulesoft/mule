@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/current/mule-smtp.xsd">
+
+    <smtp:connector name="smtpConnector">
+        <service-overrides dispatcherFactory="org.mule.transport.email.functional.SmtpTransportConfigTestCase$TestTransportDispatcherFactory"/>
+    </smtp:connector>
+
+    <flow name="endpointTransportConfigFlow">
+        <smtp:outbound-endpoint host="localhost"  user="test%40@test.com" password="test%@#encoded" port="${port1}" to="test@example.com"  connector-ref="smtpConnector"/>
+    </flow>
+
+</mule>
