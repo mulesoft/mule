@@ -122,9 +122,7 @@ public abstract class HttpConstants {
 
     GATEWAY_TIMEOUT(504, "Gateway Timeout"),
 
-    HTTP_VERSION_NOT_SUPPORTED(505, "HTTP Version Not Supported"),
-
-    DROPPED(202, "Dropped");
+    HTTP_VERSION_NOT_SUPPORTED(505, "HTTP Version Not Supported");
 
     private int statusCode;
     private String reasonPhrase;
