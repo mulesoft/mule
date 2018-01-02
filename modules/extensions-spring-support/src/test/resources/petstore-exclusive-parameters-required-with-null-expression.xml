@@ -5,14 +5,18 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
-    <petstore:config name="config" cashierName="cashierName">
-        <petstore:connection username="john" password="doe"/>
-        <petstore:pets>
-            <petstore:pet value="Dog"/>
-        </petstore:pets>
-    </petstore:config>
-
     <flow name="getBreederOperation">
         <petstore:get-breeder mammals="#[vars.mammals]"/>
     </flow>
+
+    <flow name="getAquariumOperation">
+        <petstore:get-aquarium>
+            <petstore:aquarium frogName="#[vars.frogName]" ticketPrice="100"/>
+        </petstore:get-aquarium>
+    </flow>
+
+    <flow name="getCashierOperation">
+        <petstore:get-cashier pensionPlan="#[vars.pensionPlan]" cashierName="Nicolas"/>
+    </flow>
+
 </mule>

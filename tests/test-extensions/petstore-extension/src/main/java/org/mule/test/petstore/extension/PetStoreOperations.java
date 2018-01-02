@@ -28,6 +28,7 @@ import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
@@ -99,6 +100,10 @@ public class PetStoreOperations {
 
   public ExclusiveCashier getCashier(@ParameterGroup(name = "Exclusive") ExclusiveCashier cashier) {
     return cashier;
+  }
+
+  public Aquarium getAquarium(Aquarium aquarium) {
+    return aquarium;
   }
 
   @MediaType(TEXT_PLAIN)

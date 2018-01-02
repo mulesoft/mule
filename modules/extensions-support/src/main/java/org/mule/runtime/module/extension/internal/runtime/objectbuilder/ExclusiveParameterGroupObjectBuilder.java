@@ -8,11 +8,17 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.intersection;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.declaration.type.TypeUtils;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExclusiveOptionalsTypeAnnotation;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.RequiredParameterValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 import com.google.common.base.Joiner;
@@ -42,6 +48,23 @@ public final class ExclusiveParameterGroupObjectBuilder<T> extends DefaultObject
   }
 
   @Override
+  public ObjectBuilder<T> addPropertyResolver(String propertyName, ValueResolver<? extends Object> resolver) {
+    checkArgument(!isBlank(propertyName), "property name cannot be blank");
+    checkArgument(resolver != null, "resolver cannot be null");
+
+    if (resolver.isDynamic() && exclusiveOptionalsTypeAnnotation.getExclusiveParameterNames().contains(propertyName)) {
+      if (resolver instanceof ExpressionBasedValueResolver) {
+        resolver = new RequiredParameterValueResolverWrapper<>(resolver, propertyName,
+                                                               ((ExpressionBasedValueResolver) resolver).getExpression());
+      } else {
+        resolver = new RequiredParameterValueResolverWrapper<>(resolver, propertyName);
+      }
+    }
+
+    return super.addPropertyResolver(propertyName, resolver);
+  }
+
+  @Override
   public T build(ValueResolvingContext context) throws MuleException {
 
     Collection<String> definedExclusiveParameters =
@@ -63,4 +86,5 @@ public final class ExclusiveParameterGroupObjectBuilder<T> extends DefaultObject
 
     return super.build(context);
   }
+
 }

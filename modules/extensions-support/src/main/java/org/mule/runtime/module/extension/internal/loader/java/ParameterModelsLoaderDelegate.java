@@ -29,12 +29,15 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExclusiveParametersDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasNestedComponentsDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -48,10 +51,12 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
 import org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
@@ -131,6 +136,7 @@ public final class ParameterModelsLoaderDelegate {
       parseConfigOverride(extensionParameter, parameter);
       parseNullSafe(extensionParameter, parameter);
       parseLayout(extensionParameter, parameter);
+      parseExclusiveOptional(extensionParameter, groupDeclarer, parameter);
       parameter.withModelProperty(new ExtensionParameterDescriptorModelProperty(extensionParameter));
       extensionParameter.getDeclaringElement().ifPresent(element -> addImplementingTypeModelProperty(element, parameter));
       parseParameterDsl(extensionParameter, parameter);
@@ -151,6 +157,22 @@ public final class ParameterModelsLoaderDelegate {
     }
 
     return false;
+  }
+
+  private void parseExclusiveOptional(ExtensionParameter extensionParameter, ParameterGroupDeclarer parameterGroupDeclarer,
+                                      ParameterDeclarer parameter) {
+    if (parameterGroupDeclarer.getDeclaration() instanceof ParameterGroupDeclaration) {
+      ParameterGroupDeclaration groupDeclaration = (ParameterGroupDeclaration) parameterGroupDeclarer.getDeclaration();
+      List<ExclusiveParametersDeclaration> exclusiveParameters = groupDeclaration.getExclusiveParameters();
+      if (!exclusiveParameters.isEmpty()
+          && exclusiveParameters.get(0).getParameterNames().contains(extensionParameter.getAlias())) {
+        ExclusiveParametersDeclaration exclusiveParametersDeclaration = exclusiveParameters.get(0);
+        ExclusiveParametersModel exclusiveParametersModel =
+            new ImmutableExclusiveParametersModel(exclusiveParametersDeclaration.getParameterNames(),
+                                                  exclusiveParametersDeclaration.isRequiresOne());
+        parameter.withModelProperty(new ExclusiveOptionalModelProperty(exclusiveParametersModel));
+      }
+    }
   }
 
   private void parseConfigOverride(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {

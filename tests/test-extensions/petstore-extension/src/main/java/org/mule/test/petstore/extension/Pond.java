@@ -20,4 +20,13 @@ public class Pond {
   @Parameter
   @Optional
   public String fishName;
+
+  public String getFishName() {
+    return fishName;
+  }
+
+  public String getFrogName() {
+    return frogName;
+  }
+
 }
