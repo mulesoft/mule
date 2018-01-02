@@ -34,7 +34,7 @@ import org.junit.Test;
 public class FileAgeSetUpTestCase extends AbstractMuleContextTestCase
 {
 
-    FileConnector connector;
+    private FileConnector connector;
 
     @Override
     protected void doSetUp() throws Exception
