@@ -39,6 +39,7 @@ import org.mule.runtime.module.deployment.impl.internal.application.ApplicationD
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationPluginDescriptorsResolver;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationPluginDescriptorsResolver;
+import org.mule.runtime.module.deployment.impl.internal.application.ToolingApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
@@ -85,7 +86,7 @@ public class MuleArtifactResourcesRegistry {
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final ServiceRegistryDescriptorLoaderRepository descriptorLoaderRepository;
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
-
+  private final ToolingApplicationDescriptorFactory toolingApplicationDescriptorFactory;
 
   /**
    * Builds a {@link MuleArtifactResourcesRegistry} instance
@@ -182,6 +183,8 @@ public class MuleArtifactResourcesRegistry {
                                                        artifactPluginDescriptorLoader,
                                                        licenseValidator,
                                                        applicationPluginDescriptorsResolver);
+    toolingApplicationDescriptorFactory =
+        new ToolingApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
   }
 
   private <T extends ArtifactDescriptor> ArtifactClassLoaderFactory<T> trackArtifactClassLoaderFactory(ArtifactClassLoaderFactory<T> artifactClassLoaderFactory) {
@@ -270,8 +273,11 @@ public class MuleArtifactResourcesRegistry {
     return artifactClassLoaderManager;
   }
 
-  public ApplicationDescriptorFactory getApplicationDescriptorFactory() {
-    return applicationDescriptorFactory;
+  /**
+   * @return the {@link ToolingApplicationDescriptorFactory}.
+   */
+  public ToolingApplicationDescriptorFactory getToolingApplicationDescriptorFactory() {
+    return toolingApplicationDescriptorFactory;
   }
 
   /**
