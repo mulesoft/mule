@@ -10,11 +10,14 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_OBJECT_STREAMING_BUFFER_SIZE;
+import org.mule.runtime.api.streaming.HasSize;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
-import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 
+import java.io.Closeable;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Base class for implementations of {@link ObjectStreamBuffer}
@@ -24,15 +27,17 @@ import java.util.Optional;
  */
 public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuffer implements ObjectStreamBuffer<T> {
 
-  private final StreamingIterator<T> stream;
+  private final Iterator<T> stream;
+  private final Supplier<Integer> sizeResolver;
 
   private Bucket<T> currentBucket = new Bucket<>(0, DEFAULT_OBJECT_STREAMING_BUFFER_SIZE);
   private Position currentPosition;
   private Position maxPosition = null;
   private int instancesCount = 0;
 
-  public AbstractObjectStreamBuffer(StreamingIterator<T> stream) {
+  public AbstractObjectStreamBuffer(Iterator<T> stream) {
     this.stream = stream;
+    sizeResolver = stream instanceof HasSize ? () -> ((HasSize) stream).getSize() : () -> -1;
   }
 
   @Override
@@ -67,7 +72,7 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
 
   @Override
   public int getSize() {
-    return stream.getSize();
+    return sizeResolver.get();
   }
 
   @Override
@@ -137,7 +142,9 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
       try {
         doClose();
       } finally {
-        closeSafely(stream::close);
+        if (stream instanceof Closeable) {
+          closeSafely(() -> ((Closeable) stream).close());
+        }
         setCurrentBucket(null);
         writeLock.unlock();
       }

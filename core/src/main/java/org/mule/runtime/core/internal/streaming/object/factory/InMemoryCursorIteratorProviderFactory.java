@@ -10,7 +10,6 @@ import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 import org.mule.runtime.core.internal.streaming.object.InMemoryCursorIteratorProvider;
 
@@ -37,8 +36,7 @@ public class InMemoryCursorIteratorProviderFactory extends AbstractCursorIterato
    */
   @Override
   protected Object resolve(Iterator iterator, CoreEvent event) {
-    InMemoryCursorIteratorProvider inMemoryCursorIteratorProvider =
-        new InMemoryCursorIteratorProvider((StreamingIterator) iterator, config);
+    InMemoryCursorIteratorProvider inMemoryCursorIteratorProvider = new InMemoryCursorIteratorProvider(iterator, config);
     inMemoryCursorIteratorProvider.setAnnotations(getAnnotations());
     return inMemoryCursorIteratorProvider;
   }

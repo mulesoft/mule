@@ -11,7 +11,6 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils;
@@ -84,8 +83,8 @@ public class DefaultStreamingHelper implements StreamingHelper {
 
     if (value instanceof InputStream) {
       value = resolveCursorStreamProvider((InputStream) value);
-    } else if (value instanceof StreamingIterator) {
-      value = resolveCursorIteratorProvider((StreamingIterator) value);
+    } else if (value instanceof Iterator) {
+      value = resolveCursorIteratorProvider((Iterator) value);
     }
 
     return value;

@@ -66,6 +66,6 @@ public abstract class AbstractCursorIteratorProviderFactory extends AbstractComp
    */
   @Override
   public boolean accepts(Object value) {
-    return value instanceof StreamingIterator;
+    return value instanceof Iterator;
   }
 }

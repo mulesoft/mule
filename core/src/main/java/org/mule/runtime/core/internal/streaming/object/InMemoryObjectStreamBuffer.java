@@ -10,10 +10,10 @@ import static java.lang.Math.floor;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
-import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ public class InMemoryObjectStreamBuffer<T> extends AbstractObjectStreamBuffer<T>
   private List<Bucket<T>> buckets;
 
 
-  public InMemoryObjectStreamBuffer(StreamingIterator<T> stream, InMemoryCursorIteratorConfig config) {
+  public InMemoryObjectStreamBuffer(Iterator<T> stream, InMemoryCursorIteratorConfig config) {
     super(stream);
     this.config = config;
   }
