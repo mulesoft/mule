@@ -77,6 +77,5 @@ public class ExtensionProperties {
 
   public static final String DEFAULT_CONNECTION_PROVIDER_NAME = "connection";
 
-  private ExtensionProperties() {
-  }
+  private ExtensionProperties() {}
 }
