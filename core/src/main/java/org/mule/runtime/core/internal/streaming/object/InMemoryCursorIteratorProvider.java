@@ -7,8 +7,9 @@
 package org.mule.runtime.core.internal.streaming.object;
 
 import org.mule.runtime.api.streaming.object.CursorIterator;
-import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
+
+import java.util.Iterator;
 
 /**
  * An implementation of {@link AbstractCursorIteratorProvider} which yields
@@ -26,7 +27,7 @@ public class InMemoryCursorIteratorProvider extends AbstractCursorIteratorProvid
    * @param stream the stream to buffer from
    * @param config        the config of the generated buffer
    */
-  public InMemoryCursorIteratorProvider(StreamingIterator stream, InMemoryCursorIteratorConfig config) {
+  public InMemoryCursorIteratorProvider(Iterator stream, InMemoryCursorIteratorConfig config) {
     super(stream);
     buffer = new InMemoryObjectStreamBuffer(stream, config);
     buffer.initialise();

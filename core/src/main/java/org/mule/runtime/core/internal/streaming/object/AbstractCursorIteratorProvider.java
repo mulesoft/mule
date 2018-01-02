@@ -7,12 +7,11 @@
 package org.mule.runtime.core.internal.streaming.object;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -22,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class AbstractCursorIteratorProvider extends AbstractComponent implements CursorIteratorProvider {
 
-  protected final StreamingIterator stream;
+  protected final Iterator stream;
   private final AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
@@ -30,7 +29,7 @@ public abstract class AbstractCursorIteratorProvider extends AbstractComponent i
    *
    * @param stream the original stream to be decorated
    */
-  public AbstractCursorIteratorProvider(StreamingIterator<?> stream) {
+  public AbstractCursorIteratorProvider(Iterator<?> stream) {
     this.stream = stream;
   }
 
