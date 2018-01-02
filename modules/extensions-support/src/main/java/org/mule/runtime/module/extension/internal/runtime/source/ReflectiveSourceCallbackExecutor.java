@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_CALLBACK_CONTEXT_PARAM;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_COMPLETION_CALLBACK_PARAM;
 import static reactor.core.publisher.Mono.create;
@@ -22,6 +23,7 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
@@ -138,6 +140,9 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
     if (sourceCompletionCallback != null) {
       executionContext.setVariable(SOURCE_COMPLETION_CALLBACK_PARAM, sourceCompletionCallback);
     }
+
+    callbackContext.<BackPressureAction>getVariable(BACK_PRESSURE_ACTION_CONTEXT_PARAM)
+        .ifPresent(action -> executionContext.setVariable(BACK_PRESSURE_ACTION_CONTEXT_PARAM, action));
 
     return executionContext;
   }

@@ -76,16 +76,19 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
       initialiseIfNeeded(responseCallbackParameters, true, muleContext);
       initialiseIfNeeded(errorCallbackParameters, true, muleContext);
 
+      final BackPressureStrategy backPressureStrategy = getBackPressureStrategy();
+
       return new ExtensionMessageSource(extensionModel,
                                         sourceModel,
                                         getSourceAdapterFactory(nonCallbackParameters,
                                                                 responseCallbackParameters,
-                                                                errorCallbackParameters),
+                                                                errorCallbackParameters,
+                                                                backPressureStrategy),
                                         configurationProvider,
                                         primaryNodeOnly != null ? primaryNodeOnly : sourceModel.runsOnPrimaryNodeOnly(),
                                         getRetryPolicyTemplate(),
                                         cursorProviderFactory,
-                                        getBackPressureStrategy(),
+                                        backPressureStrategy,
                                         muleContext.getExtensionManager());
     });
   }
@@ -114,13 +117,15 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   private SourceAdapterFactory getSourceAdapterFactory(ResolverSet nonCallbackParameters,
                                                        ResolverSet successCallbackParameters,
-                                                       ResolverSet errorCallbackParameters) {
+                                                       ResolverSet errorCallbackParameters,
+                                                       BackPressureStrategy backPressureStrategy) {
     return new SourceAdapterFactory(extensionModel,
                                     sourceModel,
                                     nonCallbackParameters,
                                     successCallbackParameters,
                                     errorCallbackParameters,
                                     cursorProviderFactory,
+                                    backPressureStrategy,
                                     muleContext);
   }
 

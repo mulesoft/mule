@@ -16,8 +16,10 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Un
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.FAIL;
 import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.NONE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
@@ -57,6 +59,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.connectivity.Reconnectable;
+import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
@@ -108,6 +111,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
   private final Component component;
   private final SourceConnectionManager connectionManager;
   private final MessagingExceptionResolver exceptionResolver;
+  private final BackPressureAction backPressureAction;
 
   private ErrorType flowBackPressueErrorType;
 
@@ -130,7 +134,8 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
                        ResolverSet nonCallbackParameters,
                        ResolverSet successCallbackParameters,
                        ResolverSet errorCallbackParameters,
-                       MessagingExceptionResolver exceptionResolver) {
+                       MessagingExceptionResolver exceptionResolver,
+                       Optional<BackPressureAction> backPressureAction) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
     this.source = source;
@@ -145,6 +150,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
     this.exceptionResolver = exceptionResolver;
     this.configurationSetter = fetchConfigurationField();
     this.connectionSetter = fetchConnectionProviderField();
+    this.backPressureAction = backPressureAction.orElse(FAIL);
   }
 
   private SourceCallback createSourceCallback() {
@@ -226,6 +232,7 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
       if (isOverloadError) {
         executor = onBackPressureExecutor;
         parameters = emptyMap();
+        context.addVariable(BACK_PRESSURE_ACTION_CONTEXT_PARAM, backPressureAction);
       } else {
         executor = onErrorExecutor;
       }

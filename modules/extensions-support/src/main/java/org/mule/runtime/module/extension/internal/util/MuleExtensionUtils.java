@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
@@ -23,7 +24,6 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -60,6 +60,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
+import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
@@ -78,16 +79,17 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Utilities for handling {@link ExtensionModel extensions}
@@ -323,6 +325,18 @@ public class MuleExtensionUtils {
    */
   public static BackPressureStrategy toBackPressureStrategy(String backPressureModeName) {
     return toBackPressureStrategy(BackPressureMode.valueOf(backPressureModeName));
+  }
+
+  public static Optional<BackPressureAction> toBackPressureAction(BackPressureStrategy backPressureStrategy) {
+    if (backPressureStrategy == BackPressureStrategy.FAIL) {
+      return Optional.of(BackPressureAction.FAIL);
+    } else if (backPressureStrategy == BackPressureStrategy.DROP) {
+      return Optional.of(BackPressureAction.DROP);
+    } else if (backPressureStrategy == BackPressureStrategy.WAIT) {
+      return empty();
+    } else {
+      throw new IllegalArgumentException("Unsupported BackPressureStrategy " + backPressureStrategy);
+    }
   }
 
   /**
