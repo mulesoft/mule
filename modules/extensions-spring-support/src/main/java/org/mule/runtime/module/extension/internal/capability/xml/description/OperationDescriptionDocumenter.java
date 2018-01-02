@@ -6,27 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.extension.api.annotation.Configurations;
+import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.MethodDocumentation;
-import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.ast.ConfigurationASTElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.ast.OperationElementAST;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
-import java.util.Collection;
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * {@link AbstractDescriptionDocumenter} implementation that fills {@link WithOperationsDeclaration}s
@@ -77,9 +76,31 @@ final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter
   }
 
   private Map<String, Element> getOperationMethodElements(ProcessingEnvironment processingEnv, Element withOperationsElement) {
-    return new ConfigurationASTElement((TypeElement) withOperationsElement, processingEnv).getOperationContainers().stream()
-        .map(OperationContainerElement::getOperations)
-        .flatMap(Collection::stream)
-        .collect(toMap(NamedObject::getName, op -> ((OperationElementAST) op).getExecutableElement()));
+    ImmutableMap.Builder<String, Element> methods = ImmutableMap.builder();
+    Operations operationsAnnotation =
+        processor.getAnnotationFromType(processingEnv, (TypeElement) withOperationsElement, Operations.class);
+    if (operationsAnnotation != null) {
+      final Class<?>[] operationsClasses = operationsAnnotation.value();
+      for (Class<?> operationClass : operationsClasses) {
+        while (operationClass != null && !operationClass.equals(Object.class)) {
+          TypeElement operationElement = processingEnv.getElementUtils().getTypeElement(operationClass.getName());
+          if (operationElement != null) {
+            for (Method operation : getApiMethods(operationClass)) {
+              operationElement.getEnclosedElements().stream()
+                  .filter(e -> e.getSimpleName().toString().equals(operation.getName())).findFirst()
+                  .ifPresent(operationMethodElement -> methods.put(operation.getName(), operationMethodElement));
+            }
+            operationClass = operationClass.getSuperclass();
+          }
+        }
+      }
+    }
+    return methods.build();
   }
+  //TODO MULE-14311 - REVERT THIS TEMPORALLY
+  //    return new ConfigurationASTElement((TypeElement) withOperationsElement, processingEnv).getOperationContainers().stream()
+  //        .map(OperationContainerElement::getOperations)
+  //        .flatMap(Collection::stream)
+  //        .collect(toMap(NamedObject::getName, op -> (op).getExecutableElement()));
+  //  }
 }

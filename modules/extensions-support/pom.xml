@@ -44,11 +44,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-metadata-model-java-ast</artifactId>
-            <version>${metadataModelApiVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-deployment-model</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -104,6 +99,12 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-extension-ast-loader</artifactId>
+            <version>4.1.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- Test Extensions dependencies -->
