@@ -12,7 +12,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
-
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -30,15 +29,15 @@ import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * <code>SpringXmlConfigurationBuilder</code> enables Mule to be configured from a Spring XML Configuration file used with Mule
@@ -153,6 +152,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                          optionalObjectsController,
                                          getArtifactProperties(), artifactType,
                                          resolveArtifactContextPluginClassLoadersRecursively(),
+                                         resolveComponentModelInitializer(),
                                          resolveParentConfigurationProperties(), disableXmlValidations);
     }
 
@@ -193,6 +193,15 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
 
     return parentConfigurationProperties;
+  }
+
+  private Optional<ComponentModelInitializer> resolveComponentModelInitializer() {
+    Optional<ComponentModelInitializer> parentLazyComponentInitializer = empty();
+    if (parentContext != null && parentContext instanceof ComponentModelInitializer) {
+      parentLazyComponentInitializer = of((ComponentModelInitializer) parentContext);
+    }
+
+    return parentLazyComponentInitializer;
   }
 
   private void createSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext) throws Exception {

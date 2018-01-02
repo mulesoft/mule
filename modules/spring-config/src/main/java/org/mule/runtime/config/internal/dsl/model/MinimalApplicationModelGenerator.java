@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Generates the minimal required component set to create a configuration component (i.e.: file:config, ftp:connection, a flow
@@ -48,11 +49,11 @@ public class MinimalApplicationModelGenerator {
    * Resolves the minimal set of {@link ComponentModel componentModels} for the components that pass the
    * {@link LazyComponentInitializer.ComponentLocationFilter}.
    *
-   * @param filter to select the {@link ComponentModel componentModels} to be enabled.
+   * @param predicate to select the {@link ComponentModel componentModels} to be enabled.
    * @return the generated {@link ApplicationModel} with the minimal set of {@link ComponentModel}s required.
    */
-  public ApplicationModel getMinimalModel(LazyComponentInitializer.ComponentLocationFilter filter) {
-    List<ComponentModel> required = dependencyResolver.findRequiredComponentModels(filter);
+  public ApplicationModel getMinimalModel(Predicate<ComponentModel> predicate) {
+    List<ComponentModel> required = dependencyResolver.findRequiredComponentModels(predicate);
 
     required.stream().forEach(componentModel -> {
       final DefaultComponentLocation componentLocation = componentModel.getComponentLocation();

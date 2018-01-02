@@ -12,11 +12,9 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.config.internal.BeanDependencyResolver;
@@ -34,16 +32,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.function.Predicate;
 
 public class ConfigurationDependencyResolver implements BeanDependencyResolver {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationDependencyResolver.class);
-
   private final ApplicationModel applicationModel;
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
+  private List<String> missingGlobalElementNames = new ArrayList<>();
 
   /**
    * Creates a new instance associated to a complete {@link ApplicationModel}.
@@ -127,9 +122,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     if (applicationModel.findTopLevelNamedElement(name).isPresent()) {
       otherDependencies.add(name);
     } else {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(String.format("Ignoring dependency %s because it does not exists", name));
-      }
+      missingGlobalElementNames.add(name);
     }
   }
 
@@ -189,13 +182,11 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return null;
   }
 
-  public List<ComponentModel> findRequiredComponentModels(LazyComponentInitializer.ComponentLocationFilter filter) {
+  public List<ComponentModel> findRequiredComponentModels(Predicate<ComponentModel> predicate) {
     List<ComponentModel> components = new ArrayList<>();
     applicationModel.executeOnEveryComponentTree(componentModel -> {
-      if (componentModel.getComponentLocation() != null) {
-        if (filter.accept(componentModel.getComponentLocation())) {
-          components.add(componentModel);
-        }
+      if (predicate.test(componentModel)) {
+        components.add(componentModel);
       }
     });
     return components;
@@ -220,4 +211,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return namesBuilder.build();
   }
 
+  public List<String> getMissingGlobalElementNames() {
+    return missingGlobalElementNames;
+  }
 }
