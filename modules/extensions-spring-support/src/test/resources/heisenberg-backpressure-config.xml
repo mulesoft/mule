@@ -45,7 +45,7 @@
         <test:processor waitTime="15000" />
     </flow>
 
-    <flow name="configuredToDrop" initialState="stopped">
+    <flow name="configuredToDrop" initialState="stopped" maxConcurrency="1">
         <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" payment="100" frequency="10" backPressureStrategy="DROP">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>

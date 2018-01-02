@@ -41,6 +41,13 @@ public class ExtensionProperties {
   public static final String COMPLETION_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "COMPLETION_CALLBACK_CONTEXT_PARAM";
 
   /**
+   * The key of an execution context variable which holds the back pressure action that was applied on an event
+   *
+   * @since 4.1
+   */
+  public static final String BACK_PRESSURE_ACTION_CONTEXT_PARAM = PROPERTY_PREFIX + "BACK_PRESSURE_ACTION_CONTEXT_PARAM";
+
+  /**
    * The name of a parameter that allows configuring the mimeType that should be applied
    */
   public static final String MIME_TYPE_PARAMETER_NAME = "outputMimeType";

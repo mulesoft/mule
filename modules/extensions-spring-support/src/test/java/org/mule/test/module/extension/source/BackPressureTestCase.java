@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.DROP;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.FAIL;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
@@ -74,6 +75,20 @@ public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
 
     BackPressureContext sample = backPressureContexts.get(0);
     assertThat(sample.getAction(), is(FAIL));
+    assertThat(sample.getEvent().getMessage().getPayload().getValue().toString(), containsString("If found by DEA contact"));
+    assertThat(sample.getSourceCallbackContext(), is(notNullValue()));
+  }
+
+  @Test
+  public void backPressureWithDropStrategy() throws Exception {
+    startFlow("configuredToDrop");
+    check(15000, 100, () -> {
+      backPressureContexts.addAll(heisenberg.getBackPressureContexts());
+      return !backPressureContexts.isEmpty();
+    });
+
+    BackPressureContext sample = backPressureContexts.get(0);
+    assertThat(sample.getAction(), is(DROP));
     assertThat(sample.getEvent().getMessage().getPayload().getValue().toString(), containsString("If found by DEA contact"));
     assertThat(sample.getSourceCallbackContext(), is(notNullValue()));
   }

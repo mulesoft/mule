@@ -9,16 +9,20 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getSourceFactory;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureAction;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.Optional;
 
@@ -33,6 +37,7 @@ public class SourceAdapterFactory {
   private final ResolverSet successCallbackParameters;
   private final ResolverSet errorCallbackParameters;
   private final CursorProviderFactory cursorProviderFactory;
+  private final Optional<BackPressureAction> backPressureAction;
   private final MuleContext muleContext;
 
   public SourceAdapterFactory(ExtensionModel extensionModel,
@@ -41,6 +46,7 @@ public class SourceAdapterFactory {
                               ResolverSet successCallbackParameters,
                               ResolverSet errorCallbackParameters,
                               CursorProviderFactory cursorProviderFactory,
+                              BackPressureStrategy backPressureStrategy,
                               MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
@@ -48,6 +54,7 @@ public class SourceAdapterFactory {
     this.successCallbackParameters = successCallbackParameters;
     this.errorCallbackParameters = errorCallbackParameters;
     this.cursorProviderFactory = cursorProviderFactory;
+    this.backPressureAction = toBackPressureAction(backPressureStrategy);
     this.muleContext = muleContext;
   }
 
@@ -80,7 +87,8 @@ public class SourceAdapterFactory {
                                sourceParameters,
                                successCallbackParameters,
                                errorCallbackParameters,
-                               exceptionResolver);
+                               exceptionResolver,
+                               backPressureAction);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'",
                                                                 sourceModel.getName())),

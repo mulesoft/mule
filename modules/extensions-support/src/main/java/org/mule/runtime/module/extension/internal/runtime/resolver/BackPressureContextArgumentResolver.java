@@ -7,7 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.FAIL;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -25,7 +27,11 @@ public class BackPressureContextArgumentResolver implements ArgumentResolver<Bac
   @Override
   public BackPressureContext resolve(ExecutionContext executionContext) {
     ExecutionContextAdapter ctx = (ExecutionContextAdapter) executionContext;
-    //TODO: MULE-14284 - Runtime should notify if FAIL or DROP
-    return new ImmutableBackPressureContext(ctx.getEvent(), FAIL, callbackContextResolver.resolve(ctx));
+    BackPressureAction action = (BackPressureAction) ctx.getVariable(BACK_PRESSURE_ACTION_CONTEXT_PARAM);
+    if (action == null) {
+      action = FAIL;
+    }
+
+    return new ImmutableBackPressureContext(ctx.getEvent(), action, callbackContextResolver.resolve(ctx));
   }
 }

@@ -32,7 +32,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
-
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.Component;
@@ -46,7 +45,6 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
@@ -68,6 +66,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
@@ -80,7 +79,6 @@ import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Before;
@@ -178,7 +176,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     ErrorTypeRepository errorTypeRepository = Mockito.mock(ErrorTypeRepository.class);
-    when(errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)).thenReturn(Optional.of(mock(ErrorType.class)));
+    when(errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)).thenReturn(of(mock(ErrorType.class)));
 
     Map<String, Object> registryObjects = new HashMap<>();
     registryObjects.put("errorTypeRepository", errorTypeRepository);
@@ -287,7 +285,8 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
                              mock(Component.class),
                              mock(SourceConnectionManager.class),
                              null, callbackParameters, null,
-                             mock(MessagingExceptionResolver.class));
+                             mock(MessagingExceptionResolver.class),
+                             of(BackPressureAction.FAIL));
   }
 
   protected ExtensionMessageSource getNewExtensionMessageSourceInstance() throws MuleException {
