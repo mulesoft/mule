@@ -97,11 +97,9 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectedFieldModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
-import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
-import org.mule.runtime.module.extension.internal.loader.java.type.ast.FieldTypeElement;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -882,7 +880,7 @@ public final class IntrospectionUtils {
     }
   }
 
-  public static List<FieldElement> getFields(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
+  public static List<VariableElement> getFields(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
     try {
       return getFieldsStream(typeElement, processingEnvironment).collect(toImmutableList());
     } catch (Throwable e) {
@@ -890,12 +888,12 @@ public final class IntrospectionUtils {
     }
   }
 
-  private static Stream<FieldElement> getFieldsStream(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
+  private static Stream<VariableElement> getFieldsStream(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
     try {
       return getAllSuperTypes(typeElement, processingEnvironment).stream()
           .flatMap(elem -> elem.getEnclosedElements().stream())
           .filter(elem -> elem.getKind() == ElementKind.FIELD)
-          .map(varElement -> new FieldTypeElement((VariableElement) varElement, processingEnvironment));
+          .map(varElement -> (VariableElement) varElement);
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }

@@ -19,7 +19,6 @@ import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationVal
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
-import org.mule.runtime.module.extension.internal.loader.java.type.ast.ASTType;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.annotation.Annotation;
@@ -127,10 +126,9 @@ public class TypeWrapper implements Type {
   public boolean isAssignableFrom(Type type) {
     if (type instanceof TypeWrapper) {
       return type.getDeclaringClass().get().isAssignableFrom(aClass);
-    } else if (type instanceof ASTType) {
+    } else {
       return type.isAssignableTo(this);
     }
-    return false;
   }
 
   @Override

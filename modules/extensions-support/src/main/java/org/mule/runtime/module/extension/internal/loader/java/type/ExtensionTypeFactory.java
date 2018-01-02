@@ -8,10 +8,8 @@ package org.mule.runtime.module.extension.internal.loader.java.type;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.module.extension.internal.loader.java.type.ast.ExtensionTypeElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 
 /**
@@ -29,15 +27,5 @@ public class ExtensionTypeFactory {
    */
   public static ExtensionElement getExtensionType(Class<?> extensionClass, ClassTypeLoader classTypeLoader) {
     return new ExtensionTypeWrapper<>(extensionClass, classTypeLoader);
-  }
-
-  /**
-   * Creates a {@link ExtensionElement} from a given {@link Class} that will help to introspect an extension.
-   *
-   * @param extensionElement {@link Extension} annotated {@link Class}
-   * @return an {@link ExtensionElement} wrapping the extension {@link Class} structure
-   */
-  public static ExtensionElement getExtensionType(TypeElement extensionElement, ProcessingEnvironment processingEnvironment) {
-    return new ExtensionTypeElement(extensionElement, processingEnvironment);
   }
 }
