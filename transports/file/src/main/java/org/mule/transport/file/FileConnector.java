@@ -218,12 +218,14 @@ public class FileConnector extends AbstractConnector
             {
                 logger.debug("set polling frequency to: " + polling);
             }
-            String tempFileAge = (String) props.get(PROPERTY_FILE_AGE);
-            if (tempFileAge != null)
+
+            Object tempFileAge = props.get(PROPERTY_FILE_AGE);
+
+            if (tempFileAge != null && tempFileAge instanceof String)
             {
                 try
                 {
-                    endpoint.getProperties().put(PROPERTY_FILE_AGE, parseLong(tempFileAge));
+                    endpoint.getProperties().put(PROPERTY_FILE_AGE, parseLong((String) tempFileAge));
                 }
                 catch (Exception ex1)
                 {
