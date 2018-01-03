@@ -10,7 +10,8 @@ package org.mule.transport.file;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.transport.AbstractConnector.PROPERTY_POLLING_FREQUENCY;
@@ -19,10 +20,16 @@ import static org.mule.transport.file.FileConnector.PROPERTY_FILE_AGE;
 import static org.mule.transport.file.FileConnector.PROPERTY_MOVE_TO_DIRECTORY;
 import static org.mule.transport.file.FileConnector.PROPERTY_MOVE_TO_PATTERN;
 import static org.mule.transport.file.FileConnector.PROPERTY_READ_FROM_DIRECTORY;
+import org.mule.MessageExchangePattern;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.AbstractServiceDescriptor;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.SessionHandler;
+import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.service.TransportServiceDescriptor;
 
@@ -35,6 +42,7 @@ public class FileAgeSetUpTestCase extends AbstractMuleContextTestCase
 {
 
     private FileConnector connector;
+    private InboundEndpoint endpoint;
 
     @Override
     protected void doSetUp() throws Exception
@@ -43,20 +51,20 @@ public class FileAgeSetUpTestCase extends AbstractMuleContextTestCase
         connector = createConnector();
         muleContext.start();
         connector.initialise();
+        endpoint = getEndpoint();
     }
 
     @Test
     public void getFileAgeInRestart() throws Exception
     {
-        FlowConstruct flowConstruct = mock(FlowConstruct.class);
-        InboundEndpoint endpoint = mock(InboundEndpoint.class, RETURNS_DEEP_STUBS);
-        Map<String, String> properties = mockEndpointProperties(endpoint);
+        endpoint.start();
 
-        connector.createReceiver(flowConstruct, endpoint);
+        assertThat(endpoint.getProperties().get(PROPERTY_FILE_AGE), is(instanceOf(Long.class)));
 
-        assertThat(properties.get(PROPERTY_FILE_AGE), is(instanceOf(Long.class)));
+        endpoint.stop();
+        endpoint.start();
 
-        connector.createReceiver(flowConstruct, endpoint);
+        assertThat(endpoint.getProperties().get(PROPERTY_FILE_AGE), is(instanceOf(Long.class)));
     }
 
     public FileConnector createConnector()
@@ -67,7 +75,7 @@ public class FileAgeSetUpTestCase extends AbstractMuleContextTestCase
         return connector;
     }
 
-    private Map<String, String> mockEndpointProperties(InboundEndpoint endpoint)
+    private Map<String, String> getEndpointProperties()
     {
         Map<String, String> properties = new HashMap<>();
         properties.put(PROPERTY_READ_FROM_DIRECTORY, "");
@@ -75,7 +83,6 @@ public class FileAgeSetUpTestCase extends AbstractMuleContextTestCase
         properties.put(PROPERTY_MOVE_TO_PATTERN, "");
         properties.put(PROPERTY_POLLING_FREQUENCY, "10000");
         properties.put(PROPERTY_FILE_AGE, "10000");
-        when(endpoint.getProperties()).thenReturn(properties);
         return properties;
     }
 
@@ -84,7 +91,22 @@ public class FileAgeSetUpTestCase extends AbstractMuleContextTestCase
         SessionHandler sessionHandler = mock(SessionHandler.class);
         TransportServiceDescriptor transportServiceDescriptor = mock(TransportServiceDescriptor.class);
         when(transportServiceDescriptor.createSessionHandler()).thenReturn(sessionHandler);
+        when(transportServiceDescriptor.createMessageReceiver(any(FileConnector.class), any(FlowConstruct.class), any(InboundEndpoint.class), anyObject(), anyObject(), anyObject(), anyObject())).thenReturn(mock(MessageReceiver.class));
         muleContext.getRegistry().registerObject(new AbstractServiceDescriptor.Key(FILE, null).getKey(), transportServiceDescriptor);
+    }
+
+    private InboundEndpoint getEndpoint() throws Exception
+    {
+        EndpointURI endpointURI = mock(EndpointURI.class);
+        when(endpointURI.getAddress()).thenReturn("file://test");
+        EndpointMessageProcessorChainFactory endpointMessageProcessorChainFactory = mock(EndpointMessageProcessorChainFactory.class);
+        when(endpointMessageProcessorChainFactory.createInboundMessageProcessorChain(any(InboundEndpoint.class), any(FlowConstruct.class), any(MessageProcessor.class))).thenReturn(mock(MessageProcessor.class));
+        InboundEndpoint endpoint = new DefaultInboundEndpoint(connector, endpointURI, null, getEndpointProperties(), null,
+                                                              false, MessageExchangePattern.ONE_WAY, 42, null, null, null,
+                                                              muleContext, null, null, endpointMessageProcessorChainFactory, null, null, false, null);
+
+        endpoint.setFlowConstruct(mock(FlowConstruct.class));
+        return endpoint;
     }
 
 }
