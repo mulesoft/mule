@@ -101,12 +101,6 @@
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-extension-ast-loader</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
         <!-- Test Extensions dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>
