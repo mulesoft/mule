@@ -7,14 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
-
-import org.apache.commons.lang3.StringUtils;
+import org.mule.runtime.core.api.util.func.Once;
 
 import javax.inject.Inject;
 
@@ -29,6 +28,7 @@ import javax.inject.Inject;
 public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
 
   private final String key;
+  private final Once.RunOnce keyValidator;
 
   private Registry registry;
 
@@ -38,8 +38,9 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
    * @param key a not blank {@link String}
    */
   public RegistryLookupValueResolver(String key) {
-    checkArgument(!StringUtils.isBlank(key), "key cannot be null or blank");
     this.key = key;
+    this.keyValidator = Once.of(() -> checkArgument(!isBlank(key), "A null or empty key was provided. "
+        + "Registry lookup cannot be performed with a blank key"));
   }
 
   /**
@@ -52,6 +53,7 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
    */
   @Override
   public T resolve(ValueResolvingContext context) throws MuleException {
+    keyValidator.runOnce();
     return registry.<T>lookupByName(key)
         .orElseThrow(() -> new ConfigurationException(createStaticMessage(format("Element '%s' is not defined in the Mule Registry",
                                                                                  key))));

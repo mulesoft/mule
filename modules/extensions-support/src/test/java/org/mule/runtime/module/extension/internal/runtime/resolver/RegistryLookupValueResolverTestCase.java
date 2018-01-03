@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.HELLO_WORLD;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -67,13 +68,13 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void nullKey() {
-    new RegistryLookupValueResolver(null);
+  public void nullKey() throws MuleException {
+    new RegistryLookupValueResolver(null).resolve(ValueResolvingContext.from(testEvent()));
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void blankKey() {
-    new RegistryLookupValueResolver("");
+  public void blankKey() throws MuleException {
+    new RegistryLookupValueResolver("").resolve(ValueResolvingContext.from(testEvent()));
   }
 
   @Test(expected = ConfigurationException.class)
