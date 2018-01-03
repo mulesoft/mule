@@ -262,6 +262,7 @@ public class DefaultFlowBuilder implements Builder {
                   return me;
                 });
           })
+          // Don't handle errors, these will be handled by parent flow
           .errorStrategyStop();
     }
 
