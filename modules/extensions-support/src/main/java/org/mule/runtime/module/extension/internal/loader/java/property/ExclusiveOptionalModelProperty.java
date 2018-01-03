@@ -19,7 +19,6 @@ public class ExclusiveOptionalModelProperty implements ModelProperty {
 
   private ExclusiveParametersModel exclusiveParametersModel;
 
-
   /**
    * Creates a new instance
    *
