@@ -214,9 +214,7 @@ public class DefaultToolingService implements ToolingService {
   private Domain doCreateDomain(File toolingDomainContent) throws IOException {
     Domain domain = domainFactory.createArtifact(toolingDomainContent, of(createDeploymentProperties()));
     domain.install();
-    domain.init();
-    //TODO (gfernandes) support lazy init on domains
-    //domain.lazyInit();
+    domain.lazyInit();
     domain.start();
     return new ToolingDomainWrapper(domain);
   }
