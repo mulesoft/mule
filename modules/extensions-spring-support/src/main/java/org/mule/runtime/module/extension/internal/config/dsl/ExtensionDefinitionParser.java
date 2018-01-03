@@ -712,8 +712,8 @@ public abstract class ExtensionDefinitionParser {
   }
 
   private boolean isRequiredByExclusiveOptional(Set<ModelProperty> modelProperties) {
-    return modelProperties.stream().filter(modelProperty -> modelProperty instanceof ExclusiveOptionalModelProperty
-        && ((ExclusiveOptionalModelProperty) modelProperty).isOneRequired()).count() != 0;
+    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof ExclusiveOptionalModelProperty
+        && ((ExclusiveOptionalModelProperty) modelProperty).isOneRequired());
   }
 
   /**
