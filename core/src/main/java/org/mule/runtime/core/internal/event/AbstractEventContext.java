@@ -26,6 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -55,9 +57,9 @@ abstract class AbstractEventContext implements BaseEventContext {
   private transient final List<BaseEventContext> childContexts = new ArrayList<>();
   private transient final FlowExceptionHandler exceptionHandler;
   private transient final CompletableFuture externalCompletion;
-  private transient final List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
-  private transient final List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>();
-  private transient final List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
+  private transient final Deque<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new LinkedList<>();
+  private transient final Deque<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new LinkedList<>();
+  private transient final Deque<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new LinkedList<>();
 
   private ReadWriteLock childContextsReadWriteLock = new ReentrantReadWriteLock();
 
@@ -246,7 +248,7 @@ abstract class AbstractEventContext implements BaseEventContext {
     if (state >= STATE_TERMINATED) {
       signalConsumerSilently(consumer);
     }
-    onTerminatedConsumerList.add(requireNonNull(consumer));
+    onTerminatedConsumerList.addFirst(requireNonNull(consumer));
   }
 
   @Override
@@ -254,7 +256,7 @@ abstract class AbstractEventContext implements BaseEventContext {
     if (state >= STATE_COMPLETE) {
       signalConsumerSilently(consumer);
     }
-    onCompletionConsumerList.add(requireNonNull(consumer));
+    onCompletionConsumerList.addFirst(requireNonNull(consumer));
   }
 
   @Override
@@ -262,7 +264,7 @@ abstract class AbstractEventContext implements BaseEventContext {
     if (state >= STATE_RESPONSE) {
       signalConsumerSilently(consumer);
     }
-    onResponseConsumerList.add(requireNonNull(consumer));
+    onResponseConsumerList.addFirst(requireNonNull(consumer));
   }
 
   @Override
