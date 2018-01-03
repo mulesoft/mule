@@ -114,18 +114,12 @@ public class ReflectiveExpressionFunctionExecutor implements Lifecycle, Function
     final Class<?>[] parameterTypes = method.getParameterTypes();
     final Function<Object, Object>[] resolvers = new Function[parameterTypes.length];
 
-    boolean hasTypedValueParameters = false;
     for (int i = 0; i < parameterTypes.length; i++) {
       if (TypedValue.class.isAssignableFrom(parameterTypes[i])) {
         resolvers[i] = wrapper;
-        hasTypedValueParameters = true;
       } else {
         resolvers[i] = unwrapper;
       }
-    }
-
-    if (!hasTypedValueParameters) {
-      return args -> args;
     }
 
     return args -> {
