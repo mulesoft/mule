@@ -36,6 +36,6 @@ public class DefaultValueResolverParsingDelegate implements ValueResolverParsing
    */
   @Override
   public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl) {
-    return new RegistryLookupValueResolver(key);
+    return new RegistryLookupValueResolver<>(key);
   }
 }
