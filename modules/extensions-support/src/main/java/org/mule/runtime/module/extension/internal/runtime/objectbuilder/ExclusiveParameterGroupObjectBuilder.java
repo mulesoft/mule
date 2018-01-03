@@ -52,7 +52,8 @@ public final class ExclusiveParameterGroupObjectBuilder<T> extends DefaultObject
     checkArgument(!isBlank(propertyName), "property name cannot be blank");
     checkArgument(resolver != null, "resolver cannot be null");
 
-    if (resolver.isDynamic() && exclusiveOptionalsTypeAnnotation.getExclusiveParameterNames().contains(propertyName)) {
+    if (exclusiveOptionalsTypeAnnotation.isOneRequired() && resolver.isDynamic()
+        && exclusiveOptionalsTypeAnnotation.getExclusiveParameterNames().contains(propertyName)) {
       if (resolver instanceof ExpressionBasedValueResolver) {
         resolver = new RequiredParameterValueResolverWrapper<>(resolver, propertyName,
                                                                ((ExpressionBasedValueResolver) resolver).getExpression());

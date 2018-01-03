@@ -106,6 +106,10 @@ public class PetStoreOperations {
     return aquarium;
   }
 
+  public PetStoreDeal getPetStoreDeal(PetStoreDeal petStoreDeal) {
+    return petStoreDeal;
+  }
+
   @MediaType(TEXT_PLAIN)
   public String getDefaultEncoding(boolean usePhoneNumber, @Optional PhoneNumber phoneNumber,
                                    @DefaultEncoding String encoding) {

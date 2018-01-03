@@ -6,15 +6,15 @@
  */
 package org.mule.test.module.extension.connector;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.Aquarium;
 import org.mule.test.petstore.extension.ExclusiveCashier;
 import org.mule.test.petstore.extension.ExclusivePetBreeder;
+import org.mule.test.petstore.extension.PetStoreDeal;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
@@ -30,8 +30,8 @@ public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extend
 
   @Test
   public void getBreederOperationFail() throws Exception {
-    flowRunner("getBreederOperation").withVariable("mammals", null).runExpectingException(anyOf(hasMessage(CoreMatchers
-        .containsString("Required parameters need to be assigned with non null values"))));
+    flowRunner("getBreederOperation").withVariable("mammals", null)
+        .runExpectingException(hasMessage(containsString("Required parameters need to be assigned with non null values")));
   }
 
   @Test
@@ -43,8 +43,8 @@ public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extend
 
   @Test
   public void getAquariumOperationFail() throws Exception {
-    flowRunner("getAquariumOperation").withVariable("frogName", null).runExpectingException(anyOf(hasMessage(CoreMatchers
-        .containsString("Required parameters need to be assigned with non null values"))));
+    flowRunner("getAquariumOperation").withVariable("frogName", null)
+        .runExpectingException(hasMessage(containsString("Required parameters need to be assigned with non null values")));
   }
 
   @Test
@@ -62,6 +62,13 @@ public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extend
     assertThat(cashier.getMoney(), nullValue());
     assertThat(cashier.getPensionPlan(), nullValue());
     assertThat(cashier.getRothIRA(), nullValue());
+  }
+
+  @Test
+  public void getPetStoreDealOperation() throws Exception {
+    PetStoreDeal petStoreDeal = (PetStoreDeal) flowRunner("getPetStoreDealOperation").withVariable("pensionPlan", null).run()
+        .getMessage().getPayload().getValue();
+    assertThat(petStoreDeal.getCashier().getPensionPlan(), nullValue());
   }
 
 }

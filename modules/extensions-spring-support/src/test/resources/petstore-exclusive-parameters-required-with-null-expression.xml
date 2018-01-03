@@ -19,4 +19,10 @@
         <petstore:get-cashier pensionPlan="#[vars.pensionPlan]" cashierName="Nicolas"/>
     </flow>
 
+    <flow name="getPetStoreDealOperation">
+        <petstore:get-pet-store-deal>
+            <petstore:pet-store-deal pensionPlan="#[vars.pensionPlan]" cashierName="Nicolas" dealPrice="50"/>
+        </petstore:get-pet-store-deal>
+    </flow>
+
 </mule>
