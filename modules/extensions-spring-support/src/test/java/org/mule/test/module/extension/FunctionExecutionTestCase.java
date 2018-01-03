@@ -10,18 +10,23 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.api.metadata.DataType.XML_STRING;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.core.streaming.SimpleByteBufferManager;
+import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.NodeList;
 
@@ -101,7 +106,7 @@ public class FunctionExecutionTestCase extends AbstractExtensionFunctionalTestCa
             .withVariable("xmlPayload", getDocumentStream())
             .run().getMessage().getPayload().getValue();
     assertThat(value, instanceOf(NodeList.class));
-    assertThat(((NodeList) value).getLength(), is(7));
+    assertThat(((NodeList) value).getLength(), is(8));
   }
 
   @Test
@@ -114,8 +119,65 @@ public class FunctionExecutionTestCase extends AbstractExtensionFunctionalTestCa
     assertThat(value.get(2), hasSize(2));
   }
 
+  @Test
+  public void executeWithNonWrappedParameters() throws Exception {
+    final String xmlString = IOUtils.toString(getDocumentStream());
+    final InputStream jsonStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("models/subtypes.json");
+    final KnockeableDoor knockeableDoor = new KnockeableDoor("Ricky", "Universe 137");
+
+    TypedValue<List<Object>> payload = flowRunner("typedValueFunction")
+        .withPayload(xmlString)
+        .withVariable("xmlString", xmlString)
+        .withVariable("jsonStream", jsonStream)
+        .withVariable("door", knockeableDoor)
+        .run().getMessage().getPayload();
+
+    List<Object> values = payload.getValue();
+    assertThat(values, hasSize(4));
+    assertThat(getValue(values.get(0)), is(xmlString));
+    assertThat(getValue(values.get(1)), is(xmlString));
+    assertThat(getValue(values.get(2)), is(jsonStream));
+    assertThat(getValue(values.get(3)), is(knockeableDoor));
+  }
+
+  @Test
+  @Ignore("MDF-306: Invalid type comparison when invoking Java written functions with TypedValue parameters")
+  public void executeWithTypedValueParameters() throws Exception {
+    final String xmlString = IOUtils.toString(getDocumentStream());
+    final InputStream jsonStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("models/subtypes.json");
+    final KnockeableDoor knockeableDoor = new KnockeableDoor("Ricky", "Universe 137");
+
+    TypedValue<List<Object>> payload = flowRunner("typedValueFunction")
+        .withPayload(new TypedValue<>(xmlString, XML_STRING))
+        .withVariable("door", TypedValue.of(knockeableDoor))
+        .withVariable("xmlString", new TypedValue<>(xmlString, XML_STRING))
+        .withVariable("jsonStream", new TypedValue<>(jsonStream,
+                                                     DataType.builder().type(InputStream.class).mediaType(APPLICATION_JSON)
+                                                         .build()))
+        .run().getMessage().getPayload();
+
+    List<Object> values = payload.getValue();
+    assertThat(values, hasSize(4));
+    assertThat(getValue(values.get(0)), is(xmlString));
+    assertThat(getValue(values.get(1)), is(xmlString));
+    assertThat(getValue(values.get(2)), is(jsonStream));
+    assertThat(getValue(values.get(3)), is(knockeableDoor));
+  }
+
+  @Test
+  @Ignore("MDF-306: Invalid type comparison when invoking Java written functions with TypedValue parameters")
+  public void transformValue() throws Exception {
+    List<Object> transformValues = (List<Object>) flowRunner("transformValue").run().getMessage().getPayload().getValue();
+    assertThat(transformValues, hasSize(4));
+    assertThat(getValue(transformValues.get(1)), is(instanceOf(InputStream.class)));
+  }
+
   private InputStream getDocumentStream() {
     return Thread.currentThread().getContextClassLoader().getResourceAsStream(FUNCTIONS_CONFIG_XML);
+  }
+
+  private Object getValue(Object o) {
+    return ((TypedValue) o).getValue();
   }
 
 }

@@ -47,4 +47,17 @@
         </fn:evaluate>
     </flow>
 
+    <flow name="typedValueFunction">
+        <fn:evaluate>
+            <fn:payload>#[Fn::withTypedValues(payload, vars.xmlString, vars.jsonStream, vars.door)]</fn:payload>
+        </fn:evaluate>
+    </flow>
+
+    <flow name="transformValue">
+        <set-payload value="#[output application/xml encoding='UTF-8' --- employees: { employee: {name: 'Jhon', lastName: 'Doe'}}]"/>
+        <fn:evaluate>
+            <fn:payload>#[Fn::withTypedValues(null, null, payload, null)]</fn:payload>
+        </fn:evaluate>
+    </flow>
+
 </mule>

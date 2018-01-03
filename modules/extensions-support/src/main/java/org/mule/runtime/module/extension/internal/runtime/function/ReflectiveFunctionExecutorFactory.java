@@ -18,6 +18,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.base.Defaults;
 
@@ -53,10 +54,7 @@ public final class ReflectiveFunctionExecutorFactory<T> implements FunctionExecu
                                                                                functionModel.getName())))));
 
     List<FunctionParameter> functionParameters = functionModel.getAllParameterModels().stream().map(p -> {
-      DataType type = fromType(getType(p.getType())
-          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(
-                                                                                 "Failed to obtain the type for parameter [%s] in function [%s]",
-                                                                                 p.getName(), functionModel.getName())))));
+      DataType type = IntrospectionUtils.toDataType(p.getType());
       if (p.isRequired()) {
         return new FunctionParameter(p.getName(), type);
       }
@@ -83,6 +81,5 @@ public final class ReflectiveFunctionExecutorFactory<T> implements FunctionExecu
     }
     return delegate;
   }
-
 
 }
