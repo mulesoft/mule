@@ -3612,23 +3612,23 @@
   "notifications": [],
   "errors": [
     {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "TYPED-VALUE:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY"
-    },
-    {
-      "error": "MULE:ANY"
+      "error": "TYPED-VALUE:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY"
     },
     {
-      "error": "TYPED-VALUE:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED"
+      "error": "MULE:ANY"
+    },
+    {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY"
+    },
+    {
+      "error": "TYPED-VALUE:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
     }
   ],
   "modelProperties": {},

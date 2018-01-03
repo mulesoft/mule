@@ -3945,18 +3945,18 @@
   "notifications": [],
   "errors": [
     {
+      "error": "MULE:ANY"
+    },
+    {
       "error": "TEST-OAUTH:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
-      "error": "MULE:CONNECTIVITY",
+      "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY"
     },
     {
-      "error": "MULE:ANY"
-    },
-    {
-      "error": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:CONNECTIVITY",
       "parent": "MULE:ANY"
     },
     {

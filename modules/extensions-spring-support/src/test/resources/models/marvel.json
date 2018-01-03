@@ -4007,6 +4007,9 @@
   "notifications": [],
   "errors": [
     {
+      "error": "MULE:ANY"
+    },
+    {
       "error": "MARVEL:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY"
     },
@@ -4015,15 +4018,12 @@
       "parent": "MULE:ANY"
     },
     {
-      "error": "MARVEL:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED"
-    },
-    {
-      "error": "MULE:ANY"
-    },
-    {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY"
+    },
+    {
+      "error": "MARVEL:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
       "error": "MARVEL:CUSTOM_ERROR",

@@ -228,8 +228,8 @@
   "notifications": [],
   "errors": [
     {
-      "error": "SG:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED"
+      "error": "SG:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
     },
     {
       "error": "MULE:CONNECTIVITY",
@@ -239,12 +239,12 @@
       "error": "MULE:ANY"
     },
     {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY"
+      "error": "SG:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
-      "error": "SG:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY"
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY"
     }
   ],
   "modelProperties": {},

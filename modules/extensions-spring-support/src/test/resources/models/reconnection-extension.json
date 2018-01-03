@@ -865,10 +865,6 @@
       "parent": "MULE:CONNECTIVITY"
     },
     {
-      "error": "RECONNECTION:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED"
-    },
-    {
       "error": "MULE:CONNECTIVITY",
       "parent": "MULE:ANY"
     },
@@ -878,6 +874,10 @@
     {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY"
+    },
+    {
+      "error": "RECONNECTION:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     }
   ],
   "modelProperties": {},

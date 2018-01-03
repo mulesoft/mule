@@ -411,8 +411,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "VEGAN:RETRY_EXHAUSTED",
-            "VEGAN:CONNECTIVITY"
+            "VEGAN:CONNECTIVITY",
+            "VEGAN:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -3026,8 +3026,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "VEGAN:RETRY_EXHAUSTED",
-            "VEGAN:CONNECTIVITY"
+            "VEGAN:CONNECTIVITY",
+            "VEGAN:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -5265,8 +5265,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "VEGAN:RETRY_EXHAUSTED",
-            "VEGAN:CONNECTIVITY"
+            "VEGAN:CONNECTIVITY",
+            "VEGAN:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -5801,8 +5801,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "VEGAN:RETRY_EXHAUSTED",
-            "VEGAN:CONNECTIVITY"
+            "VEGAN:CONNECTIVITY",
+            "VEGAN:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -9564,23 +9564,23 @@
   "notifications": [],
   "errors": [
     {
-      "error": "VEGAN:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED"
+      "error": "MULE:ANY"
+    },
+    {
+      "error": "VEGAN:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
     },
     {
       "error": "MULE:CONNECTIVITY",
       "parent": "MULE:ANY"
     },
     {
-      "error": "MULE:ANY"
-    },
-    {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY"
     },
     {
-      "error": "VEGAN:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY"
+      "error": "VEGAN:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     }
   ],
   "modelProperties": {},

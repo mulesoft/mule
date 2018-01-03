@@ -1117,12 +1117,12 @@
       "error": "MULE:ANY"
     },
     {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY"
-    },
-    {
       "error": "FN:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED"
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY"
     }
   ],
   "modelProperties": {},
