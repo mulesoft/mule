@@ -106,7 +106,7 @@ public class FunctionExecutionTestCase extends AbstractExtensionFunctionalTestCa
             .withVariable("xmlPayload", getDocumentStream())
             .run().getMessage().getPayload().getValue();
     assertThat(value, instanceOf(NodeList.class));
-    assertThat(((NodeList) value).getLength(), is(8));
+    assertThat(((NodeList) value).getLength(), is(9));
   }
 
   @Test
