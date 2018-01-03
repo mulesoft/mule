@@ -161,18 +161,17 @@ public final class ParameterModelsLoaderDelegate {
 
   private void parseExclusiveOptional(ExtensionParameter extensionParameter, ParameterGroupDeclarer parameterGroupDeclarer,
                                       ParameterDeclarer parameter) {
-    if (parameterGroupDeclarer.getDeclaration() instanceof ParameterGroupDeclaration) {
-      ParameterGroupDeclaration groupDeclaration = (ParameterGroupDeclaration) parameterGroupDeclarer.getDeclaration();
-      List<ExclusiveParametersDeclaration> exclusiveParameters = groupDeclaration.getExclusiveParameters();
-      if (!exclusiveParameters.isEmpty()
-          && exclusiveParameters.get(0).getParameterNames().contains(extensionParameter.getAlias())) {
-        ExclusiveParametersDeclaration exclusiveParametersDeclaration = exclusiveParameters.get(0);
-        ExclusiveParametersModel exclusiveParametersModel =
-            new ImmutableExclusiveParametersModel(exclusiveParametersDeclaration.getParameterNames(),
-                                                  exclusiveParametersDeclaration.isRequiresOne());
-        parameter.withModelProperty(new ExclusiveOptionalModelProperty(exclusiveParametersModel));
-      }
-    }
+    ParameterGroupDeclaration groupDeclaration = (ParameterGroupDeclaration) parameterGroupDeclarer.getDeclaration();
+    List<ExclusiveParametersDeclaration> exclusiveParameters = groupDeclaration.getExclusiveParameters();
+    exclusiveParameters.stream()
+        .filter(group -> group.getParameterNames().contains(extensionParameter.getAlias()))
+        .findFirst()
+        .ifPresent(exclusiveParametersDeclaration -> {
+          ExclusiveParametersModel exclusiveParametersModel =
+              new ImmutableExclusiveParametersModel(exclusiveParametersDeclaration.getParameterNames(),
+                                                    exclusiveParametersDeclaration.isRequiresOne());
+          parameter.withModelProperty(new ExclusiveOptionalModelProperty(exclusiveParametersModel));
+        });
   }
 
   private void parseConfigOverride(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
