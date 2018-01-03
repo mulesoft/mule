@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.connector;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.Aquarium;
@@ -13,10 +14,10 @@ import org.mule.test.petstore.extension.ExclusiveCashier;
 import org.mule.test.petstore.extension.ExclusivePetBreeder;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.fail;
+import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 
 public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -29,15 +30,8 @@ public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extend
 
   @Test
   public void getBreederOperationFail() throws Exception {
-    try {
-      ExclusivePetBreeder exclusivePetBreeder = (ExclusivePetBreeder) flowRunner("getBreederOperation")
-          .withVariable("mammals", null).run().getMessage().getPayload().getValue();
-      fail("This should throw an exception before");
-    } catch (Exception exception) {
-      assertThat(exception.getMessage(),
-                 containsString("Required parameter 'mammals' was assigned with value '#[vars.mammals]' which resolved to null." +
-                     " Required parameters need to be assigned with non null values."));
-    }
+    flowRunner("getBreederOperation").withVariable("mammals", null).runExpectingException(anyOf(hasMessage(CoreMatchers
+        .containsString("Required parameters need to be assigned with non null values"))));
   }
 
   @Test
@@ -49,14 +43,8 @@ public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extend
 
   @Test
   public void getAquariumOperationFail() throws Exception {
-    try {
-      Aquarium aquarium = (Aquarium) flowRunner("getAquariumOperation")
-          .withVariable("frogName", null).run().getMessage().getPayload().getValue();
-      fail("This should throw an exception before");
-    } catch (Exception exception) {
-      assertThat(exception.getMessage(),
-                 containsString(" Required parameters need to be assigned with non null values."));
-    }
+    flowRunner("getAquariumOperation").withVariable("frogName", null).runExpectingException(anyOf(hasMessage(CoreMatchers
+        .containsString("Required parameters need to be assigned with non null values"))));
   }
 
   @Test
