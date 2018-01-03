@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static javax.lang.model.element.ElementKind.METHOD;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static org.apache.commons.collections.CollectionUtils.find;
@@ -51,8 +50,6 @@ import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.ast.ASTType;
-import org.mule.runtime.ast.OperationElementAST;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
@@ -73,8 +70,6 @@ import org.mule.test.petstore.extension.TransactionalPetStoreClient;
 import org.mule.test.petstore.extension.TransactionalPetStoreConnectionProvider;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -101,7 +96,6 @@ import org.springframework.core.ResolvableType;
 public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   private static final String CLASS = "CLASS";
-  private static final String AST = "AST";
   public static final String OPERATION_RESULT = "operationResult";
   public static final String PAGING_PROVIDER = "pagingProvider";
   public static final String PAGING_PROVIDER_OPERATION_RESULT = "pagingProviderOperationResult";
@@ -127,10 +121,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
     Function<Class, Type> javaTypeSupplier =
         aClass -> new TypeWrapper(aClass, new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
-    Function<Class, Type> astTypeSupplier =
-        aClass -> new ASTType(processingEnvironment.getElementUtils().getTypeElement(aClass.getName()), processingEnvironment);
 
-    objects.add(new Object[] {AST, new ASTOperationSupplier(), astTypeSupplier});
     objects.add(new Object[] {CLASS, new ClassOperationSupplier(), javaTypeSupplier});
     return objects;
   }
@@ -468,23 +459,6 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
     @Override
     public void close(Object connection) throws MuleException {}
-  }
-
-  private static class ASTOperationSupplier implements BiFunction<String, Class[], OperationElement> {
-
-    @Override
-    public OperationElement apply(String methodName, Class[] paramTypes) {
-
-      TypeElement typeElement =
-          processingEnvironment.getElementUtils().getTypeElement(IntrospectionUtilsTestCase.class.getName());
-      Optional<OperationElementAST> first =
-          typeElement.getEnclosedElements().stream().filter(elem -> elem.getKind().equals(METHOD))
-              .map(elem -> (ExecutableElement) elem)
-              .filter(elem -> elem.getSimpleName().toString().equals(methodName))
-              .map(elem -> new OperationElementAST(elem, processingEnvironment))
-              .findFirst();
-      return first.orElseThrow(RuntimeException::new);
-    }
   }
 
   private static class ClassOperationSupplier implements BiFunction<String, Class[], OperationElement> {
