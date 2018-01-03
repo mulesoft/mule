@@ -1031,8 +1031,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "PETSTORE:RETRY_EXHAUSTED",
-            "PETSTORE:CONNECTIVITY"
+            "PETSTORE:CONNECTIVITY",
+            "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1318,8 +1318,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "PETSTORE:RETRY_EXHAUSTED",
-            "PETSTORE:CONNECTIVITY"
+            "PETSTORE:CONNECTIVITY",
+            "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1605,8 +1605,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "PETSTORE:RETRY_EXHAUSTED",
-            "PETSTORE:CONNECTIVITY"
+            "PETSTORE:CONNECTIVITY",
+            "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1881,9 +1881,9 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "PETSTORE:PET_ERROR",
+            "PETSTORE:CONNECTIVITY",
             "PETSTORE:RETRY_EXHAUSTED",
-            "PETSTORE:CONNECTIVITY"
+            "PETSTORE:PET_ERROR"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2307,8 +2307,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "PETSTORE:RETRY_EXHAUSTED",
-            "PETSTORE:CONNECTIVITY"
+            "PETSTORE:CONNECTIVITY",
+            "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2577,8 +2577,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "PETSTORE:RETRY_EXHAUSTED",
-            "PETSTORE:CONNECTIVITY"
+            "PETSTORE:CONNECTIVITY",
+            "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -3087,8 +3087,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "PETSTORE:RETRY_EXHAUSTED",
-            "PETSTORE:CONNECTIVITY"
+            "PETSTORE:CONNECTIVITY",
+            "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -16094,27 +16094,27 @@
   "notifications": [],
   "errors": [
     {
-      "error": "PETSTORE:PET_ERROR",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:ANY"
+      "error": "PETSTORE:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY"
     },
     {
-      "error": "PETSTORE:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED"
+      "error": "MULE:ANY"
     },
     {
       "error": "PETSTORE:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY"
+    },
+    {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY"
+    },
+    {
+      "error": "PETSTORE:PET_ERROR",
+      "parent": "MULE:ANY"
     }
   ],
   "modelProperties": {},

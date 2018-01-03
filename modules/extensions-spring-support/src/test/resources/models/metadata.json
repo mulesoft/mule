@@ -302,8 +302,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -698,8 +698,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1087,8 +1087,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1476,8 +1476,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1826,8 +1826,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2215,8 +2215,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2546,8 +2546,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2859,8 +2859,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -3229,8 +3229,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -3534,8 +3534,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -3945,8 +3945,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -4334,8 +4334,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -4723,8 +4723,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -5112,8 +5112,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -5455,8 +5455,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -5888,8 +5888,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -6276,8 +6276,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -6625,8 +6625,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -6968,8 +6968,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -8891,8 +8891,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -9341,8 +9341,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -9653,8 +9653,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -10022,8 +10022,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "METADATA:CONNECTIVITY",
-            "METADATA:RETRY_EXHAUSTED"
+            "METADATA:RETRY_EXHAUSTED",
+            "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -12001,6 +12001,7 @@
           "format": "json",
           "type": "Object",
           "annotations": {
+            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -12014,8 +12015,7 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            },
-            "label": "Person"
+            }
           },
           "open": {
             "type": "Any"
@@ -13025,6 +13025,7 @@
           "format": "json",
           "type": "Object",
           "annotations": {
+            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -13038,8 +13039,7 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            },
-            "label": "Person"
+            }
           },
           "open": {
             "type": "Any"
@@ -13230,6 +13230,7 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
+                  "label": "Person",
                   "classInformation": {
                     "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
@@ -13241,8 +13242,7 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": true
-                  },
-                  "label": "Person"
+                  }
                 },
                 "open": {
                   "type": "Any"
@@ -13437,6 +13437,7 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
+                  "label": "Person",
                   "classInformation": {
                     "classname": "java.io.InputStream",
                     "hasDefaultConstructor": true,
@@ -13450,8 +13451,7 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
-                  },
-                  "label": "Person"
+                  }
                 },
                 "open": {
                   "type": "Any"
@@ -13615,6 +13615,7 @@
           "format": "json",
           "type": "Object",
           "annotations": {
+            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -13628,8 +13629,7 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            },
-            "label": "Person"
+            }
           },
           "open": {
             "type": "Any"
@@ -17007,6 +17007,7 @@
                   "format": "json",
                   "type": "Object",
                   "annotations": {
+                    "label": "Person",
                     "classInformation": {
                       "classname": "java.io.InputStream",
                       "hasDefaultConstructor": true,
@@ -17020,8 +17021,7 @@
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
-                    },
-                    "label": "Person"
+                    }
                   },
                   "open": {
                     "type": "Any"
@@ -17804,23 +17804,23 @@
   "notifications": [],
   "errors": [
     {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:ANY"
+      "error": "METADATA:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY"
     },
     {
-      "error": "METADATA:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY"
+      "error": "MULE:ANY"
     },
     {
-      "error": "METADATA:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED"
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY"
+    },
+    {
+      "error": "METADATA:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
     }
   ],
   "modelProperties": {},
@@ -17829,7 +17829,6 @@
       "format": "csv",
       "type": "Object",
       "annotations": {
-        "typeId": "csv-object",
         "classInformation": {
           "classname": "java.lang.Integer",
           "hasDefaultConstructor": false,
@@ -17843,7 +17842,8 @@
           "parent": "java.lang.Number",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "csv-object"
       },
       "fields": []
     },
@@ -17851,7 +17851,6 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "custom-java",
         "classInformation": {
           "classname": "java.lang.Object",
           "hasDefaultConstructor": true,
@@ -17863,7 +17862,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "custom-java"
       },
       "fields": []
     },
@@ -17871,7 +17871,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "json-object",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -17885,7 +17884,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "json-object"
       },
       "fields": [
         {
@@ -18584,7 +18584,6 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -18598,7 +18597,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "shiporder"
       },
       "fields": [
         {

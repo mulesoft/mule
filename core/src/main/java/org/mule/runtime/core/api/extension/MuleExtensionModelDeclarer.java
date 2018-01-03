@@ -669,7 +669,7 @@ class MuleExtensionModelDeclarer {
 
   private void declareErrors(ExtensionDeclarer extensionDeclarer) {
 
-    final ErrorModel criticalError = newError(CRITICAL).build();
+    final ErrorModel criticalError = newError(CRITICAL).handleable(false).build();
     final ErrorModel overloadError = newError(OVERLOAD).withParent(criticalError).build();
     final ErrorModel securityError = newError(SECURITY).withParent(anyError).build();
     final ErrorModel sourceError = newError(SOURCE).withParent(anyError).build();
@@ -685,7 +685,7 @@ class MuleExtensionModelDeclarer {
     extensionDeclarer.withErrorModel(newError(REDELIVERY_EXHAUSTED).withParent(anyError).build());
     extensionDeclarer.withErrorModel(newError(STREAM_MAXIMUM_SIZE_EXCEEDED).withParent(anyError).build());
     extensionDeclarer.withErrorModel(newError(TIMEOUT).withParent(anyError).build());
-    extensionDeclarer.withErrorModel(newError(UNKNOWN).withParent(anyError).build());
+    extensionDeclarer.withErrorModel(newError(UNKNOWN).handleable(false).withParent(anyError).build());
 
     extensionDeclarer.withErrorModel(routingError);
     extensionDeclarer.withErrorModel(compositeRoutingError);
@@ -700,15 +700,15 @@ class MuleExtensionModelDeclarer {
 
     extensionDeclarer.withErrorModel(sourceError);
     extensionDeclarer.withErrorModel(sourceResponseError);
-    extensionDeclarer.withErrorModel(newError(SOURCE_ERROR_RESPONSE_GENERATE).withParent(sourceError).build());
-    extensionDeclarer.withErrorModel(newError(SOURCE_ERROR_RESPONSE_SEND).withParent(sourceError).build());
+    extensionDeclarer.withErrorModel(newError(SOURCE_ERROR_RESPONSE_GENERATE).handleable(false).withParent(sourceError).build());
+    extensionDeclarer.withErrorModel(newError(SOURCE_ERROR_RESPONSE_SEND).handleable(false).withParent(sourceError).build());
     extensionDeclarer.withErrorModel(newError(SOURCE_RESPONSE_GENERATE).withParent(sourceResponseError).build());
-    extensionDeclarer.withErrorModel(newError(SOURCE_RESPONSE_SEND).withParent(sourceResponseError).build());
+    extensionDeclarer.withErrorModel(newError(SOURCE_RESPONSE_SEND).handleable(false).withParent(sourceResponseError).build());
 
     extensionDeclarer.withErrorModel(criticalError);
     extensionDeclarer.withErrorModel(overloadError);
-    extensionDeclarer.withErrorModel(newError(FLOW_BACK_PRESSURE).withParent(overloadError).build());
-    extensionDeclarer.withErrorModel(newError(FATAL).withParent(criticalError).build());
+    extensionDeclarer.withErrorModel(newError(FLOW_BACK_PRESSURE).handleable(false).withParent(overloadError).build());
+    extensionDeclarer.withErrorModel(newError(FATAL).handleable(false).withParent(criticalError).build());
   }
 
   private void declareConfiguration(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {

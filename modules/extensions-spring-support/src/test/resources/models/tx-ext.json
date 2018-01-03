@@ -5140,19 +5140,19 @@
       "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
-      "error": "MULE:CONNECTIVITY",
+      "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY"
     },
     {
       "error": "MULE:ANY"
     },
     {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY"
-    },
-    {
       "error": "TX:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY"
+    },
+    {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY"
     }
   ],
   "modelProperties": {},

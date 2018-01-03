@@ -8581,6 +8581,10 @@
   "notifications": [],
   "errors": [
     {
+      "error": "VALUES:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
+    },
+    {
       "error": "MULE:CONNECTIVITY",
       "parent": "MULE:ANY"
     },
@@ -8588,16 +8592,12 @@
       "error": "MULE:ANY"
     },
     {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "VALUES:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY"
-    },
-    {
       "error": "VALUES:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED"
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY"
     }
   ],
   "modelProperties": {},
