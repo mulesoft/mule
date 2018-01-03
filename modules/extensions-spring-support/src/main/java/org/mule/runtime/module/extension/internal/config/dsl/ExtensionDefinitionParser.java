@@ -97,6 +97,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTyp
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TypedInlineParameterGroupParser;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
@@ -225,7 +226,7 @@ public abstract class ExtensionDefinitionParser {
   protected abstract Builder doParse(Builder definitionBuilder) throws ConfigurationException;
 
   /**
-   * Parses the given {@code nestedComponents} and generates matching definitions  
+   * Parses the given {@code nestedComponents} and generates matching definitions
    *
    * @param nestedComponents a list of {@link NestableElementModel}
    */
@@ -688,7 +689,7 @@ public abstract class ExtensionDefinitionParser {
     if (isExpression(value, parser)) {
       final String expression = (String) value;
       resolver = getExpressionBasedValueResolver(expectedType, expression, modelProperties, expectedClass);
-      if (required) {
+      if (required || isRequiredByExclusiveOptional(modelProperties)) {
         resolver = new RequiredParameterValueResolverWrapper(resolver, parameterName, expression);
       }
     } else {
@@ -708,6 +709,11 @@ public abstract class ExtensionDefinitionParser {
     }
 
     return resolver;
+  }
+
+  private boolean isRequiredByExclusiveOptional(Set<ModelProperty> modelProperties) {
+    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof ExclusiveOptionalModelProperty
+        && ((ExclusiveOptionalModelProperty) modelProperty).isOneRequired());
   }
 
   /**

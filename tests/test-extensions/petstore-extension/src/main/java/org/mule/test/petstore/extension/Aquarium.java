@@ -18,4 +18,13 @@ public class Aquarium {
   @Parameter
   @Optional(defaultValue = "50")
   public Integer ticketPrice;
+
+  public Integer getTicketPrice() {
+    return ticketPrice;
+  }
+
+  public Pond getPond() {
+    return pond;
+  }
+
 }

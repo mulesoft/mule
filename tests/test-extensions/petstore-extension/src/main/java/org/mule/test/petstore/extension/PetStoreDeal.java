@@ -6,27 +6,32 @@
  */
 package org.mule.test.petstore.extension;
 
-import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
-@ExclusiveOptionals(isOneRequired = true)
-public class Pond {
+public class PetStoreDeal {
+
+  @ParameterGroup(name = "cashier")
+  private ExclusiveCashier cashier;
 
   @Parameter
   @Optional
-  public String frogName;
+  private String petFood;
 
   @Parameter
-  @Optional
-  public String fishName;
+  private int dealPrice;
 
-  public String getFishName() {
-    return fishName;
+  public int getDealPrice() {
+    return dealPrice;
   }
 
-  public String getFrogName() {
-    return frogName;
+  public ExclusiveCashier getCashier() {
+    return cashier;
+  }
+
+  public String getPetFood() {
+    return petFood;
   }
 
 }
