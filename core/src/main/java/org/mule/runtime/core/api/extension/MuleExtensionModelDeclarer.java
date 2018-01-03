@@ -700,10 +700,10 @@ class MuleExtensionModelDeclarer {
 
     extensionDeclarer.withErrorModel(sourceError);
     extensionDeclarer.withErrorModel(sourceResponseError);
-    extensionDeclarer.withErrorModel(newError(SOURCE_ERROR_RESPONSE_GENERATE).withParent(sourceError).build());
-    extensionDeclarer.withErrorModel(newError(SOURCE_ERROR_RESPONSE_SEND).withParent(sourceError).build());
+    extensionDeclarer.withErrorModel(newError(SOURCE_ERROR_RESPONSE_GENERATE).handleable(false).withParent(sourceError).build());
+    extensionDeclarer.withErrorModel(newError(SOURCE_ERROR_RESPONSE_SEND).handleable(false).withParent(sourceError).build());
     extensionDeclarer.withErrorModel(newError(SOURCE_RESPONSE_GENERATE).withParent(sourceResponseError).build());
-    extensionDeclarer.withErrorModel(newError(SOURCE_RESPONSE_SEND).withParent(sourceResponseError).build());
+    extensionDeclarer.withErrorModel(newError(SOURCE_RESPONSE_SEND).handleable(false).withParent(sourceResponseError).build());
 
     extensionDeclarer.withErrorModel(criticalError);
     extensionDeclarer.withErrorModel(overloadError);
