@@ -261,7 +261,8 @@ public class DefaultFlowBuilder implements Builder {
                                                                                (InternalEvent) event));
                   return me;
                 });
-          });
+          })
+          .errorStrategyStop();
     }
 
     private PrivilegedEvent createMuleEventForCurrentFlow(PrivilegedEvent event) {
