@@ -17,6 +17,7 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHan
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @Feature(ERROR_HANDLING)
@@ -117,12 +118,14 @@ public class ModuleUsingErrorMappingTestCase extends AbstractXmlExtensionMuleArt
 
   @Test
   @Description("Verifies that a mapped error via global error handler works using subflows.")
+  @Ignore("MULE-14351")
   public void globalMappingWithDefaultErrorHandlerTimeoutThruSubflow() throws Exception {
     verifySuccessExpression("globalMappingWithDefaultErrorHandlerTimeoutThruSubflow", TIMEOUT_ERROR_MESSAGE);
   }
 
   @Test
   @Description("Verifies that a mapped error via global error handler works using nested subflows.")
+  @Ignore("MULE-14351")
   public void globalMappingWithDefaultErrorHandlerTimeoutThruSubSubflow() throws Exception {
     verifySuccessExpression("globalMappingWithDefaultErrorHandlerTimeoutThruSubSubflow", TIMEOUT_ERROR_MESSAGE);
   }

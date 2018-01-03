@@ -36,6 +36,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
+import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -209,17 +210,14 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
         }
 
         Flux<CoreEvent> flux;
-        // If referenced processor is a Flow use a child EventContext and wait for completion else simply compose
         if (referencedProcessor instanceof Flow) {
-          flux = just(event)
-              .flatMap(request -> Mono
-                  .from(processWithChildContext(request, referencedProcessor,
-                                                ofNullable(FlowRefFactoryBean.this.getLocation()),
-                                                ((Flow) referencedProcessor).getExceptionListener())));
+          flux = from(processWithChildContext(event, referencedProcessor,
+                                              ofNullable(FlowRefFactoryBean.this.getLocation()),
+                                              ((Flow) referencedProcessor).getExceptionListener()));
         } else {
-          flux = just(event).transform(referencedProcessor);
+          flux = from(processWithChildContext(event, referencedProcessor,
+                                              ofNullable(FlowRefFactoryBean.this.getLocation())));
         }
-
         return flux.map(outputToTarget(event, target, targetValue, expressionManager));
       });
     }
