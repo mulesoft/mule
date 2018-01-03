@@ -22,7 +22,6 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import org.mule.runtime.api.artifact.Registry;
@@ -56,7 +55,6 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
@@ -66,7 +64,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -153,12 +150,7 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public Domain getDomain() {
-    Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
-    if (domainBundleDescriptor.isPresent()) {
-      return domainRepository.getDomain(domainBundleDescriptor.get().getArtifactFileName());
-    } else {
-      return domainRepository.getDomain(DEFAULT_DOMAIN_NAME);
-    }
+    return domainRepository.getDomain(descriptor.getDomainName());
   }
 
   @Override
@@ -217,12 +209,7 @@ public class DefaultMuleApplication implements Application {
                                                                     descriptor.getDeploymentProperties())))
               .setPolicyProvider(policyManager);
 
-      Domain domain;
-      if (descriptor.getDomainDescriptor().isPresent()) {
-        domain = domainRepository.getDomain(descriptor.getDomainDescriptor().get().getArtifactFileName());
-      } else {
-        domain = domainRepository.getDomain(DEFAULT_DOMAIN_NAME);
-      }
+      Domain domain = domainRepository.getDomain(descriptor.getDomainName());
       if (domain.getRegistry() != null) {
         artifactBuilder.setParentArtifact(domain);
       }
