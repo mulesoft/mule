@@ -207,7 +207,7 @@ public class MetadataOperations {
   }
 
   @OutputResolver(output = TestOutputResolverWithoutKeyResolver.class)
-  public List<Object> dynamicListOfObjects(@MetadataKeyId String type) {
+  public List<Object> dynamicListOfObjects(@MetadataKeyId String type, List<String> referableElements) {
     return null;
   }
 
