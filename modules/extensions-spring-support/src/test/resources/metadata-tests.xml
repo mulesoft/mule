@@ -232,7 +232,7 @@
     </flow>
 
     <flow name="dynamicListOfObjects">
-        <metadata:dynamic-list-of-objects type="PERSON"/>
+        <metadata:dynamic-list-of-objects type="PERSON" referableElements=""/>
     </flow>
 
     <flow name="queryWithExpression">
