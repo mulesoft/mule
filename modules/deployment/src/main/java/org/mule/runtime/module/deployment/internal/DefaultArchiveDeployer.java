@@ -20,7 +20,6 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
-import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleAppsDir;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
@@ -234,7 +233,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     T artifact;
     try {
-      File artifactLocation = new File(getMuleAppsDir(), addedApp);
+      File artifactLocation = new File(artifactDir, addedApp);
       artifact = createArtifact(artifactLocation, deploymentProperties);
 
       // add to the list of known artifacts first to avoid deployment loop on failure
