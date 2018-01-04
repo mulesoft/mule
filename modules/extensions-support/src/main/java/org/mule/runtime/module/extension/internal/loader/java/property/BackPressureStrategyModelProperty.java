@@ -29,7 +29,7 @@ public class BackPressureStrategyModelProperty implements ModelProperty {
   public static BackPressureStrategyModelProperty getDefault() {
     BackPressureStrategyModelProperty property = new BackPressureStrategyModelProperty();
     property.defaultMode = WAIT;
-    property.supportedModes = EnumSet.allOf(BackPressureMode.class);
+    property.supportedModes = EnumSet.of(WAIT);
 
     return property;
   }
