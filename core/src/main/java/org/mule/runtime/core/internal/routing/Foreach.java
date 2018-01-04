@@ -7,12 +7,14 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.defer;
@@ -116,11 +118,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                 restoreVariables(previousCounterVar, previousRootMessageVar, exceptionEventBuilder);
                 me.setProcessedEvent(exceptionEventBuilder.build());
                 return me;
-              })
-              // Required due to lack of decent support for error-handling in reactor. See
-              // https://github.com/reactor/reactor-core/issues/629.
-              .onErrorMap(throwable -> !(throwable instanceof MessagingException),
-                          throwable -> new MessagingException(originalEvent, throwable, this));
+              });
         });
   }
 
@@ -144,6 +142,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     return fromIterable(
                         // Split into sequence of TypedValue
                         () -> splitRequest(request))
+                            // Wrap any exception that occurs during split in a MessagingException. This is required as the
+                            // automatic wrapping is only applied when the signal is an Event.
+                            .onErrorMap(throwable -> new MessagingException(request, throwable, Foreach.this))
                             // If batchSize > 1 then buffer sequence into List<TypedValue<T>> and convert to
                             // TypedValue<List<TypedValue<T>>>.
                             .transform(p -> batchSize > 1
@@ -162,8 +163,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                                 // Otherwise create a new message
                                 partEventBuilder.message(Message.builder().payload(typedValue).build());
                               }
-                              return just(partEventBuilder.addVariable(counterVariableName, count.incrementAndGet()).build())
-                                  .transform(nestedChain).doOnNext(result -> currentEvent.set(CoreEvent.builder(result).build()));
+                              return from(processWithChildContext(partEventBuilder
+                                  .addVariable(counterVariableName, count.incrementAndGet()).build(), nestedChain,
+                                                                  ofNullable(getLocation())))
+                                                                      .doOnNext(result -> currentEvent
+                                                                          .set(CoreEvent.builder(result).build()));
                             })
                             // This can potentially be improved but simplest way currently to determine if split results in empty
                             // iterator is to check atomic count
@@ -177,7 +181,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                               }
                             }))
                             .takeLast(1)
-                            .map(s -> CoreEvent.builder(currentEvent.get()).message(request.getMessage()).build());
+                            .map(s -> CoreEvent.builder(currentEvent.get()).message(request.getMessage()).build())
+                            .errorStrategyStop();
   }
 
   private Iterator<TypedValue<?>> splitRequest(CoreEvent request) {

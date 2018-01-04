@@ -26,6 +26,7 @@ public class SensingNullMessageProcessor implements Processor, Disposable {
   public CoreEvent event;
   public Latch latch = new Latch();
   public Thread thread;
+  public volatile int invocations;
   private ExecutorService executor = newSingleThreadExecutor(new NamedThreadFactory(SensingNullMessageProcessor.class.getName()));
 
   protected InternalMessageSource source = new InternalMessageSource();
@@ -42,6 +43,7 @@ public class SensingNullMessageProcessor implements Processor, Disposable {
 
   private void sense(CoreEvent event) {
     sleepIfNeeded();
+    invocations++;
     this.event = event;
     thread = Thread.currentThread();
   }

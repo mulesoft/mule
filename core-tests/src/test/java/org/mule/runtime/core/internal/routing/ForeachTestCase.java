@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -25,6 +24,7 @@ import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
@@ -39,6 +39,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
+import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -54,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
@@ -261,15 +263,42 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   public void failingNestedProcessor() throws Exception {
     RuntimeException throwable = new BufferOverflowException();
     Foreach foreach = createForeach();
+    SensingNullMessageProcessor firstProcessor = new SensingNullMessageProcessor();
     InternalTestProcessor failingProcessor = event -> {
       throw throwable;
     };
-    foreach.setMessageProcessors(singletonList(failingProcessor));
+    foreach.setMessageProcessors(asList(firstProcessor, failingProcessor));
     initialiseIfNeeded(foreach, muleContext);
+    try {
+      expectNestedProessorException(throwable, failingProcessor);
+      process(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build(), false);
+    } finally {
+      assertThat(firstProcessor.invocations, equalTo(1));
+    }
+  }
+
+  private void expectNestedProessorException(RuntimeException throwable, InternalTestProcessor failingProcessor) {
     expectedException.expect(is(MessagingException.class));
     expectedException.expect(new FailingProcessorMatcher(failingProcessor));
     expectedException.expectCause(is(throwable));
-    process(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build(), false);
+  }
+
+  @Test
+  public void failingNestedProcessorInChain() throws Exception {
+    RuntimeException throwable = new BufferOverflowException();
+    Foreach foreach = createForeach();
+    SensingNullMessageProcessor firstProcessor = new SensingNullMessageProcessor();
+    InternalTestProcessor failingProcessor = event -> {
+      throw throwable;
+    };
+    foreach.setMessageProcessors(asList(firstProcessor, failingProcessor));
+    initialiseIfNeeded(foreach, muleContext);
+    try {
+      expectNestedProessorException(throwable, failingProcessor);
+      processInChain(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build());
+    } finally {
+      assertThat(firstProcessor.invocations, equalTo(1));
+    }
   }
 
   private Foreach createForeach() {
@@ -282,14 +311,43 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   public void failingExpression() throws Exception {
     Foreach foreach = createForeach();
     foreach.setCollectionExpression("!@INVALID");
-    foreach.setMessageProcessors(getSimpleMessageProcessors(new TestMessageProcessor("zas")));
+    SensingNullMessageProcessor firstProcessor = new SensingNullMessageProcessor();
+    List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
+    processors.add(0, firstProcessor);
+    foreach.setMessageProcessors(processors);
     initialiseIfNeeded(foreach, muleContext);
 
+    try {
+      expectExpressionException(foreach);
+      process(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build(),
+              false);
+    } finally {
+      assertThat(firstProcessor.invocations, equalTo(0));
+    }
+  }
+
+  @Test
+  public void failingExpressionInChain() throws Exception {
+    Foreach foreach = createForeach();
+    foreach.setCollectionExpression("!@INVALID");
+    SensingNullMessageProcessor firstProcessor = new SensingNullMessageProcessor();
+    List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
+    processors.add(0, firstProcessor);
+    foreach.setMessageProcessors(processors);
+    initialiseIfNeeded(foreach, muleContext);
+
+    try {
+      expectExpressionException(foreach);
+      processInChain(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build());
+    } finally {
+      assertThat(firstProcessor.invocations, equalTo(0));
+    }
+  }
+
+  private void expectExpressionException(Foreach foreach) {
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expect(new FailingProcessorMatcher(foreach));
     expectedException.expectCause(instanceOf(ExpressionRuntimeException.class));
-    process(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build(),
-            false);
   }
 
   @Test
@@ -348,6 +406,10 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
     assertThat(result.getMessage(), equalTo(input.getMessage()));
     assertThat(processedEvents, hasSize(0));
+  }
+
+  private CoreEvent processInChain(Processor processor, CoreEvent event) throws Exception {
+    return process(newChain(Optional.empty(), processor), event, false);
   }
 
   private void assertSimpleProcessedMessages() {
