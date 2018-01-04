@@ -170,6 +170,11 @@ public class HeisenbergOperations implements Disposable {
     return info;
   }
 
+  @MediaType(TEXT_PLAIN)
+  public String transform(String transformation) {
+    return transformation;
+  }
+
   public void disguice(@ParameterGroup(name = "currentLook") BarberPreferences currentLook,
                        @ParameterGroup(name = "disguise", showInDsl = true) BarberPreferences disguise) {
 
