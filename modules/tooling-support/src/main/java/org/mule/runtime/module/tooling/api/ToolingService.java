@@ -101,6 +101,18 @@ public interface ToolingService extends Initialisable, Stoppable {
   }
 
   /**
+   * Creates an application but from the content byte[], see {@link #createApplication(File, Optional)} for more details.
+   *
+   * @param appContent the content of the application.
+   * @param deploymentProperties defines the deployment properties to be used when deploying these application.
+   * @return the created application.
+   * @throws IOException
+   */
+  default Application createApplication(byte[] appContent, Optional<Properties> deploymentProperties) throws IOException {
+    throw new UnsupportedOperationException("Method not support for Mule Runtime version: " + getProductVersion());
+  }
+
+  /**
    * Creates a {@link org.mule.runtime.deployment.model.api.domain.Domain} from a set of resources.
    * <p/>
    * The created domain will be created lazily meaning that the domain resources
