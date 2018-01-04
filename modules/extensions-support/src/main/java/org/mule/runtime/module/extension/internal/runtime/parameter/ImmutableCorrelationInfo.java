@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.parameter;
 
+import org.mule.runtime.api.message.GroupCorrelation;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 
 /**
@@ -18,11 +19,13 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
   private final String eventId;
   private final boolean outboundCorrelationEnabled;
   private final String correlationId;
+  private final GroupCorrelation groupCorrelation;
 
-  public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId) {
+  public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId, GroupCorrelation groupCorrelation) {
     this.eventId = eventId;
     this.outboundCorrelationEnabled = outboundCorrelationEnabled;
     this.correlationId = correlationId;
+    this.groupCorrelation = groupCorrelation;
   }
 
   /**
@@ -47,5 +50,13 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
   @Override
   public String getCorrelationId() {
     return correlationId;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GroupCorrelation getGroupCorrelation() {
+    return groupCorrelation;
   }
 }
