@@ -21,7 +21,8 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
   private final String correlationId;
   private final GroupCorrelation groupCorrelation;
 
-  public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId, GroupCorrelation groupCorrelation) {
+  public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId,
+                                  GroupCorrelation groupCorrelation) {
     this.eventId = eventId;
     this.outboundCorrelationEnabled = outboundCorrelationEnabled;
     this.correlationId = correlationId;

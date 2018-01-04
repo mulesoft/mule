@@ -324,9 +324,9 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     CoreEvent event = spy(testEvent());
     when(event.getGroupCorrelation()).thenReturn(of(GroupCorrelation.of(43, 100)));
     TypedValue result = expressionLanguage.evaluate(GROUP_CORRELATION_INFO, event, BindingContext.builder().build());
-    assertThat(((Optional)result.getValue()).get(), is(instanceOf(GroupCorrelation.class)));
-    assertThat(((GroupCorrelation)((Optional)result.getValue()).get()).getSequence(), is(43));
-    assertThat(((GroupCorrelation)((Optional)result.getValue()).get()).getGroupSize().getAsInt(), is(100));
+    assertThat(((Optional) result.getValue()).get(), is(instanceOf(GroupCorrelation.class)));
+    assertThat(((GroupCorrelation) ((Optional) result.getValue()).get()).getSequence(), is(43));
+    assertThat(((GroupCorrelation) ((Optional) result.getValue()).get()).getGroupSize().getAsInt(), is(100));
 
   }
 
