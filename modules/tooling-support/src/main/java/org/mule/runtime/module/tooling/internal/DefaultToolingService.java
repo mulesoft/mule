@@ -175,6 +175,20 @@ public class DefaultToolingService implements ToolingService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Application createApplication(byte[] appContent, Optional<Properties> deploymentProperties) throws IOException {
+    File toolingApplicationContent = artifactFileWriter.writeContent(getUniqueIdString(APPLICATION), appContent);
+    try {
+      return doCreateApplication(toolingApplicationContent, deploymentProperties);
+    } catch (Throwable t) {
+      deleteQuietly(toolingApplicationContent);
+      throw t;
+    }
+  }
+
   private Application doCreateApplication(ApplicationDescriptor applicationDescriptor) throws IOException {
     Application application = applicationFactory.createArtifact(applicationDescriptor);
     application.install();
