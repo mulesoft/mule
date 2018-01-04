@@ -29,7 +29,7 @@ import org.mule.test.values.extension.source.SourceWithValuesWithRequiredParamet
 
 import java.util.List;
 
-@Configuration(name = "config")
+@Configuration
 @ConnectionProviders({ValuesConnectionProvider.class, ConnectionWithValueParameter.class,
     ConnectionWithValueWithRequiredParam.class, ConnectionWithValuesWithRequiredParamsFromParamGroup.class,
     ConnectionWithValuesWithRequiredParamsFromShowInDslGroup.class})

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 
@@ -58,7 +59,11 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     Optional<Configuration> configurationAnnotation = configType.getAnnotation(Configuration.class);
     if (configurationAnnotation.isPresent()) {
       final Configuration configuration = configurationAnnotation.get();
-      configurationDeclarer = declarer.withConfig(configuration.name());
+      if (isEmpty(configuration.name())) {
+        configurationDeclarer = declarer.withConfig(DEFAULT_CONFIG_NAME);
+      } else {
+        configurationDeclarer = declarer.withConfig(configuration.name());
+      }
     } else {
       configurationDeclarer =
           declarer.withConfig(DEFAULT_CONFIG_NAME).describedAs(DEFAULT_CONFIG_DESCRIPTION);
