@@ -16,7 +16,7 @@ import static org.mule.runtime.api.notification.RoutingNotification.CORRELATION_
 import static org.mule.runtime.api.notification.RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.correlationTimedOut;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
-import static org.mule.runtime.core.api.message.GroupCorrelation.NOT_SET;
+import static org.mule.runtime.api.message.GroupCorrelation.NOT_SET;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
