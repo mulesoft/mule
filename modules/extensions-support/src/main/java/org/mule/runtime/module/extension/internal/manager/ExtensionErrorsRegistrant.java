@@ -17,7 +17,9 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
@@ -80,6 +82,15 @@ class ExtensionErrorsRegistrant {
 
       @Override
       protected void onOperation(OperationModel model) {
+        registerErrors(model);
+      }
+
+      @Override
+      protected void onConstruct(ConstructModel model) {
+        registerErrors(model);
+      }
+
+      private void registerErrors(ComponentModel model) {
         if (!errorTypes.isEmpty()) {
           ExceptionMapper.Builder builder = ExceptionMapper.builder();
           builder.addExceptionMapping(ConnectionException.class, getErrorType(connectivityErrorModel, extensionModel));

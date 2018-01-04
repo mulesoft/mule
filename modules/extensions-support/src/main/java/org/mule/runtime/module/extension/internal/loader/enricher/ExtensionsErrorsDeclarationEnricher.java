@@ -13,6 +13,7 @@ import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleE
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
@@ -59,9 +60,18 @@ public class ExtensionsErrorsDeclarationEnricher implements DeclarationEnricher 
 
         @Override
         public void onOperation(WithOperationsDeclaration owner, OperationDeclaration operationDeclaration) {
-          if (operationDeclaration.getModelProperty(ConnectivityModelProperty.class).isPresent()) {
-            operationDeclaration.addErrorModel(getErrorModel(CONNECTIVITY, errorModels, operationDeclaration));
-            operationDeclaration.addErrorModel(getErrorModel(RETRY_EXHAUSTED, errorModels, operationDeclaration));
+          enrichComponent(operationDeclaration);
+        }
+
+        @Override
+        protected void onConstruct(ConstructDeclaration declaration) {
+          enrichComponent(declaration);
+        }
+
+        private void enrichComponent(ComponentDeclaration declaration) {
+          if (declaration.getModelProperty(ConnectivityModelProperty.class).isPresent()) {
+            declaration.addErrorModel(getErrorModel(CONNECTIVITY, errorModels, declaration));
+            declaration.addErrorModel(getErrorModel(RETRY_EXHAUSTED, errorModels, declaration));
           }
         }
       }.walk(extensionDeclaration);
