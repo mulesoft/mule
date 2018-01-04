@@ -39,6 +39,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.JavaPrivileged
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.MimeTypeParametersDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.NotificationsDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ObjectStoreParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterAllowedStereotypesDeclarionEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.PrimaryNodeEnricher;
@@ -121,7 +122,8 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ParameterLayoutOrderDeclarationEnricher(),
                                                                                                new PrimaryNodeEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher(),
-                                                                                               new BackPressureDeclarationEnricher()));
+                                                                                               new BackPressureDeclarationEnricher(),
+                                                                                               new ObjectStoreParameterDeclarationEnricher()));
 
   private final String id;
   private final BiFunction<Class<?>, String, ModelLoaderDelegate> delegateFactory;

@@ -18,6 +18,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KN
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -266,6 +267,10 @@ public class HeisenbergOperations implements Disposable {
   @OnException(NullExceptionEnricher.class)
   public void failToExecute() throws HeisenbergException {
     callGusFring();
+  }
+
+  public void storeMoney(ObjectStore<Long> objectStore, Long money) throws Exception {
+    objectStore.store("money", money);
   }
 
   @Ignore
