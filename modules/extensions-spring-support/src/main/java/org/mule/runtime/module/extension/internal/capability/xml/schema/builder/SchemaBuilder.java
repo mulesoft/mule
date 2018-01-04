@@ -457,11 +457,13 @@ public final class SchemaBuilder {
     choice.getParticle().add(objectFactory.createElement(localAbstractElementRef));
     options.add(refAbstract.toString());
 
-    QName refGlobal = new QName(typeDsl.getNamespace(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, getAbstractElementName(typeDsl)),
-                                typeDsl.getPrefix());
-    TopLevelElement topLevelElementRef = createRefElement(refGlobal, true);
-    choice.getParticle().add(objectFactory.createElement(topLevelElementRef));
-    options.add(refGlobal.toString());
+    if (typeDsl.supportsTopLevelDeclaration()) {
+      QName refGlobal = new QName(typeDsl.getNamespace(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, getAbstractElementName(typeDsl)),
+                                  typeDsl.getPrefix());
+      TopLevelElement topLevelElementRef = createRefElement(refGlobal, true);
+      choice.getParticle().add(objectFactory.createElement(topLevelElementRef));
+      options.add(refGlobal.toString());
+    }
 
     typesMapping.getSubTypes((ObjectType) type).stream()
         .filter(subtype -> dslResolver.resolve(subtype).map(DslElementSyntax::supportsChildDeclaration).orElse(false))

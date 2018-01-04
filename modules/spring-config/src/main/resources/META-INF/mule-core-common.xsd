@@ -3507,19 +3507,19 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="abstract-object-store" abstract="true" type="abstractObjectStoreType" substitutionGroup="global-abstract-object-store">
-        <xsd:annotation>
-            <xsd:documentation>
-                Deprecated, use 'global-abstract-object-store'
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="abstract-private-object-store" abstract="true" type="abstractObjectStoreType">
+    <xsd:element name="abstract-object-store" abstract="true" type="abstractObjectStoreType">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for private object store elements.Private means that only the component that defines it will be able to access it.
                 Used for elements that reference an object-store but the implementation is in the connector
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="abstract-private-object-store" abstract="true" type="abstractObjectStoreType" substitutionGroup="abstract-object-store">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated, use "abstract-object-store
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
