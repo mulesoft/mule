@@ -13,6 +13,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.GroupCorrelation;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -62,6 +63,11 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
   @Override
   public String getCorrelationId() {
     return interceptedInput.getCorrelationId();
+  }
+
+  @Override
+  public Optional<GroupCorrelation> getGroupCorrelation() {
+    return interceptedInput.getGroupCorrelation();
   }
 
   @Override
