@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.api.message.GroupCorrelation;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -41,13 +41,6 @@ public interface CoreEvent extends Serializable, Event {
    * @return the context for this session or null if the request is not secure.
    */
   SecurityContext getSecurityContext();
-
-  /**
-   * Returns the correlation metadata of this message. See {@link GroupCorrelation}.
-   *
-   * @return the correlation metadata of this message.
-   */
-  Optional<GroupCorrelation> getGroupCorrelation();
 
   /**
    * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can

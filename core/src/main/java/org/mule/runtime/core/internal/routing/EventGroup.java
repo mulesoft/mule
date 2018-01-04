@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.api.message.GroupCorrelation.NOT_SET;
+import static org.mule.runtime.api.message.GroupCorrelation.NOT_SET;
 import static org.mule.runtime.core.api.util.StringUtils.DASH;
 
 import org.mule.runtime.api.exception.MuleException;
