@@ -180,11 +180,6 @@
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithConfiguration-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
-          <xs:annotation>
-            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -205,11 +200,6 @@
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithConnection-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
-          <xs:annotation>
-            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -274,11 +264,6 @@
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SimpleSource-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
-          <xs:annotation>
-            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -295,11 +280,6 @@
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceMustNotStart-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
-          <xs:annotation>
-            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -313,11 +293,6 @@
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithMultiLevelValue-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
-          <xs:annotation>
-            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="optional" default="some value" name="required"></xs:attribute>
@@ -351,11 +326,6 @@
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithRequiredParameterInsideShowInDslGroup-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
-          <xs:annotation>
-            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -369,11 +339,6 @@
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithRequiredParameterWithAlias-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
-          <xs:annotation>
-            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="required" name="superString"></xs:attribute>
@@ -391,11 +356,6 @@
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithValuesWithRequiredParameterInsideParamGroup-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
-          <xs:annotation>
-            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="xs:string" use="required" name="channels"></xs:attribute>
@@ -429,11 +389,6 @@
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/values" type="Values-SourceWithValuesWithRequiredParameters-backPressureStrategyEnumType" use="optional" default="WAIT" name="backPressureStrategy">
-          <xs:annotation>
-            <xs:documentation>The strategy that the runtime will use to apply back pressure</xs:documentation>
           </xs:annotation>
         </xs:attribute>
       </xs:extension>
@@ -546,130 +501,4 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:simpleType name="Values-SourceWithConfiguration-backPressureStrategyEnumType">
-    <xs:union>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="FAIL"></xs:enumeration>
-          <xs:enumeration value="WAIT"></xs:enumeration>
-          <xs:enumeration value="DROP"></xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
-      </xs:simpleType>
-    </xs:union>
-  </xs:simpleType>
-  <xs:simpleType name="Values-SourceWithConnection-backPressureStrategyEnumType">
-    <xs:union>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="FAIL"></xs:enumeration>
-          <xs:enumeration value="WAIT"></xs:enumeration>
-          <xs:enumeration value="DROP"></xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
-      </xs:simpleType>
-    </xs:union>
-  </xs:simpleType>
-  <xs:simpleType name="Values-SimpleSource-backPressureStrategyEnumType">
-    <xs:union>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="FAIL"></xs:enumeration>
-          <xs:enumeration value="WAIT"></xs:enumeration>
-          <xs:enumeration value="DROP"></xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
-      </xs:simpleType>
-    </xs:union>
-  </xs:simpleType>
-  <xs:simpleType name="Values-SourceMustNotStart-backPressureStrategyEnumType">
-    <xs:union>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="FAIL"></xs:enumeration>
-          <xs:enumeration value="WAIT"></xs:enumeration>
-          <xs:enumeration value="DROP"></xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
-      </xs:simpleType>
-    </xs:union>
-  </xs:simpleType>
-  <xs:simpleType name="Values-SourceWithMultiLevelValue-backPressureStrategyEnumType">
-    <xs:union>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="FAIL"></xs:enumeration>
-          <xs:enumeration value="WAIT"></xs:enumeration>
-          <xs:enumeration value="DROP"></xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
-      </xs:simpleType>
-    </xs:union>
-  </xs:simpleType>
-  <xs:simpleType name="Values-SourceWithRequiredParameterInsideShowInDslGroup-backPressureStrategyEnumType">
-    <xs:union>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="FAIL"></xs:enumeration>
-          <xs:enumeration value="WAIT"></xs:enumeration>
-          <xs:enumeration value="DROP"></xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
-      </xs:simpleType>
-    </xs:union>
-  </xs:simpleType>
-  <xs:simpleType name="Values-SourceWithRequiredParameterWithAlias-backPressureStrategyEnumType">
-    <xs:union>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="FAIL"></xs:enumeration>
-          <xs:enumeration value="WAIT"></xs:enumeration>
-          <xs:enumeration value="DROP"></xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
-      </xs:simpleType>
-    </xs:union>
-  </xs:simpleType>
-  <xs:simpleType name="Values-SourceWithValuesWithRequiredParameterInsideParamGroup-backPressureStrategyEnumType">
-    <xs:union>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="FAIL"></xs:enumeration>
-          <xs:enumeration value="WAIT"></xs:enumeration>
-          <xs:enumeration value="DROP"></xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
-      </xs:simpleType>
-    </xs:union>
-  </xs:simpleType>
-  <xs:simpleType name="Values-SourceWithValuesWithRequiredParameters-backPressureStrategyEnumType">
-    <xs:union>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="FAIL"></xs:enumeration>
-          <xs:enumeration value="WAIT"></xs:enumeration>
-          <xs:enumeration value="DROP"></xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
-      </xs:simpleType>
-    </xs:union>
-  </xs:simpleType>
 </xs:schema>

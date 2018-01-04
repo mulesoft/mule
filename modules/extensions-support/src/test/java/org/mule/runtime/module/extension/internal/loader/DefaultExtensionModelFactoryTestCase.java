@@ -331,17 +331,11 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
     SourceModel source = extensionModel.getConfigurationModels().get(0).getSourceModel("ReconnectableListenPayments").get();
 
-    ParameterModel parameter = source.getAllParameterModels().stream()
+    Optional<ParameterModel> parameter = source.getAllParameterModels().stream()
         .filter(p -> BACK_PRESSURE_STRATEGY_PARAMETER_NAME.equals(p.getName()))
-        .findAny().orElseThrow(() -> new IllegalStateException("No backPressureStrategy parameter"));
+        .findAny();
 
-    assertThat(parameter.getType(), is(instanceOf(StringType.class)));
-    assertThat(parameter.getDefaultValue(), is(WAIT));
-
-    EnumAnnotation enumAnnotation = parameter.getType().getAnnotation(EnumAnnotation.class)
-        .orElseThrow(() -> new IllegalStateException("No enum annotation"));
-
-    assertThat(asList(enumAnnotation.getValues()), containsInAnyOrder(FAIL.name(), DROP.name(), WAIT.name()));
+    assertThat(parameter.isPresent(), is(false));
   }
 
   @Test

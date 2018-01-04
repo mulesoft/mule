@@ -8248,44 +8248,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "petstore-source-backPressureStrategy",
-                      "enum": {
-                        "type": "[Ljava.lang.String;",
-                        "values": [
-                          "FAIL",
-                          "WAIT",
-                          "DROP"
-                        ]
-                      }
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "WAIT",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "backPressureStrategy",
-                  "description": "The strategy that the runtime will use to apply back pressure",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "RedeliveryPolicy"
@@ -15533,44 +15495,6 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "petstore-SentientSource-backPressureStrategy",
-                  "enum": {
-                    "type": "[Ljava.lang.String;",
-                    "values": [
-                      "FAIL",
-                      "WAIT",
-                      "DROP"
-                    ]
-                  }
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "WAIT",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "backPressureStrategy",
-              "description": "The strategy that the runtime will use to apply back pressure",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy"
@@ -15814,44 +15738,6 @@
               "allowedStereotypeModels": [],
               "name": "primaryNodeOnly",
               "description": "Whether this source should only be executed on the primary node when runnning in Cluster",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "petstore-pet-source-backPressureStrategy",
-                  "enum": {
-                    "type": "[Ljava.lang.String;",
-                    "values": [
-                      "FAIL",
-                      "WAIT",
-                      "DROP"
-                    ]
-                  }
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "WAIT",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "backPressureStrategy",
-              "description": "The strategy that the runtime will use to apply back pressure",
               "modelProperties": {}
             },
             {
