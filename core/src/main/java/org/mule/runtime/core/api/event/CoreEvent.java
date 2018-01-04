@@ -43,13 +43,6 @@ public interface CoreEvent extends Serializable, Event {
   SecurityContext getSecurityContext();
 
   /**
-   * Returns the correlation metadata of this message. See {@link GroupCorrelation}.
-   *
-   * @return the correlation metadata of this message.
-   */
-  Optional<GroupCorrelation> getGroupCorrelation();
-
-  /**
    * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can
    * determine where this event came from.
    * <p>
