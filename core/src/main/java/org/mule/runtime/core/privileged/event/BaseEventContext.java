@@ -131,8 +131,9 @@ public interface BaseEventContext extends EventContext {
   boolean isComplete();
 
   /**
-   * Register a {@link BiConsumer} callback that will be executed, in order of registration, when this {@link EventContext}
-   * terminates.
+   * Register a {@link BiConsumer} callback that will be executed when this {@link EventContext} terminates. The last callback
+   * registered will be invoked first with the first callback registered being invoked last, this allows latter components in a
+   * pipeline, that will have registered after earlier components, to receive a terminated notification before earlier components.
    * <p/>
    * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
    *
@@ -142,8 +143,9 @@ public interface BaseEventContext extends EventContext {
   void onTerminated(BiConsumer<CoreEvent, Throwable> consumer);
 
   /**
-   * Register a {@link BiConsumer} callback that will be executed, in order of registration, when this {@link EventContext}
-   * completes.
+   * Register a {@link BiConsumer} callback that will be executed when this {@link EventContext} completes. The last callback
+   * registered will be invoked first with the first callback registered being invoked last, this allows latter components in a
+   * pipeline, that will have registered after earlier components, to receive a complete notification before earlier components.
    * <p/>
    * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
    *
@@ -153,8 +155,10 @@ public interface BaseEventContext extends EventContext {
   void onComplete(BiConsumer<CoreEvent, Throwable> consumer);
 
   /**
-   * Register a {@link BiConsumer} callback that will be executed, in order of registration, when a response event or error is
-   * available for this {@link EventContext}.
+   * Register a {@link BiConsumer} callback that will be executed when an response event or error is available for this
+   * {@link EventContext}. The last callback registered will be invoked first with the first callback registered being invoked
+   * last, this allows latter components in a pipeline, that will have registered after earlier components, to receive a response
+   * notification before earlier components.
    * <p/>
    * Consumers should not plan on throwing exceptions. Any exceptions thrown will be caught and logged.
    *
