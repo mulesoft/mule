@@ -33,8 +33,8 @@ import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_OPTIONAL;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_REQUIRED;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.XML_NAMESPACE;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.componentHasAnImplicitConfiguration;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -74,11 +74,12 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.declaration.type.annotation.SubstitutionGroup;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
-import org.mule.runtime.extension.api.util.ExtensionModelUtils;
-import org.mule.runtime.extension.api.util.ParameterModelComparator;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
+import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.extension.api.util.ExtensionModelUtils;
+import org.mule.runtime.extension.api.util.ParameterModelComparator;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Documentation;
@@ -102,6 +103,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -449,14 +451,31 @@ public final class SchemaBuilder {
     choice.setMinOccurs(minOccurs);
     choice.setMaxOccurs(maxOccurs);
 
+    List<String> options = new LinkedList<>();
     QName refAbstract = new QName(typeDsl.getNamespace(), getAbstractElementName(typeDsl), typeDsl.getPrefix());
     TopLevelElement localAbstractElementRef = createRefElement(refAbstract, true);
     choice.getParticle().add(objectFactory.createElement(localAbstractElementRef));
+    options.add(refAbstract.toString());
 
     QName refGlobal = new QName(typeDsl.getNamespace(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, getAbstractElementName(typeDsl)),
                                 typeDsl.getPrefix());
     TopLevelElement topLevelElementRef = createRefElement(refGlobal, true);
     choice.getParticle().add(objectFactory.createElement(topLevelElementRef));
+    options.add(refGlobal.toString());
+
+    typesMapping.getSubTypes((ObjectType) type).stream()
+        .filter(subtype -> dslResolver.resolve(subtype).map(DslElementSyntax::supportsChildDeclaration).orElse(false))
+        .map(ExtensionMetadataTypeUtils::getSubstitutionGroup)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .forEach(customGroup -> {
+          QName qName = resolveSubstitutionGroup(customGroup);
+          if (!options.contains(qName.toString())) {
+            TopLevelElement customGroupRef = createRefElement(qName, true);
+            choice.getParticle().add(objectFactory.createElement(customGroupRef));
+            options.add(customGroupRef.toString());
+          }
+        });
 
     return choice;
   }

@@ -20,9 +20,9 @@ import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.UNBOUNDED;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getBaseType;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getLayoutModel;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import org.mule.metadata.api.model.MetadataType;
@@ -32,7 +32,6 @@ import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.extension.api.declaration.type.annotation.DslBaseType;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
@@ -46,6 +45,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ob
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -92,11 +92,11 @@ final class ObjectTypeSchemaDelegate {
       if (builder.isImported(type)) {
         addImportedTypeElement(paramSyntax, description, type, all, required);
       } else {
-        if (getSubstitutionGroup(type).isPresent()) {
+        if (paramSyntax.isWrapped()) {
+          declareRefToType(type, paramSyntax, description, all, required);
+        } else if (getSubstitutionGroup(type).isPresent()) {
           declareRefToType(type, paramSyntax, description, all, required);
           registerAbstractElement(type, paramSyntax);
-        } else if (paramSyntax.isWrapped()) {
-          declareRefToType(type, paramSyntax, description, all, required);
         } else {
           declareTypeInline(type, paramSyntax, description, all, required);
         }
@@ -177,10 +177,8 @@ final class ObjectTypeSchemaDelegate {
 
   private void addAbstractTypeRef(DslElementSyntax paramDsl, String description, MetadataType metadataType,
                                   List<TopLevelElement> all, boolean required) {
-    TopLevelElement objectElement = builder.createTopLevelElement(paramDsl.getElementName(),
-                                                                  !paramDsl.supportsAttributeDeclaration() && required ? ONE
-                                                                      : ZERO,
-                                                                  MAX_ONE);
+    BigInteger minOccurs = !paramDsl.supportsAttributeDeclaration() && required ? ONE : ZERO;
+    TopLevelElement objectElement = builder.createTopLevelElement(paramDsl.getElementName(), minOccurs, MAX_ONE);
     objectElement.setAnnotation(builder.createDocAnnotation(description));
     objectElement.setComplexType(createComplexTypeWithAbstractElementRef(metadataType));
 
@@ -190,9 +188,9 @@ final class ObjectTypeSchemaDelegate {
 
   private LocalComplexType createComplexTypeWithAbstractElementRef(MetadataType type) {
 
-    DslElementSyntax typeDsl = builder.getDslResolver().resolve(type).orElseThrow(
-                                                                                  () -> new IllegalArgumentException(format("No element ref can be created for the given type [%s]",
-                                                                                                                            getId(type))));
+    DslElementSyntax typeDsl = builder.getDslResolver().resolve(type)
+        .orElseThrow(() -> new IllegalArgumentException(format("No element ref can be created for the given type [%s]",
+                                                               getId(type))));
 
     LocalComplexType complexType = new LocalComplexType();
     if (typeDsl.isWrapped()) {
@@ -288,14 +286,19 @@ final class ObjectTypeSchemaDelegate {
    * @return the {@link QName} of the {@code base} type for which the new {@link ComplexType} declares an {@code extension}
    */
   private QName getComplexTypeBase(ObjectType type, ObjectType baseType) {
+    Optional<QName> customBaseQName = getBaseType(type)
+        .map(customDsl -> new QName(builder.getNamespaceUri(customDsl.getPrefix()), customDsl.getType(), customDsl.getPrefix()));
+
+    if (customBaseQName.isPresent()) {
+      //baseType was redefined by the user
+      return customBaseQName.get();
+    }
+
     Optional<DslElementSyntax> baseDsl = builder.getDslResolver().resolve(baseType);
     if (baseDsl.isPresent()) {
       return new QName(baseDsl.get().getNamespace(), getBaseTypeName(baseType), baseDsl.get().getPrefix());
     }
-    Optional<DslBaseType> base = getBaseType(type);
-    if (base.isPresent()) { //means that the baseType was defined by the user
-      return new QName(builder.getNamespaceUri(base.get().getPrefix()), base.get().getType(), base.get().getPrefix());
-    }
+
     return MULE_ABSTRACT_EXTENSION_TYPE;
   }
 

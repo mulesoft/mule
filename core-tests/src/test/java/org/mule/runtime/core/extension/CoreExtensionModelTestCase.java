@@ -131,7 +131,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getErrorModels(),
                hasItem(newError(TRANSFORMATION).withParent(errorMuleAny).build()));
 
-    assertThat(coreExtensionModel.getTypes(), hasSize(4));
+    assertThat(coreExtensionModel.getTypes(), hasSize(5));
   }
 
   @Test
