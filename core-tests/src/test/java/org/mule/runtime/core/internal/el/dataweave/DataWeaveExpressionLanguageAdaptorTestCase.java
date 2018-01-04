@@ -38,6 +38,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.AUTHENTICATION;
 import static org.mule.runtime.api.el.BindingContextUtils.DATA_TYPE;
 import static org.mule.runtime.api.el.BindingContextUtils.ERROR;
 import static org.mule.runtime.api.el.BindingContextUtils.FLOW;
+import static org.mule.runtime.api.el.BindingContextUtils.GROUP_CORRELATION_INFO;
 import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
@@ -64,6 +65,7 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.GroupCorrelation;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -315,6 +317,17 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     TypedValue result = expressionLanguage.evaluate(MESSAGE, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Message.class)));
     assertEquals(((Message) result.getValue()).getPayload(), event.getMessage().getPayload());
+  }
+
+  @Test
+  public void groupCorrelationBinding() throws Exception {
+    CoreEvent event = spy(testEvent());
+    when(event.getGroupCorrelation()).thenReturn(of(GroupCorrelation.of(43, 100)));
+    TypedValue result = expressionLanguage.evaluate(GROUP_CORRELATION_INFO, event, BindingContext.builder().build());
+    assertThat(((Optional)result.getValue()).get(), is(instanceOf(GroupCorrelation.class)));
+    assertThat(((GroupCorrelation)((Optional)result.getValue()).get()).getSequence(), is(43));
+    assertThat(((GroupCorrelation)((Optional)result.getValue()).get()).getGroupSize().getAsInt(), is(100));
+
   }
 
   @Test
