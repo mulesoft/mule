@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
@@ -34,8 +35,9 @@ public class ToolingApplicationDescriptorFactory extends ApplicationDescriptorFa
    */
   public ToolingApplicationDescriptorFactory(
                                              ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
-                                             DescriptorLoaderRepository descriptorLoaderRepository) {
-    super(artifactPluginDescriptorLoader, descriptorLoaderRepository);
+                                             DescriptorLoaderRepository descriptorLoaderRepository,
+                                             ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
+    super(artifactPluginDescriptorLoader, descriptorLoaderRepository, artifactDescriptorValidatorBuilder);
   }
 
   public ApplicationDescriptor createArtifact(File artifactFolder, Optional<Properties> deploymentProperties,

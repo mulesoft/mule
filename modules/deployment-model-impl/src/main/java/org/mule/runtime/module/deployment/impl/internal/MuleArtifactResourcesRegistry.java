@@ -191,7 +191,8 @@ public class MuleArtifactResourcesRegistry {
                                                        licenseValidator,
                                                        applicationPluginDescriptorsResolver);
     toolingApplicationDescriptorFactory =
-        new ToolingApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
+        new ToolingApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
+                                                artifactDescriptorValidatorBuilder);
   }
 
   private <T extends ArtifactDescriptor> ArtifactClassLoaderFactory<T> trackArtifactClassLoaderFactory(ArtifactClassLoaderFactory<T> artifactClassLoaderFactory) {
