@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.util.Objects.hash;
+import static java.util.Optional.empty;
 import static org.springframework.cglib.proxy.Enhancer.registerStaticCallbacks;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -67,13 +68,12 @@ public class ObjectFactoryClassRepository {
     try {
       if (instancePostCreationFunctionOptional.isPresent()) {
         return getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType, createdObjectType, isLazyInitFunction,
-                                            instancePostCreationFunctionOptional.get());
+                                            instancePostCreationFunctionOptional);
       } else {
         // instancePostCreationFunctionOptional is used within the intercepted method so we can't use a cache.
         return objectFactoryClassCache.get(componentBuildingDefinition,
                                            () -> getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType,
-                                                                              createdObjectType, isLazyInitFunction, object -> {
-                                                                              }));
+                                                                              createdObjectType, isLazyInitFunction, empty()));
       }
     } catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
@@ -84,7 +84,7 @@ public class ObjectFactoryClassRepository {
                                                             final Class objectFactoryType,
                                                             final Class createdObjectType,
                                                             final Supplier<Boolean> isLazyInitFunction,
-                                                            final Consumer<Object> instancePostCreationFunction) {
+                                                            final Optional<Consumer<Object>> instancePostCreationFunction) {
     /*
      * We need this to allow spring create the object using a FactoryBean but using the object factory setters and getters so we
      * create as FactoryBean a dynamic class that will have the same attributes and methods as the ObjectFactory that the user
@@ -101,7 +101,14 @@ public class ObjectFactoryClassRepository {
       enhancer.setClassLoader(new CompositeClassLoader(ObjectFactoryClassRepository.class.getClassLoader(),
                                                        objectFactoryType.getClassLoader()));
     }
-    enhancer.setUseCache(false);
+
+    // The use of the CGLIB cache is turned off when a post creation function is passed as argument in order to
+    // enrich the created proxy with properties. This is only to enable injecting properties in components
+    // from the compatibility module.
+    // Setting this to false will generate an excessive amount of different proxy classes loaded by the container CL
+    // that will end up in Metaspace OOM.
+    enhancer.setUseCache(!instancePostCreationFunction.isPresent());
+
     Class<ObjectFactory> factoryBeanClass = enhancer.createClass();
     registerStaticCallbacks(factoryBeanClass, new Callback[] {
         (MethodInterceptor) (obj, method, args, proxy) -> {
@@ -113,7 +120,7 @@ public class ObjectFactoryClassRepository {
           }
           if (method.getName().equals("getObject")) {
             Object createdInstance = proxy.invokeSuper(obj, args);
-            instancePostCreationFunction.accept(createdInstance);
+            instancePostCreationFunction.ifPresent(consumer -> consumer.accept(createdInstance));
             return createdInstance;
           }
           if (method.getName().equals("isPrototype")) {
