@@ -48,6 +48,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.ConfigOverride
 import org.mule.runtime.extension.api.declaration.type.annotation.ExclusiveOptionalsTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
@@ -383,6 +384,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       resolver = getMapResolver((Map<Object, Object>) value);
     } else if (getStackedTypesModelProperty(modelProperties).isPresent()) {
       resolver = getStackedTypesModelProperty(modelProperties).get().getValueResolverFactory().getStaticValueResolver(value);
+    } else if (value instanceof ConfigurationProvider) {
+      resolver = new ConfigurationValueResolver<>((ConfigurationProvider) value);
     } else {
       resolver = new StaticValueResolver<>(value);
       if (value instanceof ObjectStore) {

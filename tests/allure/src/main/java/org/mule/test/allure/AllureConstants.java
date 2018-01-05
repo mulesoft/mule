@@ -243,6 +243,7 @@ public interface AllureConstants {
 
       String PERSISTENT_DATA_REDEPLOYMENT = "Persistent data redeployment";
 
+      String OBJECT_STORE_AS_OPERATION_PARAMETER = "ObjectStore is used as an operation parameter";
     }
 
   }
