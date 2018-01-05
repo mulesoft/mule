@@ -169,7 +169,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   public void initializeComponent(Location location, boolean applyStartPhase) {
-    applyLifecycle(createComponents(empty(), of(location), getParentComponentModelInitializerAdapter(applyStartPhase)), applyStartPhase);
+    applyLifecycle(createComponents(empty(), of(location), getParentComponentModelInitializerAdapter(applyStartPhase)),
+                   applyStartPhase);
   }
 
   @Override
@@ -184,17 +185,22 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   @Override
-  public void initializeComponents(Predicate<org.mule.runtime.config.internal.model.ComponentModel> componentModelPredicate, boolean applyStartPhase) {
+  public void initializeComponents(Predicate<org.mule.runtime.config.internal.model.ComponentModel> componentModelPredicate,
+                                   boolean applyStartPhase) {
     applyLifecycle(createComponents(of(componentModelPredicate), empty(),
-                                    getParentComponentModelInitializerAdapter(applyStartPhase)), applyStartPhase);
+                                    getParentComponentModelInitializerAdapter(applyStartPhase)),
+                   applyStartPhase);
   }
 
   public Optional<ComponentModelInitializerAdapter> getParentComponentModelInitializerAdapter(
-      boolean applyStartPhase) {
-    return parentComponentModelInitializer.map(componentModelInitializer -> (LazyMuleArtifactContext.ComponentModelInitializerAdapter) componentModelPredicate1 -> componentModelInitializer.initializeComponents(componentModelPredicate1, applyStartPhase));
+                                                                                              boolean applyStartPhase) {
+    return parentComponentModelInitializer
+        .map(componentModelInitializer -> (LazyMuleArtifactContext.ComponentModelInitializerAdapter) componentModelPredicate1 -> componentModelInitializer
+            .initializeComponents(componentModelPredicate1, applyStartPhase));
   }
 
-  private List<String> createComponents(Optional<Predicate> predicateOptional, Optional<Location> locationOptional, Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
+  private List<String> createComponents(Optional<Predicate> predicateOptional, Optional<Location> locationOptional,
+                                        Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
     checkState(predicateOptional.isPresent() != locationOptional.isPresent(), "predicate or location has to be passed");
 
     List<String> alreadyCreatedApplicationComponents = new ArrayList<>();
@@ -291,7 +297,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private interface ComponentModelInitializerAdapter {
 
     void initializeComponents(Predicate<ComponentModel> componentModelPredicate);
-    
+
   }
 
 }
