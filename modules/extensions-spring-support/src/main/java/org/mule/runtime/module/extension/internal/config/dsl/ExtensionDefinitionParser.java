@@ -302,7 +302,7 @@ public abstract class ExtensionDefinitionParser {
           }
 
           if (!parsingContext.isRegistered(paramDsl.getElementName(), paramDsl.getPrefix())) {
-            if (!paramDsl.supportsTopLevelDeclaration()) {
+            if (!paramDsl.supportsTopLevelDeclaration() && paramDsl.supportsChildDeclaration()) {
               parsingContext.registerObjectType(paramDsl.getElementName(), paramDsl.getPrefix(), objectType);
             }
             parseObjectParameter(parameter, paramDsl);

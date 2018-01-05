@@ -27,6 +27,7 @@ import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.declaration.type.TypeUtils;
+import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
@@ -38,12 +39,12 @@ import java.util.Set;
 
 /**
  * Validates the types used as:
- *
+ * <p>
  * <ul>
  * <li>Parameter of an {@link OperationModel}</li>
  * <li>Parameter of an {@link SourceCallbackModel}</li>
  * </ul>
- *
+ * <p>
  * These types should comply that for each parameter they contain, there must exist a getter method for that parameter.
  * The vice versa is also required, that implies the fact that for each getter method, there should exist a field named with the
  * getter convention.
@@ -110,14 +111,23 @@ public final class InputParametersTypeModelValidator implements ExtensionModelVa
       public void visitObject(ObjectType objectType) {
         if (validatedTypes.add(parameterType)) {
           Collection<ObjectFieldType> parameters = objectType.getFields();
-          Set<String> fieldsWithGetters =
-              getFieldsWithGetters(parameterType).stream().map(TypeUtils::getAlias).map(String::toLowerCase).collect(toSet());
+          Set<String> fieldsWithGetters = getFieldsWithGetters(parameterType).stream()
+              .map(TypeUtils::getAlias)
+              .map(String::toLowerCase)
+              .collect(toSet());
           Set<String> parameterWithoutGetters =
-              parameters.stream().map(f -> f.getKey().getName().getLocalPart())
-                  .filter(fieldName -> !fieldsWithGetters.contains(fieldName.toLowerCase())).collect(toSet());
+              parameters.stream()
+                  .filter(p -> {
+                    StereotypeTypeAnnotation stereotypes = p.getAnnotation(StereotypeTypeAnnotation.class).orElse(null);
+                    return stereotypes != null ? stereotypes.getAllowedStereotypes().isEmpty() : true;
+                  })
+                  .map(f -> f.getKey().getName().getLocalPart())
+                  .filter(fieldName -> !fieldsWithGetters.contains(fieldName.toLowerCase()))
+                  .collect(toSet());
           if (!parameterWithoutGetters.isEmpty()) {
             problems.addError(new Problem(namedObject,
-                                          format("%s of type '%s' which contains fields (%s) that doesn't have the corresponding getter methods or getter methods that doesn't correspond to any of the present fields",
+                                          format(
+                                                 "%s of type '%s' which contains fields (%s) that doesn't have the corresponding getter methods or getter methods that doesn't correspond to any of the present fields",
                                                  message, parameterType.getName(),
                                                  parameterWithoutGetters.stream().collect(joining(", ")))));
           }

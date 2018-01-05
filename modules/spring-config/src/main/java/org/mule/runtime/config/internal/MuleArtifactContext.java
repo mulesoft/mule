@@ -249,7 +249,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           .flatMap(parentComponentModel -> ofNullable(parentComponentModel.getIdentifier()));
       if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier(), parentIdentifierOptional)) {
         componentNotSupportedByNewParsers.add(componentModel.getIdentifier());
-        throw new RuntimeException(format("Invalid config '%s'", componentModel.getIdentifier()));
+        throw new RuntimeException(format("Invalid config '%s'. No definition parser found for that config",
+                                          componentModel.getIdentifier()));
       }
     });
   }

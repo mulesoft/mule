@@ -27,7 +27,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class RequiredParameterValueResolverWrapperTestCase extends AbstractValueResolverWrapperTestCase<Object> {
+public class RequiredParameterValueResolverWrapperTestCase extends LifecycleAwareValueResolverWrapperTestCase<Object> {
 
   private static final String PARAMETER_NAME = "requiredParam";
   private static final String EXPRESSION = "#[someExpression]";
@@ -39,7 +39,7 @@ public class RequiredParameterValueResolverWrapperTestCase extends AbstractValue
   private ValueResolvingContext context;
 
   @Override
-  protected AbstractValueResolverWrapper<Object> createWrapper(ValueResolver<Object> delegate) {
+  protected LifecycleAwareValueResolverWrapper<Object> createWrapper(ValueResolver<Object> delegate) {
     return new RequiredParameterValueResolverWrapper<>(delegate, PARAMETER_NAME, EXPRESSION);
   }
 

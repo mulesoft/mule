@@ -19,9 +19,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public abstract class AbstractValueResolverWrapperTestCase<T> extends AbstractMuleContextTestCase {
+public abstract class LifecycleAwareValueResolverWrapperTestCase<T> extends AbstractMuleContextTestCase {
 
-  protected AbstractValueResolverWrapper<T> wrapper;
+  protected LifecycleAwareValueResolverWrapper<T> wrapper;
   protected ValueResolver<T> delegate;
 
   @Before
@@ -32,7 +32,7 @@ public abstract class AbstractValueResolverWrapperTestCase<T> extends AbstractMu
     muleContext.getInjector().inject(wrapper);
   }
 
-  protected abstract AbstractValueResolverWrapper<T> createWrapper(ValueResolver<T> delegate);
+  protected abstract LifecycleAwareValueResolverWrapper<T> createWrapper(ValueResolver<T> delegate);
 
   protected abstract ValueResolver<T> createDelegate();
 

@@ -2529,6 +2529,25 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="StoreMoneyType" substitutionGroup="heisenberg-empire" name="store-money"></xs:element>
+  <xs:complexType name="StoreMoneyType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="object-store">
+            <xs:complexType>
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstract-object-store"></xs:element>
+                <xs:element minOccurs="1" maxOccurs="1" ref="mule:global-abstract-object-store"></xs:element>
+              </xs:choice>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="objectStore"></xs:attribute>
+        <xs:attribute type="mule:expressionLong" use="required" name="money"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="ThrowErrorType" substitutionGroup="heisenberg-empire" name="throw-error"></xs:element>
   <xs:complexType name="ThrowErrorType">
     <xs:complexContent>

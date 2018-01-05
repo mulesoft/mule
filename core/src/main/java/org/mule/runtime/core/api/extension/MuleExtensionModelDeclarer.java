@@ -41,8 +41,8 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.VALIDATION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.CRITICAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
@@ -63,6 +63,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSO
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -121,9 +122,11 @@ class MuleExtensionModelDeclarer {
             .setPrefix(CORE_PREFIX)
             .setNamespace(CORE_NAMESPACE)
             .setSchemaVersion(MULE_VERSION)
-            .setXsdFileName("mule.xsd")
-            .setSchemaLocation("http://www.mulesoft.org/schema/mule/core/current/mule.xsd")
+            .setXsdFileName(CORE_PREFIX + ".xsd")
+            .setSchemaLocation(CORE_SCHEMA_LOCATION)
             .build());
+
+    declareExportedTypes(typeLoader, extensionDeclarer);
 
     // constructs
     declareFlow(extensionDeclarer, typeLoader);
@@ -157,6 +160,10 @@ class MuleExtensionModelDeclarer {
     declareErrors(extensionDeclarer);
 
     return extensionDeclarer;
+  }
+
+  private void declareExportedTypes(ClassTypeLoader typeLoader, ExtensionDeclarer extensionDeclarer) {
+    extensionDeclarer.getDeclaration().addType((ObjectType) typeLoader.load(ObjectStore.class));
   }
 
   private void declareScheduler(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {

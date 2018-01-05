@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import org.mule.runtime.api.exception.MuleException;
 
 /**
- * An {@link AbstractValueResolverWrapper} which throws an {@link IllegalArgumentException} if the resolved
+ * An {@link LifecycleAwareValueResolverWrapper} which throws an {@link IllegalArgumentException} if the resolved
  * value is {@code null}.
  * <p>
  * This wrapper is intended to be used on parameters which have been assigned to an expression, but we want to prevent
@@ -18,7 +18,7 @@ import org.mule.runtime.api.exception.MuleException;
  * @param <T> the generic type of the resolved values
  * @since 4.0
  */
-public class RequiredParameterValueResolverWrapper<T> extends AbstractValueResolverWrapper<T> {
+public class RequiredParameterValueResolverWrapper<T> extends LifecycleAwareValueResolverWrapper<T> {
 
   private final String errorMessage;
 

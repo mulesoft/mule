@@ -28,16 +28,16 @@ import org.slf4j.LoggerFactory;
  * @param <T> the generic type of the resolved values
  * @since 4.0
  */
-public abstract class AbstractValueResolverWrapper<T> implements ValueResolver<T>, Lifecycle {
+public class LifecycleAwareValueResolverWrapper<T> implements ValueResolver<T>, Lifecycle {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractValueResolverWrapper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareValueResolverWrapper.class);
 
   protected final ValueResolver<T> delegate;
 
   @Inject
   protected MuleContext muleContext;
 
-  public AbstractValueResolverWrapper(ValueResolver<T> delegate) {
+  public LifecycleAwareValueResolverWrapper(ValueResolver<T> delegate) {
     this.delegate = delegate;
   }
 

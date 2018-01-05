@@ -93,7 +93,6 @@
             <xsd:element ref="sub-flow" />
             <xsd:element ref="top-level-processor"/>
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
-            <xsd:element ref="abstract-object-store"/>
         </xsd:choice>
     </xsd:group>
 
@@ -3499,7 +3498,7 @@
     </xsd:complexType>
 
     <!-- Object Store -->
-    <xsd:element name="abstract-object-store" abstract="true" type="abstractObjectStoreType">
+    <xsd:element name="global-abstract-object-store" substitutionGroup="abstract-shared-extension" abstract="true" type="abstractObjectStoreType">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for global object store elements.Global means that any element can access it.
@@ -3508,7 +3507,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="abstract-private-object-store" abstract="true" type="abstractObjectStoreType">
+    <xsd:element name="abstract-object-store" abstract="true" type="abstractObjectStoreType">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for private object store elements.Private means that only the component that defines it will be able to access it.
@@ -3517,9 +3516,17 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="abstract-private-object-store" abstract="true" type="abstractObjectStoreType" substitutionGroup="abstract-object-store">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated, use "abstract-object-store
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:complexType name="abstractObjectStoreType">
         <xsd:complexContent>
-            <xsd:extension base="annotatedType"/>
+            <xsd:extension base="abstractExtensionType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
