@@ -105,7 +105,7 @@ public class ObjectFactoryClassRepository {
     // The use of the CGLIB cache is turned off when a post creation function is passed as argument in order to
     // enrich the created proxy with properties. This is only to enable injecting properties in components
     // from the compatibility module.
-    // Setting this to true will generate an excessive amount of different proxy classes loaded by the container CL
+    // Setting this to false will generate an excessive amount of different proxy classes loaded by the container CL
     // that will end up in Metaspace OOM.
     enhancer.setUseCache(!instancePostCreationFunction.isPresent());
 
