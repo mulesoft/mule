@@ -676,6 +676,7 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="1" maxOccurs="1" ref="metadata:abstract-animal"></xs:element>
+                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="1" maxOccurs="1" ref="metadata:global-abstract-animal"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -1361,6 +1362,7 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="1" maxOccurs="1" ref="metadata:abstract-shape"></xs:element>
+                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="1" maxOccurs="1" ref="metadata:global-abstract-shape"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -1368,6 +1370,7 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="1" maxOccurs="1" ref="metadata:abstract-rectangle"></xs:element>
+                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="1" maxOccurs="1" ref="metadata:global-abstract-rectangle"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -1375,6 +1378,7 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="1" maxOccurs="1" ref="metadata:abstract-animal"></xs:element>
+                <xs:element xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" minOccurs="1" maxOccurs="1" ref="metadata:global-abstract-animal"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
