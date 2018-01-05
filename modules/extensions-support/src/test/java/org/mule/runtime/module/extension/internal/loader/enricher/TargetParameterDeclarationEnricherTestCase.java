@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.metadata.api.model.StringType;
@@ -21,8 +20,11 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
 
@@ -45,10 +47,22 @@ public class TargetParameterDeclarationEnricherTestCase {
         getNamedObject(declaration.getOperations(), "transform");
     ParameterDeclaration parameterDeclaration = getNamedObject(operationDeclaration.getAllParameters(), "target");
 
-    assertThat(parameterDeclaration.getName(), Matchers.is("target"));
-    assertThat(parameterDeclaration.getExpressionSupport(), Matchers.is(NOT_SUPPORTED));
-    assertThat(parameterDeclaration.getType(), Matchers.instanceOf(StringType.class));
-    assertThat(parameterDeclaration.isRequired(), Matchers.is(false));
+    assertThat(parameterDeclaration.getName(), is("target"));
+    assertThat(parameterDeclaration.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(parameterDeclaration.getType(), instanceOf(StringType.class));
+    assertThat(parameterDeclaration.isRequired(), is(false));
+  }
+
+  @Test
+  public void verifyTargetValueParameterOnOperation() {
+    OperationDeclaration operationDeclaration =
+        getNamedObject(declaration.getOperations(), "transform");
+    ParameterDeclaration parameterDeclaration = getNamedObject(operationDeclaration.getAllParameters(), "targetValue");
+
+    assertThat(parameterDeclaration.getName(), is("targetValue"));
+    assertThat(parameterDeclaration.getExpressionSupport(), is(REQUIRED));
+    assertThat(parameterDeclaration.getType(), instanceOf(StringType.class));
+    assertThat(parameterDeclaration.isRequired(), is(false));
   }
 
 }
