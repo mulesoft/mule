@@ -40,6 +40,7 @@ import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -384,6 +385,9 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       resolver = getStackedTypesModelProperty(modelProperties).get().getValueResolverFactory().getStaticValueResolver(value);
     } else {
       resolver = new StaticValueResolver<>(value);
+      if (value instanceof ObjectStore) {
+        resolver = new LifecycleInitialiserValueResolverWrapper<>(resolver, muleContext);
+      }
     }
     return resolver;
   }

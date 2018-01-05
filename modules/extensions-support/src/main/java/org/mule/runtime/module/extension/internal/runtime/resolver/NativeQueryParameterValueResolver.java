@@ -20,7 +20,7 @@ import org.mule.runtime.extension.api.dsql.QueryTranslator;
  *
  * @since 4.0
  */
-public final class NativeQueryParameterValueResolver extends AbstractValueResolverWrapper<String> {
+public final class NativeQueryParameterValueResolver extends LifecycleAwareValueResolverWrapper<String> {
 
   private static final DsqlParser dsqlParser = DsqlParser.getInstance();
   private final static String ERROR = "Error creating QueryTranslator [%s], query translators must have a default constructor";
