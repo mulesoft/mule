@@ -65,6 +65,7 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -121,6 +122,7 @@
               <xs:complexType>
                 <xs:choice minOccurs="1" maxOccurs="1">
                   <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-vegan-cook-book"></xs:element>
+                  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-vegan-cook-book"></xs:element>
                 </xs:choice>
               </xs:complexType>
             </xs:element>
@@ -237,6 +239,7 @@
                       <xs:complexType>
                         <xs:choice minOccurs="1" maxOccurs="1">
                           <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                          <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
                         </xs:choice>
                       </xs:complexType>
                     </xs:element>
@@ -829,6 +832,7 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -958,6 +962,7 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
