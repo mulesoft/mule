@@ -6,6 +6,8 @@
  */
 package org.mule.transport.file;
 
+import static java.lang.Boolean.getBoolean;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.transport.file.FileConnector.PROPERTY_FILE_AGE;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
@@ -60,10 +62,13 @@ import org.apache.commons.collections.comparators.ReverseComparator;
 
 public class FileMessageReceiver extends AbstractPollingMessageReceiver
 {
+
     public static final String COMPARATOR_CLASS_NAME_PROPERTY = "comparator";
     public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
     public static final String MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE = "mule.transport.file.singlepollinstance";
+    public static final String NOT_PROCESS_EMPTY_FILES_PROPERTY = SYSTEM_PROPERTY_PREFIX + "transport.file.notProcessEmptyFiles";
 
+    private final Boolean NOT_PROCESS_EMPTY_FILES = getBoolean(NOT_PROCESS_EMPTY_FILES_PROPERTY);
     private FileConnector fileConnector = null;
     private String readDir = null;
     private String moveDir = null;
@@ -214,7 +219,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                         try
                         {
                             //Skipping empty files
-                            if (file.length() == 0)
+                            if (NOT_PROCESS_EMPTY_FILES && file.length() == 0)
                             {
                                 if (logger.isDebugEnabled())
                                 {
@@ -690,7 +695,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
      *
      * @return an array of files to be processed.
      * @throws org.mule.api.MuleException which will wrap any other exceptions or
-     *             errors.
+     *                                      errors.
      */
     List<File> listFiles() throws MuleException
     {
@@ -793,4 +798,5 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         return null;
     }
+
 }

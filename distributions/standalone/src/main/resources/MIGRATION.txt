@@ -4,6 +4,9 @@ MIGRATION GUIDE
 The following is a list of changes you have to execute to migrate from Mule Runtime Community edition version 3.4.x to version 3.7.x
 Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for more details.
 
+Migration changes from 3.9.x to 3.10.x
+MULE-14381: By default, the File Connector processes empty files. For tuning off this behavior use the transport.file.notProcessEmptyFiles=true system property.
+
 Migration changes from 3.8.x to 3.9.x
 MULE-12245: Old Xalan and Xerces implementations were removed in favor of the newer versions included in Java. Only minor incompatibilities could result such as ordering changes of some XML attributes.
 MULE-12017: log4j was updated from 2.5 to 2.8.2 and slf4j from 1.7.7 to 1.7.24. There is a minor incompatibility with code using logger.error(null, "message", e), in which case the first null argument should be omitted.
