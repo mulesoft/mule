@@ -63,7 +63,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
  * @since 4.0
  */
 public class LazyMuleArtifactContext extends MuleArtifactContext
-    implements LazyComponentInitializerAdapter, LazyComponentCreator, ComponentModelInitializer {
+    implements LazyComponentInitializerAdapter, ComponentModelInitializer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LazyMuleArtifactContext.class);
 
@@ -169,7 +169,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   public void initializeComponent(Location location, boolean applyStartPhase) {
-    applyLifecycle(createComponents(empty(), of(location)), applyStartPhase);
+    applyLifecycle(createComponents(empty(), of(location), getParentComponentModelInitializerAdapter(applyStartPhase)),
+                   applyStartPhase);
   }
 
   @Override
@@ -180,20 +181,26 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         return filter.accept(componentModel.getComponentLocation());
       }
       return false;
-    }), empty()), applyStartPhase);
+    }), empty(), getParentComponentModelInitializerAdapter(applyStartPhase)), applyStartPhase);
   }
 
   @Override
-  public void createComponent(Location location) {
-    createComponents(empty(), of(location));
+  public void initializeComponents(Predicate<org.mule.runtime.config.internal.model.ComponentModel> componentModelPredicate,
+                                   boolean applyStartPhase) {
+    applyLifecycle(createComponents(of(componentModelPredicate), empty(),
+                                    getParentComponentModelInitializerAdapter(applyStartPhase)),
+                   applyStartPhase);
   }
 
-  @Override
-  public void initialize(Predicate<org.mule.runtime.config.internal.model.ComponentModel> componentModelPredicate) {
-    applyLifecycle(createComponents(of(componentModelPredicate), empty()), true);
+  public Optional<ComponentModelInitializerAdapter> getParentComponentModelInitializerAdapter(
+                                                                                              boolean applyStartPhase) {
+    return parentComponentModelInitializer
+        .map(componentModelInitializer -> (LazyMuleArtifactContext.ComponentModelInitializerAdapter) componentModelPredicate1 -> componentModelInitializer
+            .initializeComponents(componentModelPredicate1, applyStartPhase));
   }
 
-  private List<String> createComponents(Optional<Predicate> predicateOptional, Optional<Location> locationOptional) {
+  private List<String> createComponents(Optional<Predicate> predicateOptional, Optional<Location> locationOptional,
+                                        Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
     checkState(predicateOptional.isPresent() != locationOptional.isPresent(), "predicate or location has to be passed");
 
     List<String> alreadyCreatedApplicationComponents = new ArrayList<>();
@@ -220,8 +227,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       unregisterBeans(alreadyCreatedApplicationComponents);
       objectProviders.clear();
 
-      if (parentComponentModelInitializer.isPresent()) {
-        parentComponentModelInitializer.get().initialize(componentModel -> {
+      if (parentComponentModelInitializerAdapter.isPresent()) {
+        parentComponentModelInitializerAdapter.get().initializeComponents(componentModel -> {
           if (componentModel.getNameAttribute() != null) {
             return dependencyResolver.getMissingGlobalElementNames().contains(componentModel.getNameAttribute());
           }
@@ -281,6 +288,16 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     locations.forEach(location -> {
       componentLocator.removeComponent(builderFromStringRepresentation(location).build());
     });
+  }
+
+  /**
+   * Adapter for {@link ComponentModelInitializer} that hides the lifecycle phase from component model creation logic.
+   */
+  @FunctionalInterface
+  private interface ComponentModelInitializerAdapter {
+
+    void initializeComponents(Predicate<ComponentModel> componentModelPredicate);
+
   }
 
 }
