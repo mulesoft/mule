@@ -21,7 +21,8 @@ public interface ComponentModelInitializer {
    * Initializes the {@link ComponentModel componentModels} that match for the predicate.
    *
    * @param componentModelPredicate a {@link Predicate} for {@link ComponentModel} to be initialized.
+   * @param applyStartPhase boolean indicating if the Start phase should be applied to the created components
    */
-  void initialize(Predicate<ComponentModel> componentModelPredicate);
+  void initializeComponents(Predicate<ComponentModel> componentModelPredicate, boolean applyStartPhase);
 
 }
