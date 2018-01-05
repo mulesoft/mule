@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
@@ -31,6 +32,7 @@ import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR_DEFINITION;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR;
@@ -50,6 +52,7 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.HasExternalLibraries;
+import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -57,6 +60,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Export;
@@ -352,6 +356,27 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     expectedException.expect(IllegalModelDefinitionException.class);
 
     createExtension(IllegalBackPressureHeisenbergExtension.class);
+  }
+
+  @Test
+  public void objectStoreParameters() {
+    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
+    OperationModel operationModel = extensionModel.getOperationModel("storeMoney").get();
+    ParameterModel parameter =
+        operationModel.getAllParameterModels().stream().filter(p -> "objectStore".equals(p.getName())).findFirst().get();
+
+    StereotypeModel stereotype = parameter.getAllowedStereotypes().stream()
+        .filter(s -> s.getType().equals(OBJECT_STORE.getType()))
+        .findFirst()
+        .get();
+
+    assertThat(stereotype.getNamespace(), equalTo(OBJECT_STORE.getNamespace()));
+
+    Optional<ImportedTypeModel> typeImport = extensionModel.getImportedTypes().stream()
+        .filter(i -> getTypeId(i.getImportedType()).map(id -> ObjectStore.class.getName().equals(id)).orElse(false))
+        .findFirst();
+
+    assertThat(typeImport.isPresent(), is(true));
   }
 
   private void assertStreamingStrategy(ParameterModel streamingParameter) {

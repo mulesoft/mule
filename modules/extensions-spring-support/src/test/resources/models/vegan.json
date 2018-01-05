@@ -1980,6 +1980,7 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "extensibleType": {},
                             "classInformation": {
                               "classname": "org.mule.runtime.api.store.ObjectStore",
                               "hasDefaultConstructor": false,
@@ -1991,9 +1992,6 @@
                               "parent": "",
                               "genericTypes": [],
                               "isMap": false
-                            },
-                            "typeAlias": {
-                              "value": "ObjectStore"
                             }
                           },
                           "fields": []
@@ -2423,6 +2421,7 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "extensibleType": {},
                             "classInformation": {
                               "classname": "org.mule.runtime.api.store.ObjectStore",
                               "hasDefaultConstructor": false,
@@ -2434,9 +2433,6 @@
                               "parent": "",
                               "genericTypes": [],
                               "isMap": false
-                            },
-                            "typeAlias": {
-                              "value": "ObjectStore"
                             }
                           },
                           "fields": []
@@ -4890,6 +4886,7 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "extensibleType": {},
                             "classInformation": {
                               "classname": "org.mule.runtime.api.store.ObjectStore",
                               "hasDefaultConstructor": false,
@@ -4901,9 +4898,6 @@
                               "parent": "",
                               "genericTypes": [],
                               "isMap": false
-                            },
-                            "typeAlias": {
-                              "value": "ObjectStore"
                             }
                           },
                           "fields": []
@@ -6506,6 +6500,7 @@
                           "type": "Object",
                           "annotations": {
                             "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "extensibleType": {},
                             "classInformation": {
                               "classname": "org.mule.runtime.api.store.ObjectStore",
                               "hasDefaultConstructor": false,
@@ -6517,9 +6512,6 @@
                               "parent": "",
                               "genericTypes": [],
                               "isMap": false
-                            },
-                            "typeAlias": {
-                              "value": "ObjectStore"
                             }
                           },
                           "fields": []

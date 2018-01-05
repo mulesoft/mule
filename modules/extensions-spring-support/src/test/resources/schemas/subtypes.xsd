@@ -130,7 +130,6 @@
               <xs:complexType>
                 <xs:choice minOccurs="1" maxOccurs="1">
                   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
                 </xs:choice>
               </xs:complexType>
             </xs:element>
@@ -138,7 +137,6 @@
               <xs:complexType>
                 <xs:choice minOccurs="1" maxOccurs="1">
                   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
                 </xs:choice>
               </xs:complexType>
             </xs:element>
@@ -167,7 +165,6 @@
               <xs:complexType>
                 <xs:choice minOccurs="0" maxOccurs="unbounded">
                   <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                 </xs:choice>
               </xs:complexType>
             </xs:element>
@@ -175,7 +172,6 @@
               <xs:complexType>
                 <xs:choice minOccurs="1" maxOccurs="1">
                   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
                 </xs:choice>
               </xs:complexType>
             </xs:element>
@@ -183,7 +179,6 @@
               <xs:complexType>
                 <xs:choice minOccurs="1" maxOccurs="1">
                   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-extensible-pojo"></xs:element>
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-extensible-pojo"></xs:element>
                 </xs:choice>
               </xs:complexType>
             </xs:element>
@@ -192,7 +187,6 @@
                 <xs:sequence>
                   <xs:choice minOccurs="0" maxOccurs="unbounded">
                     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-pojo-for-list"></xs:element>
-                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-pojo-for-list"></xs:element>
                   </xs:choice>
                 </xs:sequence>
               </xs:complexType>
@@ -202,7 +196,6 @@
                 <xs:sequence>
                   <xs:choice minOccurs="0" maxOccurs="unbounded">
                     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-pojo-for-list"></xs:element>
-                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-pojo-for-list"></xs:element>
                   </xs:choice>
                 </xs:sequence>
               </xs:complexType>
@@ -212,7 +205,6 @@
                 <xs:sequence>
                   <xs:choice minOccurs="0" maxOccurs="unbounded">
                     <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                   </xs:choice>
                 </xs:sequence>
               </xs:complexType>
@@ -224,7 +216,6 @@
                     <xs:complexType>
                       <xs:choice minOccurs="0" maxOccurs="unbounded">
                         <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                        <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
                       </xs:choice>
                       <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
                       <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
@@ -314,7 +305,6 @@
               <xs:complexType>
                 <xs:choice minOccurs="1" maxOccurs="1">
                   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
                 </xs:choice>
               </xs:complexType>
             </xs:element>
@@ -322,7 +312,6 @@
               <xs:complexType>
                 <xs:choice minOccurs="1" maxOccurs="1">
                   <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
                 </xs:choice>
               </xs:complexType>
             </xs:element>
@@ -331,7 +320,6 @@
                 <xs:sequence>
                   <xs:choice minOccurs="0" maxOccurs="unbounded">
                     <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
                   </xs:choice>
                 </xs:sequence>
               </xs:complexType>
@@ -402,7 +390,6 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -425,7 +412,6 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -472,7 +458,6 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -483,7 +468,6 @@
                   <xs:complexType>
                     <xs:choice minOccurs="0" maxOccurs="unbounded">
                       <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                      <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
                     </xs:choice>
                     <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
                     <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
@@ -517,7 +501,6 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -545,7 +528,6 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -553,7 +535,6 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -568,7 +549,6 @@
             <xs:complexType>
               <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-vegan-cook-book"></xs:element>
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-vegan-cook-book"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -576,7 +556,6 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
@@ -584,7 +563,6 @@
             <xs:complexType>
               <xs:choice minOccurs="1" maxOccurs="1">
                 <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>

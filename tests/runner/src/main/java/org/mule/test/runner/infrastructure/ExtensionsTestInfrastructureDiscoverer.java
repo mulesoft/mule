@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.jar.Manifest;
 
 /**
@@ -103,7 +104,7 @@ public class ExtensionsTestInfrastructureDiscoverer {
     String xsdFileName = model.getXmlDslModel().getXsdFileName();
     try {
       ExtensionSchemaGenerator schemaGenerator = getSchemaGenerator();
-      HashSet<ExtensionModel> models = new HashSet<>(extensionManager.getExtensions());
+      Set<ExtensionModel> models = new HashSet<>(extensionManager.getExtensions());
       models.add(MuleExtensionModelProvider.getExtensionModel());
       String schema = schemaGenerator.generate(model, DslResolvingContext.getDefault(models));
       File xsd = FileUtils.newFile(generatedResourcesDirectory, xsdFileName);

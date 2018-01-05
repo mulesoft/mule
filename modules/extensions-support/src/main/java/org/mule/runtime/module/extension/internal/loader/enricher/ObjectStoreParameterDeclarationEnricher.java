@@ -22,9 +22,17 @@ import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarat
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
 import java.util.List;
 
+/**
+ * Enriches all parameters of type {@link ObjectStore} adding the {@link MuleStereotypes#OBJECT_STORE} stereotype
+ * if not already present. If at least one parameter of that type is found, it also makes sure that {@link ObjectStore} is
+ * registered as an imported type
+ *
+ * @since 4.1
+ */
 public class ObjectStoreParameterDeclarationEnricher implements DeclarationEnricher {
 
   @Override

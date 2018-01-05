@@ -147,7 +147,7 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
    * @return whether or not the "expected" test files should be updated when comparison fails
    */
   private boolean shouldUpdateExpectedFilesOnError() {
-    return true;
+    return false;
   }
 
   @Before

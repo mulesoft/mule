@@ -79,7 +79,6 @@
               <xs:complexType>
                 <xs:choice minOccurs="1" maxOccurs="1">
                   <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" minOccurs="1" maxOccurs="1" ref="ram:abstract-message-dispatcher-provider"></xs:element>
-                  <xs:element xmlns:ram="http://www.mulesoft.org/schema/mule/ram" minOccurs="1" maxOccurs="1" ref="ram:global-abstract-message-dispatcher-provider"></xs:element>
                 </xs:choice>
               </xs:complexType>
             </xs:element>

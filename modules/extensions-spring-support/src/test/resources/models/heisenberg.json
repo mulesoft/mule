@@ -57,7 +57,29 @@
       "optional": false
     }
   ],
-  "importedTypes": [],
+  "importedTypes": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.runtime.api.store.ObjectStore",
+        "extensibleType": {},
+        "classInformation": {
+          "classname": "org.mule.runtime.api.store.ObjectStore",
+          "hasDefaultConstructor": false,
+          "isInterface": true,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        }
+      },
+      "fields": []
+    }
+  ],
   "configurations": [
     {
       "stereotype": {
@@ -9088,26 +9110,7 @@
                           "name": "objectStore"
                         },
                         "model": {
-                          "type": "Object",
-                          "annotations": {
-                            "typeId": "org.mule.runtime.api.store.ObjectStore",
-                            "classInformation": {
-                              "classname": "org.mule.runtime.api.store.ObjectStore",
-                              "hasDefaultConstructor": false,
-                              "isInterface": true,
-                              "isInstantiable": false,
-                              "isAbstract": true,
-                              "isFinal": false,
-                              "implementedInterfaces": [],
-                              "parent": "",
-                              "genericTypes": [],
-                              "isMap": false
-                            },
-                            "typeAlias": {
-                              "value": "ObjectStore"
-                            }
-                          },
-                          "fields": []
+                          "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                         },
                         "annotations": {
                           "stereotype": {
@@ -11099,26 +11102,7 @@
                           "name": "objectStore"
                         },
                         "model": {
-                          "type": "Object",
-                          "annotations": {
-                            "typeId": "org.mule.runtime.api.store.ObjectStore",
-                            "classInformation": {
-                              "classname": "org.mule.runtime.api.store.ObjectStore",
-                              "hasDefaultConstructor": false,
-                              "isInterface": true,
-                              "isInstantiable": false,
-                              "isAbstract": true,
-                              "isFinal": false,
-                              "implementedInterfaces": [],
-                              "parent": "",
-                              "genericTypes": [],
-                              "isMap": false
-                            },
-                            "typeAlias": {
-                              "value": "ObjectStore"
-                            }
-                          },
-                          "fields": []
+                          "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                         },
                         "annotations": {
                           "stereotype": {
@@ -13103,26 +13087,7 @@
                           "name": "objectStore"
                         },
                         "model": {
-                          "type": "Object",
-                          "annotations": {
-                            "typeId": "org.mule.runtime.api.store.ObjectStore",
-                            "classInformation": {
-                              "classname": "org.mule.runtime.api.store.ObjectStore",
-                              "hasDefaultConstructor": false,
-                              "isInterface": true,
-                              "isInstantiable": false,
-                              "isAbstract": true,
-                              "isFinal": false,
-                              "implementedInterfaces": [],
-                              "parent": "",
-                              "genericTypes": [],
-                              "isMap": false
-                            },
-                            "typeAlias": {
-                              "value": "ObjectStore"
-                            }
-                          },
-                          "fields": []
+                          "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                         },
                         "annotations": {
                           "stereotype": {
@@ -21645,6 +21610,137 @@
           "namespace": "MULE"
         }
       },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.runtime.api.store.ObjectStore"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [
+                {
+                  "type": "OBJECT_STORE",
+                  "namespace": "OS"
+                }
+              ],
+              "name": "objectStore",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Long",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
+                  "int": {}
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "allowedStereotypeModels": [],
+              "name": "money",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "storeMoney",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "HEISENBERG-EMPIRE",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [],
       "name": "throwError",
       "description": "",
@@ -24203,26 +24299,7 @@
                       "name": "objectStore"
                     },
                     "model": {
-                      "type": "Object",
-                      "annotations": {
-                        "typeId": "org.mule.runtime.api.store.ObjectStore",
-                        "classInformation": {
-                          "classname": "org.mule.runtime.api.store.ObjectStore",
-                          "hasDefaultConstructor": false,
-                          "isInterface": true,
-                          "isInstantiable": false,
-                          "isAbstract": true,
-                          "isFinal": false,
-                          "implementedInterfaces": [],
-                          "parent": "",
-                          "genericTypes": [],
-                          "isMap": false
-                        },
-                        "typeAlias": {
-                          "value": "ObjectStore"
-                        }
-                      },
-                      "fields": []
+                      "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
                       "stereotype": {
