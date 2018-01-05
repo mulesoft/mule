@@ -119,9 +119,7 @@ public final class InputParametersTypeModelValidator implements ExtensionModelVa
               parameters.stream()
                   .filter(p -> {
                     StereotypeTypeAnnotation stereotypes = p.getAnnotation(StereotypeTypeAnnotation.class).orElse(null);
-                    return stereotypes != null
-                        ? stereotypes.getAllowedStereotypes().stream().noneMatch(s -> s.getType().equals("CONFIG"))
-                        : true;
+                    return stereotypes != null ? stereotypes.getAllowedStereotypes().isEmpty() : true;
                   })
                   .map(f -> f.getKey().getName().getLocalPart())
                   .filter(fieldName -> !fieldsWithGetters.contains(fieldName.toLowerCase()))

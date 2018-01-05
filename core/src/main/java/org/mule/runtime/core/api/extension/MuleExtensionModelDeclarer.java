@@ -126,7 +126,7 @@ class MuleExtensionModelDeclarer {
             .setSchemaLocation(CORE_SCHEMA_LOCATION)
             .build());
 
-    declareExporetedTypes(typeLoader, extensionDeclarer);
+    declareExportedTypes(typeLoader, extensionDeclarer);
 
     // constructs
     declareFlow(extensionDeclarer, typeLoader);
@@ -162,7 +162,7 @@ class MuleExtensionModelDeclarer {
     return extensionDeclarer;
   }
 
-  private void declareExporetedTypes(ClassTypeLoader typeLoader, ExtensionDeclarer extensionDeclarer) {
+  private void declareExportedTypes(ClassTypeLoader typeLoader, ExtensionDeclarer extensionDeclarer) {
     extensionDeclarer.getDeclaration().addType((ObjectType) typeLoader.load(ObjectStore.class));
   }
 
