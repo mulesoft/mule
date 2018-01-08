@@ -22,7 +22,6 @@ public class CorrelationInfoArgumentResolver implements ArgumentResolver<Correla
   @Override
   public CorrelationInfo resolve(ExecutionContext executionContext) {
     CoreEvent event = ((ExecutionContextAdapter) executionContext).getEvent();
-    return new ImmutableCorrelationInfo(event.getContext().getId(), true, event.getCorrelationId(),
-                                        event.getGroupCorrelation().orElse(null));
+    return new ImmutableCorrelationInfo(event.getContext().getId(), true, event.getCorrelationId());
   }
 }

@@ -12,7 +12,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.api.message.GroupCorrelation;
+import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.MuleSession;
