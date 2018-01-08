@@ -16,7 +16,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.internal.interception.ProcessorInterceptorManager.PROCESSOR_INTERCEPTOR_MANAGER_REGISTRY_KEY;
-
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
@@ -36,17 +37,17 @@ import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.apache.commons.lang3.NotImplementedException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.apache.commons.lang3.NotImplementedException;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 @SmallTest
 public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
@@ -131,7 +132,14 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
   private class RecordingFlow extends DefaultFlowBuilder.DefaultFlow {
 
     public RecordingFlow(String name, MuleContext muleContext) {
-      super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED, DEFAULT_MAX_CONCURRENCY, null);
+      super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED, DEFAULT_MAX_CONCURRENCY, null,
+            new ComponentInitialStateManager() {
+
+              @Override
+              public boolean mustStartMessageSource(Component component) {
+                return true;
+              }
+            });
     }
 
     @Override

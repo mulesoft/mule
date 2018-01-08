@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.api.construct;
 
+import static org.mule.runtime.api.deployment.management.ComponentInitialStateManager.SERVICE_ID;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
@@ -16,6 +17,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 
 import java.util.List;
 
@@ -47,7 +49,7 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
    * @param muleContext context where the flow will be registered. Non null.
    */
   static Builder builder(String name, MuleContext muleContext) {
-    return new DefaultFlowBuilder(name, muleContext);
+    return new DefaultFlowBuilder(name, muleContext, ((DefaultMuleContext) muleContext).getRegistry().lookupObject(SERVICE_ID));
   }
 
   interface Builder {
@@ -110,9 +112,9 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
     Builder initialState(String initialState);
 
     /**
-     * Configures the maximum permitted concurrency of the {@link Flow}. This value determines the maximum level of
-     * parallelism that the Flow can use to optimize for performance when processing messages. Note that this does not impact in
-     * any way the number of threads that a {@link MessageSource} may use to invoke a {@link Flow} and so if a direct or blocking
+     * Configures the maximum permitted concurrency of the {@link Flow}. This value determines the maximum level of parallelism
+     * that the Flow can use to optimize for performance when processing messages. Note that this does not impact in any way the
+     * number of threads that a {@link MessageSource} may use to invoke a {@link Flow} and so if a direct or blocking
      * {@link ProcessingStrategy} is used where processing occurs in source threads it is actually the source that defines maximum
      * concurrency.
      * 

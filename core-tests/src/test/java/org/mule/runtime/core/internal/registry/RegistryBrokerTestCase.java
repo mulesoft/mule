@@ -14,6 +14,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
@@ -72,7 +74,14 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase {
   class LifecycleTrackerFlow extends DefaultFlowBuilder.DefaultFlow {
 
     public LifecycleTrackerFlow(String name, MuleContext muleContext) {
-      super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED, DEFAULT_MAX_CONCURRENCY, null);
+      super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED, DEFAULT_MAX_CONCURRENCY, null,
+            new ComponentInitialStateManager() {
+
+              @Override
+              public boolean mustStartMessageSource(Component component) {
+                return true;
+              }
+            });
     }
 
     @Override
