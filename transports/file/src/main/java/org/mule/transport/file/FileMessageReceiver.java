@@ -68,7 +68,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     public static final String MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE = "mule.transport.file.singlepollinstance";
     public static final String IGNORE_EMPTY_FILES_PROPERTY = SYSTEM_PROPERTY_PREFIX + "transport.file.ignoreEmptyFiles";
 
-    private final Boolean IGNORE_EMPTY_FILES = getBoolean(IGNORE_EMPTY_FILES_PROPERTY);
+    private final Boolean ignoreEmptyFiles = getBoolean(IGNORE_EMPTY_FILES_PROPERTY);
     private FileConnector fileConnector = null;
     private String readDir = null;
     private String moveDir = null;
@@ -219,7 +219,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                         try
                         {
                             //Skipping empty files
-                            if (IGNORE_EMPTY_FILES && file.length() == 0)
+                            if (ignoreEmptyFiles && file.length() == 0)
                             {
                                 if (logger.isDebugEnabled())
                                 {
