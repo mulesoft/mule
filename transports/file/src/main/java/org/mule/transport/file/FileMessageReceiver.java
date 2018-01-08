@@ -66,9 +66,9 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     public static final String COMPARATOR_CLASS_NAME_PROPERTY = "comparator";
     public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
     public static final String MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE = "mule.transport.file.singlepollinstance";
-    public static final String NOT_PROCESS_EMPTY_FILES_PROPERTY = SYSTEM_PROPERTY_PREFIX + "transport.file.notProcessEmptyFiles";
+    public static final String IGNORE_EMPTY_FILES_PROPERTY = SYSTEM_PROPERTY_PREFIX + "transport.file.ignoreEmptyFiles";
 
-    private final Boolean NOT_PROCESS_EMPTY_FILES = getBoolean(NOT_PROCESS_EMPTY_FILES_PROPERTY);
+    private final Boolean IGNORE_EMPTY_FILES = getBoolean(IGNORE_EMPTY_FILES_PROPERTY);
     private FileConnector fileConnector = null;
     private String readDir = null;
     private String moveDir = null;
@@ -219,7 +219,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                         try
                         {
                             //Skipping empty files
-                            if (NOT_PROCESS_EMPTY_FILES && file.length() == 0)
+                            if (IGNORE_EMPTY_FILES && file.length() == 0)
                             {
                                 if (logger.isDebugEnabled())
                                 {

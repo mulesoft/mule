@@ -27,7 +27,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.transport.file.FileMessageReceiver.NOT_PROCESS_EMPTY_FILES_PROPERTY;
+import static org.mule.transport.file.FileMessageReceiver.IGNORE_EMPTY_FILES_PROPERTY;
 
 import java.util.Collection;
 
@@ -50,7 +50,7 @@ public class ProcessEmptyFileTestCase extends AbstractMessageReceiverTestCase
 
     public ProcessEmptyFileTestCase(String shouldProcessEmptyFiles)
     {
-        this.processFileSystemProperty = new SystemProperty(NOT_PROCESS_EMPTY_FILES_PROPERTY, shouldProcessEmptyFiles);
+        this.processFileSystemProperty = new SystemProperty(IGNORE_EMPTY_FILES_PROPERTY, shouldProcessEmptyFiles);
         this.numberOfInvocationsOfNextProcessor = "false".equals(shouldProcessEmptyFiles) ? 1 : 0;
     }
 
