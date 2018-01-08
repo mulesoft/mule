@@ -54,6 +54,6 @@ final class SourcesDescriptionDocumenter extends AbstractDescriptionDocumenter<W
   }
 
   private List<TypeElement> getSourceClasses(ProcessingEnvironment processingEnv, Element element) {
-    return processor.getArrayClassAnnotationValue(element, Sources.class, "value", processingEnv);
+    return processor.getArrayClassAnnotationValue(element, Sources.class, VALUE_PROPERTY, processingEnv);
   }
 }

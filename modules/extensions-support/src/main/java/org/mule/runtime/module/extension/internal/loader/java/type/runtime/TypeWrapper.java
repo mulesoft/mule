@@ -24,7 +24,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.PropertyElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
-import org.mule.runtime.module.extension.api.loader.java.type.DefaultPropertyElement;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import javax.lang.model.element.TypeElement;
@@ -124,7 +123,12 @@ public class TypeWrapper implements Type {
       } else {
         accessibility = WRITE_ONLY;
       }
-      return new DefaultPropertyElement(this, p.getName(), accessibility);
+      return PropertyElement
+          .builder()
+          .type(new TypeWrapper(p.getPropertyType(), typeLoader))
+          .name(p.getName())
+          .accessibility(accessibility)
+          .build();
     }).collect(toList());
   }
 

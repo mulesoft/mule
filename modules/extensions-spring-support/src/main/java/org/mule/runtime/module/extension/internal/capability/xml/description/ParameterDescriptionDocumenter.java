@@ -69,7 +69,7 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
   }
 
   String getAlias(Element element) {
-    return processor.<String>getAnnotationValue(processingEnv, element, Alias.class, "value")
+    return processor.<String>getAnnotationValue(processingEnv, element, Alias.class, VALUE_PROPERTY)
         .orElse(element.getSimpleName().toString());
   }
 }

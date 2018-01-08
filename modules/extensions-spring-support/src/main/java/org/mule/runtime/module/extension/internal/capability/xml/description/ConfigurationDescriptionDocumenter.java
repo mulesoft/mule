@@ -74,6 +74,6 @@ final class ConfigurationDescriptionDocumenter extends AbstractDescriptionDocume
   }
 
   private List<TypeElement> getConnectionProviderClasses(ProcessingEnvironment processingEnv, TypeElement element) {
-    return processor.getArrayClassAnnotationValue(element, ConnectionProviders.class, "value", processingEnv);
+    return processor.getArrayClassAnnotationValue(element, ConnectionProviders.class, VALUE_PROPERTY, processingEnv);
   }
 }

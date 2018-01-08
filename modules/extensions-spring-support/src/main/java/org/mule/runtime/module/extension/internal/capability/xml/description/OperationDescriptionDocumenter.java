@@ -67,7 +67,7 @@ final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter
   private Map<String, Element> getAllOperations(ProcessingEnvironment processingEnv, Element element) {
     Map<String, Element> elements = new LinkedHashMap<>();
 
-    processor.getArrayClassAnnotationValue(element, Configurations.class, "value", processingEnv)
+    processor.getArrayClassAnnotationValue(element, Configurations.class, VALUE_PROPERTY, processingEnv)
         .forEach(c -> elements.putAll(getOperationMethodElements(processingEnv, c)));
 
     elements.putAll(getOperationMethodElements(processingEnv, element));
@@ -78,7 +78,7 @@ final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter
     ImmutableMap.Builder<String, Element> methods = ImmutableMap.builder();
 
     List<TypeElement> operationsClasses =
-        processor.getArrayClassAnnotationValue(withOperationsElement, Operations.class, "value", processingEnv);
+        processor.getArrayClassAnnotationValue(withOperationsElement, Operations.class, VALUE_PROPERTY, processingEnv);
 
     for (TypeElement operationElement : operationsClasses) {
       while (operationElement != null
