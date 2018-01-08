@@ -10,14 +10,26 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationsTestCase.DummyNotification.EVENT_RECEIVED;
 
+import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.api.notification.CustomNotificationListener;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -26,7 +38,9 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.junit.Test;
 
 import java.util.EventObject;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -104,6 +118,63 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
     // Wait for the notifcation event to be fired as they are queued
     latch.await(2000, MILLISECONDS);
     assertEquals(2, customNotificationCount.get());
+  }
+
+  @Test
+  public void testAsyncNotificationRejectedExecution() {
+    MuleContext muleContext = mock(MuleContext.class);
+    SchedulerService schedulerService = mock(SchedulerService.class);
+    Scheduler scheduler = mock(Scheduler.class);
+    when(muleContext.getSchedulerService()).thenReturn(schedulerService);
+    when(schedulerService.cpuLightScheduler()).thenReturn(scheduler);
+    when(scheduler.submit(any(Callable.class))).thenThrow(new RejectedExecutionException());
+
+    Notification notification = mock(CustomNotification.class);
+    when(notification.isSynchronous()).thenReturn(false);
+    NotificationListener notificationListener = mock(CustomNotificationListener.class);
+
+    ServerNotificationManager manager = new ServerNotificationManager();
+    manager.setMuleContext(muleContext);
+    manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
+    manager.addListener(notificationListener);
+
+    manager.fireNotification(notification);
+
+    verify(notificationListener, never()).onNotification(notification);
+  }
+
+  @Test
+  public void testSyncNotificationException() {
+    ServerNotificationManager manager = new ServerNotificationManager();
+    manager.setMuleContext(muleContext);
+    manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
+
+    Notification notification = mock(CustomNotification.class);
+    when(notification.isSynchronous()).thenReturn(true);
+    NotificationListener notificationListener = mock(CustomNotificationListener.class);
+    doThrow(new IllegalArgumentException()).when(notificationListener).onNotification(any(CustomNotification.class));
+    manager.addListener(notificationListener);
+
+    manager.fireNotification(notification);
+
+    verify(notificationListener, times(1)).onNotification(notification);
+  }
+
+  @Test
+  public void testSyncNotificationError() {
+    ServerNotificationManager manager = new ServerNotificationManager();
+    manager.setMuleContext(muleContext);
+    manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
+
+    Notification notification = mock(CustomNotification.class);
+    when(notification.isSynchronous()).thenReturn(true);
+    NotificationListener notificationListener = mock(CustomNotificationListener.class);
+    doThrow(new LinkageError()).when(notificationListener).onNotification(any(CustomNotification.class));
+    manager.addListener(notificationListener);
+
+    manager.fireNotification(notification);
+
+    verify(notificationListener, times(1)).onNotification(notification);
   }
 
   private NotificationListenerRegistry getNotificationListenerRegistry() throws RegistrationException {
