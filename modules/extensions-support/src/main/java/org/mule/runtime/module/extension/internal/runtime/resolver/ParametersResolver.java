@@ -243,7 +243,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     Class<Object> type = getType(groupField.getValue());
     if (groupField.getAnnotation(ExclusiveOptionalsTypeAnnotation.class).isPresent()) {
       return new ExclusiveParameterGroupObjectBuilder(type,
-                                                      groupField.getAnnotation(ExclusiveOptionalsTypeAnnotation.class).get());
+                                                      groupField.getAnnotation(ExclusiveOptionalsTypeAnnotation.class).get(),
+                                                      lazyInitEnabled);
     }
 
     return new DefaultObjectBuilder(type);

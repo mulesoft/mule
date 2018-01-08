@@ -174,11 +174,11 @@ public class MetadataOperations {
     return locationKey;
   }
 
-  public Order getOrder(Order order) {
-    return order;
+  public Order inputHasPojoWithExclusiveOptionalParameterGroup(Order dessertOrder) {
+    return dessertOrder;
   }
 
-  public Dessert getDessert(@ParameterGroup(name = "dessert") Dessert dessert) {
+  public Dessert inputHasExclusiveOptionalParameterGroup(@ParameterGroup(name = "dessert") Dessert dessert) {
     return dessert;
   }
 
