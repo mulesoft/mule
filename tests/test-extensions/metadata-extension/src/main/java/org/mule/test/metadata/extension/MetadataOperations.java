@@ -30,6 +30,8 @@ import org.mule.test.metadata.extension.model.animals.Bear;
 import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
 import org.mule.test.metadata.extension.model.shapes.Shape;
+import org.mule.test.metadata.extension.model.shops.Dessert;
+import org.mule.test.metadata.extension.model.shops.Order;
 import org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver;
 import org.mule.test.metadata.extension.query.MetadataExtensionQueryTranslator;
 import org.mule.test.metadata.extension.query.NativeQueryOutputResolver;
@@ -170,6 +172,14 @@ public class MetadataOperations {
                                                       name = "key") @MetadataKeyId(TestPartialMultiLevelKeyResolver.class) LocationKey locationKey,
                                                   @Content @TypeResolver(TestMultiLevelKeyResolver.class) Object content) {
     return locationKey;
+  }
+
+  public Order getOrder(Order order) {
+    return order;
+  }
+
+  public Dessert getDessert(@ParameterGroup(name = "dessert") Dessert dessert) {
+    return dessert;
   }
 
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
