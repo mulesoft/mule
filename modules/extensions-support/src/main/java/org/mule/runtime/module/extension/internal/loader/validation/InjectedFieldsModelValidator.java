@@ -33,9 +33,9 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 
 import java.lang.annotation.Annotation;
@@ -102,7 +102,8 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
                       validateType(model, type, DefaultEncoding.class);
                     }
                   } catch (Exception e) {
-                    problemsReporter.addWarning(new Problem(model, "Could not validate Class: " + e.getMessage()));
+                    //TODO - This is too verbose and fails always in AST Mode
+                    //problemsReporter.addWarning(new Problem(model, "Could not validate Class: " + e.getMessage()));
                   }
                 }
               }

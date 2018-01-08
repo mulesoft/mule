@@ -23,7 +23,7 @@ import org.mule.runtime.extension.api.annotation.param.stereotype.Validator;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
-import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
+import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;

@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 
 import javax.lang.model.element.ExecutableElement;
 
@@ -55,9 +56,12 @@ public class MethodWrapper<T extends Type> implements MethodElement<T> {
     return (T) new TypeWrapper(getDeclaringClass().get(), typeLoader);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public ExecutableElement getExecutableElement() {
-    return null;
+  public Optional<ExecutableElement> getElement() {
+    return empty();
   }
 
   /**
@@ -124,7 +128,7 @@ public class MethodWrapper<T extends Type> implements MethodElement<T> {
   public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
     return isAnnotatedWith(annotationClass)
         ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, method, typeLoader))
-        : Optional.empty();
+        : empty();
   }
 
   @Override

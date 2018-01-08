@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.contributor;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getInfrastructureType;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
+import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
-import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 
 /**
  * {@link ParameterDeclarerContributor} implementation which given a {@link ExtensionParameter} which their type
@@ -31,15 +32,14 @@ public class InfrastructureFieldContributor implements ParameterDeclarerContribu
   @Override
   public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer,
                          ParameterDeclarationContext declarationContext) {
-    //TODO REVIEW
-    InfrastructureTypeMapping.InfrastructureType infrastructureType =
-        InfrastructureTypeMapping.getMap().get(parameter.getType().getDeclaringClass().get());
-    if (infrastructureType != null && !isBlank(infrastructureType.getName())) {
-      declarer.withModelProperty(new InfrastructureParameterModelProperty(infrastructureType.getSequence()));
-      declarer.withExpressionSupport(NOT_SUPPORTED);
-      InfrastructureTypeMapping.getQName(infrastructureType.getName()).ifPresent(declarer::withModelProperty);
-      InfrastructureTypeMapping.getDslConfiguration(infrastructureType.getName()).ifPresent(declarer::withDsl);
-    }
+    getInfrastructureType(parameter.getType()).ifPresent(infrastructureType -> {
+      if (!isBlank(infrastructureType.getName())) {
+        declarer.withModelProperty(new InfrastructureParameterModelProperty(infrastructureType.getSequence()));
+        declarer.withExpressionSupport(NOT_SUPPORTED);
+        InfrastructureTypeMapping.getQName(infrastructureType.getName()).ifPresent(declarer::withModelProperty);
+        InfrastructureTypeMapping.getDslConfiguration(infrastructureType.getName()).ifPresent(declarer::withDsl);
+      }
+    });
   }
 }
 

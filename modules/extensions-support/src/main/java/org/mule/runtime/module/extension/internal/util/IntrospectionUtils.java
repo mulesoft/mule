@@ -31,6 +31,8 @@ import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.reflections.ReflectionUtils.getAllFields;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -89,6 +91,10 @@ import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
+import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
@@ -97,9 +103,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectedFieldModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
-import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -950,7 +953,18 @@ public final class IntrospectionUtils {
         .collect(toSet());
   }
 
-  private static List<PropertyDescriptor> getPropertyDescriptors(Class<?> extensionType) {
+  public static List<FieldElement> getFieldsWithGetters(Type extensionType) {
+    Set<String> properties = extensionType.getProperties().stream()
+        .filter(p -> p.getAccess().equals(READ_ONLY) || p.getAccess().equals(READ_WRITE))
+        .map(p -> p.getName()).collect(toSet());
+
+    return extensionType.getFields()
+        .stream()
+        .filter(field -> properties.contains(field.getName()))
+        .collect(toList());
+  }
+
+  public static List<PropertyDescriptor> getPropertyDescriptors(Class<?> extensionType) {
     try {
       PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(extensionType).getPropertyDescriptors();
       return asList(propertyDescriptors);

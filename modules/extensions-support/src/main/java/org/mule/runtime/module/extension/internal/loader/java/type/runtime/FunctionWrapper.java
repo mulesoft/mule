@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.module.extension.internal.loader.java.type.FunctionContainerElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.FunctionElement;
+import org.mule.runtime.module.extension.api.loader.java.type.FunctionContainerElement;
+import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
 
 import java.lang.reflect.Method;
 

@@ -49,7 +49,7 @@ public class StackableTypesValueResolverFactory {
     StackableType.ExpressionBasedResolverFactory resolverFactory = stackableType
         .getExpressionBasedResolverFactory()
         .orElseThrow(() -> new IllegalStateException(format("Unable to create an Expression Based ValueResolver of '%s' type. No ExpressionBasedResolverFactory was registered for this type.",
-                                                            stackableType.getType().getSimpleName())));
+                                                            stackableType.getType().getTypeName())));
 
     ValueResolver resolver = resolverFactory.getResolver(expression, expectedType);
     resolver = getWrapperValueResolver(resolver, stackableTypes);
@@ -70,7 +70,7 @@ public class StackableTypesValueResolverFactory {
     StackableType.StaticResolverFactory resolverFactory = stackableType
         .getStaticResolverFactory()
         .orElseThrow(() -> new IllegalStateException(format("Unable to create an Static ValueResolver of '%s' type. No StaticResolverFactory was registered for this type.",
-                                                            stackableType.getType().getSimpleName())));
+                                                            stackableType.getType().getTypeName())));
 
     ValueResolver resolver = resolverFactory.getResolver(value);
     resolver = getWrapperValueResolver(resolver, stackableTypes);
@@ -88,7 +88,7 @@ public class StackableTypesValueResolverFactory {
   public Optional<ValueResolver> getStaticValueResolver(Object value, Class clazz) {
     Stack<StackableType> stackableTypes = types.get();
     StackableType stackableType = stackableTypes.get(stackableTypes.size() - 1);
-    if (stackableType.getType().equals(clazz)) {
+    if (stackableType.getType().isSameType(clazz)) {
       return of(getStaticValueResolver(value));
     }
     return empty();
@@ -111,7 +111,7 @@ public class StackableTypesValueResolverFactory {
       StackableType.DelegateResolverFactory delegateResolverFactory = delegateStackableType
           .getDelegateResolverFactory()
           .orElseThrow(() -> new IllegalStateException(format("Unable to create a ValueResolver Wrapper of '%s' type. No DelegateResolverFactory was registered for this type.",
-                                                              delegateStackableType.getType().getSimpleName())));
+                                                              delegateStackableType.getType().getTypeName())));
       resolver = delegateResolverFactory.getResolver(resolver);
     }
     return resolver;

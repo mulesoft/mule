@@ -25,10 +25,12 @@ import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -81,7 +83,7 @@ public final class ConnectionProviderModelValidator implements ExtensionModelVal
     }
 
     for (ConnectionProviderModel connectionProviderModel : globalConnectionProviders) {
-      final Class<?> connectionType = MuleExtensionUtils.getConnectionType(connectionProviderModel);
+      final Type connectionType = MuleExtensionUtils.getConnectionType(connectionProviderModel);
 
       new IdempotentExtensionWalker() {
 
@@ -102,25 +104,27 @@ public final class ConnectionProviderModelValidator implements ExtensionModelVal
                                                   ProblemsReporter problemsReporter) {
     configLevelConnectionProviders.asMap().forEach((configModel, providerModels) -> {
       for (ConnectionProviderModel providerModel : providerModels) {
-        Class<?> connectionType = MuleExtensionUtils.getConnectionType(providerModel);
+        Type connectionType = MuleExtensionUtils.getConnectionType(providerModel);
         configModel.getOperationModels()
             .forEach(operationModel -> validateConnectionTypes(providerModel, operationModel, connectionType, problemsReporter));
       }
     });
   }
 
-  private <T> Optional<Class<T>> getConnectionType(EnrichableModel model) {
+  private <T> Optional<Type> getConnectionType(EnrichableModel model) {
     Optional<ConnectivityModelProperty> connectivityProperty = model.getModelProperty(ConnectivityModelProperty.class);
     if (!connectivityProperty.isPresent() && model instanceof ParameterizedModel) {
       connectivityProperty = ((ParameterizedModel) model).getAllParameterModels().stream()
-          .map(p -> p.getModelProperty(ConnectivityModelProperty.class).orElse(null)).filter(p -> p != null).findFirst();
+          .map(p -> p.getModelProperty(ConnectivityModelProperty.class).orElse(null))
+          .filter(Objects::nonNull)
+          .findFirst();
     }
 
-    return connectivityProperty.map(property -> (Class<T>) property.getConnectionType());
+    return connectivityProperty.map(ConnectivityModelProperty::getConnectionType);
   }
 
   private void validateConnectionTypes(ConnectionProviderModel providerModel,
-                                       ComponentModel componentModel, Class<?> providerConnectionType,
+                                       ComponentModel componentModel, Type providerConnectionType,
                                        ProblemsReporter problemsReporter) {
     getConnectionType(componentModel).ifPresent(connectionType -> {
       if (!connectionType.isAssignableFrom(providerConnectionType)) {

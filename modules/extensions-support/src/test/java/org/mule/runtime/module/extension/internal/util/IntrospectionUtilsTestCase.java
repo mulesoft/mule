@@ -53,8 +53,9 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.runtime.module.extension.internal.loader.java.type.OperationElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
+import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -80,6 +81,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -100,7 +102,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   public static final String PAGING_PROVIDER = "pagingProvider";
   public static final String PAGING_PROVIDER_OPERATION_RESULT = "pagingProviderOperationResult";
   public static final String FOO = "foo";
-  private static ProcessingEnvironment processingEnvironment;
+  public static ProcessingEnvironment processingEnvironment;
   private List<FruitBasket> baskets;
 
   @Rule
@@ -158,7 +160,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void getNullMethodReturnType() throws Exception {
+  public void getNullMethodReturnType() {
     IntrospectionUtils.getMethodReturnType(null);
   }
 
@@ -211,7 +213,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getFieldDataType() throws Exception {
-    MetadataType type = getFieldMetadataType(getClass().getDeclaredField("baskets"), TYPE_LOADER);
+    MetadataType type = getFieldMetadataType(IntrospectionUtilsTestCase.class.getDeclaredField("baskets"), TYPE_LOADER);
     assertList(type, FruitBasket.class);
   }
 
@@ -337,6 +339,15 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertThat(attributesTypes.getAnnotation(TypeIdAnnotation.class).get().getValue(), is(Apple.class.getName()));
   }
 
+  @Test
+  public void getProperties() {
+    Set<Field> fields = IntrospectionUtils.getFieldsWithGetters(SomePojo.class);
+    Type somePojo = typeSupplier.apply(SomePojo.class);
+
+    List<FieldElement> fieldsWithGetters = IntrospectionUtils.getFieldsWithGetters(somePojo);
+    assertThat(fieldsWithGetters.size(), is(fields.size()));
+  }
+
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {
     Field field = findField(name, fields);
     assertThat(field, is(notNullValue()));
@@ -443,6 +454,29 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
     assertThat(returnType, is(instanceOf(ArrayType.class)));
     assertMessageType(((ArrayType) returnType).getType(), is(instanceOf(StringType.class)), is(instanceOf(ObjectType.class)));
+  }
+
+  public static class SomePojo {
+
+    private String aString;
+    private Integer someNumber;
+    private String nonProperty;
+
+    public String getaString() {
+      return aString;
+    }
+
+    public void setaString(String aString) {
+      this.aString = aString;
+    }
+
+    public Integer getSomeNumber() {
+      return someNumber;
+    }
+
+    public void setSomeNumber(Integer someNumber) {
+      this.someNumber = someNumber;
+    }
   }
 
   private class TestPagingProvider implements PagingProvider<Object, Result<Banana, Apple>> {

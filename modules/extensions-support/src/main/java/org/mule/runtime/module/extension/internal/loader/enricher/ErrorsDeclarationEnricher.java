@@ -11,6 +11,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.INITIALIZE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
@@ -30,8 +31,8 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
@@ -59,10 +60,11 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
     String extensionNamespace = getExtensionsNamespace(declaration);
     Optional<ExtensionTypeDescriptorModelProperty> implementingType =
         declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+
     ErrorsModelFactory errorModelDescriber = new ErrorsModelFactory(extensionNamespace);
     errorModelDescriber.getErrorModels().forEach(declaration::addErrorModel);
 
-    if (implementingType.isPresent()) {
+    if (implementingType.isPresent() && implementingType.get().getType().getDeclaringClass().isPresent()) {
 
       Type extensionElement = implementingType.get().getType();
       Optional<ErrorTypes> errorAnnotation = extensionElement.getAnnotation(ErrorTypes.class);

@@ -10,7 +10,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher.stereotypes;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithStereotypesDeclaration;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.annotation.Annotation;

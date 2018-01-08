@@ -24,12 +24,12 @@ import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProviderElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.WithConnectionProviders;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.ConnectionProviderElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.java.type.WithConnectionProviders;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
@@ -57,8 +57,6 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
   }
 
   private void declareConnectionProvider(HasConnectionProviderDeclarer declarer, ConnectionProviderElement providerType) {
-    //TODO - MULE-14311 - Remove class reference
-    final Class<?> providerClass = providerType.getDeclaringClass().get();
     ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(providerType);
     if (providerDeclarer != null) {
       declarer.withConnectionProvider(providerDeclarer);
@@ -82,16 +80,16 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
                                                                          providerType.getName(), providerGenerics.size()));
     }
 
-    providerDeclarer = declarer.withConnectionProvider(name).describedAs(description)
-        .withModelProperty(new ConnectionProviderFactoryModelProperty(new DefaultConnectionProviderFactory<>(
-                                                                                                             providerClass,
-                                                                                                             getExtensionType()
-                                                                                                                 .getClassLoader())))
-        //TODO - MULE-14311 - Remove class reference
-        .withModelProperty(new ConnectionTypeModelProperty(providerGenerics.get(0).getDeclaringClass().get()))
-        .withModelProperty(new ImplementingTypeModelProperty(providerClass));
+    providerDeclarer = declarer.withConnectionProvider(name).describedAs(description);
+    ConnectionProviderDeclarer finalProviderDeclarer = providerDeclarer;
+    providerType.getDeclaringClass().ifPresent(clazz -> finalProviderDeclarer
+        .withModelProperty(new ConnectionProviderFactoryModelProperty(new DefaultConnectionProviderFactory<>(clazz,
+                                                                                                             getExtensionClassLoader())))
+        .withModelProperty(new ImplementingTypeModelProperty(clazz)));
 
-    providerDeclarer.withModelProperty(new ExtensionTypeDescriptorModelProperty(providerType));
+    providerDeclarer
+        .withModelProperty(new ConnectionTypeModelProperty(providerGenerics.get(0)))
+        .withModelProperty(new ExtensionTypeDescriptorModelProperty(providerType));
 
     loader.parseExternalLibs(providerType, providerDeclarer);
 

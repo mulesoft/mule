@@ -35,8 +35,8 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.model.notification.ImmutableNotificationModel;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
-import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
@@ -65,7 +65,7 @@ public class NotificationsDeclarationEnricher implements DeclarationEnricher {
     String extensionNamespace = getExtensionsNamespace(declaration);
     ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-    if (extensionType.isPresent()) {
+    if (extensionType.isPresent() && extensionType.get().getType().getDeclaringClass().isPresent()) {
       Type extensionElement = extensionType.get().getType();
       Optional<NotificationActions> annotation = extensionElement.getAnnotation(NotificationActions.class);
       annotation.ifPresent(actionsAnnotation -> {

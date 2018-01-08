@@ -9,8 +9,10 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
@@ -18,16 +20,18 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
+import org.mule.runtime.module.extension.api.loader.java.type.WithAlias;
+import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
+import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
-import org.mule.runtime.module.extension.internal.loader.java.type.WithAlias;
-import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
-import org.mule.runtime.module.extension.internal.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
+
 import java.util.List;
 
 /**
@@ -41,6 +45,15 @@ abstract class AbstractModelLoaderDelegate {
 
   AbstractModelLoaderDelegate(DefaultJavaModelLoaderDelegate loader) {
     this.loader = loader;
+  }
+
+  protected ClassLoader getExtensionClassLoader() {
+    Class<?> extensionType = getExtensionType();
+    if (extensionType != null) {
+      return extensionType.getClassLoader();
+    } else {
+      return ExtensionModel.class.getClassLoader();
+    }
   }
 
   protected Class<?> getExtensionType() {
@@ -85,11 +98,12 @@ abstract class AbstractModelLoaderDelegate {
       componentDeclarer.requiresConnection(false).transactional(false);
     } else if (connectionParameters.size() == 1) {
       ExtensionParameter connectionParameter = connectionParameters.iterator().next();
-      final Class<?> connectionType = resolveConnectionType(componentDeclarer, connectionParameter, alias);
+      final Type connectionType = resolveConnectionType(componentDeclarer, connectionParameter, alias);
+
       componentDeclarer.requiresConnection(true)
-          .transactional(TransactionalConnection.class.isAssignableFrom(connectionType))
+          .transactional(connectionType.isAssignableTo(TransactionalConnection.class))
           .withModelProperty(new ConnectivityModelProperty(connectionType));
-    } else if (connectionParameters.size() > 1) {
+    } else {
       throw new IllegalOperationModelDefinitionException(format(
                                                                 "%s '%s' defines %d parameters annotated with @%s. Only one is allowed",
                                                                 getComponentDeclarationTypeName(componentDeclarer
@@ -100,10 +114,10 @@ abstract class AbstractModelLoaderDelegate {
     }
   }
 
-  private Class<?> resolveConnectionType(ExecutableComponentDeclarer componentDeclarer, ExtensionParameter connectionParameter,
-                                         WithAlias alias) {
-    org.mule.runtime.module.extension.internal.loader.java.type.Type connectionType = connectionParameter.getType();
+  private Type resolveConnectionType(ExecutableComponentDeclarer componentDeclarer, ExtensionParameter connectionParameter,
+                                     WithAlias alias) {
 
+    Type connectionType = connectionParameter.getType();
 
     if (connectionType.getTypeName().startsWith(ConnectionProvider.class.getName())) {
       List<TypeGeneric> generics = connectionType.getGenerics();
@@ -115,11 +129,9 @@ abstract class AbstractModelLoaderDelegate {
                                                                   alias.getAlias(),
                                                                   ConnectionProvider.class.getSimpleName()));
       }
-      //TODO - MULE-14311 - Remove classes references
-      return generics.get(0).getConcreteType().getDeclaringClass().get();
+      return generics.get(0).getConcreteType();
     }
-    //TODO - MULE-14311 - Remove classes references
-    return connectionType.getDeclaringClass().get();
+    return connectionType;
   }
 
   void processMimeType(HasModelProperties declarer, WithAnnotations element) {

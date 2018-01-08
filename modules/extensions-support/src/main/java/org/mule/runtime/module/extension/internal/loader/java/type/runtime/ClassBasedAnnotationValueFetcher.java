@@ -11,8 +11,8 @@ import static java.util.stream.Collectors.toList;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
-import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;

@@ -6,37 +6,25 @@
  */
 package org.mule.test.module.extension;
 
-import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.metadata.extension.CustomStaticMetadataOperations.CSV_VALUE;
 import static org.mule.test.metadata.extension.CustomStaticMetadataOperations.JSON_VALUE;
 import static org.mule.test.metadata.extension.CustomStaticMetadataOperations.XML_VALUE;
-import static org.mule.test.module.extension.source.HeisenbergMessageSourceTestCase.POLL_DELAY_MILLIS;
-import static org.mule.test.module.extension.source.HeisenbergMessageSourceTestCase.TIMEOUT_MILLIS;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.metadata.extension.CustomStaticMetadataSource;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 import javax.inject.Inject;
 
+import java.io.IOException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

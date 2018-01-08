@@ -8,6 +8,9 @@ package org.mule.runtime.module.extension.internal.loader.java.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
 /**
  * A {@link ModelProperty} meant to be used on {@link ConnectionProviderModel connection provider models},
@@ -17,7 +20,8 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
  */
 public final class ConnectionTypeModelProperty implements ModelProperty {
 
-  private final Class<?> connectionType;
+  private Class<?> connectionType;
+  private Type type;
 
   /**
    * Creates a new instance
@@ -26,6 +30,11 @@ public final class ConnectionTypeModelProperty implements ModelProperty {
    */
   public ConnectionTypeModelProperty(Class<?> connectionType) {
     this.connectionType = connectionType;
+    this.type = new TypeWrapper(connectionType, new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
+  }
+
+  public ConnectionTypeModelProperty(Type type) {
+    this.type = type;
   }
 
   /**
@@ -33,6 +42,10 @@ public final class ConnectionTypeModelProperty implements ModelProperty {
    */
   public Class<?> getConnectionType() {
     return connectionType;
+  }
+
+  public Type getConnectionTypeElement() {
+    return type;
   }
 
   /**

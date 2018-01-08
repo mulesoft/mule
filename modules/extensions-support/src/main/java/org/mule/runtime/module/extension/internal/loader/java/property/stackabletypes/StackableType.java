@@ -7,6 +7,10 @@
 package org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes;
 
 import static java.util.Optional.ofNullable;
+
+import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.Optional;
@@ -18,7 +22,7 @@ import java.util.Optional;
  */
 public class StackableType {
 
-  private final Class type;
+  private final Type type;
   private final ExpressionBasedResolverFactory expressionBasedResolverFactory;
   private final StaticResolverFactory staticResolverFactory;
   private final DelegateResolverFactory delegateResolverFactory;
@@ -33,7 +37,7 @@ public class StackableType {
    * @param staticResolverFactory          A factory that creates instances of static {@link ValueResolver value resolvers}
    * @param delegateResolverFactory        A factory that create instances of {@link ValueResolver value resolver} wrappers
    */
-  private StackableType(Class type, ExpressionBasedResolverFactory expressionBasedResolverFactory,
+  private StackableType(Type type, ExpressionBasedResolverFactory expressionBasedResolverFactory,
                         StaticResolverFactory staticResolverFactory, DelegateResolverFactory delegateResolverFactory) {
     this.type = type;
     this.expressionBasedResolverFactory = expressionBasedResolverFactory;
@@ -44,7 +48,7 @@ public class StackableType {
   /**
    * @return The {@link Class} of the wrapper type
    */
-  public Class getType() {
+  public Type getType() {
     return type;
   }
 
@@ -79,17 +83,17 @@ public class StackableType {
    * @return The builder
    */
   public static <T> Builder<T> builder(Class<T> type) {
-    return new Builder<>(type);
+    return new Builder<>(new TypeWrapper(type, new JavaTypeLoader(Thread.currentThread().getContextClassLoader())));
   }
 
   public static class Builder<T> {
 
-    private Class<T> type;
+    private Type type;
     private ExpressionBasedResolverFactory<T> expressionBasedResolverFactory;
     private StaticResolverFactory staticResolverFactory;
     private DelegateResolverFactory delegateResolverFactory;
 
-    private Builder(Class<T> type) {
+    private Builder(Type type) {
       this.type = type;
     }
 

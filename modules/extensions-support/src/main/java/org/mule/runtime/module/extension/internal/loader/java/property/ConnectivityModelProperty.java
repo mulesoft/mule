@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java.property;
 
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 
 /**
  * An immutable model property which specifies that the owning {@link EnrichableModel} requires a connection of a given
@@ -18,7 +19,8 @@ import org.mule.runtime.api.meta.model.ModelProperty;
  */
 public class ConnectivityModelProperty implements ModelProperty {
 
-  private final Class<?> connectionType;
+  private Class<?> connectionType;
+  private Type type;
 
   /**
    * Creates a new instance for the given {@code connectionType}
@@ -30,10 +32,19 @@ public class ConnectivityModelProperty implements ModelProperty {
   }
 
   /**
+   * Creates a new instance for the given {@code connectionType}
+   *
+   * @param connectionType
+   */
+  public ConnectivityModelProperty(Type connectionType) {
+    this.type = connectionType;
+  }
+
+  /**
    * @return the {@link {@link #connectionType}}
    */
-  public Class<?> getConnectionType() {
-    return connectionType;
+  public Type getConnectionType() {
+    return type;
   }
 
   /**

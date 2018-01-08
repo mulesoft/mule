@@ -21,6 +21,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.soap.api.loader.SoapExtensionModelLoader.SOAP_LOADER_ID;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -29,8 +30,8 @@ import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.resources.manifest.ExportedArtifactsCollector;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 
@@ -51,8 +52,8 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
    */
   @Override
   public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
-    final Optional<ImplementingTypeModelProperty> typeProperty =
-        extensionModel.getModelProperty(ImplementingTypeModelProperty.class);
+    final Optional<ExtensionTypeDescriptorModelProperty> typeProperty =
+        extensionModel.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
     if (!typeProperty.isPresent()) {
       return empty();
     }
@@ -69,7 +70,7 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
         .addProperty(PRIVILEGED_ARTIFACTS_IDS, exportCollector.getPrivilegedArtifacts()).build());
     builder.withExtensionModelDescriber()
         .setId(getLoaderId(extensionModel))
-        .addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName())
+        .addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getTypeName())
         .addProperty("version", extensionModel.getVersion());
 
     builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));

@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.OperationElement;
+import org.mule.runtime.module.extension.api.loader.java.type.OperationContainerElement;
+import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Method;

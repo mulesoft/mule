@@ -26,9 +26,11 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
@@ -69,7 +71,9 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
   public static final String PROCESSING_ENVIRONMENT = "PROCESSING_ENVIRONMENT";
   public static final String EXTENSION_ELEMENT = "EXTENSION_ELEMENT";
   public static final String ROUND_ENVIRONMENT = "ROUND_ENVIRONMENT";
+  public static final String PROBLEMS_HANDLER = "PROBLEMS_HANDLER";
   public static final String EXTENSION_VERSION = "extension.version";
+  public static final String EXTENSION_TYPE = "EXTENSION_TYPE";
 
   private final SpiServiceRegistry serviceRegistry = new SpiServiceRegistry();
 
@@ -81,17 +85,13 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
     try {
       getExtension(roundEnv).ifPresent(extensionElement -> {
         Optional<Class<Object>> annotatedClass = processor.classFor(extensionElement, processingEnv);
-        if (!annotatedClass.isPresent()) {
-          log("Extension class " + processor.getClassName(extensionElement, processingEnv) + " could not be found. Skipping");
-          return;
-        }
-        final Class<?> extensionClass = annotatedClass.get();
-        withContextClassLoader(extensionClass.getClassLoader(), () -> {
-          ExtensionModel extensionModel = parseExtension(extensionElement, roundEnv);
+        ExtensionElement extension = toExtensionElement(extensionElement, processingEnv);
+        ClassLoader classLoader = annotatedClass.map(Class::getClassLoader).orElseGet(ExtensionModel.class::getClassLoader);
+        withContextClassLoader(classLoader, () -> {
+          ExtensionModel extensionModel = parseExtension(extensionElement, extension, roundEnv, classLoader);
           generator.generateFor(extensionModel);
         });
       });
-
 
       return false;
     } catch (MuleRuntimeException e) {
@@ -99,21 +99,25 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
       if (exception.isPresent()) {
         throw exception.get();
       }
+
       processingEnv.getMessager().printMessage(ERROR, format("%s\n%s", e.getMessage(), getStackTrace(e)));
       throw e;
     }
   }
 
-  private ExtensionModel parseExtension(TypeElement extensionElement, RoundEnvironment roundEnvironment) {
-    Class<?> extensionClass = processor.classFor(extensionElement, processingEnv).get();
+  private ExtensionModel parseExtension(TypeElement extensionElement, ExtensionElement extension,
+                                        RoundEnvironment roundEnvironment, ClassLoader classLoader) {
 
     Map<String, Object> params = new HashMap<>();
-    params.put(TYPE_PROPERTY_NAME, extensionClass.getName());
+    params.put(TYPE_PROPERTY_NAME, extensionElement.toString());
     params.put(VERSION, getVersion(extensionElement.getQualifiedName()));
+    params.put(EXTENSION_TYPE, extension);
     params.put(EXTENSION_ELEMENT, extensionElement);
+    params.put(PROBLEMS_HANDLER, new AnnotationProcessorProblemsHandler(processingEnv));
     params.put(PROCESSING_ENVIRONMENT, processingEnv);
     params.put(ROUND_ENVIRONMENT, roundEnvironment);
-    return getExtensionModelLoader().loadExtensionModel(extensionClass.getClassLoader(), getDefault(emptySet()), params);
+    return getExtensionModelLoader().loadExtensionModel(classLoader, getDefault(emptySet()),
+                                                        params);
   }
 
   private Optional<TypeElement> getExtension(RoundEnvironment env) {
@@ -151,6 +155,8 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
         .addAll(serviceRegistry.lookupProviders(DslResourceFactory.class, getClass().getClassLoader())).build();
 
   }
+
+  public abstract ExtensionElement toExtensionElement(TypeElement typeElement, ProcessingEnvironment processingEnvironment);
 
   protected abstract ExtensionModelLoader getExtensionModelLoader();
 }

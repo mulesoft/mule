@@ -11,9 +11,9 @@ import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.module.extension.internal.loader.java.type.ConfigurationElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
+import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.ParameterizableTypeElement;
 
 import java.util.List;
 import java.util.stream.Stream;

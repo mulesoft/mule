@@ -12,16 +12,17 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
+import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.enricher.BackPressureDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ConnectionDeclarationEnricher;
@@ -48,6 +49,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclara
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
@@ -74,6 +76,7 @@ import java.util.function.BiFunction;
 public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
 
   public static final String TYPE_PROPERTY_NAME = "type";
+  public static final String EXTENSION_TYPE = "EXTENSION_TYPE";
   public static final String VERSION = "version";
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
                                                                                          new ConfigurationModelValidator(),
@@ -126,11 +129,17 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ObjectStoreParameterDeclarationEnricher()));
 
   private final String id;
-  private final BiFunction<Class<?>, String, ModelLoaderDelegate> delegateFactory;
+  private ModelLoaderDelegateFactory factory;
 
+  @Deprecated
   public AbstractJavaExtensionModelLoader(String id, BiFunction<Class<?>, String, ModelLoaderDelegate> delegate) {
+    this(id, (ModelLoaderDelegateFactory) (extensionElement, version) -> delegate
+        .apply(extensionElement.getDeclaringClass().get(), version));
+  }
+
+  public AbstractJavaExtensionModelLoader(String id, ModelLoaderDelegateFactory factory) {
     this.id = id;
-    this.delegateFactory = delegate;
+    this.factory = factory;
   }
 
   /**
@@ -156,39 +165,43 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
    */
   @Override
   protected void declareExtension(ExtensionLoadingContext context) {
-    Class<?> extensionType = getExtensionType(context);
+    ExtensionElement extensionType = getExtensionType(context);
     String version =
         context.<String>getParameter(VERSION).orElseThrow(() -> new IllegalArgumentException("version not specified"));
-    delegateFactory.apply(extensionType, version).declare(context);
+    factory.getLoader(extensionType, version).declare(context);
   }
 
   private Collection<DeclarationEnricher> getPrivilegedDeclarationEnrichers(ExtensionLoadingContext context) {
-    Class<?> extensionType = getExtensionType(context);
-    try {
-      // TODO: MULE-12744. If this call throws an exception it means that the extension cannot access the privileged API.
-      ClassLoader extensionClassLoader = context.getExtensionClassLoader();
-      Class annotation = extensionClassLoader.loadClass(DeclarationEnrichers.class.getName());
-      DeclarationEnrichers enrichers = extensionType.getAnnotation((Class<DeclarationEnrichers>) annotation);
-      if (enrichers != null) {
-        return withContextClassLoader(extensionClassLoader,
-                                      () -> stream(enrichers.value()).map(this::instantiateOrFail).collect(toList()));
+    ExtensionElement extensionType = getExtensionType(context);
+    if (extensionType.getDeclaringClass().isPresent()) {
+      try {
+        // TODO: MULE-12744. If this call throws an exception it means that the extension cannot access the privileged API.
+        ClassLoader extensionClassLoader = context.getExtensionClassLoader();
+        Class annotation = extensionClassLoader.loadClass(DeclarationEnrichers.class.getName());
+        return (Collection<DeclarationEnricher>) extensionType.getAnnotation((Class<DeclarationEnrichers>) annotation)
+            .map(enrichers -> withContextClassLoader(extensionClassLoader,
+                                                     () -> stream(enrichers.value())
+                                                         .map(this::instantiateOrFail)
+                                                         .collect(toList())))
+            .orElse(emptyList());
+      } catch (ClassNotFoundException e) {
+        // Do nothing
       }
-    } catch (ClassNotFoundException e) {
-      // Do nothing
     }
     return emptyList();
   }
 
-  private Class<?> getExtensionType(ExtensionLoadingContext context) {
-    String type = context.<String>getParameter(TYPE_PROPERTY_NAME).get();
-    if (isBlank(type)) {
-      throw new IllegalArgumentException(format("Property '%s' has not been specified", TYPE_PROPERTY_NAME));
-    }
-    try {
-      return loadClass(type, context.getExtensionClassLoader());
-    } catch (ClassNotFoundException e) {
-      throw new RuntimeException(format("Class '%s' cannot be loaded", type), e);
-    }
+  private ExtensionElement getExtensionType(ExtensionLoadingContext context) {
+    return context.<ExtensionElement>getParameter(EXTENSION_TYPE).orElseGet(() -> {
+      String type = (String) context.getParameter("type").get();
+      try {
+        ClassLoader extensionClassLoader = context.getExtensionClassLoader();
+        return new ExtensionTypeWrapper<>(loadClass(type, extensionClassLoader),
+                                          new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionClassLoader));
+      } catch (ClassNotFoundException e) {
+        throw new RuntimeException(format("Class '%s' cannot be loaded", type), e);
+      }
+    });
   }
 
   private <R> R instantiateOrFail(Class<R> clazz) {

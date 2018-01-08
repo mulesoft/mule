@@ -25,11 +25,14 @@ import javax.lang.model.element.TypeElement;
 abstract class AbstractDescriptionDocumenter<T> {
 
   protected static final ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
+  protected final TypeElement objectType;
 
   final ProcessingEnvironment processingEnv;
 
+
   AbstractDescriptionDocumenter(ProcessingEnvironment processingEnvironment) {
     this.processingEnv = processingEnvironment;
+    objectType = processingEnv.getElementUtils().getTypeElement(Object.class.getCanonicalName());
   }
 
   /**

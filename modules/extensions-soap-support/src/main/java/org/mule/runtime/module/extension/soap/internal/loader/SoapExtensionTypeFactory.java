@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.soap.internal.loader;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapExtensionTypeWrapper;
 
 /**

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.extension.multiple.config;
 
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 public class TestDocumentedParameterGroup {
@@ -21,4 +22,11 @@ public class TestDocumentedParameterGroup {
    */
   @Parameter
   private String value2;
+
+  /**
+   * Param with alias
+   */
+  @Parameter
+  @Alias("alias-param")
+  private String aliasedParam;
 }

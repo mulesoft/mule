@@ -7,13 +7,17 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getInfrastructureType;
 import static org.springframework.core.ResolvableType.forField;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
-import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
+import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
+import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.InfrastructureType;
+
+import javax.lang.model.element.VariableElement;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -70,17 +74,10 @@ public class FieldWrapper implements FieldElement {
    * {@inheritDoc}
    */
   @Override
-  public java.lang.reflect.Type getJavaType() {
-    return forField(field).getType();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public String getAlias() {
-    return ofNullable(InfrastructureTypeMapping.getMap().get(field.getType()))
-        .map(InfrastructureTypeMapping.InfrastructureType::getName).orElse(FieldElement.super.getAlias());
+    return getInfrastructureType(getType())
+        .map(InfrastructureType::getName)
+        .orElse(FieldElement.super.getAlias());
   }
 
   /**
@@ -95,7 +92,12 @@ public class FieldWrapper implements FieldElement {
   public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
     return isAnnotatedWith(annotationClass)
         ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, field, typeLoader))
-        : Optional.empty();
+        : empty();
+  }
+
+  @Override
+  public Optional<VariableElement> getElement() {
+    return empty();
   }
 
   @Override

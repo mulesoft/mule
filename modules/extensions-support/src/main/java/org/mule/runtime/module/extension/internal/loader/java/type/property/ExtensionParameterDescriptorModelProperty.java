@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java.type.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 
 /**
  * Binds a {@link ParameterModel} with a {@link ExtensionParameter}

@@ -20,7 +20,6 @@ import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensi
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isProcessorChain;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
@@ -53,6 +52,10 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
 import org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.WithAlias;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -60,12 +63,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Exclusive
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.java.type.WithAlias;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 import java.lang.annotation.Annotation;
@@ -261,13 +259,7 @@ public final class ParameterModelsLoaderDelegate {
     if (!annotatedParameters.isEmpty()) {
       return declare(component, annotatedParameters, declarationContext, declarer);
     } else {
-      //TODO - MULE-14311 - Remove class references
-      Class declaringClass = type.getDeclaringClass().get();
-      List<FieldWrapper> fields = getFieldsWithGetters(declaringClass)
-          .stream()
-          .map(field -> new FieldWrapper(field, typeLoader))
-          .collect(toList());
-      return declare(component, fields, declarationContext, declarer);
+      return declare(component, getFieldsWithGetters(type), declarationContext, declarer);
     }
   }
 
@@ -300,6 +292,9 @@ public final class ParameterModelsLoaderDelegate {
 
       MetadataType nullSafeType =
           hasDefaultOverride ? nullSafeAnnotationType.asMetadataType() : parameter.getDeclaration().getType();
+
+      boolean isInstantiable =
+          hasDefaultOverride ? nullSafeAnnotationType.isInstantiable() : extensionParameter.getType().isInstantiable();
 
       parameter.getDeclaration().getType().accept(new BasicTypeMetadataVisitor() {
 
@@ -335,7 +330,7 @@ public final class ParameterModelsLoaderDelegate {
                                                                       extensionParameter.getType().getName()));
           }
 
-          if (hasDefaultOverride && isInstantiable(objectType)) {
+          if (hasDefaultOverride && extensionParameter.getType().isInstantiable()) {
             throw new IllegalParameterModelDefinitionException(
                                                                format("Parameter '%s' is annotated with '@%s' is of concrete type '%s',"
                                                                    + " but a 'defaultImplementingType' was provided."
@@ -345,7 +340,7 @@ public final class ParameterModelsLoaderDelegate {
                                                                       extensionParameter.getType().getName()));
           }
 
-          if (!isInstantiable(nullSafeType) && !isMap(nullSafeType)) {
+          if (!isInstantiable && !isMap(nullSafeType)) {
             throw new IllegalParameterModelDefinitionException(
                                                                format("Parameter '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
                                                                    + "used with complex instantiable types (Pojos, Lists, Maps)",
@@ -354,7 +349,7 @@ public final class ParameterModelsLoaderDelegate {
                                                                       extensionParameter.getType().getName()));
           }
 
-          if (hasDefaultOverride && !getType(parameter.getDeclaration().getType()).isAssignableFrom(getType(nullSafeType))) {
+          if (hasDefaultOverride && !extensionParameter.getType().isAssignableFrom(nullSafeAnnotationType)) {
             throw new IllegalParameterModelDefinitionException(
                                                                format("Parameter '%s' is annotated with '@%s' of type '%s', but provided type '%s"
                                                                    + " is not a subtype of the parameter's type",

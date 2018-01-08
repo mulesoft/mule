@@ -7,18 +7,20 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.empty;
+import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getInfrastructureType;
 import static org.springframework.core.ResolvableType.forMethodParameter;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
+import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
+import org.mule.runtime.module.extension.api.loader.java.type.ParameterElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
-import org.mule.runtime.module.extension.internal.loader.java.type.ParameterElement;
+
+import javax.lang.model.element.VariableElement;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 import java.util.Optional;
 
 /**
@@ -68,7 +70,7 @@ public final class ParameterWrapper implements ParameterElement {
   public <A extends Annotation> Optional<AnnotationValueFetcher<A>> getValueFromAnnotation(Class<A> annotationClass) {
     return isAnnotatedWith(annotationClass)
         ? Optional.of(new ClassBasedAnnotationValueFetcher<>(annotationClass, parameter, typeLoader))
-        : Optional.empty();
+        : empty();
   }
 
   /**
@@ -76,8 +78,9 @@ public final class ParameterWrapper implements ParameterElement {
    */
   @Override
   public String getAlias() {
-    return ofNullable(InfrastructureTypeMapping.getMap().get(parameter.getType()))
-        .map(InfrastructureTypeMapping.InfrastructureType::getName).orElse(ParameterElement.super.getAlias());
+    return getInfrastructureType(getType())
+        .map(InfrastructureTypeMapping.InfrastructureType::getName)
+        .orElse(ParameterElement.super.getAlias());
   }
 
   /**
@@ -96,11 +99,8 @@ public final class ParameterWrapper implements ParameterElement {
     return format("Method: '%s'", owner.getName());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public Type getJavaType() {
-    return forMethodParameter(owner, index).getType();
+  public Optional<VariableElement> getElement() {
+    return empty();
   }
 }
