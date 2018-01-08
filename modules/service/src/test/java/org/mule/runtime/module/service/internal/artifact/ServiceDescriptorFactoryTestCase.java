@@ -20,9 +20,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServiceFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder.builder;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
@@ -44,7 +44,6 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
   private DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
 
-  private ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder = mock(ArtifactDescriptorValidatorBuilder.class);
   private ArtifactDescriptorValidator artifactDescriptorValidator = mock(ArtifactDescriptorValidator.class);
   private ServiceDescriptorFactory serviceDescriptorFactory;
 
@@ -58,10 +57,9 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
     when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(ClassLoaderModelLoader.class))))
         .thenReturn(mock(ClassLoaderModelLoader.class));
 
-    when(artifactDescriptorValidatorBuilder.build()).thenReturn(artifactDescriptorValidator);
     doNothing().when(artifactDescriptorValidator).validate(anyObject());
 
-    serviceDescriptorFactory = new ServiceDescriptorFactory(descriptorLoaderRepository, artifactDescriptorValidatorBuilder);
+    serviceDescriptorFactory = new ServiceDescriptorFactory(descriptorLoaderRepository, builder());
   }
 
 

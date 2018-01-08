@@ -24,13 +24,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder.builder;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
@@ -56,7 +56,6 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
   public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
   private ArtifactClassLoader containerClassLoader = mock(ArtifactClassLoader.class);
   private DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
-  private ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder = mock(ArtifactDescriptorValidatorBuilder.class);
   private ArtifactDescriptorValidator artifactDescriptorValidator = mock(ArtifactDescriptorValidator.class);
 
   @Before
@@ -71,7 +70,6 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
     when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(ClassLoaderModelLoader.class))))
         .thenReturn(mock(ClassLoaderModelLoader.class));
 
-    when(artifactDescriptorValidatorBuilder.build()).thenReturn(artifactDescriptorValidator);
     doNothing().when(artifactDescriptorValidator).validate(anyObject());
   }
 
@@ -79,7 +77,7 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
   public void discoversNoServices() throws Exception {
     final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
-                                                artifactDescriptorValidatorBuilder);
+                                                builder());
 
     final List<Pair<ArtifactClassLoader, ServiceProvider>> discover = serviceProviderDiscoverer.discover();
 
@@ -98,7 +96,7 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
                                                                                                                                   .thenReturn(serviceClassLoader);
     final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
-                                                artifactDescriptorValidatorBuilder);
+                                                builder());
 
     final List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProvidersPairs = serviceProviderDiscoverer.discover();
 
@@ -120,7 +118,7 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
                                                                                                                                   .thenReturn(serviceClassLoader);
     final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
-                                                artifactDescriptorValidatorBuilder);
+                                                builder());
 
     serviceProviderDiscoverer.discover();
   }
