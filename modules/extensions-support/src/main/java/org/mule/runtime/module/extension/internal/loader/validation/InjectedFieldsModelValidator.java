@@ -37,6 +37,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -51,7 +52,7 @@ import java.util.Set;
  * <li>The annotated field is of {@link String} type</li>
  * <li>There is at most one field annotated per type</li>
  * </ul>
- *
+ * <p>
  * It also validates the aforementioned rules for all the {@link OperationModel} method's arguments.
  *
  * @since 4.0
@@ -61,113 +62,119 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
     final Set<Class<?>> validatedTypes = new HashSet<>();
+    //TODO - MULE-14401 - Make InjectedFieldsModelValidator work in AST Mode
+    Boolean isASTMode = !extensionModel.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+        .map(mp -> mp.getType().getDeclaringClass().isPresent())
+        .orElse(false);
 
-    extensionModel.getModelProperty(ClassLoaderModelProperty.class).ifPresent(classLoaderModelProperty -> {
-      new ExtensionWalker() {
+    if (!isASTMode) {
+      extensionModel.getModelProperty(ClassLoaderModelProperty.class).ifPresent(classLoaderModelProperty -> {
+        new ExtensionWalker() {
 
-        @Override
-        protected void onSource(HasSourceModels owner, SourceModel model) {
-          validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), DefaultEncoding.class);
-        }
+          @Override
+          protected void onSource(HasSourceModels owner, SourceModel model) {
+            validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), DefaultEncoding.class);
+          }
 
-        @Override
-        protected void onConfiguration(ConfigurationModel model) {
-          validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), DefaultEncoding.class);
-          validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), RefName.class);
-        }
+          @Override
+          protected void onConfiguration(ConfigurationModel model) {
+            validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), DefaultEncoding.class);
+            validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), RefName.class);
+          }
 
-        @Override
-        protected void onOperation(HasOperationModels owner, OperationModel model) {
-          validateArguments(model, model.getModelProperty(ExtensionOperationDescriptorModelProperty.class),
-                            DefaultEncoding.class);
-        }
+          @Override
+          protected void onOperation(HasOperationModels owner, OperationModel model) {
+            validateArguments(model, model.getModelProperty(ExtensionOperationDescriptorModelProperty.class),
+                              DefaultEncoding.class);
+          }
 
-        @Override
-        protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-          validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), DefaultEncoding.class);
-          validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), RefName.class);
-        }
+          @Override
+          protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
+            validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), DefaultEncoding.class);
+            validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), RefName.class);
+          }
 
-        @Override
-        protected void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
-          if (model.getType().getMetadataFormat().equals(JAVA)) {
-            model.getType().accept(new MetadataTypeVisitor() {
+          @Override
+          protected void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
+            if (model.getType().getMetadataFormat().equals(JAVA)) {
+              model.getType().accept(new MetadataTypeVisitor() {
 
-              @Override
-              public void visitObject(ObjectType objectType) {
-                if (!objectType.getAnnotation(InfrastructureTypeAnnotation.class).isPresent()) {
-                  try {
-                    Class<?> type = getType(objectType, classLoaderModelProperty.getClassLoader());
-                    if (validatedTypes.add(type)) {
-                      validateType(model, type, DefaultEncoding.class);
+                @Override
+                public void visitObject(ObjectType objectType) {
+                  if (!objectType.getAnnotation(InfrastructureTypeAnnotation.class).isPresent()) {
+                    try {
+                      Class<?> type = getType(objectType, classLoaderModelProperty.getClassLoader());
+                      if (validatedTypes.add(type)) {
+                        validateType(model, type, DefaultEncoding.class);
+                      }
+                    } catch (Exception e) {
+                      //TODO - This is too verbose and fails always in AST Mode
+                      //problemsReporter.addWarning(new Problem(model, "Could not validate Class: " + e.getMessage()));
                     }
-                  } catch (Exception e) {
-                    //TODO - This is too verbose and fails always in AST Mode
-                    //problemsReporter.addWarning(new Problem(model, "Could not validate Class: " + e.getMessage()));
                   }
                 }
+              });
+            }
+          }
+
+          private void validateArguments(NamedObject model, Optional<ExtensionOperationDescriptorModelProperty> modelProperty,
+                                         Class<? extends Annotation> annotationClass) {
+            modelProperty.ifPresent(operationDescriptorModelProperty -> {
+              MethodElement operation = operationDescriptorModelProperty.getOperationMethod();
+              int size = operation.getParametersAnnotatedWith(annotationClass).size();
+
+              if (size == 0) {
+                return;
+              } else if (size > 1) {
+                problemsReporter
+                    .addError(new Problem(model,
+                                          format("Operation method '%s' has %d arguments annotated with @%s. Only one argument may carry that annotation",
+                                                 operation.getName(), size,
+                                                 annotationClass.getSimpleName())));
+              }
+
+              ExtensionParameter argument = operation.getParametersAnnotatedWith(annotationClass).get(0);
+              if (!argument.getType().isSameType(String.class)) {
+                problemsReporter
+                    .addError(new Problem(model,
+                                          format("Operation method '%s' declares an argument '%s' which is annotated with @%s and is of type '%s'. Only "
+                                              + "arguments of type String are allowed to carry such annotation",
+                                                 operation.getName(),
+                                                 argument.getName(), annotationClass.getSimpleName(),
+                                                 argument.getType().getName())));
               }
             });
           }
-        }
 
-        private void validateArguments(NamedObject model, Optional<ExtensionOperationDescriptorModelProperty> modelProperty,
-                                       Class<? extends Annotation> annotationClass) {
-          modelProperty.ifPresent(operationDescriptorModelProperty -> {
-            MethodElement operation = operationDescriptorModelProperty.getOperationMethod();
-            int size = operation.getParametersAnnotatedWith(annotationClass).size();
+          private void validateFields(NamedObject model, Optional<ImplementingTypeModelProperty> modelProperty,
+                                      Class<? extends Annotation> annotationClass) {
+            modelProperty.ifPresent(implementingTypeModelProperty -> {
+              validateType(model, implementingTypeModelProperty.getType(), annotationClass);
+            });
+          }
 
-            if (size == 0) {
+          private void validateType(NamedObject model, Class<?> type, Class<? extends Annotation> annotationClass) {
+            List<Field> fields = getAnnotatedFields(type, annotationClass);
+            if (fields.isEmpty()) {
               return;
-            } else if (size > 1) {
+            } else if (fields.size() > 1) {
               problemsReporter
                   .addError(new Problem(model,
-                                        format("Operation method '%s' has %d arguments annotated with @%s. Only one argument may carry that annotation",
-                                               operation.getName(), size,
-                                               annotationClass.getSimpleName())));
+                                        format("Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
+                                               type.getName(), fields.size(), annotationClass.getSimpleName())));
             }
 
-            ExtensionParameter argument = operation.getParametersAnnotatedWith(annotationClass).get(0);
-            if (!argument.getType().isSameType(String.class)) {
+            Field field = fields.get(0);
+            if (!String.class.equals(field.getType())) {
               problemsReporter
                   .addError(new Problem(model,
-                                        format("Operation method '%s' declares an argument '%s' which is annotated with @%s and is of type '%s'. Only "
-                                            + "arguments of type String are allowed to carry such annotation",
-                                               operation.getName(),
-                                               argument.getName(), annotationClass.getSimpleName(),
-                                               argument.getType().getName())));
+                                        format("Class '%s' declares the field '%s' which is annotated with @%s and is of type '%s'. Only "
+                                            + "fields of type String are allowed to carry such annotation", type.getName(),
+                                               field.getName(), annotationClass.getSimpleName(), field.getType().getName())));
             }
-          });
-        }
-
-        private void validateFields(NamedObject model, Optional<ImplementingTypeModelProperty> modelProperty,
-                                    Class<? extends Annotation> annotationClass) {
-          modelProperty.ifPresent(implementingTypeModelProperty -> {
-            validateType(model, implementingTypeModelProperty.getType(), annotationClass);
-          });
-        }
-
-        private void validateType(NamedObject model, Class<?> type, Class<? extends Annotation> annotationClass) {
-          List<Field> fields = getAnnotatedFields(type, annotationClass);
-          if (fields.isEmpty()) {
-            return;
-          } else if (fields.size() > 1) {
-            problemsReporter
-                .addError(new Problem(model,
-                                      format("Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
-                                             type.getName(), fields.size(), annotationClass.getSimpleName())));
           }
-
-          Field field = fields.get(0);
-          if (!String.class.equals(field.getType())) {
-            problemsReporter
-                .addError(new Problem(model,
-                                      format("Class '%s' declares the field '%s' which is annotated with @%s and is of type '%s'. Only "
-                                          + "fields of type String are allowed to carry such annotation", type.getName(),
-                                             field.getName(), annotationClass.getSimpleName(), field.getType().getName())));
-          }
-        }
-      }.walk(extensionModel);
-    });
+        }.walk(extensionModel);
+      });
+    }
   }
 }

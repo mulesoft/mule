@@ -43,10 +43,10 @@ public final class AnnotationProcessorProblemsHandler implements ProblemsHandler
    */
   @Override
   public void handleProblems(ProblemsReporter problemsReporter) {
-    problemsReporter.getErrors().forEach(problem -> messager
-        .printMessage(ERROR, problem.getMessage(), getElement(problem.getComponent())));
     problemsReporter.getWarnings().forEach(problem -> messager
         .printMessage(WARNING, problem.getMessage(), getElement(problem.getComponent())));
+    problemsReporter.getErrors().forEach(problem -> messager
+        .printMessage(ERROR, problem.getMessage(), getElement(problem.getComponent())));
   }
 
   private Element getElement(NamedObject component) {
