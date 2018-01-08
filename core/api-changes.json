@@ -24,6 +24,15 @@
           "classSimpleName": "Scheduler",
           "elementKind": "interface",
           "justification": "Make interface MetadataType consistent with schema declaration in mule-core-common.xsd when loading the type DSL"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.core.api.event.CoreEvent.Builder org.mule.runtime.core.api.event.CoreEvent.Builder::itemSequenceInfo(java.util.Optional<org.mule.runtime.api.message.ItemSequenceInfo>)",
+          "package": "org.mule.runtime.core.api.event",
+          "classSimpleName": "Builder",
+          "methodName": "itemSequenceInfo",
+          "elementKind": "method",
+          "justification": "Method inherited from parent (Event). Needed in mule-api to bind data to DW"
         }
       ]
     }

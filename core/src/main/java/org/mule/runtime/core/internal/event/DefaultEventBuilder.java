@@ -236,7 +236,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
       return new InternalEventImplementation(context, message, flowVariables,
                                              internalParameters, session, securityContext, replyToDestination,
-                                             replyToHandler, groupCorrelation,itemSequenceInfo, error,
+                                             replyToHandler, groupCorrelation, itemSequenceInfo, error,
                                              legacyCorrelationId,
                                              notificationsEnabled);
     }
@@ -289,7 +289,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private InternalEventImplementation(BaseEventContext context, Message message, Map<String, TypedValue<?>> variables,
                                         Map<String, ?> internalParameters, MuleSession session, SecurityContext securityContext,
                                         Object replyToDestination, ReplyToHandler replyToHandler,
-                                        Optional<GroupCorrelation> groupCorrelation, Optional<ItemSequenceInfo> itemSequenceInfo, Error error,
+                                        Optional<GroupCorrelation> groupCorrelation, Optional<ItemSequenceInfo> itemSequenceInfo,
+                                        Error error,
                                         String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
       this.session = session;

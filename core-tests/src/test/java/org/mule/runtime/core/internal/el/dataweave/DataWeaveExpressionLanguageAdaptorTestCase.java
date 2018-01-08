@@ -339,7 +339,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void itemSequenceInfoBinding() throws Exception {
     CoreEvent event = spy(testEvent());
-    when(event.getItemSequenceInfo()).thenReturn(of(ItemSequenceInfo.of(43,100)));
+    when(event.getItemSequenceInfo()).thenReturn(of(ItemSequenceInfo.of(43, 100)));
     TypedValue result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".position", event, BindingContext.builder().build());
     assertThat(result.getValue(), is(43));
     result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".sequenceSize", event, BindingContext.builder().build());

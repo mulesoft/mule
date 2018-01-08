@@ -61,6 +61,7 @@ public class GroupCorrelation implements Serializable {
   public int getSequence() {
     return wrappedInfo.getPosition();
   }
+
   /**
    * Determines how many messages are in the correlation group
    *
