@@ -14,18 +14,19 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServiceFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
-import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 
@@ -42,7 +43,10 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
   private static final String PROVIDER_CLASS_NAME = "org.foo.FooServiceProvider";
 
   private DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
-  private final ServiceDescriptorFactory serviceDescriptorFactory = new ServiceDescriptorFactory(descriptorLoaderRepository);
+
+  private ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder = mock(ArtifactDescriptorValidatorBuilder.class);
+  private ArtifactDescriptorValidator artifactDescriptorValidator = mock(ArtifactDescriptorValidator.class);
+  private ServiceDescriptorFactory serviceDescriptorFactory;
 
   @Rule
   public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
@@ -53,7 +57,13 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
         .thenReturn(mock(BundleDescriptorLoader.class));
     when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(ClassLoaderModelLoader.class))))
         .thenReturn(mock(ClassLoaderModelLoader.class));
+
+    when(artifactDescriptorValidatorBuilder.build()).thenReturn(artifactDescriptorValidator);
+    doNothing().when(artifactDescriptorValidator).validate(anyObject());
+
+    serviceDescriptorFactory = new ServiceDescriptorFactory(descriptorLoaderRepository, artifactDescriptorValidatorBuilder);
   }
+
 
   @Test
   public void createServiceDescriptor() throws Exception {

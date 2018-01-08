@@ -1,0 +1,27 @@
+{
+  "4.1.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method void org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory<M extends org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel, T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::<init>(org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository)",
+          "new": "method void org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory<M extends org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel, T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::<init>(org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository, org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "AbstractArtifactDescriptorFactory",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "In order to allow customization for artifact descriptor validations"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory<M extends org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel, T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::validateVersion(T)",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "AbstractArtifactDescriptorFactory",
+          "methodName": "validateVersion",
+          "elementKind": "method",
+          "justification": "In order to allow customization for artifact descriptor validations"
+        }
+      ]
+    }
+  }
+}

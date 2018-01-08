@@ -7,11 +7,11 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
-import static java.util.Optional.empty;
 import static java.io.File.createTempFile;
 import static java.io.File.separator;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
@@ -43,10 +43,10 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
-import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
@@ -90,7 +90,6 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader = mock(ArtifactPluginDescriptorLoader.class);
   private final DescriptorLoaderRepository descriptorLoaderRepository = mock(ServiceRegistryDescriptorLoaderRepository.class);
 
-
   private static File getResourceFile(String resource) {
     return toFile(PolicyTemplateDescriptorFactoryTestCase.class.getResource(resource));
   }
@@ -124,7 +123,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     unzip(policyFileBuilder.getArtifactFile(), tempFolder);
 
     PolicyTemplateDescriptorFactory descriptorFactory =
-        new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
+        new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
+                                            ArtifactDescriptorValidatorBuilder.builder());
 
     expectedException.expect(ArtifactDescriptorCreateException.class);
     expectedException.expectMessage(allOf(containsString(ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR),
@@ -148,7 +148,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     unzip(policyFileBuilder.getArtifactFile(), tempFolder);
 
     PolicyTemplateDescriptorFactory descriptorFactory =
-        new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
+        new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
+                                            ArtifactDescriptorValidatorBuilder.builder());
     PolicyTemplateDescriptor desc = descriptorFactory.create(tempFolder, empty());
 
     assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
@@ -173,7 +174,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     unzip(policyFileBuilder.getArtifactFile(), tempFolder);
 
     PolicyTemplateDescriptorFactory descriptorFactory =
-        new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
+        new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
+                                            ArtifactDescriptorValidatorBuilder.builder());
     PolicyTemplateDescriptor desc = descriptorFactory.create(tempFolder, empty());
 
     assertThat(desc.getBundleDescriptor().getArtifactId(), equalTo(POLICY_NAME));
@@ -205,7 +207,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
     final PolicyTemplateDescriptorFactory policyTemplateDescriptorFactory =
         new PolicyTemplateDescriptorFactory(new ArtifactPluginDescriptorLoader(pluginDescriptorFactory),
-                                            descriptorLoaderRepository);
+                                            descriptorLoaderRepository, ArtifactDescriptorValidatorBuilder.builder());
 
     final ArtifactPluginDescriptor expectedPluginDescriptor1 = mock(ArtifactPluginDescriptor.class);
     when(expectedPluginDescriptor1.getName()).thenReturn("plugin1");
@@ -239,7 +241,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     unzip(policyFileBuilder.getArtifactFile(), tempFolder);
 
     PolicyTemplateDescriptorFactory descriptorFactory =
-        new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
+        new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
+                                            ArtifactDescriptorValidatorBuilder.builder());
     expectedException.expect(ArtifactDescriptorCreateException.class);
     expectedException
         .expectMessage(invalidClassLoaderModelIdError(tempFolder, mulePolicyModelBuilder.getClassLoaderModelDescriptorLoader()));
@@ -260,7 +263,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     unzip(policyFileBuilder.getArtifactFile(), tempFolder);
 
     PolicyTemplateDescriptorFactory descriptorFactory =
-        new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
+        new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
+                                            ArtifactDescriptorValidatorBuilder.builder());
     expectedException.expect(ArtifactDescriptorCreateException.class);
     expectedException
         .expectMessage(invalidBundleDescriptorLoaderIdError(tempFolder, mulePolicyModelBuilder.getBundleDescriptorLoader()));

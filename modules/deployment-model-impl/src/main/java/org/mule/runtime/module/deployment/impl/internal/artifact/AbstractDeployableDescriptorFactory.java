@@ -16,6 +16,7 @@ import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescripto
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
 import com.google.common.collect.ImmutableSet;
@@ -31,8 +32,9 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
   protected final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
 
   public AbstractDeployableDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
-                                             DescriptorLoaderRepository descriptorLoaderRepository) {
-    super(descriptorLoaderRepository);
+                                             DescriptorLoaderRepository descriptorLoaderRepository,
+                                             ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
+    super(descriptorLoaderRepository, artifactDescriptorValidatorBuilder);
     checkArgument(artifactPluginDescriptorLoader != null, "ApplicationPluginDescriptorFactory cannot be null");
 
     this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;

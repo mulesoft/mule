@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
@@ -51,7 +52,8 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase {
     ApplicationDescriptor descriptor = new ApplicationDescriptor("app");
     ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                         new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()));
+                                         new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
+                                         ArtifactDescriptorValidatorBuilder.builder());
     applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
     Map<String, String> appProps = descriptor.getAppProperties();
     assertEquals("state", appProps.get("texas"));

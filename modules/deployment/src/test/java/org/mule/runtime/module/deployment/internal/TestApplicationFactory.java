@@ -18,6 +18,7 @@ import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependencie
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactory;
@@ -74,7 +75,8 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader =
         new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
     ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
+        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
+                                         ArtifactDescriptorValidatorBuilder.builder());
     final DefaultClassLoaderManager artifactClassLoaderManager = new DefaultClassLoaderManager();
     PluginDependenciesResolver pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
 

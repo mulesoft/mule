@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
@@ -34,8 +35,9 @@ public class ApplicationDescriptorFactory
   public static final String SYSTEM_PROPERTY_OVERRIDE = "-O";
 
   public ApplicationDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
-                                      DescriptorLoaderRepository descriptorLoaderRepository) {
-    super(artifactPluginDescriptorLoader, descriptorLoaderRepository);
+                                      DescriptorLoaderRepository descriptorLoaderRepository,
+                                      ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
+    super(artifactPluginDescriptorLoader, descriptorLoaderRepository, artifactDescriptorValidatorBuilder);
   }
 
   @Override

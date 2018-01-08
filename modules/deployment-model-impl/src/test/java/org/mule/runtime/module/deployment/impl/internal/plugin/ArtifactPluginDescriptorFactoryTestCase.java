@@ -7,8 +7,8 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static java.util.Optional.empty;
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -17,8 +17,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.invalidBundleDescriptorLoaderIdError;
@@ -37,6 +37,7 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
@@ -70,7 +71,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   private final ClassLoaderFilterFactory classLoaderFilterFactory = mock(ClassLoaderFilterFactory.class);
   private final DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
-  private ArtifactPluginDescriptorFactory descriptorFactory = new ArtifactPluginDescriptorFactory(descriptorLoaderRepository);
+  private ArtifactPluginDescriptorFactory descriptorFactory;
   private MavenClientProvider mavenClientProvider =
       MavenClientProvider.discoverProvider(ArtifactPluginDescriptorFactoryTestCase.class.getClassLoader());
 
@@ -98,6 +99,9 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
         .thenReturn(new PropertiesBundleDescriptorLoader());
     when(descriptorLoaderRepository.get(INVALID_LOADER_ID, PLUGIN, BundleDescriptorLoader.class))
         .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
+
+    descriptorFactory =
+        new ArtifactPluginDescriptorFactory(descriptorLoaderRepository, ArtifactDescriptorValidatorBuilder.builder());
   }
 
   @Test

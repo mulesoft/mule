@@ -8,18 +8,11 @@
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.core.internal.util.JarUtils.loadFileContentFrom;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Properties;
-
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
@@ -31,7 +24,13 @@ import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescripto
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Creates {@link ArtifactPluginDescriptor} instances
@@ -43,16 +42,19 @@ public class ArtifactPluginDescriptorFactory
    * Creates a default factory
    */
   public ArtifactPluginDescriptorFactory() {
-    this(new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()));
+    this(new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
+         ArtifactDescriptorValidatorBuilder.builder());
   }
 
   /**
    * Creates a custom factory
    * 
    * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
+   * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} builder to define the validator to be used. Non null.
    */
-  public ArtifactPluginDescriptorFactory(DescriptorLoaderRepository descriptorLoaderRepository) {
-    super(descriptorLoaderRepository);
+  public ArtifactPluginDescriptorFactory(DescriptorLoaderRepository descriptorLoaderRepository,
+                                         ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
+    super(descriptorLoaderRepository, artifactDescriptorValidatorBuilder);
   }
 
   @Override
