@@ -28,6 +28,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Saves the payload that goes through a processor for accessing it later
+ */
 public class FlowExecutionLogger extends AbstractComponent implements Processor {
 
   private static final int POLLING_TIMEOUT = 5000;
