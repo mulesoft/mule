@@ -5,7 +5,7 @@ The following is a list of changes you have to execute to migrate from Mule Runt
 Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for more details.
 
 Migration changes from 3.9.x to 3.10.x
-MULE-14381: By default, the File Connector processes empty files. For tuning off this behavior use the transport.file.notProcessEmptyFiles=true system property.
+MULE-14381: By default, the File Connector processes empty files. For disabling this behavior use the mule.transport.file.notProcessEmptyFiles=true system property.
 
 Migration changes from 3.8.x to 3.9.x
 MULE-12245: Old Xalan and Xerces implementations were removed in favor of the newer versions included in Java. Only minor incompatibilities could result such as ordering changes of some XML attributes.
