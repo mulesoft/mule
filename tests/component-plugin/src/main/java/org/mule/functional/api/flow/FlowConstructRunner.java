@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -164,12 +165,26 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
    * Configures the product event to have the provided {@code correlation}. See {@link CoreEvent#getGroupCorrelation()}.
    *
    * @return this {@link TestEventBuilder}
+   * @deprecated use
    */
   public R withCorrelation(GroupCorrelation correlation) {
     eventBuilder.withCorrelation(correlation);
 
     return (R) this;
   }
+
+  /**
+   * Configures the product event to have the provided {@code itemSequenceInfo}. See {@link CoreEvent#getItemSequenceInfo()}.
+   *
+   * @return this {@link TestEventBuilder}
+   */
+  public R withItemSequenceInfo(ItemSequenceInfo itemSequenceInfo) {
+    eventBuilder.withItemSequenceInfo(itemSequenceInfo);
+
+    return (R) this;
+  }
+
+
 
   /**
    * Prepares a flow variable with the given key and value to be set in the {@link Message} to the configured flow.

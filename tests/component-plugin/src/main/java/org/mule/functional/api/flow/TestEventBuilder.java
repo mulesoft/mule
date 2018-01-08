@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -52,6 +53,7 @@ public class TestEventBuilder {
 
   private String sourceCorrelationId = null;
   private GroupCorrelation groupCorrelation;
+  private ItemSequenceInfo itemSequenceInfo;
 
   private Map<String, TypedValue> variables = new HashMap<>();
 
@@ -187,12 +189,25 @@ public class TestEventBuilder {
    * Configures the product event to have the provided {@code correlation}. See {@link CoreEvent#getGroupCorrelation()}.
    *
    * @return this {@link TestEventBuilder}
+   * @deprecated use {@link #withItemSequenceInfo(ItemSequenceInfo)} instead
    */
   public TestEventBuilder withCorrelation(GroupCorrelation groupCorrelation) {
     this.groupCorrelation = groupCorrelation;
 
     return this;
   }
+
+  /**
+   * Configures the product event to have the provided {@code itemSequenceInfo}. See {@link CoreEvent#getItemSequenceInfo()}.
+   *
+   * @return this {@link TestEventBuilder}
+   */
+  public TestEventBuilder withItemSequenceInfo(ItemSequenceInfo itemSequenceInfo) {
+    this.itemSequenceInfo = itemSequenceInfo;
+
+    return this;
+  }
+
 
   /**
    * Prepares a flow variable with the given key and value to be set in the product.
@@ -279,7 +294,7 @@ public class TestEventBuilder {
 
     CoreEvent.Builder builder = InternalEvent.builder(eventContext)
         .message(spyMessage.apply(muleMessage)).groupCorrelation(ofNullable(groupCorrelation))
-        .replyToHandler(replyToHandler);
+        .replyToHandler(replyToHandler).itemSequenceInfo(ofNullable(itemSequenceInfo));
     for (Entry<String, TypedValue> variableEntry : variables.entrySet()) {
       builder.addVariable(variableEntry.getKey(), variableEntry.getValue().getValue(), variableEntry.getValue().getDataType());
     }
