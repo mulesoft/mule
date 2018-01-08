@@ -12,7 +12,7 @@ import org.mule.runtime.api.notification.NotificationListener;
 public interface ServerNotificationHandler {
 
   /**
-   * Fire the {@link Notification}. Regardless of is a notification is fired synchronously or asynchronously any {@link Throwable}
+   * Fire the {@link Notification}. Regardless of if a notification is fired synchronously or asynchronously any {@link Throwable}
    * thrown by the {@link NotificationListener} will not be propagated.
    * 
    * @param notification the notification to fire.
