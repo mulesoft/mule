@@ -55,7 +55,7 @@ public class SoapExtensionWithCustomTransportsDeclarationTestCase extends Abstra
     assertSubtypes(model);
     List<ConnectionProviderModel> providers = configuration.getConnectionProviders();
     assertThat(providers, hasSize(1));
-    assertConnectionProvider(providers.get(0), "rick-and-morty-connection", "",
+    assertConnectionProvider(providers.get(0), "rick-and-morty-connection", "", true,
                              new ParameterProber("wsdlUrl", StringType.class),
                              new ParameterProber("port", StringType.class),
                              new ParameterProber("service", StringType.class),

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
 import static java.util.Arrays.asList;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.*;
 
@@ -90,19 +91,21 @@ public class ForwardingSoapClientConnectionProvider implements ConnectionProvide
     connection.disconnect();
   }
 
-  // TODO: MULE-12207 connectivity testing for Soap Connect extensions.
   @Override
   public ConnectionValidationResult validate(ForwardingSoapClient connection) {
-    return success();
+    try {
+      serviceProvider.validateConfiguration();
+      MessageDispatcher messageDispatcher = transportProvider.connect();
+      ConnectionValidationResult result = transportProvider.validate(messageDispatcher);
+      transportProvider.disconnect(messageDispatcher);
+      return result;
+    } catch (Exception e) {
+      return failure(e.getMessage(), e);
+    }
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    try {
-      serviceProvider.validateConfiguration();
-    } catch (SoapServiceProviderConfigurationException e) {
-      throw new InitialisationException(e, this);
-    }
     initialiseIfNeeded(asList(transportProvider, serviceProvider), true, muleContext);
   }
 

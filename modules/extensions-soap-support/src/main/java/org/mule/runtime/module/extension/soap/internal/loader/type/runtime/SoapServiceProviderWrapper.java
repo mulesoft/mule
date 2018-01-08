@@ -11,6 +11,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
 
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
@@ -43,5 +44,9 @@ public class SoapServiceProviderWrapper extends SoapComponentWrapper implements 
         .replace("-connection", "")
         .replace("-extension", "");
     return finalName + "-" + DEFAULT_CONNECTION_PROVIDER_NAME;
+  }
+
+  public boolean supportsConnectivityTesting() {
+    return !(super.getDeclaringClass().isPresent() && NoConnectivityTest.class.isAssignableFrom(super.getDeclaringClass().get()));
   }
 }

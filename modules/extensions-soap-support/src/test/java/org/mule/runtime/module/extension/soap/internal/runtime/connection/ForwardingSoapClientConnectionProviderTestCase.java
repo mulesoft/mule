@@ -8,11 +8,15 @@ package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
@@ -34,11 +38,10 @@ public class ForwardingSoapClientConnectionProviderTestCase {
   private static final Exception EXCEPTION = new RuntimeException(ERROR_MESSAGE);
   private static final ErrorType ERROR_TYPE = mock(ErrorType.class);
 
-  @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
   private MessageDispatcherProvider dispatcherProvider = mock(MessageDispatcherProvider.class);
-  private MuleContext muleContext = mock(MuleContext.class);
+  private MuleContext ctx = mock(MuleContext.class);
 
   @Before
   public void setup() {
@@ -48,10 +51,11 @@ public class ForwardingSoapClientConnectionProviderTestCase {
 
   @Test
   public void invalidProvider() throws Exception {
-    expectedException.expectMessage(ERROR_MESSAGE);
-    expectedException.expect(InitialisationException.class);
-    expectedException.expectCause(instanceOf(SoapServiceProviderConfigurationException.class));
-    new ForwardingSoapClientConnectionProvider(new ValidableServiceProvider(false), dispatcherProvider, muleContext).initialise();
+    ConnectionValidationResult result =
+        new ForwardingSoapClientConnectionProvider(new ValidableServiceProvider(false), dispatcherProvider, ctx).validate(null);
+    assertThat(result.isValid(), is(false));
+    assertThat(result.getException(), instanceOf(SoapServiceProviderConfigurationException.class));
+    assertThat(result.getMessage(), is(ERROR_MESSAGE));
   }
 
   private class ValidableServiceProvider implements SoapServiceProvider {
