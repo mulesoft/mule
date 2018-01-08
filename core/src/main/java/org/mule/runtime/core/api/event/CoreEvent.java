@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.event;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -46,6 +47,8 @@ public interface CoreEvent extends Serializable, Event {
    * Returns the correlation metadata of this message. See {@link GroupCorrelation}.
    *
    * @return the correlation metadata of this message.
+   *
+   * @deprecated use {@link #getItemSequenceInfo()} instead
    */
   Optional<GroupCorrelation> getGroupCorrelation();
 
@@ -147,8 +150,17 @@ public interface CoreEvent extends Serializable, Event {
      *
      * @param groupCorrelation the object containing the group correlation information to set on the produced event
      * @return the builder instance
+     * @deprecated use {@link #itemSequenceInfo(Optional)}} instead
      */
     Builder groupCorrelation(Optional<GroupCorrelation> groupCorrelation);
+
+    /**
+     * Sets the event sequence information.
+     *
+     * @param itemSequenceInfo the object containing the sequence information of the produced event
+     * @return the builder instance
+     */
+    Builder itemSequenceInfo(Optional<ItemSequenceInfo> itemSequenceInfo);
 
     /**
      * Sets an error related to the produced event.

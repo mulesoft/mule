@@ -264,6 +264,7 @@ public interface PrivilegedEvent extends CoreEvent {
     Builder removeVariable(String key);
 
     @Override
+    @Deprecated
     Builder groupCorrelation(Optional<GroupCorrelation> groupCorrelation);
 
     @Override

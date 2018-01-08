@@ -38,6 +38,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.AUTHENTICATION;
 import static org.mule.runtime.api.el.BindingContextUtils.DATA_TYPE;
 import static org.mule.runtime.api.el.BindingContextUtils.ERROR;
 import static org.mule.runtime.api.el.BindingContextUtils.FLOW;
+import static org.mule.runtime.api.el.BindingContextUtils.ITEM_SEQUENCE_INFO;
 import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
@@ -64,6 +65,7 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -315,6 +317,33 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     TypedValue result = expressionLanguage.evaluate(MESSAGE, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Message.class)));
     assertEquals(((Message) result.getValue()).getPayload(), event.getMessage().getPayload());
+  }
+
+  @Test
+  public void nullItemSequenceInfoBinding() throws Exception {
+    CoreEvent event = testEvent();
+    TypedValue result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO, event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(nullValue()));
+  }
+
+  @Test
+  public void noSequenceSizeItemSequenceInfoBinding() throws Exception {
+    CoreEvent event = spy(testEvent());
+    when(event.getItemSequenceInfo()).thenReturn(of(ItemSequenceInfo.of(43)));
+    TypedValue result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".position", event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(43));
+    result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".sequenceSize", event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(nullValue()));
+  }
+
+  @Test
+  public void itemSequenceInfoBinding() throws Exception {
+    CoreEvent event = spy(testEvent());
+    when(event.getItemSequenceInfo()).thenReturn(of(ItemSequenceInfo.of(43,100)));
+    TypedValue result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".position", event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(43));
+    result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".sequenceSize", event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(100));
   }
 
   @Test

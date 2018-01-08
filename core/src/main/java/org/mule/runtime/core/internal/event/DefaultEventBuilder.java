@@ -24,6 +24,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -66,6 +67,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private Map<String, Object> internalParameters = new HashMap<>(4);
   private Error error;
   private Optional<GroupCorrelation> groupCorrelation = empty();
+  private Optional<ItemSequenceInfo> itemSequenceInfo = empty();
   private String legacyCorrelationId;
   private ReplyToHandler replyToHandler;
   private Object replyToDestination;
@@ -85,6 +87,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.originalEvent = event;
     this.message = event.getMessage();
     this.groupCorrelation = event.getGroupCorrelation();
+    this.itemSequenceInfo = event.getItemSequenceInfo();
     this.legacyCorrelationId = event.getLegacyCorrelationId();
     this.replyToHandler = event.getReplyToHandler();
     this.replyToDestination = event.getReplyToDestination();
@@ -167,8 +170,16 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   @Override
+  @Deprecated
   public DefaultEventBuilder groupCorrelation(Optional<GroupCorrelation> correlation) {
     this.groupCorrelation = correlation;
+    this.modified = true;
+    return this;
+  }
+
+  @Override
+  public CoreEvent.Builder itemSequenceInfo(Optional<ItemSequenceInfo> itemSequenceInfo) {
+    this.itemSequenceInfo = itemSequenceInfo;
     this.modified = true;
     return this;
   }
@@ -225,7 +236,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
       return new InternalEventImplementation(context, message, flowVariables,
                                              internalParameters, session, securityContext, replyToDestination,
-                                             replyToHandler, groupCorrelation, error,
+                                             replyToHandler, groupCorrelation,itemSequenceInfo, error,
                                              legacyCorrelationId,
                                              notificationsEnabled);
     }
@@ -271,11 +282,14 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final String legacyCorrelationId;
     private final Error error;
 
+    private GroupCorrelation groupCorrelation;
+    private ItemSequenceInfo itemSequenceInfo;
+
     // Use this constructor from the builder
     private InternalEventImplementation(BaseEventContext context, Message message, Map<String, TypedValue<?>> variables,
                                         Map<String, ?> internalParameters, MuleSession session, SecurityContext securityContext,
                                         Object replyToDestination, ReplyToHandler replyToHandler,
-                                        Optional<GroupCorrelation> groupCorrelation, Error error,
+                                        Optional<GroupCorrelation> groupCorrelation, Optional<ItemSequenceInfo> itemSequenceInfo, Error error,
                                         String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
       this.session = session;
@@ -288,6 +302,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.replyToDestination = replyToDestination;
 
       this.groupCorrelation = groupCorrelation.orElse(null);
+      this.itemSequenceInfo = itemSequenceInfo.orElse(null);
       this.error = error;
       this.legacyCorrelationId = legacyCorrelationId;
 
@@ -462,8 +477,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       return securityContext;
     }
 
-    private GroupCorrelation groupCorrelation;
-
     @Override
     public Map<String, ?> getInternalParameters() {
       return unmodifiableMap(internalParameters);
@@ -472,6 +485,11 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     @Override
     public Optional<GroupCorrelation> getGroupCorrelation() {
       return ofNullable(groupCorrelation);
+    }
+
+    @Override
+    public Optional<ItemSequenceInfo> getItemSequenceInfo() {
+      return ofNullable(itemSequenceInfo);
     }
 
     @Override
