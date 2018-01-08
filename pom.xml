@@ -159,7 +159,7 @@
         <apacheHttpCoreVersion>4.4.6</apacheHttpCoreVersion>
         <apacheHttpClientVersion>4.5.3</apacheHttpClientVersion>
         <awaitilityVersion>1.7.0</awaitilityVersion>
-        <bouncycastleVersion>1.56</bouncycastleVersion>
+        <bouncycastleVersion>1.59</bouncycastleVersion>
         <c3p0Version>0.9.5.2</c3p0Version>
         <cglibVersion>3.2.5</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
