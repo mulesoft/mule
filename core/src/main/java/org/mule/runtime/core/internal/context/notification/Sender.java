@@ -33,7 +33,7 @@ public class Sender<N extends Notification> {
       try {
         notifier.notify(pair.getListener(), notification);
       } catch (Throwable e) {
-        // Exceptions or errorrs from listeners do not affect the notification processing
+        // Exceptions or errors from listeners do not affect the notification processing
         LOGGER.info("NotificationListener {} was unable to fire notification {} due to an exception: {}.",
                     pair.getListener(), notification, e);
       }
