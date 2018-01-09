@@ -199,8 +199,8 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   }
 
   private void validateNotifications(SourceCallbackContextAdapter contextAdapter) {
-    contextAdapter.getSourceNotifications().forEach(sourceNotification -> {
-      String notificationName = ((Enum) sourceNotification.getAction()).name();
+    contextAdapter.getNotificationsFunctions().forEach(sourceNotification -> {
+      String notificationName = ((ExtensionNotificationFunction) sourceNotification).getActionName();
       checkArgument(notificationModelNames.contains(notificationName),
                     format("Cannot fire notification '%s' since it's not declared by the component.", notificationName));
     });
@@ -210,7 +210,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     messageProcessingManager.processMessage(
                                             new ModuleFlowProcessingTemplate(message, listener,
-                                                                             contextAdapter.getSourceNotifications(),
+                                                                             contextAdapter.getNotificationsFunctions(),
                                                                              completionHandlerFactory
                                                                                  .createCompletionHandler(contextAdapter)),
                                             messageProcessContext);

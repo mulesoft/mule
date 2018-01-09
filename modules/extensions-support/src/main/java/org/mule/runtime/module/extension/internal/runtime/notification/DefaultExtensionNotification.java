@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.extension;
+package org.mule.runtime.module.extension.internal.runtime.notification;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -19,7 +19,6 @@ import org.mule.runtime.extension.internal.notification.ExtensionAction;
 /**
  * Represents notifications fired by an extension.
  *
- * TODO: MULE-14333 - Move to ext-support
  * @since 4.1
  */
 public class DefaultExtensionNotification implements ExtensionNotification {

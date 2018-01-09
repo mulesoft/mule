@@ -51,7 +51,6 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.extension.DefaultExtensionNotification;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalEvent.Builder;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -163,10 +162,8 @@ public class ModuleFlowProcessingPhase
                                                 MessageProcessContext messageProcessContext, FlowConstruct flowConstruct) {
     return request -> {
       fireNotification(messageProcessContext.getMessageSource(), request, flowConstruct, MESSAGE_RECEIVED);
-      //TODO: MULE-14333 - Decouple ModuleProcessingPhase from extension notifications
-      template.getSourceNotifications().forEach(sourceNotification -> muleContext.getNotificationManager()
-          .fireNotification(new DefaultExtensionNotification(request, messageProcessContext.getMessageSource(),
-                                                             sourceNotification.getAction(), sourceNotification.getData())));
+      template.getNotificationFunctions().forEach(notificationFunction -> muleContext.getNotificationManager()
+          .fireNotification(notificationFunction.apply(request, messageProcessContext.getMessageSource())));
     };
   }
 

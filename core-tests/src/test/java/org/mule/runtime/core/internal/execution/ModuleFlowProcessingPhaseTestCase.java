@@ -157,7 +157,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     template = mock(ModuleFlowProcessingPhaseTemplate.class);
     when(template.getMessage()).thenReturn(Message.of(null));
-    when(template.getSourceNotifications()).thenReturn(emptyList());
+    when(template.getNotificationFunctions()).thenReturn(emptyList());
     when(template.sendResponseToClient(any(), any())).thenAnswer(invocation -> Mono.empty());
     when(template.sendFailureResponseToClient(any(), any())).thenAnswer(invocation -> Mono.empty());
 
@@ -281,7 +281,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     reset(template);
     when(template.getMessage()).thenReturn(Message.of(null));
-    when(template.getSourceNotifications()).thenReturn(emptyList());
+    when(template.getNotificationFunctions()).thenReturn(emptyList());
     when(template.sendFailureResponseToClient(any(), any())).thenAnswer(invocation -> create(sinkReference::set));
 
     configureFailingFlow(mockException);
