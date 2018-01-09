@@ -280,7 +280,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final String legacyCorrelationId;
     private final Error error;
 
-    private Optional<ItemSequenceInfo> itemSequenceInfo;
+    private ItemSequenceInfo itemSequenceInfo;
 
     // Use this constructor from the builder
     private InternalEventImplementation(BaseEventContext context, Message message, Map<String, TypedValue<?>> variables,
@@ -299,7 +299,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.replyToHandler = replyToHandler;
       this.replyToDestination = replyToDestination;
 
-      this.itemSequenceInfo = itemSequenceInfo;
+      this.itemSequenceInfo = itemSequenceInfo.orElse(null);
       this.error = error;
       this.legacyCorrelationId = legacyCorrelationId;
 
@@ -481,12 +481,12 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public Optional<GroupCorrelation> getGroupCorrelation() {
-      return ofNullable(toGroupCorrelation(itemSequenceInfo.orElse(null)));
+      return ofNullable(toGroupCorrelation(itemSequenceInfo));
     }
 
     @Override
     public Optional<ItemSequenceInfo> getItemSequenceInfo() {
-      return itemSequenceInfo;
+      return ofNullable(itemSequenceInfo);
     }
 
     @Override
