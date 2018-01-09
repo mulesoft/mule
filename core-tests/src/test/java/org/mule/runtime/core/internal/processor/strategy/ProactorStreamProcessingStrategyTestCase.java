@@ -389,4 +389,30 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     testBackPressure(DROP, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
   }
 
+  @Test
+  @Description("When concurrency < parallelism IO threads are still used for blocking processors to avoid cpuLight thread starvation.")
+  public void concurrencyLessThanParallelism() throws Exception {
+    flow = flowBuilder.get()
+        .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
+                                                                                             XS_BUFFER_SIZE,
+                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             DEFAULT_WAIT_STRATEGY,
+                                                                                             () -> cpuLight,
+                                                                                             () -> blocking,
+                                                                                             () -> cpuIntensive,
+                                                                                             4,
+                                                                                             2))
+        .processors(blockingProcessor)
+        .build();
+    flow.initialise();
+    flow.start();
+
+    processFlow(testEvent());
+    assertThat(threads, hasSize(equalTo(1)));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
 }

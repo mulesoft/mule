@@ -132,9 +132,9 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-      if (processor.getProcessingType() == BLOCKING && maxConcurrency > getParallelism()) {
+      if (processor.getProcessingType() == BLOCKING) {
         return proactor(processor, blockingScheduler);
-      } else if (processor.getProcessingType() == CPU_INTENSIVE && maxConcurrency > getParallelism()) {
+      } else if (processor.getProcessingType() == CPU_INTENSIVE) {
         return proactor(processor, cpuIntensiveScheduler);
       } else {
         return super.onProcessor(processor);
@@ -152,7 +152,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
               .retryWhen(errors -> errors
                   .flatMap(error -> delay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS),
                                           fromExecutorService(getCpuLightScheduler())))),
-                   maxConcurrency / (getParallelism() * subscribers));
+                   max(maxConcurrency / (getParallelism() * subscribers), 1));
     }
 
   }
