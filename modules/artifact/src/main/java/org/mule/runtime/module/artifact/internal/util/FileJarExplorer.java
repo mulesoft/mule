@@ -7,7 +7,11 @@
 
 package org.mule.runtime.module.artifact.internal.util;
 
+import static java.io.File.separator;
+import static java.io.File.separatorChar;
 import static org.apache.commons.io.FileUtils.listFiles;
+import static org.apache.commons.io.filefilter.TrueFileFilter.INSTANCE;
+import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
 
 import java.io.File;
@@ -19,8 +23,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import org.apache.commons.io.filefilter.TrueFileFilter;
 
 /**
  * Discovers Java packages from files and folders
@@ -40,16 +42,20 @@ public class FileJarExplorer implements JarExplorer {
         throw new IllegalArgumentException("Library file does not exists: " + library);
       }
       if (libraryFile.isDirectory()) {
-        final Collection<File> files = listFiles(libraryFile, TrueFileFilter.TRUE, TrueFileFilter.INSTANCE);
+        final Collection<File> files = listFiles(libraryFile, TRUE, INSTANCE);
         for (File classFile : files) {
           final String relativePath = classFile.getAbsolutePath().substring(libraryFile.getAbsolutePath().length() + 1);
           if (relativePath.endsWith(CLASS_EXTENSION)) {
             final String packageName =
-                getPackageName(relativePath.substring(0, relativePath.length() - CLASS_EXTENSION.length()).replace(File.separator,
+                getPackageName(relativePath.substring(0, relativePath.length() - CLASS_EXTENSION.length()).replace(separator,
                                                                                                                    "."));
             packages.add(packageName);
           } else {
-            resources.add(relativePath);
+            if (separatorChar == '/') {
+              resources.add(relativePath);
+            } else {
+              resources.add(relativePath.replace(separator, "/"));
+            }
           }
         }
       } else {

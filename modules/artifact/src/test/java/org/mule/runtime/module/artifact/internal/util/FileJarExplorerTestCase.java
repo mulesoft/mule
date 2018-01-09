@@ -11,8 +11,6 @@ import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-
-import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.tck.ZipUtils;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -57,5 +55,22 @@ public class FileJarExplorerTestCase extends AbstractMuleTestCase {
     assertThat(packages.size(), equalTo(2));
     assertThat(packages, hasItem("org.foo"));
     assertThat(packages, hasItem("org.bar"));
+  }
+
+  @Test
+  public void readsResourcesFromFolder() throws Exception {
+    final File folder = File.createTempFile("test", "");
+    folder.delete();
+    folder.mkdirs();
+    final File orgFolder = new File(folder, "org");
+    final File orgFooFolder = new File(orgFolder, "foo");
+    final File orgFooBarFolder = new File(orgFolder, "bar");
+    writeStringToFile(new File(orgFooFolder, "foo.txt"), "foo");
+    writeStringToFile(new File(orgFooBarFolder, "bar.txt"), "bar");
+
+    final Set<String> resources = packageExplorer.explore(folder.toURI()).getResources();
+    assertThat(resources.size(), equalTo(2));
+    assertThat(resources, hasItem("org/foo/foo.txt"));
+    assertThat(resources, hasItem("org/bar/bar.txt"));
   }
 }
