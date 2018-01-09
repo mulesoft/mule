@@ -24,6 +24,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
@@ -53,6 +54,8 @@ import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.metadata.ResolverSupplier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -218,6 +221,11 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   public void before() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
+    ExtensionTypeDescriptorModelProperty descriptorModelProperty = mock(ExtensionTypeDescriptorModelProperty.class);
+    when(extensionModel.getModelProperty(ExtensionTypeDescriptorModelProperty.class)).thenReturn(of(descriptorModelProperty));
+    Type extensionType = mock(Type.class);
+    when(descriptorModelProperty.getType()).thenReturn(extensionType);
+    when(extensionType.getDeclaringClass()).thenReturn(of(this.getClass()));
 
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(String.class), false, emptySet()));
     when(operationModel.getOutputAttributes())

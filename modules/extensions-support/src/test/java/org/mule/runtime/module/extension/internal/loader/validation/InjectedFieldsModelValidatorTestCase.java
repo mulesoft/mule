@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,7 +33,9 @@ import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -59,6 +62,12 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
   @Mock
   private ConfigurationModel configurationModel;
 
+  @Mock
+  private ExtensionTypeDescriptorModelProperty modelProperty;
+
+  @Mock
+  private Type type;
+
   private InjectedFieldsModelValidator validator = new InjectedFieldsModelValidator();
 
   @Before
@@ -66,6 +75,10 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
     when(extensionModel.getName()).thenReturn("dummyExtension");
     visitableMock(operationModel, sourceModel);
+
+    when(extensionModel.getModelProperty(ExtensionTypeDescriptorModelProperty.class)).thenReturn(of(modelProperty));
+    when(modelProperty.getType()).thenReturn(type);
+    when(type.getDeclaringClass()).thenReturn(of(this.getClass()));
   }
 
   @Test

@@ -108,8 +108,7 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
                         validateType(model, type, DefaultEncoding.class);
                       }
                     } catch (Exception e) {
-                      //TODO - This is too verbose and fails always in AST Mode
-                      //problemsReporter.addWarning(new Problem(model, "Could not validate Class: " + e.getMessage()));
+                      problemsReporter.addWarning(new Problem(model, "Could not validate Class: " + e.getMessage()));
                     }
                   }
                 }
