@@ -28,4 +28,14 @@
         </body>
         <output type="string"/>
     </operation>
+
+    <operation name="set-payload-with-name-parameter">
+        <parameters>
+            <parameter name="name" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[vars.name]"/>
+        </body>
+        <output type="string"/>
+    </operation>
 </module>
