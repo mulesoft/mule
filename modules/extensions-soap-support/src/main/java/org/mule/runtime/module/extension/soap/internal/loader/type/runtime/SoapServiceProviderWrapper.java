@@ -13,8 +13,8 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEF
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
-import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.ParameterizableTypeElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 
 import java.util.Optional;
 

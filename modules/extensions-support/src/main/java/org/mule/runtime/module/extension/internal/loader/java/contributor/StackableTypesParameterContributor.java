@@ -16,9 +16,11 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackableType;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionTypedValueValueResolver;
@@ -29,9 +31,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import org.springframework.core.ResolvableType;
+import java.util.Optional;
 
 /**
  * {@link ParameterDeclarerContributor} implementation contributes to the parameters of type that are registered as
@@ -42,9 +44,9 @@ import org.springframework.core.ResolvableType;
 public class StackableTypesParameterContributor implements ParameterDeclarerContributor {
 
   private final ClassTypeLoader typeLoader;
-  private Map<Class, StackableType> stackableTypes;
+  private Map<Type, StackableType> stackableTypes;
 
-  private StackableTypesParameterContributor(ClassTypeLoader typeLoader, Map<Class, StackableType> stackableTypes) {
+  private StackableTypesParameterContributor(ClassTypeLoader typeLoader, Map<Type, StackableType> stackableTypes) {
     this.typeLoader = typeLoader;
     this.stackableTypes = stackableTypes;
   }
@@ -62,29 +64,36 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
                          ParameterDeclarationContext declarationContext) {
     LazyValue<StackedTypesModelProperty.Builder> stackedTypesModelPropertyBuilder =
         new LazyValue<>(StackedTypesModelProperty::builder);
-    ResolvableType resolvableType = ResolvableType.forType(parameter.getJavaType());
 
-    doContribute(parameter, declarationContext, resolvableType, stackedTypesModelPropertyBuilder);
-    declarer.ofType(typeLoader.load(resolvableType.getType()));
+    doContribute(parameter, declarationContext, parameter.getType(), stackedTypesModelPropertyBuilder);
+    declarer.ofType(parameter.getType().asMetadataType());
     stackedTypesModelPropertyBuilder.ifComputed(builder -> declarer.withModelProperty(builder.build()));
   }
 
   private void doContribute(ExtensionParameter extensionParameter, ParameterDeclarationContext declarationContext,
-                            ResolvableType resolvableType, LazyValue<StackedTypesModelProperty.Builder> builder) {
-    if (stackableTypes.containsKey(resolvableType.getRawClass())) {
-      ResolvableType[] generics = resolvableType.getGenerics();
-      if (generics.length > 0) {
-        builder.get().addType(stackableTypes.get(resolvableType.getRawClass()));
-        doContribute(extensionParameter, declarationContext, generics[0], builder);
-      } else {
-        throw new IllegalParameterModelDefinitionException(
-                                                           format(
-                                                                  "The parameter [%s] from the %s [%s] doesn't specify the %s parameterized type",
-                                                                  extensionParameter.getName(),
-                                                                  declarationContext.getComponentType(),
-                                                                  declarationContext.getName(), extensionParameter.getType()));
-      }
-    }
+                            Type resolvableType, LazyValue<StackedTypesModelProperty.Builder> builder) {
+    getStackableType(resolvableType)
+        .ifPresent(stackableType -> {
+          List<TypeGeneric> generics = resolvableType.getGenerics();
+          if (!generics.isEmpty()) {
+            builder.get().addType(stackableType);
+            doContribute(extensionParameter, declarationContext, generics.get(0).getConcreteType(), builder);
+          } else {
+            throw new IllegalParameterModelDefinitionException(
+                                                               format(
+                                                                      "The parameter [%s] from the %s [%s] doesn't specify the %s parameterized type",
+                                                                      extensionParameter.getName(),
+                                                                      declarationContext.getComponentType(),
+                                                                      declarationContext.getName(),
+                                                                      extensionParameter.getType()));
+          }
+        });
+
+  }
+
+  Optional<StackableType> getStackableType(Type type) {
+    return stackableTypes.entrySet().stream().filter(entry -> entry.getKey().isSameType(type)).map(Map.Entry::getValue)
+        .findFirst();
   }
 
   public static Builder builder(ClassTypeLoader typeLoader) {
@@ -93,7 +102,7 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
 
   public static class Builder {
 
-    private Map<Class, StackableType> stackableTypes = new HashMap<>();
+    private Map<Type, StackableType> stackableTypes = new HashMap<>();
     private ClassTypeLoader typeLoader;
 
     public Builder(ClassTypeLoader typeLoader) {
@@ -109,6 +118,7 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
       return new StackableTypesParameterContributor(typeLoader, stackableTypes);
     }
   }
+
 
   public static StackableTypesParameterContributor defaultContributor(ClassTypeLoader typeLoader) {
     return StackableTypesParameterContributor.builder(typeLoader)

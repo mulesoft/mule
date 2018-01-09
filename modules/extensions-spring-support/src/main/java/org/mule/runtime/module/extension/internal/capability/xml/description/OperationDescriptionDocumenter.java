@@ -18,9 +18,9 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.MethodDo
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
-import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,41 +66,36 @@ final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter
 
   private Map<String, Element> getAllOperations(ProcessingEnvironment processingEnv, Element element) {
     Map<String, Element> elements = new LinkedHashMap<>();
-    Configurations configurations = processor.getAnnotationFromType(processingEnv, (TypeElement) element, Configurations.class);
-    if (configurations != null) {
-      List<TypeElement> configs = processor.getAnnotationClassesValue(element, Configurations.class, configurations.value());
-      configs.forEach(c -> elements.putAll(getOperationMethodElements(processingEnv, c)));
-    }
+
+    processor.getArrayClassAnnotationValue(element, Configurations.class, VALUE_PROPERTY, processingEnv)
+        .forEach(c -> elements.putAll(getOperationMethodElements(processingEnv, c)));
+
     elements.putAll(getOperationMethodElements(processingEnv, element));
     return elements;
   }
 
   private Map<String, Element> getOperationMethodElements(ProcessingEnvironment processingEnv, Element withOperationsElement) {
     ImmutableMap.Builder<String, Element> methods = ImmutableMap.builder();
-    Operations operationsAnnotation =
-        processor.getAnnotationFromType(processingEnv, (TypeElement) withOperationsElement, Operations.class);
-    if (operationsAnnotation != null) {
-      final Class<?>[] operationsClasses = operationsAnnotation.value();
-      for (Class<?> operationClass : operationsClasses) {
-        while (operationClass != null && !operationClass.equals(Object.class)) {
-          TypeElement operationElement = processingEnv.getElementUtils().getTypeElement(operationClass.getName());
-          if (operationElement != null) {
-            for (Method operation : getApiMethods(operationClass)) {
-              operationElement.getEnclosedElements().stream()
-                  .filter(e -> e.getSimpleName().toString().equals(operation.getName())).findFirst()
-                  .ifPresent(operationMethodElement -> methods.put(operation.getName(), operationMethodElement));
-            }
-            operationClass = operationClass.getSuperclass();
-          }
+
+    List<TypeElement> operationsClasses =
+        processor.getArrayClassAnnotationValue(withOperationsElement, Operations.class, VALUE_PROPERTY, processingEnv);
+
+    for (TypeElement operationElement : operationsClasses) {
+      while (operationElement != null
+          && !processingEnv.getTypeUtils().isSameType(operationElement.asType(), objectType.asType())) {
+        for (ExecutableElement operation : getApiMethods(operationElement, processingEnv)) {
+          operationElement.getEnclosedElements().stream()
+              .filter(e -> e.getSimpleName().toString().equals(operation.getSimpleName().toString())).findFirst()
+              .ifPresent(operationMethodElement -> methods.put(operation.getSimpleName().toString(), operationMethodElement));
+        }
+        Element superClass = processingEnv.getTypeUtils().asElement(operationElement.getSuperclass());
+        if (superClass instanceof TypeElement) {
+          operationElement = (TypeElement) superClass;
+        } else {
+          operationElement = null;
         }
       }
     }
     return methods.build();
   }
-  //TODO MULE-14311 - REVERT THIS TEMPORALLY
-  //    return new ConfigurationASTElement((TypeElement) withOperationsElement, processingEnv).getOperationContainers().stream()
-  //        .map(OperationContainerElement::getOperations)
-  //        .flatMap(Collection::stream)
-  //        .collect(toMap(NamedObject::getName, op -> (op).getExecutableElement()));
-  //  }
 }

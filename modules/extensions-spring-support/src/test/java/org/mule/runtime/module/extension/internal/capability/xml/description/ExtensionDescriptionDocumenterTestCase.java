@@ -21,6 +21,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLIC
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -42,16 +43,6 @@ import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLo
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
 import org.mule.tck.size.SmallTest;
 
-import com.google.testing.compile.JavaFileObjects;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -61,6 +52,15 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
 
+import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import com.google.testing.compile.JavaFileObjects;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -112,7 +112,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
   }
 
   @Test
-  public void loadDocumentationFromFile() throws Exception {
+  public void loadDocumentationFromFile() {
     ClassLoader cl = currentThread().getContextClassLoader();
     ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(cl, getDefault(emptySet()));
     DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(extensionClass, "1.0.0-dev");
@@ -158,6 +158,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
     assertDescription(params.get(2), EXPIRATION_POLICY_DESCRIPTION);
     assertDescription(params.get(3), "Group parameter 1");
     assertDescription(params.get(4), "Group parameter 2");
+    assertDescription(params.get(5), "Param with alias");
 
     List<OperationModel> operations = declaration.getOperationModels();
     OperationModel operation = getOperationByName(operations, "operation");

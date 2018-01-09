@@ -10,12 +10,11 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.doc.JavaDocReader.parseJavaDoc;
 
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.doc.JavaDocModel;
@@ -38,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -49,8 +47,6 @@ import com.google.common.collect.ImmutableMap;
  * @since 3.7.0
  */
 public final class ExtensionAnnotationProcessor {
-
-  private static final String VALUE = "value";
 
   /**
    * Returns the {@link Class} object that is associated to the {@code typeElement}
@@ -90,26 +86,32 @@ public final class ExtensionAnnotationProcessor {
     return ElementFilter.typesIn(roundEnvironment.getElementsAnnotatedWith(annotationType));
   }
 
-  public List<TypeElement> getAnnotationClassesValue(Element element, Class<? extends Annotation> annotation,
-                                                     Class[] valueClasses) {
-    List<AnnotationValue> annotationValues = getAnnotationValue(element, annotation);
-    if (annotation == null) {
-      return emptyList();
-    }
-    return Stream.of(valueClasses)
-        .map(c -> (TypeElement) getElementForClass(annotationValues, c))
-        .collect(toImmutableList());
+  public <T> Optional<T> getAnnotationValue(ProcessingEnvironment processingEnvironment, Element rootElement,
+                                            Class annotationClass, String propertyName) {
+    TypeMirror annotationType =
+        processingEnvironment.getElementUtils().getTypeElement(annotationClass.getCanonicalName()).asType();
+    return (Optional<T>) rootElement.getAnnotationMirrors()
+        .stream()
+        .filter(annotation -> processingEnvironment.getTypeUtils().isSameType(annotation.getAnnotationType(), annotationType))
+        .findAny()
+        .map(annotation -> annotation.getElementValues()
+            .keySet()
+            .stream()
+            .filter(method -> method.getSimpleName().toString().equals(propertyName))
+            .findFirst()
+            .map(method -> annotation
+                .getElementValues()
+                .get(method))
+            .map(AnnotationValue::getValue)
+            .orElse(null));
   }
 
-  public <T> T getAnnotationFromType(ProcessingEnvironment processingEnvironment, TypeElement rootElement,
-                                     Class<? extends Annotation> annotationClass) {
-    //TODO - MULE-14311 - Make loader work in compile time
-    return (T) classFor(rootElement, processingEnvironment).get().getAnnotation(annotationClass);
-  }
-
-  public Element getElementForClass(List<AnnotationValue> annotationValues, Class<?> clazz) {
-    return annotationValues.stream().map(e -> ((DeclaredType) e.getValue()).asElement())
-        .filter(e -> e.getSimpleName().toString().equals(clazz.getSimpleName())).findFirst().orElse(null);
+  public List<TypeElement> getArrayClassAnnotationValue(Element element, Class annotationClass, String propertyName,
+                                                        ProcessingEnvironment processingEnv) {
+    return this.<List<AnnotationValue>>getAnnotationValue(processingEnv, element, annotationClass, propertyName)
+        .map(list -> list.stream().map(annotationValue -> (TypeElement) ((DeclaredType) annotationValue.getValue()).asElement())
+            .collect(toList()))
+        .orElse(emptyList());
   }
 
   public Map<String, VariableElement> getFieldsAnnotatedWith(TypeElement element, Class<? extends Annotation> annotation) {
@@ -196,28 +198,5 @@ public final class ExtensionAnnotationProcessor {
 
   public String getJavaDocSummary(ProcessingEnvironment processingEnv, Element element) {
     return parseJavaDoc(processingEnv, element).getBody();
-  }
-
-  /**
-   * Returns the content of a field for a given annotation.
-   */
-  public <T> T getAnnotationValue(Element rootElement, Class<? extends Annotation> anAnnotation) {
-    if (rootElement.getAnnotation(anAnnotation) != null) {
-      final String fullQualifiedAnnotationName = anAnnotation.getName();
-      final Reference<T> annotationFieldValue = new Reference<>();
-      rootElement.getAnnotationMirrors()
-          .stream()
-          .filter(annotationMirror -> fullQualifiedAnnotationName.equals(annotationMirror.getAnnotationType().toString()))
-          .forEach(annotationMirror -> annotationMirror.getElementValues()
-              .entrySet()
-              .stream()
-              .filter(entry -> VALUE.equals(entry.getKey().getSimpleName().toString()))
-              .findFirst()
-              .ifPresent(entry -> annotationFieldValue.set((T) entry.getValue().getValue())));
-
-      return annotationFieldValue.get();
-    } else {
-      return null;
-    }
   }
 }

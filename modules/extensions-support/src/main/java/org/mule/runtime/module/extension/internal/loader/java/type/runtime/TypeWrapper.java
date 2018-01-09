@@ -11,15 +11,22 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.WRITE_ONLY;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPropertyDescriptors;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.runtime.module.extension.internal.loader.java.type.AnnotationValueFetcher;
-import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.java.type.TypeGeneric;
+import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
+import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
+import org.mule.runtime.module.extension.api.loader.java.type.PropertyElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+
+import javax.lang.model.element.TypeElement;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -59,7 +66,12 @@ public class TypeWrapper implements Type {
     this.typeLoader = typeLoader;
     resolvableTypeGenerics = resolvableType.getGenerics();
     for (ResolvableType type : resolvableTypeGenerics) {
-      TypeWrapper concreteType = new TypeWrapper(type, typeLoader);
+      TypeWrapper concreteType;
+      if (type == resolvableType) {
+        concreteType = this;
+      } else {
+        concreteType = new TypeWrapper(type, typeLoader);
+      }
       generics.add(new TypeGeneric(concreteType, concreteType.getGenerics()));
     }
   }
@@ -100,9 +112,29 @@ public class TypeWrapper implements Type {
         .collect(toList());
   }
 
+  @Override
+  public List<PropertyElement> getProperties() {
+    return getPropertyDescriptors(aClass).stream().map(p -> {
+      PropertyElement.Accessibility accessibility;
+      if (p.getReadMethod() != null && p.getWriteMethod() != null) {
+        accessibility = READ_WRITE;
+      } else if (p.getReadMethod() != null && p.getWriteMethod() == null) {
+        accessibility = READ_ONLY;
+      } else {
+        accessibility = WRITE_ONLY;
+      }
+      return PropertyElement
+          .builder()
+          .type(new TypeWrapper(p.getPropertyType(), typeLoader))
+          .name(p.getName())
+          .accessibility(accessibility)
+          .build();
+    }).collect(toList());
+  }
+
   /**
-   * {@inheritDoc}
-   */
+  * {@inheritDoc}
+  */
   @Override
   public List<FieldElement> getAnnotatedFields(Class<? extends Annotation>... annotations) {
     return getFields().stream().filter(field -> of(annotations).anyMatch(field::isAnnotatedWith)).collect(toList());
@@ -125,7 +157,7 @@ public class TypeWrapper implements Type {
   @Override
   public boolean isAssignableFrom(Type type) {
     if (type instanceof TypeWrapper) {
-      return type.getDeclaringClass().get().isAssignableFrom(aClass);
+      return aClass.isAssignableFrom(type.getDeclaringClass().get());
     } else {
       return type.isAssignableTo(this);
     }
@@ -145,7 +177,7 @@ public class TypeWrapper implements Type {
   public boolean isSameType(Type type) {
     if (type instanceof TypeWrapper) {
       Class<?> aClass = ((TypeWrapper) type).aClass;
-      return type.isSameType(aClass);
+      return this.isSameType(aClass);
     }
     return false;
   }
@@ -198,7 +230,7 @@ public class TypeWrapper implements Type {
    * {@inheritDoc}
    */
   @Override
-  public List<org.mule.runtime.module.extension.internal.loader.java.type.Type> getInterfaceGenerics(Class interfaceClass) {
+  public List<Type> getInterfaceGenerics(Class interfaceClass) {
     return IntrospectionUtils.getInterfaceGenerics(type, interfaceClass)
         .stream()
         .map(e -> new TypeWrapper(e, typeLoader))
@@ -227,5 +259,10 @@ public class TypeWrapper implements Type {
         .append(type)
         .append(aClass)
         .toHashCode();
+  }
+
+  @Override
+  public Optional<TypeElement> getElement() {
+    return empty();
   }
 }

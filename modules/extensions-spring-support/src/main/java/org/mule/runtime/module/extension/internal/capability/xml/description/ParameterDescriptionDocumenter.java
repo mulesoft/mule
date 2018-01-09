@@ -6,17 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.MethodDocumentation;
 
-import java.util.Map;
-
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * {@link AbstractDescriptionDocumenter} implementation that fills {@link ParameterizedDeclaration}s
@@ -43,18 +45,19 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
 
   @Override
   void document(ParameterizedDeclaration<?> parameterized, final TypeElement element) {
-    final Map<String, VariableElement> variableElements = processor.getFieldsAnnotatedWith(element, Parameter.class);
     TypeElement traversingElement = element;
     while (traversingElement != null && !Object.class.getName().equals(traversingElement.getQualifiedName().toString())) {
-      Class<?> declaringClass = processor.classFor(traversingElement, processingEnv).get();
+      final Map<String, VariableElement> variableElements = processor.getFieldsAnnotatedWith(traversingElement, Parameter.class)
+          .entrySet()
+          .stream()
+          .collect(Collectors.toMap(entry -> getAlias(entry.getValue()), Map.Entry::getValue));
 
       parameterized.getAllParameters()
-          .forEach(param -> getField(declaringClass, param)
-              .filter(field -> variableElements.containsKey(field.getName()))
-              .ifPresent(field -> {
-                String summary = processor.getJavaDocSummary(processingEnv, variableElements.get(field.getName()));
-                param.setDescription(summary);
-              }));
+          .stream().filter(param -> variableElements.containsKey(param.getName()))
+          .forEach(param -> {
+            String summary = processor.getJavaDocSummary(processingEnv, variableElements.get(param.getName()));
+            param.setDescription(summary);
+          });
       traversingElement = (TypeElement) processingEnv.getTypeUtils().asElement(traversingElement.getSuperclass());
     }
 
@@ -63,5 +66,10 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
       TypeElement typeElement = (TypeElement) processingEnv.getTypeUtils().asElement(variableElement.asType());
       document(parameterized, typeElement);
     }
+  }
+
+  String getAlias(Element element) {
+    return processor.<String>getAnnotationValue(processingEnv, element, Alias.class, VALUE_PROPERTY)
+        .orElse(element.getSimpleName().toString());
   }
 }

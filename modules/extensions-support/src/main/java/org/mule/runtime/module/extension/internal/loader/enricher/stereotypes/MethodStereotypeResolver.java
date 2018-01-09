@@ -21,8 +21,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithAllowedStereotypes
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
 import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
 
 import java.lang.annotation.Annotation;

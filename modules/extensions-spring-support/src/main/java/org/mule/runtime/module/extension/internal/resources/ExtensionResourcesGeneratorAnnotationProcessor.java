@@ -8,10 +8,11 @@ package org.mule.runtime.module.extension.internal.resources;
 
 import static javax.lang.model.SourceVersion.RELEASE_8;
 import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
+
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
@@ -26,7 +27,7 @@ import javax.annotation.processing.SupportedSourceVersion;
 @SupportedAnnotationTypes(value = {"org.mule.runtime.extension.api.annotation.Extension"})
 @SupportedSourceVersion(RELEASE_8)
 @SupportedOptions(EXTENSION_VERSION)
-public class ExtensionResourcesGeneratorAnnotationProcessor extends BaseExtensionResourcesGeneratorAnnotationProcessor {
+public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensionResourcesGeneratorAnnotationProcessor {
 
   @Override
   protected ExtensionModelLoader getExtensionModelLoader() {

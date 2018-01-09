@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.extension.api.annotation.Sources;
 
-import java.util.List;
-import java.util.Optional;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * {@link AbstractDescriptionDocumenter} implementation that fills {@link WithSourcesDeclaration}s
@@ -54,10 +54,6 @@ final class SourcesDescriptionDocumenter extends AbstractDescriptionDocumenter<W
   }
 
   private List<TypeElement> getSourceClasses(ProcessingEnvironment processingEnv, Element element) {
-    Sources sourcesAnnotation = processor.getAnnotationFromType(processingEnv, (TypeElement) element, Sources.class);
-    if (sourcesAnnotation == null) {
-      return emptyList();
-    }
-    return processor.getAnnotationClassesValue(element, Sources.class, sourcesAnnotation.value());
+    return processor.getArrayClassAnnotationValue(element, Sources.class, VALUE_PROPERTY, processingEnv);
   }
 }

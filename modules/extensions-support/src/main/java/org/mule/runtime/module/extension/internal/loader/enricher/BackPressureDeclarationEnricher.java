@@ -13,6 +13,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_STRATEGY_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -22,10 +23,13 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
-import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.BackPressureStrategyModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+
+import java.util.Optional;
 
 /**
  * Adds a parameter for back pressure on message sources that apply
@@ -42,27 +46,21 @@ public class BackPressureDeclarationEnricher extends AbstractAnnotatedDeclaratio
       @Override
       protected void onSource(SourceDeclaration sourceDeclaration) {
         BackPressureStrategyModelProperty property;
-        BackPressure annotation = extractAnnotation(sourceDeclaration, BackPressure.class);
-        if (annotation == null) {
-          property = BackPressureStrategyModelProperty.getDefault();
-        } else {
-          property = BackPressureStrategyModelProperty.of(annotation);
-        }
+        Optional<ExtensionTypeDescriptorModelProperty> extensionTypeDescriptorModelProperty =
+            sourceDeclaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+        if (extensionTypeDescriptorModelProperty.isPresent()) {
+          Type sourceType = extensionTypeDescriptorModelProperty.get().getType();
 
-        sourceDeclaration.addModelProperty(property);
+          property = sourceType.getAnnotation(BackPressure.class)
+              .map(BackPressureStrategyModelProperty::of)
+              .orElseGet(BackPressureStrategyModelProperty::getDefault);
 
-        if (property.getSupportedModes().size() > 1) {
-          addBackPressureParameter(extensionDeclaration, sourceDeclaration, property);
-        } else {
-          if (!property.getSupportedModes().contains(property.getDefaultMode())) {
-            throw new IllegalSourceModelDefinitionException(
-                                                            format("Source '%s' defines '%s' as the only supported back pressure strategy, but '%s' is set as default",
-                                                                   sourceDeclaration.getName(),
-                                                                   property.getSupportedModes().iterator().next().name(),
-                                                                   property.getDefaultMode().name()));
+          sourceDeclaration.addModelProperty(property);
+
+          if (property.getSupportedModes().size() > 1) {
+            addBackPressureParameter(extensionDeclaration, sourceDeclaration, property);
           }
         }
-
       }
     }.walk(extensionDeclaration);
   }

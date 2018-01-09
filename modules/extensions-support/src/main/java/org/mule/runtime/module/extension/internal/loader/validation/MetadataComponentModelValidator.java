@@ -47,6 +47,7 @@ import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.io.Serializable;
@@ -71,6 +72,16 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
+
+    //TODO - MULE-14397 - Improve Dynamic Metadata Enricher to enrich without requiring Classes
+    //This is skipped if the extension is loaded with java, but it doesn't have classes which means AST Mode
+    Optional<ExtensionTypeDescriptorModelProperty> property =
+        extensionModel.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+    if (property.isPresent()) {
+      if (!property.get().getType().getDeclaringClass().isPresent()) {
+        return;
+      }
+    }
 
     final Table<String, String, Class<?>> names = HashBasedTable.create();
     new ExtensionWalker() {

@@ -6,12 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.lang.String.format;
 import static java.util.Arrays.stream;
-import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.apache.commons.lang3.ArrayUtils.EMPTY_CLASS_ARRAY;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 
@@ -25,24 +21,22 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.ExternalLibs;
-import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.license.RequiresEnterpriseLicense;
 import org.mule.runtime.extension.api.annotation.license.RequiresEntitlement;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
+import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.StackableTypesParameterContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionTypeFactory;
-import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
-import org.mule.runtime.module.extension.internal.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 
@@ -59,7 +53,7 @@ import com.google.common.collect.ImmutableList;
  */
 public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
-  protected final Class<?> extensionType;
+  protected Class<?> extensionType;
   protected final ExtensionElement extensionElement;
   protected final ClassTypeLoader typeLoader;
   protected final String version;
@@ -74,12 +68,10 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private final ParameterModelsLoaderDelegate fieldParametersLoader;
   private final ParameterModelsLoaderDelegate methodParametersLoader;
 
-  public DefaultJavaModelLoaderDelegate(Class<?> extensionType, String version) {
-    checkArgument(extensionType != null, format("describer %s does not specify an extension type", getClass().getName()));
-    this.extensionType = extensionType;
+  public DefaultJavaModelLoaderDelegate(ExtensionElement extensionElement, String version) {
     this.version = version;
-    this.typeLoader = getDefault().createTypeLoader(extensionType.getClassLoader());
-    this.extensionElement = new ExtensionTypeWrapper<>(extensionType, typeLoader);
+    this.typeLoader = getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
+    this.extensionElement = extensionElement;
 
     this.fieldParametersLoader = new ParameterModelsLoaderDelegate(getParameterFieldsContributors(), typeLoader);
     this.methodParametersLoader = new ParameterModelsLoaderDelegate(getParameterMethodsContributors(), typeLoader);
@@ -96,20 +88,26 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
             StackableTypesParameterContributor.defaultContributor(typeLoader));
   }
 
+  public DefaultJavaModelLoaderDelegate(Class<?> extensionType, String version) {
+    this(new ExtensionTypeWrapper<>(extensionType, getDefault().createTypeLoader(extensionType.getClassLoader())), version);
+    this.extensionType = extensionType;
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
-    final ExtensionElement extensionElement = ExtensionTypeFactory.getExtensionType(extensionType, typeLoader);
     ExtensionDeclarer declarer =
         context.getExtensionDeclarer()
             .named(extensionElement.getName())
             .onVersion(version)
             .fromVendor(extensionElement.getVendor())
             .withCategory(extensionElement.getCategory())
-            .withModelProperty(new ImplementingTypeModelProperty(extensionType))
             .withModelProperty(new ExtensionTypeDescriptorModelProperty(extensionElement));
+
+    extensionElement.getDeclaringClass()
+        .ifPresent(extensionClass -> declarer.withModelProperty(new ImplementingTypeModelProperty(extensionClass)));
 
     processLicenseRequirements(declarer);
     parseExternalLibs(extensionElement, declarer);
@@ -133,15 +131,14 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   }
 
   private void processLicenseRequirements(ExtensionDeclarer declarer) {
-    Optional<RequiresEntitlement> requiresEntitlementOptional =
-        MuleExtensionAnnotationParser.getOptionalAnnotation(extensionType, RequiresEntitlement.class);
+
+    Optional<RequiresEntitlement> requiresEntitlementOptional = extensionElement.getAnnotation(RequiresEntitlement.class);
     Optional<RequiresEnterpriseLicense> requiresEnterpriseLicenseOptional =
-        MuleExtensionAnnotationParser.getOptionalAnnotation(extensionType, RequiresEnterpriseLicense.class);
-    boolean requiresEnterpriseLicense =
-        requiresEnterpriseLicenseOptional.map(requiresEnterpriseLicenseAnnotation -> true).orElse(false);
+        extensionElement.getAnnotation(RequiresEnterpriseLicense.class);
+    boolean requiresEnterpriseLicense = requiresEnterpriseLicenseOptional.isPresent();
     boolean allowsEvaluationLicense =
         requiresEnterpriseLicenseOptional.map(RequiresEnterpriseLicense::allowEvaluationLicense).orElse(true);
-    Optional<String> requiredEntitlement = ofNullable(requiresEntitlementOptional.map(RequiresEntitlement::name).orElse(null));
+    Optional<String> requiredEntitlement = requiresEntitlementOptional.map(RequiresEntitlement::name);
 
     declarer.withModelProperty(new LicenseModelProperty(requiresEnterpriseLicense, allowsEvaluationLicense, requiredEntitlement));
   }
@@ -174,11 +171,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     MuleExtensionAnnotationParser.getExceptionEnricherFactory(model).map(ExceptionHandlerModelProperty::new)
         .ifPresent(declarer::withModelProperty);
     return declarer;
-  }
-
-  Class<?>[] getOperationClasses(Class<?> extensionType) {
-    Operations operations = extensionType.getAnnotation(Operations.class);
-    return operations == null ? EMPTY_CLASS_ARRAY : operations.value();
   }
 
   boolean isInvalidConfigSupport(boolean supportsConfig, Optional<ExtensionParameter>... parameters) {
@@ -231,7 +223,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   }
 
   Class<?> getExtensionType() {
-    return extensionType;
+    return extensionElement.getDeclaringClass().orElse(null);
   }
 
   ExtensionElement getExtensionElement() {

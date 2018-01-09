@@ -30,6 +30,9 @@
                 <parameter name="value2">
                     <description><![CDATA[Group parameter 2]]></description>
                 </parameter>
+                <parameter name="alias-param">
+                    <description><![CDATA[Param with alias]]></description>
+                </parameter>
             </parameters>
         </config>
     </configs>
@@ -116,6 +119,9 @@
                 </parameter>
                 <parameter name="value2">
                     <description><![CDATA[Group parameter 2]]></description>
+                </parameter>
+                <parameter name="alias-param">
+                    <description><![CDATA[]]></description>
                 </parameter>
             </parameters>
         </operation>

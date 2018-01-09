@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 
 
 /**

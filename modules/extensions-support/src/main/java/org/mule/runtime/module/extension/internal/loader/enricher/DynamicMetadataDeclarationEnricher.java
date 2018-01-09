@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builderFrom;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedElement;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
@@ -34,13 +33,13 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
@@ -74,7 +73,8 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       Optional<ExtensionTypeDescriptorModelProperty> property = extensionLoadingContext.getExtensionDeclarer().getDeclaration()
           .getModelProperty(ExtensionTypeDescriptorModelProperty.class);
 
-      if (property.isPresent()) {
+      //TODO MULE-14397 - Improve Dynamic Metadata Enricher to enrich without requiring Classes
+      if (property.isPresent() && property.get().getType().getDeclaringClass().isPresent()) {
         extensionType = property.get().getType();
 
         new IdempotentDeclarationWalker() {
@@ -106,7 +106,6 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
     private void enrichOperationMetadata(OperationDeclaration declaration) {
       declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
           .map(ExtensionOperationDescriptorModelProperty::getOperationMethod)
-          .filter(operation -> operation.getMethod().isPresent())
           .ifPresent(operation -> {
             if (operation.isAnnotatedWith(Query.class)) {
               enrichWithDsql(declaration, operation);
@@ -222,9 +221,15 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                                                ComponentDeclaration<? extends ComponentDeclaration> component) {
       return component.getParameterGroups().stream()
           .flatMap(g -> g.getParameters().stream())
-          .filter(p -> getAnnotatedElement(p).map(element -> element.isAnnotationPresent(MetadataKeyId.class)).orElse(false))
+          .filter(p -> getExtensionParameter(p).map(element -> element.isAnnotatedWith(MetadataKeyId.class)).orElse(false))
           .map(p -> new MetadataKeyIdModelProperty(p.getType(), p.getName()))
           .findFirst();
+    }
+
+    private Optional<ExtensionParameter> getExtensionParameter(ParameterDeclaration parameterDeclaration) {
+      return parameterDeclaration
+          .getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+          .map(ExtensionParameterDescriptorModelProperty::getExtensionParameter);
     }
 
     /**

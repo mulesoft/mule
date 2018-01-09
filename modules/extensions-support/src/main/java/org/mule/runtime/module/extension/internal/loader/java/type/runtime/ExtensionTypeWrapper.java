@@ -17,11 +17,11 @@ import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.ExpressionFunctions;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.module.extension.internal.loader.java.type.ConfigurationElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.FunctionElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.OperationElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
+import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
+import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
+import org.mule.runtime.module.extension.api.loader.java.type.ParameterizableTypeElement;
 
 import java.util.List;
 import java.util.Optional;

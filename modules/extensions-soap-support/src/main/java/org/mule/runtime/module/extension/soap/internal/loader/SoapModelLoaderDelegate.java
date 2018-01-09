@@ -27,6 +27,7 @@ import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnot
 import org.mule.runtime.module.extension.internal.loader.java.TypeAwareConfigurationFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.MessageDispatcherProviderTypeWrapper;
@@ -88,6 +89,7 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
         .fromVendor(extension.vendor())
         .withCategory(extension.category())
         .withModelProperty(new SoapExtensionModelProperty())
+        .withModelProperty(new ExtensionTypeDescriptorModelProperty(new TypeWrapper(extensionType, typeLoader)))
         .withModelProperty(new ImplementingTypeModelProperty(extensionType));
   }
 

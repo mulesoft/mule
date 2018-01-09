@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
+import org.mule.runtime.module.extension.api.loader.java.type.ParameterizableTypeElement;
 
 /**
  * Wrapper for any kind of class that can define parameters

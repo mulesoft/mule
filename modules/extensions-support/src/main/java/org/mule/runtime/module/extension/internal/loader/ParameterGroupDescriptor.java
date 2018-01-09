@@ -8,10 +8,11 @@ package org.mule.runtime.module.extension.internal.loader;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;

@@ -46,7 +46,7 @@ import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.api.model.impl.DefaultUnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -224,7 +224,7 @@ class MetadataTypeEnricher {
     }
 
     private Set<TypeAnnotation> getAllTypeAnnotations() {
-      Set<TypeAnnotation> all = new HashSet<>(annotations);
+      Set<TypeAnnotation> all = new LinkedHashSet<>(annotations);
       all.addAll(target.getAnnotations());
       return all;
     }
