@@ -66,7 +66,7 @@ import com.google.common.collect.ImmutableList;
 @SupportedOptions(BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION)
 public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor {
 
-  private static final ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
+  static final ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
 
   public static final String PROCESSING_ENVIRONMENT = "PROCESSING_ENVIRONMENT";
   public static final String EXTENSION_ELEMENT = "EXTENSION_ELEMENT";
