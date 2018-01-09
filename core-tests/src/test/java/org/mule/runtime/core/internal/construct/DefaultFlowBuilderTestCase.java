@@ -13,16 +13,17 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.hamcrest.core.IsNot;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,13 +52,7 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
   public static final String FLOW_NAME = "flowName";
 
   private MuleContext muleContext = mockContextWithServices();
-  private Builder flowBuilder = new DefaultFlowBuilder(FLOW_NAME, muleContext, new ComponentInitialStateManager() {
-
-    @Override
-    public boolean mustStartMessageSource(Component component) {
-      return true;
-    }
-  });
+  private Builder flowBuilder = new DefaultFlowBuilder(FLOW_NAME, muleContext);
   private ProcessingStrategyFactory defaultProcessingStrategyFactory = mock(ProcessingStrategyFactory.class);
   private ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
 
