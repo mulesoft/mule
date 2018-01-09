@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.core.api.policy;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -75,19 +77,25 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
-        .flatMapMany(event -> {
+        .flatMap(event -> {
           Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getCorrelationId());
           if (nextOperation == null) {
             return error(new MuleRuntimeException(createStaticMessage("There's no next operation configured for event context id "
                 + event.getContext().getId())));
           }
 
-          return just(event)
-              .doOnNext(popBeforeNextFlowFlowStackElement().andThen(notificationHelper.notification(BEFORE_NEXT))
-                  .andThen(req -> ((BaseEventContext) req.getContext())
-                      .onResponse(notificationHelper.successOrErrorNotification(AFTER_NEXT))))
-              .transform(nextOperation)
-              .doOnSuccessOrError((ev, t) -> pushAfterNextFlowStackElement().accept(event));
+          popBeforeNextFlowFlowStackElement().accept(event);
+          notificationHelper.notification(BEFORE_NEXT).accept(event);
+
+          return from(processWithChildContext(event, nextOperation, ofNullable(getLocation())))
+              .doOnSuccessOrError(notificationHelper.successOrErrorNotification(AFTER_NEXT)
+                  .andThen((ev, t) -> pushAfterNextFlowStackElement().accept(event)))
+              .onErrorResume(MessagingException.class, t -> {
+                // Given we've used child context to ensure AFTER_NEXT notifications are fired at exactly the right time we need
+                // to propagate the error to parent context manually.
+                ((BaseEventContext) event.getContext()).error(t);
+                return empty();
+              });
         });
   }
 
