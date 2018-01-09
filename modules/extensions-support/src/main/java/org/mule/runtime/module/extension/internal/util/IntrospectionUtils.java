@@ -788,7 +788,7 @@ public final class IntrospectionUtils {
   private static boolean isLifecycleMethod(ExecutableElement method, Class<?> lifecycleClass, String lifecycleMethodName,
                                            ProcessingEnvironment processingEnvironment) {
     TypeElement lifecycleElement = processingEnvironment.getElementUtils().getTypeElement(lifecycleClass.getTypeName());
-    return ((TypeElement) method.getEnclosingElement()).getInterfaces().contains(lifecycleElement.asType())
+    return processingEnvironment.getTypeUtils().isAssignable(method.getEnclosingElement().asType(), lifecycleElement.asType())
         && method.getSimpleName().toString().equals(lifecycleMethodName);
   }
 
