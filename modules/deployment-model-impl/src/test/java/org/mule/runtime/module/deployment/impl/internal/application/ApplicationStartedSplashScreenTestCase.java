@@ -53,6 +53,7 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
   private static void addRuntimeLibrary(String libraryFileName) throws MalformedURLException {
     File library = newFile(workingDirectory.getRoot(), getAppPathFor(libraryFileName));
     library.mkdir();
+    runtimeLibs.add(workingDirectory.getRoot().toURL());
     runtimeLibs.add(library.toURI().toURL());
   }
 

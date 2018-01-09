@@ -15,6 +15,8 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactStartedSplashScreen;
 
+import java.net.URL;
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -42,7 +44,10 @@ public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen<
   }
 
   protected void listLibraries(ApplicationDescriptor descriptor) {
-    listItems(stream(descriptor.getClassLoaderModel().getUrls()).map(url -> toFile(url).getName()).collect(toList()),
-              "Application libraries:");
+    // Excludes the application URL 
+    URL[] urls = descriptor.getClassLoaderModel().getUrls();
+    urls = Arrays.copyOfRange(urls, 1, urls.length);
+
+    listItems(stream(urls).map(url -> toFile(url).getName()).collect(toList()), "Application libraries:");
   }
 }
