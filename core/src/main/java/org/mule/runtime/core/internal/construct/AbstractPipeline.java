@@ -22,12 +22,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.function.Consumer;
-
+import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -61,8 +56,12 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import org.reactivestreams.Publisher;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.function.Consumer;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -87,11 +86,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private volatile boolean canProcessMessage = false;
   private Sink sink;
   private final int maxConcurrency;
+  private final ComponentInitialStateManager componentInitialStateManager;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
-                          int maxConcurrency, FlowConstructStatistics flowConstructStatistics) {
+                          int maxConcurrency, FlowConstructStatistics flowConstructStatistics,
+                          ComponentInitialStateManager componentInitialStateManager) {
     super(name, muleContext, exceptionListener, initialState, flowConstructStatistics);
 
     try {
@@ -101,6 +102,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     this.source = source;
+    this.componentInitialStateManager = componentInitialStateManager;
     this.processors = unmodifiableList(processors);
     this.maxConcurrency = maxConcurrency;
 
@@ -317,7 +319,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     canProcessMessage = true;
     if (getMuleContext().isStarted()) {
       try {
-        startIfStartable(source);
+        if (componentInitialStateManager.mustStartMessageSource(source)) {
+          startIfStartable(source);
+        }
       } catch (ConnectException ce) {
         // Let connection exceptions bubble up to trigger the reconnection strategy.
         throw ce;

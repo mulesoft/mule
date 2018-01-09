@@ -24,11 +24,11 @@ import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -47,6 +47,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -54,8 +55,6 @@ import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
-
-import org.mockito.Mockito;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -66,6 +65,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
+
+import org.mockito.Mockito;
 
 /**
  * Provides helper methods to handle mock {@link MuleContext}s in unit tests.
@@ -157,14 +158,18 @@ public class MuleContextUtils {
 
   public static MuleContextWithRegistries mockMuleContext() {
     final MuleContextWithRegistries muleContext =
-        mock(MuleContextWithRegistries.class,
+        mock(DefaultMuleContext.class,
              withSettings().defaultAnswer(RETURNS_DEEP_STUBS).extraInterfaces(PrivilegedMuleContext.class));
     when(muleContext.getUniqueIdString()).thenReturn(UUID.getUUID());
     when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new OnErrorPropagateHandler());
+
     StreamingManager streamingManager = mock(StreamingManager.class, RETURNS_DEEP_STUBS);
     try {
       MuleRegistry registry = mock(MuleRegistry.class);
       when(muleContext.getRegistry()).thenReturn(registry);
+      ComponentInitialStateManager componentInitialStateManager = mock(ComponentInitialStateManager.class);
+      when(componentInitialStateManager.mustStartMessageSource(any())).thenReturn(true);
+      when(registry.lookupObject(ComponentInitialStateManager.SERVICE_ID)).thenReturn(componentInitialStateManager);
       doReturn(streamingManager).when(registry).lookupObject(StreamingManager.class);
       doReturn(mock(NotificationDispatcher.class)).when(registry).lookupObject(NotificationDispatcher.class);
       doReturn(mock(ObjectStoreManager.class, RETURNS_DEEP_STUBS)).when(registry).lookupObject(OBJECT_STORE_MANAGER);
