@@ -18,6 +18,7 @@ import java.util.function.BiFunction;
  *
  * @since 4.1
  */
+@FunctionalInterface
 public interface NotificationFunction extends BiFunction<Event, Component, Notification> {
 
 }
