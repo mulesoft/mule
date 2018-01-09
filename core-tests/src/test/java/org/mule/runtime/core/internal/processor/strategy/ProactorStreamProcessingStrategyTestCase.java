@@ -333,9 +333,9 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
                                                                                              1)),
                        true, BLOCKING, 1);
     assertThat(threads, hasSize(1));
-    assertThat(threads.stream().filter(name -> name.startsWith(RING_BUFFER)).count(), equalTo(1l));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
-    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(RING_BUFFER))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
