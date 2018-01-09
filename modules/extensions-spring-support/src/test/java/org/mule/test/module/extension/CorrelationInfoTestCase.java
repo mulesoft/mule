@@ -36,7 +36,8 @@ public class CorrelationInfoTestCase extends AbstractExtensionFunctionalTestCase
   @Test
   public void customCorrelationId() throws Exception {
     final String correlationId = "correlateThis";
-    final CoreEvent event = flowRunner("correlate").withSourceCorrelationId(correlationId).withItemSequenceInfo(of(43,100)).run();
+    final CoreEvent event =
+        flowRunner("correlate").withSourceCorrelationId(correlationId).withItemSequenceInfo(of(43, 100)).run();
     CorrelationInfo correlationInfo = (CorrelationInfo) event.getMessage().getPayload().getValue();
     assertThat(correlationInfo.getEventId(), is(event.getContext().getId()));
     assertThat(correlationInfo.isOutboundCorrelationEnabled(), is(true));

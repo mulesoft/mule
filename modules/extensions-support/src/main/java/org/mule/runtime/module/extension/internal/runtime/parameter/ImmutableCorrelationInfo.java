@@ -23,7 +23,8 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
   private final String correlationId;
   private final Optional<ItemSequenceInfo> itemSequenceInfo;
 
-  public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId, Optional<ItemSequenceInfo> itemSequenceInfo) {
+  public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId,
+                                  Optional<ItemSequenceInfo> itemSequenceInfo) {
     this.eventId = eventId;
     this.outboundCorrelationEnabled = outboundCorrelationEnabled;
     this.correlationId = correlationId;

@@ -463,6 +463,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     when(event.getMessage().getPayload()).thenReturn(new TypedValue<>(null, OBJECT));
     when(event.getMessage().getAttributes()).thenReturn(new TypedValue<>(null, OBJECT));
     when(event.getAuthentication()).thenReturn(empty());
+    when(event.getItemSequenceInfo()).thenReturn(empty());
     return event;
   }
 
