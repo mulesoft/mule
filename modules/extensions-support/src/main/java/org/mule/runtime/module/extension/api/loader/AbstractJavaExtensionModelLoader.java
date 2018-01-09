@@ -43,6 +43,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.NotificationsD
 import org.mule.runtime.module.extension.internal.loader.enricher.ObjectStoreParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterAllowedStereotypesDeclarionEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.PollingSourceDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.PrimaryNodeEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RedeliveryPolicyDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclarationEnricher;
@@ -126,7 +127,8 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new PrimaryNodeEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher(),
                                                                                                new BackPressureDeclarationEnricher(),
-                                                                                               new ObjectStoreParameterDeclarationEnricher()));
+                                                                                               new ObjectStoreParameterDeclarationEnricher(),
+                                                                                               new PollingSourceDeclarationEnricher()));
 
   private final String id;
   private ModelLoaderDelegateFactory factory;

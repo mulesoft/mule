@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static reactor.core.publisher.Mono.empty;
-
+import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
@@ -15,22 +14,18 @@ import java.util.Map;
 
 import org.reactivestreams.Publisher;
 
-/**
- * Null object implementation of {@link SourceCallbackExecutor}
- *
- * @since 4.0
- */
-public class NullSourceCallbackExecutor implements SourceCallbackExecutor {
+public class ComposedSourceCallbackExecutor implements SourceCallbackExecutor {
 
-  public static final NullSourceCallbackExecutor INSTANCE = new NullSourceCallbackExecutor();
+  private final SourceCallbackExecutor first;
+  private final SourceCallbackExecutor then;
 
-  private NullSourceCallbackExecutor() {}
+  public ComposedSourceCallbackExecutor(SourceCallbackExecutor first, SourceCallbackExecutor then) {
+    this.first = first;
+    this.then = then;
+  }
 
-  /**
-   * @return {@code null}
-   */
   @Override
   public Publisher<Void> execute(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context) {
-    return empty();
+    return from(first.execute(event, parameters, context)).compose(v -> then.execute(event, parameters, context));
   }
 }
