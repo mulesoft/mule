@@ -31,10 +31,10 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
   Message getMessage();
 
   /**
-   * @return a {@link List} of {@link SourceNotification} to fire
+   * @return a {@link List} of {@link NotificationFunction} to evaluate and fire
    * @since 4.1
    */
-  List<SourceNotification> getSourceNotifications();
+  List<NotificationFunction> getNotificationFunctions();
 
   /**
    * Routes the {@link CoreEvent} through the processors chain

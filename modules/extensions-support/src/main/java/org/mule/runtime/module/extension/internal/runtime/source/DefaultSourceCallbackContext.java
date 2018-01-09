@@ -11,12 +11,16 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.internal.execution.SourceNotification;
+import org.mule.runtime.core.internal.execution.NotificationFunction;
+import org.mule.runtime.module.extension.internal.runtime.notification.DefaultExtensionNotification;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -47,7 +51,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   private Object connection = null;
   private TransactionHandle transactionHandle = NULL_TRANSACTION_HANDLE;
   private boolean dispatched = false;
-  private List<SourceNotification> sourceNotifications = new LinkedList<>();
+  private List<NotificationFunction> notificationFunctions = new LinkedList<>();
 
   /**
    * Creates a new instance
@@ -173,15 +177,26 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
    */
   @Override
   public void fireOnHandle(NotificationActionDefinition<?> action, TypedValue<?> data) {
-    sourceNotifications.add(new SourceNotification(action, data));
+    notificationFunctions.add(new ExtensionNotificationFunction() {
+
+      @Override
+      public String getActionName() {
+        return ((Enum) action).name();
+      }
+
+      @Override
+      public Notification apply(Event event, Component component) {
+        return new DefaultExtensionNotification(event, component, action, data);
+      }
+    });
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public List<SourceNotification> getSourceNotifications() {
-    return sourceNotifications;
+  public List<NotificationFunction> getNotificationsFunctions() {
+    return notificationFunctions;
   }
 
   private I18nMessage createWrongConnectionMessage(Object connection) {

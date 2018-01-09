@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ModuleFlowProcessingPhaseTemplate;
-import org.mule.runtime.core.internal.execution.SourceNotification;
+import org.mule.runtime.core.internal.execution.NotificationFunction;
 
 import java.util.List;
 import java.util.Map;
@@ -28,15 +28,15 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
 
   private final Message message;
   private final Processor messageProcessor;
-  private final List<SourceNotification> sourceNotifications;
+  private final List<NotificationFunction> notificationFunctions;
   private final SourceCompletionHandler completionHandler;
 
   ModuleFlowProcessingTemplate(Message message,
                                Processor messageProcessor,
-                               List<SourceNotification> sourceNotifications, SourceCompletionHandler completionHandler) {
+                               List<NotificationFunction> notificationFunctions, SourceCompletionHandler completionHandler) {
     this.message = message;
     this.messageProcessor = messageProcessor;
-    this.sourceNotifications = sourceNotifications;
+    this.notificationFunctions = notificationFunctions;
     this.completionHandler = completionHandler;
   }
 
@@ -56,8 +56,8 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public List<SourceNotification> getSourceNotifications() {
-    return sourceNotifications;
+  public List<NotificationFunction> getNotificationFunctions() {
+    return notificationFunctions;
   }
 
   @Override

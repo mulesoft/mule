@@ -13,7 +13,6 @@ import org.mule.runtime.api.meta.model.notification.HasNotifications;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.extension.DefaultExtensionNotification;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 
