@@ -160,7 +160,9 @@ public interface CoreEvent extends Serializable, Event {
      * @param itemSequenceInfo the object containing the sequence information of the produced event
      * @return the builder instance
      */
-    Builder itemSequenceInfo(Optional<ItemSequenceInfo> itemSequenceInfo);
+    default Builder itemSequenceInfo(Optional<ItemSequenceInfo> itemSequenceInfo) {
+      return this;
+    }
 
     /**
      * Sets an error related to the produced event.
