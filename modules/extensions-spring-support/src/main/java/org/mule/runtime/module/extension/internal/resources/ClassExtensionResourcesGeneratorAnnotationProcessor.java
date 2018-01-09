@@ -25,13 +25,8 @@ public abstract class ClassExtensionResourcesGeneratorAnnotationProcessor
 
   @Override
   public ExtensionElement toExtensionElement(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
-    Class<?> aClass;
-    try {
-      aClass = Class.forName(processingEnvironment.getElementUtils().getBinaryName(typeElement).toString());
-      return new ExtensionTypeWrapper<>(aClass,
-                                        new DefaultExtensionsTypeLoaderFactory().createTypeLoader(aClass.getClassLoader()));
-    } catch (ClassNotFoundException e) {
-      throw new RuntimeException(format("Unable to load class for extension: %s", typeElement.getQualifiedName().toString()), e);
-    }
+    Class<?> extensionClass = processor.classFor(typeElement, processingEnvironment)
+            .orElseThrow(() -> new RuntimeException(format("Unable to load class for extension: %s", typeElement.getQualifiedName().toString())));
+    return new ExtensionTypeWrapper<>(extensionClass, new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionClass.getClassLoader()));
   }
 }
