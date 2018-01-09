@@ -44,6 +44,7 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -579,6 +580,28 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     assertThat(objects, is(instanceOf(NullType.class)));
   }
 
+  @Test
+  public void operationReceivesExclusiveOptionalParameterGroup() throws Exception {
+    location =
+        Location.builder().globalName("inputHasExclusiveOptionalParameterGroup").addProcessorsPart().addIndexPart(0).build();
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> operationMetadata =
+        metadataService.getOperationMetadata(location);
+    ParameterGroupModel dessert = getParameterGroup(operationMetadata.get().getModel(), "dessert");
+
+    assertThat(dessert.getName(), is("dessert"));
+  }
+
+  @Test
+  public void operationReceivesPojoWithExclusiveOptionalParameterGroup() throws Exception {
+    location = Location.builder().globalName("inputHasPojoWithExclusiveOptionalParameterGroup").addProcessorsPart()
+        .addIndexPart(0).build();
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> operationMetadata =
+        metadataService.getOperationMetadata(location);
+    ParameterModel dessertOrder = getParameter(operationMetadata.get().getModel(), "dessertOrder");
+
+    assertThat(dessertOrder.getName(), is("dessertOrder"));
+  }
+
   private MetadataType getResolvedTypeFromList() {
     final MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = metadataService.getOperationMetadata(location);
     assertSuccessResult(result);
@@ -609,5 +632,11 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     return model.getAllParameterModels().stream()
         .filter(p -> p.getName().equals(parameterName)).findFirst()
         .orElseThrow(() -> new IllegalArgumentException("Parameter not found"));
+  }
+
+  private ParameterGroupModel getParameterGroup(ComponentModel model, String parameterName) {
+    return model.getParameterGroupModels().stream()
+        .filter(p -> p.getName().equals(parameterName)).findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Parameter Group not found"));
   }
 }

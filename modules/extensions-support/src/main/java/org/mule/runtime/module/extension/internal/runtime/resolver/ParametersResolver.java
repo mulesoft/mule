@@ -243,7 +243,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     Class<Object> type = getType(groupField.getValue());
     if (groupField.getAnnotation(ExclusiveOptionalsTypeAnnotation.class).isPresent()) {
       return new ExclusiveParameterGroupObjectBuilder(type,
-                                                      groupField.getAnnotation(ExclusiveOptionalsTypeAnnotation.class).get());
+                                                      groupField.getAnnotation(ExclusiveOptionalsTypeAnnotation.class).get(),
+                                                      lazyInitEnabled);
     }
 
     return new DefaultObjectBuilder(type);
@@ -326,22 +327,24 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
 
   public void checkParameterGroupExclusiveness(ParameterizedModel model, Set<String> resolverKeys)
       throws ConfigurationException {
-
-    for (ParameterGroupModel group : model.getParameterGroupModels()) {
-      for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
-        Collection<String> definedExclusiveParameters = intersection(exclusiveModel.getExclusiveParameterNames(), resolverKeys);
-        if (definedExclusiveParameters.isEmpty() && exclusiveModel.isOneRequired()) {
-          throw new ConfigurationException((createStaticMessage(format(
-                                                                       "Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing. "
-                                                                           + "One of the following should be set: [%s]",
-                                                                       group.getName(),
-                                                                       Joiner.on(", ")
-                                                                           .join(exclusiveModel.getExclusiveParameterNames())))));
-        } else if (definedExclusiveParameters.size() > 1) {
-          throw new ConfigurationException(
-                                           createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
-                                                                      getComponentModelTypeName(model), getModelName(model),
-                                                                      Joiner.on(", ").join(definedExclusiveParameters))));
+    if (!lazyInitEnabled) {
+      for (ParameterGroupModel group : model.getParameterGroupModels()) {
+        for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
+          Collection<String> definedExclusiveParameters = intersection(exclusiveModel.getExclusiveParameterNames(), resolverKeys);
+          if (definedExclusiveParameters.isEmpty() && exclusiveModel.isOneRequired()) {
+            throw new ConfigurationException((createStaticMessage(format(
+                                                                         "Parameter group '%s' requires that one of its optional parameters should be set but all of them are missing. "
+                                                                             + "One of the following should be set: [%s]",
+                                                                         group.getName(),
+                                                                         Joiner.on(", ")
+                                                                             .join(exclusiveModel
+                                                                                 .getExclusiveParameterNames())))));
+          } else if (definedExclusiveParameters.size() > 1) {
+            throw new ConfigurationException(
+                                             createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
+                                                                        getComponentModelTypeName(model), getModelName(model),
+                                                                        Joiner.on(", ").join(definedExclusiveParameters))));
+          }
         }
       }
     }
