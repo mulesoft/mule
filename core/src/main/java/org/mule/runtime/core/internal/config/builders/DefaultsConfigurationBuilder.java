@@ -38,7 +38,8 @@ import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QU
 import static org.mule.runtime.core.internal.interception.ProcessorInterceptorManager.PROCESSOR_INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
-
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.api.store.ObjectStore;
@@ -139,6 +140,13 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(NotificationListenerRegistry.REGISTRY_KEY, new DefaultNotificationListenerRegistry(), muleContext);
     registerObject(EventContextService.REGISTRY_KEY, new DefaultEventContextService(), muleContext);
     registerObject(OBJECT_TRANSACTION_FACTORY_LOCATOR, new TransactionFactoryLocator(), muleContext);
+    registerObject(ComponentInitialStateManager.SERVICE_ID, new ComponentInitialStateManager() {
+
+      @Override
+      public boolean mustStartMessageSource(Component component) {
+        return true;
+      }
+    }, muleContext);
   }
 
   protected void registerObject(String serviceId, Object serviceImpl, MuleContext muleContext) throws RegistrationException {

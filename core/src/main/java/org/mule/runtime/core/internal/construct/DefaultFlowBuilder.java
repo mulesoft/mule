@@ -21,7 +21,7 @@ import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
-
+import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -66,7 +66,7 @@ public class DefaultFlowBuilder implements Builder {
 
   private final String name;
   private final MuleContext muleContext;
-
+  private final ComponentInitialStateManager componentInitialStateManager;
   private MessageSource source;
   private List<Processor> processors = emptyList();
   private FlowExceptionHandler exceptionListener;
@@ -81,11 +81,15 @@ public class DefaultFlowBuilder implements Builder {
    *
    * @param name name of the flow to be created. Non empty.
    * @param muleContext context where the flow will be associated with. Non null.
+   * @param componentInitialStateManager component state manager used by the flow to determine what components must be started or
+   *        not. Noo null.
    */
-  public DefaultFlowBuilder(String name, MuleContext muleContext) {
+  public DefaultFlowBuilder(String name, MuleContext muleContext, ComponentInitialStateManager componentInitialStateManager) {
     checkArgument(isNotEmpty(name), "name cannot be empty");
     checkArgument(muleContext != null, "muleContext cannot be null");
+    checkArgument(componentInitialStateManager != null, "componentInitialStateManager cannot be null");
 
+    this.componentInitialStateManager = componentInitialStateManager;
     this.name = name;
     this.muleContext = muleContext;
   }
@@ -193,7 +197,7 @@ public class DefaultFlowBuilder implements Builder {
 
     flow = new DefaultFlow(name, muleContext, source, processors,
                            ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState, maxConcurrency,
-                           createFlowStatistics(name, muleContext));
+                           createFlowStatistics(name, muleContext), componentInitialStateManager);
 
     return flow;
   }
@@ -216,9 +220,10 @@ public class DefaultFlowBuilder implements Builder {
     protected DefaultFlow(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
-                          int maxConcurrency, FlowConstructStatistics flowConstructStatistics) {
+                          int maxConcurrency, FlowConstructStatistics flowConstructStatistics,
+                          ComponentInitialStateManager componentInitialStateManager) {
       super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
-            flowConstructStatistics);
+            flowConstructStatistics, componentInitialStateManager);
     }
 
     @Override

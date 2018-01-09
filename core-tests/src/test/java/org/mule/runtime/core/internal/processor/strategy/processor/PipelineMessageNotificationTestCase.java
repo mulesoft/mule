@@ -27,8 +27,9 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
@@ -57,6 +58,9 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBui
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
 import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.Before;
@@ -66,9 +70,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.ArgumentMatcher;
-
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 
 @RunWith(Parameterized.class)
@@ -189,7 +190,13 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     public TestPipeline(String name, MuleContext muleContext, MessageSource messageSource, List<Processor> messageProcessors,
                         ErrorHandler errorHandler) {
       super(name, muleContext, messageSource, messageProcessors, ofNullable(errorHandler), empty(), INITIAL_STATE_STARTED,
-            DEFAULT_MAX_CONCURRENCY, createFlowStatistics(name, muleContext));
+            DEFAULT_MAX_CONCURRENCY, createFlowStatistics(name, muleContext), new ComponentInitialStateManager() {
+
+              @Override
+              public boolean mustStartMessageSource(Component component) {
+                return true;
+              }
+            });
     }
 
     @Override
