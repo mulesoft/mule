@@ -66,7 +66,7 @@ public class SoapServiceProviderDeclarer {
         //TODO - MULE-14311 - Make loader work in compile time
         .withModelProperty(new ImplementingTypeModelProperty(provider.getDeclaringClass().get()))
         .withConnectionManagementType(POOLING)
-        .supportsConnectivityTesting(false);
+        .supportsConnectivityTesting(provider.supportsConnectivityTesting());
 
     ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", providerDeclarer.getDeclaration());
     parametersLoader.declare(providerDeclarer, provider.getParameters(), context);

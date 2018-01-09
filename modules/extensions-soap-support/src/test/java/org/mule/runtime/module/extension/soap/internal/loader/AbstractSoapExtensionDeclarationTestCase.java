@@ -25,6 +25,7 @@ public class AbstractSoapExtensionDeclarationTestCase {
   void assertConnectionProvider(ConnectionProviderModel provider,
                                 String name,
                                 String description,
+                                boolean supportsConnectivityTesting,
                                 ParameterProber... probers) {
     List<ParameterModel> parameterModels = provider.getAllParameterModels();
     assertThat(provider.getName(), is(name));
@@ -36,6 +37,7 @@ public class AbstractSoapExtensionDeclarationTestCase {
 
     assertThat(parameterCount.intValue(), is(probers.length));
     assertParameters(parameterModels, probers);
+    assertThat(provider.supportsConnectivityTesting(), is(supportsConnectivityTesting));
   }
 
   void assertParameters(List<ParameterModel> parameterModels, ParameterProber... probers) {

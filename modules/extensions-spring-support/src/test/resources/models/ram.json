@@ -995,7 +995,7 @@
         {
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
-          "supportsConnectivityTesting": false,
+          "supportsConnectivityTesting": true,
           "stereotype": {
             "type": "RICK-AND-MORTY-CONNECTION",
             "namespace": "RAM",

@@ -10,13 +10,14 @@ import static java.util.Collections.singletonList;
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_DESC;
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_ID;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 
 import java.util.List;
 
 @Alias(value = CALCIO_ID, description = CALCIO_DESC)
-public class CalcioServiceProvider implements SoapServiceProvider {
+public class CalcioServiceProvider implements SoapServiceProvider, NoConnectivityTest {
 
   public static final String CALCIO_ID = "higuain-gp";
   public static final String CALCIO_DESC = "This a nice description about the league where higuain is a star *";
