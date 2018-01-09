@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -55,7 +54,7 @@ public class PolicyChain extends AbstractComponent
   private List<Processor> processors;
   private MessageProcessorChain processorChain;
 
-  private ReactiveProcessor chainWithPs;
+  private ReactiveProcessor chainWithMPs;
   private PolicyNotificationHelper notificationHelper;
 
   public void setProcessors(List<Processor> processors) {
@@ -68,7 +67,7 @@ public class PolicyChain extends AbstractComponent
 
     chainBuilder.setProcessingStrategy(processingStrategy);
     processorChain = chainBuilder.build();
-    chainWithPs = processingStrategy.onPipeline(processorChain);
+    chainWithMPs = processingStrategy.onPipeline(processorChain);
     initialiseIfNeeded(processorChain, muleContext);
 
     notificationHelper =
@@ -102,7 +101,7 @@ public class PolicyChain extends AbstractComponent
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
-    return processToApply(event, chainWithPs);
+    return processToApply(event, chainWithMPs);
   }
 
   @Override
@@ -113,20 +112,16 @@ public class PolicyChain extends AbstractComponent
                 .onResponse(notificationHelper.successOrErrorNotification(PROCESS_END)
                     .andThen((resp, t) -> popFlowFlowStackElement().accept(req))))
             .andThen(notificationHelper.notification(PROCESS_START)))
-        .transform(chainWithPs);
+        .transform(chainWithMPs);
   }
 
   private Consumer<CoreEvent> pushBeforeNextFlowStackElement() {
-    return event -> {
-      ((DefaultFlowCallStack) event.getFlowCallStack())
-          .push(new FlowStackElement(getLocation().getLocation() + "[before next]", null));
-    };
+    return event -> ((DefaultFlowCallStack) event.getFlowCallStack())
+        .push(new FlowStackElement(getLocation().getLocation() + "[before next]", null));
   }
 
   private Consumer<CoreEvent> popFlowFlowStackElement() {
-    return event -> {
-      ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
-    };
+    return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
   }
 
 }
