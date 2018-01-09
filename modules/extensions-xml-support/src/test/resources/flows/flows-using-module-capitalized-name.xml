@@ -16,4 +16,10 @@
         <capitalizedededede:_underscore-set-payload-with-parameter config-ref="a-name" _theUnderscore="underscore parameter value"/>
     </flow>
 
+    <flow name="testSetPayloadWithNameParameter">
+        <capitalizedededede:set-payload-with-name-parameter config-ref="a-name" name="the name parameter"/>
+        <!-- calling a second time with the same values to ensure the application does not fail when checking for "name" attributes -->
+        <capitalizedededede:set-payload-with-name-parameter config-ref="a-name" name="the name parameter"/>
+    </flow>
+
 </mule>
