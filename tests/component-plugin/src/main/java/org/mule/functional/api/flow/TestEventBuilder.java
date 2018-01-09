@@ -10,6 +10,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 
 import org.mule.runtime.api.event.EventContext;
@@ -52,7 +53,6 @@ public class TestEventBuilder {
   private Map<String, Object> sessionProperties = new HashMap<>();
 
   private String sourceCorrelationId = null;
-  private GroupCorrelation groupCorrelation;
   private ItemSequenceInfo itemSequenceInfo;
 
   private Map<String, TypedValue> variables = new HashMap<>();
@@ -192,9 +192,7 @@ public class TestEventBuilder {
    * @deprecated use {@link #withItemSequenceInfo(ItemSequenceInfo)} instead
    */
   public TestEventBuilder withCorrelation(GroupCorrelation groupCorrelation) {
-    this.groupCorrelation = groupCorrelation;
-
-    return this;
+    return withItemSequenceInfo(fromGroupCorrelation(groupCorrelation));
   }
 
   /**
@@ -293,8 +291,7 @@ public class TestEventBuilder {
     }
 
     CoreEvent.Builder builder = InternalEvent.builder(eventContext)
-        .message(spyMessage.apply(muleMessage)).groupCorrelation(ofNullable(groupCorrelation))
-        .replyToHandler(replyToHandler).itemSequenceInfo(ofNullable(itemSequenceInfo));
+        .message(spyMessage.apply(muleMessage)).replyToHandler(replyToHandler).itemSequenceInfo(ofNullable(itemSequenceInfo));
     for (Entry<String, TypedValue> variableEntry : variables.entrySet()) {
       builder.addVariable(variableEntry.getKey(), variableEntry.getValue().getValue(), variableEntry.getValue().getDataType());
     }

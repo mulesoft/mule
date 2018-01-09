@@ -14,11 +14,10 @@ public class ItemSequenceInfoUtils {
 
   public static ItemSequenceInfo fromGroupCorrelation(GroupCorrelation groupCorrelation) {
     ItemSequenceInfo itemSequenceInfo = null;
-    if(groupCorrelation != null) {
+    if (groupCorrelation != null) {
       if (groupCorrelation.getGroupSize().isPresent()) {
         itemSequenceInfo = ItemSequenceInfo.of(groupCorrelation.getSequence(), groupCorrelation.getGroupSize().getAsInt());
-      }
-      else {
+      } else {
         itemSequenceInfo = ItemSequenceInfo.of(groupCorrelation.getSequence());
       }
     }
@@ -27,10 +26,10 @@ public class ItemSequenceInfoUtils {
 
   public static GroupCorrelation toGroupCorrelation(ItemSequenceInfo itemSequenceInfo) {
     GroupCorrelation groupCorrelation = null;
-    if(itemSequenceInfo != null) {
-      if(itemSequenceInfo.getSequenceSize().isPresent()) {
+    if (itemSequenceInfo != null) {
+      if (itemSequenceInfo.getSequenceSize().isPresent()) {
         groupCorrelation = GroupCorrelation.of(itemSequenceInfo.getPosition(), itemSequenceInfo.getSequenceSize().getAsInt());
-      }else {
+      } else {
         groupCorrelation = GroupCorrelation.of(itemSequenceInfo.getPosition());
       }
     }

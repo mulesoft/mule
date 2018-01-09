@@ -8,6 +8,7 @@ package org.mule.functional.api.flow;
 
 import static java.lang.String.format;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -165,12 +166,10 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
    * Configures the product event to have the provided {@code correlation}. See {@link CoreEvent#getGroupCorrelation()}.
    *
    * @return this {@link TestEventBuilder}
-   * @deprecated use
+   * @deprecated use {@link #withItemSequenceInfo(ItemSequenceInfo)}
    */
   public R withCorrelation(GroupCorrelation correlation) {
-    eventBuilder.withCorrelation(correlation);
-
-    return (R) this;
+    return withItemSequenceInfo(fromGroupCorrelation(correlation));
   }
 
   /**
