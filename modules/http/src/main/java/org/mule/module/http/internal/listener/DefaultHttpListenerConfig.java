@@ -338,4 +338,15 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
     {
         this.connectionIdleTimeout = connectionIdleTimeout;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append("org.mule.module.http.internal.listener.DefaultHttpListenerConfig{name=")
+           .append(name)
+           .append(", url=")
+           .append(listenerUrl())
+           .append("}");
+        return buf.toString();
+    }
 }
