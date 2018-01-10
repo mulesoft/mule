@@ -57,7 +57,7 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
    */
   @Override
   public DispatchingResponse dispatch(DispatchingRequest context) {
-    InputStream content = retrieveLogging("Soap Request to [" + context.getAddress() + "]", context.getContent());
+    InputStream content = logIfNeeded("Soap Request to [" + context.getAddress() + "]", context.getContent());
     MultiMap<String, String> parameters = new MultiMap<>();
     context.getHeaders().forEach(parameters::put);
     HttpRequest request = HttpRequest.builder()
@@ -68,7 +68,7 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
         .build();
     try {
       HttpResponse response = client.send(request, DEFAULT_TIMEOUT_MILLIS, false, null);
-      return new DispatchingResponse(retrieveLogging("Soap Response", response.getEntity().getContent()), toHeadersMap(response));
+      return new DispatchingResponse(logIfNeeded("Soap Response", response.getEntity().getContent()), toHeadersMap(response));
     } catch (IOException e) {
       throw new DispatchingException("An error occurred while sending the SOAP request");
     } catch (TimeoutException e) {
@@ -77,9 +77,9 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
   }
 
   /**
-   * Logs the content if it's log enabled.
+   * Logs the content if it's log enabled, returns the same content.
    */
-  private InputStream retrieveLogging(String title, InputStream content) {
+  private InputStream logIfNeeded(String title, InputStream content) {
     if (LOGGER.isDebugEnabled()) {
       String c = IOUtils.toString(content);
       LOGGER.debug("Logging " + title);
