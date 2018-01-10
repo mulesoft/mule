@@ -72,11 +72,11 @@ public final class SoapOperationExecutor implements ComponentExecutor<OperationM
   public Publisher<Object> execute(ExecutionContext<OperationModel> context) {
     try {
       String serviceId = context.getParameter(SERVICE_PARAM);
-      ForwardingSoapClient connection = (ForwardingSoapClient) connectionResolver.resolve(context);
+      ForwardingSoapClient connection = (ForwardingSoapClient) connectionResolver.resolve(context).get();
       Map<String, String> customHeaders = connection.getCustomHeaders(serviceId, getOperation(context));
       SoapRequest request = getRequest(context, customHeaders);
       SoapResponse response = connection.getSoapClient(serviceId).consume(request);
-      return justOrEmpty(response.getAsResult(streamingHelperArgumentResolver.resolve(context)));
+      return justOrEmpty(response.getAsResult(streamingHelperArgumentResolver.resolve(context).get()));
     } catch (MessageTransformerException | TransformerException e) {
       return error(e);
     } catch (Exception e) {

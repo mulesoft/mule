@@ -11,6 +11,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGroupModelContainerName;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
@@ -77,15 +78,18 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
         .map(group -> group.get().getDescriptor());
   }
 
-  private Object getShowInDslParameterValue(String parameterName, String showInDslGroupName) {
-    Object group = executionContext.getParameter(showInDslGroupName);
-    try {
-      return getFieldValue(group, parameterName);
-    } catch (IllegalAccessException | NoSuchFieldException e) {
-      throw new IllegalStateException(
-                                      format("An error occurred trying to obtain the field '%s' from the group '%s' of the Operation '%s'",
-                                             parameterName, showInDslGroupName, operationModel.getName()));
-    }
+  private LazyValue<Object> getShowInDslParameterValue(String parameterName, String showInDslGroupName) {
+    return new LazyValue<>(() -> {
+      Object group = executionContext.getParameter(showInDslGroupName);
+      try {
+        return getFieldValue(group, parameterName);
+      } catch (IllegalAccessException | NoSuchFieldException e) {
+        throw new IllegalStateException(
+                                        format("An error occurred trying to obtain the field '%s' from the group '%s' of the Operation '%s'",
+                                               parameterName, showInDslGroupName, operationModel.getName()));
+      }
+    });
+
   }
 
   private Map<String, String> getShowInDslParameters() {

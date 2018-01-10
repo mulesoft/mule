@@ -96,11 +96,11 @@ import reactor.core.publisher.Mono;
  * {@link #componentExecutor}. This message processor is capable of serving the execution of any {@link } of any
  * {@link ExtensionModel}.
  * <p>
- * A {@link #componentExecutor} is obtained by testing the {@link T} for a {@link ComponentExecutorModelProperty}
- * through which a {@link ComponentExecutorFactory} is obtained. Models with no such property cannot be used with this class. The
- * obtained {@link ComponentExecutor} serve all invocations of {@link #process(CoreEvent)} on {@code this} instance but will
- * not be shared with other instances of {@link ComponentMessageProcessor}. All the {@link Lifecycle} events that {@code this}
- * instance receives will be propagated to the {@link #componentExecutor}.
+ * A {@link #componentExecutor} is obtained by testing the {@link T} for a {@link ComponentExecutorModelProperty} through which a
+ * {@link ComponentExecutorFactory} is obtained. Models with no such property cannot be used with this class. The obtained
+ * {@link ComponentExecutor} serve all invocations of {@link #process(CoreEvent)} on {@code this} instance but will not be shared
+ * with other instances of {@link ComponentMessageProcessor}. All the {@link Lifecycle} events that {@code this} instance receives
+ * will be propagated to the {@link #componentExecutor}.
  * <p>
  * The {@link #componentExecutor} is executed directly but by the means of a {@link DefaultExecutionMediator}
  * <p>
@@ -417,7 +417,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   public void resolveParameters(CoreEvent.Builder eventBuilder,
-                                BiConsumer<Map<String, Object>, ExecutionContext> afterConfigurer)
+                                BiConsumer<Map<String, LazyValue<Object>>, ExecutionContext> afterConfigurer)
       throws MuleException {
     if (componentExecutor instanceof OperationArgumentResolverFactory) {
       PrecalculatedExecutionContextAdapter executionContext =
@@ -430,7 +430,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       InterceptorsExecutionResult beforeExecutionResult = mediator.before(executionContext, interceptors);
 
       if (beforeExecutionResult.isOk()) {
-        final Map<String, Object> resolvedArguments = ((OperationArgumentResolverFactory<T>) componentExecutor)
+        final Map<String, LazyValue<Object>> resolvedArguments = ((OperationArgumentResolverFactory<T>) componentExecutor)
             .createArgumentResolver(componentModel).apply(executionContext);
 
         afterConfigurer.accept(resolvedArguments, executionContext);

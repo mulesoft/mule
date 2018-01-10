@@ -33,8 +33,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
@@ -42,7 +42,6 @@ import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorTypeThat;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -56,6 +55,7 @@ import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -68,6 +68,19 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.Defaul
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
+
+import com.google.common.collect.ImmutableMap;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -82,19 +95,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
 import org.mockito.verification.VerificationMode;
-
-import com.google.common.collect.ImmutableMap;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -1678,9 +1678,14 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     }
 
     @Override
+    public void disposeResolvedParameters(ExecutionContext executionContext) {
+      assertThat(executionContext, sameInstance(this.executionContext));
+    }
+
+    @Override
     public void resolveParameters(CoreEvent.Builder eventBuilder,
-                                  BiConsumer<Map<String, Object>, ExecutionContext> afterConfigurer) {
-      afterConfigurer.accept(singletonMap("operationParam", new ProcessorParameterValue() {
+                                  BiConsumer<Map<String, LazyValue<Object>>, ExecutionContext> afterConfigurer) {
+      afterConfigurer.accept(singletonMap("operationParam", new LazyValue<>(new ProcessorParameterValue() {
 
         @Override
         public String parameterName() {
@@ -1696,12 +1701,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         public Object resolveValue() {
           return "operationParamValue";
         }
-      }), executionContext);
-    }
-
-    @Override
-    public void disposeResolvedParameters(ExecutionContext executionContext) {
-      assertThat(executionContext, sameInstance(this.executionContext));
+      })), executionContext);
     }
   }
 

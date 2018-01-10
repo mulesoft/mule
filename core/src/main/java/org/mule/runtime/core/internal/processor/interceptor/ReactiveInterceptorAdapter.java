@@ -17,7 +17,6 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -38,9 +37,6 @@ import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -48,6 +44,11 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.map.LazyMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -244,7 +245,8 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
       try {
         ((ParametersResolverProcessor<?>) processor).resolveParameters(builder, (params, context) -> {
           resolvedParameters.putAll(params.entrySet().stream()
-              .collect(toMap(e -> e.getKey(), e -> new DefaultProcessorParameterValue(e.getKey(), null, () -> e.getValue()))));
+              .collect(toMap(e -> e.getKey(),
+                             e -> new DefaultProcessorParameterValue(e.getKey(), null, () -> e.getValue().get()))));
           Map<String, Object> interceptionEventParams = new HashMap<>();
           interceptionEventParams.put(INTERCEPTION_RESOLVED_CONTEXT, context);
           interceptionEventParams.put(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);

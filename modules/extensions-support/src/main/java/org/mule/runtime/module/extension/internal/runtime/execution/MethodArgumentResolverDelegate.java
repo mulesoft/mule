@@ -19,6 +19,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
@@ -70,6 +71,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 
 /**
@@ -122,7 +124,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
    * Creates a new instance for the given {@code method}
    *
    * @param parameterGroupModels {@link List} of {@link ParameterGroupModel} from the corresponding model
-   * @param method               the {@link Method} to be called
+   * @param method the {@link Method} to be called
    */
   public MethodArgumentResolverDelegate(List<ParameterGroupModel> parameterGroupModels, Method method) {
     this.method = method;
@@ -205,28 +207,27 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   }
 
   @Override
-  public Object[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
+  public LazyValue<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
 
-    Object[] parameterValues = new Object[argumentResolvers.length];
+    LazyValue<Object>[] parameterValues = new LazyValue[argumentResolvers.length];
     int i = 0;
     for (ArgumentResolver<?> argumentResolver : argumentResolvers) {
-      parameterValues[i++] = argumentResolver.resolve(executionContext);
+      parameterValues[i] = wrapWithResolvePrimitiveType(parameterTypes[i], argumentResolver.resolve(executionContext));
+      i++;
     }
 
-    return resolvePrimitiveTypes(parameterTypes, parameterValues);
+    return parameterValues;
   }
 
-  private Object[] resolvePrimitiveTypes(Class<?>[] parametersType, Object[] parameterValues) {
-    Object[] resolvedParameters = new Object[parameterValues.length];
-    for (int i = 0; i < parameterValues.length; i++) {
-      Object parameterValue = parameterValues[i];
+  private LazyValue<Object> wrapWithResolvePrimitiveType(Class<?> parameterType, Supplier<?> valueSupplier) {
+    return new LazyValue<>(() -> {
+      Object parameterValue = valueSupplier.get();
       if (parameterValue == null) {
-        resolvedParameters[i] = resolvePrimitiveTypeDefaultValue(parametersType[i]);
+        return resolvePrimitiveTypeDefaultValue(parameterType);
       } else {
-        resolvedParameters[i] = parameterValue;
+        return parameterValue;
       }
-    }
-    return resolvedParameters;
+    });
   }
 
   private Object resolvePrimitiveTypeDefaultValue(Class<?> type) {
