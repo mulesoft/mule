@@ -62,6 +62,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECTION_ELEMENT_ID
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -525,7 +526,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("disallowConcurrentExecution",
                                        fromSimpleParameter("disallowConcurrentExecution").withDefaultValue(true).build())
         .withSetterParameterDefinition("scheduler", fromChildConfiguration(PeriodicScheduler.class)
-            .withWrapperIdentifier("scheduling-strategy").build())
+            .withWrapperIdentifier(SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER).build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("fixed-frequency")

@@ -20,9 +20,9 @@ import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.UNBOUNDED;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getBaseType;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getLayoutModel;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import org.mule.metadata.api.model.MetadataType;
@@ -32,6 +32,7 @@ import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
@@ -365,6 +366,11 @@ final class ObjectTypeSchemaDelegate {
     final String id = getId(field.getValue());
     if (id.equals(TlsContextFactory.class.getName())) {
       builder.addTlsSupport(extension, all);
+      return;
+    }
+
+    if (id.equals(Scheduler.class.getName())) {
+      builder.addSchedulerSupport(all);
       return;
     }
 

@@ -15,6 +15,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECT_ALIAS;
@@ -104,6 +105,10 @@ class InfrastructureElementModelDelegate {
         return;
 
       case TLS_PARAMETER_NAME:
+        createTlsContext(value, parameterModel, paramDsl, parentConfig, parentElement);
+        return;
+
+      case SCHEDULING_STRATEGY_PARAMETER_NAME:
         createTlsContext(value, parameterModel, paramDsl, parentConfig, parentElement);
         return;
 

@@ -7,18 +7,22 @@
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
+import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CRL_FILE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CUSTOM_OCSP_RESPONDER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_STANDARD_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
-
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tx.TransactionType;
+import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
@@ -26,12 +30,12 @@ import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
-import javax.xml.namespace.QName;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 import java.util.Optional;
 
-import com.google.common.collect.ImmutableMap;
+import javax.xml.namespace.QName;
 
 /**
  * Mapping for types considered of "Infrastructure", of the {@link Class} of the infrastructure type and the {@link String} name
@@ -48,6 +52,7 @@ public final class InfrastructureTypeMapping {
       .put(SourceTransactionalAction.class, new InfrastructureType(TRANSACTIONAL_ACTION_PARAMETER_NAME, 6))
       .put(OperationTransactionalAction.class, new InfrastructureType(TRANSACTIONAL_ACTION_PARAMETER_NAME, 7))
       .put(TransactionType.class, new InfrastructureType(TRANSACTIONAL_TYPE_PARAMETER_NAME, 9))
+      .put(Scheduler.class, new InfrastructureType(SCHEDULING_STRATEGY_PARAMETER_NAME, 10))
       .build();
 
   private static Map<Type, InfrastructureType> TYPE_MAPPING = MAPPING.entrySet()
@@ -65,6 +70,8 @@ public final class InfrastructureTypeMapping {
   }
 
   private static Map<String, QNameModelProperty> QNAMES = ImmutableMap.<String, QNameModelProperty>builder()
+      .put(SCHEDULING_STRATEGY_PARAMETER_NAME,
+           new QNameModelProperty(new QName(CORE_NAMESPACE, SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER, CORE_PREFIX)))
       .put(TLS_PARAMETER_NAME,
            new QNameModelProperty(new QName(TLS_NAMESPACE_URI,
                                             TLS_CONTEXT_ELEMENT_IDENTIFIER,
@@ -85,6 +92,12 @@ public final class InfrastructureTypeMapping {
 
   private static Map<String, ParameterDslConfiguration> DSL_CONFIGURATIONS =
       ImmutableMap.<String, ParameterDslConfiguration>builder()
+          .put(SCHEDULING_STRATEGY_PARAMETER_NAME,
+               ParameterDslConfiguration.builder()
+                   .allowsInlineDefinition(true)
+                   .allowTopLevelDefinition(false)
+                   .allowsReferences(false)
+                   .build())
           .put(TLS_PARAMETER_NAME,
                ParameterDslConfiguration.builder()
                    .allowsInlineDefinition(true)

@@ -8,7 +8,9 @@ package org.mule.runtime.module.extension.internal.loader.java.contributor;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getDslConfiguration;
 import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getInfrastructureType;
+import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getQName;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
@@ -36,8 +38,8 @@ public class InfrastructureFieldContributor implements ParameterDeclarerContribu
       if (!isBlank(infrastructureType.getName())) {
         declarer.withModelProperty(new InfrastructureParameterModelProperty(infrastructureType.getSequence()));
         declarer.withExpressionSupport(NOT_SUPPORTED);
-        InfrastructureTypeMapping.getQName(infrastructureType.getName()).ifPresent(declarer::withModelProperty);
-        InfrastructureTypeMapping.getDslConfiguration(infrastructureType.getName()).ifPresent(declarer::withDsl);
+        getQName(infrastructureType.getName()).ifPresent(declarer::withModelProperty);
+        getDslConfiguration(infrastructureType.getName()).ifPresent(declarer::withDsl);
       }
     });
   }
