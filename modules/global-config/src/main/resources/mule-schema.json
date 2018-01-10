@@ -37,6 +37,9 @@
         },
         "repositoryLocation" : {
           "description" : "Repository location for the mule runtime to use. If not provided it will be the MULE_HOME/repository folder"
+        },
+        "ignoreArtifactDescriptorRepositories" : {
+          "description" : "Flag to ignore additional repositories from artifact descriptors, false to merge those with the originally specified remote repositories. Default value is true"
         }
       }
     }
