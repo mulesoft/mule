@@ -57,7 +57,7 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
    */
   @Override
   public DispatchingResponse dispatch(DispatchingRequest context) {
-    InputStream content = retrieveLogging("Soap Request", context.getContent());
+    InputStream content = retrieveLogging("Soap Request to [" + context.getAddress() + "]", context.getContent());
     MultiMap<String, String> parameters = new MultiMap<>();
     context.getHeaders().forEach(parameters::put);
     HttpRequest request = HttpRequest.builder()
