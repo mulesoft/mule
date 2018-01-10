@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.capability.xml.description;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
 
+import java.util.Optional;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -46,9 +48,13 @@ abstract class AbstractDescriptionDocumenter<T> {
   abstract void document(T declaration, TypeElement configElement);
 
 
-  String getAliasValue(Element element) {
-    Alias alias = element.getAnnotation(Alias.class);
-    return alias != null ? alias.value() : "";
+  String getNameOrAlias(Element element) {
+    return getAlias(element).orElse(element.getSimpleName().toString());
+  }
+
+  Optional<String> getAlias(Element element) {
+    Alias annotation = element.getAnnotation(Alias.class);
+    return annotation != null ? Optional.of(annotation.value()) : Optional.empty();
   }
 
 }

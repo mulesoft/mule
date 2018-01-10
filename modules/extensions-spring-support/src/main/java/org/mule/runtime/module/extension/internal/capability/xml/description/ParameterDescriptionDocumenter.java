@@ -7,13 +7,11 @@
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
-import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.MethodDocumentation;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 
@@ -50,7 +48,8 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
       final Map<String, VariableElement> variableElements = processor.getFieldsAnnotatedWith(traversingElement, Parameter.class)
           .entrySet()
           .stream()
-          .collect(Collectors.toMap(entry -> getAlias(entry.getValue()), Map.Entry::getValue));
+          .collect(Collectors.toMap(entry -> getNameOrAlias(entry.getValue()),
+                                    Map.Entry::getValue));
 
       parameterized.getAllParameters()
           .stream().filter(param -> variableElements.containsKey(param.getName()))
@@ -66,10 +65,5 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
       TypeElement typeElement = (TypeElement) processingEnv.getTypeUtils().asElement(variableElement.asType());
       document(parameterized, typeElement);
     }
-  }
-
-  String getAlias(Element element) {
-    return processor.<String>getAnnotationValue(processingEnv, element, Alias.class, VALUE_PROPERTY)
-        .orElse(element.getSimpleName().toString());
   }
 }

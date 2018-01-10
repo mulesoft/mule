@@ -83,5 +83,14 @@
             </parameters>
         </operation>
     </operations>
-    <sources/>
+    <sources>
+        <source name="source-alias">
+            <description><![CDATA[Source Documentation]]></description>
+            <parameters>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+            </parameters>
+        </source>
+    </sources>
 </extension-documentation>

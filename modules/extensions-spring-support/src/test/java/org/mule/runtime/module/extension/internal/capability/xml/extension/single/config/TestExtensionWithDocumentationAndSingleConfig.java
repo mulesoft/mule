@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.capability.xml.extension.sing
 
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -19,6 +20,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 @Extension(name = "single")
 @Operations({TestSingleConfigExtensionOperations.class})
 @ConnectionProviders({TestSingleConfigExtensionProvider.class})
+@Sources(TestDocumentedSource.class)
 @Xml(namespace = "namespaceLocation", prefix = "documentation")
 public class TestExtensionWithDocumentationAndSingleConfig {
 
