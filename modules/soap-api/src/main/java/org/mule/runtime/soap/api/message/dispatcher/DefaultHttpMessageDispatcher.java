@@ -11,7 +11,9 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.soap.message.DispatchingRequest;
 import org.mule.runtime.extension.api.soap.message.DispatchingResponse;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
@@ -21,10 +23,14 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.soap.api.exception.DispatchingException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -34,6 +40,9 @@ import java.util.concurrent.TimeoutException;
  * @since 4.0
  */
 public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHttpMessageDispatcher.class.getName());
+  private static final int DEFAULT_TIMEOUT_MILLIS = 5000;
 
   private final HttpClient client;
 
@@ -48,23 +57,38 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
    */
   @Override
   public DispatchingResponse dispatch(DispatchingRequest context) {
+    InputStream content = retrieveLogging("Soap Request", context.getContent());
     MultiMap<String, String> parameters = new MultiMap<>();
     context.getHeaders().forEach(parameters::put);
     HttpRequest request = HttpRequest.builder()
         .uri(context.getAddress())
         .method(POST)
-        .entity(new InputStreamHttpEntity(context.getContent()))
+        .entity(new InputStreamHttpEntity(content))
         .headers(parameters)
         .build();
     try {
-      HttpResponse response = client.send(request, 5000, false, null);
-      InputStream content = response.getEntity().getContent();
-      return new DispatchingResponse(content, toHeadersMap(response));
+      HttpResponse response = client.send(request, DEFAULT_TIMEOUT_MILLIS, false, null);
+      return new DispatchingResponse(retrieveLogging("Soap Response", response.getEntity().getContent()), toHeadersMap(response));
     } catch (IOException e) {
       throw new DispatchingException("An error occurred while sending the SOAP request");
     } catch (TimeoutException e) {
       throw new DispatchingException("The SOAP request timed out", e);
     }
+  }
+
+  /**
+   * Logs the content if it's log enabled.
+   */
+  private InputStream retrieveLogging(String title, InputStream content) {
+    if (LOGGER.isDebugEnabled()) {
+      String c = IOUtils.toString(content);
+      LOGGER.debug("Logging " + title);
+      LOGGER.debug("-----------------------------------");
+      LOGGER.debug(c);
+      LOGGER.debug("-----------------------------------");
+      return new ByteArrayInputStream(c.getBytes());
+    }
+    return content;
   }
 
   /**
