@@ -9416,23 +9416,28 @@
   "notifications": [],
   "errors": [
     {
-      "error": "MULE:ANY"
+      "error": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "VEGAN:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY"
+      "parent": "MULE:CONNECTIVITY",
+      "handleable": true
     },
     {
       "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "VEGAN:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED"
+      "parent": "MULE:RETRY_EXHAUSTED",
+      "handleable": true
     }
   ],
   "modelProperties": {},

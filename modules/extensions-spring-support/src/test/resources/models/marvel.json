@@ -3970,27 +3970,33 @@
   "notifications": [],
   "errors": [
     {
-      "error": "MULE:ANY"
+      "error": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "MARVEL:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY"
+      "parent": "MULE:CONNECTIVITY",
+      "handleable": true
     },
     {
       "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "MARVEL:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED"
+      "parent": "MULE:RETRY_EXHAUSTED",
+      "handleable": true
     },
     {
       "error": "MARVEL:CUSTOM_ERROR",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     }
   ],
   "modelProperties": {},
