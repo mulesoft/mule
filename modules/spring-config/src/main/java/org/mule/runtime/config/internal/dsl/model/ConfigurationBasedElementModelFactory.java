@@ -20,6 +20,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
@@ -36,12 +37,14 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastr
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRequired;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
@@ -67,6 +70,8 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
+import org.mule.runtime.core.api.source.scheduler.CronScheduler;
+import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -79,6 +84,7 @@ import com.google.common.collect.Multimap;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -783,6 +789,38 @@ class ConfigurationBasedElementModelFactory {
               .withDsl(paramDsl)
               .withValue(parameters.get(TLS_PARAMETER_NAME))
               .build());
+        }
+
+        return;
+
+      case SCHEDULING_STRATEGY_PARAMETER_NAME:
+        ComponentConfiguration schedulingStrategyWrapper =
+            getSingleComponentConfiguration(nested, of(ComponentIdentifier.builder()
+                .name(SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER)
+                .namespace(CORE_PREFIX)
+                .build()));
+        if (schedulingStrategyWrapper != null) {
+          DslElementModel.Builder wrapper = DslElementModel.builder()
+              .withModel(paramModel)
+              .withDsl(paramDsl)
+              .withConfig(schedulingStrategyWrapper);
+
+          Iterator<ComponentConfiguration> nestedIt = schedulingStrategyWrapper.getNestedComponents().iterator();
+          if (nestedIt.hasNext()) {
+            final ComponentConfiguration strategy = nestedIt.next();
+            final MetadataType type = CRON_STRATEGY_ELEMENT_IDENTIFIER.equals(strategy.getIdentifier().getName())
+                ? typeLoader.load(CronScheduler.class)
+                : typeLoader.load(FixedFrequencyScheduler.class);
+
+            dsl.resolve(type)
+                .ifPresent(typeDsl -> wrapper.containing(DslElementModel.builder()
+                    .withModel(type)
+                    .withDsl(typeDsl)
+                    .withConfig(strategy)
+                    .build()));
+          }
+
+          groupElementBuilder.containing(wrapper.build());
         }
 
         return;

@@ -28,13 +28,14 @@ import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_KEY_STORE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
-
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.ParameterValueVisitor;
@@ -44,6 +45,7 @@ import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
 
@@ -71,7 +73,8 @@ class InfrastructureElementModelDelegate {
                            ParameterModel parameterModel,
                            DslElementSyntax paramDsl,
                            InternalComponentConfiguration.Builder parentConfig,
-                           DslElementModel.Builder parentElement) {
+                           DslElementModel.Builder parentElement,
+                           DslResolvingContext context, DslSyntaxResolver dsl) {
 
     switch (parameterName) {
       case RECONNECTION_CONFIG_PARAMETER_NAME:
@@ -109,7 +112,8 @@ class InfrastructureElementModelDelegate {
         return;
 
       case SCHEDULING_STRATEGY_PARAMETER_NAME:
-        createTlsContext(value, parameterModel, paramDsl, parentConfig, parentElement);
+        createSchedulingStrategy((ParameterObjectValue) value, parameterModel, paramDsl, parentConfig, parentElement, context,
+                                 dsl);
         return;
 
       default:
@@ -126,6 +130,56 @@ class InfrastructureElementModelDelegate {
           }
         });
     }
+  }
+
+  private void createSchedulingStrategy(ParameterObjectValue value,
+                                        ParameterModel parameterModel,
+                                        DslElementSyntax paramDsl,
+                                        InternalComponentConfiguration.Builder parentConfig,
+                                        DslElementModel.Builder parentElement,
+                                        DslResolvingContext context,
+                                        DslSyntaxResolver dsl) {
+
+    InternalComponentConfiguration.Builder schedulingWrapperConfig = InternalComponentConfiguration.builder()
+        .withIdentifier(builder()
+            .namespace(CORE_PREFIX)
+            .name(SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER)
+            .build());
+
+    DslElementModel.Builder schedulingElement = DslElementModel.builder()
+        .withDsl(paramDsl)
+        .withModel(parameterModel);
+
+    context.getTypeCatalog().getType(value.getTypeId())
+        .ifPresent(strategyType -> {
+          dsl.resolve(strategyType)
+              .ifPresent(strategyDsl -> {
+                InternalComponentConfiguration.Builder strategyConfig = InternalComponentConfiguration.builder()
+                    .withIdentifier(builder()
+                        .namespace(CORE_PREFIX)
+                        .name(strategyDsl.getElementName())
+                        .build());
+
+                cloneParameters(value, strategyConfig);
+
+                ComponentConfiguration strategy = strategyConfig.build();
+
+                schedulingWrapperConfig.withNestedComponent(strategy);
+
+                ComponentConfiguration schedulingWrapper = schedulingWrapperConfig.build();
+                schedulingElement
+                    .withConfig(schedulingWrapper)
+                    .containing(DslElementModel.builder()
+                        .withModel(strategyType)
+                        .withDsl(strategyDsl)
+                        .withConfig(strategy)
+                        .build());
+
+                parentConfig.withNestedComponent(schedulingWrapper);
+                parentElement.containing(schedulingElement.build());
+              });
+        });
+
   }
 
   private void createTlsContext(ParameterValue value,

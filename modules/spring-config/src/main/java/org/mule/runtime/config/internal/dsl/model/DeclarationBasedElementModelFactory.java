@@ -441,7 +441,8 @@ class DeclarationBasedElementModelFactory {
                             final DslElementModel.Builder parentElement) {
 
     if (isInfrastructure(parameterModel)) {
-      infrastructureDelegate.addParameter(parameterName, value, parameterModel, paramDsl, parentConfig, parentElement);
+      infrastructureDelegate.addParameter(parameterName, value, parameterModel, paramDsl, parentConfig,
+                                          parentElement, context, dsl);
       return;
     }
 
@@ -590,13 +591,15 @@ class DeclarationBasedElementModelFactory {
 
     ObjectType nestedElementType;
     if (objectValue.getTypeId() == null || objectValue.getTypeId().trim().isEmpty() ||
-        objectValue.getTypeId().equals(getId(parameterModel.getType()))) {
+        getId(parameterModel.getType()).map(id -> id.equals(objectValue.getTypeId())).orElse(false)) {
 
       nestedElementType = (ObjectType) parameterModel.getType();
     } else {
       nestedElementType = lookupType(objectValue);
-      context.getTypeCatalog().getDeclaringExtension(objectValue.getTypeId()).ifPresent(owner -> context.getExtension(owner)
-          .ifPresent(extensionModel -> customDsl.set(resolvers.get(extensionModel))));
+      context.getTypeCatalog()
+          .getDeclaringExtension(objectValue.getTypeId())
+          .ifPresent(owner -> context.getExtension(owner)
+              .ifPresent(extensionModel -> customDsl.set(resolvers.get(extensionModel))));
     }
 
     customDsl.get().resolve(nestedElementType)

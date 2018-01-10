@@ -71,7 +71,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -92,6 +91,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.object.FixedTypePar
 import org.mule.runtime.module.extension.internal.config.dsl.object.MediaTypeValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ObjectParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.object.SchedulingStrategyParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.AnonymousInlineParameterGroupParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
@@ -167,8 +167,8 @@ public abstract class ExtensionDefinitionParser {
   protected final List<ObjectParsingDelegate> objectParsingDelegates = ImmutableList
       .of(new FixedTypeParsingDelegate(PoolingProfile.class),
           new FixedTypeParsingDelegate(RetryPolicyTemplate.class),
-          new FixedTypeParsingDelegate(Scheduler.class),
           new FixedTypeParsingDelegate(TlsContextFactory.class),
+          new SchedulingStrategyParsingDelegate(),
           new DefaultObjectParsingDelegate());
   protected final DslSyntaxResolver dslResolver;
   protected final Builder baseDefinitionBuilder;
