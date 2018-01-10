@@ -46,22 +46,22 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
     TypeElement traversingElement = element;
     while (traversingElement != null && !Object.class.getName().equals(traversingElement.getQualifiedName().toString())) {
       final Map<String, VariableElement> variableElements = processor.getFieldsAnnotatedWith(traversingElement, Parameter.class)
-                                                              .entrySet()
-                                                              .stream()
-                                                              .collect(Collectors.toMap(entry -> getNameOrAlias(entry.getValue()),
-                                                                                        Map.Entry::getValue));
+          .entrySet()
+          .stream()
+          .collect(Collectors.toMap(entry -> getNameOrAlias(entry.getValue()),
+                                    Map.Entry::getValue));
 
       parameterized.getAllParameters()
-        .stream().filter(param -> variableElements.containsKey(param.getName()))
-        .forEach(param -> {
-          String summary = processor.getJavaDocSummary(processingEnv, variableElements.get(param.getName()));
-          param.setDescription(summary);
-        });
+          .stream().filter(param -> variableElements.containsKey(param.getName()))
+          .forEach(param -> {
+            String summary = processor.getJavaDocSummary(processingEnv, variableElements.get(param.getName()));
+            param.setDescription(summary);
+          });
       traversingElement = (TypeElement) processingEnv.getTypeUtils().asElement(traversingElement.getSuperclass());
     }
 
     for (VariableElement variableElement : processor.getFieldsAnnotatedWith(element, ParameterGroup.class)
-                                             .values()) {
+        .values()) {
       TypeElement typeElement = (TypeElement) processingEnv.getTypeUtils().asElement(variableElement.asType());
       document(parameterized, typeElement);
     }
