@@ -46,9 +46,8 @@ final class SourcesDescriptionDocumenter extends AbstractDescriptionDocumenter<W
     return declaration.getMessageSources().stream()
         .filter(provider -> {
           String name = provider.getName();
-          String alias = getAliasValue(element);
           String defaultNaming = hyphenize(element.getSimpleName().toString());
-          return name.equals(defaultNaming) || name.equals(alias);
+          return name.equals(defaultNaming) || getAlias(element).map(name::equals).orElse(false);
         })
         .findAny();
   }

@@ -86,7 +86,7 @@ final class OperationDescriptionDocumenter extends AbstractDescriptionDocumenter
         for (ExecutableElement operation : getApiMethods(operationElement, processingEnv)) {
           operationElement.getEnclosedElements().stream()
               .filter(e -> e.getSimpleName().toString().equals(operation.getSimpleName().toString())).findFirst()
-              .ifPresent(operationMethodElement -> methods.put(operation.getSimpleName().toString(), operationMethodElement));
+              .ifPresent(e -> methods.put(getNameOrAlias(operation), e));
         }
         Element superClass = processingEnv.getTypeUtils().asElement(operationElement.getSuperclass());
         if (superClass instanceof TypeElement) {

@@ -125,6 +125,14 @@
                 </parameter>
             </parameters>
         </operation>
+        <operation name="operation-with-alias">
+            <description><![CDATA[Ope with Alias]]></description>
+            <parameters>
+                <parameter name="value">
+                    <description><![CDATA[some doc]]></description>
+                </parameter>
+            </parameters>
+        </operation>
         <operation name="operationWithJavadocLinkReferences">
             <description><![CDATA[Operation that returns a String value]]></description>
             <parameters>

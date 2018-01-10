@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
 
@@ -59,13 +58,13 @@ final class ConfigurationDescriptionDocumenter extends AbstractDescriptionDocume
   }
 
   private Optional<ConnectionProviderDeclaration> findMatchingProvider(ConnectedDeclaration<?> declaration, Element element) {
-    String alias = getAliasValue(element);
+    Optional<String> alias = getAlias(element);
     String defaultNaming = hyphenize(element.getSimpleName().toString().replace("Provider", ""));
     return declaration.getConnectionProviders().stream()
         .filter(provider -> {
           String name = provider.getName();
-          if (isNotBlank(alias)) {
-            return name.equals(alias);
+          if (alias.isPresent()) {
+            return name.equals(alias.get());
           } else {
             return name.equals(defaultNaming) || name.equals(DEFAULT_CONNECTION_PROVIDER_NAME);
           }
