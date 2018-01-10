@@ -14,6 +14,7 @@ import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.internal.loader.ProblemsHandler;
+import org.mule.runtime.module.extension.api.loader.java.type.WithElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
@@ -72,14 +73,19 @@ public final class AnnotationProcessorProblemsHandler implements ProblemsHandler
         return element;
       }
     }
+    if (component instanceof WithElement) {
+      Optional<? extends Element> optionalElement = ((WithElement) component).getElement();
+      if (optionalElement.isPresent()) {
+        return optionalElement.get();
+      }
+    }
     return null;
   }
 
   private <T extends ModelProperty> Element getElement(EnrichableModel enrichableModel, Class<T> modelPropertyClass,
                                                        Function<T, Optional<? extends Element>> elementFunction) {
     return enrichableModel.getModelProperty(modelPropertyClass)
-        .map(elementFunction)
-        .map(Optional::get)
+        .flatMap(elementFunction::apply)
         .orElse(null);
   }
 }

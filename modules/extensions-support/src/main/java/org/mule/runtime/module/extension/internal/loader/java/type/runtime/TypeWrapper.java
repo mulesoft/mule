@@ -50,7 +50,7 @@ public class TypeWrapper implements Type {
   private final java.lang.reflect.Type type;
   final Class<?> aClass;
   private List<TypeGeneric> generics = emptyList();
-  private ResolvableType[] resolvableTypeGenerics;
+  private ResolvableType[] resolvableTypeGenerics = new ResolvableType[] {};
   ClassTypeLoader typeLoader;
 
   public TypeWrapper(Class<?> aClass, ClassTypeLoader typeLoader) {
@@ -64,15 +64,17 @@ public class TypeWrapper implements Type {
     this.type = resolvableType.getType();
     this.generics = new ArrayList<>();
     this.typeLoader = typeLoader;
-    resolvableTypeGenerics = resolvableType.getGenerics();
-    for (ResolvableType type : resolvableTypeGenerics) {
-      TypeWrapper concreteType;
-      if (type == resolvableType) {
-        concreteType = this;
-      } else {
-        concreteType = new TypeWrapper(type, typeLoader);
+    if (!(type instanceof Class)) {
+      resolvableTypeGenerics = resolvableType.getGenerics();
+      for (ResolvableType type : resolvableTypeGenerics) {
+        TypeWrapper concreteType;
+        if (type == resolvableType) {
+          concreteType = this;
+        } else {
+          concreteType = new TypeWrapper(type, typeLoader);
+        }
+        generics.add(new TypeGeneric(concreteType, concreteType.getGenerics()));
       }
-      generics.add(new TypeGeneric(concreteType, concreteType.getGenerics()));
     }
   }
 
