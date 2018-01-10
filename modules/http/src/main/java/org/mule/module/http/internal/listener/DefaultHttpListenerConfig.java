@@ -342,7 +342,7 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append("org.mule.module.http.internal.listener.DefaultHttpListenerConfig{name=")
+        buf.append("DefaultHttpListenerConfig{name=")
            .append(name)
            .append(", url=")
            .append(listenerUrl())
