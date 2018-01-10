@@ -84,6 +84,9 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
 
     try {
       getExtension(roundEnv).ifPresent(extensionElement -> {
+        if (!shouldProcess(extensionElement, processingEnv)) {
+          return;
+        }
         Optional<Class<Object>> annotatedClass = processor.classFor(extensionElement, processingEnv);
         ExtensionElement extension = toExtensionElement(extensionElement, processingEnv);
         ClassLoader classLoader = annotatedClass.map(Class::getClassLoader).orElseGet(ExtensionModel.class::getClassLoader);
@@ -159,4 +162,10 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
   public abstract ExtensionElement toExtensionElement(TypeElement typeElement, ProcessingEnvironment processingEnvironment);
 
   protected abstract ExtensionModelLoader getExtensionModelLoader();
+
+  /**
+   * @return a boolean indicating if the annotation processor is able to process or not with the current context.
+   */
+  protected abstract boolean shouldProcess(TypeElement extensionElement, ProcessingEnvironment processingEnv);
+
 }
