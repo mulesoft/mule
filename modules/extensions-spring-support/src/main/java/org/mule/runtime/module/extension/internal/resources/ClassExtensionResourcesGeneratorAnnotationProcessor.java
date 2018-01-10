@@ -31,4 +31,9 @@ public abstract class ClassExtensionResourcesGeneratorAnnotationProcessor
     return new ExtensionTypeWrapper<>(extensionClass,
                                       new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionClass.getClassLoader()));
   }
+
+  @Override
+  protected boolean shouldProcess(TypeElement extensionElement, ProcessingEnvironment processingEnv) {
+    return processor.classFor(extensionElement, processingEnv).isPresent();
+  }
 }
