@@ -19,11 +19,14 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPaylo
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
+import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.toGroupCorrelation;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -32,7 +35,7 @@ import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.api.message.GroupCorrelation;
+import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
@@ -65,7 +68,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private Map<String, TypedValue<?>> flowVariables = new HashMap<>();
   private Map<String, Object> internalParameters = new HashMap<>(4);
   private Error error;
-  private Optional<GroupCorrelation> groupCorrelation = empty();
+  private Optional<ItemSequenceInfo> itemSequenceInfo = empty();
   private String legacyCorrelationId;
   private ReplyToHandler replyToHandler;
   private Object replyToDestination;
@@ -84,7 +87,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.context = event.getContext();
     this.originalEvent = event;
     this.message = event.getMessage();
-    this.groupCorrelation = event.getGroupCorrelation();
+    this.itemSequenceInfo = event.getItemSequenceInfo();
     this.legacyCorrelationId = event.getLegacyCorrelationId();
     this.replyToHandler = event.getReplyToHandler();
     this.replyToDestination = event.getReplyToDestination();
@@ -167,8 +170,14 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   @Override
+  @Deprecated
   public DefaultEventBuilder groupCorrelation(Optional<GroupCorrelation> correlation) {
-    this.groupCorrelation = correlation;
+    return this.itemSequenceInfo(ofNullable(fromGroupCorrelation(correlation.orElse(null))));
+  }
+
+  @Override
+  public DefaultEventBuilder itemSequenceInfo(Optional<ItemSequenceInfo> itemSequenceInfo) {
+    this.itemSequenceInfo = itemSequenceInfo;
     this.modified = true;
     return this;
   }
@@ -225,7 +234,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
       return new InternalEventImplementation(context, message, flowVariables,
                                              internalParameters, session, securityContext, replyToDestination,
-                                             replyToHandler, groupCorrelation, error,
+                                             replyToHandler, itemSequenceInfo, error,
                                              legacyCorrelationId,
                                              notificationsEnabled);
     }
@@ -271,11 +280,14 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final String legacyCorrelationId;
     private final Error error;
 
+    private ItemSequenceInfo itemSequenceInfo;
+
     // Use this constructor from the builder
     private InternalEventImplementation(BaseEventContext context, Message message, Map<String, TypedValue<?>> variables,
                                         Map<String, ?> internalParameters, MuleSession session, SecurityContext securityContext,
                                         Object replyToDestination, ReplyToHandler replyToHandler,
-                                        Optional<GroupCorrelation> groupCorrelation, Error error,
+                                        Optional<ItemSequenceInfo> itemSequenceInfo,
+                                        Error error,
                                         String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
       this.session = session;
@@ -287,7 +299,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.replyToHandler = replyToHandler;
       this.replyToDestination = replyToDestination;
 
-      this.groupCorrelation = groupCorrelation.orElse(null);
+      this.itemSequenceInfo = itemSequenceInfo.orElse(null);
       this.error = error;
       this.legacyCorrelationId = legacyCorrelationId;
 
@@ -462,8 +474,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       return securityContext;
     }
 
-    private GroupCorrelation groupCorrelation;
-
     @Override
     public Map<String, ?> getInternalParameters() {
       return unmodifiableMap(internalParameters);
@@ -471,7 +481,12 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public Optional<GroupCorrelation> getGroupCorrelation() {
-      return ofNullable(groupCorrelation);
+      return ofNullable(toGroupCorrelation(itemSequenceInfo));
+    }
+
+    @Override
+    public Optional<ItemSequenceInfo> getItemSequenceInfo() {
+      return ofNullable(itemSequenceInfo);
     }
 
     @Override

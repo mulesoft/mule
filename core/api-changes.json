@@ -15,65 +15,6 @@
           "justification": "MULE-14279: API broken by MULE-14171"
         },
         {
-          "code": "java.method.parameterTypeParameterChanged",
-          "old": "parameter org.mule.runtime.core.api.event.CoreEvent.Builder org.mule.runtime.core.api.event.CoreEvent.Builder::groupCorrelation(===java.util.Optional<org.mule.runtime.core.api.message.GroupCorrelation>===)",
-          "new": "parameter org.mule.runtime.core.api.event.CoreEvent.Builder org.mule.runtime.core.api.event.CoreEvent.Builder::groupCorrelation(===java.util.Optional<org.mule.runtime.api.message.GroupCorrelation>===)",
-          "oldType": "java.util.Optional<org.mule.runtime.core.api.message.GroupCorrelation>",
-          "newType": "java.util.Optional<org.mule.runtime.api.message.GroupCorrelation>",
-          "package": "org.mule.runtime.core.api.event",
-          "classSimpleName": "Builder",
-          "methodName": "groupCorrelation",
-          "parameterIndex": "0",
-          "elementKind": "parameter",
-          "justification": "No implementors for the method. No one was using GroupCorrelation class. Need it in mule-api to bind to DW"
-        },
-        {
-          "code": "java.method.returnTypeTypeParametersChanged",
-          "old": "method java.util.Optional<org.mule.runtime.core.api.message.GroupCorrelation> org.mule.runtime.core.api.event.CoreEvent::getGroupCorrelation()",
-          "new": "method java.util.Optional<org.mule.runtime.api.message.GroupCorrelation> org.mule.runtime.api.event.Event::getGroupCorrelation() @ org.mule.runtime.core.api.event.CoreEvent",
-          "oldType": "java.util.Optional<org.mule.runtime.core.api.message.GroupCorrelation>",
-          "newType": "java.util.Optional<org.mule.runtime.api.message.GroupCorrelation>",
-          "package": "org.mule.runtime.core.api.event",
-          "classSimpleName": "CoreEvent",
-          "methodName": "getGroupCorrelation",
-          "elementKind": "method",
-          "justification": "No implementors for the method. No one was using GroupCorrelation class. Need it in mule-api to bind to DW"
-        },
-        {
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.core.api.message.GroupCorrelation",
-          "package": "org.mule.runtime.core.api.message",
-          "classSimpleName": "GroupCorrelation",
-          "elementKind": "class",
-          "justification": "No one was using GroupCorrelation class. Need it in mule-api to bind to DW"
-        },
-        {
-          "code": "java.method.parameterTypeParameterChanged",
-          "old": "parameter org.mule.runtime.core.internal.message.InternalEvent.Builder org.mule.runtime.core.internal.message.InternalEvent.Builder::groupCorrelation(===java.util.Optional<org.mule.runtime.core.api.message.GroupCorrelation>===)",
-          "new": "parameter org.mule.runtime.core.internal.message.InternalEvent.Builder org.mule.runtime.core.internal.message.InternalEvent.Builder::groupCorrelation(===java.util.Optional<org.mule.runtime.api.message.GroupCorrelation>===)",
-          "oldType": "java.util.Optional<org.mule.runtime.core.api.message.GroupCorrelation>",
-          "newType": "java.util.Optional<org.mule.runtime.api.message.GroupCorrelation>",
-          "package": "org.mule.runtime.core.internal.message",
-          "classSimpleName": "Builder",
-          "methodName": "groupCorrelation",
-          "parameterIndex": "0",
-          "elementKind": "parameter",
-          "justification": "No implementors for the method. No one was using GroupCorrelation class. Need it in mule-api to bind to DW"
-        },
-        {
-          "code": "java.method.parameterTypeParameterChanged",
-          "old": "parameter org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder::groupCorrelation(===java.util.Optional<org.mule.runtime.core.api.message.GroupCorrelation>===)",
-          "new": "parameter org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder::groupCorrelation(===java.util.Optional<org.mule.runtime.api.message.GroupCorrelation>===)",
-          "oldType": "java.util.Optional<org.mule.runtime.core.api.message.GroupCorrelation>",
-          "newType": "java.util.Optional<org.mule.runtime.api.message.GroupCorrelation>",
-          "package": "org.mule.runtime.core.privileged.event",
-          "classSimpleName": "Builder",
-          "methodName": "groupCorrelation",
-          "parameterIndex": "0",
-          "elementKind": "parameter",
-          "justification": "No implementors for the method. No one was using GroupCorrelation class. Need it in mule-api to bind to DW"
-        },
-        {
           "code": "java.annotation.added",
           "old": "interface org.mule.runtime.core.api.source.scheduler.Scheduler",
           "new": "interface org.mule.runtime.core.api.source.scheduler.Scheduler",
@@ -83,6 +24,15 @@
           "classSimpleName": "Scheduler",
           "elementKind": "interface",
           "justification": "Make interface MetadataType consistent with schema declaration in mule-core-common.xsd when loading the type DSL"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.core.api.event.CoreEvent.Builder org.mule.runtime.core.api.event.CoreEvent.Builder::itemSequenceInfo(java.util.Optional<org.mule.runtime.api.message.ItemSequenceInfo>)",
+          "package": "org.mule.runtime.core.api.event",
+          "classSimpleName": "Builder",
+          "methodName": "itemSequenceInfo",
+          "elementKind": "method",
+          "justification": "Method inherited from parent (Event). Needed in mule-api to bind data to DW"
         }
       ]
     }

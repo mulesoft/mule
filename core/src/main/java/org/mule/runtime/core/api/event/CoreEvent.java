@@ -9,10 +9,11 @@ package org.mule.runtime.core.api.event;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.api.message.GroupCorrelation;
+import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -41,6 +42,15 @@ public interface CoreEvent extends Serializable, Event {
    * @return the context for this session or null if the request is not secure.
    */
   SecurityContext getSecurityContext();
+
+  /**
+   * Returns the correlation metadata of this message. See {@link GroupCorrelation}.
+   *
+   * @return the correlation metadata of this message.
+   *
+   * @deprecated use {@link #getItemSequenceInfo()} instead
+   */
+  Optional<GroupCorrelation> getGroupCorrelation();
 
   /**
    * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can
@@ -140,8 +150,19 @@ public interface CoreEvent extends Serializable, Event {
      *
      * @param groupCorrelation the object containing the group correlation information to set on the produced event
      * @return the builder instance
+     * @deprecated use {@link #itemSequenceInfo(Optional)}} instead
      */
     Builder groupCorrelation(Optional<GroupCorrelation> groupCorrelation);
+
+    /**
+     * Sets the event sequence information.
+     *
+     * @param itemSequenceInfo the object containing the sequence information of the produced event
+     * @return the builder instance
+     */
+    default Builder itemSequenceInfo(Optional<ItemSequenceInfo> itemSequenceInfo) {
+      return this;
+    }
 
     /**
      * Sets an error related to the produced event.

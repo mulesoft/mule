@@ -49,6 +49,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     when(event.getError()).thenReturn(java.util.Optional.empty());
     when(event.getAuthentication()).thenReturn(java.util.Optional.empty());
     when(event.getMessage()).thenReturn(of(null));
+    when(event.getItemSequenceInfo()).thenReturn(java.util.Optional.empty());
   }
 
   @Test

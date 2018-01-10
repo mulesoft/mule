@@ -18,7 +18,7 @@ import org.mule.runtime.core.privileged.event.Acceptor;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
-import org.mule.runtime.api.message.GroupCorrelation;
+import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.routing.MessageSequence;
 import org.mule.runtime.core.privileged.routing.RouterResultsHandler;
 import org.mule.runtime.core.internal.exception.MessagingException;

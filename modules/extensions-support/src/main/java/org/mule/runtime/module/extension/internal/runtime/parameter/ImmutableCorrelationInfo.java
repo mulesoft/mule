@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.parameter;
 
-import org.mule.runtime.api.message.GroupCorrelation;
+import static java.util.Optional.ofNullable;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
+
+import java.util.Optional;
 
 /**
  * Immutable implementation of {@link CorrelationInfo}
@@ -19,14 +22,14 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
   private final String eventId;
   private final boolean outboundCorrelationEnabled;
   private final String correlationId;
-  private final GroupCorrelation groupCorrelation;
+  private final ItemSequenceInfo itemSequenceInfo;
 
   public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId,
-                                  GroupCorrelation groupCorrelation) {
+                                  ItemSequenceInfo itemSequenceInfo) {
     this.eventId = eventId;
     this.outboundCorrelationEnabled = outboundCorrelationEnabled;
     this.correlationId = correlationId;
-    this.groupCorrelation = groupCorrelation;
+    this.itemSequenceInfo = itemSequenceInfo;
   }
 
   /**
@@ -57,7 +60,7 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
    * {@inheritDoc}
    */
   @Override
-  public GroupCorrelation getGroupCorrelation() {
-    return groupCorrelation;
+  public Optional<ItemSequenceInfo> getItemSequenceInfo() {
+    return ofNullable(itemSequenceInfo);
   }
 }
