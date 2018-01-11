@@ -8441,139 +8441,12 @@
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "NEW_BATCH",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "NEXT_BATCH",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Long",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_DELIVERED",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Long",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_DELIVERY_FAILED",
-              "metadataType": {
-                "format": "java",
-                "type": "@ref:org.mule.test.heisenberg.extension.model.PersonalInfo"
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_FAILED",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_TERMINATED",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            }
+            "HEISENBERG:NEW_BATCH",
+            "HEISENBERG:NEXT_BATCH",
+            "HEISENBERG:BATCH_DELIVERED",
+            "HEISENBERG:BATCH_DELIVERY_FAILED",
+            "HEISENBERG:BATCH_FAILED",
+            "HEISENBERG:BATCH_TERMINATED"
           ],
           "nestedComponents": [],
           "errors": [],
@@ -10400,139 +10273,12 @@
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "NEW_BATCH",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "NEXT_BATCH",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Long",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_DELIVERED",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Long",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_DELIVERY_FAILED",
-              "metadataType": {
-                "format": "java",
-                "type": "@ref:org.mule.test.heisenberg.extension.model.PersonalInfo"
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_FAILED",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_TERMINATED",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            }
+            "HEISENBERG:NEW_BATCH",
+            "HEISENBERG:NEXT_BATCH",
+            "HEISENBERG:BATCH_DELIVERED",
+            "HEISENBERG:BATCH_DELIVERY_FAILED",
+            "HEISENBERG:BATCH_FAILED",
+            "HEISENBERG:BATCH_TERMINATED"
           ],
           "nestedComponents": [],
           "errors": [],
@@ -12392,139 +12138,12 @@
           "requiresConnection": true,
           "supportsStreaming": true,
           "notifications": [
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "NEW_BATCH",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "NEXT_BATCH",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Long",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_DELIVERED",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Long",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_DELIVERY_FAILED",
-              "metadataType": {
-                "format": "java",
-                "type": "@ref:org.mule.test.heisenberg.extension.model.PersonalInfo"
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_FAILED",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            },
-            {
-              "namespace": "HEISENBERG",
-              "identifier": "BATCH_TERMINATED",
-              "metadataType": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
-              }
-            }
+            "HEISENBERG:NEW_BATCH",
+            "HEISENBERG:NEXT_BATCH",
+            "HEISENBERG:BATCH_DELIVERED",
+            "HEISENBERG:BATCH_DELIVERY_FAILED",
+            "HEISENBERG:BATCH_FAILED",
+            "HEISENBERG:BATCH_TERMINATED"
           ],
           "nestedComponents": [],
           "errors": [],
@@ -18444,22 +18063,8 @@
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [
-        {
-          "namespace": "HEISENBERG",
-          "identifier": "KNOCKING_DOOR",
-          "metadataType": {
-            "format": "java",
-            "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
-          }
-        },
-        {
-          "namespace": "HEISENBERG",
-          "identifier": "KNOCKED_DOOR",
-          "metadataType": {
-            "format": "java",
-            "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
-          }
-        }
+        "HEISENBERG:KNOCKING_DOOR",
+        "HEISENBERG:KNOCKED_DOOR"
       ],
       "nestedComponents": [],
       "errors": [],
@@ -24540,8 +24145,7 @@
   ],
   "notifications": [
     {
-      "namespace": "HEISENBERG",
-      "identifier": "NEW_BATCH",
+      "notification": "HEISENBERG:NEW_BATCH",
       "metadataType": {
         "format": "java",
         "type": "Number",
@@ -24565,8 +24169,7 @@
       }
     },
     {
-      "namespace": "HEISENBERG",
-      "identifier": "NEXT_BATCH",
+      "notification": "HEISENBERG:NEXT_BATCH",
       "metadataType": {
         "format": "java",
         "type": "Number",
@@ -24590,8 +24193,7 @@
       }
     },
     {
-      "namespace": "HEISENBERG",
-      "identifier": "BATCH_DELIVERED",
+      "notification": "HEISENBERG:BATCH_DELIVERED",
       "metadataType": {
         "format": "java",
         "type": "Number",
@@ -24615,16 +24217,14 @@
       }
     },
     {
-      "namespace": "HEISENBERG",
-      "identifier": "BATCH_DELIVERY_FAILED",
+      "notification": "HEISENBERG:BATCH_DELIVERY_FAILED",
       "metadataType": {
         "format": "java",
         "type": "@ref:org.mule.test.heisenberg.extension.model.PersonalInfo"
       }
     },
     {
-      "namespace": "HEISENBERG",
-      "identifier": "BATCH_FAILED",
+      "notification": "HEISENBERG:BATCH_FAILED",
       "metadataType": {
         "format": "java",
         "type": "Number",
@@ -24648,8 +24248,7 @@
       }
     },
     {
-      "namespace": "HEISENBERG",
-      "identifier": "BATCH_TERMINATED",
+      "notification": "HEISENBERG:BATCH_TERMINATED",
       "metadataType": {
         "format": "java",
         "type": "Number",
@@ -24673,16 +24272,14 @@
       }
     },
     {
-      "namespace": "HEISENBERG",
-      "identifier": "KNOCKING_DOOR",
+      "notification": "HEISENBERG:KNOCKING_DOOR",
       "metadataType": {
         "format": "java",
         "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
       }
     },
     {
-      "namespace": "HEISENBERG",
-      "identifier": "KNOCKED_DOOR",
+      "notification": "HEISENBERG:KNOCKED_DOOR",
       "metadataType": {
         "format": "java",
         "type": "@ref:org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor"
