@@ -37,6 +37,7 @@ import static org.reflections.ReflectionUtils.getAllFields;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
@@ -291,27 +292,36 @@ public final class IntrospectionUtils {
 
   private static MetadataType returnListOfMessagesType(Type returnType,
                                                        Type resultType) {
-    TypeGeneric genericType = resultType.getGenerics().get(0);
-    Type payloadType = genericType.getConcreteType();
-
-    MetadataType outputType;
-
-    if (payloadType.isAnyType()) {
-      outputType = typeBuilder().anyType().build();
+    if (resultType.getGenerics().isEmpty()) {
+      AnyType anyType = typeBuilder().anyType().build();
+      return getListOfMessageType(returnType, anyType, anyType);
     } else {
-      if (payloadType.isAssignableTo(TypedValue.class)) {
-        payloadType = payloadType.getGenerics().get(0).getConcreteType();
+      TypeGeneric genericType = resultType.getGenerics().get(0);
+      Type payloadType = genericType.getConcreteType();
+
+      MetadataType outputType;
+
+      if (payloadType.isAnyType()) {
+        outputType = typeBuilder().anyType().build();
+      } else {
+        if (payloadType.isAssignableTo(TypedValue.class)) {
+          payloadType = payloadType.getGenerics().get(0).getConcreteType();
+        }
+        outputType = payloadType.asMetadataType();
       }
-      outputType = payloadType.asMetadataType();
+
+      Type attributesType =
+          resultType.getGenerics().get(1).getConcreteType();
+
+      MetadataType attributesOutputType = attributesType.isAnyType()
+          ? typeBuilder().anyType().build()
+          : attributesType.asMetadataType();
+
+      return getListOfMessageType(returnType, outputType, attributesOutputType);
     }
+  }
 
-    Type attributesType =
-        resultType.getGenerics().get(1).getConcreteType();
-
-    MetadataType attributesOutputType = attributesType.isAnyType()
-        ? typeBuilder().anyType().build()
-        : attributesType.asMetadataType();
-
+  private static ArrayType getListOfMessageType(Type returnType, MetadataType outputType, MetadataType attributesOutputType) {
     return typeBuilder().arrayType()
         .of(new MessageMetadataTypeBuilder()
             .payload(outputType)
@@ -356,6 +366,8 @@ public final class IntrospectionUtils {
         } else {
           return typeBuilder().anyType().build();
         }
+      } else {
+        return typeBuilder().anyType().build();
       }
     }
 

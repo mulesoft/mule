@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -19,11 +18,17 @@ import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionE
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+
+import java.util.Collection;
+import java.util.List;
 
 import com.google.common.collect.ImmutableList;
-
-import java.util.List;
 
 /**
  * Validates that all {@link OperationModel operations} specify a valid return type.
@@ -34,6 +39,10 @@ import java.util.List;
  */
 public class OperationReturnTypeModelValidator implements ExtensionModelValidator {
 
+  private static final String MISSING_GENERICS_ERROR_MESSAGE =
+      "Operation [%s] in extension [%s] has a '%s' as return type but their generics "
+          +
+          "were not provided. Please provide the Payload and Attributes generics.";
   private final List<Class<?>> illegalReturnTypes = ImmutableList.of(CoreEvent.class, Message.class);
 
   @Override
@@ -46,18 +55,68 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
           throw missingReturnTypeException(extensionModel, operationModel);
         }
 
-        getType(operationModel.getOutput().getType())
-            .ifPresent(returnType -> illegalReturnTypes.stream()
-                .filter(forbiddenType -> forbiddenType.isAssignableFrom(returnType)).findFirst()
-                .ifPresent(forbiddenType -> {
-                  problemsReporter.addError(new Problem(operationModel, format(
-                                                                               "Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are "
-                                                                                   + "not allowed to return objects of that type",
-                                                                               operationModel.getName(), extensionModel.getName(),
-                                                                               forbiddenType.getName())));
-                }));
+        operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+            .ifPresent(mp -> {
+              MethodElement<? extends Type> operationMethod = mp.getOperationMethod();
+              Type returnType = mp.getOperationMethod().getReturnType();
+              validateNonBlockingCallback(operationMethod, problemsReporter, operationModel, extensionModel);
+              validateResultReturnType(returnType, problemsReporter, operationModel, extensionModel);
+              validateMessageCollectionsReturnType(returnType, problemsReporter, operationModel, extensionModel);
+              validateForbiddenTypesReturnType(returnType, problemsReporter, operationModel, extensionModel);
+            });
+
+
       }
     }.walk(extensionModel);
+  }
+
+  private void validateForbiddenTypesReturnType(Type returnType, ProblemsReporter problemsReporter, OperationModel operationModel,
+                                                ExtensionModel extensionModel) {
+    illegalReturnTypes.stream()
+        .filter(returnType::isAssignableTo)
+        .findFirst()
+        .ifPresent(forbiddenType -> problemsReporter.addError(new Problem(operationModel, format(
+                                                                                                 "Operation '%s' in Extension '%s' specifies '%s' as a return type. Operations are "
+                                                                                                     + "not allowed to return objects of that type",
+                                                                                                 operationModel.getName(),
+                                                                                                 extensionModel.getName(),
+                                                                                                 forbiddenType.getName()))));
+  }
+
+  private void validateNonBlockingCallback(MethodElement<? extends Type> operationMethod, ProblemsReporter problemsReporter,
+                                           OperationModel operationModel, ExtensionModel extensionModel) {
+    operationMethod.getParameters().stream()
+        .filter(p -> p.getType().isSameType(CompletionCallback.class))
+        .findFirst().ifPresent(p -> {
+          if (p.getType().getGenerics().isEmpty()) {
+            problemsReporter.addError(new Problem(p, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                            extensionModel.getName(), CompletionCallback.class.getName())));
+          }
+        });
+  }
+
+  private void validateResultReturnType(Type returnType, ProblemsReporter problemsReporter, OperationModel operationModel,
+                                        ExtensionModel extensionModel) {
+    if (returnType.isAssignableTo(Result.class)) {
+      if (returnType.getGenerics().isEmpty()) {
+        problemsReporter.addError(new Problem(operationModel, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                                     extensionModel.getName(), Result.class)));
+      }
+    }
+  }
+
+  private void validateMessageCollectionsReturnType(Type returnType, ProblemsReporter problemsReporter,
+                                                    OperationModel operationModel, ExtensionModel extensionModel) {
+    if (returnType.isAssignableTo(Collection.class)) {
+      List<TypeGeneric> generics = returnType.getGenerics();
+      if (!generics.isEmpty()) {
+        Type concreteType = generics.get(0).getConcreteType();
+        if (concreteType.isAssignableTo(Result.class) && concreteType.getGenerics().isEmpty()) {
+          problemsReporter.addError(new Problem(operationModel, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                                       extensionModel.getName(), Result.class)));
+        }
+      }
+    }
   }
 
   private IllegalModelDefinitionException missingReturnTypeException(ExtensionModel model, OperationModel operationModel) {
