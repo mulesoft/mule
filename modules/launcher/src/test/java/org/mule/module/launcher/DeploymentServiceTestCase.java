@@ -52,9 +52,11 @@ import org.mule.module.launcher.builder.ApplicationPluginFileBuilder;
 import org.mule.module.launcher.builder.DomainFileBuilder;
 import org.mule.module.launcher.builder.TestArtifactDescriptor;
 import org.mule.module.launcher.domain.Domain;
+import org.mule.module.launcher.domain.DomainFactory;
 import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 import org.mule.module.launcher.domain.TestDomainFactory;
 import org.mule.module.launcher.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.module.launcher.util.ObservableList;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -105,7 +107,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     // Resources
     private static final String MULE_CONFIG_XML_FILE = "mule-config.xml";
-    private static final String MULE_DOMAIN_CONFIG_XML_FILE = "mule-domain-config.xml";
     private static final String EMPTY_APP_CONFIG_XML = "/empty-config.xml";
     private static final String BAD_APP_CONFIG_XML = "/bad-app-config.xml";
     private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
@@ -159,9 +160,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     protected File muleHome;
     protected File appsDir;
     protected File domainsDir;
-    protected MuleDeploymentService deploymentService;
+    protected TestMuleDeploymentService deploymentService;
     protected DeploymentListener applicationDeploymentListener;
     protected DeploymentListener domainDeploymentListener;
+    private static Latch undeployLatch = new Latch();
+
 
     @Rule
     public SystemProperty changeChangeInterval = new SystemProperty(DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY, "10");
@@ -196,7 +199,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         applicationDeploymentListener = mock(DeploymentListener.class);
         domainDeploymentListener = mock(DeploymentListener.class);
-        deploymentService = new MuleDeploymentService(new MulePluginClassLoaderManager());
+        deploymentService = new TestMuleDeploymentService(new MulePluginClassLoaderManager());
         deploymentService.addDeploymentListener(applicationDeploymentListener);
         deploymentService.addDomainDeploymentListener(domainDeploymentListener);
     }
@@ -1847,6 +1850,21 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertDomainDir(NONE, new String[] {dummyDomainFileBuilder.getId()}, true);
     }
 
+
+    @Test
+    public void applicationBundledWithinDomainNotRemovedAfterFullDeploy() throws Exception
+    {
+        resetUndeployLatch();
+        dummyDomainBundleFileBuilder.containing(emptyAppFileBuilder);
+        dummyDomainBundleFileBuilder.definedBy("empty-domain-config.xml");
+        emptyAppFileBuilder.deployedWith("domain", "dummy-domain-bundle");
+        addPackedDomainFromBuilder(dummyDomainBundleFileBuilder);
+
+        deploymentService.start();
+
+        doRedeployBrokenDomainAfterFixedDomain();
+    }
+
     protected void alterTimestampIfNeeded(File file, long firstTimestamp)
     {
         if (!file.exists())
@@ -2777,7 +2795,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         reset(domainDeploymentListener);
 
-        File originalConfigFile = new File(domainsDir + "/incompleteDomain", "mule-domain-config.xml");
+        File originalConfigFile = new File(domainsDir + "/incompleteDomain", DOMAIN_CONFIG_FILE_LOCATION);
         URL url = getClass().getResource("/empty-domain-config.xml");
         File newConfigFile = new File(url.toURI());
         FileUtils.copyFile(newConfigFile, originalConfigFile);
@@ -2788,6 +2806,32 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         // Check that the failed application folder is still there
         assertDomainFolderIsMaintained("incompleteDomain");
+    }
+
+    /**
+     * After a successful deploy using the {@link DeploymentServiceTestCase#domainDeploymentListener},
+     * this method deploys a domain zip with the same name and a wrong configuration.
+     * Applications dependant of the domain should not be deleted after this failure full redeploy.
+     */
+    private void doRedeployBrokenDomainAfterFixedDomain() throws Exception
+    {
+        assertDeploymentSuccess(domainDeploymentListener, dummyDomainBundleFileBuilder.getId());
+        assertApplicationAnchorFileExists(emptyAppFileBuilder.getId());
+
+        reset(domainDeploymentListener);
+
+        DomainFileBuilder dummyDomainBundleFileBuilderFullDeploy = new DomainFileBuilder("dummy-domain-bundle").containing(emptyAppFileBuilder);
+
+        dummyDomainBundleFileBuilderFullDeploy.definedBy("incomplete-domain-config.xml");
+        addPackedDomainFromBuilder(dummyDomainBundleFileBuilderFullDeploy);
+
+        assertDeploymentFailure(domainDeploymentListener, dummyDomainBundleFileBuilderFullDeploy.getId());
+
+        undeployLatch.await();
+
+        assertApplicationAnchorFileExists(emptyAppFileBuilder.getId());
+        Application dependantApplication = deploymentService.getApplications().get(0);
+        assertThat(dependantApplication.getMuleContext(), is(nullValue()));
     }
 
     public void doBrokenAppArchiveTest() throws Exception
@@ -3271,7 +3315,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
     private void addExplodedDomainFromBuilder(TestArtifactDescriptor artifactFileBuilder, String appName) throws Exception
     {
-        addExplodedArtifactFromBuilder(artifactFileBuilder, appName, MULE_DOMAIN_CONFIG_XML_FILE, domainsDir);
+        addExplodedArtifactFromBuilder(artifactFileBuilder, appName, DOMAIN_CONFIG_FILE_LOCATION, domainsDir);
     }
 
     private void addExplodedArtifactFromBuilder(TestArtifactDescriptor artifactFileBuilder, String artifactName, String configFileName, File destinationDir) throws Exception
@@ -3475,4 +3519,40 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertThat("mule-app.properties should have been loaded.", (String) registry.get("myCustomProp"), equalTo("someValue"));
     }
 
+    private void resetUndeployLatch ()
+    {
+        undeployLatch = new Latch();
+    }
+
+    private static class TestMuleDeploymentService extends MuleDeploymentService
+    {
+        TestMuleDeploymentService(PluginClassLoaderManager pluginClassLoaderManager)
+        {
+            super(pluginClassLoaderManager);
+        }
+
+        @Override
+        protected DomainArchiveDeployer createDomainArchiveDeployer(DomainFactory domainFactory, ObservableList<Domain> domains, DefaultArchiveDeployer<Application> applicationDeployer)
+        {
+            return new TestDomainArchiveDeployer(
+                    new DefaultArchiveDeployer<>(new DefaultArtifactDeployer<Domain>(), domainFactory, domains,
+                                                 new DomainDeploymentTemplate(applicationDeployer, this)),
+                    applicationDeployer, this);
+        }
+    }
+
+    private static class TestDomainArchiveDeployer extends DomainArchiveDeployer
+    {
+        TestDomainArchiveDeployer(ArchiveDeployer<Domain> domainDeployer, ArchiveDeployer<Application> applicationDeployer, DeploymentService deploymentService)
+        {
+            super(domainDeployer, applicationDeployer, deploymentService);
+        }
+
+        @Override
+        public void undeployArtifact(String artifactId)
+        {
+            super.undeployArtifact(artifactId);
+            undeployLatch.countDown();
+        }
+    }
 }

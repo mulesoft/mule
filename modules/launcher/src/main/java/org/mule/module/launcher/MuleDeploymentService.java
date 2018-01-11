@@ -84,14 +84,10 @@ public class MuleDeploymentService implements DeploymentService
         applicationFactory.setDeploymentListener(applicationDeploymentListener);
 
         ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<Application>();
-        ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<Domain>();
 
         this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications, NOP_ARTIFACT_DEPLOYMENT_TEMPLATE);
         this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
-        this.domainDeployer = new DomainArchiveDeployer(
-                new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
-                                             new DomainDeploymentTemplate(applicationDeployer, this)),
-                applicationDeployer, this);
+        this.domainDeployer = createDomainArchiveDeployer(domainFactory, domains, applicationDeployer);
         this.domainDeployer.setDeploymentListener(domainDeploymentListener);
         if (useParallelDeployment())
         {
@@ -385,5 +381,14 @@ public class MuleDeploymentService implements DeploymentService
                 deploymentLock.unlock();
             }
         }
+    }
+
+    protected DomainArchiveDeployer createDomainArchiveDeployer(DomainFactory domainFactory, ObservableList<Domain> domains, DefaultArchiveDeployer<Application> applicationDeployer)
+    {
+        return new DomainArchiveDeployer(
+                new DefaultArchiveDeployer<>(new DefaultArtifactDeployer<Domain>(), domainFactory, domains,
+                                             new DomainDeploymentTemplate(applicationDeployer, this)),
+                applicationDeployer, this);
+
     }
 }

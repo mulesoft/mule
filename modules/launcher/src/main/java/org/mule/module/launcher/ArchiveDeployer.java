@@ -33,6 +33,14 @@ public interface ArchiveDeployer<T extends Artifact>
      */
     boolean isUpdatedZombieArtifact(String artifactName);
 
+    /**
+     * Indicates if the artifact is a zombie (i.e. its last deployment failed).
+     *
+     * @param artifactName the name of the artifact to check.
+     * @return true if the artifact is a zombie.
+     */
+    boolean isZombieArtifact(String artifactName);
+
     T deployPackagedArtifact(URL artifactAchivedUrl);
 
     void undeployArtifact(String artifactId);

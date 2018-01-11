@@ -70,6 +70,13 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     }
 
     @Override
+    public boolean isZombieArtifact(String artifactName)
+    {
+        // Domains do not manage zombie artifacts
+        return false;
+    }
+
+    @Override
     public Domain deployPackagedArtifact(URL artifactAchivedUrl)
     {
         Domain domain = domainDeployer.deployPackagedArtifact(artifactAchivedUrl);
@@ -82,6 +89,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
      * <p/>
      * Before undeploying the domain it undeploys the applications
      * associated.
+     * Zombie domains (i.e. its last deployment failed) and its dependant applications are ignored.
      *
      * @param artifactId domain name to undeploy
      */
@@ -89,9 +97,12 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     public void undeployArtifact(String artifactId)
     {
         Collection<Application> domainApplications = findApplicationsAssociated(artifactId);
-        for (Application domainApplication : domainApplications)
+        if (!domainDeployer.isZombieArtifact(artifactId))
         {
-            applicationDeployer.undeployArtifact(domainApplication.getArtifactName());
+            for (Application domainApplication : domainApplications)
+            {
+                applicationDeployer.undeployArtifact(domainApplication.getArtifactName());
+            }
         }
         domainDeployer.undeployArtifact(artifactId);
     }
