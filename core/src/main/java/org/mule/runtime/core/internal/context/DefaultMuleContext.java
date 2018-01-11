@@ -115,8 +115,8 @@ import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.internal.registry.RegistryBroker;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.JdkVersionUtils;
-import org.mule.runtime.core.internal.util.splash.ApplicationShutdownSplashScreen;
-import org.mule.runtime.core.internal.util.splash.ApplicationStartupSplashScreen;
+import org.mule.runtime.core.internal.util.splash.ArtifactShutdownSplashScreen;
+import org.mule.runtime.core.internal.util.splash.ArtifactStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
@@ -781,7 +781,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
   private SplashScreen buildStartupSplash() {
     SplashScreen startupScreen =
-        config.isContainerMode() ? new ApplicationStartupSplashScreen() : new ServerStartupSplashScreen();
+        config.isContainerMode() ? new ArtifactStartupSplashScreen() : new ServerStartupSplashScreen();
     startupScreen.setHeader(this);
     startupScreen.setFooter(this);
     return startupScreen;
@@ -789,7 +789,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
   private SplashScreen buildShutdownSplash() {
     SplashScreen shutdownScreen =
-        config.isContainerMode() ? new ApplicationShutdownSplashScreen() : new ServerShutdownSplashScreen();
+        config.isContainerMode() ? new ArtifactShutdownSplashScreen() : new ServerShutdownSplashScreen();
     shutdownScreen.setHeader(this);
     return shutdownScreen;
   }
