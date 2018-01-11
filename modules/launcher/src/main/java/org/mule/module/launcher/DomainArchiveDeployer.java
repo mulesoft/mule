@@ -95,7 +95,6 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
      * associated.
      * Zombie domains (i.e. its last deployment failed) and its dependant applications are ignored.
      *
-     *
      * @param artifactId domain name to undeploy
      */
     @Override
