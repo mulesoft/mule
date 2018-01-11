@@ -123,17 +123,9 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     @Override
     public void undeployArtifact(String artifactId)
     {
-        ZombieFile zombieFile = artifactZombieMap.get(artifactId);
-
-        if ((zombieFile != null))
+        if (isZombieArtifact(artifactId))
         {
-            if (zombieFile.exists()) {
-                return;
-            }
-            else
-            {
-                artifactZombieMap.remove(artifactId);
-            }
+            return;
         }
 
         T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
@@ -205,7 +197,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
             throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
         }
     }
-  
+
     private void logDeploymentFailure(Throwable t, String artifactName)
     {
         final String msg = miniSplash(String.format("Failed to deploy artifact '%s', see below", artifactName));
@@ -522,6 +514,25 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         }
 
         artifactZombieMap.remove(artifact.getArtifactName());
+    }
+
+    public boolean isZombieArtifact(String artifactId)
+    {
+        ZombieFile zombieFile = artifactZombieMap.get(artifactId);
+
+        if ((zombieFile != null))
+        {
+            if (zombieFile.exists())
+            {
+                return true;
+            }
+            else
+            {
+                artifactZombieMap.remove(artifactId);
+                return false;
+            }
+        }
+        return false;
     }
 
     @Override

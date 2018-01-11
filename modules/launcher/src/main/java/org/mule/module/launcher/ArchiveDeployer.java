@@ -24,7 +24,7 @@ public interface ArchiveDeployer<T extends Artifact>
 {
 
     T deployPackagedArtifact(String zip, Optional<Properties> deploymentProperties) throws DeploymentException;
-    
+
     T deployPackagedArtifact(String zip) throws DeploymentException;
 
     T deployExplodedArtifact(String artifactDir) throws DeploymentException;
@@ -36,6 +36,14 @@ public interface ArchiveDeployer<T extends Artifact>
      * @return true if the zombie artifact was updated, false it the artifact is not a zombie or it was not updated.
      */
     boolean isUpdatedZombieArtifact(String artifactName);
+
+    /**
+     * Indicates if the artifact is a zombie (i.e. its last deployment failed).
+     *
+     * @param artifactName the name of the artifact to check.
+     * @return true if the artifact is a zombie.
+     */
+    boolean isZombieArtifact(String artifactName);
 
     void undeployArtifact(String artifactId);
 
@@ -54,7 +62,7 @@ public interface ArchiveDeployer<T extends Artifact>
     void undeployArtifactWithoutUninstall(T artifact);
 
     void deployArtifact(T artifact) throws DeploymentException;
-    
+
     void deployArtifact(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException;
 
     T deployPackagedArtifact(URL domainArchiveUrl, Optional<Properties> appProperties) throws DeploymentException;
