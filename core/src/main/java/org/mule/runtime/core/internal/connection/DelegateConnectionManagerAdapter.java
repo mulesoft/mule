@@ -19,13 +19,11 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 
 import javax.inject.Inject;
 
@@ -96,7 +94,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
   @Override
   public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance)
-      throws IllegalArgumentException {
+          throws IllegalArgumentException {
     return connectionManagerAdapterStrategy.testConnectivity(configurationInstance);
   }
 
@@ -122,7 +120,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
   /**
    * {@link ConnectionManagerAdapter} implementation commonly used for running applications in production.
-   * 
+   *
    * @since 4.1
    */
   class EagerConnectionManagerAdapter implements ConnectionManagerAdapter {
@@ -174,7 +172,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
     @Override
     public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance)
-        throws IllegalArgumentException {
+            throws IllegalArgumentException {
       return delegate.testConnectivity(configurationInstance);
     }
 
@@ -235,7 +233,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
     @Override
     public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance)
-        throws IllegalArgumentException {
+            throws IllegalArgumentException {
       return ConnectionValidationResult.success();
     }
 
@@ -252,8 +250,8 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
     @Override
     public <C> ConnectionHandler<C> getConnection(Object config) throws ConnectionException {
       Object proxyInstance =
-          newProxyInstance(config.getClass().getClassLoader(), new Class[] {ConnectionHandler.class},
-                           new LazyInvocationHandler(config));
+              newProxyInstance(config.getClass().getClassLoader(), new Class[] {ConnectionHandler.class},
+                               new LazyInvocationHandler(config));
       return (ConnectionHandler<C>) proxyInstance;
     }
 
@@ -287,7 +285,6 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
     private Object config;
     private ConnectionHandler<Object> connection;
-    private Object connectionHandlerProxy;
 
     public LazyInvocationHandler(Object config) {
       this.config = config;
@@ -297,8 +294,6 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
       if (method.getName().equals("getConnection")) {
         if (connection == null) {
-          // connectionHandlerProxy = Proxy.newProxyInstance(proxy.getClass().getClassLoader(),
-          // ClassUtils.findImplementedInterfaces(), )
           connection = delegate.getConnection(config);
         }
         return connection.getConnection();
