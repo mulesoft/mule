@@ -6,11 +6,10 @@
  */
 package org.mule.module.http.api;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
+import static com.google.common.collect.ImmutableSet.of;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * General purpose HTTP constants
@@ -23,7 +22,7 @@ public abstract class HttpConstants
         POST, GET, PUT, OPTIONS, HEAD, DELETE;
     }
 
-    public static final List<String> IDEMPOTENT_METHODS = unmodifiableList(asList("GET", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE"));
+    public static final Set<String> IDEMPOTENT_METHODS = of("GET", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE");
 
     public static enum Protocols
     {

@@ -7,26 +7,22 @@
 package org.mule.module.http.internal.request;
 
 import static java.lang.Integer.getInteger;
+import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.context.notification.BaseConnectorMessageNotification.MESSAGE_REQUEST_END;
-
+import static org.mule.module.http.api.HttpConstants.IDEMPOTENT_METHODS;
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.api.CompletionHandler;
-import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
-import static org.mule.module.http.api.HttpConstants.IDEMPOTENT_METHODS;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -38,7 +34,6 @@ import org.mule.api.debug.FieldDebugInfoFactory;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
-import org.mule.api.MuleMessage;
 import org.mule.construct.Flow;
 import org.mule.context.notification.ConnectorMessageNotification;
 import org.mule.context.notification.NotificationHelper;
@@ -61,6 +56,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor implements Initialisable, MuleContextAware, FlowConstructAware, DebugInfoProvider
@@ -345,7 +342,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
 
     private boolean shouldRetryRemotelyClosed(Exception exception, int retryCount, String httpMethod)
     {
-        boolean shouldRetry = IDEMPOTENT_METHODS.contains(httpMethod) && exception instanceof IOException && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED) && retryCount > 0;
+        boolean shouldRetry = exception instanceof IOException && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED) && IDEMPOTENT_METHODS.contains(httpMethod) && retryCount > 0;
         if(shouldRetry)
         {
             logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
