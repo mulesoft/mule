@@ -11,6 +11,7 @@ import static java.lang.Math.min;
 import static java.time.Duration.ofMillis;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -132,7 +133,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-      if (processor.getProcessingType() == BLOCKING) {
+      if (processor.getProcessingType() == BLOCKING || processor.getProcessingType() == IO_RW) {
         return proactor(processor, blockingScheduler);
       } else if (processor.getProcessingType() == CPU_INTENSIVE) {
         return proactor(processor, cpuIntensiveScheduler);

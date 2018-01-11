@@ -18,8 +18,9 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 
 /**
- * Processes streams of {@link CoreEvent}'s using a functional approach based on <a href="http://www.reactive-streams.org/">Reactive
- * Streams<a/> where {@link CoreEvent} processing is defined via stream functions.
+ * Processes streams of {@link CoreEvent}'s using a functional approach based on
+ * <a href="http://www.reactive-streams.org/">Reactive Streams<a/> where {@link CoreEvent} processing is defined via stream
+ * functions.
  *
  * @since 4.0
  */
@@ -60,7 +61,10 @@ public interface ReactiveProcessor extends Function<Publisher<CoreEvent>, Publis
     /**
      * Blocking IO read/write operations. This is treated separately to {@link #BLOCKING} to allow for potential optimizations
      * when IO is fast and/or message sizes smalls.
+     * 
+     * @deprecated instead use {@link #BLOCKING}.
      */
+    @Deprecated
     IO_RW,
 
     /**
