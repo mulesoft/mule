@@ -24692,38 +24692,47 @@
   "errors": [
     {
       "error": "HEISENBERG:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY"
+      "parent": "MULE:CONNECTIVITY",
+      "handleable": true
     },
     {
       "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
-      "error": "MULE:ANY"
+      "error": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "HEISENBERG:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED"
+      "parent": "MULE:RETRY_EXHAUSTED",
+      "handleable": true
     },
     {
       "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "HEISENBERG:OAUTH2",
-      "parent": "HEISENBERG:CONNECTIVITY"
+      "parent": "HEISENBERG:CONNECTIVITY",
+      "handleable": true
     },
     {
       "error": "MULE:VALIDATION",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "HEISENBERG:HEALTH",
-      "parent": "HEISENBERG:CONNECTIVITY"
+      "parent": "HEISENBERG:CONNECTIVITY",
+      "handleable": true
     },
     {
       "error": "HEISENBERG:VALIDATION",
-      "parent": "MULE:VALIDATION"
+      "parent": "MULE:VALIDATION",
+      "handleable": true
     }
   ],
   "modelProperties": {},

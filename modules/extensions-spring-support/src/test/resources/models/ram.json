@@ -1581,50 +1581,62 @@
   "errors": [
     {
       "error": "RAM:TIMEOUT",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
-      "error": "MULE:ANY"
+      "error": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "RAM:CANNOT_DISPATCH",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "RAM:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY"
+      "parent": "MULE:CONNECTIVITY",
+      "handleable": true
     },
     {
       "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "RAM:INVALID_WSDL",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "RAM:ENCODING",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "RAM:BAD_RESPONSE",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "RAM:SOAP_FAULT",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "RAM:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED"
+      "parent": "MULE:RETRY_EXHAUSTED",
+      "handleable": true
     },
     {
       "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "RAM:BAD_REQUEST",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
     }
   ],
   "modelProperties": {},
