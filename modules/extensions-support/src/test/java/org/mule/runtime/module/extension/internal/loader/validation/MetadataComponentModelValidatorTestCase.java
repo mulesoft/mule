@@ -24,7 +24,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
@@ -55,6 +54,7 @@ import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.metadata.ResolverSupplier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -246,6 +246,8 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
         new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class), EMPTY);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
     when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
+    when(sourceModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)).thenReturn(empty());
+    when(operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)).thenReturn(empty());
 
     visitableMock(operationModel, sourceModel);
 

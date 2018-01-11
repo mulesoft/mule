@@ -18,7 +18,8 @@ import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.isNu
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
-
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isRouter;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isScope;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -38,17 +39,21 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
-import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -56,9 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 
 /**
  * Validates that all {@link OperationModel operations} which return type is a {@link Object} or a {@link Map} have defined a
@@ -193,6 +195,9 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
 
   private void validateMetadataReturnType(ExtensionModel extensionModel, ConnectableComponentModel component,
                                           ProblemsReporter problemsReporter) {
+    if (!shouldValidateComponentOutputMetadata(component)) {
+      return;
+    }
     if (MuleExtensionUtils.getMetadataResolverFactory(component).getOutputResolver() instanceof NullMetadataResolver) {
       component.getOutput().getType().accept(new MetadataTypeVisitor() {
 
@@ -294,4 +299,11 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
         // TODO: MULE-11774: Temporal fix. Find proper solution
         !getType(metadataType).map(t -> Serializable.class.equals(t)).orElse(false);
   }
+
+  private boolean shouldValidateComponentOutputMetadata(ConnectableComponentModel model) {
+    return model.getModelProperty(ExtensionOperationDescriptorModelProperty.class).map(mp -> mp.getOperationMethod())
+        .map(m -> !isScope(m) && !isRouter(m))
+        .orElse(true);
+  }
+
 }
