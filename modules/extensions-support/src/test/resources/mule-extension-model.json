@@ -60,6 +60,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [
         "MULE:ROUTING"
@@ -196,6 +197,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [
         "MULE:DUPLICATE_MESSAGE"
@@ -272,26 +274,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "org.mule.runtime.api.store.ObjectStore",
-                  "classInformation": {
-                    "classname": "org.mule.runtime.api.store.ObjectStore",
-                    "hasDefaultConstructor": false,
-                    "isInterface": true,
-                    "isInstantiable": false,
-                    "isAbstract": true,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "typeAlias": {
-                    "value": "ObjectStore"
-                  }
-                },
-                "fields": []
+                "type": "@ref:org.mule.runtime.api.store.ObjectStore"
               },
               "hasDynamicType": false,
               "required": false,
@@ -350,6 +333,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -469,6 +453,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -623,6 +608,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -709,6 +695,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -775,6 +762,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -881,6 +869,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -2818,6 +2807,7 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
@@ -2861,112 +2851,140 @@
       "kind": "source"
     }
   ],
+  "notifications": [],
   "errors": [
     {
-      "error": "MULE:NOT_PERMITTED",
-      "parent": "MULE:SECURITY"
-    },
-    {
-      "error": "MULE:ANY"
-    },
-    {
-      "error": "MULE:REDELIVERY_EXHAUSTED",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:SOURCE_RESPONSE_GENERATE",
-      "parent": "MULE:SOURCE_RESPONSE"
-    },
-    {
-      "error": "MULE:VALIDATION",
-      "parent": "MULE:ANY"
+      "error": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "MULE:EXPRESSION",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:SOURCE",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:STREAM_MAXIMUM_SIZE_EXCEEDED",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:UNKNOWN",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:SECURITY",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:DUPLICATE_MESSAGE",
-      "parent": "MULE:VALIDATION"
-    },
-    {
-      "error": "MULE:SERVER_SECURITY",
-      "parent": "MULE:SECURITY"
-    },
-    {
-      "error": "MULE:FATAL_JVM_ERROR",
-      "parent": "MULE:CRITICAL"
-    },
-    {
-      "error": "MULE:SOURCE_RESPONSE_SEND",
-      "parent": "MULE:SOURCE_RESPONSE"
-    },
-    {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:ROUTING",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:SOURCE_RESPONSE",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:FLOW_BACK_PRESSURE",
-      "parent": "MULE:OVERLOAD"
-    },
-    {
-      "error": "MULE:TIMEOUT",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:SOURCE_ERROR_RESPONSE_SEND",
-      "parent": "MULE:SOURCE"
-    },
-    {
-      "error": "MULE:COMPOSITE_ROUTING",
-      "parent": "MULE:ROUTING"
-    },
-    {
-      "error": "MULE:SOURCE_ERROR_RESPONSE_GENERATE",
-      "parent": "MULE:SOURCE"
-    },
-    {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY"
-    },
-    {
-      "error": "MULE:CRITICAL"
-    },
-    {
-      "error": "MULE:OVERLOAD",
-      "parent": "MULE:CRITICAL"
-    },
-    {
-      "error": "MULE:CLIENT_SECURITY",
-      "parent": "MULE:SECURITY"
+      "parent": "MULE:ANY",
+      "handleable": true
     },
     {
       "error": "MULE:TRANSFORMATION",
-      "parent": "MULE:ANY"
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:REDELIVERY_EXHAUSTED",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:STREAM_MAXIMUM_SIZE_EXCEEDED",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:TIMEOUT",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:UNKNOWN",
+      "parent": "MULE:ANY",
+      "handleable": false
+    },
+    {
+      "error": "MULE:ROUTING",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:COMPOSITE_ROUTING",
+      "parent": "MULE:ROUTING",
+      "handleable": true
+    },
+    {
+      "error": "MULE:VALIDATION",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:DUPLICATE_MESSAGE",
+      "parent": "MULE:VALIDATION",
+      "handleable": true
+    },
+    {
+      "error": "MULE:SECURITY",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:SERVER_SECURITY",
+      "parent": "MULE:SECURITY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:CLIENT_SECURITY",
+      "parent": "MULE:SECURITY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:NOT_PERMITTED",
+      "parent": "MULE:SECURITY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:SOURCE",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:SOURCE_RESPONSE",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:SOURCE_ERROR_RESPONSE_GENERATE",
+      "parent": "MULE:SOURCE",
+      "handleable": false
+    },
+    {
+      "error": "MULE:SOURCE_ERROR_RESPONSE_SEND",
+      "parent": "MULE:SOURCE",
+      "handleable": false
+    },
+    {
+      "error": "MULE:SOURCE_RESPONSE_GENERATE",
+      "parent": "MULE:SOURCE_RESPONSE",
+      "handleable": true
+    },
+    {
+      "error": "MULE:SOURCE_RESPONSE_SEND",
+      "parent": "MULE:SOURCE_RESPONSE",
+      "handleable": false
+    },
+    {
+      "error": "MULE:CRITICAL",
+      "handleable": false
+    },
+    {
+      "error": "MULE:OVERLOAD",
+      "parent": "MULE:CRITICAL",
+      "handleable": true
+    },
+    {
+      "error": "MULE:FLOW_BACK_PRESSURE",
+      "parent": "MULE:OVERLOAD",
+      "handleable": false
+    },
+    {
+      "error": "MULE:FATAL_JVM_ERROR",
+      "parent": "MULE:CRITICAL",
+      "handleable": false
     }
   ],
   "modelProperties": {},
@@ -3141,6 +3159,30 @@
           }
         }
       ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.runtime.api.store.ObjectStore",
+        "extensibleType": {},
+        "typeAlias": {
+          "value": "ObjectStore"
+        },
+        "classInformation": {
+          "classname": "org.mule.runtime.api.store.ObjectStore",
+          "hasDefaultConstructor": false,
+          "isInterface": true,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        }
+      },
+      "fields": []
     },
     {
       "format": "java",
@@ -3327,7 +3369,7 @@
           "isMap": false
         },
         "typeAlias": {
-          "value": "Scheduler"
+          "value": "scheduling-strategy"
         }
       },
       "fields": []
