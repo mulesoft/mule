@@ -13,6 +13,7 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleManifest;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -607,7 +608,7 @@ public class CoreMessages extends I18nMessageFactory {
 
   /**
    * Returns a message that is a product informatin.
-   * 
+   *
    * @return message
    */
   public static I18nMessage productInformation() {
@@ -794,7 +795,27 @@ public class CoreMessages extends I18nMessageFactory {
   }
 
   public static I18nMessage applicationShutdownNormally(String appName, Date date) {
-    return factory.createMessage(BUNDLE_PATH, 307, appName, date);
+    return factory.createMessage(BUNDLE_PATH, 307, appName, date, "Application");
+  }
+
+  public static I18nMessage artifactShutdownNormally(ArtifactType artifactType, String appName, Date date) {
+    return factory.createMessage(BUNDLE_PATH, 307, appName, date, getArtifactTypeLoggableName(artifactType));
+  }
+
+  /**
+   * Provides a log-friendly string to use for deployable artifact types.
+   */
+  public static String getArtifactTypeLoggableName(ArtifactType artifactType) {
+    switch (artifactType) {
+      case APP:
+        return "Application";
+      case DOMAIN:
+        return "Domain";
+      case POLICY:
+        return "Policy";
+      default:
+        return "Artifact";
+    }
   }
 
   public static I18nMessage applicationWasUpForDuration(long duration) {
