@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.runtime.privileged;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -30,11 +31,9 @@ import java.util.Optional;
  * {@link #getParameter(String)} counter part. It's meant for things like connection pointers, state to be shared between
  * {@link Interceptor interceptors} and {@link ComponentExecutor operation executors}, etc.
  *
- * Do not create custom implementations of this interface. The Mule Runtime should be the only one providing implementations
- * of it.
- *
  * @since 3.7.0
  */
+@NoImplement
 public interface ExecutionContextAdapter<M extends ComponentModel> extends EventedExecutionContext<M> {
 
   /**

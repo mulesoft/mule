@@ -19,10 +19,6 @@
           "old": "interface org.mule.runtime.core.api.source.scheduler.Scheduler",
           "new": "interface org.mule.runtime.core.api.source.scheduler.Scheduler",
           "annotationType": "org.mule.runtime.extension.api.annotation.Alias",
-          "annotation": "@org.mule.runtime.extension.api.annotation.Alias(\"scheduling-strategy\")",
-          "package": "org.mule.runtime.core.api.source.scheduler",
-          "classSimpleName": "Scheduler",
-          "elementKind": "interface",
           "justification": "Make interface MetadataType consistent with schema declaration in mule-core-common.xsd when loading the type DSL"
         },
         {
