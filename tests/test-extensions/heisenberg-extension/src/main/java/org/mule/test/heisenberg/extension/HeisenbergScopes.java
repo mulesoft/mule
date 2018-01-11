@@ -38,7 +38,6 @@ public class HeisenbergScopes implements Initialisable {
     return initialiasedCounter;
   }
 
-  @OutputResolver(output = HeisenbergOutputResolver.class)
   public void getChain(Chain chain, CompletionCallback<Chain, Void> cb) {
     cb.success(Result.<Chain, Void>builder().output(chain).build());
   }
@@ -47,7 +46,6 @@ public class HeisenbergScopes implements Initialisable {
     chain.process(cb::success, (t, e) -> cb.error(t));
   }
 
-  @OutputResolver(output = HeisenbergOutputResolver.class)
   public void payloadModifier(Chain chain,
                               CompletionCallback<Object, Object> cb,
                               Object payload,

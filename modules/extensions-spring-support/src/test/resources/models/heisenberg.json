@@ -15408,7 +15408,7 @@
           },
           "fields": []
         },
-        "hasDynamicType": true,
+        "hasDynamicType": false,
         "description": "",
         "modelProperties": {}
       },
@@ -19462,7 +19462,7 @@
           },
           "fields": []
         },
-        "hasDynamicType": true,
+        "hasDynamicType": false,
         "description": "",
         "modelProperties": {}
       },
