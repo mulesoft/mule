@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -28,11 +28,13 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
    * {@inheritDoc}
    */
   @Override
-  public T resolve(ExecutionContext executionContext) {
-    try {
-      return new ParameterGroupObjectBuilder<T>(group).build((EventedExecutionContext) executionContext);
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not create parameter group"), e);
-    }
+  public LazyValue<T> resolve(ExecutionContext executionContext) {
+    return new LazyValue<>(() -> {
+      try {
+        return new ParameterGroupObjectBuilder<T>(group).build((EventedExecutionContext) executionContext);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Could not create parameter group"), e);
+      }
+    });
   }
 }

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -16,8 +17,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 
 /**
- * {@link ArgumentResolver} which returns the {@link ExtensionProperties#COMPLETION_CALLBACK_CONTEXT_PARAM}
- * context variable.
+ * {@link ArgumentResolver} which returns the {@link ExtensionProperties#COMPLETION_CALLBACK_CONTEXT_PARAM} context variable.
  * <p>
  * Notice that this resolver only works if the {@link ExecutionContext} is a {@link ExecutionContextAdapter}
  *
@@ -26,22 +26,25 @@ import org.mule.runtime.module.extension.internal.ExtensionProperties;
 public final class VoidCallbackArgumentResolver implements ArgumentResolver<VoidCompletionCallback> {
 
   @Override
-  public VoidCompletionCallback resolve(ExecutionContext executionContext) {
-    ExecutionContextAdapter adapter = (ExecutionContextAdapter) executionContext;
-    CompletionCallback completionCallback = (CompletionCallback) adapter.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
-    final CoreEvent event = adapter.getEvent();
+  public LazyValue<VoidCompletionCallback> resolve(ExecutionContext executionContext) {
+    return new LazyValue<>(() -> {
+      ExecutionContextAdapter adapter = (ExecutionContextAdapter) executionContext;
+      CompletionCallback completionCallback = (CompletionCallback) adapter.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
+      final CoreEvent event = adapter.getEvent();
 
-    return new VoidCompletionCallback() {
+      return new VoidCompletionCallback() {
 
-      @Override
-      public void success() {
-        completionCallback.success(EventedResult.from(event));
-      }
+        @Override
+        public void success() {
+          completionCallback.success(EventedResult.from(event));
+        }
 
-      @Override
-      public void error(Throwable e) {
-        completionCallback.error(e);
-      }
-    };
+        @Override
+        public void error(Throwable e) {
+          completionCallback.error(e);
+        }
+      };
+    });
+
   }
 }

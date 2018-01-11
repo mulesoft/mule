@@ -120,7 +120,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
   /**
    * {@link ConnectionManagerAdapter} implementation commonly used for running applications in production.
-   * 
+   *
    * @since 4.1
    */
   class EagerConnectionManagerAdapter implements ConnectionManagerAdapter {

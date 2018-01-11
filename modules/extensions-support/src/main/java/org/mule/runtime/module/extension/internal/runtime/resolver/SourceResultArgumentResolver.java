@@ -15,9 +15,10 @@ import static org.mule.runtime.extension.api.runtime.source.SourceResult.respons
 import static org.mule.runtime.extension.api.runtime.source.SourceResult.success;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.extension.api.runtime.source.SourceResult;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.runtime.source.SourceResult;
 
 import java.util.Set;
 
@@ -43,18 +44,20 @@ public class SourceResultArgumentResolver implements ArgumentResolver<SourceResu
   }
 
   @Override
-  public SourceResult resolve(ExecutionContext executionContext) {
-    Error error = errorArgumentResolver.resolve(executionContext);
-    SourceCallbackContext callbackContext = callbackContextArgumentResolver.resolve(executionContext);
+  public LazyValue<SourceResult> resolve(ExecutionContext executionContext) {
+    return new LazyValue<>(() -> {
+      Error error = errorArgumentResolver.resolve(executionContext).get();
+      SourceCallbackContext callbackContext = callbackContextArgumentResolver.resolve(executionContext).get();
 
-    if (error == null) {
-      return success(callbackContext);
-    } else {
-      String errorIdentifier = error.getErrorType().getIdentifier();
-      return isErrorGeneratingErrorResponse(errorIdentifier)
-          ? invocationError(error, callbackContext)
-          : responseError(error, callbackContext);
-    }
+      if (error == null) {
+        return success(callbackContext);
+      } else {
+        String errorIdentifier = error.getErrorType().getIdentifier();
+        return isErrorGeneratingErrorResponse(errorIdentifier)
+            ? invocationError(error, callbackContext)
+            : responseError(error, callbackContext);
+      }
+    });
   }
 
   private boolean isErrorGeneratingErrorResponse(String identifier) {

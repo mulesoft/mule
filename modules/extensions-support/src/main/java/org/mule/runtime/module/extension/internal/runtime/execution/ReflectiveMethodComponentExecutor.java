@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
+import static java.util.Arrays.stream;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -19,6 +20,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -43,10 +45,10 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate {
 
-    private static final Object[] EMPTY = new Object[] {};
+    private static final LazyValue[] EMPTY = new LazyValue[] {};
 
     @Override
-    public Object[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
+    public LazyValue<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
       return EMPTY;
     }
   }
@@ -71,13 +73,14 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
     extensionClassLoader = method.getDeclaringClass().getClassLoader();
   }
 
-  public Object execute(ExecutionContext<M> executionContext) throws Exception {
+  public Object execute(ExecutionContext<M> executionContext) {
     return withContextClassLoader(extensionClassLoader,
                                   () -> invokeMethod(method, componentInstance,
-                                                     getParameterValues(executionContext, method.getParameterTypes())));
+                                                     stream(getParameterValues(executionContext, method.getParameterTypes()))
+                                                         .map(LazyValue::get).toArray(size -> new Object[size])));
   }
 
-  private Object[] getParameterValues(ExecutionContext<M> executionContext, Class<?>[] parameterTypes) {
+  private LazyValue<Object>[] getParameterValues(ExecutionContext<M> executionContext, Class<?>[] parameterTypes) {
     return argumentResolverDelegate.resolve(executionContext, parameterTypes);
   }
 

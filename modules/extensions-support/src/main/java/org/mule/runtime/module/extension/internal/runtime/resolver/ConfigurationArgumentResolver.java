@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
@@ -18,7 +19,7 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 public final class ConfigurationArgumentResolver implements ArgumentResolver<Object> {
 
   @Override
-  public Object resolve(ExecutionContext executionContext) {
-    return ((ConfigurationInstance) executionContext.getConfiguration().get()).getValue();
+  public LazyValue<Object> resolve(ExecutionContext executionContext) {
+    return new LazyValue<>(() -> ((ConfigurationInstance) executionContext.getConfiguration().get()).getValue());
   }
 }
