@@ -84,17 +84,23 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
 
     for (String parametersReferencingDependency : parametersReferencingDependencies) {
       if (requestedComponentModel.getParameters().containsKey(parametersReferencingDependency)) {
-        appendDependency(otherDependencies, requestedComponentModel, parametersReferencingDependency);
+        appendTopLevelDependency(otherDependencies, requestedComponentModel, parametersReferencingDependency);
       }
     }
 
     // Special cases for flow-ref and configuration
     if (isCoreComponent(requestedComponentModel.getIdentifier(), "flow-ref")) {
-      appendDependency(otherDependencies, requestedComponentModel, "name");
+      appendTopLevelDependency(otherDependencies, requestedComponentModel, "name");
     } else if (isAggregatorComponent(requestedComponentModel, "aggregatorName")) {
-      appendDependency(otherDependencies, requestedComponentModel, "aggregatorName");
+      // TODO use extensionModel to get the dependencies instead of ComponentBuildingDefinition to solve cases like this (flow-ref)
+      String name = requestedComponentModel.getParameters().get("aggregatorName");
+      if (applicationModel.findNamedElement(name).isPresent()) {
+        otherDependencies.add(name);
+      } else {
+        missingElementNames.add(name);
+      }
     } else if (isCoreComponent(requestedComponentModel.getIdentifier(), "configuration")) {
-      appendDependency(otherDependencies, requestedComponentModel, "defaultErrorHandler-ref");
+      appendTopLevelDependency(otherDependencies, requestedComponentModel, "defaultErrorHandler-ref");
     }
 
     return otherDependencies;
@@ -118,10 +124,10 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return foundDependencies;
   }
 
-  private void appendDependency(Set<String> otherDependencies, ComponentModel requestedComponentModel,
-                                String parametersReferencingDependency) {
+  private void appendTopLevelDependency(Set<String> otherDependencies, ComponentModel requestedComponentModel,
+                                        String parametersReferencingDependency) {
     String name = requestedComponentModel.getParameters().get(parametersReferencingDependency);
-    if (applicationModel.findNamedElement(name).isPresent()) {
+    if (applicationModel.findTopLevelNamedComponent(name).isPresent()) {
       otherDependencies.add(name);
     } else {
       missingElementNames.add(name);
