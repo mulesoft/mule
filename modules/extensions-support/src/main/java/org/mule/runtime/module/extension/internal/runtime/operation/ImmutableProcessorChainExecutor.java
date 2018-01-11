@@ -115,8 +115,13 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
     public void execute() {
       from(processWithChildContext(event, chain, ofNullable(chain.getLocation())))
           .doOnSuccess(this::handleSuccess)
-          .doOnError(MessagingException.class, error -> this.handleError(error, error.getEvent()))
-          .doOnError(error -> this.handleError(error, event))
+          .doOnError(error -> {
+            if (error instanceof MessagingException) {
+              this.handleError(error, ((MessagingException) error).getEvent());
+            } else {
+              this.handleError(error, event);
+            }
+          })
           .subscribe();
     }
 
