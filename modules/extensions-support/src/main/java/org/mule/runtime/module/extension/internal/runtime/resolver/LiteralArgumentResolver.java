@@ -33,7 +33,7 @@ public class LiteralArgumentResolver<T> implements ArgumentResolver<Literal<T>> 
   @Override
   public LazyValue<Literal<T>> resolve(ExecutionContext executionContext) {
     return new LazyValue<>(() -> {
-      Object value = argumentResolver.resolve(executionContext);
+      Object value = argumentResolver.resolve(executionContext).get();
       if (value instanceof Literal) {
         return (Literal<T>) value;
       } else if (value == null) {

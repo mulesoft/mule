@@ -45,11 +45,11 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate {
 
-    private static final Object[] EMPTY = new Object[] {};
+    private static final LazyValue[] EMPTY = new LazyValue[] {};
 
     @Override
     public LazyValue<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
-      return new LazyValue[] {new LazyValue(EMPTY)};
+      return EMPTY;
     }
   }
 

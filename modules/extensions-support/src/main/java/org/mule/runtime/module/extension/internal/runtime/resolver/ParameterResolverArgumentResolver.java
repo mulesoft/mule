@@ -31,7 +31,7 @@ public final class ParameterResolverArgumentResolver<T> implements ArgumentResol
   @Override
   public LazyValue<ParameterResolver<T>> resolve(ExecutionContext executionContext) {
     return new LazyValue<>(() -> {
-      Object value = argumentResolver.resolve(executionContext);
+      Object value = argumentResolver.resolve(executionContext).get();
       return ParameterResolver.class.isInstance(value)
           ? (ParameterResolver<T>) value
           : new StaticParameterResolver<>((T) value);
