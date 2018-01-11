@@ -94,7 +94,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
   @Override
   public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     return connectionManagerAdapterStrategy.testConnectivity(configurationInstance);
   }
 
@@ -172,7 +172,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
     @Override
     public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance)
-            throws IllegalArgumentException {
+        throws IllegalArgumentException {
       return delegate.testConnectivity(configurationInstance);
     }
 
@@ -233,7 +233,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
     @Override
     public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance)
-            throws IllegalArgumentException {
+        throws IllegalArgumentException {
       return ConnectionValidationResult.success();
     }
 
@@ -250,8 +250,8 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
     @Override
     public <C> ConnectionHandler<C> getConnection(Object config) throws ConnectionException {
       Object proxyInstance =
-              newProxyInstance(config.getClass().getClassLoader(), new Class[] {ConnectionHandler.class},
-                               new LazyInvocationHandler(config));
+          newProxyInstance(config.getClass().getClassLoader(), new Class[] {ConnectionHandler.class},
+                           new LazyInvocationHandler(config));
       return (ConnectionHandler<C>) proxyInstance;
     }
 
