@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static java.lang.Thread.currentThread;
 import static java.nio.charset.Charset.forName;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNotNull;
@@ -16,6 +17,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -61,10 +63,17 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
       InputStream in = new ByteArrayInputStream(new byte[newBufferSize]);
       OutputStream out = mock(OutputStream.class);
 
-      Class clazz = ClassUtils
-          .loadClass(IOUtils.class.getCanonicalName(),
-                     new URLClassLoader(((URLClassLoader) Thread.currentThread().getContextClassLoader()).getURLs(), null));
-      clazz.getMethod("copyLarge", InputStream.class, OutputStream.class).invoke(clazz.newInstance(), in, out);
+      ClassLoader contextClassLoader = currentThread().getContextClassLoader();
+      URLClassLoader newClassLoader = new URLClassLoader(((URLClassLoader) contextClassLoader).getURLs(), null);
+      Class clazz = loadClass(IOUtils.class.getCanonicalName(), newClassLoader);
+
+      try {
+        currentThread().setContextClassLoader(newClassLoader);
+        Object newInstance = clazz.newInstance();
+        clazz.getMethod("copyLarge", InputStream.class, OutputStream.class).invoke(newInstance, in, out);
+      } finally {
+        currentThread().setContextClassLoader(contextClassLoader);
+      }
 
       // With 8KB buffer define via system property only 1 read is required for 8KB
       // input stream

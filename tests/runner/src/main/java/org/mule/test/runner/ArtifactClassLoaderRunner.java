@@ -7,6 +7,7 @@
 package org.mule.test.runner;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.of;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
@@ -141,17 +142,23 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     }
 
     final Class<?> isolatedTestClass = getTestClass(clazz);
+    ClassLoader testRunnerClassLoader = artifactClassLoaderHolder.getTestRunnerPluginClassLoader().getClassLoader();
+    ClassLoader contextClassLoader = currentThread().getContextClassLoader();
+    try {
+      currentThread().setContextClassLoader(testRunnerClassLoader);
+      final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactClassLoaderHolder
+          .loadClassWithATestRunnerClassLoader(RunnerDelegateTo.class.getName());
 
-    final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactClassLoaderHolder
-        .loadClassWithATestRunnerClassLoader(RunnerDelegateTo.class.getName());
-
-    delegate = new AnnotatedBuilder(builder)
-        .buildRunner(getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"), isolatedTestClass);
+      delegate = new AnnotatedBuilder(builder)
+          .buildRunner(getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"), isolatedTestClass);
+    } finally {
+      currentThread().setContextClassLoader(contextClassLoader);
+    }
 
     if (staticFieldsInjected && errorWhileSettingClassLoaders != null) {
       throw Throwables.propagate(errorWhileSettingClassLoaders);
     }
-    withContextClassLoader(artifactClassLoaderHolder.getTestRunnerPluginClassLoader().getClassLoader(), () -> {
+    withContextClassLoader(testRunnerClassLoader, () -> {
       try {
         if (!staticFieldsInjected) {
 
