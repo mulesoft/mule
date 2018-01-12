@@ -36,6 +36,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.PollContext;
 import org.mule.runtime.extension.api.runtime.source.PollContext.PollItem;
 import org.mule.runtime.extension.api.runtime.source.PollingSource;
+import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceWrapper;
@@ -53,6 +54,16 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+/**
+ * A {@link SourceWrapper} implementation that provides Polling related
+ * capabilities to any wrapped {@link Source}, like scheduled polling,
+ * watermarking and idempotent processing.
+ *
+ * @param <T>
+ * @param <A>
+ *
+ * @since 4.1
+ */
 public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
 
   private static final Logger LOGGER = getLogger(PollingSourceWrapper.class);
@@ -270,7 +281,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
           try {
             accept = !recentlyProcessedIds.contains(itemId);
           } catch (ObjectStoreException e) {
-            throw new RuntimeException(e);
+            throw new MuleRuntimeException(
+                                           createStaticMessage("An error occurred while checking the watermark status for Item with ID [%s]",
+                                                               itemId),
+                                           e);
           }
         } else {
           accept = false;
@@ -283,12 +297,15 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
             recentlyProcessedIds.store(itemId, itemId);
           }
         } catch (ObjectStoreException e) {
-          throw new RuntimeException(e);
+          throw new MuleRuntimeException(
+                                         createStaticMessage("An error occurred while updating the watermark for Item with ID [%s]",
+                                                             itemId),
+                                         e);
         }
       } else {
         if (LOGGER.isDebugEnabled()) {
           itemId = pollItem.getItemId().orElseGet(() -> pollItem.getResult().getAttributes().map(Object::toString).orElse(""));
-          LOGGER.debug("Source at flow is skipping item '{}' because it was rejected by the watermark", flowName, itemId);
+          LOGGER.debug("Source in flow '{}' is skipping item '{}' because it was rejected by the watermark", flowName, itemId);
         }
       }
 
@@ -350,15 +367,16 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
 
     private void validate() {
       if (result == null) {
-        throw new IllegalStateException(format(
-                                               "Source at location '%s' pushed an item with a null Result", flowName));
+        throw new IllegalStateException(format("Missing item Result. "
+            + "Source in flow '%s' pushed an item with ID '%s' without configuring its Result",
+                                               flowName, itemId));
       }
     }
   }
 
   private void release(Result<T, A> result, SourceCallbackContext context) {
     try {
-      delegate.releaseRejectedResource(result, context);
+      delegate.onRejectedItem(result, context);
     } finally {
       release(context);
     }

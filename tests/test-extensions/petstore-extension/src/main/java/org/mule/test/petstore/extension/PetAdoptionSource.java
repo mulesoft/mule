@@ -88,7 +88,7 @@ public class PetAdoptionSource extends PollingSource<String, Void> {
   }
 
   @Override
-  public void releaseRejectedResource(Result<String, Void> result, SourceCallbackContext context) {
+  public void onRejectedItem(Result<String, Void> result, SourceCallbackContext context) {
     REJECTED_ADOPTIONS++;
   }
 

@@ -15,6 +15,15 @@ import java.util.Map;
 
 import org.reactivestreams.Publisher;
 
+/**
+ * An abstract wrapper for {@link Source} implementations that allows to intercept
+ * all the invocations related to a generic {@link Source} lifecycle and event handlers.
+ *
+ * @param <T>
+ * @param <A>
+ *
+ * @since 4.1
+ */
 public abstract class SourceWrapper<T, A> extends Source<T, A> {
 
   protected final Source<T, A> delegate;

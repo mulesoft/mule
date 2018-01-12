@@ -46,7 +46,7 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
             parameter.setRequired(true);
             parameter.setType(loader.load(Scheduler.class), false);
             parameter.setExpressionSupport(NOT_SUPPORTED);
-            parameter.addModelProperty(new InfrastructureParameterModelProperty(9));
+            parameter.addModelProperty(new InfrastructureParameterModelProperty(10));
             parameter.addModelProperty(new QNameModelProperty(new QName(CORE_NAMESPACE, SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER,
                                                                         CORE_PREFIX)));
             parameter.setDslConfiguration(ParameterDslConfiguration.builder()

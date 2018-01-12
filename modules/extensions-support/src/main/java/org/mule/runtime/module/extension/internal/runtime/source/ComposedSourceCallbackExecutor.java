@@ -14,12 +14,18 @@ import java.util.Map;
 
 import org.reactivestreams.Publisher;
 
+/**
+ * A {@link SourceCallbackExecutor} that allows chain the execution of two
+ * delegating {@link SourceCallbackExecutor}s.
+ *
+ * @since 4.1
+ */
 public class ComposedSourceCallbackExecutor implements SourceCallbackExecutor {
 
   private final SourceCallbackExecutor first;
   private final SourceCallbackExecutor then;
 
-  public ComposedSourceCallbackExecutor(SourceCallbackExecutor first, SourceCallbackExecutor then) {
+  ComposedSourceCallbackExecutor(SourceCallbackExecutor first, SourceCallbackExecutor then) {
     this.first = first;
     this.then = then;
   }
