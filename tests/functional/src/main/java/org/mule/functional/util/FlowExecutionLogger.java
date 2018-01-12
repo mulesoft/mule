@@ -10,7 +10,10 @@ package org.mule.functional.util;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -24,7 +27,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,9 +63,13 @@ public class FlowExecutionLogger extends AbstractComponent implements Processor 
     waitUntilNthExecution(routeKey, n);
     ExecutionLog executionLog = executionLogsMap.get(routeKey);
     Message message = executionLog.getCollectedMessages().get(n - 1);
-    assertThat(message.getPayload().getValue(), is(instanceOf(List.class)));
-    List<TypedValue> aggregatedElements = (List<TypedValue>) message.getPayload().getValue();
-    assertThat(aggregatedElements.stream().map(element -> element.getValue()).collect(toList()), hasItems(values));
+    if(message.getPayload().getValue() instanceof List) {
+      List<TypedValue> aggregatedElements = (List<TypedValue>) message.getPayload().getValue();
+      assertThat(aggregatedElements.stream().map(element -> element.getValue()).collect(toList()), hasItems(values));
+    }else {
+      assertThat(values,arrayWithSize(1));
+      assertThat(message.getPayload().getValue(), is(equalTo(values[0])));
+    }
   }
 
   public static void assertRouteExecutedNTimes(String routeKey, int n) {
