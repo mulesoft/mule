@@ -126,13 +126,14 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   public static final String TRANSFORM_VARIABLE_NAME = "variableName";
 
   private final DslResolvingContext context;
-  private final Map<ExtensionModel, DslSyntaxResolver> resolvers;
+  private final Map<String, DslSyntaxResolver> resolvers;
   private final Map<String, ExtensionModel> extensionsByNamespace = new HashMap<>();
 
   public DefaultXmlArtifactDeclarationLoader(DslResolvingContext context) {
     this.context = context;
     this.resolvers = context.getExtensions().stream()
-        .collect(toMap(e -> e, e -> DslSyntaxResolver.getDefault(e, context)));
+        .collect(toMap(e -> e.getXmlDslModel().getPrefix(), e -> DslSyntaxResolver.getDefault(e, context)));
+    this.context.getExtensions().forEach(e -> extensionsByNamespace.put(e.getXmlDslModel().getPrefix(), e));
   }
 
   /**
@@ -148,8 +149,6 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
    */
   @Override
   public ArtifactDeclaration load(String name, InputStream configResource) {
-
-    context.getExtensions().forEach(e -> extensionsByNamespace.put(e.getXmlDslModel().getPrefix(), e));
 
     ConfigLine configLine = loadArtifactConfig(name, configResource);
 
@@ -177,14 +176,14 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   private void declareElement(final ConfigLine configLine, final ArtifactDeclarer artifactDeclarer) {
     final ExtensionModel ownerExtension = getExtensionModel(configLine);
     final ElementDeclarer extensionElementsDeclarer = forExtension(ownerExtension.getName());
-    final DslSyntaxResolver dsl = resolvers.get(ownerExtension);
+    final DslSyntaxResolver dsl = resolvers.get(getNamespace(configLine));
 
     Reference<Boolean> alreadyDeclared = new Reference<>(false);
     new ExtensionWalker() {
 
       @Override
       protected void onConstruct(HasConstructModels owner, ConstructModel model) {
-        declareComponentModel(dsl, configLine, model, extensionElementsDeclarer::newConstruct)
+        declareComponentModel(configLine, model, extensionElementsDeclarer::newConstruct)
             .ifPresent(declarer -> {
               getDeclaredName(configLine).ifPresent(((ConstructElementDeclarer) declarer)::withRefName);
               artifactDeclarer.withGlobalElement((GlobalElementDeclaration) declarer.getDeclaration());
@@ -205,43 +204,16 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
               .filter(a -> !a.getName().equals(NAME_ATTRIBUTE_NAME))
               .collect(toMap(SimpleConfigAttribute::getName, a -> a));
 
-
           List<ConfigLine> configComplexParameters = configLine.getChildren().stream()
-              .filter(config -> declareAsConnectionProvider(ownerExtension, model, configurationDeclarer, config))
+              .filter(config -> declareAsConnectionProvider(ownerExtension, model, configurationDeclarer,
+                                                            config, extensionElementsDeclarer))
               .collect(toList());
-
 
           declareParameterizedComponent(model, elementDsl, configurationDeclarer, attributes, configComplexParameters);
           artifactDeclarer.withGlobalElement(configurationDeclarer.getDeclaration());
           alreadyDeclared.set(true);
           stop();
         }
-      }
-
-      private boolean declareAsConnectionProvider(ExtensionModel ownerExtension,
-                                                  ConfigurationModel model, ConfigurationElementDeclarer configurationDeclarer,
-                                                  ConfigLine config) {
-        Optional<ConnectionProviderModel> connectionProvider = model.getConnectionProviders().stream()
-            .filter(cp -> dsl.resolve(cp).getElementName().equals(config.getIdentifier()))
-            .findFirst();
-
-        if (!connectionProvider.isPresent()) {
-          connectionProvider = ownerExtension.getConnectionProviders().stream()
-              .filter(cp -> dsl.resolve(cp).getElementName().equals(config.getIdentifier()))
-              .findFirst();
-        }
-
-        if (!connectionProvider.isPresent()) {
-          return true;
-        }
-
-        ConnectionProviderModel providerModel = connectionProvider.get();
-        ConnectionElementDeclarer connectionDeclarer = extensionElementsDeclarer.newConnection(providerModel.getName());
-        declareParameterizedComponent(providerModel, dsl.resolve(providerModel), connectionDeclarer,
-                                      config.getConfigAttributes(), config.getChildren());
-
-        configurationDeclarer.withConnection(connectionDeclarer.getDeclaration());
-        return false;
       }
 
     }.walk(ownerExtension);
@@ -284,14 +256,16 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
   private ExtensionWalker getComponentDeclaringWalker(final Consumer<ComponentElementDeclaration> declarationConsumer,
                                                       final ConfigLine line,
-                                                      final ElementDeclarer extensionElementsDeclarer,
-                                                      final DslSyntaxResolver dsl) {
+                                                      final ElementDeclarer extensionElementsDeclarer) {
+
+    final DslSyntaxResolver dsl = resolvers.get(getNamespace(line));
+
     return new ExtensionWalker() {
 
       @Override
       protected void onOperation(HasOperationModels owner, OperationModel model) {
         if (!model.getName().equals(TRANSFORM_IDENTIFIER)) {
-          declareComponentModel(dsl, line, model, extensionElementsDeclarer::newOperation).ifPresent(declarer -> {
+          declareComponentModel(line, model, extensionElementsDeclarer::newOperation).ifPresent(declarer -> {
             declarationConsumer.accept((ComponentElementDeclaration) declarer.getDeclaration());
             stop();
           });
@@ -302,7 +276,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
       @Override
       protected void onSource(HasSourceModels owner, SourceModel model) {
-        declareComponentModel(dsl, line, model, extensionElementsDeclarer::newSource).ifPresent(declarer -> {
+        declareComponentModel(line, model, extensionElementsDeclarer::newSource).ifPresent(declarer -> {
           final DslElementSyntax elementDsl = dsl.resolve(model);
           model.getSuccessCallback()
               .ifPresent(cb -> declareParameterizedComponent(cb, elementDsl, declarer,
@@ -319,7 +293,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
       @Override
       protected void onConstruct(HasConstructModels owner, ConstructModel model) {
-        declareComponentModel(dsl, line, model, extensionElementsDeclarer::newConstruct).ifPresent(declarer -> {
+        declareComponentModel(line, model, extensionElementsDeclarer::newConstruct).ifPresent(declarer -> {
           declarationConsumer.accept((ComponentElementDeclaration) declarer.getDeclaration());
           stop();
         });
@@ -391,11 +365,40 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
     };
   }
 
-  private Optional<ComponentElementDeclarer> declareComponentModel(final DslSyntaxResolver dsl,
-                                                                   final ConfigLine line,
+  private boolean declareAsConnectionProvider(ExtensionModel ownerExtension,
+                                              ConfigurationModel model,
+                                              ConfigurationElementDeclarer configurationDeclarer,
+                                              ConfigLine config,
+                                              ElementDeclarer extensionElementsDeclarer) {
+
+    final DslSyntaxResolver dsl = resolvers.get(getNamespace(config));
+    Optional<ConnectionProviderModel> connectionProvider = model.getConnectionProviders().stream()
+        .filter(cp -> dsl.resolve(cp).getElementName().equals(config.getIdentifier()))
+        .findFirst();
+
+    if (!connectionProvider.isPresent()) {
+      connectionProvider = ownerExtension.getConnectionProviders().stream()
+          .filter(cp -> dsl.resolve(cp).getElementName().equals(config.getIdentifier()))
+          .findFirst();
+    }
+
+    if (!connectionProvider.isPresent()) {
+      return true;
+    }
+
+    ConnectionProviderModel providerModel = connectionProvider.get();
+    ConnectionElementDeclarer connectionDeclarer = extensionElementsDeclarer.newConnection(providerModel.getName());
+    declareParameterizedComponent(providerModel, dsl.resolve(providerModel), connectionDeclarer,
+                                  config.getConfigAttributes(), config.getChildren());
+
+    configurationDeclarer.withConnection(connectionDeclarer.getDeclaration());
+    return false;
+  }
+
+  private Optional<ComponentElementDeclarer> declareComponentModel(final ConfigLine line,
                                                                    ComponentModel model,
                                                                    Function<String, ComponentElementDeclarer> declarerBuilder) {
-    final DslElementSyntax elementDsl = dsl.resolve(model);
+    final DslElementSyntax elementDsl = resolvers.get(getNamespace(line)).resolve(model);
     if (elementDsl.getElementName().equals(line.getIdentifier())) {
       ComponentElementDeclarer declarer = declarerBuilder.apply(model.getName());
 
@@ -404,9 +407,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
       }
 
       declareParameterizedComponent(model, elementDsl, declarer, line.getConfigAttributes(), line.getChildren());
-      if (model instanceof ComposableModel) {
-        declareComposableModel((ComposableModel) model, elementDsl, dsl, line, declarer);
-      }
+      declareComposableModel(model, elementDsl, line, declarer);
       return Optional.of(declarer);
     }
     return Optional.empty();
@@ -433,7 +434,6 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
   private void declareComposableModel(ComposableModel model,
                                       DslElementSyntax elementDsl,
-                                      DslSyntaxResolver dsl,
                                       ConfigLine containerConfig, HasNestedComponentDeclarer declarer) {
     containerConfig.getChildren()
         .forEach((ConfigLine child) -> {
@@ -443,18 +443,18 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
           getComponentDeclaringWalker(declaration -> {
             declarer.withComponent(declaration);
             componentFound.set(true);
-          }, child, extensionElementsDeclarer, dsl)
+          }, child, extensionElementsDeclarer)
               .walk(extensionModel);
 
           if (!componentFound.get()) {
-            declareRoute(model, elementDsl, dsl, child, extensionElementsDeclarer)
+            declareRoute(model, elementDsl, child, extensionElementsDeclarer)
                 .ifPresent(declarer::withComponent);
           }
         });
   }
 
   private Optional<RouteElementDeclaration> declareRoute(ComposableModel model, DslElementSyntax elementDsl,
-                                                         DslSyntaxResolver dsl, ConfigLine child,
+                                                         ConfigLine child,
                                                          ElementDeclarer extensionElementsDeclarer) {
     return model.getNestedComponents().stream()
         .filter(nestedModel -> elementDsl.getContainedElement(nestedModel.getName())
@@ -466,7 +466,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
           DslElementSyntax routeDsl = elementDsl.getContainedElement(nestedModel.getName()).get();
           declareParameterizedComponent((ParameterizedModel) nestedModel,
                                         routeDsl, routeDeclarer, child.getConfigAttributes(), child.getChildren());
-          declareComposableModel((ComposableModel) nestedModel, elementDsl, dsl, child, routeDeclarer);
+          declareComposableModel((ComposableModel) nestedModel, elementDsl, child, routeDeclarer);
           return routeDeclarer.getDeclaration();
         });
   }
@@ -600,7 +600,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
   private void createWrappedObject(ObjectType objectType, ParameterObjectValue.Builder objectValue, ConfigLine config) {
     ConfigLine wrappedConfig = config.getChildren().get(0);
-    DslSyntaxResolver wrappedElementResolver = resolvers.get(extensionsByNamespace.get(wrappedConfig.getNamespace()));
+    DslSyntaxResolver wrappedElementResolver = resolvers.get(getNamespace(wrappedConfig));
     Set<ObjectType> subTypes = context.getTypeCatalog().getSubTypes(objectType);
     if (!subTypes.isEmpty()) {
       subTypes.stream()
@@ -620,6 +620,11 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                                          DslElementSyntax paramDsl) {
 
     getId(objectType).ifPresent(objectValue::ofType);
+
+    objectType.getFieldByName(CONFIG_ATTRIBUTE_NAME)
+        .map(f -> config.getConfigAttributes().get(CONFIG_ATTRIBUTE_NAME))
+        .ifPresent(configRef -> objectValue.withParameter(CONFIG_ATTRIBUTE_NAME, configRef.getValue()));
+
     copyExplicitAttributes(config.getConfigAttributes(), objectValue);
 
     config.getChildren().forEach(fieldConfig -> objectType.getFields().stream()
