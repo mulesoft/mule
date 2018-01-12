@@ -338,4 +338,16 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
     {
         this.connectionIdleTimeout = connectionIdleTimeout;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append(getClass().getSimpleName())
+           .append("{name=")
+           .append(name)
+           .append(", url=")
+           .append(listenerUrl())
+           .append("}");
+        return buf.toString();
+    }
 }
