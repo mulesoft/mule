@@ -10,6 +10,7 @@ import static java.lang.System.getProperties;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -50,7 +51,6 @@ import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -95,13 +95,8 @@ public class MuleDeploymentService implements DeploymentService {
                                                             NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
                                                             new DeploymentMuleContextListenerFactory(applicationDeploymentListener));
     this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
-    this.domainDeployer = new DomainArchiveDeployer(new DefaultArchiveDeployer<Domain>(domainMuleDeployer, domainFactory, domains,
-                                                                                       new DomainDeploymentTemplate(applicationDeployer,
-                                                                                                                    this,
-                                                                                                                    applicationDeploymentListener),
-                                                                                       new DeploymentMuleContextListenerFactory(
-                                                                                                                                domainDeploymentListener)),
-                                                    applicationDeployer, this);
+    this.domainDeployer = createDomainArchiveDeployer(domainFactory, domainMuleDeployer, domains, applicationDeployer,
+                                                      applicationDeploymentListener, domainDeploymentListener);
     this.domainDeployer.setDeploymentListener(domainDeploymentListener);
 
     this.domainBundleDeployer = new DomainBundleArchiveDeployer(domainBundleDeploymentListener, domainDeployer, domains,
@@ -176,7 +171,9 @@ public class MuleDeploymentService implements DeploymentService {
   @Override
   public Collection<Application> findDomainApplications(final String domain) {
     Preconditions.checkArgument(domain != null, "Domain name cannot be null");
-    return CollectionUtils.select(applications, object -> ((Application) object).getDomain().getArtifactName().equals(domain));
+    return applications.stream()
+        .filter(application -> application.getDomain() != null && application.getDomain().getArtifactName().equals(domain))
+        .collect(toList());
   }
 
 
@@ -401,4 +398,32 @@ public class MuleDeploymentService implements DeploymentService {
   public void redeployDomain(String domainName, Properties deploymentProperties) {
     redeployDomain(domainName, ofNullable(deploymentProperties));
   }
+
+  /**
+   * Creates a {@link DomainArchiveDeployer}. Override this method for testing purposes.
+   *
+   * @param domainFactory the domainFactory to provide to the {@link DomainArchiveDeployer}.
+   * @param domainMuleDeployer the domainMuleDeployer to provide to the {@link DomainArchiveDeployer}.
+   * @param domains the domains that this DeploymentService manages.
+   * @param applicationDeployer the applicationDeployer to provide to the {@link DomainArchiveDeployer}.
+   * @param applicationDeploymentListener the applicationDeployer listener to provide to the {@link DomainDeploymentTemplate}.
+   * @param domainDeploymentListener the domainDeploymentListener to provide to the {@link DeploymentMuleContextListenerFactory}
+   *
+   * @return the DomainArchiveDeployer.
+   */
+  protected DomainArchiveDeployer createDomainArchiveDeployer(DefaultDomainFactory domainFactory,
+                                                              ArtifactDeployer domainMuleDeployer, ObservableList<Domain> domains,
+                                                              DefaultArchiveDeployer<Application> applicationDeployer,
+                                                              CompositeDeploymentListener applicationDeploymentListener,
+                                                              DeploymentListener domainDeploymentListener) {
+    return new DomainArchiveDeployer(new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
+                                                                  new DomainDeploymentTemplate(applicationDeployer,
+                                                                                               this,
+                                                                                               applicationDeploymentListener),
+                                                                  new DeploymentMuleContextListenerFactory(
+                                                                                                           domainDeploymentListener)),
+                                     applicationDeployer, this);
+
+  }
+
 }

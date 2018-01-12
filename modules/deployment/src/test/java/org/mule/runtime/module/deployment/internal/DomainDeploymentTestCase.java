@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 import static org.apache.commons.io.FileUtils.forceDelete;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
@@ -61,6 +63,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Contains test for domain deployment
@@ -1367,6 +1370,19 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     doSynchronizedDomainDeploymentActionTest(action, assertAction);
   }
 
+  @Test
+  public void applicationBundledWithinDomainNotRemovedAfterFullDeploy()
+      throws Exception {
+    resetUndeployLatch();
+    addPackedDomainFromBuilder(dummyDomainBundleFileBuilder);
+    addPackedAppFromBuilder(new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
+        .dependingOn(dummyDomainBundleFileBuilder));
+    startDeployment();
+    deploysDomain();
+
+    doRedeployBrokenDomainAfterFixedDomain();
+  }
+
   private void doSynchronizedDomainDeploymentActionTest(final Action deploymentAction, final Action assertAction)
       throws Exception {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
@@ -1447,6 +1463,33 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDomainFolderIsMaintained(incompleteDomainFileBuilder.getId());
   }
 
+  /**
+   * After a successful deploy using the {@link DomainDeploymentTestCase#domainDeploymentListener}, this method deploys a domain
+   * zip with the same name and a wrong configuration. Applications dependant of the domain should not be deleted after this
+   * failure full redeploy.
+   */
+  private void doRedeployBrokenDomainAfterFixedDomain() throws Exception {
+    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.getId());
+
+    reset(domainDeploymentListener);
+
+    DomainFileBuilder domainBundleWrongFullRedeploy = new DomainFileBuilder("dummy-domain-bundle")
+        .definedBy("incomplete-domain-config.xml");
+
+
+    addPackedDomainFromBuilder(domainBundleWrongFullRedeploy);
+
+    assertDeploymentFailure(domainDeploymentListener, domainBundleWrongFullRedeploy.getId());
+
+    assertThat(undeployLatch.await(5000, SECONDS), is(true));
+
+    assertApplicationAnchorFileExists(dummyAppDescriptorFileBuilder.getId());
+    Application dependantApplication = deploymentService.getApplications().get(0);
+    assertThat(dependantApplication, is(notNullValue()));
+    assertThat(dependantApplication.getStatus(), is(DESTROYED));
+  }
+
+
   private void deploysDomainAndVerifyAnchorFileIsCreatedAfterDeploymentEnds(Action deployArtifactAction) throws Exception {
     Action verifyAnchorFileDoesNotExists = () -> assertDomainAnchorFileDoesNotExists(waitDomainFileBuilder.getId());
     Action verifyDeploymentSuccessful = () -> assertDeploymentSuccess(domainDeploymentListener, waitDomainFileBuilder.getId());
@@ -1468,4 +1511,5 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
       deploymentService.redeployDomain(id, deploymentProperties);
     }
   }
+
 }
