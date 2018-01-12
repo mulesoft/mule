@@ -80,6 +80,8 @@ import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
@@ -95,8 +97,10 @@ import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactor
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.TestDeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -104,8 +108,10 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFi
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
+import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
+import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -222,6 +228,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static File pluginEcho1TestClassFile;
 
   private static Boolean internalIsRunningTests;
+
+  protected static Latch undeployLatch = new Latch();
+
 
   @BeforeClass
   public static void beforeClass() throws URISyntaxException, IllegalAccessException {
@@ -384,9 +393,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
     artifactClassLoaderManager = muleArtifactResourcesRegistry.getArtifactClassLoaderManager();
 
-    deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
-                                                  muleArtifactResourcesRegistry.getApplicationFactory(),
-                                                  () -> findSchedulerService(serviceManager));
+    deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
+                                                      muleArtifactResourcesRegistry.getApplicationFactory(),
+                                                      () -> findSchedulerService(serviceManager));
     deploymentService.addDeploymentListener(applicationDeploymentListener);
     deploymentService.addDomainDeploymentListener(domainDeploymentListener);
     deploymentService.addDeploymentListener(testDeploymentListener);
@@ -1252,4 +1261,46 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       deploymentService.redeploy(id, deploymentProperties);
     }
   }
+
+  protected void resetUndeployLatch() {
+    undeployLatch = new Latch();
+  }
+
+  private static class TestMuleDeploymentService extends MuleDeploymentService {
+
+    public TestMuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
+                                     Supplier<SchedulerService> schedulerServiceSupplier) {
+      super(domainFactory, applicationFactory, schedulerServiceSupplier);
+    }
+
+    @Override
+    protected DomainArchiveDeployer createDomainArchiveDeployer(DefaultDomainFactory domainFactory,
+                                                                ArtifactDeployer domainMuleDeployer,
+                                                                ObservableList<Domain> domains,
+                                                                DefaultArchiveDeployer<Application> applicationDeployer,
+                                                                DeploymentListener domainDeploymentListener) {
+      return new TestDomainArchiveDeployer(new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
+                                                                        new DomainDeploymentTemplate(applicationDeployer,
+                                                                                                     this),
+                                                                        new DeploymentMuleContextListenerFactory(
+                                                                                                                 domainDeploymentListener)),
+                                           applicationDeployer, this);
+
+    }
+  }
+
+  private static class TestDomainArchiveDeployer extends DomainArchiveDeployer {
+
+    public TestDomainArchiveDeployer(ArchiveDeployer<Domain> domainDeployer, ArchiveDeployer<Application> applicationDeployer,
+                                     DeploymentService deploymentService) {
+      super(domainDeployer, applicationDeployer, deploymentService);
+    }
+
+    @Override
+    public void undeployArtifact(String artifactId) {
+      super.undeployArtifact(artifactId);
+      undeployLatch.countDown();
+    }
+  }
+
 }
