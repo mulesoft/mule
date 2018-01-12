@@ -15603,7 +15603,7 @@
               "description": "Configures the scheduler that triggers the polling",
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                  "sequence": 9
+                  "sequence": 10
                 },
                 "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
