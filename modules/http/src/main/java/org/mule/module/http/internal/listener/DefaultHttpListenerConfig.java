@@ -342,7 +342,8 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append("DefaultHttpListenerConfig{name=")
+        buf.append(getClass().getSimpleName())
+           .append("{name=")
            .append(name)
            .append(", url=")
            .append(listenerUrl())
