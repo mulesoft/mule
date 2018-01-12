@@ -102,6 +102,8 @@ public class SourcePolicyProcessor implements Processor {
   private Processor buildSourceExecutionWithPolicyFunction(String executionIdentifier, PrivilegedEvent sourceEvent) {
     return new Processor() {
 
+      private PolicyStateId policyStateId = new PolicyStateId(executionIdentifier, policy.getPolicyId());
+
       @Override
       public CoreEvent process(CoreEvent event) throws MuleException {
         return processToApply(event, this);
@@ -112,7 +114,8 @@ public class SourcePolicyProcessor implements Processor {
         return Flux.from(publisher)
             .cast(PrivilegedEvent.class)
             .doOnNext(event -> saveState(event))
-            .map(event -> (CoreEvent) policyEventConverter.createEvent(event, sourceEvent))
+            .map(event -> (CoreEvent) policyEventConverter
+                .createEvent(event, sourceEvent, policy.getPolicyChain().isPropagateMessageTransformations()))
             .flatMap(e -> from(processWithChildContext(e, nextProcessor, Optional.empty()))
                 .cast(PrivilegedEvent.class)
                 .map(result -> policyEventConverter.createEvent(result, loadState()))
@@ -121,8 +124,6 @@ public class SourcePolicyProcessor implements Processor {
                                                                                           loadState()),
                                                          me)));
       }
-
-      private PolicyStateId policyStateId = new PolicyStateId(executionIdentifier, policy.getPolicyId());
 
       private void saveState(PrivilegedEvent event) {
         policyStateHandler.updateState(policyStateId, event);

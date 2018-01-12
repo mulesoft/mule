@@ -20,12 +20,12 @@ import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
 
-import org.reactivestreams.Publisher;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.reactivestreams.Publisher;
 
 /**
  * {@link OperationPolicy} created from a list of {@link Policy}.
@@ -97,9 +97,7 @@ public class CompositeOperationPolicy extends
    */
   @Override
   protected Publisher<CoreEvent> processNextOperation(CoreEvent event) {
-    return just(event).transform(nextOperation).doOnNext(response -> {
-      this.nextOperationResponse = response;
-    });
+    return just(event).transform(nextOperation).doOnNext(response -> this.nextOperationResponse = response);
   }
 
   /**
@@ -112,10 +110,22 @@ public class CompositeOperationPolicy extends
    */
   @Override
   protected Publisher<CoreEvent> processPolicy(Policy policy, Processor nextProcessor, CoreEvent event) {
+    if (nextOperationResponse == null) {
+      nextOperationResponse = event;
+    }
+
     Processor defaultOperationPolicy =
         operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor);
     return just(event).transform(defaultOperationPolicy)
-        .map(policyResponse -> nextOperationResponse != null ? nextOperationResponse : policyResponse);
+        .map(policyResponse -> {
+
+          if (policy.getPolicyChain().isPropagateMessageTransformations()) {
+            nextOperationResponse = policyResponse;
+            return policyResponse;
+          }
+
+          return nextOperationResponse;
+        });
   }
 
   @Override

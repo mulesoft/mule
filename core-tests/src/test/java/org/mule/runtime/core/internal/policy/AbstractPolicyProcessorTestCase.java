@@ -39,23 +39,24 @@ import org.reactivestreams.Publisher;
 
 public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCase {
 
+  private static final String PAYLOAD = "payload";
+
+  protected static final Message MESSAGE = Message.builder().value(PAYLOAD).attributesValue(new StringAttributes()).build();
+
   private static final String INIT_VAR_NAME = "initVarName";
   private static final String INIT_VAR_VALUE = "initVarValue";
   private static final String ADDED_VAR_NAME = "addedVarName";
   private static final String ADDED_VAR_VALUE = "addedVarValue";
-  private static final String PAYLOAD = "payload";
-
-  private static final Message MESSAGE = Message.builder().value(PAYLOAD).attributesValue(new StringAttributes()).build();
 
   private MuleContext muleContext = mockContextWithServices();
   protected Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
   protected Processor flowProcessor = mock(Processor.class);
   protected PolicyStateHandler policyStateHandler;
-  private ArgumentCaptor<Publisher> eventCaptor = ArgumentCaptor.forClass(Publisher.class);
+  protected CoreEvent initialEvent;
+  protected String executionId;
+  protected Processor policyProcessor;
+  protected ArgumentCaptor<Publisher> eventCaptor = ArgumentCaptor.forClass(Publisher.class);
   private FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
-  private Processor policyProcessor;
-  private String executionId;
-  private CoreEvent initialEvent;
 
   @Before
   public void before() {
@@ -114,6 +115,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   public void messageModifiedBeforeNextProcessorIsPropagatedToIt() throws MuleException {
     CoreEvent modifiedMessageEvent = CoreEvent.builder(initialEvent).message(MESSAGE).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedMessageEvent));
+    when(policy.getPolicyChain().isPropagateMessageTransformations()).thenReturn(true);
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(modifiedMessageEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
