@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Saves the payload that goes through a processor for accessing it later
@@ -38,10 +39,10 @@ public class FlowExecutionLogger extends AbstractComponent implements Processor 
 
   private static final String EXECUTION_ROUTE_KEY = "executionRoute";
 
-  private static Map<String, ExecutionLog> executionLogsMap = new HashMap<>();
+  private static Map<String, ExecutionLog> executionLogsMap = new ConcurrentHashMap<>();
 
   public static void resetLogsMap() {
-    executionLogsMap = new HashMap<>();
+    executionLogsMap = new ConcurrentHashMap<>();
   }
 
   private static void waitUntilNthExecution(String routeKey, int n) {
