@@ -25,6 +25,7 @@ import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_SCHEMA_L
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_TLS_NAMESPACE;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_TRANSACTION_TYPE;
+import static org.mule.runtime.config.internal.dsl.SchemaConstants.SCHEDULING_STRATEGY_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.STRING;
@@ -626,6 +627,10 @@ public final class SchemaBuilder {
   void addTlsSupport(ExtensionType extensionType, List<TopLevelElement> childElements) {
     addTlsSupport(extensionType);
     childElements.add(createRefElement(TLS_CONTEXT_TYPE, false));
+  }
+
+  void addSchedulerSupport(List<TopLevelElement> childElements) {
+    childElements.add(createRefElement(SCHEDULING_STRATEGY_ELEMENT, true));
   }
 
   TopLevelElement createRefElement(QName elementRef, boolean isRequired) {

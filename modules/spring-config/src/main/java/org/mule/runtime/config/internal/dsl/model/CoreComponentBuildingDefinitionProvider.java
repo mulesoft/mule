@@ -57,12 +57,14 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECTION_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-
+import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.AbstractServerNotification;
@@ -525,16 +527,16 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("disallowConcurrentExecution",
                                        fromSimpleParameter("disallowConcurrentExecution").withDefaultValue(true).build())
         .withSetterParameterDefinition("scheduler", fromChildConfiguration(PeriodicScheduler.class)
-            .withWrapperIdentifier("scheduling-strategy").build())
+            .withWrapperIdentifier(SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER).build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("fixed-frequency")
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER)
         .withTypeDefinition(fromType(FixedFrequencyScheduler.class))
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
         .withSetterParameterDefinition("startDelay", fromSimpleParameter("startDelay").build())
         .withSetterParameterDefinition("timeUnit", fromSimpleParameter("timeUnit").build()).build());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("cron")
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(CRON_STRATEGY_ELEMENT_IDENTIFIER)
         .withTypeDefinition(fromType(CronScheduler.class))
         .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
         .withSetterParameterDefinition("timeZone", fromSimpleParameter("timeZone").build()).build());

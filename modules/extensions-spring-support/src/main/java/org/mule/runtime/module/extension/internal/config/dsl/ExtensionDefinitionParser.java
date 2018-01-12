@@ -91,6 +91,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.object.FixedTypePar
 import org.mule.runtime.module.extension.internal.config.dsl.object.MediaTypeValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ObjectParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.object.SchedulingStrategyParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.AnonymousInlineParameterGroupParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
@@ -164,8 +165,11 @@ public abstract class ExtensionDefinitionParser {
 
   protected final ExtensionParsingContext parsingContext;
   protected final List<ObjectParsingDelegate> objectParsingDelegates = ImmutableList
-      .of(new FixedTypeParsingDelegate(PoolingProfile.class), new FixedTypeParsingDelegate(RetryPolicyTemplate.class),
-          new FixedTypeParsingDelegate(TlsContextFactory.class), new DefaultObjectParsingDelegate());
+      .of(new FixedTypeParsingDelegate(PoolingProfile.class),
+          new FixedTypeParsingDelegate(RetryPolicyTemplate.class),
+          new FixedTypeParsingDelegate(TlsContextFactory.class),
+          new SchedulingStrategyParsingDelegate(),
+          new DefaultObjectParsingDelegate());
   protected final DslSyntaxResolver dslResolver;
   protected final Builder baseDefinitionBuilder;
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();

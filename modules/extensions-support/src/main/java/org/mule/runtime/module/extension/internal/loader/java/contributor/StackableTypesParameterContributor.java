@@ -43,11 +43,9 @@ import java.util.Optional;
  */
 public class StackableTypesParameterContributor implements ParameterDeclarerContributor {
 
-  private final ClassTypeLoader typeLoader;
   private Map<Type, StackableType> stackableTypes;
 
-  private StackableTypesParameterContributor(ClassTypeLoader typeLoader, Map<Type, StackableType> stackableTypes) {
-    this.typeLoader = typeLoader;
+  private StackableTypesParameterContributor(Map<Type, StackableType> stackableTypes) {
     this.stackableTypes = stackableTypes;
   }
 
@@ -115,7 +113,7 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
     }
 
     public StackableTypesParameterContributor build() {
-      return new StackableTypesParameterContributor(typeLoader, stackableTypes);
+      return new StackableTypesParameterContributor(stackableTypes);
     }
   }
 

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <flow name="vanilla" initialState="stopped">
+        <petstore:pet-adoption-source>
+            <scheduling-strategy>
+                <fixed-frequency frequency="1000"/>
+            </scheduling-strategy>
+        </petstore:pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+    <flow name="idempotent" initialState="stopped">
+        <petstore:pet-adoption-source idempotent="true">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+        </petstore:pet-adoption-source>
+        <flow-ref name="adopt"/>
+        <test:processor waitTime="7000"/>
+    </flow>
+
+    <flow name="idempotentLocksAreReleased" initialState="stopped">
+        <petstore:pet-adoption-source idempotent="true">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+        </petstore:pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+    <flow name="watermark" initialState="stopped">
+        <petstore:pet-adoption-source watermark="true">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+        </petstore:pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+    <flow name="failingPoll" initialState="stopped">
+        <petstore:pet-adoption-source>
+            <scheduling-strategy>
+                <fixed-frequency frequency="1000"/>
+            </scheduling-strategy>
+        </petstore:pet-adoption-source>
+        <test:processor throwException="true"/>
+    </flow>
+
+
+    <flow name="adopt">
+        <test:processor class="org.mule.test.module.extension.source.PollingSourceTestCase$AdoptionProcessor"/>
+    </flow>
+</mule>

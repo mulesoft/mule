@@ -34,7 +34,6 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.reflections.ReflectionUtils.getAllFields;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -105,16 +104,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVariable;
-import javax.lang.model.util.Types;
+import com.google.common.collect.ImmutableList;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -140,7 +130,17 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import com.google.common.collect.ImmutableList;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
+import javax.lang.model.util.Types;
+
 import org.reflections.ReflectionUtils;
 import org.springframework.core.ResolvableType;
 
@@ -643,16 +643,6 @@ public final class IntrospectionUtils {
     return (List) generics;
   }
 
-  private static List<Class<?>> toRawClasses(ResolvableType... types) {
-    return stream(types).map(type -> {
-      Class<?> rawClass = type.getRawClass();
-      if (rawClass == null) {
-        rawClass = type.getSuperType().getRawClass();
-      }
-      return rawClass;
-    }).collect(toList());
-  }
-
   public static List<TypeMirror> getSuperClassGenerics(TypeElement type, Class superClass,
                                                        ProcessingEnvironment processingEnvironment) {
     TypeElement superClassTypeElement = processingEnvironment.getElementUtils().getTypeElement(superClass.getName());
@@ -690,15 +680,17 @@ public final class IntrospectionUtils {
                                                 superClass.getName()));
     }
 
-    Class<?> searchClass = type;
-    while (!Object.class.equals(searchClass)) {
-      if (searchClass.getSuperclass().equals(superClass)) {
-        java.lang.reflect.Type superType = searchClass.getGenericSuperclass();
-        if (superType instanceof ParameterizedType) {
-          return stream(((ParameterizedType) superType).getActualTypeArguments()).collect(toList());
-        }
+    ResolvableType searchType = ResolvableType.forType(type);
+    while (!Object.class.equals(searchType.getType())) {
+      ResolvableType[] generics = searchType.getGenerics();
+      if (generics.length > 0) {
+        return stream(generics).map(g -> g.getType()).collect(toList());
       }
-      searchClass = searchClass.getSuperclass();
+
+      if (superClass.equals(searchType.getType())) {
+        break;
+      }
+      searchType = searchType.getSuperType();
     }
     return new LinkedList<>();
   }

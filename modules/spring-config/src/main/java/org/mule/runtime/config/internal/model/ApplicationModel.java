@@ -36,9 +36,6 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import org.apache.commons.lang3.ClassUtils;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -75,12 +72,14 @@ import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionMo
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
-import org.w3c.dom.Node;
 
-import javax.xml.namespace.QName;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -92,6 +91,11 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import javax.xml.namespace.QName;
+
+import org.apache.commons.lang3.ClassUtils;
+import org.w3c.dom.Node;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -505,8 +509,13 @@ public class ApplicationModel {
   private void convertArtifactDeclarationToComponentModel(Set<ExtensionModel> extensionModels,
                                                           ArtifactDeclaration artifactDeclaration) {
     if (artifactDeclaration != null && !extensionModels.isEmpty()) {
-      DslElementModelFactory elementFactory = DslElementModelFactory
-          .getDefault(DslResolvingContext.getDefault(extensionModels));
+      ExtensionModel muleModel = MuleExtensionModelProvider.getExtensionModel();
+      if (!extensionModels.contains(muleModel)) {
+        extensionModels = new HashSet<>(extensionModels);
+        extensionModels.add(muleModel);
+      }
+
+      DslElementModelFactory elementFactory = DslElementModelFactory.getDefault(DslResolvingContext.getDefault(extensionModels));
 
       ComponentModel rootComponent = new ComponentModel.Builder()
           .setIdentifier(ComponentIdentifier.builder()
