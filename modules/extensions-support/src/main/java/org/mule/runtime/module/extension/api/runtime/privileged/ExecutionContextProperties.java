@@ -10,6 +10,11 @@ package org.mule.runtime.module.extension.api.runtime.privileged;
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 
+/**
+ * Constants used for information related to {@link org.mule.runtime.extension.api.runtime.operation.ExecutionContext}
+ *
+ * @since 4.1
+ */
 public class ExecutionContextProperties {
 
   /**
