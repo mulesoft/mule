@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FlowExecutionLogger extends AbstractComponent implements Processor {
 
   private static final int POLLING_TIMEOUT = 5000;
-  private static final int POLLING_DELAY = 0;
+  private static final int POLLING_DELAY = 500;
 
   private static final String EXECUTION_ROUTE_KEY = "executionRoute";
 
