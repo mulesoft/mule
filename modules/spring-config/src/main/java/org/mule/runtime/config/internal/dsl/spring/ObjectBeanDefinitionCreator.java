@@ -13,7 +13,7 @@ import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCr
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
+import org.mule.runtime.config.api.dsl.model.config.RuntimeConfigurationException;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.beans.factory.config.RuntimeBeanReference;

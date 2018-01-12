@@ -9,6 +9,9 @@ package org.mule.runtime.config.internal.dsl.model.config;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesResolver;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

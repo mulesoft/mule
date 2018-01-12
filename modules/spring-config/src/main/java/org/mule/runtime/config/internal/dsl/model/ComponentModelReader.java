@@ -15,7 +15,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.POLICY_ROO
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.ComponentModel;
 
 import java.util.List;

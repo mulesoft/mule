@@ -13,8 +13,8 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.CONFIGURATION_PROPERTIES_RESOLVER_STORY;
 
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationProperty;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

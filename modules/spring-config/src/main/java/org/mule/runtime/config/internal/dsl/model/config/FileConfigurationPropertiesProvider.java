@@ -10,6 +10,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.IOException;
