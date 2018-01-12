@@ -14,6 +14,7 @@ import static java.util.stream.Stream.of;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
@@ -378,8 +379,26 @@ class DeclarationBasedElementModelFactory {
           }
         }
       }
+
+      // TODO Remove in EE-5855
+      group.getParameter("schedulingStrategy")
+          .ifPresent(param -> {
+            if (!parameterizedDeclaration.getParameterGroup(group.getName())
+                .map(g -> g.getParameter("schedulingStrategy").orElse(null))
+                .isPresent()) {
+
+              addParameter("schedulingStrategy", newObjectValue()
+                  .ofType("org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler")
+                  .withParameter("frequency", "1")
+                  .withParameter("timeUnit", "MINUTES")
+                  .build(),
+                           group.getParameter("schedulingStrategy").get(),
+                           parentDsl.getContainedElement("schedulingStrategy").get(), parentConfig, parentElement);
+            }
+          });
     });
   }
+
 
   private <T> void addGroupParameterElements(ParameterGroupModel group,
                                              DslElementSyntax elementDsl,
