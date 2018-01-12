@@ -35,12 +35,6 @@ public class ExtensionProperties {
   public static final String SOURCE_COMPLETION_CALLBACK_PARAM = PROPERTY_PREFIX + "SOURCE_COMPLETION_CALLBACK_PARAM";
 
   /**
-   * The key of an execution context variable which holds the {@link CompletionCallback} that a non blocking component will use to
-   * notify completion or failure
-   */
-  public static final String COMPLETION_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "COMPLETION_CALLBACK_CONTEXT_PARAM";
-
-  /**
    * The key of an execution context variable which holds the back pressure action that was applied on an event
    *
    * @since 4.1
