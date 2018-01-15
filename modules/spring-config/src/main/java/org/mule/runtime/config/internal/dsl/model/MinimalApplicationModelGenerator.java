@@ -15,7 +15,6 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -89,33 +88,36 @@ public class MinimalApplicationModelGenerator {
     final ImmutableSet.Builder<String> otherRequiredGlobalComponentsSetBuilder =
         ImmutableSet.<String>builder().addAll(componentDependencies).addAll(alwaysEnabledComponents);
     if (requestComponentModelName != null
-        && dependencyResolver.getApplicationModel().findTopLevelNamedElement(requestComponentModelName).isPresent()) {
+        && dependencyResolver.getApplicationModel().findNamedElement(requestComponentModelName).isPresent()) {
       otherRequiredGlobalComponentsSetBuilder.add(requestComponentModelName);
     }
 
     Set<String> allRequiredComponentModels = resolveDependencies(otherRequiredGlobalComponentsSetBuilder.build());
 
-    Iterator<ComponentModel> iterator =
-        dependencyResolver.getApplicationModel().getRootComponentModel().getInnerComponents().iterator();
-    while (iterator.hasNext()) {
-      ComponentModel componentModel = iterator.next();
-      if (componentModel.getNameAttribute() != null && allRequiredComponentModels.contains(componentModel.getNameAttribute())) {
+    dependencyResolver.getApplicationModel().executeOnEveryComponentTree(componentModel -> {
+      if (!componentModel.isEnabled() && componentModel.getNameAttribute() != null
+          && allRequiredComponentModels.contains(componentModel.getNameAttribute())) {
         componentModel.setEnabled(true);
         componentModel.executedOnEveryInnerComponent(component -> component.setEnabled(true));
+        enableParentComponentModels(componentModel);
       }
-    }
+    });
 
+    // Finally we set the requested componentModel as enabled as it could have been disabled when traversing dependencies
+    requestedComponentModel.setEnabled(true);
+    requestedComponentModel.executedOnEveryInnerComponent(componentModel -> componentModel.setEnabled(true));
+    enableParentComponentModels(requestedComponentModel);
+
+    // Mule root component model has to be enabled too
+    this.dependencyResolver.getApplicationModel().getRootComponentModel().setEnabled(true);
+  }
+
+  private void enableParentComponentModels(ComponentModel requestedComponentModel) {
     ComponentModel parentModel = requestedComponentModel.getParent();
     while (parentModel != null && parentModel.getParent() != null) {
       parentModel.setEnabled(true);
       parentModel = parentModel.getParent();
     }
-
-    // Finally we set the requested componentModel as enabled as it could have been disabled when traversing dependencies
-    requestedComponentModel.setEnabled(true);
-    requestedComponentModel.executedOnEveryInnerComponent(componentModel -> componentModel.setEnabled(true));
-    // Mule root component model has to be enabled too
-    this.dependencyResolver.getApplicationModel().getRootComponentModel().setEnabled(true);
   }
 
   /**
