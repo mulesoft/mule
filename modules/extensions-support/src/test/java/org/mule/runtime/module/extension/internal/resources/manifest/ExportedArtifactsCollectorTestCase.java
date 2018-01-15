@@ -17,21 +17,22 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.vegan.extension.VeganAttributes;
-
-import com.google.common.reflect.TypeToken;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.reflect.TypeToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -82,9 +84,12 @@ public class ExportedArtifactsCollectorTestCase {
     collector = new ExportedArtifactsCollector(extensionModel);
   }
 
-  private void withMethod(OperationModel operationModel, Optional<Method> method) {
+  private void withMethod(OperationModel operationModel, Optional<Method> optionalMethod) {
     when(operationModel.getModelProperty(ImplementingMethodModelProperty.class))
-        .thenReturn(method.map(ImplementingMethodModelProperty::new));
+        .thenReturn(optionalMethod.map(ImplementingMethodModelProperty::new));
+    when(operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class))
+        .thenReturn(optionalMethod
+            .map(method -> new ExtensionOperationDescriptorModelProperty(new MethodWrapper(method, loader))));
   }
 
   @Test

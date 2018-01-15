@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
-import static java.util.Optional.ofNullable;
-
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -22,14 +20,14 @@ public interface FieldElement extends ExtensionParameter {
   /**
    * @return The represented {@link Field}
    */
-  // TODO MULE-10137 - Adapt logic to AST
-  Field getField();
+  Optional<Field> getField();
 
   /**
    * {@inheritDoc}
    */
   @Override
   default Optional<AnnotatedElement> getDeclaringElement() {
-    return ofNullable(getField());
+    Object field = getField();
+    return (Optional<AnnotatedElement>) field;
   }
 }

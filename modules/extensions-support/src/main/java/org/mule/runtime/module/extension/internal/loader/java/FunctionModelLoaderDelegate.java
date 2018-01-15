@@ -103,10 +103,10 @@ final class FunctionModelLoaderDelegate extends AbstractModelLoaderDelegate {
   }
 
   private void checkIsNotAnExtension(FunctionContainerElement type) {
-    if (type.isAssignableFrom(getExtensionType()) || getExtensionElement().isAssignableFrom(type)) {
+    if (type.isAssignableFrom(getExtensionElement()) || getExtensionElement().isAssignableFrom(type)) {
       throw new IllegalOperationModelDefinitionException(
                                                          format("Function class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
-                                                                type.getName(), getExtensionType().getName()));
+                                                                type.getName(), getExtensionElement().getName()));
     }
   }
 

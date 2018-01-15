@@ -235,7 +235,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
     if (operationType.isAssignableFrom(getExtensionElement()) || getExtensionElement().isAssignableFrom(operationType)) {
       throw new IllegalOperationModelDefinitionException(
                                                          format("Operation class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
-                                                                operationType.getName(), getExtensionType().getName()));
+                                                                operationType.getName(), getExtensionElement().getName()));
     }
   }
 

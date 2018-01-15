@@ -46,8 +46,8 @@ public final class ParameterWrapper implements ParameterElement {
    * @return the wrapped {@link Parameter}
    */
   @Override
-  public Parameter getParameter() {
-    return parameter;
+  public Optional<Parameter> getParameter() {
+    return Optional.ofNullable(parameter);
   }
 
   /**

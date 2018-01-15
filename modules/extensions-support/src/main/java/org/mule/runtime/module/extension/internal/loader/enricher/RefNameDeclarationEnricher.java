@@ -11,6 +11,7 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -23,10 +24,10 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
-import com.google.common.base.Joiner;
-
 import java.lang.reflect.Field;
 import java.util.Collection;
+
+import com.google.common.base.Joiner;
 
 /**
  * A {@link DeclarationEnricher} which looks for configurations with fields annotated with {@link RefName}.
@@ -62,10 +63,9 @@ public final class RefNameDeclarationEnricher implements DeclarationEnricher {
     }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
   }
 
-  private void doEnrich(BaseDeclaration declaration) {
+  private void doEnrich(BaseDeclaration<?> declaration) {
 
-    declaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(p -> {
-      ImplementingTypeModelProperty typeProperty = (ImplementingTypeModelProperty) p;
+    declaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(typeProperty -> {
       Collection<Field> fields = getAllFields(typeProperty.getType(), withAnnotation(RefName.class));
       if (isEmpty(fields)) {
         return;

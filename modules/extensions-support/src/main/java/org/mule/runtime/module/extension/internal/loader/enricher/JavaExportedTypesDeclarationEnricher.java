@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.util.Arrays.stream;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.INITIALIZE;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.IntersectionType;
 import org.mule.metadata.api.model.MetadataType;
@@ -19,9 +17,12 @@ import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.Export;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+
+import java.util.Optional;
 
 /**
  * Enriches the declaration with the types which are manually exported through {@link Export}
@@ -37,16 +38,20 @@ public final class JavaExportedTypesDeclarationEnricher extends AbstractAnnotate
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-    Export exportAnnotation = extractAnnotation(extensionLoadingContext.getExtensionDeclarer().getDeclaration(), Export.class);
-    if (exportAnnotation != null) {
-      ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
-      stream(exportAnnotation.classes())
-          .map(typeLoader::load)
-          .forEach(type -> registerType(declarer, type));
+    Optional<ExtensionTypeDescriptorModelProperty> modelProperty = extensionLoadingContext.getExtensionDeclarer().getDeclaration()
+        .getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+    modelProperty
+        .map(ExtensionTypeDescriptorModelProperty::getType)
+        .flatMap(type -> type.getValueFromAnnotation(Export.class))
+        .ifPresent(exportAnnotation -> {
+          ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
+          exportAnnotation.getClassArrayValue(Export::classes)
+              .stream()
+              .map(Type::asMetadataType)
+              .forEach(type -> registerType(declarer, type));
 
-      stream(exportAnnotation.resources()).forEach(declarer::withResource);
-    }
+          exportAnnotation.getArrayValue(Export::resources).forEach(declarer::withResource);
+        });
   }
 
   private void registerType(ExtensionDeclarer declarer, MetadataType type) {

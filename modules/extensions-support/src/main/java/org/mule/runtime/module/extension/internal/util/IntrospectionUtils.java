@@ -27,6 +27,7 @@ import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getId;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
@@ -34,6 +35,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.reflections.ReflectionUtils.getAllFields;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -104,7 +106,16 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
-import com.google.common.collect.ImmutableList;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
+import javax.lang.model.util.Types;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -130,17 +141,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVariable;
-import javax.lang.model.util.Types;
-
+import com.google.common.collect.ImmutableList;
 import org.reflections.ReflectionUtils;
 import org.springframework.core.ResolvableType;
 
@@ -706,9 +707,11 @@ public final class IntrospectionUtils {
   }
 
   public static boolean isInstantiable(MetadataType type) {
-    return getType(type)
-        .map(IntrospectionUtils::isInstantiable)
-        .orElse(false);
+    return type.getAnnotation(ClassInformationAnnotation.class)
+        .map(ClassInformationAnnotation::isInstantiable)
+        .orElseGet(() -> getType(type)
+            .map(IntrospectionUtils::isInstantiable)
+            .orElse(false));
   }
 
   public static boolean isInstantiable(Class<?> declaringClass) {
@@ -1079,6 +1082,59 @@ public final class IntrospectionUtils {
       public void visitString(StringType stringType) {
         if (stringType.getMetadataFormat() == JAVA && isEnum(stringType)) {
           getType(stringType).ifPresent(relativeClasses::add);
+        }
+      }
+    });
+
+    return relativeClasses;
+  }
+
+  /**
+   * Given a {@link MetadataType} it adds all the {@link Class} that are related from that type. This includes generics of an
+   * {@link ArrayType}, open restriction of an {@link ObjectType} as well as its fields.
+   *
+   * @param type                 {@link MetadataType} to inspect
+   * @return {@link Set<Class>>} with the classes reachable from the {@code type}
+   */
+  public static Set<String> collectRelativeClassesAsString(MetadataType type) {
+    Set<String> relativeClasses = new HashSet<>();
+    type.accept(new MetadataTypeVisitor() {
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        arrayType.getType().accept(this);
+      }
+
+      @Override
+      public void visitObjectField(ObjectFieldType objectFieldType) {
+        objectFieldType.getValue().accept(this);
+      }
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        if (objectType.getMetadataFormat() != JAVA) {
+          return;
+        }
+
+        final String clazz = getId(objectType).orElse(null);
+        if (clazz == null || relativeClasses.contains(clazz)) {
+          return;
+        }
+
+        Optional<ClassInformationAnnotation> classInformation = objectType.getAnnotation(ClassInformationAnnotation.class);
+        classInformation
+            .ifPresent(classInformationAnnotation -> relativeClasses
+                .addAll(classInformationAnnotation.getGenericTypes()));
+
+        relativeClasses.add(clazz);
+        objectType.getFields().forEach(objectFieldType -> objectFieldType.accept(this));
+        objectType.getOpenRestriction().ifPresent(t -> t.accept(this));
+      }
+
+      @Override
+      public void visitString(StringType stringType) {
+        if (stringType.getMetadataFormat() == JAVA && isEnum(stringType)) {
+          getId(stringType).ifPresent(relativeClasses::add);
         }
       }
     });

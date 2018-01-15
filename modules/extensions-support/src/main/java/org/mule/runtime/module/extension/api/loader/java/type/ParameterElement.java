@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
-import static java.util.Optional.ofNullable;
-
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Parameter;
 import java.util.Optional;
@@ -22,14 +20,14 @@ public interface ParameterElement extends ExtensionParameter {
   /**
    * @return The represented {@link Parameter}
    */
-  // TODO MULE-10137 - Adapt logic to AST
-  Parameter getParameter();
+  Optional<Parameter> getParameter();
 
   /**
    * {@inheritDoc}
    */
   @Override
-  default Optional<AnnotatedElement> getDeclaringElement() {
-    return ofNullable(getParameter());
+  default Optional<? extends AnnotatedElement> getDeclaringElement() {
+    Object parameter = getParameter();
+    return (Optional<? extends AnnotatedElement>) parameter;
   }
 }

@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.util.Arrays.stream;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.PrivilegedExport;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 /**
  * Enriches the declaration with the types which are manually exported through {@link PrivilegedExport}
@@ -20,12 +20,15 @@ public final class JavaPrivilegedExportedTypesDeclarationEnricher extends Abstra
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    PrivilegedExport exportAnnotation =
-        extractAnnotation(extensionLoadingContext.getExtensionDeclarer().getDeclaration(), PrivilegedExport.class);
-    if (exportAnnotation != null) {
-      ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
-      stream(exportAnnotation.packages()).forEach(declarer::withPrivilegedPackage);
-      stream(exportAnnotation.artifacts()).forEach(declarer::withPrivilegedArtifact);
-    }
+    ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
+    extensionDeclarer
+        .getDeclaration()
+        .getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+        .map(ExtensionTypeDescriptorModelProperty::getType)
+        .flatMap(type -> type.getValueFromAnnotation(PrivilegedExport.class))
+        .ifPresent(valueFetcher -> {
+          valueFetcher.getArrayValue(PrivilegedExport::artifacts).forEach(extensionDeclarer::withPrivilegedArtifact);
+          valueFetcher.getArrayValue(PrivilegedExport::packages).forEach(extensionDeclarer::withPrivilegedPackage);
+        });
   }
 }

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Wrapper for {@link Method} that provide utility methods to facilitate the introspection of a {@link Method}
@@ -49,6 +51,16 @@ public class MethodWrapper<T extends Type> implements MethodElement<T> {
   @Override
   public Optional<Method> getMethod() {
     return of(method);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<Type> getExceptionTypes() {
+    return Stream.of(method.getExceptionTypes())
+        .map(type -> new TypeWrapper(type, typeLoader))
+        .collect(toList());
   }
 
   @Override
