@@ -113,7 +113,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
    */
   private void addConfigurationDependencies(String key, Set<String> processedKeys,
                                             DependencyNode node) {
-    Collection<String> dependencies = configurationDependencyResolver.resolveComponentDependencies(key);
+    Collection<String> dependencies = configurationDependencyResolver.resolveTopLevelComponentDependencies(key);
     for (String dependency : dependencies) {
       if (springRegistry.isSingleton(dependency)) {
         addDependency(node, dependency, springRegistry.get(dependency), processedKeys);

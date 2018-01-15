@@ -10,6 +10,7 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -55,14 +56,14 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
   }
 
   private Set<String> resolveComponentModelDependencies(ComponentModel componentModel) {
-    final Set<String> otherRequiredGlobalComponents = resolveComponentDependencies(componentModel);
+    final Set<String> otherRequiredGlobalComponents = resolveTopLevelComponentDependencies(componentModel);
     return findComponentModelsDependencies(otherRequiredGlobalComponents);
   }
 
-  protected Set<String> resolveComponentDependencies(ComponentModel requestedComponentModel) {
+  protected Set<String> resolveTopLevelComponentDependencies(ComponentModel requestedComponentModel) {
     Set<String> otherDependencies = new HashSet<>();
     requestedComponentModel.getInnerComponents()
-        .stream().forEach(childComponent -> otherDependencies.addAll(resolveComponentDependencies(childComponent)));
+        .stream().forEach(childComponent -> otherDependencies.addAll(resolveTopLevelComponentDependencies(childComponent)));
     final Set<String> parametersReferencingDependencies = new HashSet<>();
     componentBuildingDefinitionRegistry.getBuildingDefinition(requestedComponentModel.getIdentifier())
         .ifPresent(buildingDefinition -> buildingDefinition.getAttributesDefinitions()
@@ -115,7 +116,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
       for (String componentModelName : componentsToSearchDependencies) {
         if (!alreadySearchedDependencies.contains(componentModelName)) {
           alreadySearchedDependencies.add(componentModelName);
-          foundDependencies.addAll(resolveComponentDependencies(findRequiredComponentModel(componentModelName)));
+          foundDependencies.addAll(resolveTopLevelComponentDependencies(findRequiredComponentModel(componentModelName)));
         }
       }
       foundDependencies.addAll(componentModelNames);
@@ -177,10 +178,14 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
    * @return the dependencies of the component with component name {@code #componentName}. An empty collection if there is no
    *         component with such name.
    */
-  public Collection<String> resolveComponentDependencies(String componentName) {
+  //TODO (MULE-14453: When creating ApplicationModel and ComponentModels inner beans should have a name so they can be later retrieved)
+  public Collection<String> resolveTopLevelComponentDependencies(String componentName) {
     try {
       ComponentModel requiredComponentModel = findRequiredComponentModel(componentName);
-      return resolveComponentModelDependencies(requiredComponentModel);
+      return resolveComponentModelDependencies(requiredComponentModel)
+          .stream()
+          .filter(dependencyName -> applicationModel.findTopLevelNamedComponent(dependencyName).isPresent())
+          .collect(toList());
     } catch (NoSuchComponentModelException e) {
       return emptyList();
     }
