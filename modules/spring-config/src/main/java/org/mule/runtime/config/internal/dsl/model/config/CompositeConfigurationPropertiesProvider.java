@@ -8,6 +8,9 @@ package org.mule.runtime.config.internal.dsl.model.config;
 
 import static java.util.Optional.empty;
 
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+
 import java.util.List;
 import java.util.Optional;
 

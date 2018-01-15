@@ -7,9 +7,10 @@
 package org.mule.runtime.config.internal.dsl.model.config;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentProvider;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.component.Component;
 
 public class ConfigurationPropertiesException extends RuntimeConfigurationException implements ComponentProvider {
 

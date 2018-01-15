@@ -8,13 +8,14 @@ package org.mule.runtime.config.internal.dsl.model.config;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 
 /**
  * Represents a configuration attribute.
  *
  * @since 4.0
  */
-public class ConfigurationProperty {
+public class DefaultConfigurationProperty implements ConfigurationProperty {
 
   private Object source;
   private Object rawValue;
@@ -29,7 +30,7 @@ public class ConfigurationProperty {
    * @param rawValue the plain configuration value without resolution. A configuration value may contain reference to other
    *        configuration attributes.
    */
-  public ConfigurationProperty(Object source, String key, Object rawValue) {
+  public DefaultConfigurationProperty(Object source, String key, Object rawValue) {
     checkNotNull(source, "source cannot be null");
     checkNotNull(rawValue, "rawValue cannot be null");
     checkNotNull(key, "key cannot be null");
@@ -39,25 +40,17 @@ public class ConfigurationProperty {
   }
 
 
-  /**
-   * @return the source of this configuration attribute. For instance, it may be an {@link Component} if it's source was defined
-   *         in the artifact configuration or it may be the deployment properties configured at deployment time.
-   */
+  @Override
   public Object getSource() {
     return source;
   }
 
-  /**
-   * @return the plain configuration value without resolution. A configuration value may contain reference to other configuration
-   *         attributes.
-   */
+  @Override
   public Object getRawValue() {
     return rawValue;
   }
 
-  /**
-   * @return the key of the configuration attribute to reference it.
-   */
+  @Override
   public String getKey() {
     return key;
   }

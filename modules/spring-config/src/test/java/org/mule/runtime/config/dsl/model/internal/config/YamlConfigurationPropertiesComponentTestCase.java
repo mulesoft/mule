@@ -14,7 +14,7 @@ import static org.mule.test.allure.AllureConstants.ConfigurationProperties.Compo
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesComponent;
+import org.mule.runtime.config.internal.dsl.model.properties.DefaultConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
 
 import io.qameta.allure.Description;
@@ -33,7 +33,7 @@ public class YamlConfigurationPropertiesComponentTestCase {
   public ExpectedException expectedException = none();
 
   private ResourceProvider externalResourceProvider;
-  private ConfigurationPropertiesComponent configurationComponent;
+  private DefaultConfigurationPropertiesProvider configurationComponent;
 
   @Before
   public void setUp() {
@@ -43,7 +43,7 @@ public class YamlConfigurationPropertiesComponentTestCase {
   @Description("Validates the values obtained for the different types in the properties")
   @Test
   public void validConfig() throws InitialisationException {
-    configurationComponent = new ConfigurationPropertiesComponent("properties.yaml", externalResourceProvider);
+    configurationComponent = new DefaultConfigurationPropertiesProvider("properties.yaml", externalResourceProvider);
     configurationComponent.initialise();
     assertThat(configurationComponent.getConfigurationProperty("number").get().getRawValue(), is("34843"));
     assertThat(configurationComponent.getConfigurationProperty("float").get().getRawValue(), is("2392.00"));
@@ -58,7 +58,7 @@ public class YamlConfigurationPropertiesComponentTestCase {
   @Description("Validates that a list of complex objects is not valid")
   @Test
   public void complexListOfObjectsNotSuported() throws InitialisationException {
-    configurationComponent = new ConfigurationPropertiesComponent("complex-list-object.yaml", externalResourceProvider);
+    configurationComponent = new DefaultConfigurationPropertiesProvider("complex-list-object.yaml", externalResourceProvider);
     expectedException
         .expectMessage("Configuration properties does not support type a list of complex types. Complex type keys are: complex");
     expectedException.expect(ConfigurationPropertiesException.class);
@@ -69,7 +69,7 @@ public class YamlConfigurationPropertiesComponentTestCase {
   @Description("Validates that a only string types are supported")
   @Test
   public void unsupportedType() throws InitialisationException {
-    configurationComponent = new ConfigurationPropertiesComponent("unsupported-type.yaml", externalResourceProvider);
+    configurationComponent = new DefaultConfigurationPropertiesProvider("unsupported-type.yaml", externalResourceProvider);
     expectedException
         .expectMessage("YAML configuration properties only supports string values, make sure to wrap the value with \" so you force the value to be an string. Offending property is integer with value 1235");
     expectedException.expect(ConfigurationPropertiesException.class);

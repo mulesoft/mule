@@ -24,7 +24,6 @@ import static org.mule.runtime.config.internal.dsl.spring.WrapperElementType.COL
 import static org.mule.runtime.config.internal.dsl.spring.WrapperElementType.MAP;
 import static org.mule.runtime.config.internal.dsl.spring.WrapperElementType.SINGLE;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.config.internal.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.DOC_DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
@@ -39,12 +38,14 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -66,6 +67,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -105,8 +107,9 @@ public class BeanDefinitionFactory {
           .add(ANNOTATIONS_ELEMENT_IDENTIFIER)
           .add(DOC_DESCRIPTION_IDENTIFIER)
           .add(GLOBAL_PROPERTY_IDENTIFIER)
-          .add(CONFIGURATION_PROPERTIES)
           .build();
+
+  private Set<ComponentIdentifier> ignoredMuleExtensionComponentIdentifiers;
 
   /**
    * These are the set of current language construct that have specific bean definitions parsers since we don't want to include
@@ -136,6 +139,22 @@ public class BeanDefinitionFactory {
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.errorTypeRepository = errorTypeRepository;
     this.componentModelProcessor = buildComponentModelProcessorChainOfResponsability();
+    this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
+
+    registerConfigurationPropertyProviders();
+  }
+
+  private void registerConfigurationPropertyProviders() {
+    ServiceLoader<ConfigurationPropertiesProviderFactory> providerFactories =
+        java.util.ServiceLoader.load(ConfigurationPropertiesProviderFactory.class);
+    providerFactories.forEach(service -> {
+      ignoredMuleExtensionComponentIdentifiers.add(service.getSupportedComponentIdentifier());
+    });
+  }
+
+  private boolean isComponentIgnored(ComponentIdentifier identifier) {
+    return ignoredMuleCoreComponentIdentifiers.contains(identifier) ||
+        ignoredMuleExtensionComponentIdentifiers.contains(identifier);
   }
 
   public void resolveEagerCreationObjects(ComponentModel parentComponentModel, ComponentModel componentModel,
@@ -175,7 +194,7 @@ public class BeanDefinitionFactory {
                                           BeanDefinitionRegistry registry,
                                           BiConsumer<ComponentModel, BeanDefinitionRegistry> componentDefinitionModelProcessor,
                                           SpringConfigurationComponentLocator componentLocator) {
-    if (ignoredMuleCoreComponentIdentifiers.contains(componentModel.getIdentifier())) {
+    if (isComponentIgnored(componentModel.getIdentifier())) {
       return null;
     }
 
@@ -382,7 +401,7 @@ public class BeanDefinitionFactory {
    */
   public boolean hasDefinition(ComponentIdentifier componentIdentifier,
                                Optional<ComponentIdentifier> parentComponentModelOptional) {
-    return ignoredMuleCoreComponentIdentifiers.contains(componentIdentifier)
+    return isComponentIgnored(componentIdentifier)
         || customBuildersComponentIdentifiers.contains(componentIdentifier)
         || componentBuildingDefinitionRegistry.getBuildingDefinition(componentIdentifier).isPresent()
         || isWrapperComponent(componentIdentifier, parentComponentModelOptional);

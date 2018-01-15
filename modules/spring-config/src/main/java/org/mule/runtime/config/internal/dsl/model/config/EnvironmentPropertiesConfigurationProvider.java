@@ -8,6 +8,9 @@ package org.mule.runtime.config.internal.dsl.model.config;
 
 import static java.lang.System.getProperties;
 
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -44,7 +47,7 @@ public class EnvironmentPropertiesConfigurationProvider implements Configuration
 
     environmentVariables.entrySet().forEach((entry) -> {
       configurationAttributes.put(entry.getKey(),
-                                  new ConfigurationProperty("environment variable", entry.getKey(), entry.getValue()));
+                                  new DefaultConfigurationProperty("environment variable", entry.getKey(), entry.getValue()));
     });
 
     Properties properties = getProperties();
@@ -54,7 +57,7 @@ public class EnvironmentPropertiesConfigurationProvider implements Configuration
       if (value != null) {
         String stringKey = key instanceof String ? (String) key : key.toString();
         String stringValue = value instanceof String ? (String) value : value.toString();
-        configurationAttributes.put(stringKey, new ConfigurationProperty("system property", stringKey, stringValue));
+        configurationAttributes.put(stringKey, new DefaultConfigurationProperty("system property", stringKey, stringValue));
       }
     });
   }

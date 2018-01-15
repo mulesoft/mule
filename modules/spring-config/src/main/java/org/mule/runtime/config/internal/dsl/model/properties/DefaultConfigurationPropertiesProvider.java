@@ -4,19 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.dsl.model.config;
+package org.mule.runtime.config.internal.dsl.model.properties;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
+import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -31,19 +36,18 @@ import org.yaml.snakeyaml.Yaml;
  *
  * @since 4.0
  */
-public class ConfigurationPropertiesComponent extends AbstractComponent
+public class DefaultConfigurationPropertiesProvider extends AbstractComponent
     implements ConfigurationPropertiesProvider, Initialisable {
 
-  private static final String PROPERTIES_EXTENSION = ".properties";
-  private static final String YAML_EXTENSION = ".yaml";
-  private static final String UNKNOWN = "unknown";
+  protected static final String PROPERTIES_EXTENSION = ".properties";
+  protected static final String YAML_EXTENSION = ".yaml";
+  protected static final String UNKNOWN = "unknown";
 
-  private final Map<String, ConfigurationProperty> configurationAttributes = new HashMap<>();
-  private String fileLocation;
-  private ResourceProvider resourceProvider;
+  protected final Map<String, ConfigurationProperty> configurationAttributes = new HashMap<>();
+  protected String fileLocation;
+  protected ResourceProvider resourceProvider;
 
-  public ConfigurationPropertiesComponent(String fileLocation, ResourceProvider resourceProvider)
-      throws ConfigurationPropertiesException {
+  public DefaultConfigurationPropertiesProvider(String fileLocation, ResourceProvider resourceProvider) {
     this.fileLocation = fileLocation;
     this.resourceProvider = resourceProvider;
   }
@@ -56,7 +60,7 @@ public class ConfigurationPropertiesComponent extends AbstractComponent
   @Override
   public String getDescription() {
     ComponentLocation location = (ComponentLocation) getAnnotation(LOCATION_KEY);
-    return format("<configuration-attributes file=\"%s\"> - file: %s, line number: %s", fileLocation,
+    return format("<configuration-properties file=\"%s\"> - file: %s, line number: %s", fileLocation,
                   location.getFileName().orElse(UNKNOWN),
                   location.getLineInFile().map(String::valueOf).orElse("unknown"));
 
@@ -77,22 +81,7 @@ public class ConfigurationPropertiesComponent extends AbstractComponent
                                                    this);
       }
 
-      if (fileLocation.endsWith(PROPERTIES_EXTENSION)) {
-        Properties properties = new Properties();
-        properties.load(is);
-        properties.keySet().stream().map(key -> {
-          Object rawValue = properties.get(key);
-          return new ConfigurationProperty(of(this), (String) key, (String) rawValue);
-        }).forEach(configurationAttribute -> {
-          configurationAttributes.put(configurationAttribute.getKey(), configurationAttribute);
-        });
-      } else {
-        Yaml yaml = new Yaml();
-        Iterable<Object> yamlObjects = yaml.loadAll(is);
-        yamlObjects.forEach(yamlObject -> {
-          createAttributesFromYamlObject(null, null, yamlObject);
-        });
-      }
+      readAttributesFromFile(is);
     } catch (ConfigurationPropertiesException e) {
       throw e;
     } catch (Exception e) {
@@ -101,7 +90,27 @@ public class ConfigurationPropertiesComponent extends AbstractComponent
     }
   }
 
-  private void createAttributesFromYamlObject(String parentPath, Object parentYamlObject, Object yamlObject) {
+  protected void readAttributesFromFile(InputStream is) throws IOException {
+    if (fileLocation.endsWith(PROPERTIES_EXTENSION)) {
+      Properties properties = new Properties();
+      properties.load(is);
+      properties.keySet().stream().map(key -> {
+        Object rawValue = properties.get(key);
+        rawValue = createValue((String) key, (String) rawValue);
+        return new DefaultConfigurationProperty(of(this), (String) key, rawValue);
+      }).forEach(configurationAttribute -> {
+        configurationAttributes.put(configurationAttribute.getKey(), configurationAttribute);
+      });
+    } else {
+      Yaml yaml = new Yaml();
+      Iterable<Object> yamlObjects = yaml.loadAll(is);
+      yamlObjects.forEach(yamlObject -> {
+        createAttributesFromYamlObject(null, null, yamlObject);
+      });
+    }
+  }
+
+  protected void createAttributesFromYamlObject(String parentPath, Object parentYamlObject, Object yamlObject) {
     if (yamlObject instanceof List) {
       List list = (List) yamlObject;
       if (list.get(0) instanceof Map) {
@@ -115,7 +124,7 @@ public class ConfigurationPropertiesComponent extends AbstractComponent
         String[] values = new String[list.size()];
         list.toArray(values);
         String value = join(",", list);
-        configurationAttributes.put(parentPath, new ConfigurationProperty(this, parentPath, value));
+        configurationAttributes.put(parentPath, new DefaultConfigurationProperty(this, parentPath, value));
       }
     } else if (yamlObject instanceof Map) {
       if (parentYamlObject instanceof List) {
@@ -132,14 +141,19 @@ public class ConfigurationPropertiesComponent extends AbstractComponent
                                                                               parentPath, yamlObject)),
                                                    this);
       }
-      configurationAttributes.put(parentPath, new ConfigurationProperty(this, parentPath, yamlObject));
+      String resultObject = createValue(parentPath, (String) yamlObject);
+      configurationAttributes.put(parentPath, new DefaultConfigurationProperty(this, parentPath, resultObject));
     }
   }
 
-  private String createKey(String parentKey, String key) {
+  protected String createKey(String parentKey, String key) {
     if (parentKey == null) {
       return key;
     }
     return parentKey + "." + key;
+  }
+
+  protected String createValue(String key, String value) {
+    return value;
   }
 }

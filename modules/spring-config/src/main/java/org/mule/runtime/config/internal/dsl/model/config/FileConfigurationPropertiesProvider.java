@@ -10,6 +10,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.IOException;
@@ -37,7 +39,7 @@ public class FileConfigurationPropertiesProvider implements ConfigurationPropert
       try (InputStream is = resourceProvider.getResourceAsStream(path)) {
         if (is != null) {
           String value = IOUtils.toString(is);
-          return of(new ConfigurationProperty(this, configurationAttributeKey, value));
+          return of(new DefaultConfigurationProperty(this, configurationAttributeKey, value));
         }
       } catch (IOException e) {
         // ignore close exception
