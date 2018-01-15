@@ -90,7 +90,7 @@ public class HttpClientConfiguration {
     private int maxConnections = -1;
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = 30000;
-    private boolean streaming = true;
+    private boolean streaming = false;
     private int responseBufferSize = -1;
     private String name;
 
@@ -166,7 +166,7 @@ public class HttpClientConfiguration {
 
     /**
      * Defines whether the HTTP response should be streamed, meaning processing will continue as soon as all headers are parsed and
-     * the body populated as it arrives. Default is {@code true}.
+     * the body populated as it arrives. Default is {@code false}.
      * <p/>
      * When streaming is enabled, because of the internal buffer used to hold the arriving body chunks, the response MUST be
      * eventually read or the worker threads handling the chunks will block waiting to allocate them. Likewise, read/write speed
