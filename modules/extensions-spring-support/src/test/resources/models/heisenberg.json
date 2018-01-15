@@ -1406,6 +1406,9 @@
           },
           "showInDsl": false,
           "name": "Personal Information",
+          "displayModel": {
+            "displayName": "Personal Info"
+          },
           "description": "",
           "modelProperties": {}
         },
@@ -1563,6 +1566,9 @@
           },
           "showInDsl": true,
           "name": "Brother in law",
+          "displayModel": {
+            "displayName": "Brother in law"
+          },
           "description": "",
           "modelProperties": {}
         }
@@ -9459,6 +9465,9 @@
                 },
                 "showInDsl": false,
                 "name": "Dangerous-Ricin",
+                "displayModel": {
+                  "displayName": "Dangerous Ricin"
+                },
                 "description": "",
                 "modelProperties": {}
               },
@@ -11324,6 +11333,9 @@
                 },
                 "showInDsl": false,
                 "name": "Dangerous-Ricin",
+                "displayModel": {
+                  "displayName": "Dangerous Ricin"
+                },
                 "description": "",
                 "modelProperties": {}
               },
@@ -14284,6 +14296,9 @@
           },
           "showInDsl": false,
           "name": "currentLook",
+          "displayModel": {
+            "displayName": "Current look"
+          },
           "description": "",
           "modelProperties": {}
         },
@@ -14366,6 +14381,9 @@
           },
           "showInDsl": true,
           "name": "disguise",
+          "displayModel": {
+            "displayName": "Disguise look"
+          },
           "description": "",
           "modelProperties": {}
         }
@@ -15912,6 +15930,9 @@
           },
           "showInDsl": true,
           "name": "Personal Barber",
+          "displayModel": {
+            "displayName": "Personal preference"
+          },
           "description": "",
           "modelProperties": {}
         },
@@ -16289,6 +16310,9 @@
           },
           "showInDsl": true,
           "name": "Personal Info Argument",
+          "displayModel": {
+            "displayName": "Personal preference"
+          },
           "description": "",
           "modelProperties": {}
         },
@@ -26059,6 +26083,11 @@
             "flattened": {},
             "expressionSupport": {
               "value": "SUPPORTED"
+            },
+            "display": {
+              "displayModel": {
+                "displayName": "Personal Info"
+              }
             }
           }
         },
@@ -26663,6 +26692,11 @@
             "flattened": {},
             "expressionSupport": {
               "value": "SUPPORTED"
+            },
+            "display": {
+              "displayModel": {
+                "displayName": "Brother in law"
+              }
             }
           }
         }

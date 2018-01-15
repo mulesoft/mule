@@ -35,6 +35,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -48,6 +49,7 @@ import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
@@ -253,6 +255,12 @@ public final class ParameterModelsLoaderDelegate {
     });
 
     declarer.withDslInlineRepresentation(groupAnnotation.showInDsl());
+
+    DisplayName displayName = groupParameter.getAnnotation(DisplayName.class).orElse(null);
+
+    if (displayName != null) {
+      declarer.withDisplayModel(DisplayModel.builder().displayName(displayName.value()).build());
+    }
 
     parseLayoutAnnotations(groupParameter, LayoutModel.builder()).ifPresent(declarer::withLayout);
 
