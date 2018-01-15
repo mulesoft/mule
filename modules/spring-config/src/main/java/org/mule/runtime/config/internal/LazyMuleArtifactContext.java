@@ -230,12 +230,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       if (parentComponentModelInitializerAdapter.isPresent()) {
         parentComponentModelInitializerAdapter.get().initializeComponents(componentModel -> {
           if (componentModel.getNameAttribute() != null) {
-            return dependencyResolver.getMissingElementNames().contains(componentModel.getNameAttribute());
+            return dependencyResolver.getMissingGlobalElementNames().contains(componentModel.getNameAttribute());
           }
           return false;
         });
       } else {
-        dependencyResolver.getMissingElementNames().stream().forEach(globalElementName -> {
+        dependencyResolver.getMissingGlobalElementNames().stream().forEach(globalElementName -> {
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("Ignoring dependency %s because it does not exists", globalElementName));
           }

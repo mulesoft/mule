@@ -14,7 +14,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -280,8 +279,6 @@ public class ApplicationModel {
   private List<ComponentModel> muleComponentModels = new LinkedList<>();
   private PropertiesResolverConfigurationProperties configurationProperties;
   private ResourceProvider externalResourceProvider;
-  private Map<String, ComponentModel> namedComponentModels = new HashMap<>();
-  private Map<String, ComponentModel> namedTopLevelComponentModels = new HashMap<>();
 
   /**
    * Creates an {code ApplicationModel} from a {@link ArtifactConfig}.
@@ -331,33 +328,16 @@ public class ApplicationModel {
     convertConfigFileToComponentModel(artifactConfig);
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
     resolveRegistrationNames();
-    createEffectiveModel();
-    indexComponentModels();
     validateModel(componentBuildingDefinitionRegistry);
+    createEffectiveModel();
     ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
     if (runtimeMode) {
       expandModules(extensionModels);
-      // Have to index again the component models with macro expanded ones
-      indexComponentModels();
     }
     //TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors and crafted declared extesion models)
     resolveComponentTypes();
     resolveTypedComponentIdentifier(extensionModelHelper);
     executeOnEveryMuleComponentTree(new ComponentLocationVisitor(extensionModelHelper));
-  }
-
-  private void indexComponentModels() {
-    executeOnEveryComponentTree(componentModel -> {
-      if (componentModel.getNameAttribute() != null) {
-        namedComponentModels.put(componentModel.getNameAttribute(), componentModel);
-      }
-    });
-
-    executeOnEveryRootElement(componentModel -> {
-      if (componentModel.getNameAttribute() != null) {
-        namedTopLevelComponentModels.put(componentModel.getNameAttribute(), componentModel);
-      }
-    });
   }
 
   private void resolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper) {
@@ -1006,18 +986,37 @@ public class ApplicationModel {
    * @return the component if present, if not, an empty {@link Optional}
    */
   public Optional<ComponentModel> findTopLevelNamedComponent(String name) {
-    return ofNullable(namedTopLevelComponentModels.getOrDefault(name, null));
+    Optional<ComponentModel> requestedComponentModelOptional = empty();
+    for (ComponentModel muleComponentModel : muleComponentModels) {
+      requestedComponentModelOptional = muleComponentModel.getInnerComponents().stream()
+          .filter(componentModel -> name.equals(componentModel.getNameAttribute()))
+          .findAny();
+      if (requestedComponentModelOptional.isPresent()) {
+        break;
+      }
+    }
+    return requestedComponentModelOptional;
   }
 
   /**
-   * Find a named component.
+   * Find a named component configuration.
    *
    * @param name the expected value for the name attribute configuration.
    * @return the component if present, if not, an empty {@link Optional}
    */
   // TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
-  public Optional<ComponentModel> findNamedElement(String name) {
-    return ofNullable(namedComponentModels.getOrDefault(name, null));
+  public Optional<ComponentConfiguration> findTopLevelNamedElement(String name) {
+    Optional<ComponentConfiguration> requestedElement = empty();
+    for (ComponentModel muleComponentModel : muleComponentModels) {
+      requestedElement = muleComponentModel.getInnerComponents().stream()
+          .filter(componentModel -> name.equals(componentModel.getNameAttribute()))
+          .map(ComponentModel::getConfiguration)
+          .findAny();
+      if (requestedElement.isPresent()) {
+        break;
+      }
+    }
+    return requestedElement;
   }
 
   /**

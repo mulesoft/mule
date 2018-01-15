@@ -10,7 +10,6 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -39,7 +38,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
 
   private final ApplicationModel applicationModel;
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
-  private List<String> missingElementNames = new ArrayList<>();
+  private List<String> missingGlobalElementNames = new ArrayList<>();
 
   /**
    * Creates a new instance associated to a complete {@link ApplicationModel}.
@@ -85,23 +84,15 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
 
     for (String parametersReferencingDependency : parametersReferencingDependencies) {
       if (requestedComponentModel.getParameters().containsKey(parametersReferencingDependency)) {
-        appendTopLevelDependency(otherDependencies, requestedComponentModel, parametersReferencingDependency);
+        appendDependency(otherDependencies, requestedComponentModel, parametersReferencingDependency);
       }
     }
 
     // Special cases for flow-ref and configuration
     if (isCoreComponent(requestedComponentModel.getIdentifier(), "flow-ref")) {
-      appendTopLevelDependency(otherDependencies, requestedComponentModel, "name");
-    } else if (isAggregatorComponent(requestedComponentModel, "aggregatorName")) {
-      // TODO (MULE-14429): use extensionModel to get the dependencies instead of ComponentBuildingDefinition to solve cases like this (flow-ref)
-      String name = requestedComponentModel.getParameters().get("aggregatorName");
-      if (applicationModel.findNamedElement(name).isPresent()) {
-        otherDependencies.add(name);
-      } else {
-        missingElementNames.add(name);
-      }
+      appendDependency(otherDependencies, requestedComponentModel, "name");
     } else if (isCoreComponent(requestedComponentModel.getIdentifier(), "configuration")) {
-      appendTopLevelDependency(otherDependencies, requestedComponentModel, "defaultErrorHandler-ref");
+      appendDependency(otherDependencies, requestedComponentModel, "defaultErrorHandler-ref");
     }
 
     return otherDependencies;
@@ -125,13 +116,13 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return foundDependencies;
   }
 
-  private void appendTopLevelDependency(Set<String> otherDependencies, ComponentModel requestedComponentModel,
-                                        String parametersReferencingDependency) {
+  private void appendDependency(Set<String> otherDependencies, ComponentModel requestedComponentModel,
+                                String parametersReferencingDependency) {
     String name = requestedComponentModel.getParameters().get(parametersReferencingDependency);
-    if (applicationModel.findTopLevelNamedComponent(name).isPresent()) {
+    if (applicationModel.findTopLevelNamedElement(name).isPresent()) {
       otherDependencies.add(name);
     } else {
-      missingElementNames.add(name);
+      missingGlobalElementNames.add(name);
     }
   }
 
@@ -139,13 +130,8 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return componentIdentifier.getNamespace().equals(CORE_PREFIX) && componentIdentifier.getName().equals(name);
   }
 
-  private boolean isAggregatorComponent(ComponentModel componentModel, String referenceNameParameter) {
-    return componentModel.getIdentifier().getNamespace().equals("aggregators")
-        && componentModel.getParameters().containsKey(referenceNameParameter);
-  }
-
   private ComponentModel findRequiredComponentModel(String name) {
-    return applicationModel.findNamedElement(name)
+    return applicationModel.findTopLevelNamedComponent(name)
         .orElseThrow(() -> new NoSuchComponentModelException(createStaticMessage("No named component with name " + name)));
   }
 
@@ -178,14 +164,10 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
    * @return the dependencies of the component with component name {@code #componentName}. An empty collection if there is no
    *         component with such name.
    */
-  //TODO (MULE-14453: When creating ApplicationModel and ComponentModels inner beans should have a name so they can be later retrieved)
-  public Collection<String> resolveTopLevelComponentDependencies(String componentName) {
+  public Collection<String> resolveComponentDependencies(String componentName) {
     try {
       ComponentModel requiredComponentModel = findRequiredComponentModel(componentName);
-      return resolveComponentModelDependencies(requiredComponentModel)
-          .stream()
-          .filter(dependencyName -> applicationModel.findTopLevelNamedComponent(dependencyName).isPresent())
-          .collect(toList());
+      return resolveComponentModelDependencies(requiredComponentModel);
     } catch (NoSuchComponentModelException e) {
       return emptyList();
     }
@@ -229,7 +211,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return namesBuilder.build();
   }
 
-  public List<String> getMissingElementNames() {
-    return missingElementNames;
+  public List<String> getMissingGlobalElementNames() {
+    return missingGlobalElementNames;
   }
 }
