@@ -83,7 +83,7 @@ public class MinimalApplicationModelGenerator {
    */
   private void enableComponentDependencies(ComponentModel requestedComponentModel) {
     final String requestComponentModelName = requestedComponentModel.getNameAttribute();
-    final Set<String> componentDependencies = dependencyResolver.resolveComponentDependencies(requestedComponentModel);
+    final Set<String> componentDependencies = dependencyResolver.resolveTopLevelComponentDependencies(requestedComponentModel);
     final Set<String> alwaysEnabledComponents = dependencyResolver.resolveAlwaysEnabledComponents();
     final ImmutableSet.Builder<String> otherRequiredGlobalComponentsSetBuilder =
         ImmutableSet.<String>builder().addAll(componentDependencies).addAll(alwaysEnabledComponents);
