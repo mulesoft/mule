@@ -38,7 +38,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
 
   private final ApplicationModel applicationModel;
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
-  private List<String> missingGlobalElementNames = new ArrayList<>();
+  private List<String> missingElementNames = new ArrayList<>();
 
   /**
    * Creates a new instance associated to a complete {@link ApplicationModel}.
@@ -84,15 +84,23 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
 
     for (String parametersReferencingDependency : parametersReferencingDependencies) {
       if (requestedComponentModel.getParameters().containsKey(parametersReferencingDependency)) {
-        appendDependency(otherDependencies, requestedComponentModel, parametersReferencingDependency);
+        appendTopLevelDependency(otherDependencies, requestedComponentModel, parametersReferencingDependency);
       }
     }
 
     // Special cases for flow-ref and configuration
     if (isCoreComponent(requestedComponentModel.getIdentifier(), "flow-ref")) {
-      appendDependency(otherDependencies, requestedComponentModel, "name");
+      appendTopLevelDependency(otherDependencies, requestedComponentModel, "name");
+    } else if (isAggregatorComponent(requestedComponentModel, "aggregatorName")) {
+      // TODO (MULE-14429): use extensionModel to get the dependencies instead of ComponentBuildingDefinition to solve cases like this (flow-ref)
+      String name = requestedComponentModel.getParameters().get("aggregatorName");
+      if (applicationModel.findNamedElement(name).isPresent()) {
+        otherDependencies.add(name);
+      } else {
+        missingElementNames.add(name);
+      }
     } else if (isCoreComponent(requestedComponentModel.getIdentifier(), "configuration")) {
-      appendDependency(otherDependencies, requestedComponentModel, "defaultErrorHandler-ref");
+      appendTopLevelDependency(otherDependencies, requestedComponentModel, "defaultErrorHandler-ref");
     }
 
     return otherDependencies;
@@ -116,13 +124,13 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return foundDependencies;
   }
 
-  private void appendDependency(Set<String> otherDependencies, ComponentModel requestedComponentModel,
-                                String parametersReferencingDependency) {
+  private void appendTopLevelDependency(Set<String> otherDependencies, ComponentModel requestedComponentModel,
+                                        String parametersReferencingDependency) {
     String name = requestedComponentModel.getParameters().get(parametersReferencingDependency);
-    if (applicationModel.findTopLevelNamedElement(name).isPresent()) {
+    if (applicationModel.findTopLevelNamedComponent(name).isPresent()) {
       otherDependencies.add(name);
     } else {
-      missingGlobalElementNames.add(name);
+      missingElementNames.add(name);
     }
   }
 
@@ -130,8 +138,13 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return componentIdentifier.getNamespace().equals(CORE_PREFIX) && componentIdentifier.getName().equals(name);
   }
 
+  private boolean isAggregatorComponent(ComponentModel componentModel, String referenceNameParameter) {
+    return componentModel.getIdentifier().getNamespace().equals("aggregators")
+        && componentModel.getParameters().containsKey(referenceNameParameter);
+  }
+
   private ComponentModel findRequiredComponentModel(String name) {
-    return applicationModel.findTopLevelNamedComponent(name)
+    return applicationModel.findNamedElement(name)
         .orElseThrow(() -> new NoSuchComponentModelException(createStaticMessage("No named component with name " + name)));
   }
 
@@ -211,7 +224,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return namesBuilder.build();
   }
 
-  public List<String> getMissingGlobalElementNames() {
-    return missingGlobalElementNames;
+  public List<String> getMissingElementNames() {
+    return missingElementNames;
   }
 }
