@@ -125,8 +125,9 @@ public class CompositeSourcePolicy extends
    */
   @Override
   protected Publisher<CoreEvent> processPolicy(Policy policy, Processor nextProcessor, CoreEvent event) {
-    logPolicy(getCoreEventId(event), getPolicyName(policy), getCoreEventAttributesAsString(event));
-    return just(event).transform(sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor))
+    return just(event)
+        .doOnNext(s -> logPolicy(getCoreEventId(event), getPolicyName(policy), getCoreEventAttributesAsString(event)))
+        .transform(sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor))
         .doOnNext(responseEvent -> logPolicy(getCoreEventId(responseEvent), getPolicyName(policy),
                                              getCoreEventAttributesAsString(responseEvent)));
   }
@@ -153,7 +154,8 @@ public class CompositeSourcePolicy extends
                   .fromMessageToSuccessResponseParameters(policiesResultEvent.getMessage())))
               .orElse(originalResponseParameters);
           return right(new SourcePolicySuccessResult(policiesResultEvent, responseParameters, getParametersProcessor()));
-        })
+        }).doOnNext(result -> logSourcePolicySuccessfullResult(result.getRight()))
+
         .doOnError(e -> LOGGER.error(e.getMessage(), e))
         .onErrorResume(FlowExecutionException.class, e -> {
           Supplier<Map<String, Object>> responseParameters = () -> getParametersTransformer()
@@ -169,7 +171,10 @@ public class CompositeSourcePolicy extends
                                                                                            .fromMessageToErrorResponseParameters(e
                                                                                                .getEvent().getMessage())))
                   .orElse(originalFailureResponseParameters);
-          return just(left(new SourcePolicyFailureResult(e, responseParameters)));
+          return just(Either
+              .<SourcePolicyFailureResult, SourcePolicySuccessResult>left(new SourcePolicyFailureResult(e, responseParameters)))
+                  .doOnNext(result -> logSourcePolicyFailureResult(result
+                      .getLeft()));
         });
   }
 
@@ -185,6 +190,7 @@ public class CompositeSourcePolicy extends
 
   private void logPolicy(String eventId, String policyName, String message) {
     if (LOGGER.isTraceEnabled()) {
+      //TODO Remove event id when first policy generates it. MULE-14455
       LOGGER.trace("Event Id: " + eventId + ".\n Processing " + policyName + "\n" + message);
     }
   }
@@ -199,5 +205,20 @@ public class CompositeSourcePolicy extends
 
   private String getPolicyName(Policy policy) {
     return policy.getPolicyChain().getRootContainerLocation().getGlobalName();
+  }
+
+  private void logSourcePolicySuccessfullResult(SourcePolicySuccessResult result) {
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("Event id: " + result.getResult().getContext().getId() + " finished processing. \n" +
+          result.getResult().getMessage().getAttributes().getValue().toString());
+    }
+  }
+
+  private void logSourcePolicyFailureResult(SourcePolicyFailureResult result) {
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("Event id: " + result.getMessagingException().getEvent().getContext().getId()
+          + " finished processing with failure. \n" +
+          "Error message: " + result.getMessagingException().getMessage());
+    }
   }
 }

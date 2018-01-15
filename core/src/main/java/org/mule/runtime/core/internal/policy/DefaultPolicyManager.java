@@ -90,13 +90,18 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
                                                                                                                                             .getSuccessfulExecutionResponseParametersFunction()
                                                                                                                                             .apply(flowExecutionResult),
                                                                                                                                         messageSourceResponseParametersProcessor)))
+          .doOnNext(result -> logSourcePolicySuccessfullResult(result.getRight()))
           .onErrorResume(Exception.class, e -> {
             MessagingException messagingException = e instanceof MessagingException ? (MessagingException) e
                 : new MessagingException(event, e, (Component) flowExecutionProcessor);
             return just(Either
-                .left(new SourcePolicyFailureResult(messagingException, () -> messageSourceResponseParametersProcessor
-                    .getFailedExecutionResponseParametersFunction()
-                    .apply(messagingException.getEvent()))));
+                .<SourcePolicyFailureResult, SourcePolicySuccessResult>left(new SourcePolicyFailureResult(messagingException,
+                                                                                                          () -> messageSourceResponseParametersProcessor
+                                                                                                              .getFailedExecutionResponseParametersFunction()
+                                                                                                              .apply(messagingException
+                                                                                                                  .getEvent()))))
+                                                                                                                      .doOnNext(result -> logSourcePolicyFailureResult(result
+                                                                                                                          .getLeft()));
           });
     }
     return new CompositeSourcePolicy(parameterizedPolicies,
@@ -208,6 +213,21 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
       LOGGER.trace("New request arrived with Event Id: " + eventContext.getId() + " from "
           + eventContext.getOriginatingLocation().getRootContainerName() + " app. \n"
           + message.getAttributes().getValue().toString());
+    }
+  }
+
+  private void logSourcePolicySuccessfullResult(SourcePolicySuccessResult result) {
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("Event id: " + result.getResult().getContext().getId() + " finished processing. \n" +
+          result.getResult().getMessage().getAttributes().getValue().toString());
+    }
+  }
+
+  private void logSourcePolicyFailureResult(SourcePolicyFailureResult result) {
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("Event id: " + result.getMessagingException().getEvent().getContext().getId()
+          + " finished processing with failure. \n" +
+          "Error message: " + result.getMessagingException().getMessage());
     }
   }
 }

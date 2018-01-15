@@ -103,11 +103,11 @@ public class CompositeOperationPolicy extends
    */
   @Override
   protected Publisher<CoreEvent> processNextOperation(CoreEvent event) {
-    logOperationEvent(event.getContext(), event.getMessage());
-    return just(event).transform(nextOperation).doOnNext(response -> {
-      this.nextOperationResponse = response;
-      logOperationEvent(response.getContext(), response.getMessage());
-    });
+    return just(event).doOnNext(s -> logOperationEvent("Before operation execution\n", event.getContext(), event.getMessage()))
+        .transform(nextOperation).doOnNext(response -> {
+          this.nextOperationResponse = response;
+          logOperationEvent("After operation execution\n", response.getContext(), response.getMessage());
+        });
   }
 
   /**
@@ -151,9 +151,9 @@ public class CompositeOperationPolicy extends
     }
   }
 
-  private void logOperationEvent(EventContext eventContext, Message message) {
+  private void logOperationEvent(String startingMessage, EventContext eventContext, Message message) {
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("Executing operation\n" + eventContext.toString() + "\n"
+      LOGGER.trace(startingMessage + eventContext.toString() + "\n"
           + message.getAttributes().getValue().toString());
     }
   }

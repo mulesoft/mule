@@ -6,14 +6,10 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.core.internal.exception.MessagingException;
 
 import java.util.Map;
 import java.util.function.Supplier;
-
-import org.slf4j.Logger;
 
 /**
  * Result for an execution of a policy {@link org.mule.runtime.core.api.processor.Processor} which failed the executing by
@@ -22,8 +18,6 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 public class SourcePolicyFailureResult {
-
-  private static final Logger LOGGER = getLogger(SourcePolicyFailureResult.class);
 
   private final MessagingException messagingException;
   private final Supplier<Map<String, Object>> errorResponseParameters;
@@ -37,7 +31,6 @@ public class SourcePolicyFailureResult {
   public SourcePolicyFailureResult(MessagingException messagingException, Supplier<Map<String, Object>> errorResponseParameters) {
     this.messagingException = messagingException;
     this.errorResponseParameters = errorResponseParameters;
-    logSourcePolicyResult();
   }
 
   /**
@@ -52,13 +45,5 @@ public class SourcePolicyFailureResult {
    */
   public Supplier<Map<String, Object>> getErrorResponseParameters() {
     return errorResponseParameters;
-  }
-
-
-  private void logSourcePolicyResult() {
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("Event id: " + messagingException.getEvent().getContext().getId() + " finished processing with failure. \n" +
-          "Error message: " + messagingException.getMessage());
-    }
   }
 }
