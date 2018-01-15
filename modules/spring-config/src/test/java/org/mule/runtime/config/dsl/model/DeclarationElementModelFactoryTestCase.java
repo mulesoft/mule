@@ -17,6 +17,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -168,6 +169,7 @@ public class DeclarationElementModelFactoryTestCase {
     when(parameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
     when(parameterGroupModel.isShowInDsl()).thenReturn(false);
     when(parameterGroupModel.getParameterModels()).thenReturn(parameterModels);
+    when(parameterGroupModel.getParameter(anyString())).thenReturn(empty());
 
     when(source.getName()).thenReturn(SOURCE_NAME);
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
