@@ -139,6 +139,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     if (messagingExceptionHandler == null) {
       messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerLocation().toString()));
     }
+    initialiseIfNeeded(nestedChain, muleContext);
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     super.initialise();
   }

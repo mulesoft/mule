@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.policy;
+package org.mule.runtime.core.internal.policy;
 
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -17,6 +17,7 @@ import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -25,15 +26,17 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -93,10 +96,21 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
               .onErrorResume(MessagingException.class, t -> {
                 // Given we've used child context to ensure AFTER_NEXT notifications are fired at exactly the right time we need
                 // to propagate the error to parent context manually.
-                ((BaseEventContext) event.getContext()).error(t);
+                ((BaseEventContext) event.getContext())
+                    .error(resolveMessagingException(t.getFailingComponent(), muleContext).apply(t));
                 return empty();
               });
         });
+  }
+
+  private Function<MessagingException, MessagingException> resolveMessagingException(Component processor,
+                                                                                     MuleContext muleContext) {
+    if (processor != null) {
+      MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
+      return exception -> exceptionResolver.resolve(exception, muleContext);
+    } else {
+      return exception -> exception;
+    }
   }
 
   @Override
