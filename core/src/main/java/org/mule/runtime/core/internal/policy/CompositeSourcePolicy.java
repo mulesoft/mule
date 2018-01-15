@@ -125,7 +125,10 @@ public class CompositeSourcePolicy extends
    */
   @Override
   protected Publisher<CoreEvent> processPolicy(Policy policy, Processor nextProcessor, CoreEvent event) {
-    return just(event).transform(sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor));
+    logPolicy(getCoreEventId(event), getPolicyName(policy), getCoreEventAttributesAsString(event));
+    return just(event).transform(sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor))
+        .doOnNext(responseEvent -> logPolicy(getCoreEventId(responseEvent), getPolicyName(policy),
+                                             getCoreEventAttributesAsString(responseEvent)));
   }
 
   /**
@@ -180,4 +183,21 @@ public class CompositeSourcePolicy extends
     return concatMap;
   }
 
+  private void logPolicy(String eventId, String policyName, String message) {
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("Event Id: " + eventId + ".\n Processing " + policyName + "\n" + message);
+    }
+  }
+
+  private String getCoreEventId(CoreEvent event) {
+    return event.getContext().getId();
+  }
+
+  private String getCoreEventAttributesAsString(CoreEvent event) {
+    return event.getMessage().getAttributes().getValue().toString();
+  }
+
+  private String getPolicyName(Policy policy) {
+    return policy.getPolicyChain().getRootContainerLocation().getGlobalName();
+  }
 }

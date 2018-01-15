@@ -9,10 +9,12 @@ package org.mule.runtime.core.internal.policy;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -20,12 +22,14 @@ import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.reactivestreams.Publisher;
 
 /**
  * {@link OperationPolicy} created from a list of {@link Policy}.
@@ -36,6 +40,8 @@ import org.reactivestreams.Publisher;
  */
 public class CompositeOperationPolicy extends
     AbstractCompositePolicy<OperationPolicyParametersTransformer, OperationParametersProcessor> implements OperationPolicy {
+
+  private static final Logger LOGGER = getLogger(CompositeOperationPolicy.class);
 
 
   private final Processor nextOperation;
@@ -97,7 +103,11 @@ public class CompositeOperationPolicy extends
    */
   @Override
   protected Publisher<CoreEvent> processNextOperation(CoreEvent event) {
-    return just(event).transform(nextOperation).doOnNext(response -> this.nextOperationResponse = response);
+    logOperationEvent(event.getContext(), event.getMessage());
+    return just(event).transform(nextOperation).doOnNext(response -> {
+      this.nextOperationResponse = response;
+      logOperationEvent(response.getContext(), response.getMessage());
+    });
   }
 
   /**
@@ -138,6 +148,13 @@ public class CompositeOperationPolicy extends
                                      empty());
     } catch (Exception e) {
       return error(e);
+    }
+  }
+
+  private void logOperationEvent(EventContext eventContext, Message message) {
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("Executing operation\n" + eventContext.toString() + "\n"
+          + message.getAttributes().getValue().toString());
     }
   }
 }

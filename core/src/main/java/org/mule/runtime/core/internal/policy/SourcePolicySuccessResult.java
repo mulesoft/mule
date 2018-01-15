@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import org.slf4j.Logger;
 
 /**
  * Result of a successful execution of a {@link SourcePolicy}.
@@ -21,6 +25,8 @@ import java.util.function.Supplier;
  * @since 4.0
  */
 public class SourcePolicySuccessResult {
+
+  private static final Logger LOGGER = getLogger(SourcePolicySuccessResult.class);
 
   private final CoreEvent result;
   private final Supplier<Map<String, Object>> responseParameters;
@@ -38,6 +44,7 @@ public class SourcePolicySuccessResult {
     this.result = result;
     this.responseParameters = responseParameters;
     this.messageSourceResponseParametersProcessor = messageSourceResponseParametersProcessor;
+    logSourcePolicyResult();
   }
 
   /**
@@ -65,5 +72,12 @@ public class SourcePolicySuccessResult {
    */
   public Function<CoreEvent, Map<String, Object>> createErrorResponseParameters() {
     return event -> messageSourceResponseParametersProcessor.getFailedExecutionResponseParametersFunction().apply(event);
+  }
+
+  private void logSourcePolicyResult() {
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("Event id: " + result.getContext().getId() + " finished processing. \n" +
+          result.getMessage().getAttributes().getValue().toString());
+    }
   }
 }

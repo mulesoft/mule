@@ -12,14 +12,17 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.process;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
@@ -45,12 +48,16 @@ import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+
 /**
  * Default implementation of {@link PolicyManager}.
  *
  * @since 4.0
  */
 public class DefaultPolicyManager implements PolicyManager, Initialisable {
+
+  private static final Logger LOGGER = getLogger(DefaultPolicyManager.class);
 
   @Inject
   private MuleContext muleContext;
@@ -70,6 +77,9 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   public SourcePolicy createSourcePolicyInstance(Component source, CoreEvent sourceEvent,
                                                  Processor flowExecutionProcessor,
                                                  MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
+
+    logEvent(sourceEvent.getContext(), sourceEvent.getMessage());
+
     PolicyPointcutParameters sourcePointcutParameters = createSourcePointcutParameters(source, sourceEvent);
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters);
     if (parameterizedPolicies.isEmpty()) {
@@ -189,8 +199,15 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
     policyStateHandler.destroyState(executionIdentifier);
   }
 
-
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
+  }
+
+  private void logEvent(EventContext eventContext, Message message) {
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("New request arrived with Event Id: " + eventContext.getId() + " from "
+          + eventContext.getOriginatingLocation().getRootContainerName() + " app. \n"
+          + message.getAttributes().getValue().toString());
+    }
   }
 }
