@@ -6,21 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
-import org.mule.metadata.api.ClassTypeLoader;
+
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.SubTypesMapping;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,30 +37,33 @@ public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarat
     ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
     ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
 
-    Optional<ImplementingTypeModelProperty> implementingType = extractImplementingTypeProperty(extensionDeclaration);
+    Optional<ExtensionTypeDescriptorModelProperty> implementingType =
+        extensionDeclaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
     if (!implementingType.isPresent()) {
       return;
     }
-    Class<?> type = implementingType.get().getType();
-    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(type.getClassLoader());
+    Type type = implementingType.get().getType();
 
-    List<SubTypeMapping> typeMappings = parseRepeatableAnnotation(type, SubTypeMapping.class, c -> ((SubTypesMapping) c).value());
+    List<AnnotationValueFetcher<SubTypeMapping>> typeMappings =
+        parseRepeatableAnnotation(type, SubTypeMapping.class, c -> ((SubTypesMapping) c).value());
+
     if (!typeMappings.isEmpty()) {
-      declareSubTypesMapping(declarer, typeMappings, extensionDeclaration.getName(), typeLoader);
+      declareSubTypesMapping(declarer, typeMappings, extensionDeclaration.getName());
     }
   }
 
-  private void declareSubTypesMapping(ExtensionDeclarer declarer, List<SubTypeMapping> typeMappings, String name,
-                                      ClassTypeLoader typeLoader) {
-    if (typeMappings.stream().map(SubTypeMapping::baseType).distinct().collect(toList()).size() != typeMappings.size()) {
+  private void declareSubTypesMapping(ExtensionDeclarer declarer, List<AnnotationValueFetcher<SubTypeMapping>> typeMappings,
+                                      String name) {
+    if (typeMappings.stream().map(valueFetcher -> valueFetcher.getClassValue(SubTypeMapping::baseType)).distinct()
+        .collect(toList()).size() != typeMappings.size()) {
       throw new IllegalModelDefinitionException(String
           .format("There should be only one SubtypeMapping for any given base type in extension [%s]."
               + " Duplicated base types are not allowed", name));
     }
 
-    typeMappings.forEach(mapping -> declarer.withSubTypes(getMetadataType(mapping.baseType(), typeLoader),
-                                                          stream(mapping.subTypes())
-                                                              .map(subType -> getMetadataType(subType, typeLoader))
+    typeMappings.forEach(mapping -> declarer.withSubTypes(mapping.getClassValue(SubTypeMapping::baseType).asMetadataType(),
+                                                          mapping.getClassArrayValue(SubTypeMapping::subTypes).stream()
+                                                              .map(Type::asMetadataType)
                                                               .collect(toImmutableList())));
   }
 

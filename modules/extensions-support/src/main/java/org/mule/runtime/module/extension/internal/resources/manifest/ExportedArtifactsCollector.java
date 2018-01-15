@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.collectRelativeClasses;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.collectRelativeClassesAsString;
 
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -22,12 +20,14 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
-
-import com.google.common.collect.ImmutableSet;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Utility class which calculates the default set of java package names and resources that a given extension should export in
@@ -41,10 +41,11 @@ final public class ExportedArtifactsCollector {
       ImmutableSet.<String>builder().add("java.", "javax.", "org.mule.runtime.", "com.mulesoft.mule.runtime").build();
 
   private final ExtensionModel extensionModel;
-  private final Set<Class<?>> exportedClasses = new LinkedHashSet<>();
+  private final Set<String> exportedClasses = new LinkedHashSet<>();
+
   private final Set<String> privilegedExportedPackages = new LinkedHashSet<>();
   private final Set<String> privilegedArtifacts = new LinkedHashSet<>();
-  private final ClassLoader extensionClassloader;
+  private final ClassPackageFinder packageFinder;
 
   /**
    * Creates a new instance
@@ -52,8 +53,17 @@ final public class ExportedArtifactsCollector {
    * @param extensionModel the {@link ExtensionModel model} for the analyzed extension
    */
   public ExportedArtifactsCollector(ExtensionModel extensionModel) {
+    this(extensionModel, new DefaultClassPackageFinder());
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @param extensionModel the {@link ExtensionModel model} for the analyzed extension
+   */
+  public ExportedArtifactsCollector(ExtensionModel extensionModel, ClassPackageFinder packageFinder) {
     this.extensionModel = extensionModel;
-    this.extensionClassloader = getClassLoader(extensionModel);
+    this.packageFinder = packageFinder;
   }
 
   /**
@@ -70,8 +80,11 @@ final public class ExportedArtifactsCollector {
     collectDefault();
     collectManuallyExportedPackages();
 
-    Set<String> exportedPackages = exportedClasses.stream().filter(type -> type.getPackage() != null)
-        .map(type -> type.getPackage().getName()).collect(toSet());
+    Set<String> exportedPackages = exportedClasses.stream()
+        .map(packageFinder::packageFor)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(toSet());
 
     return filterExportedPackages(exportedPackages);
   }
@@ -101,7 +114,7 @@ final public class ExportedArtifactsCollector {
   }
 
   private void collectManuallyExportedPackages() {
-    extensionModel.getTypes().forEach(t -> getType(t).ifPresent(exportedClasses::add));
+    extensionModel.getTypes().forEach(t -> getId(t).ifPresent(exportedClasses::add));
   }
 
   private void collectDefault() {
@@ -109,7 +122,7 @@ final public class ExportedArtifactsCollector {
 
       @Override
       public void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
-        exportedClasses.addAll(collectRelativeClasses(model.getType(), extensionClassloader));
+        exportedClasses.addAll(collectRelativeClassesAsString(model.getType()));
       }
 
       @Override
@@ -127,13 +140,13 @@ final public class ExportedArtifactsCollector {
   }
 
   private void collectReturnTypes(ConnectableComponentModel model) {
-    exportedClasses.addAll(collectRelativeClasses(model.getOutput().getType(), extensionClassloader));
-    exportedClasses.addAll(collectRelativeClasses(model.getOutputAttributes().getType(), extensionClassloader));
+    exportedClasses.addAll(collectRelativeClassesAsString(model.getOutput().getType()));
+    exportedClasses.addAll(collectRelativeClassesAsString(model.getOutputAttributes().getType()));
   }
 
   private void collectExceptionTypes(OperationModel operationModel) {
-    operationModel.getModelProperty(ImplementingMethodModelProperty.class)
-        .map(ImplementingMethodModelProperty::getMethod)
-        .ifPresent(method -> exportedClasses.addAll(asList(method.getExceptionTypes())));
+    operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+        .map(ExtensionOperationDescriptorModelProperty::getOperationMethod)
+        .ifPresent(method -> exportedClasses.addAll(method.getExceptionTypes().stream().map(Type::getTypeName).collect(toSet())));
   }
 }

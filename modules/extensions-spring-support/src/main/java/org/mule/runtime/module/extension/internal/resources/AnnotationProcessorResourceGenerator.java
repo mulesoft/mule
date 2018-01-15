@@ -9,16 +9,18 @@ package org.mule.runtime.module.extension.internal.resources;
 
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.FileObject;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implementation of {@link ResourcesGenerator} that writes files using a {@link javax.annotation.processing.Filer} obtained
@@ -38,7 +40,7 @@ public final class AnnotationProcessorResourceGenerator extends AbstractResource
    */
   public AnnotationProcessorResourceGenerator(List<GeneratedResourceFactory> resourceFactories,
                                               ProcessingEnvironment processingEnv) {
-    super(resourceFactories);
+    super(enrichFactories(resourceFactories, processingEnv));
     this.processingEnv = processingEnv;
   }
 
@@ -61,5 +63,16 @@ public final class AnnotationProcessorResourceGenerator extends AbstractResource
 
   private RuntimeException wrapException(Exception e, GeneratedResource resource) {
     return new RuntimeException(String.format("Could not write generated resource '%s'", resource.getPath()), e);
+  }
+
+  private static Collection<GeneratedResourceFactory> enrichFactories(List<GeneratedResourceFactory> resourceFactories,
+                                                                      ProcessingEnvironment processingEnv) {
+    resourceFactories.forEach(factory -> {
+      if (factory instanceof ProcessingEnvironmentAware) {
+        ((ProcessingEnvironmentAware) factory).setProcessingEnvironment(processingEnv);
+      }
+    });
+
+    return resourceFactories;
   }
 }

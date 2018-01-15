@@ -33,6 +33,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MediaType
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Base class for sub delegates of {@link DefaultJavaModelLoaderDelegate}
@@ -48,16 +49,13 @@ abstract class AbstractModelLoaderDelegate {
   }
 
   protected ClassLoader getExtensionClassLoader() {
-    Class<?> extensionType = getExtensionType();
-    if (extensionType != null) {
-      return extensionType.getClassLoader();
-    } else {
-      return ExtensionModel.class.getClassLoader();
-    }
+    return getExtensionType()
+        .map(Class::getClassLoader)
+        .orElseGet(ExtensionModel.class::getClassLoader);
   }
 
-  protected Class<?> getExtensionType() {
-    return loader.getExtensionType();
+  protected Optional<Class<?>> getExtensionType() {
+    return Optional.ofNullable(loader.getExtensionType());
   }
 
   protected ExtensionElement getExtensionElement() {

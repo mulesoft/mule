@@ -7,16 +7,17 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
+import com.google.common.collect.ImmutableList;
 
 
 /**

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -28,15 +29,17 @@ import java.util.stream.Stream;
  */
 public class ClassBasedAnnotationValueFetcher<T extends Annotation> implements AnnotationValueFetcher<T> {
 
-  private Class<T> annotationClass;
-  private AnnotatedElement annotatedElement;
   private ClassTypeLoader typeLoader;
-  private LazyValue<T> annotation = new LazyValue<>(() -> annotatedElement.getAnnotation(annotationClass));
+  private LazyValue<T> annotation;
 
   ClassBasedAnnotationValueFetcher(Class<T> annotationClass, AnnotatedElement annotatedElement, ClassTypeLoader typeLoader) {
-    this.annotationClass = annotationClass;
-    this.annotatedElement = annotatedElement;
     this.typeLoader = typeLoader;
+    this.annotation = new LazyValue<>(() -> annotatedElement.getAnnotation(annotationClass));
+  }
+
+  private ClassBasedAnnotationValueFetcher(T annotation, ClassTypeLoader typeLoader) {
+    this.typeLoader = typeLoader;
+    this.annotation = new LazyValue<>(annotation);
   }
 
   /**
@@ -45,6 +48,11 @@ public class ClassBasedAnnotationValueFetcher<T extends Annotation> implements A
   @Override
   public String getStringValue(Function<T, String> function) {
     return function.apply(annotation.get());
+  }
+
+  @Override
+  public <E> List<E> getArrayValue(Function<T, E[]> function) {
+    return asList(function.apply(annotation.get()));
   }
 
   /**
@@ -88,4 +96,23 @@ public class ClassBasedAnnotationValueFetcher<T extends Annotation> implements A
   public <E extends Enum> E getEnumValue(Function<T, E> function) {
     return function.apply(annotation.get());
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <E extends Annotation> AnnotationValueFetcher<E> getInnerAnnotation(Function<T, E> function) {
+    return new ClassBasedAnnotationValueFetcher<>(function.apply(annotation.get()), typeLoader);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <E extends Annotation> List<AnnotationValueFetcher<E>> getInnerAnnotations(Function<T, E[]> function) {
+    return Stream.of(function.apply(annotation.get()))
+        .map(e -> new ClassBasedAnnotationValueFetcher<>(e, typeLoader))
+        .collect(toList());
+  }
+
 }

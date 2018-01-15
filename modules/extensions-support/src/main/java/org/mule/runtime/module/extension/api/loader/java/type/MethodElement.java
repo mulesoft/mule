@@ -15,6 +15,7 @@ import org.mule.runtime.api.meta.NamedObject;
 import javax.lang.model.element.ExecutableElement;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -29,6 +30,11 @@ public interface MethodElement<T extends Type>
    * @return The represented method
    */
   Optional<Method> getMethod();
+
+  /**
+   * @return The list of exceptions types that a method can throw
+   */
+  List<Type> getExceptionTypes();
 
   /**
    * @return The {@link OperationContainerElement} which contains the current {@link MethodElement}

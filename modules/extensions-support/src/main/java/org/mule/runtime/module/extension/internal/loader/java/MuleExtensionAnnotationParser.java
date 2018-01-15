@@ -23,6 +23,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
+import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
@@ -34,6 +35,7 @@ import java.lang.annotation.Repeatable;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,15 +73,6 @@ public final class MuleExtensionAnnotationParser {
     }
   }
 
-  public static <T extends Annotation> Optional<T> getOptionalAnnotation(Class<?> annotatedType, Class<T> annotationType) {
-    try {
-      return Optional.ofNullable(annotatedType.getAnnotation(annotationType));
-    } catch (Exception e) {
-      logger.error(format("%s getting annotation from %s", e.getClass().getName(), annotatedType.getName()), e);
-      throw e;
-    }
-  }
-
   public static <T extends Annotation> List<T> parseRepeatableAnnotation(Class<?> extensionType, Class<T> annotation,
                                                                          Function<Annotation, T[]> containerConsumer) {
     List<T> annotationDeclarations = ImmutableList.of();
@@ -95,6 +88,28 @@ public final class MuleExtensionAnnotationParser {
     T singleDeclaration = IntrospectionUtils.getAnnotation(extensionType, annotation);
     if (singleDeclaration != null) {
       annotationDeclarations = ImmutableList.of(singleDeclaration);
+    }
+
+    return annotationDeclarations;
+  }
+
+  public static <T extends Annotation> List<AnnotationValueFetcher<T>> parseRepeatableAnnotation(Type extensionType,
+                                                                                                 Class<T> annotation,
+                                                                                                 Function<Annotation, T[]> containerConsumer) {
+    List<AnnotationValueFetcher<T>> annotationDeclarations = ImmutableList.of();
+
+    Repeatable repeatableContainer = annotation.getAnnotation(Repeatable.class);
+    if (repeatableContainer != null) {
+      Optional<? extends AnnotationValueFetcher<? extends Annotation>> container =
+          extensionType.getValueFromAnnotation(repeatableContainer.value());
+      if (container.isPresent()) {
+        annotationDeclarations = container.get().getInnerAnnotations((Function) containerConsumer);
+      }
+    }
+
+    Optional<AnnotationValueFetcher<T>> singleDeclaration = extensionType.getValueFromAnnotation(annotation);
+    if (singleDeclaration.isPresent()) {
+      annotationDeclarations = Collections.singletonList(singleDeclaration.get());
     }
 
     return annotationDeclarations;

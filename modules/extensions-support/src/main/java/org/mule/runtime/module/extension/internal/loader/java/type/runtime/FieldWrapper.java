@@ -21,6 +21,7 @@ import javax.lang.model.element.VariableElement;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -42,8 +43,8 @@ public class FieldWrapper implements FieldElement {
    * @return the wrapped {@link Field}
    */
   @Override
-  public Field getField() {
-    return field;
+  public Optional<Field> getField() {
+    return ofNullable(field);
   }
 
   /**
@@ -103,7 +104,7 @@ public class FieldWrapper implements FieldElement {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof FieldWrapper) {
-      return ((FieldWrapper) obj).getField().equals(field);
+      return Objects.equals(((FieldWrapper) obj).field, field);
     }
     return false;
   }

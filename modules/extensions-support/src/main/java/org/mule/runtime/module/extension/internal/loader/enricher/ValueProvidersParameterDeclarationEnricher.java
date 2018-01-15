@@ -171,7 +171,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                                ParameterizableTypeWrapper parameterizableComponent) {
     List<FieldElement> connectionFields = parameterizableComponent.getAnnotatedFields(Connection.class);
     if (!connectionFields.isEmpty()) {
-      Field field = connectionFields.get(0).getField();
+      Field field = connectionFields.get(0).getField().get();
       modelPropertyBuilder.withConnection(field);
       return of(field);
     }
@@ -190,7 +190,7 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
                                                   ParameterizableTypeWrapper parameterizableComponent) {
     List<FieldElement> configFields = parameterizableComponent.getAnnotatedFields(Config.class);
     if (!configFields.isEmpty()) {
-      Field field = configFields.get(0).getField();
+      Field field = configFields.get(0).getField().get();
       modelPropertyBuilder.withConfig(field);
       return of(field);
     }

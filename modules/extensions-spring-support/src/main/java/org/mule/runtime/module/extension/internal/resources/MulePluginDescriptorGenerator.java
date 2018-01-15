@@ -32,8 +32,11 @@ import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.resources.manifest.DefaultClassPackageFinder;
 import org.mule.runtime.module.extension.internal.resources.manifest.ExportedArtifactsCollector;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
+
+import javax.annotation.processing.ProcessingEnvironment;
 
 import java.util.Optional;
 
@@ -43,9 +46,10 @@ import java.util.Optional;
  * @since 4.0
  */
 // TODO: MULE-12295. This was moved here just to make it work with soap extensions.
-public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
+public class MulePluginDescriptorGenerator implements GeneratedResourceFactory, ProcessingEnvironmentAware {
 
   private static final String AUTO_GENERATED_MULE_ARTIFACT_DESCRIPTOR = "auto-generated-" + MULE_ARTIFACT_JSON_DESCRIPTOR;
+  private ProcessingEnvironment processingEnvironment;
 
   /**
    * {@inheritDoc}
@@ -58,7 +62,8 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
       return empty();
     }
 
-    final ExportedArtifactsCollector exportCollector = new ExportedArtifactsCollector(extensionModel);
+    final ExportedArtifactsCollector exportCollector =
+        new ExportedArtifactsCollector(extensionModel, new DefaultClassPackageFinder(processingEnvironment));
     final MulePluginModelBuilder builder = new MulePluginModelBuilder();
     // Set only for testing purposes, the value will be reset by the plugin packager.
     builder.setName(extensionModel.getName());
@@ -95,5 +100,10 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
   private String getLoaderId(ExtensionModel extensionModel) {
     Optional<SoapExtensionModelProperty> soapModelProperty = extensionModel.getModelProperty(SoapExtensionModelProperty.class);
     return soapModelProperty.isPresent() ? SOAP_LOADER_ID : JAVA_LOADER_ID;
+  }
+
+  @Override
+  public void setProcessingEnvironment(ProcessingEnvironment processingEnvironment) {
+    this.processingEnvironment = processingEnvironment;
   }
 }

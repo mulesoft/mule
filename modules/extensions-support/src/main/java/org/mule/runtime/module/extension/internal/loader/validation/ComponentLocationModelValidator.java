@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
