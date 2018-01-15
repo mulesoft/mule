@@ -11,14 +11,15 @@ import static java.lang.String.join;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesException;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
+import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,8 +47,7 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
   protected String fileLocation;
   protected ResourceProvider resourceProvider;
 
-  public DefaultConfigurationPropertiesProvider(String fileLocation, ResourceProvider resourceProvider)
-      throws ConfigurationPropertiesException {
+  public DefaultConfigurationPropertiesProvider(String fileLocation, ResourceProvider resourceProvider) {
     this.fileLocation = fileLocation;
     this.resourceProvider = resourceProvider;
   }
@@ -97,7 +97,7 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
       properties.keySet().stream().map(key -> {
         Object rawValue = properties.get(key);
         rawValue = createValue((String) key, (String) rawValue);
-        return new ConfigurationProperty(of(this), (String) key, rawValue);
+        return new DefaultConfigurationProperty(of(this), (String) key, rawValue);
       }).forEach(configurationAttribute -> {
         configurationAttributes.put(configurationAttribute.getKey(), configurationAttribute);
       });
@@ -124,7 +124,7 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
         String[] values = new String[list.size()];
         list.toArray(values);
         String value = join(",", list);
-        configurationAttributes.put(parentPath, new ConfigurationProperty(this, parentPath, value));
+        configurationAttributes.put(parentPath, new DefaultConfigurationProperty(this, parentPath, value));
       }
     } else if (yamlObject instanceof Map) {
       if (parentYamlObject instanceof List) {
@@ -142,7 +142,7 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
                                                    this);
       }
       String resultObject = createValue(parentPath, (String) yamlObject);
-      configurationAttributes.put(parentPath, new ConfigurationProperty(this, parentPath, resultObject));
+      configurationAttributes.put(parentPath, new DefaultConfigurationProperty(this, parentPath, resultObject));
     }
   }
 

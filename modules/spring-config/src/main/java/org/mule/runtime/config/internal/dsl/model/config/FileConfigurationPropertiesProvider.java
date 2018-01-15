@@ -39,7 +39,7 @@ public class FileConfigurationPropertiesProvider implements ConfigurationPropert
       try (InputStream is = resourceProvider.getResourceAsStream(path)) {
         if (is != null) {
           String value = IOUtils.toString(is);
-          return of(new ConfigurationProperty(this, configurationAttributeKey, value));
+          return of(new DefaultConfigurationProperty(this, configurationAttributeKey, value));
         }
       } catch (IOException e) {
         // ignore close exception

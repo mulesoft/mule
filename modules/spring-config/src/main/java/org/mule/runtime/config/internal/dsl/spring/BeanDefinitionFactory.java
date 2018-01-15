@@ -148,7 +148,7 @@ public class BeanDefinitionFactory {
     ServiceLoader<ConfigurationPropertiesProviderFactory> providerFactories =
         java.util.ServiceLoader.load(ConfigurationPropertiesProviderFactory.class);
     providerFactories.forEach(service -> {
-      ignoredMuleExtensionComponentIdentifiers.add(service.getComponentIdentifier());
+      ignoredMuleExtensionComponentIdentifiers.add(service.getSupportedComponentIdentifier());
     });
   }
 

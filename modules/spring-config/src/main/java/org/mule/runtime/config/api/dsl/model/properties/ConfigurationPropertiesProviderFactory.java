@@ -8,15 +8,28 @@ package org.mule.runtime.config.api.dsl.model.properties;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute;
 
 import java.util.Map;
 
+/**
+ * Builds the provider for a custom configuration properties element.
+ *
+ * @since 4.1
+ */
 public interface ConfigurationPropertiesProviderFactory {
 
-  ComponentIdentifier getComponentIdentifier();
+  /**
+   * @return the component identifier of the supported element.
+   */
+  ComponentIdentifier getSupportedComponentIdentifier();
 
-  ConfigurationPropertiesProvider createProvider(Map<String, SimpleConfigAttribute> parameters,
-                                                 ConfigurationPropertiesResolver localResolver,
+  /**
+   * Builds a properties provider for each matching configuration element.
+   *
+   * @param parameters the element attributed, after resolving property placeholders
+   * @param externalResourceProvider the resource provider for locating files (such as .properties and .yaml)
+   * @return the properties provider
+   */
+  ConfigurationPropertiesProvider createProvider(Map<String, String> parameters,
                                                  ResourceProvider externalResourceProvider);
 }

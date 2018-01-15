@@ -16,6 +16,7 @@ import static org.mule.test.allure.AllureConstants.ConfigurationProperties.Compo
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableList;
@@ -48,12 +49,12 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
         new DefaultConfigurationPropertiesResolver(Optional.empty(), new ConfigurationPropertiesProvider() {
 
           private List<ConfigurationProperty> attributes = ImmutableList.<ConfigurationProperty>builder()
-              .add(new ConfigurationProperty(this, "parent-key1", "parent-value1"))
-              .add(new ConfigurationProperty(this, "parent-key2", "parent-value2"))
-              .add(new ConfigurationProperty(this, "parent-complex-key1", "parent-complex-${parent-key1}"))
-              .add(new ConfigurationProperty(this, "parent-complex-key2", "${parent-key1}-${parent-complex-key3}"))
-              .add(new ConfigurationProperty(this, "parent-complex-key3", "${parent-key2}"))
-              .add(new ConfigurationProperty(this, "parent-key-referencing-child", "${child-key1}"))
+              .add(new DefaultConfigurationProperty(this, "parent-key1", "parent-value1"))
+              .add(new DefaultConfigurationProperty(this, "parent-key2", "parent-value2"))
+              .add(new DefaultConfigurationProperty(this, "parent-complex-key1", "parent-complex-${parent-key1}"))
+              .add(new DefaultConfigurationProperty(this, "parent-complex-key2", "${parent-key1}-${parent-complex-key3}"))
+              .add(new DefaultConfigurationProperty(this, "parent-complex-key3", "${parent-key2}"))
+              .add(new DefaultConfigurationProperty(this, "parent-key-referencing-child", "${child-key1}"))
               .build();
 
           @Override
@@ -69,12 +70,12 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
     resolver = new DefaultConfigurationPropertiesResolver(Optional.of(parentResolver), new ConfigurationPropertiesProvider() {
 
       private List<ConfigurationProperty> attributes = ImmutableList.<ConfigurationProperty>builder()
-          .add(new ConfigurationProperty(this, "child-key1", "child-value1"))
-          .add(new ConfigurationProperty(this, "child-key2", "child-value2"))
-          .add(new ConfigurationProperty(this, "child-complex-key1", "${child-key1}-${parent-complex-key1}"))
-          .add(new ConfigurationProperty(this, "child-complex-key2", "${child-key1}-${parent-complex-key2}-${child-key2}"))
-          .add(new ConfigurationProperty(this, "unresolved-nested-key", "${child-key1}-${child-key3}"))
-          .add(new ConfigurationProperty(this, "invalid-key1", "${nonExistentKey}"))
+          .add(new DefaultConfigurationProperty(this, "child-key1", "child-value1"))
+          .add(new DefaultConfigurationProperty(this, "child-key2", "child-value2"))
+          .add(new DefaultConfigurationProperty(this, "child-complex-key1", "${child-key1}-${parent-complex-key1}"))
+          .add(new DefaultConfigurationProperty(this, "child-complex-key2", "${child-key1}-${parent-complex-key2}-${child-key2}"))
+          .add(new DefaultConfigurationProperty(this, "unresolved-nested-key", "${child-key1}-${child-key3}"))
+          .add(new DefaultConfigurationProperty(this, "invalid-key1", "${nonExistentKey}"))
           .build();
 
       @Override

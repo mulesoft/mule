@@ -54,10 +54,8 @@ import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.api.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.api.dsl.processor.ConfigFile;
@@ -66,12 +64,15 @@ import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
 import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
 import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
+import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler;
@@ -395,7 +396,8 @@ public class ApplicationModel {
             @Override
             public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
               return parentConfigurationProperties.get().resolveProperty(configurationAttributeKey)
-                  .map(value -> new ConfigurationProperty(parentConfigurationProperties, configurationAttributeKey, value));
+                  .map(value -> new DefaultConfigurationProperty(parentConfigurationProperties, configurationAttributeKey,
+                                                                 value));
             }
 
             @Override
@@ -438,7 +440,7 @@ public class ApplicationModel {
     ServiceLoader<ConfigurationPropertiesProviderFactory> providerFactories =
         java.util.ServiceLoader.load(ConfigurationPropertiesProviderFactory.class);
     providerFactories.forEach(service -> {
-      ComponentIdentifier componentIdentifier = service.getComponentIdentifier();
+      ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
       if (providerFactoriesMap.containsKey(componentIdentifier)) {
         throw new MuleRuntimeException(createStaticMessage("Multiple configuration providers for component: "
             + componentIdentifier));
@@ -461,8 +463,12 @@ public class ApplicationModel {
                   continue;
                 }
 
+                Map<String, String> configAttributes = new HashMap<>();
+                componentConfigLine.getConfigAttributes().forEach((key, value) -> {
+                  configAttributes.put(key, localResolver.resolveValue(value.getValue()).toString());
+                });
                 ConfigurationPropertiesProvider provider = providerFactoriesMap.get(componentIdentifier)
-                    .createProvider(componentConfigLine.getConfigAttributes(), localResolver, externalResourceProvider);
+                    .createProvider(configAttributes, externalResourceProvider);
                 if (provider instanceof Component) {
                   Component providerComponent = (Component) provider;
                   TypedComponentIdentifier typedComponentIdentifier = TypedComponentIdentifier.builder()
@@ -618,9 +624,9 @@ public class ApplicationModel {
           String key = configLine.getConfigAttributes().get("name").getValue();
           String rawValue = configLine.getConfigAttributes().get("value").getValue();
           globalProperties.put(key,
-                               new ConfigurationProperty(format("global-property - file: %s - lineNumber %s",
-                                                                configFile.getFilename(), configLine.getLineNumber()),
-                                                         key, rawValue));
+                               new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
+                                                                       configFile.getFilename(), configLine.getLineNumber()),
+                                                                key, rawValue));
         }
       });
     });

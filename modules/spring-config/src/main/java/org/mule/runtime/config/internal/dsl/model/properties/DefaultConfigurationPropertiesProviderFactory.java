@@ -14,8 +14,6 @@ import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute;
 
 import java.util.Map;
 
@@ -31,20 +29,17 @@ public class DefaultConfigurationPropertiesProviderFactory implements Configurat
       builder().namespace(CORE_PREFIX).name(CONFIGURATION_PROPERTIES_ELEMENT).build();
 
   @Override
-  public ComponentIdentifier getComponentIdentifier() {
+  public ComponentIdentifier getSupportedComponentIdentifier() {
     return CONFIGURATION_PROPERTIES;
   }
 
   @Override
-  public ConfigurationPropertiesProvider createProvider(Map<String, SimpleConfigAttribute> parameters,
-                                                        ConfigurationPropertiesResolver localResolver,
+  public ConfigurationPropertiesProvider createProvider(Map<String, String> parameters,
                                                         ResourceProvider externalResourceProvider) {
 
-    SimpleConfigAttribute file = parameters.get("file");
+    String file = parameters.get("file");
     Preconditions.checkArgument(file != null, "Required attribute 'file' of 'configuration-properties' not found");
 
-    return new DefaultConfigurationPropertiesProvider(
-                                                      localResolver.resolveValue(file.getValue()).toString(),
-                                                      externalResourceProvider);
+    return new DefaultConfigurationPropertiesProvider(file, externalResourceProvider);
   }
 }

@@ -65,7 +65,7 @@ import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolve
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
-import org.mule.runtime.config.api.dsl.model.config.RuntimeConfigurationException;
+import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.model.ApplicationModel;

@@ -6,60 +6,30 @@
  */
 package org.mule.runtime.config.api.dsl.model.properties;
 
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.component.Component;
 
 /**
  * Represents a configuration attribute.
  *
- * @since 4.0
+ * @since 4.1
  */
-public class ConfigurationProperty {
-
-  private Object source;
-  private Object rawValue;
-  private String key;
-
-  /**
-   * Creates a new configuration value
-   *
-   * @param source the source of this configuration attribute. For instance, it may be an {@link Component} if it's source was
-   *        defined in the artifact configuration or it may be the deployment properties configured at deployment time.
-   * @param key the key of the configuration attribute to reference it.
-   * @param rawValue the plain configuration value without resolution. A configuration value may contain reference to other
-   *        configuration attributes.
-   */
-  public ConfigurationProperty(Object source, String key, Object rawValue) {
-    checkNotNull(source, "source cannot be null");
-    checkNotNull(rawValue, "rawValue cannot be null");
-    checkNotNull(key, "key cannot be null");
-    this.source = source;
-    this.rawValue = rawValue;
-    this.key = key;
-  }
-
+public interface ConfigurationProperty {
 
   /**
    * @return the source of this configuration attribute. For instance, it may be an {@link Component} if it's source was defined
    *         in the artifact configuration or it may be the deployment properties configured at deployment time.
    */
-  public Object getSource() {
-    return source;
-  }
+  Object getSource();
 
   /**
    * @return the plain configuration value without resolution. A configuration value may contain reference to other configuration
    *         attributes.
    */
-  public Object getRawValue() {
-    return rawValue;
-  }
+  Object getRawValue();
 
   /**
    * @return the key of the configuration attribute to reference it.
    */
-  public String getKey() {
-    return key;
-  }
+  String getKey();
 
 }

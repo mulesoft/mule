@@ -4,14 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model.properties;
+package org.mule.runtime.config.internal.dsl.model.config;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentProvider;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.config.api.dsl.model.config.RuntimeConfigurationException;
 
 public class ConfigurationPropertiesException extends RuntimeConfigurationException implements ComponentProvider {
 

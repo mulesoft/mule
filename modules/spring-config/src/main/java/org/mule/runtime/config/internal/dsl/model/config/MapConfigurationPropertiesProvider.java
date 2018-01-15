@@ -42,7 +42,7 @@ public class MapConfigurationPropertiesProvider implements ConfigurationProperti
     if (value == null) {
       return empty();
     }
-    return of(new ConfigurationProperty(this, configurationAttributeKey, value));
+    return of(new DefaultConfigurationProperty(this, configurationAttributeKey, value));
   }
 
   @Override
