@@ -57,6 +57,8 @@ public class PolicyChain extends AbstractComponent
   private ReactiveProcessor chainWithMPs;
   private PolicyNotificationHelper notificationHelper;
 
+  private boolean propagateMessageTransformations;
+
   public void setProcessors(List<Processor> processors) {
     this.processors = processors;
   }
@@ -124,4 +126,11 @@ public class PolicyChain extends AbstractComponent
     return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
   }
 
+  public boolean isPropagateMessageTransformations() {
+    return propagateMessageTransformations;
+  }
+
+  public void setPropagateMessageTransformations(boolean propagateMessageTransformations) {
+    this.propagateMessageTransformations = propagateMessageTransformations;
+  }
 }
