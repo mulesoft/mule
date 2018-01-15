@@ -7,12 +7,14 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addPrimaryNodeParameter;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.ExtensionConstants;
 import org.mule.runtime.extension.api.annotation.source.PrimaryNodeOnly;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 /**
  * Adds a #{@link ExtensionConstants#PRIMARY_NODE_ONLY_PARAMETER_NAME} parameter on all sources for which
@@ -39,6 +41,9 @@ public class PrimaryNodeEnricher extends AbstractAnnotatedDeclarationEnricher {
   }
 
   private boolean isPrimaryNodeOnly(SourceDeclaration declaration) {
-    return extractAnnotation(declaration, PrimaryNodeOnly.class) != null;
+    return declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+        .map(ExtensionTypeDescriptorModelProperty::getType)
+        .map(type -> type.isAnnotatedWith(PrimaryNodeOnly.class))
+        .orElse(false);
   }
 }
