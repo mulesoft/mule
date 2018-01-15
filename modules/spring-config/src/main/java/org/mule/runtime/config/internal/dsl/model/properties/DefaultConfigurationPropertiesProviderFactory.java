@@ -19,6 +19,11 @@ import org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute;
 
 import java.util.Map;
 
+/**
+ * Builds the provider for the configuration-properties element.
+ *
+ * @since 4.1
+ */
 public class DefaultConfigurationPropertiesProviderFactory implements ConfigurationPropertiesProviderFactory {
 
   public static final String CONFIGURATION_PROPERTIES_ELEMENT = "configuration-properties";
