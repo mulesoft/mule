@@ -487,6 +487,12 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   }
 
   @Test
+  public void executeOperationWithExtensionsClient() throws Exception {
+    String result = (String) flowRunner("withClient").run().getMessage().getPayload().getValue();
+    assertThat(result, is("ADIOS, Juani"));
+  }
+
+  @Test
   public void operationWithAliasedParametersAsChild() throws Exception {
     Map<String, Weapon> value =
         (Map<String, Weapon>) flowRunner("operationWithAliasedParametersAsChild").run().getMessage().getPayload().getValue();

@@ -34,6 +34,8 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 
+import com.sun.org.apache.xalan.internal.lib.Extensions;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +49,8 @@ import javax.xml.namespace.QName;
 public class MuleExtensionUtils {
 
   private MuleExtensionUtils() {}
+
+  private static final String INITIALIZER_EVENT = "InitializerEvent";
 
   /**
    * Loads a extension model
@@ -157,7 +161,7 @@ public class MuleExtensionUtils {
         return null;
       }
     };
-    return InternalEvent.builder(create(flowConstruct, fromSingleComponent("InitializerEvent"))).message(of(null))
+    return InternalEvent.builder(create(flowConstruct, fromSingleComponent(INITIALIZER_EVENT))).message(of(null))
         .build();
   }
 

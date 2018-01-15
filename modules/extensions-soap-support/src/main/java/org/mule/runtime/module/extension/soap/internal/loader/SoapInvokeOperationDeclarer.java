@@ -28,6 +28,7 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
