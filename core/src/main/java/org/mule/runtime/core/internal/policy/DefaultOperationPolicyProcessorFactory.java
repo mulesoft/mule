@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import org.mule.runtime.core.api.policy.OperationPolicyProcessor;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.processor.Processor;

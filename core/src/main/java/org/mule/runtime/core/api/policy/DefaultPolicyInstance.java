@@ -41,6 +41,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
+import org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;

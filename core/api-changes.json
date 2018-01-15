@@ -29,6 +29,22 @@
           "methodName": "itemSequenceInfo",
           "elementKind": "method",
           "justification": "Method inherited from parent (Event). Needed in mule-api to bind data to DW"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.policy.OperationPolicyProcessor",
+          "package": "org.mule.runtime.core.api.policy",
+          "classSimpleName": "OperationPolicyProcessor",
+          "elementKind": "class",
+          "justification": "This class is not meant to be used by the user"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.policy.PolicyNextActionMessageProcessor",
+          "package": "org.mule.runtime.core.api.policy",
+          "classSimpleName": "PolicyNextActionMessageProcessor",
+          "elementKind": "class",
+          "justification": "This class is not meant to be used by the user"
         }
       ]
     }

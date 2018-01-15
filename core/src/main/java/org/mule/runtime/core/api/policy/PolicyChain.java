@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.api.policy;
 
+import static java.util.Optional.of;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.from;
 
@@ -28,7 +30,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.reactivestreams.Publisher;
@@ -65,10 +66,7 @@ public class PolicyChain extends AbstractComponent
 
   @Override
   public final void initialise() throws InitialisationException {
-    DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder().chain(processors);
-
-    chainBuilder.setProcessingStrategy(processingStrategy);
-    processorChain = chainBuilder.build();
+    processorChain = newChain(of(processingStrategy), processors);
     chainWithMPs = processingStrategy.onPipeline(processorChain);
     initialiseIfNeeded(processorChain, muleContext);
 
