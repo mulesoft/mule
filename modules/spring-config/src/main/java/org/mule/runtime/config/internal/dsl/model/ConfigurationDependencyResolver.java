@@ -10,7 +10,10 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.INNER;
+import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP_LEVEL;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
@@ -38,7 +41,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
 
   private final ApplicationModel applicationModel;
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
-  private List<String> missingGlobalElementNames = new ArrayList<>();
+  private List<DependencyNode> missingElementNames = new ArrayList<>();
 
   /**
    * Creates a new instance associated to a complete {@link ApplicationModel}.
@@ -54,15 +57,15 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
   }
 
-  private Set<String> resolveComponentModelDependencies(ComponentModel componentModel) {
-    final Set<String> otherRequiredGlobalComponents = resolveTopLevelComponentDependencies(componentModel);
+  private Set<DependencyNode> resolveComponentModelDependencies(ComponentModel componentModel) {
+    final Set<DependencyNode> otherRequiredGlobalComponents = resolveComponentDependencies(componentModel);
     return findComponentModelsDependencies(otherRequiredGlobalComponents);
   }
 
-  protected Set<String> resolveTopLevelComponentDependencies(ComponentModel requestedComponentModel) {
-    Set<String> otherDependencies = new HashSet<>();
+  protected Set<DependencyNode> resolveComponentDependencies(ComponentModel requestedComponentModel) {
+    Set<DependencyNode> otherDependencies = new HashSet<>();
     requestedComponentModel.getInnerComponents()
-        .stream().forEach(childComponent -> otherDependencies.addAll(resolveTopLevelComponentDependencies(childComponent)));
+        .stream().forEach(childComponent -> otherDependencies.addAll(resolveComponentDependencies(childComponent)));
     final Set<String> parametersReferencingDependencies = new HashSet<>();
     componentBuildingDefinitionRegistry.getBuildingDefinition(requestedComponentModel.getIdentifier())
         .ifPresent(buildingDefinition -> buildingDefinition.getAttributesDefinitions()
@@ -84,30 +87,39 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
 
     for (String parametersReferencingDependency : parametersReferencingDependencies) {
       if (requestedComponentModel.getParameters().containsKey(parametersReferencingDependency)) {
-        appendDependency(otherDependencies, requestedComponentModel, parametersReferencingDependency);
+        appendTopLevelDependency(otherDependencies, requestedComponentModel, parametersReferencingDependency);
       }
     }
 
     // Special cases for flow-ref and configuration
     if (isCoreComponent(requestedComponentModel.getIdentifier(), "flow-ref")) {
-      appendDependency(otherDependencies, requestedComponentModel, "name");
+      appendTopLevelDependency(otherDependencies, requestedComponentModel, "name");
+    } else if (isAggregatorComponent(requestedComponentModel, "aggregatorName")) {
+      // TODO (MULE-14429): use extensionModel to get the dependencies instead of ComponentBuildingDefinition to solve cases like this (flow-ref)
+      String name = requestedComponentModel.getParameters().get("aggregatorName");
+      DependencyNode dependency = new DependencyNode(name, INNER);
+      if (applicationModel.findNamedElement(name).isPresent()) {
+        otherDependencies.add(dependency);
+      } else {
+        missingElementNames.add(dependency);
+      }
     } else if (isCoreComponent(requestedComponentModel.getIdentifier(), "configuration")) {
-      appendDependency(otherDependencies, requestedComponentModel, "defaultErrorHandler-ref");
+      appendTopLevelDependency(otherDependencies, requestedComponentModel, "defaultErrorHandler-ref");
     }
 
     return otherDependencies;
   }
 
-  protected Set<String> findComponentModelsDependencies(Set<String> componentModelNames) {
-    Set<String> componentsToSearchDependencies = new HashSet<>(componentModelNames);
-    Set<String> foundDependencies = new LinkedHashSet<>();
-    Set<String> alreadySearchedDependencies = new HashSet<>();
+  protected Set<DependencyNode> findComponentModelsDependencies(Set<DependencyNode> componentModelNames) {
+    Set<DependencyNode> componentsToSearchDependencies = new HashSet<>(componentModelNames);
+    Set<DependencyNode> foundDependencies = new LinkedHashSet<>();
+    Set<DependencyNode> alreadySearchedDependencies = new HashSet<>();
     do {
       componentsToSearchDependencies.addAll(foundDependencies);
-      for (String componentModelName : componentsToSearchDependencies) {
-        if (!alreadySearchedDependencies.contains(componentModelName)) {
-          alreadySearchedDependencies.add(componentModelName);
-          foundDependencies.addAll(resolveTopLevelComponentDependencies(findRequiredComponentModel(componentModelName)));
+      for (DependencyNode dependencyNode : componentsToSearchDependencies) {
+        if (!alreadySearchedDependencies.contains(dependencyNode)) {
+          alreadySearchedDependencies.add(dependencyNode);
+          foundDependencies.addAll(resolveComponentDependencies(findRequiredComponentModel(dependencyNode.getComponentName())));
         }
       }
       foundDependencies.addAll(componentModelNames);
@@ -116,13 +128,14 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return foundDependencies;
   }
 
-  private void appendDependency(Set<String> otherDependencies, ComponentModel requestedComponentModel,
-                                String parametersReferencingDependency) {
-    String name = requestedComponentModel.getParameters().get(parametersReferencingDependency);
-    if (applicationModel.findTopLevelNamedElement(name).isPresent()) {
-      otherDependencies.add(name);
+  private void appendTopLevelDependency(Set<DependencyNode> otherDependencies, ComponentModel requestedComponentModel,
+                                        String parametersReferencingDependency) {
+    DependencyNode dependency =
+        new DependencyNode(requestedComponentModel.getParameters().get(parametersReferencingDependency), TOP_LEVEL);
+    if (applicationModel.findTopLevelNamedComponent(dependency.getComponentName()).isPresent()) {
+      otherDependencies.add(dependency);
     } else {
-      missingGlobalElementNames.add(name);
+      missingElementNames.add(dependency);
     }
   }
 
@@ -130,8 +143,13 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return componentIdentifier.getNamespace().equals(CORE_PREFIX) && componentIdentifier.getName().equals(name);
   }
 
+  private boolean isAggregatorComponent(ComponentModel componentModel, String referenceNameParameter) {
+    return componentModel.getIdentifier().getNamespace().equals("aggregators")
+        && componentModel.getParameters().containsKey(referenceNameParameter);
+  }
+
   private ComponentModel findRequiredComponentModel(String name) {
-    return applicationModel.findTopLevelNamedComponent(name)
+    return applicationModel.findNamedElement(name)
         .orElseThrow(() -> new NoSuchComponentModelException(createStaticMessage("No named component with name " + name)));
   }
 
@@ -164,10 +182,15 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
    * @return the dependencies of the component with component name {@code #componentName}. An empty collection if there is no
    *         component with such name.
    */
+  //TODO (MULE-14453: When creating ApplicationModel and ComponentModels inner beans should have a name so they can be later retrieved)
   public Collection<String> resolveComponentDependencies(String componentName) {
     try {
       ComponentModel requiredComponentModel = findRequiredComponentModel(componentName);
-      return resolveComponentModelDependencies(requiredComponentModel);
+      return resolveComponentModelDependencies(requiredComponentModel)
+          .stream()
+          .filter(dependencyNode -> dependencyNode.isTopLevel())
+          .map(dependencyNode -> dependencyNode.getComponentName())
+          .collect(toList());
     } catch (NoSuchComponentModelException e) {
       return emptyList();
     }
@@ -195,15 +218,15 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
   /**
    * @return the set of component names that must always be enabled.
    */
-  public Set<String> resolveAlwaysEnabledComponents() {
-    ImmutableSet.Builder<String> namesBuilder = ImmutableSet.builder();
+  public Set<DependencyNode> resolveAlwaysEnabledComponents() {
+    ImmutableSet.Builder<DependencyNode> namesBuilder = ImmutableSet.builder();
     this.applicationModel.executeOnEveryRootElement(componentModel -> {
       Optional<ComponentBuildingDefinition<?>> buildingDefinition =
           this.componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
       buildingDefinition.ifPresent(definition -> {
         if (definition.isAlwaysEnabled()) {
           if (componentModel.getNameAttribute() != null) {
-            namesBuilder.add(componentModel.getNameAttribute());
+            namesBuilder.add(new DependencyNode(componentModel.getNameAttribute(), TOP_LEVEL));
           }
         }
       });
@@ -211,7 +234,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return namesBuilder.build();
   }
 
-  public List<String> getMissingGlobalElementNames() {
-    return missingGlobalElementNames;
+  public List<DependencyNode> getMissingElementNames() {
+    return missingElementNames;
   }
 }
