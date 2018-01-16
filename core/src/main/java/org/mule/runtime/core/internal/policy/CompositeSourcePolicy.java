@@ -88,6 +88,7 @@ public class CompositeSourcePolicy extends
   @Override
   protected Publisher<CoreEvent> processNextOperation(CoreEvent event) {
     return just(event)
+        //        .doOnNext(coreEvent -> logExecuteNext(getCoreEventId(event), "Before execute-next", coreEvent.getContext().toString()))
         .flatMap(request -> from(processWithChildContext(request, flowExecutionProcessor, empty())))
         .map(flowExecutionResponse -> {
           originalResponseParameters =
@@ -99,6 +100,7 @@ public class CompositeSourcePolicy extends
           return CoreEvent.builder(event).message(message).build();
 
         })
+        //            .doOnNext(coreEvent -> logExecuteNext(getCoreEventId(event), "After execute-next", coreEvent.getContext().toString()))
         .onErrorMap(MessagingException.class, messagingException -> {
           originalFailureResponseParameters =
               getParametersProcessor().getFailedExecutionResponseParametersFunction().apply(messagingException.getEvent());
@@ -126,10 +128,11 @@ public class CompositeSourcePolicy extends
   @Override
   protected Publisher<CoreEvent> processPolicy(Policy policy, Processor nextProcessor, CoreEvent event) {
     return just(event)
-        .doOnNext(s -> logPolicy(getCoreEventId(event), getPolicyName(policy), getCoreEventAttributesAsString(event)))
+        .doOnNext(s -> logPolicy(getCoreEventId(event), getPolicyName(policy), getCoreEventAttributesAsString(event),
+                                 "Starting Policy "))
         .transform(sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor))
         .doOnNext(responseEvent -> logPolicy(getCoreEventId(responseEvent), getPolicyName(policy),
-                                             getCoreEventAttributesAsString(responseEvent)));
+                                             getCoreEventAttributesAsString(responseEvent), "At the end of the Policy "));
   }
 
   /**
@@ -188,10 +191,17 @@ public class CompositeSourcePolicy extends
     return concatMap;
   }
 
-  private void logPolicy(String eventId, String policyName, String message) {
+  private void logPolicy(String eventId, String policyName, String message, String startingMessage) {
     if (LOGGER.isTraceEnabled()) {
       //TODO Remove event id when first policy generates it. MULE-14455
-      LOGGER.trace("Event Id: " + eventId + ".\n Processing " + policyName + "\n" + message);
+      LOGGER.trace("Event Id: " + eventId + ".\n " + startingMessage + policyName + "\n" + message);
+    }
+  }
+
+  private void logExecuteNext(String eventId, String startingMessage, String message) {
+    if (LOGGER.isTraceEnabled()) {
+      //TODO Remove event id when first policy generates it. MULE-14455
+      LOGGER.trace("Event Id: " + eventId + ".\n " + startingMessage + ".\n" + message);
     }
   }
 

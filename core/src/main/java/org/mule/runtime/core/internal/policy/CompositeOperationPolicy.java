@@ -103,10 +103,10 @@ public class CompositeOperationPolicy extends
    */
   @Override
   protected Publisher<CoreEvent> processNextOperation(CoreEvent event) {
-    return just(event).doOnNext(s -> logOperationEvent("Before operation execution\n", event.getContext(), event.getMessage()))
+    return just(event).doOnNext(s -> logOperationEvent("Before operation execute-next\n", event.getContext(), event.getMessage()))
         .transform(nextOperation).doOnNext(response -> {
           this.nextOperationResponse = response;
-          logOperationEvent("After operation execution\n", response.getContext(), response.getMessage());
+          logOperationEvent("After operation execute-next\n", response.getContext(), response.getMessage());
         });
   }
 
@@ -127,6 +127,8 @@ public class CompositeOperationPolicy extends
     Processor defaultOperationPolicy =
         operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor);
     return just(event).transform(defaultOperationPolicy)
+        //        .doOnNext(coreEvent -> logPolicy(event.getContext().getId(), policy.getPolicyId(),
+        //                                         coreEvent.getMessage().getAttributes().getValue().toString(), "Before Operation"))
         .map(policyResponse -> {
 
           if (policy.getPolicyChain().isPropagateMessageTransformations()) {
@@ -136,6 +138,8 @@ public class CompositeOperationPolicy extends
 
           return nextOperationResponse;
         });
+    //        .doOnNext(coreEvent -> logPolicy(event.getContext().getId(), policy.getPolicyId(),
+    //                                         coreEvent.getMessage().getAttributes().getValue().toString(), "After Operation"));
   }
 
   @Override
@@ -155,6 +159,13 @@ public class CompositeOperationPolicy extends
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace(startingMessage + eventContext.toString() + "\n"
           + message.getAttributes().getValue().toString());
+    }
+  }
+
+  private void logPolicy(String eventId, String policyName, String message, String startingMessage) {
+    if (LOGGER.isTraceEnabled()) {
+      //TODO Remove event id when first policy generates it. MULE-14455
+      LOGGER.trace("Event Id: " + eventId + ".\n " + startingMessage + policyName + "\n" + message);
     }
   }
 }
