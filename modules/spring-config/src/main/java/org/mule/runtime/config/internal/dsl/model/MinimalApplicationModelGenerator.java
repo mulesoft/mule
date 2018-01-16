@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP_LEVEL;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -15,6 +17,7 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -83,25 +86,23 @@ public class MinimalApplicationModelGenerator {
    */
   private void enableComponentDependencies(ComponentModel requestedComponentModel) {
     final String requestComponentModelName = requestedComponentModel.getNameAttribute();
-    final Set<String> componentDependencies = dependencyResolver.resolveTopLevelComponentDependencies(requestedComponentModel);
-    final Set<String> alwaysEnabledComponents = dependencyResolver.resolveAlwaysEnabledComponents();
-    final ImmutableSet.Builder<String> otherRequiredGlobalComponentsSetBuilder =
-        ImmutableSet.<String>builder().addAll(componentDependencies).addAll(alwaysEnabledComponents);
+    final Set<DependencyNode> componentDependencies = dependencyResolver.resolveComponentDependencies(requestedComponentModel);
+    final Set<DependencyNode> alwaysEnabledComponents = dependencyResolver.resolveAlwaysEnabledComponents();
+    final ImmutableSet.Builder<DependencyNode> otherRequiredGlobalComponentsSetBuilder =
+        ImmutableSet.<DependencyNode>builder().addAll(componentDependencies).addAll(alwaysEnabledComponents);
     if (requestComponentModelName != null
-        && dependencyResolver.getApplicationModel().findNamedElement(requestComponentModelName).isPresent()) {
-      otherRequiredGlobalComponentsSetBuilder.add(requestComponentModelName);
+        && dependencyResolver.getApplicationModel().findTopLevelNamedComponent(requestComponentModelName).isPresent()) {
+      otherRequiredGlobalComponentsSetBuilder.add(new DependencyNode(requestComponentModelName, TOP_LEVEL));
     }
+    Set<DependencyNode> allRequiredComponentModels = resolveDependencies(otherRequiredGlobalComponentsSetBuilder.build());
+    enableTopLevelElementDependencies(allRequiredComponentModels);
+    enableInnerElementDependencies(allRequiredComponentModels);
 
-    Set<String> allRequiredComponentModels = resolveDependencies(otherRequiredGlobalComponentsSetBuilder.build());
-
-    dependencyResolver.getApplicationModel().executeOnEveryComponentTree(componentModel -> {
-      if (!componentModel.isEnabled() && componentModel.getNameAttribute() != null
-          && allRequiredComponentModels.contains(componentModel.getNameAttribute())) {
-        componentModel.setEnabled(true);
-        componentModel.executedOnEveryInnerComponent(component -> component.setEnabled(true));
-        enableParentComponentModels(componentModel);
-      }
-    });
+    ComponentModel parentModel = requestedComponentModel.getParent();
+    while (parentModel != null && parentModel.getParent() != null) {
+      parentModel.setEnabled(true);
+      parentModel = parentModel.getParent();
+    }
 
     // Finally we set the requested componentModel as enabled as it could have been disabled when traversing dependencies
     requestedComponentModel.setEnabled(true);
@@ -110,6 +111,38 @@ public class MinimalApplicationModelGenerator {
 
     // Mule root component model has to be enabled too
     this.dependencyResolver.getApplicationModel().getRootComponentModel().setEnabled(true);
+  }
+
+  private void enableInnerElementDependencies(Set<DependencyNode> allRequiredComponentModels) {
+    Set<String> noneTopLevelDendencyNames = allRequiredComponentModels.stream()
+        .filter(dependencyNode -> !dependencyNode.isTopLevel())
+        .map(dependencyNode -> dependencyNode.getComponentName())
+        .collect(toSet());
+    dependencyResolver.getApplicationModel().executeOnEveryComponentTree(componentModel -> {
+      if (!componentModel.isEnabled() && componentModel.getNameAttribute() != null
+          && noneTopLevelDendencyNames.contains(componentModel.getNameAttribute())) {
+        componentModel.setEnabled(true);
+        componentModel.executedOnEveryInnerComponent(component -> component.setEnabled(true));
+        enableParentComponentModels(componentModel);
+      }
+    });
+  }
+
+  private void enableTopLevelElementDependencies(Set<DependencyNode> allRequiredComponentModels) {
+    Set<String> topLevelDendencyNames = allRequiredComponentModels.stream()
+        .filter(dependencyNode -> dependencyNode.isTopLevel())
+        .map(dependencyNode -> dependencyNode.getComponentName())
+        .collect(toSet());
+
+    Iterator<ComponentModel> iterator =
+        dependencyResolver.getApplicationModel().getRootComponentModel().getInnerComponents().iterator();
+    while (iterator.hasNext()) {
+      ComponentModel componentModel = iterator.next();
+      if (componentModel.getNameAttribute() != null && topLevelDendencyNames.contains(componentModel.getNameAttribute())) {
+        componentModel.setEnabled(true);
+        componentModel.executedOnEveryInnerComponent(component -> component.setEnabled(true));
+      }
+    }
   }
 
   private void enableParentComponentModels(ComponentModel requestedComponentModel) {
@@ -126,16 +159,16 @@ public class MinimalApplicationModelGenerator {
    * @param initialComponents {@ling Set} of initial components to retrieve their dependencies
    * @return a new {@ling Set} with all the dependencies needed to run all the initial components
    */
-  private Set<String> resolveDependencies(Set<String> initialComponents) {
-    Set<String> difference = initialComponents;
-    Set<String> allRequiredComponentModels = new HashSet<>(initialComponents);
+  private Set<DependencyNode> resolveDependencies(Set<DependencyNode> initialComponents) {
+    Set<DependencyNode> difference = initialComponents;
+    Set<DependencyNode> allRequiredComponentModels = new HashSet<>(initialComponents);
 
     // While there are new dependencies resolved, calculate their dependencies
     // This fixes bugs related to not resolving dependencies of dependencies, such as a config for a config
     // e.g. tlsContext for http request, or a flow-ref inside a flow that is being referenced in another flow.
     while (difference.size() > 0) {
       // Only calculate the dependencies for the difference, to avoid recalculating
-      Set<String> newDependencies = dependencyResolver.findComponentModelsDependencies(difference);
+      Set<DependencyNode> newDependencies = dependencyResolver.findComponentModelsDependencies(difference);
       newDependencies.removeAll(allRequiredComponentModels);
       allRequiredComponentModels.addAll(newDependencies);
       difference = newDependencies;

@@ -14,6 +14,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -100,7 +101,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -530,9 +530,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
             .collect(toList()));
     registerObjectFromObjectProviders(beanFactory);
 
-    Set<String> alwaysEnabledComponents = dependencyResolver.resolveAlwaysEnabledComponents();
+    Set<String> alwaysEnabledComponents = dependencyResolver.resolveAlwaysEnabledComponents().stream()
+        .map(dependencyNode -> dependencyNode.getComponentName())
+        .collect(toSet());
     Set<String> objectProviderNames = objectProvidersByName.stream().map(Pair::getSecond).filter(Optional::isPresent)
-        .map(Optional::get).collect(Collectors.toSet());
+        .map(Optional::get).collect(toSet());
 
     // Put object providers first, then always enabled components, then the rest
     createdComponentModels.sort(Comparator.comparing(beanName -> {
