@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+         http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+
+    <flow name="transactional-exception-strategy-main-appFlow">
+        <transactional action="ALWAYS_BEGIN">
+            <logger/>
+            <exception-strategy ref="exception-strategy-flowChoice_Exception_Strategy"/>
+        </transactional>
+    </flow>
+
+    <choice-exception-strategy name="exception-strategy-flowChoice_Exception_Strategy">
+        <catch-exception-strategy>
+            <flow-ref name="exception-strategy-subflowSub_Flow"/>
+        </catch-exception-strategy>
+    </choice-exception-strategy>
+
+    <sub-flow name="exception-strategy-subflowSub_Flow">
+        <custom-processor class="org.mule.issues.TxPropagatesFlowToExceptionHandlerFlowTestCase$WithFlowConstructProcessor" />
+    </sub-flow></mule>
+        

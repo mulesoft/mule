@@ -9,6 +9,8 @@ package org.mule.processor;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.execution.ExecutionCallback;
@@ -31,7 +33,7 @@ import org.mule.util.NotificationUtils;
  * the {@link org.mule.api.transaction.TransactionConfig} is null then no transaction is used and the next
  * {@link org.mule.api.processor.MessageProcessor} is invoked directly.
  */
-public class TransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle, MuleContextAware
+public class TransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle, MuleContextAware, FlowConstructAware
 {
     protected MessagingExceptionHandler exceptionListener;
     protected MuleTransactionConfig transactionConfig;
@@ -125,6 +127,15 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
         if(next instanceof MessageProcessorChain) //If this is no checked, the cast raises exception
         {
             NotificationUtils.addMessageProcessorPathElements(((MessageProcessorChain) next).getMessageProcessors(), pathElement);
+        }
+    }
+    
+    @Override
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        if (this.exceptionListener != null && this.exceptionListener instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware)(this.exceptionListener)).setFlowConstruct(flowConstruct);
         }
     }
 }
