@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.function;
 
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.metadata.DataType.fromObject;
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
 import org.mule.runtime.api.el.BindingContext;
@@ -22,10 +26,15 @@ import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -52,7 +61,10 @@ public class ReflectiveExpressionFunctionExecutor implements Lifecycle, Function
   private final Function<Object[], Object[]> parametersResolver;
 
   @Inject
-  MuleContext muleContext;
+  private MuleContext muleContext;
+
+  @Inject
+  private TransformationService transformationService;
 
   public ReflectiveExpressionFunctionExecutor(FunctionModel model, DataType returnType,
                                               List<FunctionParameter> functionParameters, Method method,
@@ -103,22 +115,15 @@ public class ReflectiveExpressionFunctionExecutor implements Lifecycle, Function
   }
 
   private Function<Object[], Object[]> getTypedValueArgumentsResolver(Method method) {
-    final Function<Object, Object> wrapper = value -> (value == null || value instanceof TypedValue)
-        ? value
-        : new TypedValue<>(value, DataType.fromObject(value));
-
-    final Function<Object, Object> unwrapper = value -> value instanceof TypedValue
-        ? ((TypedValue) value).getValue()
-        : value;
-
-    final Class<?>[] parameterTypes = method.getParameterTypes();
-    final Function<Object, Object>[] resolvers = new Function[parameterTypes.length];
-
-    for (int i = 0; i < parameterTypes.length; i++) {
-      if (TypedValue.class.isAssignableFrom(parameterTypes[i])) {
-        resolvers[i] = wrapper;
+    Parameter[] parameters = method.getParameters();
+    final Function<Object, Object>[] resolvers = new Function[parameters.length];
+    for (int i = 0; i < parameters.length; i++) {
+      Parameter parameter = parameters[i];
+      Class<?> type = parameter.getType();
+      if (TypedValue.class.isAssignableFrom(type)) {
+        resolvers[i] = getWrapper(parameter);
       } else {
-        resolvers[i] = unwrapper;
+        resolvers[i] = getUnWrapper(type);
       }
     }
 
@@ -138,6 +143,59 @@ public class ReflectiveExpressionFunctionExecutor implements Lifecycle, Function
 
       return values;
     };
+  }
+
+  private Function<Object, Object> getWrapper(Parameter parameter) {
+    Type[] generics = parameter.getType().getGenericInterfaces();
+    Class<?> type;
+    if (generics.length == 0) {
+      type = Object.class;
+    } else {
+      type = model.getAllParameterModels().stream()
+          .filter(p -> p.getModelProperty(ImplementingParameterModelProperty.class)
+              .map(mp -> mp.getParameter().getName().equals(parameter.getName()))
+              .orElse(false))
+          .map(p -> getType(p.getType()).orElse(Object.class))
+          .findFirst()
+          .orElseThrow(() -> new IllegalStateException(format("Missing parameter with name [%s]", parameter.getName())));
+    }
+
+    DataType expected = DataType.fromType(type);
+
+    return value -> {
+      if (value == null) {
+        return null;
+      }
+
+      if (value instanceof TypedValue) {
+        if (((TypedValue) value).getDataType().equals(DataType.TYPED_VALUE)) {
+          // DW will wrap anything of type TypedValue in a new TypedValue with DataType.TYPED_VALUE
+          value = ((TypedValue) value).getValue();
+        }
+
+        TypedValue typedValue = (TypedValue) value;
+        // We have to check for transformations of the value because weave won't be able to validate types
+        return type.isInstance(typedValue.getValue())
+            ? value
+            : new TypedValue<>(transformationService.transform(typedValue.getValue(), typedValue.getDataType(), expected),
+                               typedValue.getDataType());
+      } else {
+
+        return new TypedValue<>(value, fromObject(value));
+      }
+    };
+  }
+
+  private Function<Object, Object> getUnWrapper(Class<?> parameterType) {
+    DataType expected = fromType(parameterType);
+    return value -> doUnWrap(value, expected);
+  }
+
+  private Object doUnWrap(Object value, DataType expected) {
+    return value instanceof TypedValue
+        ? doUnWrap(((TypedValue) value).getValue(), expected)
+        : ClassUtils.isInstance(expected.getType(), value) ? value
+            : transformationService.transform(value, fromObject(value), expected);
   }
 
 }
