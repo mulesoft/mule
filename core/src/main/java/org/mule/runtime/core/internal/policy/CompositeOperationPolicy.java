@@ -9,12 +9,10 @@ package org.mule.runtime.core.internal.policy;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -22,14 +20,12 @@ import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.reactivestreams.Publisher;
 
 /**
  * {@link OperationPolicy} created from a list of {@link Policy}.
@@ -40,8 +36,6 @@ import java.util.Optional;
  */
 public class CompositeOperationPolicy extends
     AbstractCompositePolicy<OperationPolicyParametersTransformer, OperationParametersProcessor> implements OperationPolicy {
-
-  private static final Logger LOGGER = getLogger(CompositeOperationPolicy.class);
 
 
   private final Processor nextOperation;
@@ -103,11 +97,7 @@ public class CompositeOperationPolicy extends
    */
   @Override
   protected Publisher<CoreEvent> processNextOperation(CoreEvent event) {
-    return just(event).doOnNext(s -> logOperationEvent("Before operation execute-next\n", event.getContext(), event.getMessage()))
-        .transform(nextOperation).doOnNext(response -> {
-          this.nextOperationResponse = response;
-          logOperationEvent("After operation execute-next\n", response.getContext(), response.getMessage());
-        });
+    return just(event).transform(nextOperation).doOnNext(response -> this.nextOperationResponse = response);
   }
 
   /**
@@ -127,8 +117,6 @@ public class CompositeOperationPolicy extends
     Processor defaultOperationPolicy =
         operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor);
     return just(event).transform(defaultOperationPolicy)
-        //        .doOnNext(coreEvent -> logPolicy(event.getContext().getId(), policy.getPolicyId(),
-        //                                         coreEvent.getMessage().getAttributes().getValue().toString(), "Before Operation"))
         .map(policyResponse -> {
 
           if (policy.getPolicyChain().isPropagateMessageTransformations()) {
@@ -138,8 +126,6 @@ public class CompositeOperationPolicy extends
 
           return nextOperationResponse;
         });
-    //        .doOnNext(coreEvent -> logPolicy(event.getContext().getId(), policy.getPolicyId(),
-    //                                         coreEvent.getMessage().getAttributes().getValue().toString(), "After Operation"));
   }
 
   @Override
@@ -152,20 +138,6 @@ public class CompositeOperationPolicy extends
                                      empty());
     } catch (Exception e) {
       return error(e);
-    }
-  }
-
-  private void logOperationEvent(String startingMessage, EventContext eventContext, Message message) {
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace(startingMessage + eventContext.toString() + "\n"
-          + message.getAttributes().getValue().toString());
-    }
-  }
-
-  private void logPolicy(String eventId, String policyName, String message, String startingMessage) {
-    if (LOGGER.isTraceEnabled()) {
-      //TODO Remove event id when first policy generates it. MULE-14455
-      LOGGER.trace("Event Id: " + eventId + ".\n " + startingMessage + policyName + "\n" + message);
     }
   }
 }

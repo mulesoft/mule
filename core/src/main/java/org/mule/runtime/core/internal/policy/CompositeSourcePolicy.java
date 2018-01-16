@@ -88,7 +88,6 @@ public class CompositeSourcePolicy extends
   @Override
   protected Publisher<CoreEvent> processNextOperation(CoreEvent event) {
     return just(event)
-        //        .doOnNext(coreEvent -> logExecuteNext(getCoreEventId(event), "Before execute-next", coreEvent.getContext().toString()))
         .flatMap(request -> from(processWithChildContext(request, flowExecutionProcessor, empty())))
         .map(flowExecutionResponse -> {
           originalResponseParameters =
@@ -100,7 +99,6 @@ public class CompositeSourcePolicy extends
           return CoreEvent.builder(event).message(message).build();
 
         })
-        //            .doOnNext(coreEvent -> logExecuteNext(getCoreEventId(event), "After execute-next", coreEvent.getContext().toString()))
         .onErrorMap(MessagingException.class, messagingException -> {
           originalFailureResponseParameters =
               getParametersProcessor().getFailedExecutionResponseParametersFunction().apply(messagingException.getEvent());
@@ -128,11 +126,11 @@ public class CompositeSourcePolicy extends
   @Override
   protected Publisher<CoreEvent> processPolicy(Policy policy, Processor nextProcessor, CoreEvent event) {
     return just(event)
-        .doOnNext(s -> logPolicy(getCoreEventId(event), getPolicyName(policy), getCoreEventAttributesAsString(event),
-                                 "Starting Policy "))
+        .doOnNext(s -> logEvent(getCoreEventId(event), getPolicyName(policy), getCoreEventAttributesAsString(event),
+                                "Starting Policy "))
         .transform(sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor))
-        .doOnNext(responseEvent -> logPolicy(getCoreEventId(responseEvent), getPolicyName(policy),
-                                             getCoreEventAttributesAsString(responseEvent), "At the end of the Policy "));
+        .doOnNext(responseEvent -> logEvent(getCoreEventId(responseEvent), getPolicyName(policy),
+                                            getCoreEventAttributesAsString(responseEvent), "At the end of the Policy "));
   }
 
   /**
@@ -191,17 +189,10 @@ public class CompositeSourcePolicy extends
     return concatMap;
   }
 
-  private void logPolicy(String eventId, String policyName, String message, String startingMessage) {
+  private void logEvent(String eventId, String policyName, String message, String startingMessage) {
     if (LOGGER.isTraceEnabled()) {
       //TODO Remove event id when first policy generates it. MULE-14455
-      LOGGER.trace("Event Id: " + eventId + ".\n " + startingMessage + policyName + "\n" + message);
-    }
-  }
-
-  private void logExecuteNext(String eventId, String startingMessage, String message) {
-    if (LOGGER.isTraceEnabled()) {
-      //TODO Remove event id when first policy generates it. MULE-14455
-      LOGGER.trace("Event Id: " + eventId + ".\n " + startingMessage + ".\n" + message);
+      LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + policyName + "\n" + message);
     }
   }
 
@@ -210,24 +201,27 @@ public class CompositeSourcePolicy extends
   }
 
   private String getCoreEventAttributesAsString(CoreEvent event) {
+    if (event.getMessage() == null || event.getMessage().getAttributes() == null) {
+      return "";
+    }
     return event.getMessage().getAttributes().getValue().toString();
   }
 
   private String getPolicyName(Policy policy) {
-    return policy.getPolicyChain().getRootContainerLocation().getGlobalName();
+    return policy.getPolicyId();
   }
 
   private void logSourcePolicySuccessfullResult(SourcePolicySuccessResult result) {
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("Event id: " + result.getResult().getContext().getId() + " finished processing. \n" +
-          result.getResult().getMessage().getAttributes().getValue().toString());
+      LOGGER.trace("Event id: " + result.getResult().getContext().getId() + "\nFinished processing. \n" +
+          getCoreEventAttributesAsString(result.getResult()));
     }
   }
 
   private void logSourcePolicyFailureResult(SourcePolicyFailureResult result) {
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("Event id: " + result.getMessagingException().getEvent().getContext().getId()
-          + " finished processing with failure. \n" +
+          + "\nFinished processing with failure. \n" +
           "Error message: " + result.getMessagingException().getMessage());
     }
   }
