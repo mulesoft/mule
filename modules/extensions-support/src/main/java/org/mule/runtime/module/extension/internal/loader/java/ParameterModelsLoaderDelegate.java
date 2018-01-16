@@ -256,11 +256,8 @@ public final class ParameterModelsLoaderDelegate {
 
     declarer.withDslInlineRepresentation(groupAnnotation.showInDsl());
 
-    DisplayName displayName = groupParameter.getAnnotation(DisplayName.class).orElse(null);
-
-    if (displayName != null) {
-      declarer.withDisplayModel(DisplayModel.builder().displayName(displayName.value()).build());
-    }
+    groupParameter.getAnnotation(DisplayName.class)
+        .ifPresent(displayName -> declarer.withDisplayModel(DisplayModel.builder().displayName(displayName.value()).build()));
 
     parseLayoutAnnotations(groupParameter, LayoutModel.builder()).ifPresent(declarer::withLayout);
 
