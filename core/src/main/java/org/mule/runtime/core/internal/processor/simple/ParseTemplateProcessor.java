@@ -60,7 +60,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   @Override
   public CoreEvent process(CoreEvent event) {
     evaluateCorrectArguments();
-    Object result = muleContext.getExpressionManager().parse(content, event, null);
+    Object result = muleContext.getExpressionManager().parseLogTemplate(content, event, null, null);
     Message resultMessage = Message.builder(event.getMessage()).value(result).nullAttributesValue().build();
     if (target == null) {
       return CoreEvent.builder(event).message(resultMessage).build();
