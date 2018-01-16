@@ -176,9 +176,8 @@ public class HeisenbergOperations implements Disposable {
     return transformation;
   }
 
-  public void disguice(@ParameterGroup(name = "currentLook") @DisplayName("Current look") BarberPreferences currentLook,
-                       @ParameterGroup(name = "disguise",
-                           showInDsl = true) @DisplayName("Disguise look") BarberPreferences disguise) {
+  public void disguice(@ParameterGroup(name = "currentLook") @DisplayName("Look") BarberPreferences currentLook,
+                       @ParameterGroup(name = "disguise", showInDsl = true) @DisplayName("Look") BarberPreferences disguise) {
 
   }
 

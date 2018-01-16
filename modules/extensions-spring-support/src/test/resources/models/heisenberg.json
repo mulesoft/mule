@@ -14297,7 +14297,7 @@
           "showInDsl": false,
           "name": "currentLook",
           "displayModel": {
-            "displayName": "Current look"
+            "displayName": "Look"
           },
           "description": "",
           "modelProperties": {}
@@ -14382,7 +14382,7 @@
           "showInDsl": true,
           "name": "disguise",
           "displayModel": {
-            "displayName": "Disguise look"
+            "displayName": "Look"
           },
           "description": "",
           "modelProperties": {}
