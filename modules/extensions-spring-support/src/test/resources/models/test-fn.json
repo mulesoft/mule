@@ -1138,7 +1138,7 @@
                 "query": false
               },
               "allowedStereotypeModels": [],
-              "name": "object",
+              "name": "notObject",
               "description": "",
               "modelProperties": {}
             },

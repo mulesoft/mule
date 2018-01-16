@@ -6,14 +6,13 @@
  */
 package org.mule.test.module.extension;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.DataType.XML_STRING;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -138,7 +137,6 @@ public class FunctionExecutionTestCase extends AbstractExtensionFunctionalTestCa
     List<Object> values = payload.getValue();
     assertThat(values, hasSize(4));
     assertThat(getValue(values.get(0)), is(xmlString));
-    assertThat(getValue(values.get(0)), is(xmlString));
     assertThat(getValue(values.get(1)), is(xmlString));
     assertThat(getValue(values.get(2)), is(jsonStream));
     assertThat(getValue(values.get(3)), is(knockeableDoor));
@@ -146,8 +144,8 @@ public class FunctionExecutionTestCase extends AbstractExtensionFunctionalTestCa
 
   @Test
   public void typedInputStream() throws Exception {
-    Message result = flowRunner("typedInputStream").run().getMessage();
-    assertThat(result, is(notNullValue()));
+    String result = (String) flowRunner("typedInputStream").run().getMessage().getPayload().getValue();
+    assertThat(result, containsString("employees"));
   }
 
   private InputStream getDocumentStream() {

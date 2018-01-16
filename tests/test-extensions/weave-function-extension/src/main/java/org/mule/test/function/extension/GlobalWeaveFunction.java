@@ -57,7 +57,7 @@ public class GlobalWeaveFunction implements Initialisable {
     return stream;
   }
 
-  public List<Object> withTypedValues(@Optional TypedValue<Object> object,
+  public List<Object> withTypedValues(@Alias("notObject") @Optional TypedValue<Object> object,
                                       @Optional TypedValue<String> string,
                                       @Optional TypedValue<InputStream> stream,
                                       @Optional TypedValue<KnockeableDoor> door) {
