@@ -12,13 +12,16 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isTypedValue;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.base.Defaults;
 
@@ -54,7 +57,8 @@ public final class ReflectiveFunctionExecutorFactory<T> implements FunctionExecu
                                                                                functionModel.getName())))));
 
     List<FunctionParameter> functionParameters = functionModel.getAllParameterModels().stream().map(p -> {
-      DataType type = IntrospectionUtils.toDataType(p.getType());
+      MetadataType paramType = p.getType();
+      DataType type = isTypedValue(paramType) ? fromType(TypedValue.class) : toDataType(paramType);
       if (p.isRequired()) {
         return new FunctionParameter(p.getName(), type);
       }

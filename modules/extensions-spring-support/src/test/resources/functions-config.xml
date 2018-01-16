@@ -60,4 +60,11 @@
         </fn:evaluate>
     </flow>
 
+    <flow name="typedInputStream">
+        <set-payload value="#[output application/xml encoding='UTF-8' --- employees: { employee: {name: 'Jhon', lastName: 'Doe'}}]"/>
+        <fn:evaluate>
+            <fn:payload>#[Fn::typedInputStream(payload)]</fn:payload>
+        </fn:evaluate>
+    </flow>
+
 </mule>

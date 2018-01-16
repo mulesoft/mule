@@ -45,12 +45,16 @@ public class GlobalWeaveFunction implements Initialisable {
       xPathFactory = XPathFactory.newInstance();
     }
     if (manager == null) {
-      throw new InitialisationException(createStaticMessage("Expected ExpressionManager to be inected but was null"), this);
+      throw new InitialisationException(createStaticMessage("Expected ExpressionManager to be injected but was null"), this);
     }
   }
 
   public String customEcho(String echo) {
     return echo;
+  }
+
+  public TypedValue<InputStream> typedInputStream(@Optional TypedValue<InputStream> stream) {
+    return stream;
   }
 
   public List<Object> withTypedValues(@Optional TypedValue<Object> object,

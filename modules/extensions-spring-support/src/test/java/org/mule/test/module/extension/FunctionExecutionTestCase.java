@@ -8,10 +8,12 @@ package org.mule.test.module.extension;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.DataType.XML_STRING;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -26,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.NodeList;
 
@@ -51,7 +52,7 @@ public class FunctionExecutionTestCase extends AbstractExtensionFunctionalTestCa
   }
 
   @Test
-  public void echoFromManager() throws Exception {
+  public void echoFromManager() {
     TypedValue result = expressionManager.evaluate("Fn::defaultPrimitives()");
     assertThat(result.getValue(), is("SUCCESS"));
   }
@@ -106,7 +107,7 @@ public class FunctionExecutionTestCase extends AbstractExtensionFunctionalTestCa
             .withVariable("xmlPayload", getDocumentStream())
             .run().getMessage().getPayload().getValue();
     assertThat(value, instanceOf(NodeList.class));
-    assertThat(((NodeList) value).getLength(), is(9));
+    assertThat(((NodeList) value).getLength(), is(10));
   }
 
   @Test
@@ -120,28 +121,6 @@ public class FunctionExecutionTestCase extends AbstractExtensionFunctionalTestCa
   }
 
   @Test
-  public void executeWithNonWrappedParameters() throws Exception {
-    final String xmlString = IOUtils.toString(getDocumentStream());
-    final InputStream jsonStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("models/subtypes.json");
-    final KnockeableDoor knockeableDoor = new KnockeableDoor("Ricky", "Universe 137");
-
-    TypedValue<List<Object>> payload = flowRunner("typedValueFunction")
-        .withPayload(xmlString)
-        .withVariable("xmlString", xmlString)
-        .withVariable("jsonStream", jsonStream)
-        .withVariable("door", knockeableDoor)
-        .run().getMessage().getPayload();
-
-    List<Object> values = payload.getValue();
-    assertThat(values, hasSize(4));
-    assertThat(getValue(values.get(0)), is(xmlString));
-    assertThat(getValue(values.get(1)), is(xmlString));
-    assertThat(getValue(values.get(2)), is(jsonStream));
-    assertThat(getValue(values.get(3)), is(knockeableDoor));
-  }
-
-  @Test
-  @Ignore("MDF-306: Invalid type comparison when invoking Java written functions with TypedValue parameters")
   public void executeWithTypedValueParameters() throws Exception {
     final String xmlString = IOUtils.toString(getDocumentStream());
     final InputStream jsonStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("models/subtypes.json");
@@ -159,17 +138,16 @@ public class FunctionExecutionTestCase extends AbstractExtensionFunctionalTestCa
     List<Object> values = payload.getValue();
     assertThat(values, hasSize(4));
     assertThat(getValue(values.get(0)), is(xmlString));
+    assertThat(getValue(values.get(0)), is(xmlString));
     assertThat(getValue(values.get(1)), is(xmlString));
     assertThat(getValue(values.get(2)), is(jsonStream));
     assertThat(getValue(values.get(3)), is(knockeableDoor));
   }
 
   @Test
-  @Ignore("MDF-306: Invalid type comparison when invoking Java written functions with TypedValue parameters")
-  public void transformValue() throws Exception {
-    List<Object> transformValues = (List<Object>) flowRunner("transformValue").run().getMessage().getPayload().getValue();
-    assertThat(transformValues, hasSize(4));
-    assertThat(getValue(transformValues.get(1)), is(instanceOf(InputStream.class)));
+  public void typedInputStream() throws Exception {
+    Message result = flowRunner("typedInputStream").run().getMessage();
+    assertThat(result, is(notNullValue()));
   }
 
   private InputStream getDocumentStream() {
