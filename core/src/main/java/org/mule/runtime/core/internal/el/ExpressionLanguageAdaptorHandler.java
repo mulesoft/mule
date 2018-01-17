@@ -27,6 +27,8 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +47,8 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
 
   private final Pattern exprPrefixPattern;
   private Map<String, ExtendedExpressionLanguageAdaptor> expressionLanguages;
+  private ConcurrentMap<String, ExtendedExpressionLanguageAdaptor> expressionLanguagesByExpressionCache =
+      new ConcurrentHashMap<>();
 
   private boolean melDefault = false;
 
@@ -147,20 +151,22 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   private ExtendedExpressionLanguageAdaptor selectExpressionLanguage(String expression) {
-    final String languagePrefix = getLanguagePrefix(expression);
-    if (isEmpty(languagePrefix)) {
-      if (melDefault) {
-        return expressionLanguages.get(MEL_PREFIX);
+    return expressionLanguagesByExpressionCache.computeIfAbsent(expression, e -> {
+      final String languagePrefix = getLanguagePrefix(expression);
+      if (isEmpty(languagePrefix)) {
+        if (melDefault) {
+          return expressionLanguages.get(MEL_PREFIX);
+        } else {
+          return expressionLanguages.get(DW_PREFIX);
+        }
       } else {
-        return expressionLanguages.get(DW_PREFIX);
+        ExtendedExpressionLanguageAdaptor extendedExpressionLanguageAdaptor = expressionLanguages.get(languagePrefix);
+        if (extendedExpressionLanguageAdaptor == null) {
+          throw new IllegalStateException(format("There is no expression language registered for '%s'", languagePrefix));
+        }
+        return extendedExpressionLanguageAdaptor;
       }
-    } else {
-      ExtendedExpressionLanguageAdaptor extendedExpressionLanguageAdaptor = expressionLanguages.get(languagePrefix);
-      if (extendedExpressionLanguageAdaptor == null) {
-        throw new IllegalStateException(format("There is no expression language registered for '%s'", languagePrefix));
-      }
-      return extendedExpressionLanguageAdaptor;
-    }
+    });
   }
 
   public String getLanguagePrefix(String expression) {

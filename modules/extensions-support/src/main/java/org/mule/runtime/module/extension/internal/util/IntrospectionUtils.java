@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static com.google.common.cache.CacheBuilder.newBuilder;
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
@@ -50,6 +51,7 @@ import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -107,16 +109,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVariable;
-import javax.lang.model.util.Types;
+import org.reflections.ReflectionUtils;
+import org.springframework.core.ResolvableType;
+
+import com.google.common.cache.Cache;
+import com.google.common.collect.ImmutableList;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -139,12 +136,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import com.google.common.collect.ImmutableList;
-import org.reflections.ReflectionUtils;
-import org.springframework.core.ResolvableType;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
+import javax.lang.model.util.Types;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -1333,19 +1340,31 @@ public final class IntrospectionUtils {
     });
   }
 
+  private static final ConcurrentMap<Class<? extends Annotation>, Cache<Class<?>, Optional<FieldSetter>>> fieldSetterForAnnotatedFieldCache =
+      new ConcurrentHashMap<>();
+
   private static Optional<FieldSetter> getFieldSetterForAnnotatedField(Object target,
                                                                        Class<? extends Annotation> annotationClass) {
-    final Class<?> type = target.getClass();
-    List<Field> fields = getAnnotatedFields(type, annotationClass);
-    if (fields.isEmpty()) {
-      return empty();
-    } else if (fields.size() > 1) {
-      throw new IllegalModelDefinitionException(format(
-                                                       "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
-                                                       type.getName(), fields.size(), annotationClass));
-    }
+    Cache<Class<?>, Optional<FieldSetter>> cache =
+        fieldSetterForAnnotatedFieldCache.computeIfAbsent(annotationClass, k -> newBuilder().weakKeys().build());
 
-    return of(new FieldSetter<>(fields.get(0)));
+    final Class<?> type = target.getClass();
+    try {
+      return cache.get(type, () -> {
+        List<Field> fields = getAnnotatedFields(type, annotationClass);
+        if (fields.isEmpty()) {
+          return empty();
+        } else if (fields.size() > 1) {
+          throw new IllegalModelDefinitionException(format(
+                                                           "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
+                                                           type.getName(), fields.size(), annotationClass));
+        }
+
+        return of(new FieldSetter<>(fields.get(0)));
+      });
+    } catch (ExecutionException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   private static void injectFieldOfType(Object target, Object value, Class<?> fieldType) {
