@@ -12,7 +12,6 @@ import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
@@ -20,12 +19,10 @@ import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -37,7 +34,6 @@ import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -53,8 +49,6 @@ import javax.inject.Inject;
  * @since 4.0
  */
 public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor, Initialisable {
-
-  private static final Logger LOGGER = getLogger(PolicyNextActionMessageProcessor.class);
 
   @Inject
   private PolicyStateHandler policyStateHandler;
@@ -86,8 +80,6 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
-        .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
-                                                   coreEvent.getMessage(), this.muleContext.getConfiguration().getId()))
         .flatMap(event -> {
           Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getCorrelationId());
           if (nextOperation == null) {
@@ -107,10 +99,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                 ((BaseEventContext) event.getContext())
                     .error(resolveMessagingException(t.getFailingComponent(), muleContext).apply(t));
                 return empty();
-              })
-              .doOnNext(coreEvent -> logExecuteNextEvent("After execute-next",
-                                                         coreEvent.getContext(), coreEvent.getMessage(),
-                                                         this.muleContext.getConfiguration().getId()));
+              });
         });
   }
 
@@ -131,10 +120,4 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                                      this);
   }
 
-  private void logExecuteNextEvent(String startingMessage, EventContext eventContext, Message message, String policyName) {
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("\nEvent Id: " + eventContext.getId() + "\n" + startingMessage + ".\nPolicy: " + policyName
-          + "\n" + message.getAttributes().getValue().toString());
-    }
-  }
 }
