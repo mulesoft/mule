@@ -253,7 +253,7 @@
         <muleHeisenbergExtensionTestVersion>4.2.0-SNAPSHOT</muleHeisenbergExtensionTestVersion>
         <muleMarvelExtensionTestVersion>4.2.0-SNAPSHOT</muleMarvelExtensionTestVersion>
         <mulePetstoreExtensionTestVersion>4.2.0-SNAPSHOT</mulePetstoreExtensionTestVersion>
-        <muleSubtypesExtensionTestVersion>4.1.0-SNAPSHOT</muleSubtypesExtensionTestVersion>
+        <muleSubtypesExtensionTestVersion>4.2.0-SNAPSHOT</muleSubtypesExtensionTestVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>3.0.2</dependency.plugin.version>
