@@ -8,7 +8,7 @@ package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.test.implicit.config.extension.extension.Counter;
+import org.mule.test.implicit.config.extension.extension.api.Counter;
 
 import org.junit.Test;
 

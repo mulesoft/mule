@@ -5,10 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.implicit.config.extension.extension;
+package org.mule.test.implicit.config.extension.extension.internal;
 
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.test.implicit.config.extension.extension.api.Counter;
+import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 
 public class ImplicitOperations {
 
