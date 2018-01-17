@@ -237,23 +237,23 @@
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.1.0-SNAPSHOT</muleDslApiVersion>
-        <muleExtensionsApiVersion>1.1.0-SNAPSHOT</muleExtensionsApiVersion>
+        <muleExtensionsApiVersion>1.2.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.1.0-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.1.0-SNAPSHOT</muleMavenClientApi>
-        <muleMavenClientImpl>1.1.0-SNAPSHOT</muleMavenClientImpl>
-        <muleMavenClientTest>1.1.0-SNAPSHOT</muleMavenClientTest>
+        <muleMavenClientApi>1.2.0-SNAPSHOT</muleMavenClientApi>
+        <muleMavenClientImpl>1.2.0-SNAPSHOT</muleMavenClientImpl>
+        <muleMavenClientTest>1.2.0-SNAPSHOT</muleMavenClientTest>
         <mulePolicyApiVersion>1.1.0-SNAPSHOT</mulePolicyApiVersion>
         <muleApiVersion>1.2.0-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.1.0-SNAPSHOT</muleMetadataModelVersion>
+        <muleMetadataModelVersion>1.2.0-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!-- Test Extensions -->
-        <muleMetadataExtensionTestVersion>4.1.0-SNAPSHOT</muleMetadataExtensionTestVersion>
-        <muleVeganExtensionTestVersion>4.1.0-SNAPSHOT</muleVeganExtensionTestVersion>
-        <muleHeisenbergExtensionTestVersion>4.1.0-SNAPSHOT</muleHeisenbergExtensionTestVersion>
-        <muleMarvelExtensionTestVersion>4.1.0-SNAPSHOT</muleMarvelExtensionTestVersion>
-        <mulePetstoreExtensionTestVersion>4.1.0-SNAPSHOT</mulePetstoreExtensionTestVersion>
-        <muleSubtypesExtensionTestVersion>4.1.0-SNAPSHOT</muleSubtypesExtensionTestVersion>
+        <muleMetadataExtensionTestVersion>4.2.0-SNAPSHOT</muleMetadataExtensionTestVersion>
+        <muleVeganExtensionTestVersion>4.2.0-SNAPSHOT</muleVeganExtensionTestVersion>
+        <muleHeisenbergExtensionTestVersion>4.2.0-SNAPSHOT</muleHeisenbergExtensionTestVersion>
+        <muleMarvelExtensionTestVersion>4.2.0-SNAPSHOT</muleMarvelExtensionTestVersion>
+        <mulePetstoreExtensionTestVersion>4.2.0-SNAPSHOT</mulePetstoreExtensionTestVersion>
+        <muleSubtypesExtensionTestVersion>4.2.0-SNAPSHOT</muleSubtypesExtensionTestVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>3.0.2</dependency.plugin.version>
