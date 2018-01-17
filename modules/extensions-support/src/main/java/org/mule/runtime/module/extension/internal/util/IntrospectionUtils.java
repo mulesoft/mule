@@ -62,6 +62,7 @@ import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
@@ -1033,6 +1034,26 @@ public final class IntrospectionUtils {
     return parameterClasses;
   }
 
+  /**
+   * Traverses through all the {@link ObjectType object types} of the {@link ExtensionModel extension model's}
+   * {@link SubTypesModel} and returns the {@link Class classes} that are used behind of each type.
+   *
+   * @param extensionModel a {@link ExtensionModel}
+   * @return a non {@code null} {@link Set}
+   * @since 4.1
+   */
+  public static Set<Class<?>> getSubtypeClasses(ExtensionModel extensionModel, ClassLoader extensionClassLoader) {
+    return extensionModel.getSubTypes().stream().flatMap(subTypesModel -> {
+      Set<Class<?>> classes = new HashSet<>();
+      classes.addAll(collectRelativeClasses(subTypesModel.getBaseType(), extensionClassLoader));
+      classes.addAll(subTypesModel.getSubTypes()
+          .stream()
+          .flatMap(type -> collectRelativeClasses(subTypesModel.getBaseType(), extensionClassLoader)
+              .stream())
+          .collect(toSet()));
+      return classes.stream();
+    }).collect(toSet());
+  }
 
   /**
    * Given a {@link MetadataType} it adds all the {@link Class} that are related from that type. This includes generics of an
