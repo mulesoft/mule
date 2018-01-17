@@ -162,12 +162,12 @@ public class HeisenbergOperations implements Disposable {
   }
 
   public BarberPreferences getInlineInfo(@ParameterGroup(name = "Personal Barber",
-      showInDsl = true) BarberPreferences preferences) {
+      showInDsl = true) @DisplayName("Personal preference") BarberPreferences preferences) {
     return preferences;
   }
 
   public PersonalInfo getInlinePersonalInfo(@ParameterGroup(name = "Personal Info Argument",
-      showInDsl = true) PersonalInfo info) {
+      showInDsl = true) @DisplayName("Personal preference") PersonalInfo info) {
     return info;
   }
 
@@ -176,8 +176,8 @@ public class HeisenbergOperations implements Disposable {
     return transformation;
   }
 
-  public void disguice(@ParameterGroup(name = "currentLook") BarberPreferences currentLook,
-                       @ParameterGroup(name = "disguise", showInDsl = true) BarberPreferences disguise) {
+  public void disguice(@ParameterGroup(name = "currentLook") @DisplayName("Look") BarberPreferences currentLook,
+                       @ParameterGroup(name = "disguise", showInDsl = true) @DisplayName("Look") BarberPreferences disguise) {
 
   }
 
