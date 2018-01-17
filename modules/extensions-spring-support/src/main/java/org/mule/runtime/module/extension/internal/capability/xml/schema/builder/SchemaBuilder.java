@@ -25,6 +25,7 @@ import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_SCHEMA_L
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_TLS_NAMESPACE;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_TRANSACTION_TYPE;
+import static org.mule.runtime.config.internal.dsl.SchemaConstants.PRIVATE_OBJECT_STORE_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.SCHEDULING_STRATEGY_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
@@ -34,8 +35,8 @@ import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_OPTIONAL;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.USE_REQUIRED;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.XML_NAMESPACE;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.componentHasAnImplicitConfiguration;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -68,6 +69,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.config.internal.dsl.SchemaConstants;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -125,6 +127,8 @@ public final class SchemaBuilder {
   private final Set<StringType> registeredEnums = new LinkedHashSet<>();
   private final ObjectFactory objectFactory = new ObjectFactory();
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private final MetadataType OBJECT_STORE_TYPE = typeLoader.load(ObjectStore.class);
+
   private Schema schema;
   private boolean requiresTls = false;
 
@@ -439,7 +443,7 @@ public final class SchemaBuilder {
    */
   ExplicitGroup createTypeRefChoiceLocalOrGlobal(DslElementSyntax typeDsl, MetadataType type, BigInteger minOccurs,
                                                  String maxOccurs) {
-    if (!isImported(type)) {
+    if (!isImported(type) && !OBJECT_STORE_TYPE.equals(type)) {
       objectTypeDelegate.registerPojoType(type, EMPTY);
       objectTypeDelegate.registerAbstractElement(type, typeDsl);
       if (typeDsl.supportsTopLevelDeclaration() || (typeDsl.supportsChildDeclaration() && typeDsl.isWrapped())) {
@@ -453,16 +457,25 @@ public final class SchemaBuilder {
     choice.setMaxOccurs(maxOccurs);
 
     List<String> options = new LinkedList<>();
-    QName refAbstract = new QName(typeDsl.getNamespace(), getAbstractElementName(typeDsl), typeDsl.getPrefix());
-    TopLevelElement localAbstractElementRef = createRefElement(refAbstract, true);
-    choice.getParticle().add(objectFactory.createElement(localAbstractElementRef));
-    options.add(refAbstract.toString());
 
-    QName refGlobal = new QName(typeDsl.getNamespace(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, getAbstractElementName(typeDsl)),
-                                typeDsl.getPrefix());
-    TopLevelElement topLevelElementRef = createRefElement(refGlobal, true);
-    choice.getParticle().add(objectFactory.createElement(topLevelElementRef));
-    options.add(refGlobal.toString());
+    if (type.equals(OBJECT_STORE_TYPE)) {
+      QName refInternal = PRIVATE_OBJECT_STORE_ELEMENT;
+      TopLevelElement internalAbstractElementRef = createRefElement(refInternal, true);
+      choice.getParticle().add(objectFactory.createElement(internalAbstractElementRef));
+      options.add(refInternal.toString());
+
+    } else {
+      QName refAbstract = new QName(typeDsl.getNamespace(), getAbstractElementName(typeDsl), typeDsl.getPrefix());
+      TopLevelElement localAbstractElementRef = createRefElement(refAbstract, true);
+      choice.getParticle().add(objectFactory.createElement(localAbstractElementRef));
+      options.add(refAbstract.toString());
+
+      QName refGlobal = new QName(typeDsl.getNamespace(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, getAbstractElementName(typeDsl)),
+                                  typeDsl.getPrefix());
+      TopLevelElement topLevelElementRef = createRefElement(refGlobal, true);
+      choice.getParticle().add(objectFactory.createElement(topLevelElementRef));
+      options.add(refGlobal.toString());
+    }
 
     typesMapping.getSubTypes((ObjectType) type).stream()
         .filter(subtype -> dslResolver.resolve(subtype).map(DslElementSyntax::supportsChildDeclaration).orElse(false))

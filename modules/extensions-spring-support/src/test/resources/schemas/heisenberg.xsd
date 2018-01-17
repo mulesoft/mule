@@ -2537,8 +2537,7 @@
           <xs:element minOccurs="0" maxOccurs="1" name="object-store">
             <xs:complexType>
               <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstract-object-store"></xs:element>
-                <xs:element minOccurs="1" maxOccurs="1" ref="mule:global-abstract-object-store"></xs:element>
+                <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstract-private-object-store"></xs:element>
               </xs:choice>
             </xs:complexType>
           </xs:element>
