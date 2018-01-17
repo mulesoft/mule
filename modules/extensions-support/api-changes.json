@@ -22,6 +22,54 @@
           "new": "interface org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext<M extends org.mule.runtime.api.meta.model.ComponentModel>",
           "annotationType": "org.mule.api.annotation.NoImplement",
           "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory",
+          "new": "class org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "justification": "This class is not meant to be extended"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.extension.api.runtime.connectivity.oauth.ImmutableAuthCodeRequest",
+          "new": "class org.mule.runtime.module.extension.api.runtime.connectivity.oauth.ImmutableAuthCodeRequest",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "justification": "This class is not meant to be extended"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.extension.api.runtime.connectivity.oauth.ImmutableAuthCodeRequest",
+          "new": "class org.mule.runtime.module.extension.api.runtime.connectivity.oauth.ImmutableAuthCodeRequest",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "annotation": "@org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.extension.api.tooling.ExtensionConnectivityTestingStrategy",
+          "new": "class org.mule.runtime.module.extension.api.tooling.ExtensionConnectivityTestingStrategy",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.extension.api.tooling.ExtensionConnectivityTestingStrategy",
+          "new": "class org.mule.runtime.module.extension.api.tooling.ExtensionConnectivityTestingStrategy",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "annotation": "@org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.method.visibilityReduced",
+          "old": "method void org.mule.runtime.module.extension.api.util.MuleExtensionUtils::<init>()",
+          "new": "method void org.mule.runtime.module.extension.api.util.MuleExtensionUtils::<init>()",
+          "oldVisibility": "public",
+          "newVisibility": "private",
+          "justification": "This utils class is not meant to be instantiated"
         }
       ]
     }

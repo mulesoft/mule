@@ -46,6 +46,8 @@ import javax.xml.namespace.QName;
  */
 public class MuleExtensionUtils {
 
+  private MuleExtensionUtils() {}
+
   /**
    * Loads a extension model
    *
