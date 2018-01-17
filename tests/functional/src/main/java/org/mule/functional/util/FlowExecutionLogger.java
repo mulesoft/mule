@@ -66,7 +66,7 @@ public class FlowExecutionLogger extends AbstractComponent implements Processor 
       assertThat(aggregatedElements.stream().map(element -> element.getValue()).collect(toList()), contains(values));
     } else {
       assertThat(values, arrayWithSize(1));
-      assertThat(message.getPayload().getValue(), is(equalTo(values[0])));
+      assertThat(message.getPayload().getValue(),is(equalTo(values[0])));
     }
   }
 
