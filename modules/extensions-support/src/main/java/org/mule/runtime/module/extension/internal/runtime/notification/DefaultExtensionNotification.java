@@ -48,9 +48,9 @@ public class DefaultExtensionNotification implements ExtensionNotification {
     DataType actualDataType = data.getDataType();
     DataType expectedDataType = actionDefinition.getDataType();
     checkArgument(expectedDataType.isCompatibleWith(actualDataType),
-                  format("The action data type (%s) does not match the actual data type received (%s)",
-                         expectedDataType,
-                         actualDataType));
+                  () -> format("The action data type (%s) does not match the actual data type received (%s)",
+                               expectedDataType,
+                               actualDataType));
     this.event = event;
     this.component = component;
     this.actionDefinition = actionDefinition;
