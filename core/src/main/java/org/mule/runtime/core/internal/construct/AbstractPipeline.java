@@ -308,7 +308,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super.doStart();
     startIfStartable(processingStrategy);
     sink = processingStrategy.createSink(this, processFlowFunction());
-    // TODO MULE-13360: PhaseErrorLifecycleInterceptor is not being applied when AbstractPipeline doStart fails
     try {
       startIfStartable(pipeline);
     } catch (MuleException e) {

@@ -72,7 +72,8 @@ public class DefaultLifecycleInterceptorTestCase {
 
   @Test
   public void stopIsInvokedForPreviousPhasesIfStartFailed() {
-    Object anotherStartableAndStopableObject = mock(Object.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+    Object anotherStartableAndStopableObject =
+        mock(Object.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
 
     assertThat(interceptor.beforePhaseExecution(startLifecyclePhase, startableAndStoppableObject), is(true));
     interceptor.afterPhaseExecution(startLifecyclePhase, startableAndStoppableObject, Optional.empty());
