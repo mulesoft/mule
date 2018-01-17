@@ -48,7 +48,7 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   private final Pattern exprPrefixPattern;
   private Map<String, ExtendedExpressionLanguageAdaptor> expressionLanguages;
   private ConcurrentMap<String, ExtendedExpressionLanguageAdaptor> expressionLanguagesByExpressionCache =
-      new ConcurrentHashMap<>();
+      new ConcurrentHashMap<>(3, 0.9f);
 
   private boolean melDefault = false;
 
@@ -152,7 +152,7 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
 
   private ExtendedExpressionLanguageAdaptor selectExpressionLanguage(String expression) {
     return expressionLanguagesByExpressionCache.computeIfAbsent(expression, e -> {
-      final String languagePrefix = getLanguagePrefix(expression);
+      final String languagePrefix = getLanguagePrefix(e);
       if (isEmpty(languagePrefix)) {
         if (melDefault) {
           return expressionLanguages.get(MEL_PREFIX);

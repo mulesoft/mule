@@ -1341,7 +1341,7 @@ public final class IntrospectionUtils {
   }
 
   private static final ConcurrentMap<Class<? extends Annotation>, Cache<Class<?>, Optional<FieldSetter>>> fieldSetterForAnnotatedFieldCache =
-      new ConcurrentHashMap<>();
+      new ConcurrentHashMap<>(3, 0.9f);
 
   private static Optional<FieldSetter> getFieldSetterForAnnotatedField(Object target,
                                                                        Class<? extends Annotation> annotationClass) {
@@ -1363,7 +1363,7 @@ public final class IntrospectionUtils {
         return of(new FieldSetter<>(fields.get(0)));
       });
     } catch (ExecutionException e) {
-      throw new MuleRuntimeException(e);
+      throw new MuleRuntimeException(e.getCause());
     }
   }
 

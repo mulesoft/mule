@@ -81,7 +81,7 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
             }
           });
     } catch (ExecutionException e) {
-      throw new DefaultMuleException(e);
+      throw new DefaultMuleException(e.getCause());
     }
 
     return build(context);
