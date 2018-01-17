@@ -234,7 +234,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     return namesBuilder.build();
   }
 
-  public List<DependencyNode> getMissingElementNames() {
+  public List<DependencyNode> getMissingDependencies() {
     return missingElementNames;
   }
 }

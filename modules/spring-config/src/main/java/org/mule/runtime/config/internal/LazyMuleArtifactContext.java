@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.reverse;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
@@ -228,14 +229,18 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       objectProviders.clear();
 
       if (parentComponentModelInitializerAdapter.isPresent()) {
+        List<String> missingComponentNames = dependencyResolver.getMissingDependencies().stream()
+            .filter(dependencyNode -> dependencyNode.isTopLevel())
+            .map(dependencyNode -> dependencyNode.getComponentName())
+            .collect(toList());
         parentComponentModelInitializerAdapter.get().initializeComponents(componentModel -> {
           if (componentModel.getNameAttribute() != null) {
-            return dependencyResolver.getMissingElementNames().contains(componentModel.getNameAttribute());
+            return missingComponentNames.contains(componentModel.getNameAttribute());
           }
           return false;
         });
       } else {
-        dependencyResolver.getMissingElementNames().stream().forEach(globalElementName -> {
+        dependencyResolver.getMissingDependencies().stream().forEach(globalElementName -> {
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(String.format("Ignoring dependency %s because it does not exists", globalElementName));
           }
