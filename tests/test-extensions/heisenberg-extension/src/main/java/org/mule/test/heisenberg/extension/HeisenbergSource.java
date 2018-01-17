@@ -50,6 +50,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.RefName;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
@@ -187,7 +188,7 @@ public class HeisenbergSource extends Source<String, Object> {
 
   @OnSuccess
   public void onSuccess(@Optional(defaultValue = PAYLOAD) Long payment, @Optional String sameNameParameter,
-                        @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin,
+                        @ParameterGroup(name = RICIN_GROUP_NAME) @DisplayName("Dangerous Ricin") RicinGroup ricin,
                         @ParameterGroup(name = "Success Info", showInDsl = true) PersonalInfo successInfo,
                         @Optional boolean fail,
                         NotificationEmitter notificationEmitter) {
