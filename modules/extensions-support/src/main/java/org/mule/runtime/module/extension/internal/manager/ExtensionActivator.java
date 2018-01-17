@@ -14,7 +14,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSubtypeClasses;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.el.ModuleNamespace;
@@ -66,7 +68,13 @@ public final class ExtensionActivator implements Startable, Stoppable {
   }
 
   private void registerEnumTransformers(ExtensionModel extensionModel) {
-    getParameterClasses(extensionModel, getClassLoader(extensionModel)).stream()
+    ClassLoader classLoader = getClassLoader(extensionModel);
+    Set<Class<?>> parameterClasses = new HashSet<>();
+
+    parameterClasses.addAll(getParameterClasses(extensionModel, classLoader));
+    parameterClasses.addAll(getSubtypeClasses(extensionModel, classLoader));
+
+    parameterClasses.stream()
         .filter(type -> Enum.class.isAssignableFrom(type))
         .forEach(type -> {
           final Class<Enum> enumClass = (Class<Enum>) type;
