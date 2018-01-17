@@ -25,7 +25,7 @@ import java.util.List;
  * The MessageProcessor instance that this builder builds can be nested in other chains as required.
  * </p>
  */
-abstract class AbstractMessageProcessorChainBuilder implements MessageProcessorChainBuilder {
+public abstract class AbstractMessageProcessorChainBuilder implements MessageProcessorChainBuilder {
 
   protected List processors = new ArrayList();
   protected String name;
