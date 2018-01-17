@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Describes a java bean property
  *
  * @since 4.1
  */
+@NoImplement
 public interface PropertyElement extends WithType, WithName {
 
   /**

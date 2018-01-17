@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.manager;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 
@@ -14,6 +15,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ExtensionManagerFactory {
 
   /**

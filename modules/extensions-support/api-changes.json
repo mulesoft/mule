@@ -8,6 +8,20 @@
           "new": "interface org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>",
           "annotationType": "org.mule.api.annotation.NoImplement",
           "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory",
+          "new": "interface org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext<M extends org.mule.runtime.api.meta.model.ComponentModel>",
+          "new": "interface org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext<M extends org.mule.runtime.api.meta.model.ComponentModel>",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
         }
       ]
     }

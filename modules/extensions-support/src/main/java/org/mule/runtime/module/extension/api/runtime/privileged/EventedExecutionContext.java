@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.runtime.privileged;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -16,6 +17,7 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
  * @param <M> the generic type of of the model which represents the component being executed
  * @since 4.0
  */
+@NoImplement
 public interface EventedExecutionContext<M extends ComponentModel> extends ExecutionContext<M> {
 
   /**

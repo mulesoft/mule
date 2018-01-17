@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
 /**
@@ -13,6 +14,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeW
  *
  * @since 4.0
  */
+@NoImplement
 interface WithType {
 
   /**
