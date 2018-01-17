@@ -5,15 +5,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.implicit.config.extension.extension;
+package org.mule.test.implicit.config.extension.extension.internal;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.test.implicit.config.extension.extension.api.Counter;
 
 public class ImplicitConnectionProvider implements ConnectionProvider<Counter> {
+
+  @ParameterGroup(name = "Internal")
+  private PrivateParameterGroup privateGroup;
 
   @Parameter
   @Optional(defaultValue = "#[vars.number]")
@@ -21,6 +26,9 @@ public class ImplicitConnectionProvider implements ConnectionProvider<Counter> {
 
   @Override
   public Counter connect() throws ConnectionException {
+    if (privateGroup == null) {
+      throw new ConnectionException("Internal parameter group was not instantiate with nullsafe");
+    }
     return new Counter(number);
   }
 

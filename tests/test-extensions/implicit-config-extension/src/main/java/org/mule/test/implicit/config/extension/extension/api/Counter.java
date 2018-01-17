@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.implicit.config.extension.extension;
+package org.mule.test.implicit.config.extension.extension.api;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

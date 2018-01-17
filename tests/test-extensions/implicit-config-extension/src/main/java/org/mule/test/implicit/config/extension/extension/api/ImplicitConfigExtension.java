@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.implicit.config.extension.extension;
+package org.mule.test.implicit.config.extension.extension.api;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -20,6 +20,8 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.test.implicit.config.extension.extension.internal.ImplicitConnectionProvider;
+import org.mule.test.implicit.config.extension.extension.internal.ImplicitOperations;
 
 @Extension(name = "implicit")
 @Operations({ImplicitOperations.class})
