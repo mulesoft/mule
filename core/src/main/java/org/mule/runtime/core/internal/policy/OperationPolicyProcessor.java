@@ -95,14 +95,14 @@ public class OperationPolicyProcessor implements Processor {
                                                    PrivilegedEvent policyEvent) {
     return just(policyEvent)
         .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
-                                     event.getMessage().getAttributes().getValue().toString(), "Before operation"))
+                                     getMessageAttributesAsString(event), "Before operation"))
         .cast(CoreEvent.class)
         .transform(policy.getPolicyChain())
         .cast(PrivilegedEvent.class)
         .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
         .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent))
         .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
-                                     event.getMessage().getAttributes().getValue().toString(), "After operation"));
+                                     getMessageAttributesAsString(event), "After operation"));
   }
 
   private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, PrivilegedEvent operationEvent) {
@@ -129,6 +129,14 @@ public class OperationPolicyProcessor implements Processor {
             });
       }
     };
+  }
+
+  private String getMessageAttributesAsString(CoreEvent event) {
+    if (event.getMessage() == null || event.getMessage().getAttributes() == null
+        || event.getMessage().getAttributes().getValue() == null) {
+      return "";
+    }
+    return event.getMessage().getAttributes().getValue().toString();
   }
 
   private void logPolicy(String eventId, String policyName, String message, String startingMessage) {

@@ -201,7 +201,8 @@ public class CompositeSourcePolicy extends
   }
 
   private String getCoreEventAttributesAsString(CoreEvent event) {
-    if (event.getMessage() == null || event.getMessage().getAttributes() == null) {
+    if (event.getMessage() == null || event.getMessage().getAttributes() == null
+        || event.getMessage().getAttributes().getValue() == null) {
       return "";
     }
     return event.getMessage().getAttributes().getValue().toString();
