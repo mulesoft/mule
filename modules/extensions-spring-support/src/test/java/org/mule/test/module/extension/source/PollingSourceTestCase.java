@@ -65,7 +65,14 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   @Test
   public void idempotentPoll() throws Exception {
     startFlow("idempotent");
-    assertAllPetsAdopted();
+    check(5000, 100, () -> {
+      synchronized (ADOPTION_EVENTS) {
+        return PetAdoptionSource.REJECTED_ADOPTIONS >= ALL_PETS.size() &&
+            ALL_PETS.containsAll(ADOPTION_EVENTS.stream()
+                .map(e -> e.getMessage().getPayload().getValue().toString())
+                .collect(toList()));
+      }
+    });
     assertIdempotentAdoptions();
   }
 
