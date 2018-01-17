@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.simple;
 
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -60,7 +61,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   @Override
   public CoreEvent process(CoreEvent event) {
     evaluateCorrectArguments();
-    Object result = muleContext.getExpressionManager().parse(content, event, null);
+    Object result = muleContext.getExpressionManager().parseLogTemplate(content, event, getLocation(), NULL_BINDING_CONTEXT);
     Message resultMessage = Message.builder(event.getMessage()).value(result).nullAttributesValue().build();
     if (target == null) {
       return CoreEvent.builder(event).message(resultMessage).build();

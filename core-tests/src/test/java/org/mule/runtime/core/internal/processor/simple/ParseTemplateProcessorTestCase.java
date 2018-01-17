@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.simple;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -95,7 +96,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
     when(mockMuleMessage.getPayload()).thenReturn(TypedValue.of("Parsed"));
     when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
-    when(mockExpressionManager.parse(expectedExpression, event, null)).thenReturn("Parsed");
+    when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
 
     CoreEvent response = parseTemplateProcessor.process(event);
     assertNotNull(response);
@@ -115,7 +116,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
     when(mockMuleMessage.getPayload()).thenReturn(TypedValue.of(template));
     when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
-    when(mockExpressionManager.parse(template, event, null)).thenReturn(template);
+    when(mockExpressionManager.parseLogTemplate(eq(template), eq(event), any(), any())).thenReturn(template);
 
     CoreEvent response = parseTemplateProcessor.process(event);
     assertNotNull(response);
@@ -137,7 +138,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
     when(mockMuleMessage.getPayload()).thenReturn(TypedValue.of(payload));
     when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
-    when(mockExpressionManager.parse(any(), any(), any())).thenReturn("Parsed");
+    when(mockExpressionManager.parseLogTemplate(any(), any(), any(), any())).thenReturn("Parsed");
 
     CoreEvent response = parseTemplateProcessor.process(event);
     assertNotNull(response);
