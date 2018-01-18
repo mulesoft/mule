@@ -129,6 +129,7 @@ public class HeisenbergExtension implements Lifecycle {
   private RicinGroup ricinGroup;
 
   @ParameterGroup(name = PERSONAL_INFORMATION_GROUP_NAME)
+  @DisplayName("Personal Info")
   private PersonalInfo personalInfo = new PersonalInfo();
 
   @Parameter
@@ -186,6 +187,7 @@ public class HeisenbergExtension implements Lifecycle {
   private BarberPreferences barberPreferences;
 
   @ParameterGroup(name = BROTHER_IN_LAW, showInDsl = true)
+  @DisplayName("Brother in law")
   private HankSchrader brotherInLaw;
 
   private List<BackPressureContext> backPressureContexts = new LinkedList<>();
