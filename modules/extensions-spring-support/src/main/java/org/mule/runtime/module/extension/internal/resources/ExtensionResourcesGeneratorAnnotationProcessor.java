@@ -13,6 +13,7 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
@@ -37,6 +38,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensi
       protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
         super.configureContextBeforeDeclaration(context);
         context.addCustomDeclarationEnricher(new DescriptionDeclarationEnricher());
+        context.addCustomValidator(new ExportedPackagesValidator());
       }
     };
   }
