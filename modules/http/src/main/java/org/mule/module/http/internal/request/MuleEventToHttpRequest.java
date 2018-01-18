@@ -180,7 +180,7 @@ public class MuleEventToHttpRequest
 
         if (isEmptyBody(muleEvent, resolvedMethod))
         {
-            entity = new EmptyHttpEntity();
+            entity = EmptyHttpEntity.instance();
         }
         else
         {

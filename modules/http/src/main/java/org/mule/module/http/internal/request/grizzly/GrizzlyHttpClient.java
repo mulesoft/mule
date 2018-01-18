@@ -8,6 +8,7 @@ package org.mule.module.http.internal.request.grizzly;
 
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig.Property.MAX_HTTP_PACKET_HEADER_SIZE;
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Integer.valueOf;
 import static java.lang.System.getProperty;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
@@ -30,6 +31,7 @@ import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
+import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
@@ -91,6 +93,8 @@ public class GrizzlyHttpClient implements HttpClient
 
     public static final String CUSTOM_MAX_HTTP_PACKET_HEADER_SIZE = SYSTEM_PROPERTY_PREFIX + "http.client.headerSectionSize";
 
+    public static final String AVOID_ZERO_CONTENT_LENGTH = SYSTEM_PROPERTY_PREFIX + "http.client.avoidZeroContentLength";
+
     private static final Logger logger = LoggerFactory.getLogger(GrizzlyHttpClient.class);
 
     private static final List<String> SPECIAL_CUSTOM_HEADERS = Arrays.asList(
@@ -121,6 +125,7 @@ public class GrizzlyHttpClient implements HttpClient
 
     private AsyncHttpClient asyncHttpClient;
     private SSLContext sslContext;
+    private boolean avoidZeroContentLength = getBoolean(AVOID_ZERO_CONTENT_LENGTH);
 
     public GrizzlyHttpClient(HttpClientConfiguration config)
     {
@@ -497,7 +502,11 @@ public class GrizzlyHttpClient implements HttpClient
                     }
                     else if (request.getEntity() instanceof ByteArrayHttpEntity)
                     {
-                        builder.setBody(((ByteArrayHttpEntity) request.getEntity()).getContent());
+                        ByteArrayHttpEntity byteArrayHttpEntity = (ByteArrayHttpEntity) request.getEntity();
+                        if (byteArrayHttpEntity.getContent().length != 0 || byteArrayHttpEntity.getContent().length == 0 && !avoidZeroContentLength)
+                        {
+                            builder.setBody(((ByteArrayHttpEntity) request.getEntity()).getContent());
+                        }
                     }
                     else if (request.getEntity() instanceof MultipartHttpEntity)
                     {

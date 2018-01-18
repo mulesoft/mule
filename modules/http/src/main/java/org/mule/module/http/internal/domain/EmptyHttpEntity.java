@@ -9,12 +9,19 @@ package org.mule.module.http.internal.domain;
 /**
  *  Represents a http empty body
  */
-public class EmptyHttpEntity implements HttpEntity
+public class EmptyHttpEntity extends ByteArrayHttpEntity
 {
 
-    private static EmptyHttpEntity instance = new EmptyHttpEntity();
+    private static byte [] NO_CONTENT= new byte[0];
 
-    public EmptyHttpEntity instance()
+    private static EmptyHttpEntity instance = new EmptyHttpEntity(NO_CONTENT);
+
+    private EmptyHttpEntity(byte[] content)
+    {
+        super(content);
+    }
+
+    public static EmptyHttpEntity instance()
     {
         return instance;
     }
