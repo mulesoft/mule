@@ -7,14 +7,13 @@
 package org.mule.runtime.core.internal.message;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
-import static org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
-
 import org.mule.runtime.api.message.ErrorType;
+
+import java.util.Objects;
 
 /**
  * Builder for {@link ErrorType}. This must be the only mechanism to create an instance of {@code ErrorType}.
@@ -131,13 +130,23 @@ public final class ErrorTypeBuilder {
     }
 
     @Override
-    public boolean equals(Object obj) {
-      return reflectionEquals(this, obj);
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      ErrorTypeImplementation that = (ErrorTypeImplementation) o;
+      return Objects.equals(identifier, that.identifier) &&
+          Objects.equals(namespace, that.namespace) &&
+          Objects.equals(parentErrorType, that.parentErrorType);
     }
 
     @Override
     public int hashCode() {
-      return reflectionHashCode(this);
+      return Objects.hash(identifier, namespace, parentErrorType);
     }
   }
 

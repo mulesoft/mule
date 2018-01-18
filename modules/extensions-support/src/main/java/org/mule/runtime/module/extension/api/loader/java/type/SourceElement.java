@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.api.loader.java.type;
 
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceReturnType;
-
+import org.mule.api.annotation.NoImplement;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.extension.api.runtime.source.Source;
 
@@ -19,6 +19,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
+@NoImplement
 public interface SourceElement extends ParameterizableTypeElement, WithReturnType {
 
   /**

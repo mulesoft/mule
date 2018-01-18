@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.Category;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ExtensionElement extends ParameterizableTypeElement, ComponentElement, WithOperations, WithFunctions {
 
   /**

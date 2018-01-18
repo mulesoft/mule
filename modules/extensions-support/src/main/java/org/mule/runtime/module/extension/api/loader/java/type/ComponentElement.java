@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * A generic contract for any component that is considered as declaring point of different extensions components (Sources,
  * Connection Providers and Operation Containers)
@@ -14,6 +16,7 @@ package org.mule.runtime.module.extension.api.loader.java.type;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ComponentElement
     extends WithMessageSources, WithOperationContainers, WithFunctionContainers, WithConnectionProviders,
     ParameterizableTypeElement {

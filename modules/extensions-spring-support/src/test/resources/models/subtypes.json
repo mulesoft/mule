@@ -1009,8 +1009,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "SUBTYPES:RETRY_EXHAUSTED",
-            "SUBTYPES:CONNECTIVITY"
+            "SUBTYPES:CONNECTIVITY",
+            "SUBTYPES:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -3226,17 +3226,8 @@
   "notifications": [],
   "errors": [
     {
-      "error": "SUBTYPES:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
-      "handleable": true
-    },
-    {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "MULE:ANY",
+      "error": "SUBTYPES:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
     {
@@ -3245,8 +3236,17 @@
       "handleable": true
     },
     {
-      "error": "SUBTYPES:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "SUBTYPES:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     }
   ],

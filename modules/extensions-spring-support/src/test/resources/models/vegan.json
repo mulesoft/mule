@@ -411,8 +411,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "VEGAN:CONNECTIVITY",
-            "VEGAN:RETRY_EXHAUSTED"
+            "VEGAN:RETRY_EXHAUSTED",
+            "VEGAN:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2952,8 +2952,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "VEGAN:CONNECTIVITY",
-            "VEGAN:RETRY_EXHAUSTED"
+            "VEGAN:RETRY_EXHAUSTED",
+            "VEGAN:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -5154,8 +5154,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "VEGAN:CONNECTIVITY",
-            "VEGAN:RETRY_EXHAUSTED"
+            "VEGAN:RETRY_EXHAUSTED",
+            "VEGAN:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -5690,8 +5690,8 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "VEGAN:CONNECTIVITY",
-            "VEGAN:RETRY_EXHAUSTED"
+            "VEGAN:RETRY_EXHAUSTED",
+            "VEGAN:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -9416,6 +9416,16 @@
   "notifications": [],
   "errors": [
     {
+      "error": "VEGAN:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
+      "handleable": true
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
       "error": "MULE:ANY",
       "handleable": true
     },
@@ -9427,16 +9437,6 @@
     {
       "error": "MULE:CONNECTIVITY",
       "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "VEGAN:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     }
   ],

@@ -5062,6 +5062,10 @@
   "notifications": [],
   "errors": [
     {
+      "error": "MULE:ANY",
+      "handleable": true
+    },
+    {
       "error": "TX:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
@@ -5069,10 +5073,6 @@
     {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "MULE:ANY",
       "handleable": true
     },
     {

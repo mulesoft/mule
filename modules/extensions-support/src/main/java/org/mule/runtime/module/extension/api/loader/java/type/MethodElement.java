@@ -8,21 +8,22 @@ package org.mule.runtime.module.extension.api.loader.java.type;
 
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
-
+import org.mule.api.annotation.NoImplement;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.NamedObject;
-
-import javax.lang.model.element.ExecutableElement;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+
+import javax.lang.model.element.ExecutableElement;
 
 /**
  * A contract for an element to be considered as a Method
  *
  * @since 4.0
  */
+@NoImplement
 public interface MethodElement<T extends Type>
     extends WithParameters, WithReturnType, NamedObject, WithAnnotations, WithAlias, WithDeclaringClass, WithElement {
 

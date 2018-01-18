@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.api.runtime.connectivity.oauth;
 
 import static java.util.Optional.ofNullable;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
 
 import java.util.Optional;
@@ -17,7 +18,8 @@ import java.util.Optional;
  * @see AuthCodeRequest
  * @since 4.0
  */
-public class ImmutableAuthCodeRequest implements AuthCodeRequest {
+@NoInstantiate
+public final class ImmutableAuthCodeRequest implements AuthCodeRequest {
 
   private final String resourceOwnerId;
   private final String scopes;

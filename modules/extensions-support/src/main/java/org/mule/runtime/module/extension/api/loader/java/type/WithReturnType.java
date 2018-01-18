@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.metadata.api.model.MetadataType;
 
 /**
@@ -13,6 +14,7 @@ import org.mule.metadata.api.model.MetadataType;
  *
  * @since 4.0
  */
+@NoImplement
 interface WithReturnType {
 
   /**

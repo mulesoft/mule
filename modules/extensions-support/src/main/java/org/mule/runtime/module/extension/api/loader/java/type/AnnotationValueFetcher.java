@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.function.Function;
@@ -14,6 +16,7 @@ import java.util.function.Function;
  * @param <A> Annotation type
  * @since 4.1
  */
+@NoImplement
 public interface AnnotationValueFetcher<A extends Annotation> {
 
   /**

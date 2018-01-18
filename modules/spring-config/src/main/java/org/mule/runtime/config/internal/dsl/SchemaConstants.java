@@ -59,6 +59,8 @@ public final class SchemaConstants {
   public static final QName TLS_CONTEXT_TYPE = new QName(MULE_TLS_NAMESPACE, TLS_CONTEXT_ELEMENT_IDENTIFIER, "tls");
   public static final QName SCHEDULING_STRATEGY_ELEMENT =
       new QName(CORE_NAMESPACE, "scheduling-strategy", CORE_PREFIX);
+  public static final QName PRIVATE_OBJECT_STORE_ELEMENT =
+      new QName(CORE_NAMESPACE, "abstract-private-object-store", CORE_PREFIX);
 
   // TYPES
   public static final QName SUBSTITUTABLE_INT = new QName(CORE_NAMESPACE, "substitutableInt", CORE_PREFIX);
