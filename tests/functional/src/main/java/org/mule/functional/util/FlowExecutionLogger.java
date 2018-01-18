@@ -63,11 +63,11 @@ public class FlowExecutionLogger extends AbstractComponent implements Processor 
     waitUntilNthExecution(routeKey, n);
     ExecutionLog executionLog = executionLogsMap.get(routeKey);
     Message message = executionLog.getCollectedMessages().get(n - 1);
-    if(message.getPayload().getValue() instanceof List) {
+    if (message.getPayload().getValue() instanceof List) {
       List<TypedValue> aggregatedElements = (List<TypedValue>) message.getPayload().getValue();
       assertThat(aggregatedElements.stream().map(element -> element.getValue()).collect(toList()), hasItems(values));
-    }else {
-      assertThat(values,arrayWithSize(1));
+    } else {
+      assertThat(values, arrayWithSize(1));
       assertThat(message.getPayload().getValue(), is(equalTo(values[0])));
     }
   }
