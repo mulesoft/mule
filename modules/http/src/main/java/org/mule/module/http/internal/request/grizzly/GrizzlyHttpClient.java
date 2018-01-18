@@ -503,7 +503,7 @@ public class GrizzlyHttpClient implements HttpClient
                     else if (request.getEntity() instanceof ByteArrayHttpEntity)
                     {
                         ByteArrayHttpEntity byteArrayHttpEntity = (ByteArrayHttpEntity) request.getEntity();
-                        if (byteArrayHttpEntity.getContent().length != 0 || byteArrayHttpEntity.getContent().length == 0 && !avoidZeroContentLength)
+                        if (byteArrayHttpEntity.getContent().length != 0 || (byteArrayHttpEntity.getContent().length == 0 && !avoidZeroContentLength))
                         {
                             builder.setBody(((ByteArrayHttpEntity) request.getEntity()).getContent());
                         }

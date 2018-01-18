@@ -156,7 +156,6 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             {
                 setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
                 httpEntity = EmptyHttpEntity.instance();
-
             }
             else if (payload instanceof Map)
             {
