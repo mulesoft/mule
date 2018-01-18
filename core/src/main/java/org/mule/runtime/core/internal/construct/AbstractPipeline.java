@@ -308,13 +308,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super.doStart();
     startIfStartable(processingStrategy);
     sink = processingStrategy.createSink(this, processFlowFunction());
-    try {
-      startIfStartable(pipeline);
-    } catch (MuleException e) {
-      // If the pipeline couldn't be started we would need to stop the processingStrategy (if possible) in order to avoid leaks
-      doStop();
-      throw e;
-    }
+
+    startIfStartable(pipeline);
+
     canProcessMessage = true;
     if (getMuleContext().isStarted()) {
       try {
