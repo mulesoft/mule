@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
+import static com.google.common.cache.CacheBuilder.newBuilder;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -20,23 +22,25 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
+import com.google.common.cache.Cache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * An {@link ObjectBuilder} used to build pojos which are used with the {@link ParameterGroup}
- * annotation.
+ * An {@link ObjectBuilder} used to build pojos which are used with the {@link ParameterGroup} annotation.
  *
  * @param <T> the generic type of the object being built
  */
 public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
 
   private final ParameterGroupDescriptor groupDescriptor;
-  private final ConcurrentMap<Class<?>, List<FieldElement>> fieldsCache = new ConcurrentHashMap<>();
+
+  private static final Cache<Class<?>, List<FieldElement>> fieldsCache = newBuilder().weakKeys().build();
 
   /**
    * Create a new instance
@@ -68,13 +72,17 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
 
   private T doBuild(Predicate<String> hasParameter, Function<String, Object> parameters, ValueResolvingContext context)
       throws MuleException {
-    fieldsCache.computeIfAbsent(groupDescriptor.getType().getDeclaringClass().get(), k -> groupDescriptor.getType().getFields())
-        .forEach(field -> {
-          String name = field.getName();
-          if (hasParameter.test(name)) {
-            addPropertyResolver(name, new StaticValueResolver<>(parameters.apply(name)));
-          }
-        });
+    try {
+      fieldsCache.get(groupDescriptor.getType().getDeclaringClass().get(), () -> groupDescriptor.getType().getFields())
+          .forEach(field -> {
+            String name = field.getName();
+            if (hasParameter.test(name)) {
+              addPropertyResolver(name, new StaticValueResolver<>(parameters.apply(name)));
+            }
+          });
+    } catch (ExecutionException | UncheckedExecutionException e) {
+      throw new DefaultMuleException(e.getCause());
+    }
 
     return build(context);
   }
