@@ -109,18 +109,13 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
-import org.reflections.ReflectionUtils;
-import org.springframework.core.ResolvableType;
-
-import com.google.common.cache.Cache;
-import com.google.common.collect.ImmutableList;
-
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -153,6 +148,13 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Types;
 
+import org.reflections.ReflectionUtils;
+import org.springframework.core.ResolvableType;
+
+import com.google.common.cache.Cache;
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 /**
  * Set of utility operations to get insights about objects and their components
  *
@@ -165,7 +167,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.
    *
-   * @param type       the {@link Class} being introspected
+   * @param type the {@link Class} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    */
@@ -354,7 +356,7 @@ public final class IntrospectionUtils {
    * If the {@code method} returns a collection or a {@link PagingProvider} of {@link Result}, then this will return
    * {@link VoidType} since the messages in the main output already contain an attributes for each item.
    *
-   * @param method     the {@link Method} being introspected
+   * @param method the {@link Method} being introspected
    * @return a {@link MetadataType}
    * @throws IllegalArgumentException is method is {@code null}
    */
@@ -448,10 +450,10 @@ public final class IntrospectionUtils {
   /**
    * Returns an array of {@link MetadataType} representing each of the given {@link Method}'s argument types.
    *
-   * @param method     a not {@code null} {@link Method}
+   * @param method a not {@code null} {@link Method}
    * @param typeLoader a {@link ClassTypeLoader} to be used to create the returned {@link MetadataType}s
    * @return an array of {@link MetadataType} matching the method's arguments. If the method doesn't take any, then the array will
-   * be empty
+   *         be empty
    * @throws IllegalArgumentException is method is {@code null}
    */
   public static MetadataType[] getMethodArgumentTypes(Method method, ClassTypeLoader typeLoader) {
@@ -473,7 +475,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link MetadataType} describing the given {@link Field}'s type
    *
-   * @param field      a not {@code null} {@link Field}
+   * @param field a not {@code null} {@link Field}
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType} matching the field's type
    * @throws IllegalArgumentException if field is {@code null}
@@ -500,32 +502,41 @@ public final class IntrospectionUtils {
     return getField(clazz, MuleExtensionAnnotationParser.getMemberName(parameterDeclaration, parameterDeclaration.getName()));
   }
 
+  private static final Cache<Pair<Class<?>, String>, Optional<Field>> fieldByClassAndNameCache =
+      newBuilder().weakKeys().build();
+
   public static Optional<Field> getField(Class<?> clazz, String name) {
-    for (Field field : clazz.getDeclaredFields()) {
-      if (field.getName().equals(name)) {
-        return Optional.of(field);
-      }
-    }
-
-    for (Class<?> type : ReflectionUtils.getAllSuperTypes(clazz)) {
-      for (Field field : type.getDeclaredFields()) {
-        if (field.getName().equals(name)) {
-          return Optional.of(field);
+    try {
+      return fieldByClassAndNameCache.get(new Pair<>(clazz, name), () -> {
+        for (Field field : clazz.getDeclaredFields()) {
+          if (field.getName().equals(name)) {
+            return Optional.of(field);
+          }
         }
-      }
-    }
 
-    return empty();
+        for (Class<?> type : ReflectionUtils.getAllSuperTypes(clazz)) {
+          for (Field field : type.getDeclaredFields()) {
+            if (field.getName().equals(name)) {
+              return Optional.of(field);
+            }
+          }
+        }
+
+        return empty();
+      });
+    } catch (ExecutionException | UncheckedExecutionException e) {
+      throw new MuleRuntimeException(e.getCause());
+    }
   }
 
   /**
    * Resolves and returns the field value of an object instance
    *
-   * @param object    The object where grab the field value
+   * @param object The object where grab the field value
    * @param fieldName The name of the field to obtain the value
    * @return The value of the field with the given fieldName and object instance
    * @throws IllegalAccessException if is unavailable to access to the field
-   * @throws NoSuchFieldException   if the field doesn't exist in the given object instance
+   * @throws NoSuchFieldException if the field doesn't exist in the given object instance
    */
   public static Object getFieldValue(Object object, String fieldName) throws IllegalAccessException, NoSuchFieldException {
     final Optional<Field> fieldOptional = getField(object.getClass(), fieldName);
@@ -547,8 +558,15 @@ public final class IntrospectionUtils {
         .orElse(defaultName);
   }
 
+  private static final Cache<Class<?>, Boolean> hasDefaultConstructorsByClassCache =
+      newBuilder().weakKeys().build();
+
   public static boolean hasDefaultConstructor(Class<?> clazz) {
-    return ClassUtils.getConstructor(clazz, new Class[] {}) != null;
+    try {
+      return hasDefaultConstructorsByClassCache.get(clazz, () -> ClassUtils.getConstructor(clazz, new Class[] {}) != null);
+    } catch (ExecutionException | UncheckedExecutionException e) {
+      throw new MuleRuntimeException(e.getCause());
+    }
   }
 
 
@@ -734,7 +752,7 @@ public final class IntrospectionUtils {
   /**
    * Determines if the given {@code type} is assignable from any of the {@code matchingTypes}
    *
-   * @param type          a {@link Class}
+   * @param type a {@link Class}
    * @param matchingTypes a collection of {@link Class classes} to test against
    * @return whether the type is assignable or not
    */
@@ -824,7 +842,7 @@ public final class IntrospectionUtils {
    *
    * @param declaringClass the type to introspect
    * @param annotationType the annotation you're looking for
-   * @param superClasses   whether to consider supper classes or not
+   * @param superClasses whether to consider supper classes or not
    * @return a {@link Collection} of {@link Method}s
    */
   public static Collection<Method> getMethodsAnnotatedWith(Class<?> declaringClass,
@@ -879,7 +897,7 @@ public final class IntrospectionUtils {
       typeElements.add(currentType);
       currentType = (TypeElement) processingEnvironment.getTypeUtils().asElement(currentType.getSuperclass());
     }
-    //Required to have the order as when introspecting with classes.
+    // Required to have the order as when introspecting with classes.
     reverse(typeElements);
     return typeElements;
   }
@@ -936,7 +954,7 @@ public final class IntrospectionUtils {
    * return
    *
    * @param element an annotated member
-   * @param <T>     the generic type of the element
+   * @param <T> the generic type of the element
    * @return an alias name
    */
   public static <T extends AnnotatedElement & Member> String getAlias(T element) {
@@ -1066,7 +1084,7 @@ public final class IntrospectionUtils {
    * Given a {@link MetadataType} it adds all the {@link Class} that are related from that type. This includes generics of an
    * {@link ArrayType}, open restriction of an {@link ObjectType} as well as its fields.
    *
-   * @param type                 {@link MetadataType} to inspect
+   * @param type {@link MetadataType} to inspect
    * @param extensionClassLoader extension class loader
    * @return {@link Set<Class<?>>} with the classes reachable from the {@code type}
    */
@@ -1121,7 +1139,7 @@ public final class IntrospectionUtils {
    * Given a {@link MetadataType} it adds all the {@link Class} that are related from that type. This includes generics of an
    * {@link ArrayType}, open restriction of an {@link ObjectType} as well as its fields.
    *
-   * @param type                 {@link MetadataType} to inspect
+   * @param type {@link MetadataType} to inspect
    * @return {@link Set<Class>>} with the classes reachable from the {@code type}
    */
   public static Set<String> collectRelativeClassesAsString(MetadataType type) {
@@ -1183,7 +1201,7 @@ public final class IntrospectionUtils {
    * Given a {@link Set} of Annotation classes and a {@link MetadataType} that describes a component parameter, indicates if the
    * parameter is considered as a multilevel {@link MetadataKeyId}
    *
-   * @param annotations   of the parameter
+   * @param annotations of the parameter
    * @param parameterType of the parameter
    * @return a boolean indicating if the Parameter is considered as a multilevel {@link MetadataKeyId}
    */
@@ -1197,7 +1215,7 @@ public final class IntrospectionUtils {
    * <p>
    * To be a parameter container means that the parameter is a {@link ParameterGroup} or a multilevel {@link MetadataKeyId}.
    *
-   * @param annotations   of the component parameter
+   * @param annotations of the component parameter
    * @param parameterType of the component parameter
    * @return a boolean indicating if the parameter is considered as a parameter container
    */
@@ -1298,7 +1316,7 @@ public final class IntrospectionUtils {
   /**
    * Resolves the correspondent {@link ConnectionProviderModel} for a given {@link ConnectionProvider} instance.
    *
-   * @param connectionProvider     connection provider class
+   * @param connectionProvider connection provider class
    * @param allConnectionProviders list of available {@link ConnectionProviderModel}
    * @return an {@link Optional} value of the {@link ConnectionProviderModel}
    */
@@ -1362,7 +1380,7 @@ public final class IntrospectionUtils {
 
         return of(new FieldSetter<>(fields.get(0)));
       });
-    } catch (ExecutionException e) {
+    } catch (ExecutionException | UncheckedExecutionException e) {
       throw new MuleRuntimeException(e.getCause());
     }
   }
@@ -1382,13 +1400,14 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Sets the {@code configName} into the field of the {@code target} annotated {@link RefName} (if it's present) and does the same for the
-   * {@code encoding} and the field annotated with {@link DefaultEncoding} if the {@code model} contains the {@link DeclaringMemberModelProperty}
+   * Sets the {@code configName} into the field of the {@code target} annotated {@link RefName} (if it's present) and does the
+   * same for the {@code encoding} and the field annotated with {@link DefaultEncoding} if the {@code model} contains the
+   * {@link DeclaringMemberModelProperty}
    *
-   * @param model      enriched with {@link InjectedFieldModelProperty}
-   * @param target     object in which the fields are going to be set
+   * @param model enriched with {@link InjectedFieldModelProperty}
+   * @param target object in which the fields are going to be set
    * @param configName to be injected into the {@link String} field annotated with {@link RefName}
-   * @param encoding   to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   * @param encoding to be injected into the {@link String} field annotated with {@link DefaultEncoding}
    */
   public static void injectFields(EnrichableModel model, Object target, String configName, String encoding) {
     injectFieldFromModelProperty(target, configName, model.getModelProperty(RequireNameField.class), RefName.class);
@@ -1399,8 +1418,8 @@ public final class IntrospectionUtils {
    * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} if the {@code model}
    * contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
    *
-   * @param model    enriched with {@link DefaultEncodingModelProperty}
-   * @param target   object in which the fields are going to be set
+   * @param model enriched with {@link DefaultEncodingModelProperty}
+   * @param target object in which the fields are going to be set
    * @param encoding to be injected into the {@link String} field annotated with {@link DefaultEncoding}
    */
   public static void injectDefaultEncoding(EnrichableModel model, Object target, String encoding) {
@@ -1409,12 +1428,12 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Sets the {@code configName} into the field of the {@code target} annotated {@link RefName} (if it's present) and does the same for the
-   * {@code encoding} and the field annotated with {@link DefaultEncoding}.
+   * Sets the {@code configName} into the field of the {@code target} annotated {@link RefName} (if it's present) and does the
+   * same for the {@code encoding} and the field annotated with {@link DefaultEncoding}.
    *
-   * @param target     object in which the fields are going to be set
+   * @param target object in which the fields are going to be set
    * @param configName to be injected into the {@link String} field annotated with {@link RefName}
-   * @param encoding   to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   * @param encoding to be injected into the {@link String} field annotated with {@link DefaultEncoding}
    * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
    */
   public static void injectFields(Object target, String configName, String encoding) {
@@ -1423,13 +1442,13 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Introspects the {@code target} object for a field annotated with {@link RefName}. If found, it injects the
-   * {@code configName} value into it.
+   * Introspects the {@code target} object for a field annotated with {@link RefName}. If found, it injects the {@code configName}
+   * value into it.
    * <p>
-   * The {@code target} object is expected to have only one field annotated with {@link RefName} and that field is
-   * required to be a String.
+   * The {@code target} object is expected to have only one field annotated with {@link RefName} and that field is required to be
+   * a String.
    *
-   * @param target     object in which the value are going to be set
+   * @param target object in which the value are going to be set
    * @param configName the value to be injected
    */
   public static void injectRefName(Object target, String configName) {
@@ -1439,7 +1458,7 @@ public final class IntrospectionUtils {
   /**
    * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} (if present)
    *
-   * @param target   object in which the fields are going to be set
+   * @param target object in which the fields are going to be set
    * @param encoding to be injected into the {@link String} field annotated with {@link DefaultEncoding}
    * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
    */
@@ -1463,7 +1482,7 @@ public final class IntrospectionUtils {
    * <p>
    * The {@code target} object is expected to have only one field of such type.
    *
-   * @param target            object in which the value are going to be set
+   * @param target object in which the value are going to be set
    * @param componentLocation the value to be injected
    */
   public static void injectComponentLocation(Object target, ComponentLocation componentLocation) {

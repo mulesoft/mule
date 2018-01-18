@@ -23,6 +23,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 import com.google.common.cache.Cache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import java.util.List;
 import java.util.Map;
@@ -31,8 +32,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * An {@link ObjectBuilder} used to build pojos which are used with the {@link ParameterGroup}
- * annotation.
+ * An {@link ObjectBuilder} used to build pojos which are used with the {@link ParameterGroup} annotation.
  *
  * @param <T> the generic type of the object being built
  */
@@ -80,7 +80,7 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
               addPropertyResolver(name, new StaticValueResolver<>(parameters.apply(name)));
             }
           });
-    } catch (ExecutionException e) {
+    } catch (ExecutionException | UncheckedExecutionException e) {
       throw new DefaultMuleException(e.getCause());
     }
 
