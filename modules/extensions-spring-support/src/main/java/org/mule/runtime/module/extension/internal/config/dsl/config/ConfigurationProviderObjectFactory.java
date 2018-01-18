@@ -6,16 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.config;
 
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.time.TimeSupplier;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
+import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
@@ -28,8 +33,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticConnectionProviderResolver;
 
 import java.util.Optional;
-
-import javax.inject.Inject;
 
 /**
  * A {@link AbstractExtensionObjectFactory} which produces {@link ConfigurationProvider} instances
@@ -74,34 +77,42 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
 
     ResolverSet resolverSet = getParametersResolver().getParametersAsHashedResolverSet(configurationModel, muleContext);
     final ConnectionProviderValueResolver connectionProviderResolver = getConnectionProviderResolver();
-    connectionProviderResolver.getResolverSet()
-        .ifPresent((CheckedConsumer) resolver -> initialiseIfNeeded(resolver, true, muleContext));
+    return withContextClassLoader(getExtensionClassLoader(), () -> {
+      connectionProviderResolver.getResolverSet()
+          .ifPresent((CheckedConsumer) resolver -> initialiseIfNeeded(resolver, true, muleContext));
 
-    ConfigurationProvider configurationProvider;
-    try {
-      if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
-        configurationProvider =
-            configurationProviderFactory.createDynamicConfigurationProvider(name, extensionModel,
-                                                                            configurationModel,
-                                                                            resolverSet,
-                                                                            connectionProviderResolver,
-                                                                            expirationPolicy,
-                                                                            muleContext);
-      } else {
-        configurationProvider = configurationProviderFactory
-            .createStaticConfigurationProvider(name,
-                                               extensionModel,
-                                               configurationModel,
-                                               resolverSet,
-                                               connectionProviderResolver,
-                                               muleContext);
+      ConfigurationProvider configurationProvider;
+      try {
+        if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
+          configurationProvider =
+              configurationProviderFactory.createDynamicConfigurationProvider(name, extensionModel,
+                                                                              configurationModel,
+                                                                              resolverSet,
+                                                                              connectionProviderResolver,
+                                                                              expirationPolicy,
+                                                                              muleContext);
+        } else {
+          configurationProvider = configurationProviderFactory
+              .createStaticConfigurationProvider(name,
+                                                 extensionModel,
+                                                 configurationModel,
+                                                 resolverSet,
+                                                 connectionProviderResolver,
+                                                 muleContext);
+        }
+
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
+                                                                  configurationModel.getName(), extensionModel.getName())),
+                                       e);
       }
+      return configurationProvider;
+    });
+  }
 
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-
-    return configurationProvider;
+  private ClassLoader getExtensionClassLoader() {
+    return extensionModel.getModelProperty(ClassLoaderModelProperty.class).map(ClassLoaderModelProperty::getClassLoader)
+        .orElse(currentThread().getContextClassLoader());
   }
 
   private ConnectionProviderValueResolver getConnectionProviderResolver() {
