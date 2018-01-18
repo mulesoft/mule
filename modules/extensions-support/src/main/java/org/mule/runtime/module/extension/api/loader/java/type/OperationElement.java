@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * {@link MethodElement} specification for Operations
  *
  * @since 4.1
  */
+@NoImplement
 public interface OperationElement extends MethodElement<OperationContainerElement> {
 }

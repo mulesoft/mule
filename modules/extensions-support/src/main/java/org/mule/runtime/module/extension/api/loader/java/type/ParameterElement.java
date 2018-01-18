@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Parameter;
 import java.util.Optional;
@@ -15,6 +17,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ParameterElement extends ExtensionParameter {
 
   /**

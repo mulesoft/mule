@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * A generic contract for any kind of component that could describer who is their owner
  * <p>
@@ -13,6 +15,7 @@ package org.mule.runtime.module.extension.api.loader.java.type;
  *
  * @since 4.0
  */
+@NoImplement
 interface WithOwner {
 
   String getOwnerDescription();

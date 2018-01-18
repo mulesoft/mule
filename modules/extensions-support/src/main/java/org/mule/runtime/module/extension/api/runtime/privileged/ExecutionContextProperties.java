@@ -23,4 +23,6 @@ public class ExecutionContextProperties {
    */
   public static final String COMPLETION_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "COMPLETION_CALLBACK_CONTEXT_PARAM";
 
+  private ExecutionContextProperties() {}
+
 }

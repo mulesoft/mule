@@ -21,7 +21,7 @@ import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManage
  *
  * @since 4.0
  */
-public class DefaultExtensionManagerFactory implements ExtensionManagerFactory {
+public final class DefaultExtensionManagerFactory implements ExtensionManagerFactory {
 
   /**
    * {@inheritDoc}

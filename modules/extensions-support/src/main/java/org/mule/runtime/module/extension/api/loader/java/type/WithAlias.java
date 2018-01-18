@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 /**
@@ -13,6 +14,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
  *
  * @since 4.0
  */
+@NoImplement
 public interface WithAlias extends WithAnnotations, WithName {
 
   String EMPTY = "";
