@@ -502,28 +502,28 @@ public final class IntrospectionUtils {
     return getField(clazz, MuleExtensionAnnotationParser.getMemberName(parameterDeclaration, parameterDeclaration.getName()));
   }
 
-  private static final Cache<Pair<Class<?>, String>, Optional<Field>> fieldByClassAndNameCache =
+  private static final Cache<Class<?>, List<Field>> fieldsByClassCache =
       newBuilder().weakKeys().build();
 
   public static Optional<Field> getField(Class<?> clazz, String name) {
     try {
-      return fieldByClassAndNameCache.get(new Pair<>(clazz, name), () -> {
+      final List<Field> classFields = fieldsByClassCache.get(clazz, () -> {
+        List<Field> fields = new ArrayList<>();
+
         for (Field field : clazz.getDeclaredFields()) {
-          if (field.getName().equals(name)) {
-            return Optional.of(field);
-          }
+          fields.add(field);
         }
 
         for (Class<?> type : ReflectionUtils.getAllSuperTypes(clazz)) {
           for (Field field : type.getDeclaredFields()) {
-            if (field.getName().equals(name)) {
-              return Optional.of(field);
-            }
+            fields.add(field);
           }
         }
 
-        return empty();
+        return fields;
       });
+
+      return classFields.stream().filter(f -> f.getName().equals(name)).findFirst();
     } catch (ExecutionException | UncheckedExecutionException e) {
       throw new MuleRuntimeException(e.getCause());
     }
