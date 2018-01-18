@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -24,6 +25,7 @@ import org.reactivestreams.Publisher;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -42,6 +44,8 @@ import reactor.core.publisher.Mono;
  * <p>
  */
 public class OperationPolicyProcessor implements Processor {
+
+  private static final Logger LOGGER = getLogger(OperationPolicyProcessor.class);
 
   private final Policy policy;
   private final PolicyStateHandler policyStateHandler;
@@ -90,11 +94,15 @@ public class OperationPolicyProcessor implements Processor {
   private Mono<PrivilegedEvent> executePolicyChain(PrivilegedEvent operationEvent, PolicyStateId policyStateId,
                                                    PrivilegedEvent policyEvent) {
     return just(policyEvent)
+        .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
+                                     getMessageAttributesAsString(event), "Before operation"))
         .cast(CoreEvent.class)
         .transform(policy.getPolicyChain())
         .cast(PrivilegedEvent.class)
         .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
-        .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent));
+        .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent))
+        .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
+                                     getMessageAttributesAsString(event), "After operation"));
   }
 
   private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, PrivilegedEvent operationEvent) {
@@ -123,4 +131,18 @@ public class OperationPolicyProcessor implements Processor {
     };
   }
 
+  private String getMessageAttributesAsString(CoreEvent event) {
+    if (event.getMessage() == null || event.getMessage().getAttributes() == null
+        || event.getMessage().getAttributes().getValue() == null) {
+      return "";
+    }
+    return event.getMessage().getAttributes().getValue().toString();
+  }
+
+  private void logPolicy(String eventId, String policyName, String message, String startingMessage) {
+    if (LOGGER.isTraceEnabled()) {
+      //TODO Remove event id when first policy generates it. MULE-14455
+      LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + "\nPolicy:" + policyName + "\n" + message);
+    }
+  }
 }
