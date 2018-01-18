@@ -33,7 +33,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -98,8 +97,8 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   private static final String CHILD_PLURAL_PARAM_NAME = "childTests";
   private static final String CHILD_SINGULAR_PARAM_NAME = "childTest";
 
-  private static final String REPEATED_NAME="repeatedName";
-  private static final String UNIQUE_PARAM_NAME="uniqueParam";
+  private static final String REPEATED_NAME = "repeatedName";
+  private static final String UNIQUE_PARAM_NAME = "uniqueParam";
 
   @Mock
   private ExtensionModel extensionModel;
@@ -168,7 +167,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     topLevelConnectionProviderParam = getParameter(TOP_LEVEL_OPERATION_PARAM_NAME, TopLevelTest.class);
 
     simpleConstructParam = getParameter(SIMPLE_PARAM_NAME, String.class);
-    topLevelConstructParam = getParameter(TOP_LEVEL_CONSTRUCT_PARAM_NAME,TopLevelTest.class);
+    topLevelConstructParam = getParameter(TOP_LEVEL_CONSTRUCT_PARAM_NAME, TopLevelTest.class);
 
     when(configurationModel.getName()).thenReturn(CONFIG_NAME);
     when(configurationModel.getAllParameterModels()).thenReturn(asList(simpleConfigParam, topLevelConfigParam));
@@ -582,12 +581,12 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     mockParameterGroups(operationModel, true);
     validate();
   }
-  
+
   @Test
   public void repeatedContentParameterNameAndConfiguration() {
     exception.expect(IllegalModelDefinitionException.class);
     when(configurationModel.getName()).thenReturn(REPEATED_NAME);
-    ParameterModel param = getParameter(REPEATED_NAME+CONFIG_SUFFIX, ChildObjectTest.class);
+    ParameterModel param = getParameter(REPEATED_NAME + CONFIG_SUFFIX, ChildObjectTest.class);
     when(param.getRole()).thenReturn(PRIMARY_CONTENT);
     when(operationModel.getAllParameterModels()).thenReturn(asList(param));
     validate();
@@ -616,22 +615,30 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void repeatedContentParameterNameAndChildElementSupport() {
     exception.expect(IllegalModelDefinitionException.class);
-    ParameterModel firstParam = getParameter(REPEATED_NAME, ChildObjectTest.class);
-    ParameterModel secondParam = getParameter(UNIQUE_PARAM_NAME, ChildElementTest.class);
-    when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
-    when(secondParam.getRole()).thenReturn(BEHAVIOUR);
-    when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam, secondParam));
 
-    mockParameterGroup(operationModel, asList(firstParam,secondParam));
-    
+    OperationModel anotherOperationModel = mock(OperationModel.class);
+
+    when(extensionModel.getOperationModels()).thenReturn(asList(operationModel, anotherOperationModel));
+    when(anotherOperationModel.getName()).thenReturn("anotherOperation");
+
+    ParameterModel param = getParameter(REPEATED_NAME, String.class);
+    ParameterModel anotherParam = getParameter(UNIQUE_PARAM_NAME, ChildElementTest.class);
+    when(param.getRole()).thenReturn(PRIMARY_CONTENT);
+    when(anotherParam.getRole()).thenReturn(BEHAVIOUR);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(param));
+    when(anotherOperationModel.getAllParameterModels()).thenReturn(asList(anotherParam));
+
+    mockParameterGroup(operationModel, asList(param));
+    mockParameterGroup(anotherOperationModel, asList(anotherParam));
+
     validate();
   }
 
   @Test
   public void repeatedChildElementSupportNameAndChildElementSupportDifferentType() {
     exception.expect(IllegalModelDefinitionException.class);
-    ParameterModel firstParam = getParameter(UNIQUE_PARAM_NAME+"1", ChildElementTest.class);
-    ParameterModel secondParam = getParameter(UNIQUE_PARAM_NAME+"2", ChildElementTestClone.class);
+    ParameterModel firstParam = getParameter(UNIQUE_PARAM_NAME + "1", ChildElementTest.class);
+    ParameterModel secondParam = getParameter(UNIQUE_PARAM_NAME + "2", ChildElementTestClone.class);
     when(firstParam.getRole()).thenReturn(BEHAVIOUR);
     when(secondParam.getRole()).thenReturn(BEHAVIOUR);
     when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam, secondParam));
@@ -660,13 +667,13 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel, anotherOperationModel));
     when(anotherOperationModel.getName()).thenReturn("anotherOperation");
-    
+
     ParameterModel param = getParameter(UNIQUE_PARAM_NAME + "1", ChildElementTest.class);
     ParameterModel anotherParam = getParameter(UNIQUE_PARAM_NAME + "2", ChildElementTest.class);
     when(param.getRole()).thenReturn(BEHAVIOUR);
     when(anotherParam.getRole()).thenReturn(BEHAVIOUR);
     when(operationModel.getAllParameterModels()).thenReturn(asList(param));
-    when(anotherOperationModel.getAllParameterModels()).thenReturn(asList(param));
+    when(anotherOperationModel.getAllParameterModels()).thenReturn(asList(anotherParam));
 
     mockParameterGroup(operationModel, asList(param));
     mockParameterGroup(anotherOperationModel, asList(anotherParam));
@@ -676,23 +683,23 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void repeatedChildElementSupportNameAndChildElementSupportDifferenctTypeDifferentOperation() {
-      exception.expect(IllegalModelDefinitionException.class);
-      OperationModel anotherOperationModel = mock(OperationModel.class);
+    exception.expect(IllegalModelDefinitionException.class);
+    OperationModel anotherOperationModel = mock(OperationModel.class);
 
-      when(extensionModel.getOperationModels()).thenReturn(asList(operationModel, anotherOperationModel));
-      when(anotherOperationModel.getName()).thenReturn("anotherOperation");
+    when(extensionModel.getOperationModels()).thenReturn(asList(operationModel, anotherOperationModel));
+    when(anotherOperationModel.getName()).thenReturn("anotherOperation");
 
-      ParameterModel param = getParameter(UNIQUE_PARAM_NAME + "1", ChildElementTest.class);
-      ParameterModel anotherParam = getParameter(UNIQUE_PARAM_NAME + "2", ChildElementTestClone.class);
-      when(param.getRole()).thenReturn(BEHAVIOUR);
-      when(anotherParam.getRole()).thenReturn(BEHAVIOUR);
-      when(operationModel.getAllParameterModels()).thenReturn(asList(param));
-      when(anotherOperationModel.getAllParameterModels()).thenReturn(asList(param));
+    ParameterModel param = getParameter(UNIQUE_PARAM_NAME + "1", ChildElementTest.class);
+    ParameterModel anotherParam = getParameter(UNIQUE_PARAM_NAME + "2", ChildElementTestClone.class);
+    when(param.getRole()).thenReturn(BEHAVIOUR);
+    when(anotherParam.getRole()).thenReturn(BEHAVIOUR);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(param));
+    when(anotherOperationModel.getAllParameterModels()).thenReturn(asList(anotherParam));
 
-      mockParameterGroup(operationModel, asList(param));
-      mockParameterGroup(anotherOperationModel, asList(anotherParam));
+    mockParameterGroup(operationModel, asList(param));
+    mockParameterGroup(anotherOperationModel, asList(anotherParam));
 
-      validate();
+    validate();
   }
 
   @Test
@@ -759,16 +766,16 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   private void mockParameterGroup(ParameterizedModel model, List<ParameterModel> parameters) {
-      ParameterGroupModel group = mock(ParameterGroupModel.class);
+    ParameterGroupModel group = mock(ParameterGroupModel.class);
 
-      when(group.getName()).thenReturn(DEFAULT_GROUP_NAME);
-      when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
-      when(group.getParameterModels()).thenReturn(parameters);
-      when(group.isShowInDsl()).thenReturn(true);
+    when(group.getName()).thenReturn(DEFAULT_GROUP_NAME);
+    when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
+    when(group.getParameterModels()).thenReturn(parameters);
+    when(group.isShowInDsl()).thenReturn(true);
 
-      when(model.getParameterGroupModels()).thenReturn(asList(group));
+    when(model.getParameterGroupModels()).thenReturn(asList(group));
   }
-  
+
   private void mockParameterGroups(ParameterizedModel model, boolean showInDsl) {
     ParameterGroupModel group = mock(ParameterGroupModel.class);
     ParameterModel parameterModel = getParameter(SIMPLE_PARAM_NAME, Object.class);
@@ -866,7 +873,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     ChildObjectTest repeatedName;
   }
 
-    public static class ChildObjectTest {
+  public static class ChildObjectTest {
 
     @Parameter
     String argument3;
