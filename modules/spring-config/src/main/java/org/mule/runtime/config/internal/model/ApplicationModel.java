@@ -1015,8 +1015,11 @@ public class ApplicationModel {
    * @param name the expected value for the name attribute configuration.
    * @return the component if present, if not, an empty {@link Optional}
    */
-  // TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
   public Optional<ComponentModel> findNamedElement(String name) {
+    final Optional<ComponentModel> topLevelNamedComponent = findTopLevelNamedComponent(name);
+    if (topLevelNamedComponent.isPresent()) {
+      return topLevelNamedComponent;
+    }
     return ofNullable(namedComponentModels.getOrDefault(name, null));
   }
 
