@@ -14087,8 +14087,8 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
-        "HEISENBERG:OAUTH2",
-        "HEISENBERG:HEALTH"
+        "HEISENBERG:HEALTH",
+        "HEISENBERG:OAUTH2"
       ],
       "stereotype": {
         "type": "HEISENBERG-EMPIRE",
@@ -24312,6 +24312,10 @@
   ],
   "errors": [
     {
+      "error": "MULE:ANY",
+      "handleable": true
+    },
+    {
       "error": "HEISENBERG:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY",
       "handleable": true
@@ -24322,22 +24326,13 @@
       "handleable": true
     },
     {
-      "error": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "HEISENBERG:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
-      "handleable": true
-    },
-    {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY",
       "handleable": true
     },
     {
-      "error": "HEISENBERG:OAUTH2",
-      "parent": "HEISENBERG:CONNECTIVITY",
+      "error": "HEISENBERG:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     },
     {
@@ -24347,6 +24342,11 @@
     },
     {
       "error": "HEISENBERG:HEALTH",
+      "parent": "HEISENBERG:CONNECTIVITY",
+      "handleable": true
+    },
+    {
+      "error": "HEISENBERG:OAUTH2",
       "parent": "HEISENBERG:CONNECTIVITY",
       "handleable": true
     },

@@ -18061,13 +18061,13 @@
       "handleable": true
     },
     {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY",
+      "error": "METADATA:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
     {
-      "error": "METADATA:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY",
       "handleable": true
     }
   ],
