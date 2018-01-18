@@ -1363,8 +1363,12 @@ public final class IntrospectionUtils {
 
   private static Optional<FieldSetter> getFieldSetterForAnnotatedField(Object target,
                                                                        Class<? extends Annotation> annotationClass) {
-    Cache<Class<?>, Optional<FieldSetter>> cache =
-        fieldSetterForAnnotatedFieldCache.computeIfAbsent(annotationClass, k -> newBuilder().weakKeys().build());
+    Cache<Class<?>, Optional<FieldSetter>> cache = fieldSetterForAnnotatedFieldCache.get(annotationClass);
+    // This pre-check is made in order to avoid the synchronized block in the implementation of ConcurrentHashMap
+    // (https://bugs.openjdk.java.net/browse/JDK-8161372)
+    if (cache == null) {
+      cache = fieldSetterForAnnotatedFieldCache.computeIfAbsent(annotationClass, k -> newBuilder().weakKeys().build());
+    }
 
     final Class<?> type = target.getClass();
     try {

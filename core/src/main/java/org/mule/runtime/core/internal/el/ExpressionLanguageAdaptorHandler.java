@@ -151,6 +151,13 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   private ExtendedExpressionLanguageAdaptor selectExpressionLanguage(String expression) {
+    // This pre-check is made in order to avoid the synchronized block in the implementation of ConcurrentHashMap
+    // (https://bugs.openjdk.java.net/browse/JDK-8161372)
+    final ExtendedExpressionLanguageAdaptor el = expressionLanguagesByExpressionCache.get(expression);
+    if (el != null) {
+      return el;
+    }
+
     return expressionLanguagesByExpressionCache.computeIfAbsent(expression, e -> {
       final String languagePrefix = getLanguagePrefix(e);
       if (isEmpty(languagePrefix)) {
