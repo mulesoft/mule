@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.collectRelativeClassesAsString;
 
@@ -20,13 +21,17 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -87,6 +92,24 @@ final public class ExportedArtifactsCollector {
         .collect(toSet());
 
     return filterExportedPackages(exportedPackages);
+  }
+
+  /**
+   * @return A {@link Map} of default java package names that the extension should export and indicates which
+   * are the classes that makes the package to be exported.
+   */
+  public Map<String, Collection<String>> getDetailedExportedPackages() {
+    collectDefault();
+    collectManuallyExportedPackages();
+    HashMultimap<String, String> exportedPackages = HashMultimap.create();
+
+    exportedClasses.stream()
+        .map(clazz -> new Pair<>(packageFinder.packageFor(clazz).orElse(""), clazz))
+        .filter(pair -> !isBlank(pair.getFirst()))
+        .filter(pair -> filteredPackages.stream().noneMatch(filteredPackage -> pair.getFirst().startsWith(filteredPackage)))
+        .forEach(pair -> exportedPackages.put(pair.getFirst(), pair.getSecond()));
+
+    return exportedPackages.asMap();
   }
 
   /**
