@@ -6,18 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
+import static java.util.Collections.singletonList;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.extension.api.annotation.Sources;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.MethodDocumentation;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * {@link AbstractDescriptionDocumenter} implementation that fills {@link WithSourcesDeclaration}s
@@ -39,7 +42,19 @@ final class SourcesDescriptionDocumenter extends AbstractDescriptionDocumenter<W
             .ifPresent(source -> {
               source.setDescription(processor.getJavaDocSummary(processingEnv, sourceElement));
               parameterDeclarer.document(source, sourceElement);
+
+              Map<String, Element> methods = getApiMethods(processingEnv, singletonList(sourceElement));
+              source.getSuccessCallback().ifPresent(cb -> documentCallback(methods, cb));
+              source.getErrorCallback().ifPresent(cb -> documentCallback(methods, cb));
             }));
+  }
+
+  private void documentCallback(Map<String, Element> methods, SourceCallbackDeclaration cb) {
+    Element method = methods.get(cb.getName());
+    if (method != null) {
+      MethodDocumentation documentation = processor.getMethodDocumentation(processingEnv, method);
+      parameterDeclarer.document(cb, method, documentation);
+    }
   }
 
   private Optional<SourceDeclaration> findMatchingSource(WithSourcesDeclaration<?> declaration, Element element) {

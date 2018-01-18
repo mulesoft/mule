@@ -27,6 +27,7 @@ public class XmlExtensionDocumentation {
   private List<XmlExtensionElementDocumentation> configs = new LinkedList<>();
   private List<XmlExtensionElementDocumentation> sources = new LinkedList<>();
   private List<XmlExtensionElementDocumentation> operation = new LinkedList<>();
+  private List<XmlExtensionElementDocumentation> types = new LinkedList<>();
 
   @XmlElementWrapper(name = "connections")
   @XmlElement(name = "connection")
@@ -66,6 +67,16 @@ public class XmlExtensionDocumentation {
 
   public void setOperation(List<XmlExtensionElementDocumentation> operation) {
     this.operation = operation;
+  }
+
+  @XmlElementWrapper(name = "types")
+  @XmlElement(name = "type")
+  public List<XmlExtensionElementDocumentation> getTypes() {
+    return types;
+  }
+
+  public void setTypes(List<XmlExtensionElementDocumentation> types) {
+    this.types = types;
   }
 
   @XmlElement

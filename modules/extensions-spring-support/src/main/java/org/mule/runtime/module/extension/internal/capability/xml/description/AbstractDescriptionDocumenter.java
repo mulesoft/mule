@@ -6,13 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
+import static java.util.Collections.unmodifiableMap;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
 /**
@@ -55,6 +61,38 @@ abstract class AbstractDescriptionDocumenter<T> {
   Optional<String> getAlias(Element element) {
     Alias annotation = element.getAnnotation(Alias.class);
     return annotation != null ? Optional.of(annotation.value()) : Optional.empty();
+  }
+
+
+  Map<String, Element> getApiMethods(ProcessingEnvironment processingEnv, List<TypeElement> containerClasses) {
+    Map<String, Element> methods = new HashMap<>();
+
+    for (TypeElement containerElement : containerClasses) {
+
+      TypeElement currentElement = containerElement;
+      while (currentElement != null
+          && !processingEnv.getTypeUtils().isSameType(currentElement.asType(), objectType.asType())) {
+        for (ExecutableElement operation : IntrospectionUtils.getApiMethods(currentElement, processingEnv)) {
+          currentElement.getEnclosedElements().stream()
+              .filter(e -> e.getSimpleName().toString().equals(operation.getSimpleName().toString()))
+              .findFirst()
+              .ifPresent(e -> {
+                String nameOrAlias = getNameOrAlias(operation);
+                if (!methods.containsKey(nameOrAlias) || e.getEnclosingElement().equals(containerElement)) {
+                  // Use the leaf in an overriden method hierarchy
+                  methods.put(nameOrAlias, e);
+                }
+              });
+        }
+        Element superClass = processingEnv.getTypeUtils().asElement(currentElement.getSuperclass());
+        if (superClass instanceof TypeElement) {
+          currentElement = (TypeElement) superClass;
+        } else {
+          currentElement = null;
+        }
+      }
+    }
+    return unmodifiableMap(methods);
   }
 
 }

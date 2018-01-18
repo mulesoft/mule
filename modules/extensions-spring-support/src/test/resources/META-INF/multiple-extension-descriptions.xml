@@ -121,7 +121,7 @@
                     <description><![CDATA[Group parameter 2]]></description>
                 </parameter>
                 <parameter name="alias-param">
-                    <description><![CDATA[]]></description>
+                    <description><![CDATA[Param with alias]]></description>
                 </parameter>
             </parameters>
         </operation>

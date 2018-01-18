@@ -8,18 +8,17 @@ package org.mule.runtime.module.extension.internal.capability.xml.description;
 
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 
+import java.util.List;
+import java.util.Optional;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * {@link AbstractDescriptionDocumenter} implementation that fills {@link ConfigurationDeclaration}s
@@ -48,7 +47,7 @@ final class ConfigurationDescriptionDocumenter extends AbstractDescriptionDocume
     parameterDeclarer.document(declaration, configElement);
   }
 
-  private void documentConnectionProviders(ConfigurationDeclaration declaration, TypeElement element) {
+  public void documentConnectionProviders(ConnectedDeclaration<?> declaration, TypeElement element) {
     getConnectionProviderClasses(processingEnv, element)
         .forEach(providerElement -> findMatchingProvider(declaration, providerElement)
             .ifPresent(provider -> {
