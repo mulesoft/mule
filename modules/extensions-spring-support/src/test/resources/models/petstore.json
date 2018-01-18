@@ -1882,8 +1882,8 @@
           "nestedComponents": [],
           "errors": [
             "PETSTORE:CONNECTIVITY",
-            "PETSTORE:RETRY_EXHAUSTED",
-            "PETSTORE:PET_ERROR"
+            "PETSTORE:PET_ERROR",
+            "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -16347,12 +16347,12 @@
   "notifications": [],
   "errors": [
     {
-      "error": "PETSTORE:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "PETSTORE:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
     {
-      "error": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:CONNECTIVITY",
       "parent": "MULE:ANY",
       "handleable": true
     },
@@ -16361,13 +16361,13 @@
       "handleable": true
     },
     {
-      "error": "PETSTORE:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY",
       "handleable": true
     },
     {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY",
+      "error": "PETSTORE:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     },
     {

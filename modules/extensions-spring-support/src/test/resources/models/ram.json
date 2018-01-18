@@ -411,18 +411,18 @@
           "notifications": [],
           "nestedComponents": [],
           "errors": [
-            "RAM:TIMEOUT",
-            "RAM:INVALID_WSDL",
-            "RAM:CANNOT_DISPATCH",
-            "RAM:CONNECTIVITY",
             "RAM:ENCODING",
-            "RAM:BAD_RESPONSE",
-            "RAM:SOAP_FAULT",
-            "MULE:ANY",
             "RAM:RETRY_EXHAUSTED",
-            "MULE:CONNECTIVITY",
+            "MULE:ANY",
+            "RAM:CANNOT_DISPATCH",
+            "RAM:INVALID_WSDL",
             "MULE:RETRY_EXHAUSTED",
-            "RAM:BAD_REQUEST"
+            "RAM:BAD_REQUEST",
+            "RAM:TIMEOUT",
+            "RAM:CONNECTIVITY",
+            "RAM:SOAP_FAULT",
+            "RAM:BAD_RESPONSE",
+            "MULE:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1580,47 +1580,12 @@
   "notifications": [],
   "errors": [
     {
-      "error": "RAM:TIMEOUT",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "RAM:CANNOT_DISPATCH",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "RAM:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
-      "handleable": true
-    },
-    {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "RAM:INVALID_WSDL",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
       "error": "RAM:ENCODING",
       "parent": "MULE:ANY",
       "handleable": true
     },
     {
-      "error": "RAM:BAD_RESPONSE",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "RAM:SOAP_FAULT",
-      "parent": "MULE:ANY",
+      "error": "MULE:ANY",
       "handleable": true
     },
     {
@@ -1634,7 +1599,42 @@
       "handleable": true
     },
     {
+      "error": "RAM:CANNOT_DISPATCH",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "RAM:INVALID_WSDL",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "RAM:TIMEOUT",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
       "error": "RAM:BAD_REQUEST",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "RAM:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
+      "handleable": true
+    },
+    {
+      "error": "RAM:SOAP_FAULT",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "RAM:BAD_RESPONSE",
       "parent": "MULE:ANY",
       "handleable": true
     }

@@ -1453,12 +1453,12 @@
   "notifications": [],
   "errors": [
     {
-      "error": "FN:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "FN:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     },
     {
-      "error": "MULE:CONNECTIVITY",
+      "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY",
       "handleable": true
     },
@@ -1467,12 +1467,12 @@
       "handleable": true
     },
     {
-      "error": "FN:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "FN:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
     {
-      "error": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:CONNECTIVITY",
       "parent": "MULE:ANY",
       "handleable": true
     }
