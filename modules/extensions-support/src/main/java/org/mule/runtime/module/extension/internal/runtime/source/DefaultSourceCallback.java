@@ -202,7 +202,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     contextAdapter.getNotificationsFunctions().forEach(sourceNotification -> {
       String notificationName = ((ExtensionNotificationFunction) sourceNotification).getActionName();
       checkArgument(notificationModelNames.contains(notificationName),
-                    format("Cannot fire notification '%s' since it's not declared by the component.", notificationName));
+                    () -> format("Cannot fire notification '%s' since it's not declared by the component.", notificationName));
     });
   }
 
