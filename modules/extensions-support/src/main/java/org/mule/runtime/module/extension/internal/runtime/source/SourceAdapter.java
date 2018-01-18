@@ -257,12 +257,13 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
     @Override
     public Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters) {
       final CoreEvent event = exception.getEvent();
-      final boolean isOverloadError = event.getError()
+      final boolean isBackPressureError = event.getError()
           .map(e -> flowBackPressueErrorType.equals(e.getErrorType()))
           .orElse(false);
 
       SourceCallbackExecutor executor;
-      if (isOverloadError) {
+      if (isBackPressureError) {
+        LOGGER.info("FLOW OVERLOAD - {}.", event.getError().get().getCause().getMessage());
         executor = onBackPressureExecutor;
         parameters = emptyMap();
         context.addVariable(BACK_PRESSURE_ACTION_CONTEXT_PARAM, backPressureAction);

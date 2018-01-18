@@ -63,8 +63,8 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
     if (exception instanceof MessagingException && ((MessagingException) exception).getEvent().getError().isPresent()) {
       ErrorType errorType = ((MessagingException) exception).getEvent().getError().get().getErrorType();
       if (overloadMatcher.match(errorType)) {
-        if (logger.isDebugEnabled()) {
-          logger.debug(resolveExceptionAndMessageToLog(exception).toString());
+        if (logger.isInfoEnabled()) {
+          logger.info(resolveExceptionAndMessageToLog(exception).toString());
         }
         return;
       }
