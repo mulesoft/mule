@@ -863,14 +863,7 @@ public class ClassUtils {
    */
   public static <I, O> Function<I, O> memoize(Function<I, O> f, Map<I, O> cache) {
     return input -> {
-      // This pre-check is made in order to avoid the synchronized block in the implementation of ConcurrentHashMap
-      // (https://bugs.openjdk.java.net/browse/JDK-8161372)
-      O value = cache.get(input);
-      if (value != null) {
-        return value;
-      } else {
-        return cache.computeIfAbsent(input, f);
-      }
+      return cache.computeIfAbsent(input, f);
     };
   }
 
