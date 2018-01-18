@@ -12,6 +12,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 
+import org.mule.api.annotation.NoExtend;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connectivity.ConnectivityTestingStrategy;
@@ -32,6 +34,8 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
+@NoExtend
+@NoInstantiate
 public class ExtensionConnectivityTestingStrategy implements ConnectivityTestingStrategy {
 
   @Inject

@@ -6,22 +6,24 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-
-import javax.lang.model.element.TypeElement;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
+import javax.lang.model.element.TypeElement;
+
 /**
  * A generic contract for any kind of component that is based on a Class
  *
  * @since 4.0
  */
+@NoImplement
 public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclaringClass, WithElement {
 
   /**

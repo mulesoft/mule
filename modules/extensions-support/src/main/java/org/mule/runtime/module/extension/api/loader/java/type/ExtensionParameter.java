@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.api.loader.java.type;
 
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.meta.NamedObject;
@@ -29,18 +30,19 @@ import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
-import javax.lang.model.element.VariableElement;
+import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
+import javax.lang.model.element.VariableElement;
 
 /**
  * A contract for any kind of component from which an extension's parameter can be derived
  *
  * @since 4.0
  */
+@NoImplement
 public interface ExtensionParameter extends WithType, WithAnnotations, NamedObject, WithAlias, WithOwner, WithElement {
 
   Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder()

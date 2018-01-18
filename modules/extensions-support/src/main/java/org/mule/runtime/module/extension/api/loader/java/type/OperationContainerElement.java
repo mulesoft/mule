@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * A contract for a element from which operation container can be derived
  *
  * @since 4.0
  */
+@NoImplement
 public interface OperationContainerElement extends Type, WithOperations, ParameterizableTypeElement {
 
 }

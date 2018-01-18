@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.api.loader.java.type;
 
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -21,6 +22,7 @@ import java.util.List;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ParameterizableTypeElement extends Type, WithParameters {
 
   /**

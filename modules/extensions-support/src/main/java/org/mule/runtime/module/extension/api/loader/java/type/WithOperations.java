@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.util.List;
 
 /**
@@ -13,6 +15,7 @@ import java.util.List;
  *
  * @since 4.0
  */
+@NoImplement
 interface WithOperations {
 
   /**
