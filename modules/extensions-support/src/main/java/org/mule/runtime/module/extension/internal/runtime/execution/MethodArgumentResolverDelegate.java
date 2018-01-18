@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
@@ -14,6 +15,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -21,6 +24,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -128,6 +132,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       new NotificationHandlerArgumentResolver();
 
   private final Method method;
+  private final MuleContext context;
   private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
   private ArgumentResolver<?>[] argumentResolvers;
   private Map<java.lang.reflect.Parameter, ParameterGroupArgumentResolver<?>> parameterGroupResolvers;
@@ -138,8 +143,14 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
    * @param parameterGroupModels {@link List} of {@link ParameterGroupModel} from the corresponding model
    * @param method the {@link Method} to be called
    */
-  public MethodArgumentResolverDelegate(List<ParameterGroupModel> parameterGroupModels, Method method) {
+  public MethodArgumentResolverDelegate(List<ParameterGroupModel> parameterGroupModels, Method method, MuleContext context) {
     this.method = method;
+    this.context = context;
+    try {
+      context.getInjector().inject(this);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could initialize argument resolver resolver"), e);
+    }
     initArgumentResolvers(parameterGroupModels);
   }
 

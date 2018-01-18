@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -60,29 +59,23 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   private final Method method;
   private final Object componentInstance;
-  private final ArgumentResolverDelegate argumentResolverDelegate;
   private final ClassLoader extensionClassLoader;
+
+  // Needs to be lazy to wait the muleContext to be injected
+  private final LazyValue<ArgumentResolverDelegate> argumentResolverDelegate;
 
   private MuleContext muleContext;
 
   public ReflectiveMethodComponentExecutor(List<ParameterGroupModel> groups, Method method, Object componentInstance) {
     this.method = method;
     this.componentInstance = componentInstance;
-    argumentResolverDelegate = isEmpty(method.getParameterTypes()) ? NO_ARGS_DELEGATE : getMethodArgumentResolver(groups, method);
+    argumentResolverDelegate =
+        isEmpty(method.getParameterTypes()) ? new LazyValue<>(NO_ARGS_DELEGATE) : getMethodArgumentResolver(groups, method);
     extensionClassLoader = method.getDeclaringClass().getClassLoader();
   }
 
-  private MethodArgumentResolverDelegate getMethodArgumentResolver(List<ParameterGroupModel> groups, Method method) {
-    try {
-      MethodArgumentResolverDelegate resolver = new MethodArgumentResolverDelegate(groups, method);
-      if (muleContext != null) {
-        muleContext.getInjector().inject(resolver);
-      }
-      return resolver;
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage("Cannot inject MethodArgumentResolver for method: [" + method.getName()
-          + "]"), e);
-    }
+  private LazyValue<ArgumentResolverDelegate> getMethodArgumentResolver(List<ParameterGroupModel> groups, Method method) {
+    return new LazyValue<>(() -> new MethodArgumentResolverDelegate(groups, method, muleContext));
   }
 
   public Object execute(ExecutionContext<M> executionContext) {
@@ -93,7 +86,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   }
 
   private LazyValue<Object>[] getParameterValues(ExecutionContext<M> executionContext, Class<?>[] parameterTypes) {
-    return argumentResolverDelegate.resolve(executionContext, parameterTypes);
+    return argumentResolverDelegate.get().resolve(executionContext, parameterTypes);
   }
 
   @Override
