@@ -1,0 +1,24 @@
+{
+  "4.2.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.internal.dsl.model.properties.DefaultConfigurationPropertiesProvider",
+          "package": "org.mule.runtime.config.internal.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProvider",
+          "elementKind": "class",
+          "justification": "Class was moved to api and this change will be cherry-picked to 4.1.0"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.internal.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory",
+          "package": "org.mule.runtime.config.internal.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProviderFactory",
+          "elementKind": "class",
+          "justification": "Class was moved to api and this change will be cherry-picked to 4.1.0"
+        }
+      ]
+    }
+  }
+}

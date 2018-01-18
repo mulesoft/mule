@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.dsl.model.properties;
+package org.mule.runtime.config.api.dsl.model.properties;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -12,8 +12,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
 
 import java.util.Map;
 
