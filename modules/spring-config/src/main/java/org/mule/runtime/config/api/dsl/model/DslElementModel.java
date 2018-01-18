@@ -8,10 +8,7 @@ package org.mule.runtime.config.api.dsl.model;
 
 import static com.google.common.collect.ImmutableList.copyOf;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
-import static org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
@@ -21,6 +18,7 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -246,11 +244,18 @@ public class DslElementModel<T> {
       return false;
     }
 
-    return reflectionEquals(this, o);
+    DslElementModel<?> that = (DslElementModel<?>) o;
+    return explicitInDsl == that.explicitInDsl &&
+      Objects.equals(model, that.model) &&
+      Objects.equals(value, that.value) &&
+      Objects.equals(dsl, that.dsl) &&
+      Objects.equals(containedElements, that.containedElements) &&
+      Objects.equals(configuration, that.configuration) &&
+      Objects.equals(identifier, that.identifier);
   }
 
   @Override
   public int hashCode() {
-    return reflectionHashCode(this);
+    return Objects.hash(model, value, dsl, explicitInDsl, containedElements, configuration, identifier);
   }
 }
