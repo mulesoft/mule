@@ -140,8 +140,8 @@ public final class ErrorTypeBuilder {
 
       ErrorTypeImplementation that = (ErrorTypeImplementation) o;
       return Objects.equals(identifier, that.identifier) &&
-        Objects.equals(namespace, that.namespace) &&
-        Objects.equals(parentErrorType, that.parentErrorType);
+          Objects.equals(namespace, that.namespace) &&
+          Objects.equals(parentErrorType, that.parentErrorType);
     }
 
     @Override

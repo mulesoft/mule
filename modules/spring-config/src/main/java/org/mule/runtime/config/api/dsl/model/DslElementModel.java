@@ -246,12 +246,12 @@ public class DslElementModel<T> {
 
     DslElementModel<?> that = (DslElementModel<?>) o;
     return explicitInDsl == that.explicitInDsl &&
-      Objects.equals(model, that.model) &&
-      Objects.equals(value, that.value) &&
-      Objects.equals(dsl, that.dsl) &&
-      Objects.equals(containedElements, that.containedElements) &&
-      Objects.equals(configuration, that.configuration) &&
-      Objects.equals(identifier, that.identifier);
+        Objects.equals(model, that.model) &&
+        Objects.equals(value, that.value) &&
+        Objects.equals(dsl, that.dsl) &&
+        Objects.equals(containedElements, that.containedElements) &&
+        Objects.equals(configuration, that.configuration) &&
+        Objects.equals(identifier, that.identifier);
   }
 
   @Override
