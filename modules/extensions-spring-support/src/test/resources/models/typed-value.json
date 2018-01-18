@@ -3575,17 +3575,8 @@
   "notifications": [],
   "errors": [
     {
-      "error": "TYPED-VALUE:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
-      "handleable": true
-    },
-    {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "MULE:ANY",
+      "error": "TYPED-VALUE:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
     {
@@ -3594,8 +3585,17 @@
       "handleable": true
     },
     {
-      "error": "TYPED-VALUE:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "TYPED-VALUE:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     }
   ],
