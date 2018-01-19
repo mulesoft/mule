@@ -10,11 +10,9 @@ package org.mule.functional.util;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.fail;
@@ -65,7 +63,7 @@ public class FlowExecutionLogger extends AbstractComponent implements Processor 
     Message message = executionLog.getCollectedMessages().get(n - 1);
     if (message.getPayload().getValue() instanceof List) {
       List<TypedValue> aggregatedElements = (List<TypedValue>) message.getPayload().getValue();
-      assertThat(aggregatedElements.stream().map(element -> element.getValue()).collect(toList()), hasItems(values));
+      assertThat(aggregatedElements.stream().map(element -> element.getValue()).collect(toList()), contains(values));
     } else {
       assertThat(values, arrayWithSize(1));
       assertThat(message.getPayload().getValue(), is(equalTo(values[0])));
