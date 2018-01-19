@@ -49,6 +49,7 @@ import org.mule.runtime.module.extension.internal.metadata.QueryMetadataResolver
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * {@link DeclarationEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for components (Operations and
@@ -67,6 +68,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
   private class EnricherDelegate extends AbstractAnnotatedDeclarationEnricher {
 
     private Type extensionType;
+    private NullMetadataResolver nullMetadataResolver = new NullMetadataResolver();
 
     @Override
     public void enrich(ExtensionLoadingContext extensionLoadingContext) {
@@ -130,7 +132,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                 MetadataScopeAdapter metadataScope) {
       MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
       declaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> metadataResolverFactory));
-      declareMetadataKeyId(declaration);
+      declareMetadataKeyId(declaration, metadataScope.getKeysResolver());
       declareInputResolvers(declaration, metadataScope);
       if (declaration instanceof WithOutputDeclaration) {
         declareOutputResolvers((WithOutputDeclaration) declaration, metadataScope);
@@ -146,8 +148,8 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                                                                                        .entityResolver())));
       addQueryModelProperties(declaration, query);
       declareDynamicType(declaration.getOutput());
-      declareMetadataKeyId(declaration);
-      enrichMetadataKeyParameters(declaration, new NullMetadataResolver());
+      declareMetadataKeyId(declaration, () -> nullMetadataResolver);
+      enrichMetadataKeyParameters(declaration, nullMetadataResolver);
     }
 
 
@@ -196,33 +198,39 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       component.setType(component.getType(), true);
     }
 
-    private void declareMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component) {
-      getMetadataKeyModelProperty(component).ifPresent(property -> component.addModelProperty(property));
+    private void declareMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component,
+                                      Supplier<? extends TypeKeysResolver> keysResolver) {
+      getMetadataKeyModelProperty(component, keysResolver).ifPresent(component::addModelProperty);
     }
 
     private Optional<MetadataKeyIdModelProperty> getMetadataKeyModelProperty(
-                                                                             ComponentDeclaration<? extends ComponentDeclaration> component) {
-      Optional<MetadataKeyIdModelProperty> keyId = findMetadataKeyIdInGroups(component);
-      return keyId.isPresent() ? keyId : findMetadataKeyIdInParameters(component);
+                                                                             ComponentDeclaration<? extends ComponentDeclaration> component,
+                                                                             Supplier<? extends TypeKeysResolver> keysResolver) {
+
+      String categoryName = getCategoryName(keysResolver);
+      Optional<MetadataKeyIdModelProperty> keyId = findMetadataKeyIdInGroups(component, categoryName);
+      return keyId.isPresent() ? keyId : findMetadataKeyIdInParameters(component, categoryName);
     }
 
     private Optional<MetadataKeyIdModelProperty> findMetadataKeyIdInGroups(
-                                                                           ComponentDeclaration<? extends ComponentDeclaration> component) {
+                                                                           ComponentDeclaration<? extends ComponentDeclaration> component,
+                                                                           String categoryName) {
       return component.getParameterGroups().stream()
           .map(group -> group.getModelProperty(ParameterGroupModelProperty.class).orElse(null))
           .filter(Objects::nonNull)
           .filter(group -> group.getDescriptor().getAnnotatedContainer().isAnnotatedWith(MetadataKeyId.class))
           .map(group -> new MetadataKeyIdModelProperty(group.getDescriptor().getMetadataType(),
-                                                       group.getDescriptor().getName()))
+                                                       group.getDescriptor().getName(), categoryName))
           .findFirst();
     }
 
     private Optional<MetadataKeyIdModelProperty> findMetadataKeyIdInParameters(
-                                                                               ComponentDeclaration<? extends ComponentDeclaration> component) {
+                                                                               ComponentDeclaration<? extends ComponentDeclaration> component,
+                                                                               String categoryName) {
       return component.getParameterGroups().stream()
           .flatMap(g -> g.getParameters().stream())
           .filter(p -> getExtensionParameter(p).map(element -> element.isAnnotatedWith(MetadataKeyId.class)).orElse(false))
-          .map(p -> new MetadataKeyIdModelProperty(p.getType(), p.getName()))
+          .map(p -> new MetadataKeyIdModelProperty(p.getType(), p.getName(), categoryName))
           .findFirst();
     }
 
@@ -254,5 +262,12 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
                                                                      .getBooleanValue(MetadataKeyPart::providedByKeyResolver))));
 
     }
+  }
+
+  private String getCategoryName(Supplier<? extends TypeKeysResolver> keysResolver) {
+    TypeKeysResolver typeKeysResolver = keysResolver.get();
+    return typeKeysResolver instanceof NullMetadataResolver
+        ? null
+        : typeKeysResolver.getCategoryName();
   }
 }

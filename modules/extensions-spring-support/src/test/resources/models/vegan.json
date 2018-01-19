@@ -2603,7 +2603,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "key"
+              "parameterName": "key",
+              "categoryName": "HarvestedKeys"
             }
           },
           "kind": "source"

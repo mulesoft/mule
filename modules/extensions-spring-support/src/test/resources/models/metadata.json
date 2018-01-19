@@ -647,7 +647,8 @@
                   "typeId": "boolean"
                 }
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "BooleanMetadataResolver"
             }
           },
           "kind": "operation"
@@ -1425,7 +1426,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -2164,7 +2166,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -3491,7 +3494,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -3894,7 +3898,8 @@
                   }
                 }
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "EnumMetadataResolver"
             }
           },
           "kind": "operation"
@@ -4283,7 +4288,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -4672,7 +4678,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -5061,7 +5068,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -5404,7 +5412,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -5837,7 +5846,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -6225,7 +6235,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -7260,7 +7271,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -9309,7 +9321,8 @@
                 "format": "java",
                 "type": "@ref:org.mule.test.metadata.extension.LocationKey"
               },
-              "parameterName": "key"
+              "parameterName": "key",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -9990,7 +10003,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -10440,7 +10454,8 @@
                 "format": "java",
                 "type": "@ref:org.mule.test.metadata.extension.LocationKey"
               },
-              "parameterName": "key"
+              "parameterName": "key",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "operation"
@@ -11105,7 +11120,8 @@
                 "format": "java",
                 "type": "String"
               },
-              "parameterName": "type"
+              "parameterName": "type",
+              "categoryName": "MetadataExtensionResolver"
             }
           },
           "kind": "source"
@@ -15360,7 +15376,8 @@
             "format": "java",
             "type": "String"
           },
-          "parameterName": "type"
+          "parameterName": "type",
+          "categoryName": "MetadataExtensionResolver"
         }
       },
       "kind": "operation"
@@ -15498,7 +15515,8 @@
             "format": "java",
             "type": "String"
           },
-          "parameterName": "type"
+          "parameterName": "type",
+          "categoryName": "MetadataExtensionResolver"
         }
       },
       "kind": "operation"
@@ -17265,7 +17283,8 @@
             "format": "java",
             "type": "@ref:org.mule.test.metadata.extension.LocationKey"
           },
-          "parameterName": "Location"
+          "parameterName": "Location",
+          "categoryName": "MetadataExtensionResolver"
         }
       },
       "kind": "source"
