@@ -30,7 +30,7 @@ import javax.lang.model.element.TypeElement;
  * @param <T> the type to document.
  * @since 4.0
  */
-abstract class AbstractDescriptionDocumenter<T> {
+abstract class AbstractDescriptionDocumenter {
 
   protected static final ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
   protected final TypeElement objectType;
@@ -44,15 +44,6 @@ abstract class AbstractDescriptionDocumenter<T> {
     this.processingEnv = processingEnvironment;
     objectType = processingEnv.getElementUtils().getTypeElement(Object.class.getCanonicalName());
   }
-
-  /**
-   * Sets the descriptions for the provided {@code declaration} using the javadocs in the source code.
-   *
-   * @param declaration   the declaration to document
-   * @param configElement the type element associated to the declaration.
-   */
-  abstract void document(T declaration, TypeElement configElement);
-
 
   String getNameOrAlias(Element element) {
     return getAlias(element).orElse(element.getSimpleName().toString());

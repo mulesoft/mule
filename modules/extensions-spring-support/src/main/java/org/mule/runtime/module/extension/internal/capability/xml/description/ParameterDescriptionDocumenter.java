@@ -25,7 +25,7 @@ import javax.lang.model.element.VariableElement;
  *
  * @since 4.0
  */
-final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter<ParameterizedDeclaration<?>> {
+final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter {
 
   ParameterDescriptionDocumenter(ProcessingEnvironment processingEnv) {
     super(processingEnv);
@@ -52,7 +52,6 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
     }
   }
 
-  @Override
   void document(ParameterizedDeclaration<?> parameterized, final TypeElement element) {
     TypeElement traversingElement = element;
     while (traversingElement != null && !Object.class.getName().equals(traversingElement.getQualifiedName().toString())) {

@@ -11,6 +11,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEF
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 
 import java.util.List;
@@ -25,7 +26,7 @@ import javax.lang.model.element.TypeElement;
  *
  * @since 4.0
  */
-final class ConfigurationDescriptionDocumenter extends AbstractDescriptionDocumenter<ConfigurationDeclaration> {
+final class ConfigurationDescriptionDocumenter extends AbstractDescriptionDocumenter {
 
   private final ParameterDescriptionDocumenter parameterDeclarer;
   private final OperationDescriptionDocumenter operationDeclarer;
@@ -38,11 +39,10 @@ final class ConfigurationDescriptionDocumenter extends AbstractDescriptionDocume
     this.sourceDeclarer = new SourcesDescriptionDocumenter(processingEnv);
   }
 
-  @Override
-  void document(ConfigurationDeclaration declaration, TypeElement configElement) {
+  void document(ExtensionDeclaration extensionDeclaration, ConfigurationDeclaration declaration, TypeElement configElement) {
     declaration.setDescription(processor.getJavaDocSummary(processingEnv, configElement));
-    operationDeclarer.document(declaration, configElement);
-    sourceDeclarer.document(declaration, configElement);
+    operationDeclarer.document(configElement, declaration, extensionDeclaration);
+    sourceDeclarer.document(configElement, declaration, extensionDeclaration);
     documentConnectionProviders(declaration, configElement);
     parameterDeclarer.document(declaration, configElement);
   }

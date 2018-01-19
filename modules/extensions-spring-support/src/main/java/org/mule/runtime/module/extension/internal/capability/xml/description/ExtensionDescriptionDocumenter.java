@@ -29,7 +29,7 @@ import javax.lang.model.element.TypeElement;
  *
  * @since 4.0
  */
-final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter<ExtensionDeclaration> {
+final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter {
 
   private final RoundEnvironment roundEnv;
   private final ConfigurationDescriptionDocumenter configDocumenter;
@@ -53,22 +53,22 @@ final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter
    */
   void document(ExtensionDeclaration extensionDeclaration, TypeElement extensionElement) {
     extensionDeclaration.setDescription(processor.getJavaDocSummary(processingEnv, extensionElement));
-    sourceDocumenter.document(extensionDeclaration, extensionElement);
-    operationDocumenter.document(extensionDeclaration, extensionElement);
+    sourceDocumenter.document(extensionElement, extensionDeclaration);
+    operationDocumenter.document(extensionElement, extensionDeclaration);
     documentConfigurations(extensionDeclaration, extensionElement);
   }
 
-  private void documentConfigurations(ExtensionDeclaration declaration, TypeElement extensionElement) {
+  private void documentConfigurations(ExtensionDeclaration extensionDeclaration, TypeElement extensionElement) {
     Set<TypeElement> configurations = processor.getTypeElementsAnnotatedWith(Configuration.class, roundEnv);
     if (!configurations.isEmpty()) {
       configurations
-          .forEach(config -> findMatchingConfiguration(declaration, config)
-              .ifPresent(configDeclaration -> configDocumenter.document(configDeclaration, config)));
+          .forEach(config -> findMatchingConfiguration(extensionDeclaration, config)
+              .ifPresent(configDeclaration -> configDocumenter.document(extensionDeclaration, configDeclaration, config)));
 
-      configDocumenter.documentConnectionProviders(declaration, extensionElement);
+      configDocumenter.documentConnectionProviders(extensionDeclaration, extensionElement);
     } else {
-      configDocumenter.document(declaration.getConfigurations().get(0), extensionElement);
-      declaration.getConfigurations().get(0).setDescription(DEFAULT_CONFIG_DESCRIPTION);
+      configDocumenter.document(extensionDeclaration, extensionDeclaration.getConfigurations().get(0), extensionElement);
+      extensionDeclaration.getConfigurations().get(0).setDescription(DEFAULT_CONFIG_DESCRIPTION);
     }
   }
 

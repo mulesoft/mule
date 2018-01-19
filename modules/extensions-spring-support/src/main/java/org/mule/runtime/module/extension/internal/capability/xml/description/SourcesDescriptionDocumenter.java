@@ -27,7 +27,7 @@ import javax.lang.model.element.TypeElement;
  *
  * @since 4.0
  */
-final class SourcesDescriptionDocumenter extends AbstractDescriptionDocumenter<WithSourcesDeclaration<?>> {
+final class SourcesDescriptionDocumenter extends AbstractDescriptionDocumenter {
 
   private final ParameterDescriptionDocumenter parameterDeclarer;
 
@@ -36,9 +36,9 @@ final class SourcesDescriptionDocumenter extends AbstractDescriptionDocumenter<W
     this.parameterDeclarer = new ParameterDescriptionDocumenter(processingEnv);
   }
 
-  void document(WithSourcesDeclaration<?> declaration, TypeElement element) {
+  void document(TypeElement element, WithSourcesDeclaration<?>... containerDeclarations) {
     getSourceClasses(processingEnv, element)
-        .forEach(sourceElement -> findMatchingSource(declaration, sourceElement)
+        .forEach(sourceElement -> findMatchingSource(containerDeclarations, sourceElement)
             .ifPresent(source -> {
               source.setDescription(processor.getJavaDocSummary(processingEnv, sourceElement));
               parameterDeclarer.document(source, sourceElement);
@@ -57,14 +57,23 @@ final class SourcesDescriptionDocumenter extends AbstractDescriptionDocumenter<W
     }
   }
 
-  private Optional<SourceDeclaration> findMatchingSource(WithSourcesDeclaration<?> declaration, Element element) {
-    return declaration.getMessageSources().stream()
-        .filter(provider -> {
-          String name = provider.getName();
-          String defaultNaming = hyphenize(element.getSimpleName().toString());
-          return name.equals(defaultNaming) || getAlias(element).map(name::equals).orElse(false);
-        })
-        .findAny();
+  private Optional<SourceDeclaration> findMatchingSource(WithSourcesDeclaration<?>[] containerDeclarations, Element element) {
+    for (WithSourcesDeclaration<?> declaration : containerDeclarations) {
+      Optional<SourceDeclaration> sourceDeclaration = declaration.getMessageSources().stream()
+          .filter(source -> {
+            String name = source.getName();
+            String elementName = element.getSimpleName().toString();
+            String defaultNaming = hyphenize(elementName);
+            return name.equals(defaultNaming) || getAlias(element).map(name::equals).orElse(name.equals(elementName));
+          })
+          .findFirst();
+
+      if (sourceDeclaration.isPresent()) {
+        return sourceDeclaration;
+      }
+    }
+
+    return Optional.empty();
   }
 
   private List<TypeElement> getSourceClasses(ProcessingEnvironment processingEnv, Element element) {
