@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
  */
 public class ExecutionContextProperties {
 
-  
+
   /**
    * The key of an execution context variable which holds the {@link CompletionCallback} that a non blocking component will use to
    * notify completion or failure
