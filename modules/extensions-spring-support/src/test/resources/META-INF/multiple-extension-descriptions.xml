@@ -121,7 +121,7 @@
                     <description><![CDATA[Group parameter 2]]></description>
                 </parameter>
                 <parameter name="alias-param">
-                    <description><![CDATA[]]></description>
+                    <description><![CDATA[Param with alias]]></description>
                 </parameter>
             </parameters>
         </operation>
@@ -142,5 +142,36 @@
             </parameters>
         </operation>
     </operations>
-    <sources/>
+    <sources>
+        <source name="TestDocumentedExtensionSource">
+            <description><![CDATA[TestDocumentedExtensionSource javadoc documentation]]></description>
+            <parameters>
+                <parameter name="source1">
+                    <description><![CDATA[Source parameter 1]]></description>
+                </parameter>
+                <parameter name="value1">
+                    <description><![CDATA[Group parameter 1]]></description>
+                </parameter>
+                <parameter name="value2">
+                    <description><![CDATA[Group parameter 2]]></description>
+                </parameter>
+                <parameter name="alias-param">
+                    <description><![CDATA[Param with alias]]></description>
+                </parameter>
+                <parameter name="value1">
+                    <description><![CDATA[Group parameter 1]]></description>
+                </parameter>
+                <parameter name="value2">
+                    <description><![CDATA[Group parameter 2]]></description>
+                </parameter>
+                <parameter name="alias-param">
+                    <description><![CDATA[Param with alias]]></description>
+                </parameter>
+                <parameter name="errorParam">
+                    <description><![CDATA[Callback Doc of errorParam]]></description>
+                </parameter>
+            </parameters>
+        </source>
+    </sources>
+    <types/>
 </extension-documentation>
