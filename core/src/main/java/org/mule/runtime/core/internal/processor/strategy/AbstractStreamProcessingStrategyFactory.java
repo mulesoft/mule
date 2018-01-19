@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.getInteger;
-import static java.lang.Integer.min;
 import static java.lang.Long.max;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.currentTimeMillis;
@@ -61,7 +60,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
   // Use more than one subscriber by default on machines with large number of cores. 1 on < 8 cores, 2 on < 8-core, 3 on <
   // 24-core, and so on.
   protected static final int DEFAULT_SUBSCRIBER_COUNT =
-      getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_SUBSCRIBER_COUNT", min(1, (CORES / 2)));
+      getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_SUBSCRIBER_COUNT", Integer.max(1, (CORES / 2)));
   protected static final String DEFAULT_WAIT_STRATEGY =
       getProperty(SYSTEM_PROPERTY_PREFIX + "DEFAULT_WAIT_STRATEGY", LITE_BLOCKING.name());
   protected static String RING_BUFFER_SCHEDULER_NAME_SUFFIX = ".ring-buffer";
