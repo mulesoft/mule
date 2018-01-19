@@ -7,12 +7,18 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -20,10 +26,14 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
@@ -51,6 +61,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArg
 import org.mule.runtime.module.extension.internal.runtime.resolver.CorrelationInfoArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.DefaultEncodingArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ExtensionsClientArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.FlowListenerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.LiteralArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MediaTypeArgumentResolver;
@@ -73,6 +84,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import javax.inject.Inject;
+
 
 /**
  * Resolves the values of an {@link ComponentModel}'s {@link ParameterModel parameterModels} by matching them to the arguments in
@@ -80,7 +93,13 @@ import java.util.function.Supplier;
  *
  * @since 3.7.0
  */
-public final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate {
+public final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate, Initialisable {
+
+  @Inject
+  private Registry registry;
+
+  @Inject
+  private PolicyManager policyManager;
 
   private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
   private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectionArgumentResolver();
@@ -115,6 +134,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<NotificationEmitter> NOTIFICATION_HANDLER_ARGUMENT_RESOLVER =
       new NotificationHandlerArgumentResolver();
 
+  private final List<ParameterGroupModel> parameterGroupModels;
   private final Method method;
   private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
   private ArgumentResolver<?>[] argumentResolvers;
@@ -127,11 +147,11 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
    * @param method the {@link Method} to be called
    */
   public MethodArgumentResolverDelegate(List<ParameterGroupModel> parameterGroupModels, Method method) {
+    this.parameterGroupModels = parameterGroupModels;
     this.method = method;
-    initArgumentResolvers(parameterGroupModels);
   }
 
-  private void initArgumentResolvers(List<ParameterGroupModel> parameterGroupModels) {
+  private void initArgumentResolvers() {
     final Class<?>[] parameterTypes = method.getParameterTypes();
 
     if (isEmpty(parameterTypes)) {
@@ -172,6 +192,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = new LiteralArgumentResolver<>(paramNames.get(i), parameterType);
       } else if (CompletionCallback.class.equals(parameterType)) {
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
+      } else if (ExtensionsClient.class.equals(parameterType)) {
+        argumentResolver = new ExtensionsClientArgumentResolver(registry, policyManager);
       } else if (RouterCompletionCallback.class.equals(parameterType)) {
         argumentResolver = ROUTER_CALLBACK_ARGUMENT_RESOLVER;
       } else if (VoidCompletionCallback.class.equals(parameterType)) {
@@ -271,5 +293,10 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
             .map(ParameterGroupModelProperty::getDescriptor).orElse(null))
         .filter(group -> group != null && group.getContainer() instanceof Parameter)
         .collect(toImmutableMap(group -> (Parameter) group.getContainer(), ParameterGroupArgumentResolver::new));
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initArgumentResolvers();
   }
 }

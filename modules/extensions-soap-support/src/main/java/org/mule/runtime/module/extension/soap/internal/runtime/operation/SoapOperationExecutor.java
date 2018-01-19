@@ -18,6 +18,7 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.justOrEmpty;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -27,10 +28,13 @@ import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ExtensionsClientArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.soap.api.client.SoapClient;
@@ -61,6 +65,12 @@ public final class SoapOperationExecutor implements ComponentExecutor<OperationM
   @Inject
   private TransformationService transformationService;
 
+  @Inject
+  private Registry registry;
+
+  @Inject
+  private PolicyManager policyManager;
+
   private final ConnectionArgumentResolver connectionResolver = new ConnectionArgumentResolver();
   private final StreamingHelperArgumentResolver streamingHelperArgumentResolver = new StreamingHelperArgumentResolver();
   private final SoapExceptionEnricher soapExceptionEnricher = new SoapExceptionEnricher();
@@ -75,7 +85,13 @@ public final class SoapOperationExecutor implements ComponentExecutor<OperationM
       ForwardingSoapClient connection = (ForwardingSoapClient) connectionResolver.resolve(context).get();
       Map<String, String> customHeaders = connection.getCustomHeaders(serviceId, getOperation(context));
       SoapRequest request = getRequest(context, customHeaders);
-      SoapResponse response = connection.getSoapClient(serviceId).consume(request);
+      SoapClient soapClient = connection.getSoapClient(serviceId);
+      SoapResponse response = connection.getExtensionsClientDispatcher(() -> new ExtensionsClientArgumentResolver(registry,
+                                                                                                                  policyManager)
+                                                                                                                      .resolve(context)
+                                                                                                                      .get())
+          .map(d -> soapClient.consume(request, d))
+          .orElseGet(() -> soapClient.consume(request));
       return justOrEmpty(response.getAsResult(streamingHelperArgumentResolver.resolve(context).get()));
     } catch (MessageTransformerException | TransformerException e) {
       return error(e);
@@ -120,7 +136,8 @@ public final class SoapOperationExecutor implements ComponentExecutor<OperationM
 
   private String getOperation(ExecutionContext<OperationModel> context) {
     return (String) getParam(context, OPERATION_PARAM)
-        .orElseThrow(() -> new IllegalStateException("Execution Context does not have the required operation parameter"));
+        .orElseThrow(
+                     () -> new IllegalStateException("Execution Context does not have the required operation parameter"));
   }
 
   private <T> Optional<T> getParam(ExecutionContext<OperationModel> context, String param) {

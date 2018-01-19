@@ -9,11 +9,14 @@ package org.mule.runtime.module.extension.internal.runtime.client;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -44,7 +47,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -63,6 +68,8 @@ import reactor.core.publisher.Mono;
  */
 public final class DefaultExtensionsClient implements ExtensionsClient {
 
+  private final TemplateParser parser = TemplateParser.createMuleStyleParser();
+
   @Inject
   private MuleContext muleContext;
 
@@ -75,49 +82,62 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
   @Inject
   private ExtensionManager extensionManager;
 
-  private final Map<Pair<String, String>, OperationModel> operations = new LinkedHashMap<>();
-  private final TemplateParser parser = TemplateParser.createMuleStyleParser();
+  private final CoreEvent event;
 
   /**
-   * {@inheritDoc}
+   * This constructor enables the {@link DefaultExtensionsClient} to be aware of the current execution {@link CoreEvent} and
+   * enables to perform the dynamic operation execution with the same event that the SDK operation using the {@link ExtensionsClient}
+   * receives.
+   *
+   * @param muleContext   the current context.
+   * @param event         the current execution event.
+   * @param registry      the application registry.
+   * @param policyManager the configured application policy manager.
    */
-  @Override
-  public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension,
-                                                             String operation,
-                                                             OperationParameters parameters) {
-    CoreEvent initialiserEvent = null;
-    try {
-      initialiserEvent = getInitialiserEvent(muleContext);
-      OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
-      Mono<Result<T, A>> resultMono = from(processor.apply(just(initialiserEvent)))
-          .map(event -> Result.<T, A>builder(event.getMessage()).build())
-          .onErrorMap(Exceptions::unwrap)
-          .doAfterTerminate(() -> disposeProcessor(processor));
-      return resultMono.toFuture();
-    } finally {
-      if (initialiserEvent != null) {
-        ((BaseEventContext) initialiserEvent.getContext()).success();
-      }
-    }
+  public DefaultExtensionsClient(MuleContext muleContext, CoreEvent event, Registry registry, PolicyManager policyManager) {
+    this.muleContext = muleContext;
+    this.event = event;
+    this.extensionManager = muleContext.getExtensionManager();
+    this.registry = registry;
+    this.policyManager = policyManager;
+  }
+
+  /**
+   * Creating a client from this constructor will enable the execution of operations with an initializer event.
+   */
+  public DefaultExtensionsClient() {
+    this.event = null;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
+  public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation, OperationParameters parameters) {
+    OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
+    Mono<Result<T, A>> resultMono = process(processor)
+        .map(event -> Result.<T, A>builder(event.getMessage()).build())
+        .onErrorMap(Exceptions::unwrap)
+        .doAfterTerminate(() -> disposeProcessor(processor));
+    return resultMono.toFuture();
+  }
+
+  private Mono<CoreEvent> process(OperationMessageProcessor omp) {
+    if (event != null) {
+      return from(processWithChildContext(event, omp, Optional.empty()));
+    }
+    return from(omp.apply(just(getInitialiserEvent(muleContext))));
+  }
+
+  @Override
   public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters params)
       throws MuleException {
     OperationMessageProcessor processor = createProcessor(extension, operation, params);
-    CoreEvent initialiserEvent = null;
     try {
-      initialiserEvent = getInitialiserEvent(muleContext);
-      CoreEvent process = processor.process(initialiserEvent);
+      CoreEvent process = processor.process(getEvent());
       return Result.<T, A>builder(process.getMessage()).build();
     } finally {
       disposeProcessor(processor);
-      if (initialiserEvent != null) {
-        ((BaseEventContext) initialiserEvent.getContext()).success();
-      }
     }
   }
 
@@ -129,27 +149,19 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     ExtensionModel extension = findExtension(extensionName);
     OperationModel operation = findOperation(extension, operationName);
     ConfigurationProvider config = parameters.getConfigName().map(this::findConfiguration).orElse(null);
-    CoreEvent initialiserEvent = null;
+    Map<String, ValueResolver> resolvedParams = resolveParameters(parameters.get(), getEvent());
     try {
-      initialiserEvent = getInitialiserEvent(muleContext);
-      Map<String, ValueResolver> resolvedParams = resolveParameters(parameters.get(), initialiserEvent);
-      try {
-        OperationMessageProcessor processor =
-            new OperationMessageProcessorBuilder(extension, operation, policyManager, muleContext, registry)
-                .setConfigurationProvider(config)
-                .setParameters(resolvedParams)
-                .build();
+      OperationMessageProcessor processor =
+          new OperationMessageProcessorBuilder(extension, operation, policyManager, muleContext, registry)
+              .setConfigurationProvider(config)
+              .setParameters(resolvedParams)
+              .build();
 
-        initialiseIfNeeded(processor, muleContext);
-        processor.start();
-        return processor;
-      } catch (Exception e) {
-        throw new MuleRuntimeException(createStaticMessage("Could not create Operation Message Processor"), e);
-      }
-    } finally {
-      if (initialiserEvent != null) {
-        ((BaseEventContext) initialiserEvent.getContext()).success();
-      }
+      initialiseIfNeeded(processor, muleContext);
+      processor.start();
+      return processor;
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not create Operation Message Processor"), e);
     }
   }
 
@@ -184,24 +196,22 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
   }
 
   private OperationModel findOperation(ExtensionModel extensionModel, String operationName) {
-    return operations.computeIfAbsent(new Pair<>(extensionModel.getName(), operationName), ope -> {
-      Reference<OperationModel> operation = new Reference<>();
-      ExtensionWalker walker = new IdempotentExtensionWalker() {
+    Reference<OperationModel> operation = new Reference<>();
+    ExtensionWalker walker = new IdempotentExtensionWalker() {
 
-        @Override
-        protected void onOperation(OperationModel operationModel) {
-          if (operationName.equals(operationModel.getName())) {
-            operation.set(operationModel);
-            stop();
-          }
+      @Override
+      protected void onOperation(OperationModel operationModel) {
+        if (operationName.equals(operationModel.getName())) {
+          operation.set(operationModel);
+          stop();
         }
-      };
-      walker.walk(extensionModel);
-      if (operation.get() == null) {
-        throw new MuleRuntimeException(createStaticMessage("No Operation [" + operationName + "] Found"));
       }
-      return operation.get();
-    });
+    };
+    walker.walk(extensionModel);
+    if (operation.get() == null) {
+      throw new MuleRuntimeException(createStaticMessage("No Operation [" + operationName + "] Found"));
+    }
+    return operation.get();
   }
 
   private ConfigurationProvider findConfiguration(String configName) {
@@ -221,5 +231,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     } catch (MuleException e) {
       throw new MuleRuntimeException(createStaticMessage("Error while disposing the executing operation"), e);
     }
+  }
+
+  private CoreEvent getEvent() {
+    return event == null ? getInitialiserEvent() : event;
   }
 }

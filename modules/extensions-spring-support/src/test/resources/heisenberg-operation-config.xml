@@ -285,4 +285,9 @@
     <flow name="aliasedOperation">
         <heisenberg:echo literalExpression="#['an expression']"/>
     </flow>
+
+    <flow name="withClient">
+        <heisenberg:execute-kill-with-client configName="heisenberg"/>
+    </flow>
+
 </mule>

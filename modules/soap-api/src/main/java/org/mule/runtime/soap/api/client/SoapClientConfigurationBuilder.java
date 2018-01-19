@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.soap.security.UsernameTokenSecurityStrateg
 import org.mule.runtime.extension.api.soap.security.VerifySignatureSecurityStrategy;
 import org.mule.runtime.soap.api.SoapVersion;
 import org.mule.runtime.soap.api.message.SoapMessage;
+import org.mule.runtime.soap.api.message.dispatcher.DefaultHttpMessageDispatcher;
 import org.mule.runtime.soap.api.transport.NullTransportResourceLocator;
 import org.mule.runtime.soap.api.transport.TransportResourceLocator;
 
@@ -169,7 +170,6 @@ public class SoapClientConfigurationBuilder {
     checkNotNull(wsdlLocation, "WSDL location cannot be null");
     checkNotNull(service, "Service cannot be null");
     checkNotNull(port, "Port cannot be null");
-    checkNotNull(dispatcher, "Message Dispatcher cannot be null");
     return new SoapClientConfiguration(wsdlLocation, address, service, port, version, mtomEnabled, securities,
                                        dispatcher, locator, encoding);
   }

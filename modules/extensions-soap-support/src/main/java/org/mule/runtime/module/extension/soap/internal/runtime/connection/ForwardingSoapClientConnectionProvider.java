@@ -18,6 +18,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
+import org.mule.runtime.extension.api.soap.ContextAwareMessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProviderConfigurationException;
@@ -52,6 +54,9 @@ public class ForwardingSoapClientConnectionProvider implements ConnectionProvide
 
   @Inject
   private HttpService httpService;
+
+  @Inject
+  private ExtensionsClient client;
 
   /**
    * The {@link SoapServiceProvider} that knows which services will this connection connect to.
@@ -95,7 +100,13 @@ public class ForwardingSoapClientConnectionProvider implements ConnectionProvide
   public ConnectionValidationResult validate(ForwardingSoapClient connection) {
     try {
       serviceProvider.validateConfiguration();
-      MessageDispatcher messageDispatcher = transportProvider.connect();
+      MessageDispatcher messageDispatcher;
+      if (transportProvider instanceof ContextAwareMessageDispatcherProvider) {
+        messageDispatcher = ((ContextAwareMessageDispatcherProvider) transportProvider)
+            .connect(new DefaultDispatchingContext(client));
+      } else {
+        messageDispatcher = transportProvider.connect();
+      }
       ConnectionValidationResult result = transportProvider.validate(messageDispatcher);
       transportProvider.disconnect(messageDispatcher);
       return result;
