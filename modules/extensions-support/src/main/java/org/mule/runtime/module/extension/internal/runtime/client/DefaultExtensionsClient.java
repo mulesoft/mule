@@ -129,15 +129,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     return from(omp.apply(just(getInitialiserEvent(muleContext))));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters params) throws MuleException {
+  public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters params)
+      throws MuleException {
+    OperationMessageProcessor processor = createProcessor(extension, operation, params);
     try {
-      return (Result<T, A>) executeAsync(extension, operation, params).get();
-    } catch (InterruptedException | ExecutionException e) {
-      throw new MuleRuntimeException(e);
+      CoreEvent process = processor.process(getEvent());
+      return Result.<T, A>builder(process.getMessage()).build();
+    } finally {
+      disposeProcessor(processor);
     }
   }
 

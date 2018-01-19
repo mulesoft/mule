@@ -17,6 +17,8 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -25,6 +27,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -90,7 +93,7 @@ import javax.inject.Inject;
  *
  * @since 3.7.0
  */
-public final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate {
+public final class MethodArgumentResolverDelegate implements ArgumentResolverDelegate, Initialisable {
 
   @Inject
   private Registry registry;
@@ -131,6 +134,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<NotificationEmitter> NOTIFICATION_HANDLER_ARGUMENT_RESOLVER =
       new NotificationHandlerArgumentResolver();
 
+  private final List<ParameterGroupModel> parameterGroupModels;
   private final Method method;
   private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
   private ArgumentResolver<?>[] argumentResolvers;
@@ -143,11 +147,11 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
    * @param method the {@link Method} to be called
    */
   public MethodArgumentResolverDelegate(List<ParameterGroupModel> parameterGroupModels, Method method) {
+    this.parameterGroupModels = parameterGroupModels;
     this.method = method;
-    initArgumentResolvers(parameterGroupModels);
   }
 
-  private void initArgumentResolvers(List<ParameterGroupModel> parameterGroupModels) {
+  private void initArgumentResolvers() {
     final Class<?>[] parameterTypes = method.getParameterTypes();
 
     if (isEmpty(parameterTypes)) {
@@ -289,5 +293,10 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
             .map(ParameterGroupModelProperty::getDescriptor).orElse(null))
         .filter(group -> group != null && group.getContainer() instanceof Parameter)
         .collect(toImmutableMap(group -> (Parameter) group.getContainer(), ParameterGroupArgumentResolver::new));
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initArgumentResolvers();
   }
 }

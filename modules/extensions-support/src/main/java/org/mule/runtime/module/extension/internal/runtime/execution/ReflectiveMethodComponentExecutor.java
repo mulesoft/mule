@@ -77,13 +77,14 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   private LazyValue<ArgumentResolverDelegate> getMethodArgumentResolver(List<ParameterGroupModel> groups, Method method) {
     return new LazyValue<>(() -> {
-      MethodArgumentResolverDelegate resolver = new MethodArgumentResolverDelegate(groups, method);
       try {
+        MethodArgumentResolverDelegate resolver = new MethodArgumentResolverDelegate(groups, method);
         muleContext.getInjector().inject(resolver);
+        resolver.initialise();
+        return resolver;
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage("Could not initialize argument resolver resolver"), e);
       }
-      return resolver;
     });
   }
 
