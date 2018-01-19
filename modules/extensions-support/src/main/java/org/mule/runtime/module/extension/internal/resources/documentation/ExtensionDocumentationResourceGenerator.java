@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
+import org.mule.metadata.api.annotation.DescriptionAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -20,6 +22,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -35,13 +38,18 @@ import java.util.Optional;
  */
 public class ExtensionDocumentationResourceGenerator implements GeneratedResourceFactory {
 
-  private static final ExtensionDescriptionsSerializer serializer = new ExtensionDescriptionsSerializer();
-
   @Override
   public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
+    final ExtensionDescriptionsSerializer serializer = new ExtensionDescriptionsSerializer();
     ExtensionDocumenterWalker walker = new ExtensionDocumenterWalker();
     walker.walk(extensionModel);
-    String documenter = serializer.serialize(walker.getDocumenter(extensionModel));
+
+    String documenter = serializer.serialize(getDocumenter(extensionModel,
+                                                           walker.getConfigs(),
+                                                           walker.getConnections(),
+                                                           walker.getOperations(),
+                                                           walker.getSources(),
+                                                           getTypesDocumentation(extensionModel)));
     return Optional.of(new GeneratedResource(serializer.getFileName(extensionModel.getName()), documenter.getBytes()));
   }
 
@@ -84,18 +92,61 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
       return builder.build();
     }
 
-    private XmlExtensionDocumentation getDocumenter(ExtensionModel model) {
-      final XmlExtensionDocumentation documenter = new XmlExtensionDocumentation();
-      XmlExtensionElementDocumentation element = new XmlExtensionElementDocumentation();
-      element.setName(model.getName());
-      element.setDescription(model.getDescription());
-      element.setParameters(emptyList());
-      documenter.setExtension(element);
-      documenter.setConfigs(configs);
-      documenter.setConnections(connections);
-      documenter.setOperation(operations);
-      documenter.setSources(sources);
-      return documenter;
+    public List<XmlExtensionElementDocumentation> getConfigs() {
+      return configs;
     }
+
+    public List<XmlExtensionElementDocumentation> getConnections() {
+      return connections;
+    }
+
+    public List<XmlExtensionElementDocumentation> getOperations() {
+      return operations;
+    }
+
+    public List<XmlExtensionElementDocumentation> getSources() {
+      return sources;
+    }
+  }
+
+  private List<XmlExtensionElementDocumentation> getTypesDocumentation(ExtensionModel extensionModel) {
+    List<XmlExtensionElementDocumentation> types = new ArrayList<>();
+
+    extensionModel.getTypes().forEach(type -> ExtensionMetadataTypeUtils.getId(type)
+        .ifPresent(id -> {
+          XmlExtensionElementDocumentation element = new XmlExtensionElementDocumentation();
+          element.setName(id);
+          element.setDescription(type.getAnnotation(DescriptionAnnotation.class)
+              .map(DescriptionAnnotation::getValue).orElse(""));
+          element.setParameters(type.getFields().stream()
+              .map(f -> new XmlExtensionParameterDocumentation(getAlias(f),
+                                                               f.getAnnotation(DescriptionAnnotation.class)
+                                                                   .map(DescriptionAnnotation::getValue).orElse("")))
+              .collect(toList()));
+
+          types.add(element);
+        }));
+    return types;
+  }
+
+
+  private XmlExtensionDocumentation getDocumenter(ExtensionModel model,
+                                                  List<XmlExtensionElementDocumentation> configs,
+                                                  List<XmlExtensionElementDocumentation> connections,
+                                                  List<XmlExtensionElementDocumentation> operations,
+                                                  List<XmlExtensionElementDocumentation> sources,
+                                                  List<XmlExtensionElementDocumentation> types) {
+    final XmlExtensionDocumentation documenter = new XmlExtensionDocumentation();
+    XmlExtensionElementDocumentation element = new XmlExtensionElementDocumentation();
+    element.setName(model.getName());
+    element.setDescription(model.getDescription());
+    element.setParameters(emptyList());
+    documenter.setExtension(element);
+    documenter.setConfigs(configs);
+    documenter.setConnections(connections);
+    documenter.setOperation(operations);
+    documenter.setSources(sources);
+    documenter.setTypes(types);
+    return documenter;
   }
 }

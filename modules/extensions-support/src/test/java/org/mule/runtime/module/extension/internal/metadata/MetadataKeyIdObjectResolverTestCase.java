@@ -239,9 +239,7 @@ public class MetadataKeyIdObjectResolverTestCase {
   @Test
   public void failToResolveWithMultipleChildren() throws MetadataResolvingException {
     exception.expect(MetadataResolvingException.class);
-    exception
-        .expectMessage(
-                       is("MetadataKey used for Metadata resolution must only have one child per level. Key 'USA' has [SFO, NY] as children."));
+    exception.expectMessage("MetadataKey used for Metadata resolution must only have one child per level.");
 
     final MetadataKey invalidMetadataKey = newKey(AMERICA, CONTINENT)
         .withChild(newKey(USA, COUNTRY).withChild(newKey(SFO, CITY)).withChild(newKey(NY, CITY))).build();
