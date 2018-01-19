@@ -13,6 +13,8 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.internal.resources.manifest.DefaultClassPackageFinder;
 import org.mule.runtime.module.extension.internal.resources.manifest.ExportedArtifactsCollector;
 
+import javax.annotation.processing.ProcessingEnvironment;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,12 +29,20 @@ public class ExportedPackagesValidator implements ExtensionModelValidator {
 
   private static final String EXPORTED_PACKAGES_VALIDATOR_SKIP = "exportedPackagesValidator.skip";
   private static final String EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION = "exportedPackagesValidator.strictValidation";
+  private ProcessingEnvironment processingEnv;
+
+  public ExportedPackagesValidator(ProcessingEnvironment processingEnv) {
+    this.processingEnv = processingEnv;
+  }
+
+  public ExportedPackagesValidator() {
+
+  }
 
   @Override
   public void validate(ExtensionModel model, ProblemsReporter problemsReporter) {
     if (shouldValidate()) {
-      ExportedArtifactsCollector exportedArtifactsCollector =
-          new ExportedArtifactsCollector(model, new DefaultClassPackageFinder());
+      ExportedArtifactsCollector exportedArtifactsCollector = getExportedArtifactsCollector(model);
       Map<String, Collection<String>> exportedPackages = exportedArtifactsCollector.getDetailedExportedPackages();
 
       Map<String, Collection<String>> internalPackages = new HashMap<>();
@@ -50,7 +60,7 @@ public class ExportedPackagesValidator implements ExtensionModelValidator {
           });
 
       if (!internalPackages.isEmpty()) {
-        Problem problem = new Problem(model, getErrorMessage(model, internalPackages));
+        Problem problem = new Problem(model, getErrorMessage(model, internalPackages, "exports the following internal packages"));
         if (strictValidation()) {
           problemsReporter.addError(problem);
         } else {
@@ -59,14 +69,17 @@ public class ExportedPackagesValidator implements ExtensionModelValidator {
       }
 
       if (!noVisibilityDeclaredPackages.isEmpty()) {
-        problemsReporter.addWarning(new Problem(model, getErrorMessage(model, noVisibilityDeclaredPackages)));
+        problemsReporter
+            .addWarning(new Problem(model,
+                                    getErrorMessage(model, noVisibilityDeclaredPackages,
+                                                    "exports packages which doesn't have a defined visibility, 'api' or 'internal'")));
       }
     }
   }
 
-  private String getErrorMessage(ExtensionModel model, Map<String, Collection<String>> packages) {
+  private String getErrorMessage(ExtensionModel model, Map<String, Collection<String>> packages, String message) {
     StringBuilder messageBuilder = new StringBuilder();
-    messageBuilder.append("The extension [").append(model.getName()).append("] exports the following internal packages: \n");
+    messageBuilder.append("The extension [").append(model.getName()).append("] ").append(message).append(":\n");
     packages.forEach((packageName, classes) -> {
       messageBuilder.append("-> [").append(packageName).append("]:")
           .append(" because of these classes: \n");
@@ -87,5 +100,11 @@ public class ExportedPackagesValidator implements ExtensionModelValidator {
   private boolean strictValidation() {
     String strictValidation = System.getProperty(EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION);
     return strictValidation != null ? Boolean.valueOf(strictValidation) : true;
+  }
+
+  private ExportedArtifactsCollector getExportedArtifactsCollector(ExtensionModel extensionModel) {
+    return processingEnv != null
+        ? new ExportedArtifactsCollector(extensionModel, new DefaultClassPackageFinder(processingEnv))
+        : new ExportedArtifactsCollector(extensionModel);
   }
 }
