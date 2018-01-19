@@ -465,7 +465,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(46));
+    assertThat(extensionDeclaration.getOperations(), hasSize(47));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(15));
@@ -565,8 +565,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(operation, is(notNullValue()));
     assertThat(operation.getAllParameters(), hasSize(1));
     assertParameter(operation.getAllParameters(), "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)),
-                    true,
-                    SUPPORTED, null);
+                    true, SUPPORTED, null);
     assertConnected(operation, false);
     assertTransactional(operation, false);
 

@@ -11,7 +11,10 @@ import static java.util.Collections.emptyMap;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.soap.api.client.SoapClientConfiguration.builder;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
+import org.mule.runtime.extension.api.soap.ContextAwareMessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
@@ -29,7 +32,9 @@ import com.google.common.cache.RemovalNotification;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 /**
  * This client is just a manager of {@link SoapClient} instances, since a single {@link SoapServiceProvider} can connect with
@@ -47,13 +52,12 @@ public class ForwardingSoapClient {
   private final SoapServiceProvider serviceProvider;
   private final List<WebServiceDefinition> webServiceDefinitions;
 
-
   ForwardingSoapClient(SoapService service,
                        SoapServiceProvider serviceProvider,
-                       MessageDispatcherProvider<MessageDispatcher> dispatcherProvider) {
+                       MessageDispatcherProvider<MessageDispatcher> dispatcher) {
     this.serviceProvider = serviceProvider;
     this.webServiceDefinitions = serviceProvider.getWebServiceDefinitions();
-    this.dispatcherProvider = dispatcherProvider;
+    this.dispatcherProvider = dispatcher;
     this.clientsCache = CacheBuilder.<WebServiceDefinition, SoapClient>newBuilder()
         .expireAfterAccess(1, MINUTES)
         .removalListener(new ForwardingClientRemovalListener())
@@ -95,6 +99,13 @@ public class ForwardingSoapClient {
     clientsCache.invalidateAll();
   }
 
+  public Optional<MessageDispatcher> getExtensionsClientDispatcher(Supplier<ExtensionsClient> clientSupplier) {
+    return (dispatcherProvider instanceof ContextAwareMessageDispatcherProvider)
+        ? Optional.ofNullable(((ContextAwareMessageDispatcherProvider) dispatcherProvider)
+            .connect(new DefaultDispatchingContext(clientSupplier.get())))
+        : Optional.empty();
+  }
+
   /**
    * {@link CacheLoader} implementation to load lazily {@link SoapClient}s.
    */
@@ -111,18 +122,24 @@ public class ForwardingSoapClient {
       SoapClientFactory clientFactory = service.getClientFactory();
       SoapClientConfigurationBuilder configurationBuilder = builder()
           .withService(definition.getService())
-          .withDispatcher(dispatcherProvider.connect())
           .withPort(definition.getPort())
           .withWsdlLocation(definition.getWsdlUrl().toString());
+
       if (definition.getAddress() != null) {
         configurationBuilder.withAddress(definition.getAddress().toString());
       }
+
+      if (!(dispatcherProvider instanceof ContextAwareMessageDispatcherProvider)) {
+        configurationBuilder.withDispatcher(dispatcherProvider.connect());
+      }
+
       serviceProvider.getSecurities().forEach(configurationBuilder::withSecurity);
       SoapClient soapClient = clientFactory.create(configurationBuilder.build());
       soapClient.start();
       return soapClient;
     }
   }
+
 
   /**
    * {@link RemovalListener} implementation stop {@link SoapClient}s.

@@ -8,13 +8,19 @@ package org.mule.test.heisenberg.extension;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.metadata.TypedValue.of;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKED_DOOR;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKING_DOOR;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -38,10 +44,13 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
+import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
@@ -66,6 +75,7 @@ import com.google.common.collect.ImmutableMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -305,6 +315,7 @@ public class HeisenbergOperations implements Disposable {
     throw new LinkageError();
   }
 
+
   @MediaType(value = TEXT_PLAIN, strict = false)
   public InputStream nameAsStream(@Config HeisenbergExtension config) {
     return new ByteArrayInputStream(sayMyName(config).getBytes());
@@ -313,5 +324,19 @@ public class HeisenbergOperations implements Disposable {
   @Override
   public void dispose() {
     disposed = true;
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public String executeKillWithClient(String configName, ExtensionsClient client) {
+    OperationParameters params = builder().configName(configName)
+        .addParameter("victim", "Juani")
+        .addParameter("goodbyeMessage", "ADIOS")
+        .build();
+    Result<String, Object> result = null;
+    try {
+      return (String) client.execute(HEISENBERG, "kill", params).getOutput();
+    } catch (MuleException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

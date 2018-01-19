@@ -37,8 +37,12 @@ public class TestSoapClient implements SoapClient {
 
   }
 
-  @Override
   public SoapResponse consume(SoapRequest request) {
+    return consume(request, null);
+  }
+
+  @Override
+  public SoapResponse consume(SoapRequest request, MessageDispatcher dispatcher) {
     SoapResponse response = mock(SoapResponse.class);
     when(response.getContent()).thenReturn(new ByteArrayInputStream("Content".getBytes()));
     return response;
