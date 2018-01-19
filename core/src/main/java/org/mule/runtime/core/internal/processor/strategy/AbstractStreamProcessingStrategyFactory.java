@@ -57,8 +57,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
 
   protected static final int DEFAULT_BUFFER_SIZE = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_BUFFER_SIZE", SMALL_BUFFER_SIZE);
 
-  // Use more than one subscriber by default on machines with large number of cores. 1 on < 8 cores, 2 on < 8-core, 3 on <
-  // 24-core, and so on.
+  // Use one subscriber for every two cores available, or 1 subscriber for 1 core.
   protected static final int DEFAULT_SUBSCRIBER_COUNT =
       getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_SUBSCRIBER_COUNT", Integer.max(1, (CORES / 2)));
   protected static final String DEFAULT_WAIT_STRATEGY =
