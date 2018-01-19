@@ -849,6 +849,32 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     validate();
   }
 
+  @Test
+  public void functionParameterClashesWithOperationParameter() {
+    ParameterModel param = getParameter(UNIQUE_PARAM_NAME + "1", ChildElementTest.class);
+    ParameterModel anotherParam = getParameter(UNIQUE_PARAM_NAME + "2", ChildElementTestClone.class);
+    when(param.getRole()).thenReturn(BEHAVIOUR);
+    when(anotherParam.getRole()).thenReturn(BEHAVIOUR);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(param));
+    when(functionModel.getAllParameterModels()).thenReturn(asList(anotherParam));
+
+    mockParameterGroup(operationModel, asList(param));
+    mockParameterGroup(functionModel, asList(anotherParam));
+
+    validate();
+  }
+
+  @Test
+  public void functionParameterClashesWithOperationName() {
+    when(operationModel.getName()).thenReturn(REPEATED_NAME);
+    ParameterModel param = getParameter(UNIQUE_PARAM_NAME, ChildElementTest.class);
+    when(param.getRole()).thenReturn(BEHAVIOUR);
+    when(functionModel.getAllParameterModels()).thenReturn(asList(param));
+    mockParameterGroup(functionModel, asList(param));
+
+    validate();
+  }
+
   private void mockParameterGroup(ParameterizedModel model, List<ParameterModel> parameters) {
     ParameterGroupModel group = mock(ParameterGroupModel.class);
 
