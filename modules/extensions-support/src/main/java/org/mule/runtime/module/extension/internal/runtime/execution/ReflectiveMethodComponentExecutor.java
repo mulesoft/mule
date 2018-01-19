@@ -25,6 +25,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
 
@@ -79,8 +80,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
     return new LazyValue<>(() -> {
       try {
         MethodArgumentResolverDelegate resolver = new MethodArgumentResolverDelegate(groups, method);
-        muleContext.getInjector().inject(resolver);
-        resolver.initialise();
+        initialiseIfNeeded(resolver, muleContext);
         return resolver;
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage("Could not initialize argument resolver resolver"), e);
