@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -75,7 +76,15 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   }
 
   private LazyValue<ArgumentResolverDelegate> getMethodArgumentResolver(List<ParameterGroupModel> groups, Method method) {
-    return new LazyValue<>(() -> new MethodArgumentResolverDelegate(groups, method, muleContext));
+    return new LazyValue<>(() -> {
+      MethodArgumentResolverDelegate resolver = new MethodArgumentResolverDelegate(groups, method);
+      try {
+        muleContext.getInjector().inject(resolver);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Could not initialize argument resolver resolver"), e);
+      }
+      return resolver;
+    });
   }
 
   public Object execute(ExecutionContext<M> executionContext) {

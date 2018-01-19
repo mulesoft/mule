@@ -132,7 +132,6 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       new NotificationHandlerArgumentResolver();
 
   private final Method method;
-  private final MuleContext context;
   private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
   private ArgumentResolver<?>[] argumentResolvers;
   private Map<java.lang.reflect.Parameter, ParameterGroupArgumentResolver<?>> parameterGroupResolvers;
@@ -143,14 +142,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
    * @param parameterGroupModels {@link List} of {@link ParameterGroupModel} from the corresponding model
    * @param method the {@link Method} to be called
    */
-  public MethodArgumentResolverDelegate(List<ParameterGroupModel> parameterGroupModels, Method method, MuleContext context) {
+  public MethodArgumentResolverDelegate(List<ParameterGroupModel> parameterGroupModels, Method method) {
     this.method = method;
-    this.context = context;
-    try {
-      context.getInjector().inject(this);
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Could initialize argument resolver resolver"), e);
-    }
     initArgumentResolvers(parameterGroupModels);
   }
 

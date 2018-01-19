@@ -114,13 +114,11 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
    */
   @Override
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation, OperationParameters parameters) {
-    CoreEvent initialiserEvent = getInitialiserEvent(muleContext);
     OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
     Mono<Result<T, A>> resultMono = process(processor)
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
         .onErrorMap(Exceptions::unwrap)
-        .doAfterTerminate(() -> disposeProcessor(processor))
-        .doFinally(s -> ((BaseEventContext) initialiserEvent.getContext()).success());
+        .doAfterTerminate(() -> disposeProcessor(processor));
     return resultMono.toFuture();
   }
 
@@ -128,7 +126,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     if (event != null) {
       return from(processWithChildContext(event, omp, Optional.empty()));
     }
-    return from(omp.apply(just(getInitialiserEvent())));
+    return from(omp.apply(just(getInitialiserEvent(muleContext))));
   }
 
   /**
