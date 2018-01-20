@@ -106,6 +106,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
             .withCategory(extensionElement.getCategory())
             .withModelProperty(new ExtensionTypeDescriptorModelProperty(extensionElement));
 
+    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     context.getParameter("COMPILATION_MODE")
         .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
