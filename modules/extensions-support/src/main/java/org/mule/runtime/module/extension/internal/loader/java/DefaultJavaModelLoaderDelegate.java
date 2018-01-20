@@ -10,7 +10,6 @@ import static java.util.Arrays.stream;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -34,17 +33,18 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.StackableTypesParameterContributor;
+import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Describes an {@link ExtensionModel} by analyzing the annotations in the class provided in the constructor
@@ -105,6 +105,9 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
             .fromVendor(extensionElement.getVendor())
             .withCategory(extensionElement.getCategory())
             .withModelProperty(new ExtensionTypeDescriptorModelProperty(extensionElement));
+
+    context.getParameter("COMPILATION_MODE")
+        .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
     extensionElement.getDeclaringClass()
         .ifPresent(extensionClass -> declarer.withModelProperty(new ImplementingTypeModelProperty(extensionClass)));

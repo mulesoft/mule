@@ -112,12 +112,11 @@ public final class ParameterModelsLoaderDelegate {
         continue;
       }
 
-      List<ParameterDeclarer> groupParams = declaredAsGroup(component, declarationContext, extensionParameter);
-      if (!groupParams.isEmpty()) {
+      if (isParameterGroup(extensionParameter)) {
+        List<ParameterDeclarer> groupParams = declaredAsGroup(component, declarationContext, extensionParameter);
         declarerList.addAll(groupParams);
         continue;
       }
-
 
       ParameterGroupDeclarer groupDeclarer =
           parameterGroupDeclarer != null ? parameterGroupDeclarer : component.onDefaultParameterGroup();
@@ -261,11 +260,17 @@ public final class ParameterModelsLoaderDelegate {
 
     parseLayoutAnnotations(groupParameter, LayoutModel.builder()).ifPresent(declarer::withLayout);
 
+    declarer.withModelProperty(new ExtensionParameterDescriptorModelProperty(groupParameter));
+
     if (!annotatedParameters.isEmpty()) {
       return declare(component, annotatedParameters, declarationContext, declarer);
     } else {
       return declare(component, getFieldsWithGetters(type), declarationContext, declarer);
     }
+  }
+
+  private boolean isParameterGroup(ExtensionParameter groupParameter) {
+    return groupParameter.getAnnotation(ParameterGroup.class).isPresent();
   }
 
   private void parseParameterRole(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {

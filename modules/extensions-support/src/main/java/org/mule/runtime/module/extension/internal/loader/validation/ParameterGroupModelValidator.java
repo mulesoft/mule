@@ -7,15 +7,14 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
-
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 
 /**
@@ -28,16 +27,20 @@ public final class ParameterGroupModelValidator implements ExtensionModelValidat
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
+    boolean isCompileTime = extensionModel.getModelProperty(CompileTimeModelProperty.class).isPresent();
     new ExtensionWalker() {
 
       @Override
-      public void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
-        validateParameterGroup(groupModel, problemsReporter);
+      protected void onParameterGroup(ParameterizedModel owner, ParameterGroupModel model) {
+        validateIsInstantiable(model, problemsReporter);
+        if (isCompileTime) {
+          validateNonEmptyGroup(model, problemsReporter);
+        }
       }
     }.walk(extensionModel);
   }
 
-  private void validateParameterGroup(ParameterGroupModel groupModel, ProblemsReporter problemsReporter) {
+  private void validateIsInstantiable(ParameterGroupModel groupModel, ProblemsReporter problemsReporter) {
     groupModel.getModelProperty(ParameterGroupModelProperty.class).map(ParameterGroupModelProperty::getDescriptor)
         .ifPresent(group -> {
           if (!group.getType().isInstantiable()) {
@@ -47,5 +50,12 @@ public final class ParameterGroupModelValidator implements ExtensionModelValidat
                                              group.getType().getDeclaringClass())));
           }
         });
+  }
+
+  private void validateNonEmptyGroup(ParameterGroupModel groupModel, ProblemsReporter problemsReporter) {
+    if (groupModel.getParameterModels().isEmpty()) {
+      problemsReporter.addError(new Problem(groupModel, "ParameterGroups cannot be empty. "
+          + "At least one user-facing parameter should be declared, but none was found."));
+    }
   }
 }

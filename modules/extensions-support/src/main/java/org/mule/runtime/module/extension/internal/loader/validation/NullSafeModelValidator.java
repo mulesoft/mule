@@ -7,10 +7,15 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -18,6 +23,7 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -99,10 +105,23 @@ public final class NullSafeModelValidator implements ExtensionModelValidator {
 
               @Override
               public void visitObject(ObjectType objectType) {
+                String requiredFields = objectType.getFields().stream()
+                    .filter(f -> f.isRequired() && !isFlattenedParameterGroup(f))
+                    .map(MetadataTypeUtils::getLocalPart)
+                    .collect(joining(", "));
+
+                if (!isBlank(requiredFields) && isCompiletime(extensionModel)) {
+                  problemsReporter
+                      .addError(new Problem(model,
+                                            format("Class '%s' cannot be used with '@%s' parameter since it contains non optional fields: [%s]",
+                                                   getId(objectType).orElse(""), NullSafe.class.getSimpleName(),
+                                                   requiredFields)));
+                }
+
                 if (objectType.isOpen()) {
                   if (hasDefaultOverride) {
                     problemsReporter.addError(
-                                              new Problem(extensionModel,
+                                              new Problem(model,
                                                           format("Field '%s' in class '%s' is annotated with '@%s' is of type '%s'"
                                                               + " but a 'defaultImplementingType' was provided."
                                                               + " Type override is not allowed for Maps",
@@ -115,35 +134,35 @@ public final class NullSafeModelValidator implements ExtensionModelValidator {
                 }
 
                 if (hasDefaultOverride && isInstantiable(fieldType)) {
-                  problemsReporter.addError(new Problem(extensionModel, format(
-                                                                               "Field '%s' in class '%s' is annotated with '@%s' is of concrete type '%s',"
-                                                                                   + " but a 'defaultImplementingType' was provided."
-                                                                                   + " Type override is not allowed for concrete types",
-                                                                               fieldName,
-                                                                               declaringClass.getName(),
-                                                                               NullSafe.class.getSimpleName(),
-                                                                               fieldType.getName())));
+                  problemsReporter.addError(new Problem(model, format(
+                                                                      "Field '%s' in class '%s' is annotated with '@%s' is of concrete type '%s',"
+                                                                          + " but a 'defaultImplementingType' was provided."
+                                                                          + " Type override is not allowed for concrete types",
+                                                                      fieldName,
+                                                                      declaringClass.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      fieldType.getName())));
                 }
 
                 if (!isInstantiable(nullSafeType)) {
-                  problemsReporter.addError(new Problem(extensionModel, format(
-                                                                               "Field '%s' in class '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
-                                                                                   + "used with complex instantiable types (Pojos, Lists, Maps)",
-                                                                               fieldName,
-                                                                               declaringClass.getName(),
-                                                                               NullSafe.class.getSimpleName(),
-                                                                               nullSafeType.getName())));
+                  problemsReporter.addError(new Problem(model, format(
+                                                                      "Field '%s' in class '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
+                                                                          + "used with complex instantiable types (Pojos, Lists, Maps)",
+                                                                      fieldName,
+                                                                      declaringClass.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      nullSafeType.getName())));
                 }
 
                 if (hasDefaultOverride && !fieldType.isAssignableFrom(nullSafeType)) {
-                  problemsReporter.addError(new Problem(extensionModel, format(
-                                                                               "Field '%s' in class '%s' is annotated with '@%s' of type '%s', but provided type '%s"
-                                                                                   + " is not a subtype of the parameter's type",
-                                                                               fieldName,
-                                                                               declaringClass.getName(),
-                                                                               NullSafe.class.getSimpleName(),
-                                                                               fieldType.getName(),
-                                                                               nullSafeType.getName())));
+                  problemsReporter.addError(new Problem(model, format(
+                                                                      "Field '%s' in class '%s' is annotated with '@%s' of type '%s', but provided type '%s"
+                                                                          + " is not a subtype of the parameter's type",
+                                                                      fieldName,
+                                                                      declaringClass.getName(),
+                                                                      NullSafe.class.getSimpleName(),
+                                                                      fieldType.getName(),
+                                                                      nullSafeType.getName())));
                 }
               }
             });
