@@ -6,22 +6,43 @@
  */
 package org.mule.test.module.extension.connector;
 
-import org.junit.Test;
-import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-import org.mule.test.petstore.extension.Aquarium;
-import org.mule.test.petstore.extension.ExclusiveCashier;
-import org.mule.test.petstore.extension.ExclusivePetBreeder;
-import org.mule.test.petstore.extension.PetStoreDeal;
-
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
+import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.petstore.extension.Aquarium;
+import org.mule.test.petstore.extension.ExclusiveCashier;
+import org.mule.test.petstore.extension.ExclusivePetBreeder;
+import org.mule.test.petstore.extension.PetStoreDeal;
+import org.mule.test.runner.RunnerDelegateTo;
 
+import java.util.Map;
+import java.util.Optional;
+
+import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+
+@RunnerDelegateTo(MockitoJUnitRunner.class)
 public class PetStoreExclusiveParameterRequiredWithNullExpressionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private final String TEST_VALUE = "TEST";
+
+  @Mock
+  ConfigurationProperties configProperties;
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    Mockito.doReturn(Optional.empty()).when(configProperties).resolveBooleanProperty(Matchers.anyString());
+    return singletonMap(OBJECT_CONFIGURATION_PROPERTIES, configProperties);
+  }
 
   @Override
   protected String getConfigFile() {

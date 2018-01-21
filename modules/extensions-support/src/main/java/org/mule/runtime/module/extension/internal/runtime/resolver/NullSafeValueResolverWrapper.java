@@ -43,6 +43,9 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBu
 import java.lang.reflect.Field;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A {@link ValueResolver} wrapper which generates and returns default instances if the {@link #delegate} returns {@code null}.
  * <p>
@@ -55,6 +58,8 @@ import java.util.Optional;
  * @since 4.0
  */
 public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initialisable {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(NullSafeValueResolverWrapper.class);
 
   private final ValueResolver<T> delegate;
   private final ValueResolver<T> fallback;
@@ -76,7 +81,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
                                         ObjectTypeParametersResolver parametersResolver) {
     checkArgument(delegate != null, "delegate cannot be null");
 
-    Reference<ValueResolver> value = new Reference<>();
+    Reference<ValueResolver> wrappedResolver = new Reference<>();
     type.accept(new MetadataTypeVisitor() {
 
       @Override
@@ -84,7 +89,8 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
         Class clazz = getType(objectType);
 
         if (isMap(objectType)) {
-          value.set(MapValueResolver.of(clazz, emptyList(), emptyList(), muleContext));
+          ValueResolver<?> fallback = MapValueResolver.of(clazz, emptyList(), emptyList(), muleContext);
+          wrappedResolver.set(new NullSafeValueResolverWrapper(delegate, fallback, muleContext));
           return;
         }
 
@@ -94,24 +100,26 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
             .collect(joining(", "));
 
         if (!isBlank(requiredFields)) {
-          throw new IllegalParameterModelDefinitionException(
-                                                             format("Class '%s' cannot be used with '@%s' parameter since it contains non optional fields: [%s]",
-                                                                    clazz.getName(), NullSafe.class.getSimpleName(),
-                                                                    requiredFields));
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(format("Class '%s' cannot be used with NullSafe Wrapper since it contains non optional fields: [%s]",
+                                clazz.getName(), requiredFields));
+          }
+          wrappedResolver.set(delegate);
+          return;
         }
 
         ResolverSet resolverSet = new ResolverSet(muleContext);
         for (Field field : getFields(clazz)) {
-          ValueResolver<?> resolver = null;
+          ValueResolver<?> fieldResolver = null;
           ObjectFieldType objectField = objectType.getFieldByName(getAlias(field)).orElse(null);
           if (objectField == null) {
             continue;
           }
 
           Optional<String> defaultValue = getDefaultValue(objectField);
-          // TODO MULE-13066
+          // TODO MULE-13066 Extract ParameterResolver logic into a centralized resolver
           if (defaultValue.isPresent()) {
-            resolver = getFieldDefaultValueValueResolver(objectField, muleContext);
+            fieldResolver = getFieldDefaultValueValueResolver(objectField, muleContext);
           } else if (isFlattenedParameterGroup(objectField)) {
             DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder<>(getType(objectField.getValue()));
             resolverSet.add(field.getName(), new ObjectBuilderValueResolver<T>(groupBuilder, muleContext));
@@ -132,41 +140,46 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
                     .build();
               }
 
-              resolver = NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), nullSafeType,
-                                                         muleContext, parametersResolver);
+              fieldResolver = NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), nullSafeType,
+                                                              muleContext, parametersResolver);
             }
 
             if (field.getAnnotation(ConfigOverride.class) != null) {
-              resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
-                                                               field.getName(), muleContext);
+              ValueResolver<?> fieldDelegate = fieldResolver != null ? fieldResolver : new StaticValueResolver<>(null);
+              fieldResolver = ConfigOverrideValueResolverWrapper.of(fieldDelegate, field.getName(), muleContext);
             }
           }
 
-          if (resolver != null) {
-            resolverSet.add(field.getName(), resolver);
+          if (fieldResolver != null) {
+            resolverSet.add(field.getName(), fieldResolver);
           }
         }
 
         ObjectBuilder<T> objectBuilder = new DefaultResolverSetBasedObjectBuilder<T>(clazz, resolverSet);
 
-        value.set(new ObjectBuilderValueResolver<>(objectBuilder, muleContext));
+        wrappedResolver.set(new NullSafeValueResolverWrapper(delegate,
+                                                             new ObjectBuilderValueResolver(objectBuilder, muleContext),
+                                                             muleContext));
       }
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
         Class collectionClass = getType(arrayType);
-        value.set(CollectionValueResolver.of(collectionClass, emptyList()));
+        ValueResolver<?> fallback = CollectionValueResolver.of(collectionClass, emptyList());
+        wrappedResolver.set(new NullSafeValueResolverWrapper(delegate, fallback, muleContext));
       }
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        throw new IllegalParameterModelDefinitionException(
-                                                           format("Cannot use @%s on type '%s'", NullSafe.class.getSimpleName(),
-                                                                  getType(metadataType)));
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(format("Class '%s' cannot be used with NullSafe Wrapper since it is of a simple type",
+                              getType(metadataType).getName()));
+        }
+        wrappedResolver.set(delegate);
       }
     });
 
-    return new NullSafeValueResolverWrapper<>(delegate, value.get(), muleContext);
+    return wrappedResolver.get();
   }
 
   private NullSafeValueResolverWrapper(ValueResolver<T> delegate, ValueResolver<T> fallback, MuleContext muleContext) {

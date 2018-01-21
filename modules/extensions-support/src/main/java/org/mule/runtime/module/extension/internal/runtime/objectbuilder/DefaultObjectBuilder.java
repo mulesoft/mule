@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
@@ -16,6 +17,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
@@ -31,7 +34,7 @@ import javax.inject.Inject;
  *
  * @since 3.7.0
  */
-public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
+public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable {
 
   protected final Class<T> prototypeClass;
   protected final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
@@ -102,4 +105,9 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
     this.encoding = encoding;
   }
 
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(resolvers.values(), muleContext);
+  }
 }
