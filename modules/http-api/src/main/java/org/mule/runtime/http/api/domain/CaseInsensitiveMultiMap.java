@@ -8,6 +8,7 @@
 package org.mule.runtime.http.api.domain;
 
 import static java.util.stream.Collectors.toCollection;
+
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.api.util.MultiMap;
 
@@ -28,7 +29,7 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> {
   }
 
   public CaseInsensitiveMultiMap(MultiMap<String, String> paramsMap) {
-    this.paramsMap = new CaseInsensitiveMapWrapper<>(new LinkedHashMap());
+    this.paramsMap = new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
     for (String key : paramsMap.keySet()) {
       this.paramsMap.put(key, paramsMap.getAll(key).stream().collect(toCollection(LinkedList::new)));
     }

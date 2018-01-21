@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.domain.message;
 
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 
@@ -47,6 +48,11 @@ public interface HttpMessage {
    *         collection of header values
    */
   Collection<String> getHeaderValuesIgnoreCase(String headerName);
+
+  /**
+   * @return all headers
+   */
+  MultiMap<String, String> getHeaders();
 
   /**
    * @return the entity of the message. If there's no entity an {@link EmptyHttpEntity} is returned

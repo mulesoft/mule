@@ -8,6 +8,7 @@ package org.mule.runtime.http.api.domain.message;
 
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
@@ -57,9 +58,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return this builder
    */
   public B headers(MultiMap<String, String> headersMap) {
-    headersMap.keySet().forEach(
-                                key -> headersMap.getAll(key).forEach(
-                                                                      value -> this.headers.put(key, value)));
+    headersMap.keySet().forEach(key -> this.headers.put(key, headersMap.getAll(key)));
     return (B) this;
   }
 
@@ -73,6 +72,18 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    */
   public B addHeader(String name, String value) {
     headers.put(name, value);
+    return (B) this;
+  }
+
+  /**
+   * Includes a new header with multiple values to be sent in the desired {@link HttpMessage}.
+   *
+   * @param name the name of the HTTP header
+   * @param values the values of the HTTP header
+   * @return this builder
+   */
+  public B addHeaders(String name, Collection<String> values) {
+    headers.put(name, values);
     return (B) this;
   }
 

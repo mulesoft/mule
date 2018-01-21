@@ -8,8 +8,10 @@ package org.mule.runtime.core.internal.util;
 
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -73,4 +75,18 @@ public class FunctionalUtils {
       orElse.run();
     }
   }
+
+  /**
+   * Wraps the given function {@code f} so that results for a given input are cached in the given Map.
+   *
+   * @param f the function to memoize
+   * @param cache the map where cached values are stored
+   * @return the memoized function
+   */
+  public static <I, O> Function<I, O> memoize(Function<I, O> f, Map<I, O> cache) {
+    return input -> {
+      return cache.computeIfAbsent(input, f);
+    };
+  }
+
 }
