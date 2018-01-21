@@ -20,8 +20,8 @@ import java.util.Collection;
 class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse {
 
   private final HttpEntity body;
-  private ResponseStatus responseStatus = new ResponseStatus();
-  private MultiMap<String, String> headers = new MultiMap<>();
+  private final ResponseStatus responseStatus;
+  private final MultiMap<String, String> headers;
 
   DefaultHttpResponse(ResponseStatus responseStatus, MultiMap<String, String> headers, HttpEntity body) {
     this.responseStatus = responseStatus;
@@ -47,6 +47,10 @@ class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse {
   @Override
   public Collection<String> getHeaderValues(String headerName) {
     return headers.getAll(headerName);
+  }
+
+  public MultiMap<String, String> getHeaders() {
+    return headers.toImmutableMultiMap();
   }
 
   @Override

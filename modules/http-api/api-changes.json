@@ -6,6 +6,15 @@
           "code": "java.method.addedToInterface",
           "new": "method org.mule.runtime.http.api.domain.request.ServerConnection org.mule.runtime.http.api.domain.request.HttpRequestContext::getServerConnection()",
           "justification": "Services implementations should match container API"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.api.util.MultiMap<java.lang.String, java.lang.String> org.mule.runtime.http.api.domain.message.HttpMessage::getHeaders()",
+          "package": "org.mule.runtime.http.api.domain.message",
+          "classSimpleName": "HttpMessage",
+          "methodName": "getHeaders",
+          "elementKind": "method",
+          "justification": "Services implementations should match container API"
         }
       ]
     }

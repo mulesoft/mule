@@ -25,9 +25,9 @@ class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
   private final String path;
   private final String method;
   private HttpProtocol version;
-  private MultiMap<String, String> headers;
-  private MultiMap<String, String> queryParams;
-  private HttpEntity entity;
+  private final MultiMap<String, String> headers;
+  private final MultiMap<String, String> queryParams;
+  private final HttpEntity entity;
 
   DefaultHttpRequest(URI uri, String path, String method, MultiMap<String, String> headers,
                      MultiMap<String, String> queryParams, HttpEntity entity) {
@@ -68,6 +68,11 @@ class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
   @Override
   public Collection<String> getHeaderValues(String headerName) {
     return headers.getAll(headerName);
+  }
+
+  @Override
+  public MultiMap<String, String> getHeaders() {
+    return headers.toImmutableMultiMap();
   }
 
   @Override
