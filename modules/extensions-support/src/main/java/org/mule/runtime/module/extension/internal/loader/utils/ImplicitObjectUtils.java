@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -22,9 +24,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.Optional;
-
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 
 /**
  * Utilities for creating object with implicit values based on a {@link ParameterizedModel}
@@ -48,19 +47,19 @@ public final class ImplicitObjectUtils {
     ResolverSet resolverSet = new HashedResolverSet(muleContext);
     ParametersResolver parametersResolver = ParametersResolver.fromDefaultValues(model, muleContext);
 
-    for (ParameterGroupModel parameterGroupModel : model.getParameterGroupModels()) {
-      Optional<ParameterGroupDescriptor> descriptor = parameterGroupModel.getModelProperty(ParameterGroupModelProperty.class)
+    for (ParameterGroupModel groupModel : model.getParameterGroupModels()) {
+      Optional<ParameterGroupDescriptor> descriptor = groupModel.getModelProperty(ParameterGroupModelProperty.class)
           .map(ParameterGroupModelProperty::getDescriptor);
 
-      if (descriptor.isPresent()) {
+      if (descriptor.isPresent() && groupModel.getParameterModels().stream().noneMatch(ParameterModel::isRequired)) {
         String groupKey = getContainerName(descriptor.get().getContainer());
         resolverSet.add(groupKey,
                         NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), descriptor.get().getMetadataType(),
                                                         muleContext, parametersResolver));
       } else {
-        parameterGroupModel.getParameterModels().forEach(parameterModel -> {
+        groupModel.getParameterModels().forEach(parameterModel -> {
           Object defaultValue = parameterModel.getDefaultValue();
-          ValueResolver resolver;
+          ValueResolver<?> resolver;
           if (defaultValue instanceof String) {
             resolver = getExpressionBasedValueResolver((String) defaultValue, parameterModel.getType(), muleContext);
           } else {

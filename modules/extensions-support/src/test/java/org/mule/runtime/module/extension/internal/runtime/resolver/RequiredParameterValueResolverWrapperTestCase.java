@@ -6,18 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.allOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Map;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -37,6 +45,19 @@ public class RequiredParameterValueResolverWrapperTestCase extends LifecycleAwar
 
   @Mock
   private ValueResolvingContext context;
+
+  @Mock
+  ConfigurationProperties configProperties;
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_CONFIGURATION_PROPERTIES, configProperties);
+  }
+
+  @Before
+  public void setUpConfigProperties() {
+    when(configProperties.resolveBooleanProperty(anyString())).thenReturn(empty());
+  }
 
   @Override
   protected LifecycleAwareValueResolverWrapper<Object> createWrapper(ValueResolver<Object> delegate) {
