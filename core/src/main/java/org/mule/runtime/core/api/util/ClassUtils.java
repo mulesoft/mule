@@ -14,7 +14,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.internal.util.FunctionalUtils;
 
 import com.google.common.primitives.Primitives;
 
@@ -861,10 +860,7 @@ public class ClassUtils {
    * @param f the function to memoize
    * @param cache the map where cached values are stored
    * @return the memoized function
-   *
-   * @deprecated use {@link FunctionalUtils#memoize(Function, Map)}
    */
-  @Deprecated
   public static <I, O> Function<I, O> memoize(Function<I, O> f, Map<I, O> cache) {
     return input -> {
       return cache.computeIfAbsent(input, f);
