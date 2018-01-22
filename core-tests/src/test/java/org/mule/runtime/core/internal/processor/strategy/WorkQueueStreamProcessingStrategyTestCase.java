@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.WORK_QUEUE;
@@ -47,7 +46,7 @@ public class WorkQueueStreamProcessingStrategyTestCase extends WorkQueueProcessi
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new WorkQueueStreamProcessingStrategy(() -> blocking,
                                                  XS_BUFFER_SIZE,
-                                                 DEFAULT_SUBSCRIBER_COUNT,
+                                                 1,
                                                  DEFAULT_WAIT_STRATEGY,
                                                  () -> blocking,
                                                  4);
@@ -60,7 +59,7 @@ public class WorkQueueStreamProcessingStrategyTestCase extends WorkQueueProcessi
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new WorkQueueStreamProcessingStrategy(() -> blocking,
                                                                                               DEFAULT_BUFFER_SIZE,
-                                                                                              DEFAULT_SUBSCRIBER_COUNT,
+                                                                                              1,
                                                                                               DEFAULT_WAIT_STRATEGY,
                                                                                               () -> blocking,
                                                                                               1)),
@@ -79,7 +78,7 @@ public class WorkQueueStreamProcessingStrategyTestCase extends WorkQueueProcessi
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new WorkQueueStreamProcessingStrategy(() -> blocking,
                                                                                               DEFAULT_BUFFER_SIZE,
-                                                                                              DEFAULT_SUBSCRIBER_COUNT,
+                                                                                              1,
                                                                                               DEFAULT_WAIT_STRATEGY,
                                                                                               () -> blocking,
                                                                                               1)),
