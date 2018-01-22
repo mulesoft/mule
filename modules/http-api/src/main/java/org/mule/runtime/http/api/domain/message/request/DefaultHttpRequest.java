@@ -87,7 +87,7 @@ class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
 
   @Override
   public MultiMap<String, String> getQueryParams() {
-    return queryParams;
+    return queryParams.toImmutableMultiMap();
   }
 
   @Override
