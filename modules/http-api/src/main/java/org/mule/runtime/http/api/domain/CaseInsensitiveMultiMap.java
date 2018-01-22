@@ -10,6 +10,7 @@ package org.mule.runtime.http.api.domain;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.toCollection;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.api.util.MultiMap;
 
@@ -21,6 +22,7 @@ import java.util.LinkedList;
  *
  * @since 4.0
  */
+@NoExtend
 public class CaseInsensitiveMultiMap extends MultiMap<String, String> {
 
   private static final long serialVersionUID = -7231875232585176671L;
