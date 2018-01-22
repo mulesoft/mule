@@ -18,6 +18,29 @@
           "elementKind": "class",
           "justification": "Class was moved to api and this change will be cherry-picked to 4.1.0"
         }
+        ,
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory::createProvider(===java.util.Map<java.lang.String, java.lang.String>===, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
+          "new": "parameter org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory::createProvider(===org.mule.runtime.config.api.dsl.model.ConfigurationParameters===, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
+          "oldType": "java.util.Map<java.lang.String, java.lang.String>",
+          "newType": "org.mule.runtime.config.api.dsl.model.ConfigurationParameters",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "methodName": "createProvider",
+          "parameterIndex": "0",
+          "justification": "Never used since it was never released"
+         },
+         {
+           "code": "java.method.parameterTypeChanged",
+           "old": "parameter org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory::createProvider(===java.util.Map<java.lang.String, java.lang.String>===, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
+           "new": "parameter org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory::createProvider(===org.mule.runtime.config.api.dsl.model.ConfigurationParameters===, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
+           "oldType": "java.util.Map<java.lang.String, java.lang.String>",
+           "newType": "org.mule.runtime.config.api.dsl.model.ConfigurationParameters",
+           "package": "org.mule.runtime.config.api.dsl.model.properties",
+           "methodName": "createProvider",
+           "parameterIndex": "0",
+           "justification": "Never used since it was never released"
+         }
       ]
     }
   }

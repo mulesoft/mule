@@ -38,7 +38,6 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -52,6 +51,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
+import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
@@ -62,6 +62,7 @@ import org.mule.runtime.config.api.dsl.processor.ConfigFile;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
+import org.mule.runtime.config.internal.dsl.model.DefaultConfigurationParameters;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
@@ -340,7 +341,8 @@ public class ApplicationModel {
       // Have to index again the component models with macro expanded ones
       indexComponentModels();
     }
-    //TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors and crafted declared extesion models)
+    // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
+    // and crafted declared extesion models)
     resolveComponentTypes();
     resolveTypedComponentIdentifier(extensionModelHelper);
     executeOnEveryMuleComponentTree(new ComponentLocationVisitor(extensionModelHelper));
@@ -463,12 +465,12 @@ public class ApplicationModel {
                   continue;
                 }
 
-                Map<String, String> configAttributes = new HashMap<>();
-                componentConfigLine.getConfigAttributes().forEach((key, value) -> {
-                  configAttributes.put(key, localResolver.resolveValue(value.getValue()).toString());
-                });
+                DefaultConfigurationParameters.Builder configurationParametersBuilder =
+                    DefaultConfigurationParameters.builder();
+                ConfigurationParameters configurationParameters =
+                    resolveConfigurationParameters(configurationParametersBuilder, componentConfigLine, localResolver);
                 ConfigurationPropertiesProvider provider = providerFactoriesMap.get(componentIdentifier)
-                    .createProvider(configAttributes, externalResourceProvider);
+                    .createProvider(configurationParameters, externalResourceProvider);
                 if (provider instanceof Component) {
                   Component providerComponent = (Component) provider;
                   TypedComponentIdentifier typedComponentIdentifier = TypedComponentIdentifier.builder()
@@ -496,13 +498,28 @@ public class ApplicationModel {
     return configConfigurationPropertiesProviders;
   }
 
+  private ConfigurationParameters resolveConfigurationParameters(DefaultConfigurationParameters.Builder configurationParametersBuilder,
+                                                                 ConfigLine componentConfigLine,
+                                                                 ConfigurationPropertiesResolver localResolver) {
+    componentConfigLine.getConfigAttributes().forEach((key, value) -> configurationParametersBuilder
+        .withSimpleParameter(key, localResolver.resolveValue(value.getValue())));
+    for (ConfigLine childConfigLine : componentConfigLine.getChildren()) {
+      DefaultConfigurationParameters.Builder childParametersBuilder = DefaultConfigurationParameters.builder();
+      configurationParametersBuilder.withComplexParameter(ComponentIdentifier.builder().name(childConfigLine.getIdentifier())
+          .namespace(childConfigLine.getNamespace()).build(),
+                                                          resolveConfigurationParameters(childParametersBuilder, childConfigLine,
+                                                                                         localResolver));
+    }
+    return configurationParametersBuilder.build();
+  }
+
   /**
    * Resolves the types of each component model when possible.
    */
   public void resolveComponentTypes() {
-    //TODO MULE-13894 enable this once changes are completed and no componentBuildingDefinition is needed
-    //checkState(componentBuildingDefinitionRegistry.isPresent(),
-    //           "ApplicationModel was created without a " + ComponentBuildingDefinitionProvider.class.getName());
+    // TODO MULE-13894 enable this once changes are completed and no componentBuildingDefinition is needed
+    // checkState(componentBuildingDefinitionRegistry.isPresent(),
+    // "ApplicationModel was created without a " + ComponentBuildingDefinitionProvider.class.getName());
     componentBuildingDefinitionRegistry.ifPresent(buildingDefinitionRegistry -> {
       executeOnEveryComponentTree(componentModel -> {
         Optional<ComponentBuildingDefinition<?>> buildingDefinition =
