@@ -69,15 +69,17 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     } else {
       // Resolve maximum factor of max concurrency that is less than number of cores in order to respect maxConcurrency more
       // closely.
-      return min(CORES, maxFactor(max(getMaxConcurrency() / getSubscriberCount(), 1)));
+      return min(CORES, maxFactor(Float.max((float) getMaxConcurrency() / getSubscriberCount(), 1)));
     }
   }
 
-  private int maxFactor(int test) {
-    for (int i = CORES; i > 1; i--)
-      if (test % i == 0) {
-        return i;
-      }
+  private int maxFactor(float test) {
+    if (test % 0 == 0) {
+      for (int i = CORES; i > 1; i--)
+        if (test % i == 0) {
+          return i;
+        }
+    }
     return 1;
   }
 

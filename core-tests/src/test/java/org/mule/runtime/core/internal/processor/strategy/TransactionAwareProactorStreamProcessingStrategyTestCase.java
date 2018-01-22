@@ -13,7 +13,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
@@ -41,7 +40,7 @@ public class TransactionAwareProactorStreamProcessingStrategyTestCase extends Pr
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new TransactionAwareProactorStreamProcessingStrategy(() -> blocking,
                                                                 XS_BUFFER_SIZE,
-                                                                DEFAULT_SUBSCRIBER_COUNT,
+                                                                1,
                                                                 DEFAULT_WAIT_STRATEGY,
                                                                 () -> cpuLight,
                                                                 () -> blocking,
