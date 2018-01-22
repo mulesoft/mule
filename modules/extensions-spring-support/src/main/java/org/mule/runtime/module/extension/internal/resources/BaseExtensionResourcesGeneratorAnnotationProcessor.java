@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
@@ -29,6 +28,15 @@ import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -39,15 +47,6 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 
 
 /**
@@ -74,6 +73,9 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
   public static final String PROBLEMS_HANDLER = "PROBLEMS_HANDLER";
   public static final String EXTENSION_VERSION = "extension.version";
   public static final String EXTENSION_TYPE = "EXTENSION_TYPE";
+
+  private static final String EXTENSION_LOADING_MODE_SYSTEM_PROPERTY = "modelLoader.runtimeMode";
+  public static final String COMPILATION_MODE = "COMPILATION_MODE";
 
   private final SpiServiceRegistry serviceRegistry = new SpiServiceRegistry();
 
@@ -119,6 +121,11 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
     params.put(PROBLEMS_HANDLER, new AnnotationProcessorProblemsHandler(processingEnv));
     params.put(PROCESSING_ENVIRONMENT, processingEnv);
     params.put(ROUND_ENVIRONMENT, roundEnvironment);
+
+    if (!simulateRuntimeLoading()) {
+      params.put(COMPILATION_MODE, true);
+    }
+
     return getExtensionModelLoader().loadExtensionModel(classLoader, getDefault(emptySet()),
                                                         params);
   }
@@ -157,6 +164,26 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
         .addAll(serviceRegistry.lookupProviders(GeneratedResourceFactory.class, getClass().getClassLoader()))
         .addAll(serviceRegistry.lookupProviders(DslResourceFactory.class, getClass().getClassLoader())).build();
 
+  }
+
+  /**
+   * During compile-time, some model validations will be performed over the plugin being compiled
+   * that are different from the ones executed at execution-time for the same plugin
+   * (being the runtime validations a subset of the ones executed at compile-time).
+   *
+   * Ir order to skip the compile-time-only validations and load the plugin as if it was loaded
+   * on an application deploy, the user can flag the compilation as a "runtime simulation".
+   * For example, a plugin that has been developed using a 1.0 version of the SDK and fails its compilation
+   * when moving to the 1.1 version of the SDK, should never fail when using the "runtime simulation" loading mode
+   * (otherwise runtime backwards compatibility would've been broken).
+   *
+   * This simulation mode should be treated as an internal, test-only configuration.
+   *
+   * @return {@code true} if {@code modelLoader.runtimeMode} configuration property was provided
+   */
+  private boolean simulateRuntimeLoading() {
+    String runtimeMode = System.getProperty(EXTENSION_LOADING_MODE_SYSTEM_PROPERTY);
+    return runtimeMode != null && !runtimeMode.trim().isEmpty() ? Boolean.valueOf(runtimeMode) : false;
   }
 
   public abstract ExtensionElement toExtensionElement(TypeElement typeElement, ProcessingEnvironment processingEnvironment);

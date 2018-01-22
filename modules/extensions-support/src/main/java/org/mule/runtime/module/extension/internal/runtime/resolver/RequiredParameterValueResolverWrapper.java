@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleException;
+
+import javax.inject.Inject;
 
 /**
  * An {@link LifecycleAwareValueResolverWrapper} which throws an {@link IllegalArgumentException} if the resolved
@@ -20,8 +24,10 @@ import org.mule.runtime.api.exception.MuleException;
  */
 public class RequiredParameterValueResolverWrapper<T> extends LifecycleAwareValueResolverWrapper<T> {
 
-  private final String errorMessage;
+  @Inject
+  private ConfigurationProperties properties;
 
+  private final String errorMessage;
 
   /**
    * Creates a new instance
@@ -58,10 +64,15 @@ public class RequiredParameterValueResolverWrapper<T> extends LifecycleAwareValu
   @Override
   public T resolve(ValueResolvingContext context) throws MuleException {
     T value = super.resolve(context);
-    if (value == null) {
+    if (value == null && !isLazyInit()) {
       throw new IllegalArgumentException(errorMessage);
     }
 
     return value;
   }
+
+  private Boolean isLazyInit() {
+    return properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
+  }
+
 }
