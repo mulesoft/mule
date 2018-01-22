@@ -23,6 +23,8 @@ import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
+
 @Feature(LIFECYCLE_AND_DEPENDENCY_INJECTION)
 @Story(LIFECYCLE_PHASE_STORY)
 public class DefaultLifecycleInterceptorTestCase {
@@ -66,6 +68,21 @@ public class DefaultLifecycleInterceptorTestCase {
     assertThat(interceptor.beforePhaseExecution(startLifecyclePhase, startableAndStoppableObject), is(true));
     interceptor.afterPhaseExecution(startLifecyclePhase, startableAndStoppableObject, of(new RuntimeException()));
     assertThat(interceptor.beforePhaseExecution(stopLifecyclePhase, startableAndStoppableObject), is(false));
+  }
+
+  @Test
+  public void stopIsInvokedForPreviousPhasesIfStartFailed() {
+    Object anotherStartableAndStopableObject =
+        mock(Object.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+
+    assertThat(interceptor.beforePhaseExecution(startLifecyclePhase, startableAndStoppableObject), is(true));
+    interceptor.afterPhaseExecution(startLifecyclePhase, startableAndStoppableObject, Optional.empty());
+
+    assertThat(interceptor.beforePhaseExecution(startLifecyclePhase, anotherStartableAndStopableObject), is(true));
+    interceptor.afterPhaseExecution(startLifecyclePhase, anotherStartableAndStopableObject, of(new RuntimeException()));
+    assertThat(interceptor.beforePhaseExecution(stopLifecyclePhase, anotherStartableAndStopableObject), is(false));
+
+    assertThat(interceptor.beforePhaseExecution(stopLifecyclePhase, startableAndStoppableObject), is(true));
   }
 
 }
