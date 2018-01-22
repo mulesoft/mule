@@ -62,7 +62,7 @@ import org.mule.runtime.config.api.dsl.processor.ConfigFile;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
-import org.mule.runtime.config.internal.dsl.model.DefaultConfigurationParamerters;
+import org.mule.runtime.config.internal.dsl.model.DefaultConfigurationParameters;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
@@ -465,8 +465,8 @@ public class ApplicationModel {
                   continue;
                 }
 
-                DefaultConfigurationParamerters.Builder configurationParametersBuilder =
-                    DefaultConfigurationParamerters.builder();
+                DefaultConfigurationParameters.Builder configurationParametersBuilder =
+                    DefaultConfigurationParameters.builder();
                 ConfigurationParameters configurationParameters =
                     resolveConfigurationParameters(configurationParametersBuilder, componentConfigLine, localResolver);
                 ConfigurationPropertiesProvider provider = providerFactoriesMap.get(componentIdentifier)
@@ -498,13 +498,13 @@ public class ApplicationModel {
     return configConfigurationPropertiesProviders;
   }
 
-  private ConfigurationParameters resolveConfigurationParameters(DefaultConfigurationParamerters.Builder configurationParametersBuilder,
+  private ConfigurationParameters resolveConfigurationParameters(DefaultConfigurationParameters.Builder configurationParametersBuilder,
                                                                  ConfigLine componentConfigLine,
                                                                  ConfigurationPropertiesResolver localResolver) {
     componentConfigLine.getConfigAttributes().forEach((key, value) -> configurationParametersBuilder
         .withSimpleParameter(key, localResolver.resolveValue(value.getValue())));
     for (ConfigLine childConfigLine : componentConfigLine.getChildren()) {
-      DefaultConfigurationParamerters.Builder childParametersBuilder = DefaultConfigurationParamerters.builder();
+      DefaultConfigurationParameters.Builder childParametersBuilder = DefaultConfigurationParameters.builder();
       configurationParametersBuilder.withComplexParameter(ComponentIdentifier.builder().name(childConfigLine.getIdentifier())
           .namespace(childConfigLine.getNamespace()).build(),
                                                           resolveConfigurationParameters(childParametersBuilder, childConfigLine,

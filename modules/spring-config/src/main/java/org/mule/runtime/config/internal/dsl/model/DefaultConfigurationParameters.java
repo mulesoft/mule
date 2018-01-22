@@ -16,13 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class DefaultConfigurationParamerters implements ConfigurationParameters {
+public class DefaultConfigurationParameters implements ConfigurationParameters {
 
   private Map<String, Object> simpleConfigurationParameters;
   private MultiMap<ComponentIdentifier, ConfigurationParameters> complexConfigurationParameters;
 
-  private DefaultConfigurationParamerters(Map<String, Object> simpleConfigurationParameters,
-                                          MultiMap<ComponentIdentifier, ConfigurationParameters> complexConfigurationParameters) {
+  private DefaultConfigurationParameters(Map<String, Object> simpleConfigurationParameters,
+                                         MultiMap<ComponentIdentifier, ConfigurationParameters> complexConfigurationParameters) {
     this.simpleConfigurationParameters = simpleConfigurationParameters;
     this.complexConfigurationParameters = complexConfigurationParameters;
   }
@@ -66,7 +66,7 @@ public class DefaultConfigurationParamerters implements ConfigurationParameters 
     }
 
     public ConfigurationParameters build() {
-      return new DefaultConfigurationParamerters(simpleConfigurationParameters, complexConfigurationParameters);
+      return new DefaultConfigurationParameters(simpleConfigurationParameters, complexConfigurationParameters);
     }
 
   }
