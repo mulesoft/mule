@@ -7,6 +7,7 @@
 package org.mule.runtime.http.api.domain.response;
 
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -20,10 +21,10 @@ import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 
+import org.junit.Test;
+
 import java.util.Collection;
 import java.util.Optional;
-
-import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -57,8 +58,8 @@ public class HttpResponseBuilderTestCase {
     assertThat(response.getStatusCode(), is(418));
     assertThat(response.getReasonPhrase(), is("I'm a teapot"));
     assertThat(response.getEntity(), is(instanceOf(ByteArrayHttpEntity.class)));
-    assertThat(response.getHeaderNames(), hasItems(header));
-    assertThat(response.getHeaderValues(header), hasItems(value));
+    assertThat(response.getHeaderNames(), hasItems(equalToIgnoringCase(header)));
+    assertThat(response.getHeaderValuesIgnoreCase(header), hasItems(value));
   }
 
   @Test
@@ -72,7 +73,7 @@ public class HttpResponseBuilderTestCase {
     assertThat(headerValue.get(), is(value));
     Collection<String> headerValues = builder.getHeaderValues(header);
     assertThat(headerValues, hasItems(value));
-    assertThat(builder.build().getHeaderValues(header), hasItems(value));
+    assertThat(builder.build().getHeaderValuesIgnoreCase(header), hasItems(value));
 
     // add same header with different case
     builder.addHeader(header.toLowerCase(), value.toUpperCase());
@@ -81,7 +82,7 @@ public class HttpResponseBuilderTestCase {
     assertThat(headerValue2.get(), is(value));
     Collection<String> headerValues2 = builder.getHeaderValues(header.toLowerCase());
     assertThat(headerValues2, hasItems(value, value.toUpperCase()));
-    assertThat(builder.build().getHeaderValues(header), hasItems(value, value.toUpperCase()));
+    assertThat(builder.build().getHeaderValuesIgnoreCase(header), hasItems(value, value.toUpperCase()));
 
     // remove header
     builder.removeHeader(header);
