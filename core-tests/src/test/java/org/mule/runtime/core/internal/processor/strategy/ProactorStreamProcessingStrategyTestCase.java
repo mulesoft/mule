@@ -29,7 +29,6 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
@@ -65,7 +64,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new ProactorStreamProcessingStrategy(() -> ringBuffer,
                                                 XS_BUFFER_SIZE,
-                                                DEFAULT_SUBSCRIBER_COUNT,
+                                                1,
                                                 DEFAULT_WAIT_STRATEGY,
                                                 () -> cpuLight,
                                                 () -> blocking,
@@ -223,7 +222,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     flow = flowBuilder.get().processors(blockingProcessor)
         .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
-                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             1,
                                                                                              DEFAULT_WAIT_STRATEGY,
                                                                                              () -> cpuLight,
                                                                                              () -> rejectingSchedulerSpy,
@@ -252,7 +251,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     flow = flowBuilder.get().processors(cpuIntensiveProcessor)
         .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
-                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             1,
                                                                                              DEFAULT_WAIT_STRATEGY,
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
@@ -279,7 +278,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
-                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             1,
                                                                                              DEFAULT_WAIT_STRATEGY,
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
@@ -301,7 +300,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
-                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             1,
                                                                                              DEFAULT_WAIT_STRATEGY,
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
@@ -324,7 +323,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
-                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             1,
                                                                                              DEFAULT_WAIT_STRATEGY,
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
@@ -346,7 +345,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                              DEFAULT_BUFFER_SIZE,
-                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             1,
                                                                                              DEFAULT_WAIT_STRATEGY,
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
@@ -395,7 +394,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     flow = flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                              XS_BUFFER_SIZE,
-                                                                                             DEFAULT_SUBSCRIBER_COUNT,
+                                                                                             1,
                                                                                              DEFAULT_WAIT_STRATEGY,
                                                                                              () -> cpuLight,
                                                                                              () -> blocking,
