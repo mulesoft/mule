@@ -52,16 +52,16 @@ import reactor.core.publisher.WorkQueueProcessor;
  */
 abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
 
-  protected static int CORES = getRuntime().availableProcessors();
   private static final String SYSTEM_PROPERTY_PREFIX = AbstractStreamProcessingStrategyFactory.class.getName() + ".";
+  protected static final int CORES = getInteger(SYSTEM_PROPERTY_PREFIX + "AVAILABLE_CORES", getRuntime().availableProcessors());
 
-  public static final int DEFAULT_BUFFER_SIZE = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_BUFFER_SIZE", SMALL_BUFFER_SIZE);
+  protected static final int DEFAULT_BUFFER_SIZE = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_BUFFER_SIZE", SMALL_BUFFER_SIZE);
 
-  // Use more than one subscriber by default on machines with large number of cores. 1 on < 8 cores, 2 on < 8-core, 3 on <
-  // 24-core, and so on.
-  public static final int DEFAULT_SUBSCRIBER_COUNT =
-      getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_SUBSCRIBER_COUNT", getRuntime().availableProcessors() / 12 + 1);
-  public static final String DEFAULT_WAIT_STRATEGY =
+  // Use one subscriber for every two cores available, or 1 subscriber for 1 core. This value is high for most scenarios but
+  // required to achieve absolute minimum latency for the scenarios where this is important.
+  protected static final int DEFAULT_SUBSCRIBER_COUNT =
+      getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_SUBSCRIBER_COUNT", Integer.max(1, (CORES / 2)));
+  protected static final String DEFAULT_WAIT_STRATEGY =
       getProperty(SYSTEM_PROPERTY_PREFIX + "DEFAULT_WAIT_STRATEGY", LITE_BLOCKING.name());
   protected static String RING_BUFFER_SCHEDULER_NAME_SUFFIX = ".ring-buffer";
   private int bufferSize = DEFAULT_BUFFER_SIZE;

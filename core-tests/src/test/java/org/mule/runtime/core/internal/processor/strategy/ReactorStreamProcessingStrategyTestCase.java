@@ -22,7 +22,6 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
@@ -49,7 +48,7 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new ReactorStreamProcessingStrategy(() -> ringBuffer,
                                                XS_BUFFER_SIZE,
-                                               DEFAULT_SUBSCRIBER_COUNT,
+                                               1,
                                                DEFAULT_WAIT_STRATEGY,
                                                () -> cpuLight,
                                                CORES,
@@ -64,7 +63,7 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ReactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                             DEFAULT_BUFFER_SIZE,
-                                                                                            DEFAULT_SUBSCRIBER_COUNT,
+                                                                                            1,
                                                                                             DEFAULT_WAIT_STRATEGY,
                                                                                             () -> cpuLight,
                                                                                             CORES,
@@ -84,7 +83,7 @@ public class ReactorStreamProcessingStrategyTestCase extends ReactorProcessingSt
     internalConcurrent(flowBuilder.get()
         .processingStrategyFactory((context, prefix) -> new ReactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                             DEFAULT_BUFFER_SIZE,
-                                                                                            DEFAULT_SUBSCRIBER_COUNT,
+                                                                                            1,
                                                                                             DEFAULT_WAIT_STRATEGY,
                                                                                             () -> cpuLight,
                                                                                             CORES,
