@@ -13,10 +13,12 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
+
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.MultiMapTestCase;
 
 import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
@@ -63,6 +65,13 @@ public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
     assertThat(multiMap.put("KeY", VALUE_2), is(VALUE_1));
     assertThat(multiMap.get("key"), is(VALUE_1));
     assertThat(multiMap.getAll("KEY"), is(asList(VALUE_1, VALUE_2)));
+  }
+
+  @Test
+  public void immutableRemainsCaseInsensitive() {
+    multiMap.put("wHaTeVeR", VALUE_1);
+
+    assertThat(multiMap.toImmutableMultiMap().get("Whatever"), is(VALUE_1));
   }
 
 }

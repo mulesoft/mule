@@ -15,6 +15,29 @@
           "methodName": "getHeaders",
           "elementKind": "method",
           "justification": "Services implementations should match container API"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.api.util.MultiMap<K, V> org.mule.runtime.api.util.MultiMap<K, V>::toImmutableMultiMap() @ org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "new": "method org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap::toImmutableMultiMap()",
+          "oldType": "org.mule.runtime.api.util.MultiMap<java.lang.String, java.lang.String>",
+          "newType": "org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "package": "org.mule.runtime.http.api.domain",
+          "classSimpleName": "CaseInsensitiveMultiMap",
+          "methodName": "toImmutableMultiMap",
+          "elementKind": "method",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "new": "class org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.http.api.domain",
+          "classSimpleName": "CaseInsensitiveMultiMap",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
         }
       ]
     }
