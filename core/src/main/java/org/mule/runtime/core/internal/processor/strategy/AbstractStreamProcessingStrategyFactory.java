@@ -173,7 +173,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
         } catch (InterruptedException e) {
           throw new MuleRuntimeException(e);
         }
-      }, createOnEventConsumer());
+      }, createOnEventConsumer(), bufferSize);
     }
 
     protected enum WaitStrategy {

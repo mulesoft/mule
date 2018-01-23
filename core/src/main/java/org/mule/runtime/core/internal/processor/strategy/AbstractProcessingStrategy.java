@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -25,7 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 import reactor.core.publisher.FluxSink;
-import reactor.util.concurrent.Queues;
 
 /**
  * Abstract base {@link ProcessingStrategy} that creates a basic {@link Sink} that serializes events.
@@ -60,12 +60,14 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     private final FluxSink<CoreEvent> fluxSink;
     private final reactor.core.Disposable disposable;
     private final Consumer onEventConsumer;
+    private final int bufferSize;
 
     ReactorSink(FluxSink<CoreEvent> fluxSink, reactor.core.Disposable disposable,
-                Consumer<CoreEvent> onEventConsumer) {
+                Consumer<CoreEvent> onEventConsumer, int bufferSize) {
       this.fluxSink = fluxSink;
       this.disposable = disposable;
       this.onEventConsumer = onEventConsumer;
+      this.bufferSize = bufferSize;
     }
 
     @Override
@@ -77,13 +79,14 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     @Override
     public boolean emit(CoreEvent event) {
       onEventConsumer.accept(event);
-      synchronized (fluxSink) {
-        if (fluxSink.requestedFromDownstream() > 0) {
-          fluxSink.next(event);
-          return true;
-        } else {
-          return false;
-        }
+      // Optimization to avoid a sync block here while also minimizing the possibility of blocking source threads if next is
+      // called when there are no pending requests. Optimization is not applied is buffer size is small relative to the number of
+      // cores. See also: https://github.com/reactor/reactor-core/issues/1037
+      if (fluxSink.requestedFromDownstream() > (bufferSize > CORES * 4 ? CORES : 0)) {
+        fluxSink.next(event);
+        return true;
+      } else {
+        return false;
       }
     }
 
