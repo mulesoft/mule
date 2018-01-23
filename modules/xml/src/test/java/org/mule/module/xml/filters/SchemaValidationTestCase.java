@@ -8,6 +8,7 @@ package org.mule.module.xml.filters;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -25,6 +26,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXParseException;
+
 import org.mule.util.IOUtils;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,6 +47,8 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
     private static final String VALID_XML_FILE = "/validation1.xml";
 
     private static final String INVALID_XML_FILE = "/validation2.xml";
+
+    private final TestErrorHandler errorHandler = new TestErrorHandler();
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private MuleContext muleContext;
@@ -93,4 +99,43 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase
         assertThat(message.getDataType().getMimeType(), is("text/xml"));
         assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
     }
+
+    @Test
+    public void testErrorHandler() throws Exception
+    {
+        SchemaValidationFilter filter = new SchemaValidationFilter();
+        filter.setSchemaLocations(SIMPLE_SCHEMA);
+        filter.initialise();
+        filter.setErrorHandler(errorHandler);
+        assertThat(filter.accept(new DefaultMuleMessage(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext)), is(false));
+        assertThat(errorHandler.exception, is(notNullValue()));
+    }
+
+    private class TestErrorHandler implements ErrorHandler
+    {
+
+        private Exception exception = null;
+
+        @Override
+        public void warning(SAXParseException exception) throws SAXParseException
+        {
+            this.exception = exception;
+            throw exception;
+        }
+
+        @Override
+        public void error(SAXParseException exception) throws SAXParseException
+        {
+            this.exception = exception;
+            throw exception;
+        }
+
+        @Override
+        public void fatalError(SAXParseException exception) throws SAXParseException
+        {
+            this.exception = exception;
+            throw exception;
+        }
+    }
+
 }
