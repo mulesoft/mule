@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.xmlsecurity;
 
 import static java.lang.String.format;
 import static javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD;
+import static javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA;
 import static javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET;
 import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
 import static javax.xml.stream.XMLInputFactory.SUPPORT_DTD;
@@ -20,15 +21,16 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import javax.xml.XMLConstants;
 
 import org.slf4j.Logger;
 
 /**
  * Create different XML factories configured through the same interface for disabling vulnerabilities.
  *
- * Also make sure we are using standard Java implementations when not overriding explicitly. This is necessary
- * as some dependencies such as Woodstox and Saxon register service providers that take precedence over
- * the Java defaults (in META-INF/services).
+ * Also make sure we are using standard Java implementations when not overriding explicitly. This is necessary as some
+ * dependencies such as Woodstox and Saxon register service providers that take precedence over the Java defaults (in
+ * META-INF/services).
  */
 public class DefaultXMLSecureFactories {
 
@@ -172,6 +174,14 @@ public class DefaultXMLSecureFactories {
     factory.setProperty(SUPPORT_DTD, expandEntities);
   }
 
+  /**
+   * Disables {@link XMLConstants#ACCESS_EXTERNAL_DTD} and {@link XMLConstants#ACCESS_EXTERNAL_STYLESHEET} features if
+   * {@link DefaultXMLSecureFactories#externalEntities} and {@link DefaultXMLSecureFactories#expandEntities} are false.
+   * 
+   * @see TransformerFactory#setAttribute(String, Object) for more information about supported attributes.
+   *
+   * @param factory the {@link TransformerFactory} to configure.
+   */
   public void configureTransformerFactory(TransformerFactory factory) {
     if (!externalEntities && !expandEntities) {
       try {
@@ -183,10 +193,18 @@ public class DefaultXMLSecureFactories {
     }
   }
 
+  /**
+   * Disables {@link XMLConstants#ACCESS_EXTERNAL_DTD} and {@link XMLConstants#ACCESS_EXTERNAL_DTD} features if
+   * {@link DefaultXMLSecureFactories#externalEntities} and {@link DefaultXMLSecureFactories#expandEntities} are false.
+   * 
+   * @see SchemaFactory#setProperty(String, Object) for more information about supported properties.
+   *
+   * @param factory the {@link SchemaFactory} to configure.
+   */
   public void configureSchemaFactory(SchemaFactory factory) {
     if (!externalEntities && !expandEntities) {
       try {
-        factory.setProperty(ACCESS_EXTERNAL_STYLESHEET, "");
+        factory.setProperty(ACCESS_EXTERNAL_SCHEMA, "");
         factory.setProperty(ACCESS_EXTERNAL_DTD, "");
       } catch (Exception e) {
         logConfigurationWarning(SchemaFactory.class.getName(), factory.getClass().getName(), e);
@@ -194,10 +212,18 @@ public class DefaultXMLSecureFactories {
     }
   }
 
+  /**
+   * Disables {@link XMLConstants#ACCESS_EXTERNAL_DTD} and {@link XMLConstants#ACCESS_EXTERNAL_DTD} features if
+   * {@link DefaultXMLSecureFactories#externalEntities} and {@link DefaultXMLSecureFactories#expandEntities} are false.
+   * 
+   * @see Validator#setProperty(String, Object) for more information about supported properties.
+   *
+   * @param validator the {@link Validator} to configure.
+   */
   public void configureValidator(Validator validator) {
     if (!externalEntities && !expandEntities) {
       try {
-        validator.setProperty(ACCESS_EXTERNAL_STYLESHEET, "");
+        validator.setProperty(ACCESS_EXTERNAL_SCHEMA, "");
         validator.setProperty(ACCESS_EXTERNAL_DTD, "");
       } catch (Exception e) {
         logConfigurationWarning(Validator.class.getName(), validator.getClass().getName(), e);
