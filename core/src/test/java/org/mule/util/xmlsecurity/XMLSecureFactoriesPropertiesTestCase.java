@@ -66,7 +66,6 @@ public class XMLSecureFactoriesPropertiesTestCase extends AbstractMuleTestCase
         doAnswer(setPropertyAnswer).when(schemaFactoryWrapper).setProperty(anyString(), anyObject());
         defaultXMLSecureFactories.configureSchemaFactory(schemaFactoryWrapper);
         assertThat(setPropertyAnswer.exception, is(nullValue()));
-        verify(schemaFactoryWrapper, times(2)).setProperty(anyString(), anyObject());
         for (String property : SCHEMA_FACTORY_PROPERTIES)
         {
             verify(schemaFactoryWrapper).setProperty(property, "");
@@ -80,7 +79,6 @@ public class XMLSecureFactoriesPropertiesTestCase extends AbstractMuleTestCase
         doAnswer(setPropertyAnswer).when(transformerFactoryWrapper).setAttribute(anyString(), anyObject());
         defaultXMLSecureFactories.configureTransformerFactory(transformerFactoryWrapper);
         assertThat(setPropertyAnswer.exception, is(nullValue()));
-        verify(transformerFactoryWrapper, times(2)).setAttribute(anyString(), anyObject());
         for (String property : FACTORY_ATTRIBUTES)
         {
             verify(transformerFactoryWrapper).setAttribute(property, "");
