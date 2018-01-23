@@ -802,6 +802,53 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     validate();
   }
 
+  @Test
+  public void operationNameClashesWithAnotherOperationName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    OperationModel anotherOperationModel = mock(OperationModel.class);
+    when(anotherOperationModel.getName()).thenReturn(OPERATION_NAME);
+    when(extensionModel.getOperationModels()).thenReturn(asList(operationModel, anotherOperationModel));
+    validate();
+  }
+
+  @Test
+  public void configurationNameClashesWithAnotherConfigurationName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ConfigurationModel anotherConfigurationModel = mock(ConfigurationModel.class);
+    when(anotherConfigurationModel.getName()).thenReturn(CONFIG_NAME);
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel, anotherConfigurationModel));
+    validate();
+  }
+
+  @Test
+  public void sourceNameClashesWithSourceName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    SourceModel anotherSourceModel = mock(SourceModel.class);
+    when(anotherSourceModel.getName()).thenReturn(SOURCE_NAME);
+    when(anotherSourceModel.getErrorCallback()).thenReturn(empty());
+    when(anotherSourceModel.getSuccessCallback()).thenReturn(empty());
+    when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel, anotherSourceModel));
+    validate();
+  }
+
+  @Test
+  public void constructNameClashesWithAnotherConstructName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ConstructModel anotherConstructModel = mock(ConstructModel.class);
+    when(anotherConstructModel.getName()).thenReturn(CONSTRUCT_NAME);
+    when(extensionModel.getConstructModels()).thenReturn(asList(constructModel, anotherConstructModel));
+    validate();
+  }
+
+  @Test
+  public void connectionProviderNameClashesWithAnotherConnectionProviderName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ConnectionProviderModel anotherConnectionProviderModel = mock(ConnectionProviderModel.class);
+    when(anotherConnectionProviderModel.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
+    when(extensionModel.getConnectionProviders()).thenReturn(asList(connectionProviderModel, anotherConnectionProviderModel));
+    validate();
+  }
+
   private void mockParameterGroup(ParameterizedModel model, List<ParameterModel> parameters) {
     ParameterGroupModel group = mock(ParameterGroupModel.class);
 
