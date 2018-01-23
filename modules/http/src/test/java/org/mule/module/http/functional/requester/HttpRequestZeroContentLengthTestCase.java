@@ -39,16 +39,21 @@ public class HttpRequestZeroContentLengthTestCase extends FunctionalTestCase
 
     private final String expectedContentLength;
 
-    public HttpRequestZeroContentLengthTestCase(String avoidZeroContentLength)
+    public HttpRequestZeroContentLengthTestCase(String avoidZeroContentLength, String expectedContentLength)
     {
         avoidZeroContentLengthProperty = new SystemProperty(AVOID_ZERO_CONTENT_LENGTH, avoidZeroContentLength);
-        expectedContentLength = "true".equals(avoidZeroContentLength) ? "" : "0";
+        this.expectedContentLength = expectedContentLength;
     }
 
     @Parameters
-    public static Collection<Object> data()
+    public static Collection<Object[]> data()
     {
-        return asList(new Object[] {"true", "false"});
+        return asList(
+                new Object[][]
+                        {
+                                {"true", ""},
+                                {"false", "0"}
+                        });
     }
 
     @Override

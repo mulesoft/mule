@@ -116,7 +116,7 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
                         {
                             ((InputStreamHttpEntity) httpResponse.getEntity()).getInputStream().close();
                         }
-                        httpResponse = new HttpResponseBuilder(httpResponse).setEntity(EmptyHttpEntity.instance()).build();
+                        httpResponse = new HttpResponseBuilder(httpResponse).setEntity(new EmptyHttpEntity()).build();
                     }
                     if (httpResponse.getEntity() instanceof InputStreamHttpEntity)
                     {

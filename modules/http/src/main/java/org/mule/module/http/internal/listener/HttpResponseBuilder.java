@@ -155,7 +155,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             if (payload == NullPayload.getInstance())
             {
                 setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
-                httpEntity = EmptyHttpEntity.instance();
+                httpEntity = new EmptyHttpEntity();
             }
             else if (payload instanceof Map)
             {
@@ -225,7 +225,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
             if (resolvedStatusCode == NO_CONTENT.getStatusCode())
             {
                 //See GRIZZLY-1885. This could be avoided when that is available
-                httpEntity = EmptyHttpEntity.instance();
+                httpEntity = new EmptyHttpEntity();
                 httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
             }
         }
@@ -343,7 +343,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     private HttpEntity createUrlEncodedEntity(MuleEvent event, Map payload)
     {
         final Map mapPayload = payload;
-        HttpEntity entity = EmptyHttpEntity.instance();
+        HttpEntity entity = new EmptyHttpEntity();
         if (!mapPayload.isEmpty())
         {
             String encodedBody;

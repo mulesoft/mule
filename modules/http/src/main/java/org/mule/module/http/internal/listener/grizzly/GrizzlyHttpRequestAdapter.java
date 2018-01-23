@@ -166,7 +166,7 @@ public class GrizzlyHttpRequestAdapter extends BaseHttpMessage implements HttpRe
                     }
                     else
                     {
-                        this.body = EmptyHttpEntity.instance();
+                        this.body = new EmptyHttpEntity();
                     }
                 }
             }

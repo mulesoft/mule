@@ -31,7 +31,6 @@ import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
-import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
