@@ -62,6 +62,7 @@ public class TransactionalOperations {
 
       private static final int SIZE = 2;
       private int count = 0;
+      private int timesClosed = 0;
 
       @Override
       public List<Integer> getPage(TestTransactionalConnection connection) {
@@ -75,7 +76,10 @@ public class TransactionalOperations {
 
       @Override
       public void close(TestTransactionalConnection connection) throws MuleException {
-
+        timesClosed++;
+        if (timesClosed > 1) {
+          throw new RuntimeException("Expected to be closed only once but was called twice");
+        }
       }
 
       @Override

@@ -52,6 +52,7 @@ public class MoneyLaunderingOperation {
     return new PagingProvider<HeisenbergConnection, PersonalInfo>() {
 
       private int index = 0;
+      private int timesClosed = 0;
 
       @Override
       public List<PersonalInfo> getPage(HeisenbergConnection heisenbergConnection) {
@@ -68,12 +69,19 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public void close(HeisenbergConnection connection) throws MuleException {}
+      public void close(HeisenbergConnection connection) throws MuleException {
+        timesClosed++;
+        if (timesClosed > 1) {
+          throw new RuntimeException("Expected to be closed only once but was called twice");
+        }
+      }
     };
   }
 
   public PagingProvider<HeisenbergConnection, String> emptyPagedOperation() {
     return new PagingProvider<HeisenbergConnection, String>() {
+
+      private int timesClosed = 0;
 
       @Override
       public List<String> getPage(HeisenbergConnection connection) {
@@ -86,7 +94,12 @@ public class MoneyLaunderingOperation {
       }
 
       @Override
-      public void close(HeisenbergConnection connection) throws MuleException {}
+      public void close(HeisenbergConnection connection) throws MuleException {
+        timesClosed++;
+        if (timesClosed > 1) {
+          throw new RuntimeException("Expected to be closed only once but was called twice");
+        }
+      }
     };
   }
 
@@ -111,6 +124,7 @@ public class MoneyLaunderingOperation {
   public PagingProvider<HeisenbergConnection, String> pagedOperationUsingConnection() {
     return new PagingProvider<HeisenbergConnection, String>() {
 
+      private int timesClosed = 0;
       int index = 0;
 
       @Override
@@ -136,12 +150,18 @@ public class MoneyLaunderingOperation {
       @Override
       public void close(HeisenbergConnection connection) throws MuleException {
         index = 0;
+        timesClosed++;
+        if (timesClosed > 1) {
+          throw new RuntimeException("Expected to be closed only once but was called twice");
+        }
       }
     };
   }
 
   public PagingProvider<HeisenbergConnection, Integer> stickyPagedOperation() {
     return new PagingProvider<HeisenbergConnection, Integer>() {
+
+      private int timesClosed = 0;
 
       @Override
       public List<Integer> getPage(HeisenbergConnection connection) {
@@ -155,7 +175,10 @@ public class MoneyLaunderingOperation {
 
       @Override
       public void close(HeisenbergConnection connection) throws MuleException {
-
+        timesClosed++;
+        if (timesClosed > 1) {
+          throw new RuntimeException("Expected to be closed only once but was called twice");
+        }
       }
 
       @Override

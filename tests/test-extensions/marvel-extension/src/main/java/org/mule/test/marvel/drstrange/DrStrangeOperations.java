@@ -80,6 +80,8 @@ public class DrStrangeOperations {
 
     return new PagingProvider<MysticConnection, String>() {
 
+      private int timesClosed = 0;
+
       @Override
       public List<String> getPage(MysticConnection connection) {
         final int i = index.get();
@@ -100,7 +102,10 @@ public class DrStrangeOperations {
 
       @Override
       public void close(MysticConnection connection) throws MuleException {
-
+        timesClosed++;
+        if (timesClosed > 1) {
+          throw new RuntimeException("Expected to be closed only once but was called twice");
+        }
       }
     };
   }
