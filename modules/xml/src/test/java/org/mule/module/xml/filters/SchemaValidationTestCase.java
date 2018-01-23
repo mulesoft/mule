@@ -11,13 +11,16 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.EXTERNAL_ENTITIES_PROPERTY;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -28,6 +31,11 @@ import org.mule.util.IOUtils;
 @SmallTest
 public class SchemaValidationTestCase extends AbstractMuleTestCase
 {
+
+    // this is disabled (secure) by default, so we need to change it for the test
+    @Rule
+    public SystemProperty externalEntities = new SystemProperty(EXTERNAL_ENTITIES_PROPERTY, "true");
+
     private static final String SIMPLE_SCHEMA = "schema1.xsd";
 
     private static final String INCLUDE_SCHEMA = "schema-with-include.xsd";
