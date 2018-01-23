@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.internal.util.xmlsecurity;
 
+import static java.util.Arrays.asList;
+import static javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD;
+import static javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA;
+import static javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -13,10 +17,11 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.List;
 
 import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;
@@ -27,6 +32,10 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 public class XMLSecureFactoriesPropertiesTestCase extends AbstractMuleTestCase {
+
+  private static final List<String> FACTORY_ATTRIBUTES = asList(ACCESS_EXTERNAL_STYLESHEET, ACCESS_EXTERNAL_DTD);
+  private static final List<String> VALIDATOR_PROPERTIES = asList(ACCESS_EXTERNAL_SCHEMA, ACCESS_EXTERNAL_DTD);
+  private static final List<String> SCHEMA_FACTORY_PROPERTIES = asList(ACCESS_EXTERNAL_SCHEMA, ACCESS_EXTERNAL_DTD);
 
   private final DefaultXMLSecureFactories defaultXMLSecureFactories = new DefaultXMLSecureFactories(false, false);
   private final SchemaFactory schemaFactory =
@@ -42,7 +51,9 @@ public class XMLSecureFactoriesPropertiesTestCase extends AbstractMuleTestCase {
     doAnswer(setPropertyAnswer).when(validatorWrapper).setProperty(anyString(), anyObject());
     defaultXMLSecureFactories.configureValidator(validatorWrapper);
     assertThat(setPropertyAnswer.exception, is(nullValue()));
-    verify(validatorWrapper, times(2)).setProperty(anyString(), anyObject());
+    for (String property : VALIDATOR_PROPERTIES) {
+      verify(validatorWrapper).setProperty(property, "");
+    }
   }
 
   @Test
@@ -51,7 +62,9 @@ public class XMLSecureFactoriesPropertiesTestCase extends AbstractMuleTestCase {
     doAnswer(setPropertyAnswer).when(schemaFactoryWrapper).setProperty(anyString(), anyObject());
     defaultXMLSecureFactories.configureSchemaFactory(schemaFactoryWrapper);
     assertThat(setPropertyAnswer.exception, is(nullValue()));
-    verify(schemaFactoryWrapper, times(2)).setProperty(anyString(), anyObject());
+    for (String property : SCHEMA_FACTORY_PROPERTIES) {
+      verify(schemaFactoryWrapper).setProperty(property, "");
+    }
   }
 
   @Test
@@ -60,7 +73,9 @@ public class XMLSecureFactoriesPropertiesTestCase extends AbstractMuleTestCase {
     doAnswer(setPropertyAnswer).when(transformerFactoryWrapper).setAttribute(anyString(), anyObject());
     defaultXMLSecureFactories.configureTransformerFactory(transformerFactoryWrapper);
     assertThat(setPropertyAnswer.exception, is(nullValue()));
-    verify(transformerFactoryWrapper, times(2)).setAttribute(anyString(), anyObject());
+    for (String property : FACTORY_ATTRIBUTES) {
+      verify(transformerFactoryWrapper).setAttribute(property, "");
+    }
   }
 
   private class SetPropertyAnswer implements Answer<Void> {
