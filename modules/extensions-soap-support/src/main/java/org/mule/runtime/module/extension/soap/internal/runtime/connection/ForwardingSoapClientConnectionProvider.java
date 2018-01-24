@@ -107,7 +107,7 @@ public class ForwardingSoapClientConnectionProvider implements ConnectionProvide
       } else {
         messageDispatcher = transportProvider.connect();
       }
-      ConnectionValidationResult result = transportProvider.validate(messageDispatcher);
+      ConnectionValidationResult result = transportProvider.validate(messageDispatcher, serviceProvider);
       transportProvider.disconnect(messageDispatcher);
       return result;
     } catch (Exception e) {
