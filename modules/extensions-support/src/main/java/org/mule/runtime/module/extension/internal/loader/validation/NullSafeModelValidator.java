@@ -17,6 +17,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isF
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -37,6 +38,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAn
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
  * Validates that all fields of the {@link ParameterModel parameters} which are annotated with {@link NullSafe} honor that:
@@ -52,6 +54,7 @@ public final class NullSafeModelValidator implements ExtensionModelValidator {
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
+    ReflectionCache reflectionCache = new ReflectionCache();
     TypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
     new ExtensionWalker() {
 
@@ -133,7 +136,7 @@ public final class NullSafeModelValidator implements ExtensionModelValidator {
                   return;
                 }
 
-                if (hasDefaultOverride && isInstantiable(fieldType)) {
+                if (hasDefaultOverride && isInstantiable(fieldType, reflectionCache)) {
                   problemsReporter.addError(new Problem(model, format(
                                                                       "Field '%s' in class '%s' is annotated with '@%s' is of concrete type '%s',"
                                                                           + " but a 'defaultImplementingType' was provided."
@@ -144,7 +147,7 @@ public final class NullSafeModelValidator implements ExtensionModelValidator {
                                                                       fieldType.getName())));
                 }
 
-                if (!isInstantiable(nullSafeType)) {
+                if (!isInstantiable(nullSafeType, reflectionCache)) {
                   problemsReporter.addError(new Problem(model, format(
                                                                       "Field '%s' in class '%s' is annotated with '@%s' but is of type '%s'. That annotation can only be "
                                                                           + "used with complex instantiable types (Pojos, Lists, Maps)",

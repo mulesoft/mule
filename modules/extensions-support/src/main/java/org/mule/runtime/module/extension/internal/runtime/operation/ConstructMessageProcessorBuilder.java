@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
  * Provides instances of {@link ConstructMessageProcessor} for a given {@link ConstructModel}
@@ -25,10 +26,11 @@ public final class ConstructMessageProcessorBuilder
   public ConstructMessageProcessorBuilder(ExtensionModel extensionModel,
                                           ConstructModel operationModel,
                                           PolicyManager policyManager,
+                                          ReflectionCache reflectionCache,
                                           MuleContext muleContext,
                                           Registry registry) {
 
-    super(extensionModel, operationModel, policyManager, muleContext, registry);
+    super(extensionModel, operationModel, policyManager, reflectionCache, muleContext, registry);
   }
 
   @Override
@@ -38,7 +40,8 @@ public final class ConstructMessageProcessorBuilder
                                          arguments,
                                          cursorProviderFactory, retryPolicyTemplate,
                                          extensionManager,
-                                         policyManager);
+                                         policyManager,
+                                         reflectionCache);
   }
 
 }

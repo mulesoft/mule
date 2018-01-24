@@ -10,11 +10,13 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,15 +43,15 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>, I
 
   /**
    * Creates a new instance
-   * 
+   *
    * @param mapType the {@link Class} for a concrete {@link Map} type with a default constructor
    * @param keyResolvers a not {@code null} {@link List} of resolvers for map key params
    * @param valueResolvers a not {@code null} {@link List} of resolvers for map value params
    * @param muleContext the artifact {@link MuleContext} that will be used for initialisation of resolvers
    */
   public MapValueResolver(Class<? extends Map> mapType, List<ValueResolver<K>> keyResolvers,
-                          List<ValueResolver<V>> valueResolvers, MuleContext muleContext) {
-    checkInstantiable(mapType);
+                          List<ValueResolver<V>> valueResolvers, ReflectionCache reflectionCache, MuleContext muleContext) {
+    checkInstantiable(mapType, reflectionCache);
     checkArgument(keyResolvers != null && valueResolvers != null, "resolvers cannot be null");
     checkArgument(keyResolvers.size() == valueResolvers.size(), "exactly one valueResolver for each keyResolver is required");
 
@@ -60,14 +62,15 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>, I
   }
 
   public static <K, V> MapValueResolver<K, V> of(Class<? extends Map> mapType, List<ValueResolver<K>> keyResolvers,
-                                                 List<ValueResolver<V>> valueResolvers, MuleContext muleContext) {
+                                                 List<ValueResolver<V>> valueResolvers, ReflectionCache reflectionCache,
+                                                 MuleContext muleContext) {
 
     if (ConcurrentMap.class.equals(mapType)) {
-      return new MapValueResolver<>(ConcurrentHashMap.class, keyResolvers, valueResolvers, muleContext);
+      return new MapValueResolver<>(ConcurrentHashMap.class, keyResolvers, valueResolvers, reflectionCache, muleContext);
     } else if (Map.class.equals(mapType)) {
-      return new MapValueResolver<>(HashMap.class, keyResolvers, valueResolvers, muleContext);
+      return new MapValueResolver<>(HashMap.class, keyResolvers, valueResolvers, reflectionCache, muleContext);
     } else {
-      return new MapValueResolver<>(mapType, keyResolvers, valueResolvers, muleContext);
+      return new MapValueResolver<>(mapType, keyResolvers, valueResolvers, reflectionCache, muleContext);
     }
   }
 

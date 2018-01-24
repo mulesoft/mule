@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Optional;
 
@@ -44,9 +45,10 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                         RetryPolicyTemplate retryPolicyTemplate,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
+                                        ReflectionCache reflectionCache,
                                         ExtensionConnectionSupplier connectionSupplier) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, extensionManager, policyManager);
+          retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
     this.connectionSupplier = connectionSupplier;
   }
 

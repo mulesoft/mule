@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_VALUE_RESOLVER_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.cloneAndEnrichValue;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -24,6 +25,7 @@ import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;
 import java.util.Set;
@@ -39,6 +41,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
 
   private T containerModel;
   private Supplier<MuleContext> muleContext;
+  private Supplier<ReflectionCache> reflectionCache;
   private Supplier<Object> NULL_SUPPLIER = () -> null;
 
   /**
@@ -47,9 +50,10 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
    * @param containerModel container model which is a {@link ParameterizedModel} and {@link EnrichableModel}
    * @param muleContext context to be able to initialize {@link ValueProvider} if necessary
    */
-  public ValueProviderMediator(T containerModel, Supplier<MuleContext> muleContext) {
+  public ValueProviderMediator(T containerModel, Supplier<MuleContext> muleContext, Supplier<ReflectionCache> reflectionCache) {
     this.containerModel = containerModel;
     this.muleContext = muleContext;
+    this.reflectionCache = reflectionCache;
   }
 
   /**
@@ -117,7 +121,9 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
       ValueResolvingException {
 
     ValueProvider valueProvider =
-        factoryModelProperty.createFactory(parameterValueResolver, connectionSupplier, configurationSupplier, muleContext.get())
+        factoryModelProperty
+            .createFactory(parameterValueResolver, connectionSupplier, configurationSupplier, reflectionCache.get(),
+                           muleContext.get())
             .createValueProvider();
 
     Set<Value> valueSet = valueProvider.resolve();

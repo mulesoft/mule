@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -40,7 +41,7 @@ public class SingleValueResolverTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     when(result.get(NAME)).thenReturn(NAME);
-    valueSetter = new SingleValueSetter(NAME, getField(PersonalInfo.class, "name").get());
+    valueSetter = new SingleValueSetter(NAME, getField(PersonalInfo.class, "name", new ReflectionCache()).get());
   }
 
   @Test

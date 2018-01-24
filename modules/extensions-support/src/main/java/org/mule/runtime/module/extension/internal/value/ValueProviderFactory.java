@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
@@ -17,15 +18,16 @@ import org.mule.runtime.module.extension.internal.loader.java.property.ValueProv
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Provides instances of the {@link ValueProvider}
@@ -42,18 +44,20 @@ public class ValueProviderFactory {
   private final Supplier<Object> configurationSupplier;
   private final Field connectionField;
   private final Field configField;
+  private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
 
   public ValueProviderFactory(ValueProviderFactoryModelProperty factoryModelProperty,
                               ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                               Supplier<Object> configurationSupplier, Field connectionField, Field configField,
-                              MuleContext muleContext) {
+                              ReflectionCache reflectionCache, MuleContext muleContext) {
     this.factoryModelProperty = factoryModelProperty;
     this.parameterValueResolver = parameterValueResolver;
     this.connectionSupplier = connectionSupplier;
     this.configurationSupplier = configurationSupplier;
     this.connectionField = connectionField;
     this.configField = configField;
+    this.reflectionCache = reflectionCache;
     this.muleContext = muleContext;
   }
 
@@ -93,7 +97,7 @@ public class ValueProviderFactory {
       }
 
       if (parameterValue != null) {
-        injectValueIntoField(resolver, parameterValue, parameterName);
+        injectValueIntoField(resolver, parameterValue, parameterName, reflectionCache);
       } else if (injectableParam.isRequired()) {
         missingParameters.add(parameterName);
       }
@@ -105,8 +109,9 @@ public class ValueProviderFactory {
     }
   }
 
-  private static void injectValueIntoField(ValueProvider fieldContainer, Object valueToInject, String requiredParamName) {
-    Optional<Field> optionalField = IntrospectionUtils.getField(fieldContainer.getClass(), requiredParamName);
+  private static void injectValueIntoField(ValueProvider fieldContainer, Object valueToInject, String requiredParamName,
+                                           ReflectionCache reflectionCache) {
+    Optional<Field> optionalField = IntrospectionUtils.getField(fieldContainer.getClass(), requiredParamName, reflectionCache);
     if (optionalField.isPresent()) {
       Field field = optionalField.get();
       injectValueIntoField(fieldContainer, valueToInject, field);

@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
  * Provides implicit configuration providers which are compliant with a {@link ConfigurationModel}. These are used when no
@@ -32,5 +33,6 @@ public interface ImplicitConfigurationProviderFactory {
   ConfigurationProvider createImplicitConfigurationProvider(ExtensionModel extensionModel,
                                                             ConfigurationModel implicitConfigurationModel,
                                                             CoreEvent muleEvent,
+                                                            ReflectionCache reflectionCache,
                                                             MuleContext muleContext);
 }

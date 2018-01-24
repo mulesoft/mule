@@ -32,6 +32,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
+
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -77,6 +78,10 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValu
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -85,8 +90,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -128,6 +131,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected ExecutionMediator executionMediator;
   protected ComponentExecutor componentExecutor;
   protected PolicyManager policyManager;
+  private final ReflectionCache reflectionCache;
   protected ReturnDelegate returnDelegate;
   private boolean initialised = false;
 
@@ -140,7 +144,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
-                                   PolicyManager policyManager) {
+                                   PolicyManager policyManager,
+                                   ReflectionCache reflectionCache) {
     super(extensionModel, componentModel, configurationProvider, cursorProviderFactory, extensionManager);
     this.extensionModel = extensionModel;
     this.resolverSet = resolverSet;
@@ -148,6 +153,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.targetValue = targetValue;
     this.policyManager = policyManager;
     this.retryPolicyTemplate = retryPolicyTemplate;
+    this.reflectionCache = reflectionCache;
   }
 
   @Override
@@ -403,7 +409,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     try {
       event = getInitialiserEvent(muleContext);
       return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, componentModel, extensionModel,
-                                                                            from(event)));
+                                                                            from(event)),
+                                                 reflectionCache);
     } finally {
       if (event != null) {
         ((BaseEventContext) event.getContext()).success();

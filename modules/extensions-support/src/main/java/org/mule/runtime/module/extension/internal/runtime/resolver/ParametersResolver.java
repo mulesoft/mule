@@ -28,6 +28,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -56,6 +57,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ExclusiveParameterGroupObjectBuilder;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import com.google.common.base.Joiner;
 
@@ -79,24 +81,29 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   private final Boolean lazyInitEnabled;
   private final MuleContext muleContext;
   private final Map<String, ?> parameters;
+  private final ReflectionCache reflectionCache;
 
-  private ParametersResolver(MuleContext muleContext, Map<String, ?> parameters, boolean lazyInitEnabled) {
+  private ParametersResolver(MuleContext muleContext, Map<String, ?> parameters, boolean lazyInitEnabled,
+                             ReflectionCache reflectionCache) {
     this.muleContext = muleContext;
     this.parameters = parameters;
     this.lazyInitEnabled = lazyInitEnabled;
+    this.reflectionCache = reflectionCache;
   }
 
-  public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext, boolean lazyInitEnabled) {
-    return new ParametersResolver(muleContext, parameters, lazyInitEnabled);
+  public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext, boolean lazyInitEnabled,
+                                              ReflectionCache reflectionCache) {
+    return new ParametersResolver(muleContext, parameters, lazyInitEnabled, reflectionCache);
   }
 
-  public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel, MuleContext muleContext) {
+  public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel, MuleContext muleContext,
+                                                     ReflectionCache reflectionCache) {
     Map<String, Object> parameterValues = new HashMap<>();
     for (ParameterModel model : parameterizedModel.getAllParameterModels()) {
       parameterValues.put(model.getName(), model.getDefaultValue());
     }
 
-    return new ParametersResolver(muleContext, parameterValues, false);
+    return new ParametersResolver(muleContext, parameterValues, false, reflectionCache);
   }
 
   /**
@@ -169,7 +176,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     } else if (descriptor.isPresent()) {
       resolverSet.add(groupKey,
                       NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), descriptor.get().getMetadataType(),
-                                                      muleContext, this));
+                                                      reflectionCache, muleContext, this));
     }
   }
 
@@ -207,12 +214,12 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       if (isNullSafe(p)) {
         ValueResolver<?> delegate = resolver != null ? resolver : new StaticValueResolver<>(null);
         MetadataType type = p.getModelProperty(NullSafeModelProperty.class).get().defaultType();
-        resolver = NullSafeValueResolverWrapper.of(delegate, type, muleContext, this);
+        resolver = NullSafeValueResolverWrapper.of(delegate, type, reflectionCache, muleContext, this);
       }
 
       if (p.isOverrideFromConfig()) {
         resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
-                                                         parameterName, muleContext);
+                                                         parameterName, reflectionCache, muleContext);
       }
 
       if (resolver != null) {
@@ -296,13 +303,13 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         ValueResolver<?> delegate = valueResolver != null ? valueResolver : new StaticValueResolver<>(null);
         MetadataType type =
             getMetadataType(nullSafe.get().getType(), ExtensionsTypeLoaderFactory.getDefault().createTypeLoader());
-        valueResolver = NullSafeValueResolverWrapper.of(delegate, type, muleContext, this);
+        valueResolver = NullSafeValueResolverWrapper.of(delegate, type, reflectionCache, muleContext, this);
       }
 
       if (field.getAnnotation(ConfigOverrideTypeAnnotation.class).isPresent()) {
         valueResolver =
             ConfigOverrideValueResolverWrapper.of(valueResolver != null ? valueResolver : new StaticValueResolver<>(null),
-                                                  key, muleContext);
+                                                  key, reflectionCache, muleContext);
       }
 
       if (valueResolver != null) {
@@ -319,7 +326,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   }
 
   private Field getField(Class<?> objectClass, String key) {
-    return getFieldByNameOrAlias(objectClass, key)
+    return getFieldByNameOrAlias(objectClass, key, reflectionCache)
         .orElseThrow(() -> new IllegalModelDefinitionException(format("Class '%s' does not contain field %s",
                                                                       objectClass.getName(),
                                                                       key)));
@@ -402,7 +409,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     Map<ValueResolver<Object>, ValueResolver<Object>> normalizedMap = new LinkedHashMap<>(value.size());
     value.forEach((key, entryValue) -> normalizedMap.put((ValueResolver<Object>) toValueResolver(key),
                                                          (ValueResolver<Object>) toValueResolver(entryValue)));
-    return MapValueResolver.of(value.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()), muleContext);
+    return MapValueResolver.of(value.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()), reflectionCache,
+                               muleContext);
   }
 
   private ValueResolver<?> getCollectionResolver(Collection<?> collection) {

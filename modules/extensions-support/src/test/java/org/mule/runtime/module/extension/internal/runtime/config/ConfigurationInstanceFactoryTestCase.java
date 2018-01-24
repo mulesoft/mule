@@ -19,6 +19,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -39,18 +40,19 @@ import org.mule.runtime.module.extension.internal.runtime.execution.Configuratio
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Kiwi;
-
-import com.google.common.collect.ImmutableList;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.ImmutableList;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -111,7 +113,8 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
     when(sourceModel.getSuccessCallback()).thenReturn(of(sourceCallbackModel));
     when(muleContext.getConfiguration().getDefaultEncoding()).thenReturn(ENCODING);
     resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
-    factory = new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, muleContext);
+    factory =
+        new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, new ReflectionCache(), muleContext);
   }
 
   @Test

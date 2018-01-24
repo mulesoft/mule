@@ -10,10 +10,11 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConnectionProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConnectionProviderFactory;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Optional;
 
@@ -35,10 +36,11 @@ public final class ImplicitConnectionProviderValueResolver<C> implements Connect
   public ImplicitConnectionProviderValueResolver(String name,
                                                  ExtensionModel extensionModel,
                                                  ConfigurationModel configurationModel,
+                                                 ReflectionCache reflectionCache,
                                                  MuleContext muleContext) {
     configName = name;
     implicitConnectionProviderFactory =
-        new DefaultImplicitConnectionProviderFactory(extensionModel, configurationModel, muleContext);
+        new DefaultImplicitConnectionProviderFactory(extensionModel, configurationModel, reflectionCache, muleContext);
   }
 
   @Override

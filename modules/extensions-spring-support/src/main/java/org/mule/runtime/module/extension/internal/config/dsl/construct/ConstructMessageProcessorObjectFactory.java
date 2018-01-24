@@ -15,6 +15,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionOb
 import org.mule.runtime.module.extension.internal.config.dsl.ComponentMessageProcessorObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.ConstructMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.ConstructMessageProcessorBuilder;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
  * An {@link AbstractExtensionObjectFactory} which produces {@link ConstructMessageProcessor} instances
@@ -34,7 +35,8 @@ public class ConstructMessageProcessorObjectFactory
 
   @Override
   protected ConstructMessageProcessorBuilder getMessageProcessorBuilder() {
-    return new ConstructMessageProcessorBuilder(extensionModel, componentModel, policyManager, muleContext, registry);
+    return new ConstructMessageProcessorBuilder(extensionModel, componentModel, policyManager,
+                                                registry.lookupByType(ReflectionCache.class).get(), muleContext, registry);
   }
 
 }

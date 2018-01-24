@@ -43,6 +43,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationProviderFactory;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.inject.Inject;
 
 /**
  * Default implementation of {@link ExtensionManager}. This implementation uses standard Java SPI as a discovery mechanism.
@@ -67,6 +70,9 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   private final ImplicitConfigurationProviderFactory implicitConfigurationProviderFactory =
       new DefaultImplicitConfigurationProviderFactory();
+
+  @Inject
+  private ReflectionCache reflectionCache;
 
   private MuleContext muleContext;
   private ExtensionRegistry extensionRegistry;
@@ -211,6 +217,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
           registerConfigurationProvider(implicitConfigurationProviderFactory.createImplicitConfigurationProvider(extensionModel,
                                                                                                                  implicitConfigurationModel,
                                                                                                                  muleEvent,
+                                                                                                                 getReflectionCache(),
                                                                                                                  muleContext));
         }
       }
@@ -275,5 +282,13 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   public ExtensionActivator getExtensionActivator() {
     return extensionActivator;
+  }
+
+
+  public ReflectionCache getReflectionCache() {
+    if (reflectionCache == null) {
+      reflectionCache = new ReflectionCache();
+    }
+    return reflectionCache;
   }
 }

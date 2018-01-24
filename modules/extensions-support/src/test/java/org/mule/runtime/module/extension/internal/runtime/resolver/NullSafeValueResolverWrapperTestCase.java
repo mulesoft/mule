@@ -11,20 +11,17 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +29,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -42,6 +43,8 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
   @Mock
   private ObjectTypeParametersResolver objectTypeParametersResolver;
+
+  private ReflectionCache reflectionCache = new ReflectionCache();
 
   @Before
   public void setUp() {
@@ -76,7 +79,8 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
   private void assertExpected(ValueResolver valueResolver, MetadataType type, boolean isDynamic, Object expected)
       throws Exception {
-    ValueResolver resolver = NullSafeValueResolverWrapper.of(valueResolver, type, muleContext, objectTypeParametersResolver);
+    ValueResolver resolver =
+        NullSafeValueResolverWrapper.of(valueResolver, type, reflectionCache, muleContext, objectTypeParametersResolver);
     assertThat(resolver.isDynamic(), is(isDynamic));
     assertThat(resolver.resolve(ValueResolvingContext.from(event)), is(expected));
   }

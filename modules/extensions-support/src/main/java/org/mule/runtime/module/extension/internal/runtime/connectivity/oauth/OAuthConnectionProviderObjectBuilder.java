@@ -294,7 +294,8 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
       }
     }
 
-    MapValueResolver result = new MapValueResolver(HashMap.class, staticKeyResolvers, staticValueResolvers, muleContext);
+    MapValueResolver result =
+        new MapValueResolver(HashMap.class, staticKeyResolvers, staticValueResolvers, getReflectionCache(), muleContext);
     initialiseIfNeeded(result, muleContext);
 
     return result;

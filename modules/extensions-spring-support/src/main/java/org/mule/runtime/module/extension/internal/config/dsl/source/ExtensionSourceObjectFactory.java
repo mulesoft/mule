@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
@@ -30,11 +31,14 @@ import org.mule.runtime.module.extension.internal.loader.java.property.BackPress
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceAdapterFactory;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import com.google.common.base.Joiner;
 
 import java.util.List;
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 
 /**
@@ -43,6 +47,9 @@ import java.util.Optional;
  * @since 4.0
  */
 public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory<ExtensionMessageSource> {
+
+  @Inject
+  private ReflectionCache reflectionCache;
 
   private final ExtensionModel extensionModel;
   private final SourceModel sourceModel;
@@ -126,6 +133,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                     errorCallbackParameters,
                                     cursorProviderFactory,
                                     backPressureStrategy,
+                                    reflectionCache,
                                     muleContext);
   }
 

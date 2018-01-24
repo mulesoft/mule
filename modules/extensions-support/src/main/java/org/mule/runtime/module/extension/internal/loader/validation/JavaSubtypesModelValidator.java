@@ -10,12 +10,14 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.toSubTypesMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -37,15 +39,15 @@ public final class JavaSubtypesModelValidator implements ExtensionModelValidator
   @Override
   public void validate(ExtensionModel model, ProblemsReporter problemsReporter) {
     final Map<ObjectType, Set<ObjectType>> typesMapping = toSubTypesMap(model.getSubTypes());
-    validateNonAbstractSubtypes(model, typesMapping, problemsReporter);
+    validateNonAbstractSubtypes(model, typesMapping, problemsReporter, new ReflectionCache());
   }
 
   private void validateNonAbstractSubtypes(ExtensionModel model, Map<ObjectType, Set<ObjectType>> typesMapping,
-                                           ProblemsReporter problemsReporter) {
+                                           ProblemsReporter problemsReporter, ReflectionCache reflectionCache) {
     List<String> abstractSubtypes = new LinkedList<>();
     for (Set<ObjectType> subtypes : typesMapping.values()) {
       abstractSubtypes.addAll(subtypes.stream()
-          .filter(s -> !isInstantiable(s))
+          .filter(s -> !isInstantiable(s, reflectionCache))
           .map(ExtensionMetadataTypeUtils::getId)
           .filter(Optional::isPresent)
           .map(Optional::get)

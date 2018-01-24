@@ -10,6 +10,7 @@ import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getDefaultEncodingFieldSetter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -22,6 +23,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.module.extension.internal.util.GroupValueSetter;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.util.SingleValueSetter;
 import org.mule.runtime.module.extension.internal.util.ValueSetter;
 
@@ -51,6 +53,9 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
   @Inject
   private MuleContext muleContext;
 
+  @Inject
+  protected ReflectionCache reflectionCache;
+
   public ResolverSetBasedObjectBuilder(Class<?> prototypeClass, ResolverSet resolverSet) {
     this(prototypeClass, null, resolverSet);
   }
@@ -58,7 +63,7 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
   public ResolverSetBasedObjectBuilder(Class<?> prototypeClass, ParameterizedModel model, ResolverSet resolverSet) {
     this.resolverSet = resolverSet;
     singleValueSetters = createSingleValueSetters(prototypeClass, resolverSet);
-    groupValueSetters = model != null ? GroupValueSetter.settersFor(model) : ImmutableList.of();
+    groupValueSetters = model != null ? GroupValueSetter.settersFor(model, () -> getReflectionCache()) : ImmutableList.of();
   }
 
   /**
@@ -89,7 +94,7 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
     setValues(object, result, singleValueSetters);
 
     if (muleContext != null) {
-      encodingFieldSetter.computeIfAbsent(object.getClass(), clazz -> getDefaultEncodingFieldSetter(object))
+      encodingFieldSetter.computeIfAbsent(object.getClass(), clazz -> getDefaultEncodingFieldSetter(object, getReflectionCache()))
           .ifPresent(s -> s.set(object, muleContext.getConfiguration().getDefaultEncoding()));
     }
   }
@@ -97,7 +102,7 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
   private List<ValueSetter> createSingleValueSetters(Class<?> prototypeClass, ResolverSet resolverSet) {
     return resolverSet.getResolvers().keySet().stream().map(parameterName -> {
       // if no field, then it means this is a group attribute
-      return getField(prototypeClass, parameterName).map(f -> new SingleValueSetter(parameterName, f));
+      return getField(prototypeClass, parameterName, getReflectionCache()).map(f -> new SingleValueSetter(parameterName, f));
     }).filter(Optional::isPresent).map(Optional::get).collect(toImmutableList());
   }
 
@@ -115,5 +120,12 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
   @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(resolverSet, true, muleContext);
+  }
+
+  public ReflectionCache getReflectionCache() {
+    if (reflectionCache == null) {
+      reflectionCache = new ReflectionCache();
+    }
+    return reflectionCache;
   }
 }
