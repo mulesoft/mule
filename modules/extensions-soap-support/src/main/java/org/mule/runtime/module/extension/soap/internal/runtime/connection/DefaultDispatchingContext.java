@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.soap.DispatchingContext;
+import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 
 /**
  * Default {@link DispatchingContext} implementation
@@ -17,7 +18,7 @@ import org.mule.runtime.extension.api.soap.DispatchingContext;
  */
 public class DefaultDispatchingContext implements DispatchingContext {
 
-  private ExtensionsClient client;
+  private final ExtensionsClient client;
 
   DefaultDispatchingContext(ExtensionsClient client) {
     this.client = client;
