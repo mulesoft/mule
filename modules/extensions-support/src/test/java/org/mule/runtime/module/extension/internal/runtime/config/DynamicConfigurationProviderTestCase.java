@@ -32,25 +32,22 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueR
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
-
-import com.google.common.collect.ImmutableList;
-
-import java.util.HashMap;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -61,6 +58,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.ImmutableList;
+
+import java.util.HashMap;
+import java.util.List;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -114,7 +116,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(connectionProviderResolver.getResolverSet()).thenReturn(empty());
     when(connectionProviderResolver.resolve(any())).thenReturn(null);
     provider = new DynamicConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet,
-                                                connectionProviderResolver, expirationPolicy, muleContext);
+                                                connectionProviderResolver, expirationPolicy, new ReflectionCache(), muleContext);
 
     super.before();
     provider.initialise();

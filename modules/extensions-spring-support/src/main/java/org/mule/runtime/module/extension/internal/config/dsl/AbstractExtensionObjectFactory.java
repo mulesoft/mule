@@ -25,6 +25,7 @@ import org.mule.runtime.module.extension.internal.runtime.exception.RequiredPara
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectTypeParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +45,9 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
 
   @Inject
   private ConfigurationProperties properties;
+
+  @Inject
+  protected ReflectionCache reflectionCache;
 
   protected final MuleContext muleContext;
   protected Map<String, Object> parameters = new HashMap<>();
@@ -84,7 +88,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
   }
 
   private ParametersResolver parametersResolverFromValues(MuleContext muleContext) {
-    return ParametersResolver.fromValues(parameters, muleContext, isLazyModeEnabled());
+    return ParametersResolver.fromValues(parameters, muleContext, isLazyModeEnabled(), reflectionCache);
   }
 
   protected boolean isLazyModeEnabled() {

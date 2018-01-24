@@ -70,7 +70,14 @@ import org.mule.test.petstore.extension.PhoneNumber;
 import org.mule.test.petstore.extension.TransactionalPetStoreClient;
 import org.mule.test.petstore.extension.TransactionalPetStoreConnectionProvider;
 
-import javax.annotation.processing.ProcessingEnvironment;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.springframework.core.ResolvableType;
+
+import com.google.testing.compile.CompilationRule;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -85,13 +92,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import com.google.testing.compile.CompilationRule;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.springframework.core.ResolvableType;
+import javax.annotation.processing.ProcessingEnvironment;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -107,6 +108,8 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Rule
   public CompilationRule compilationRule = new CompilationRule();
+
+  private ReflectionCache reflectionCache = new ReflectionCache();
 
   @Parameterized.Parameter
   public String mode;
@@ -224,20 +227,20 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getEmptyExposedPojoFields() {
-    Collection<Field> exposedFields = getExposedFields(FruitBasket.class);
+    Collection<Field> exposedFields = getExposedFields(FruitBasket.class, reflectionCache);
     assertThat(exposedFields, is(empty()));
   }
 
   @Test
   public void getFieldsWithGettersOnly() {
-    Collection<Field> fieldsWithGetters = getFieldsWithGetters(PhoneNumber.class);
+    Collection<Field> fieldsWithGetters = getFieldsWithGetters(PhoneNumber.class, reflectionCache);
     assertThat(fieldsWithGetters.size(), is(4));
   }
 
   @Test
   public void getWildCardFieldsDataTypes() {
 
-    Collection<Field> exposedFields = getFieldsWithGetters(FruitBox.class);
+    Collection<Field> exposedFields = getFieldsWithGetters(FruitBox.class, reflectionCache);
     assertNotNull(exposedFields);
     assertEquals(6, exposedFields.size());
     assertField("fruitLikeList", arrayOf(List.class, objectTypeBuilder(Fruit.class)), exposedFields);
@@ -341,7 +344,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getProperties() {
-    Set<Field> fields = IntrospectionUtils.getFieldsWithGetters(SomePojo.class);
+    Set<Field> fields = IntrospectionUtils.getFieldsWithGetters(SomePojo.class, reflectionCache);
     Type somePojo = typeSupplier.apply(SomePojo.class);
 
     List<FieldElement> fieldsWithGetters = IntrospectionUtils.getFieldsWithGetters(somePojo);

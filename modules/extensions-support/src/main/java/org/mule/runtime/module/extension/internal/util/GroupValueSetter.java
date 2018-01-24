@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.util;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.springframework.util.ReflectionUtils.setField;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -21,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * An implementation of {@link ValueSetter} for parameter groups. Parameter groups are a set of parameters defined inside a Pojo
@@ -32,22 +34,22 @@ import java.util.List;
 public final class GroupValueSetter implements ValueSetter {
 
   /**
-   * Returns a {@link List} containing one {@link ValueSetter} instance per each
-   * {@link ParameterGroupDescriptor} defined in the
+   * Returns a {@link List} containing one {@link ValueSetter} instance per each {@link ParameterGroupDescriptor} defined in the
    * {@link ParameterGroupModelProperty} extracted from the given {@code model}. If {@code model} does not contain such model
    * property then an empty {@link List} is returned
    *
    * @param model a {@link EnrichableModel} instance presumed to have the {@link ParameterGroupModelProperty}
+   * @param reflectionCache the cache for expensive reflection lookups
    * @return a {@link List} with {@link ValueSetter} instances. May be empty but will never be {@code null}
    */
-  public static List<ValueSetter> settersFor(ParameterizedModel model) {
+  public static List<ValueSetter> settersFor(ParameterizedModel model, Supplier<ReflectionCache> reflectionCache) {
     ImmutableList.Builder<ValueSetter> setters = ImmutableList.builder();
     model.getParameterGroupModels().stream()
         .filter(group -> !group.isShowInDsl())
         .filter(group -> !group.getName().equals(DEFAULT_GROUP_NAME))
         .forEach(group -> group.getModelProperty(ParameterGroupModelProperty.class).ifPresent(property -> {
           if (property.getDescriptor().getContainer() instanceof Field) {
-            setters.add(new GroupValueSetter(property.getDescriptor()));
+            setters.add(new GroupValueSetter(property.getDescriptor(), reflectionCache));
           }
         }));
 
@@ -56,21 +58,24 @@ public final class GroupValueSetter implements ValueSetter {
 
   private final ParameterGroupDescriptor groupDescriptor;
   private final Field container;
+  private final Supplier<ReflectionCache> reflectionCache;
 
   /**
    * Creates a new instance that can set values defined in the given {@code group}
    *
    * @param groupDescriptor a {@link ParameterGroupDescriptor}
+   * @param reflectionCache the cache for expensive reflection lookups
    */
-  public GroupValueSetter(ParameterGroupDescriptor groupDescriptor) {
+  public GroupValueSetter(ParameterGroupDescriptor groupDescriptor, Supplier<ReflectionCache> reflectionCache) {
     this.groupDescriptor = groupDescriptor;
     checkArgument(groupDescriptor.getContainer() instanceof Field, "Only field contained parameter groups are allowed");
     container = (Field) groupDescriptor.getContainer();
+    this.reflectionCache = reflectionCache;
   }
 
   @Override
   public void set(Object target, ResolverSetResult result) throws MuleException {
     container.setAccessible(true);
-    setField(container, target, new ParameterGroupObjectBuilder<>(groupDescriptor).build(result));
+    setField(container, target, new ParameterGroupObjectBuilder<>(groupDescriptor, reflectionCache.get()).build(result));
   }
 }

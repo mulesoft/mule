@@ -14,6 +14,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
@@ -31,6 +32,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeType
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -52,6 +54,8 @@ import java.util.Set;
  * @since 4.0
  */
 public final class InputParametersTypeModelValidator implements ExtensionModelValidator {
+
+  private ReflectionCache reflectionCache = new ReflectionCache();
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problems) {
@@ -111,7 +115,7 @@ public final class InputParametersTypeModelValidator implements ExtensionModelVa
       public void visitObject(ObjectType objectType) {
         if (validatedTypes.add(parameterType)) {
           Collection<ObjectFieldType> parameters = objectType.getFields();
-          Set<String> fieldsWithGetters = getFieldsWithGetters(parameterType).stream()
+          Set<String> fieldsWithGetters = getFieldsWithGetters(parameterType, reflectionCache).stream()
               .map(TypeUtils::getAlias)
               .map(String::toLowerCase)
               .collect(toSet());

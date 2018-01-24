@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGroupModelContainerName;
+
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -18,6 +19,7 @@ import org.mule.runtime.module.extension.internal.runtime.ValueResolvingExceptio
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,11 +35,13 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
   private final T operationModel;
   private final ExecutionContext<T> executionContext;
   private final Map<String, String> showInDslParameters;
+  private final ReflectionCache reflectionCache;
 
-  OperationParameterValueResolver(ExecutionContext<T> executionContext) {
+  OperationParameterValueResolver(ExecutionContext<T> executionContext, ReflectionCache reflectionCache) {
     this.executionContext = executionContext;
     this.operationModel = executionContext.getComponentModel();
     this.showInDslParameters = getShowInDslParameters();
+    this.reflectionCache = reflectionCache;
   }
 
   /**
@@ -47,7 +51,7 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
   public Object getParameterValue(String parameterName) throws ValueResolvingException {
     try {
       return getParameterGroup(parameterName)
-          .map(group -> new ParameterGroupArgumentResolver<>(group).resolve(executionContext).get())
+          .map(group -> new ParameterGroupArgumentResolver<>(group, reflectionCache).resolve(executionContext).get())
           .orElseGet(() -> {
             String showInDslGroupName = showInDslParameters.get(parameterName);
             if (showInDslGroupName != null) {
@@ -80,7 +84,7 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
   private Object getShowInDslParameterValue(String parameterName, String showInDslGroupName) {
     Object group = executionContext.getParameter(showInDslGroupName);
     try {
-      return getFieldValue(group, parameterName);
+      return getFieldValue(group, parameterName, reflectionCache);
     } catch (IllegalAccessException | NoSuchFieldException e) {
       throw new IllegalStateException(
                                       format("An error occurred trying to obtain the field '%s' from the group '%s' of the Operation '%s'",

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -16,12 +17,14 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import static org.springframework.util.ReflectionUtils.setField;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -44,13 +47,16 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable 
   @Inject
   private MuleContext muleContext;
 
+  @Inject
+  private ReflectionCache reflectionCache;
+
   /**
    * Creates a new instance that will build instances of {@code prototypeClass}.
    *
    * @param prototypeClass a {@link Class} which needs to have a public defualt constructor
    */
   public DefaultObjectBuilder(Class<T> prototypeClass) {
-    checkInstantiable(prototypeClass);
+    checkInstantiable(prototypeClass, getReflectionCache());
     this.prototypeClass = prototypeClass;
   }
 
@@ -66,10 +72,9 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable 
     checkArgument(!isBlank(propertyName), "property name cannot be blank");
     checkArgument(resolver != null, "resolver cannot be null");
 
-    Field field = getField(prototypeClass, propertyName).orElseThrow(
-                                                                     () -> new IllegalArgumentException(String
-                                                                         .format("Class '%s' does not contain property '%s'",
-                                                                                 prototypeClass.getName(), propertyName)));
+    Field field = getField(prototypeClass, propertyName, getReflectionCache())
+        .orElseThrow(() -> new IllegalArgumentException(format("Class '%s' does not contain property '%s'",
+                                                               prototypeClass.getName(), propertyName)));
 
     field.setAccessible(true);
     resolvers.put(field, (ValueResolver<Object>) resolver);
@@ -92,7 +97,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable 
       setField(entry.getKey(), object, resolveValue(entry.getValue(), context));
     }
 
-    injectFields(object, name, encoding);
+    injectFields(object, name, encoding, getReflectionCache());
 
     return object;
   }
@@ -109,5 +114,12 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable 
   @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(resolvers.values(), muleContext);
+  }
+
+  public ReflectionCache getReflectionCache() {
+    if (reflectionCache == null) {
+      reflectionCache = new ReflectionCache();
+    }
+    return reflectionCache;
   }
 }

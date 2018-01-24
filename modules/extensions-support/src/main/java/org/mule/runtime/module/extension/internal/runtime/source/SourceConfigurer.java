@@ -13,6 +13,7 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueR
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectComponentLocation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRefName;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -30,6 +31,7 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.Resolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Optional;
 
@@ -44,21 +46,24 @@ public final class SourceConfigurer {
   private final SourceModel model;
   private final ResolverSet resolverSet;
   private final ComponentLocation componentLocation;
+  private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
 
   /**
    * Create a new instance
    *
-   * @param model the {@link SourceModel} which describes the instances that
-   *              the {@link #configure(Source, Optional)} method will accept
+   * @param model the {@link SourceModel} which describes the instances that the {@link #configure(Source, Optional)} method will
+   *        accept
    * @param resolverSet the {@link ResolverSet} used to resolve the parameters
+   * @param reflectionCache the cache for expensive reflection lookups
    * @param muleContext the current {@link MuleContext}
    */
   public SourceConfigurer(SourceModel model, ComponentLocation componentLocation, ResolverSet resolverSet,
-                          MuleContext muleContext) {
+                          ReflectionCache reflectionCache, MuleContext muleContext) {
     this.model = model;
     this.resolverSet = resolverSet;
     this.componentLocation = componentLocation;
+    this.reflectionCache = reflectionCache;
     this.muleContext = muleContext;
   }
 
@@ -84,7 +89,7 @@ public final class SourceConfigurer {
             Source source = build(resolverSet.resolve(context));
             injectDefaultEncoding(model, source, muleContext.getConfiguration().getDefaultEncoding());
             injectComponentLocation(source, componentLocation);
-            config.ifPresent(c -> injectRefName(source, c.getName()));
+            config.ifPresent(c -> injectRefName(source, c.getName(), getReflectionCache()));
             return source;
           }
 

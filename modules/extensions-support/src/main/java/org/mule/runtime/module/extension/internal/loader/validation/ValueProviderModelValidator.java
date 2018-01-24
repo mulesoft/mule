@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
@@ -30,6 +31,7 @@ import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
 
@@ -68,16 +70,17 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
   }
 
   private void validateModel(ParameterizedModel model, ProblemsReporter problemsReporter, boolean supportsConnectionsAndConfigs) {
+    ReflectionCache reflectionCache = new ReflectionCache();
     model.getAllParameterModels()
         .forEach(param -> param
             .getModelProperty(ValueProviderFactoryModelProperty.class)
             .ifPresent(modelProperty -> validateOptionsResolver(param, modelProperty, model, problemsReporter,
-                                                                supportsConnectionsAndConfigs)));
+                                                                supportsConnectionsAndConfigs, reflectionCache)));
   }
 
   private void validateOptionsResolver(ParameterModel param, ValueProviderFactoryModelProperty modelProperty,
                                        ParameterizedModel model, ProblemsReporter problemsReporter,
-                                       boolean supportsConnectionsAndConfigs) {
+                                       boolean supportsConnectionsAndConfigs, ReflectionCache reflectionCache) {
     Class<? extends ValueProvider> valueProvider = modelProperty.getValueProvider();
     String providerName = valueProvider.getSimpleName();
     Map<String, MetadataType> allParameters =
@@ -85,7 +88,7 @@ public final class ValueProviderModelValidator implements ExtensionModelValidato
     String modelName = NameUtils.getModelName(model);
     String modelTypeName = NameUtils.getComponentModelTypeName(model);
 
-    if (!isInstantiable(valueProvider)) {
+    if (!isInstantiable(valueProvider, reflectionCache)) {
       problemsReporter.addError(new Problem(model, format("The Value Provider [%s] is not instantiable but it should",
                                                           providerName)));
     }

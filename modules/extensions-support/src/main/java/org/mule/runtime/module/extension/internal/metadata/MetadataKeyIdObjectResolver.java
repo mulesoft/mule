@@ -40,6 +40,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Declaring
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -131,9 +132,11 @@ final class MetadataKeyIdObjectResolver {
     return visitor.getResultId();
   }
 
-  private MetadataKeyBuilder getKeyFromField(Object resolvedKey, DeclaringMemberModelProperty declaringMemberModelProperty)
+  private MetadataKeyBuilder getKeyFromField(Object resolvedKey, DeclaringMemberModelProperty declaringMemberModelProperty,
+                                             ReflectionCache reflectionCache)
       throws Exception {
-    return newKey(valueOf(getFieldValue(resolvedKey, declaringMemberModelProperty.getDeclaringField().getName())));
+    return newKey(valueOf(getFieldValue(resolvedKey, declaringMemberModelProperty.getDeclaringField().getName(),
+                                        reflectionCache)));
   }
 
   /**
@@ -143,7 +146,7 @@ final class MetadataKeyIdObjectResolver {
    * @return {@link MetadataKey} reconstructed from the resolved object key
    * @throws MetadataResolvingException
    */
-  MetadataKey reconstructKeyFromType(Object resolvedKey) throws MetadataResolvingException {
+  MetadataKey reconstructKeyFromType(Object resolvedKey, ReflectionCache reflectionCache) throws MetadataResolvingException {
     if (isKeyLess() || resolvedKey == null) {
       return new NullMetadataKey();
     }
@@ -160,7 +163,7 @@ final class MetadataKeyIdObjectResolver {
       try {
         if (p.getModelProperty(DeclaringMemberModelProperty.class).isPresent()) {
           MetadataKeyBuilder fieldBuilder =
-              getKeyFromField(resolvedKey, p.getModelProperty(DeclaringMemberModelProperty.class).get());
+              getKeyFromField(resolvedKey, p.getModelProperty(DeclaringMemberModelProperty.class).get(), reflectionCache);
           if (rootBuilder == null) {
             rootBuilder = fieldBuilder;
             childBuilder = rootBuilder;

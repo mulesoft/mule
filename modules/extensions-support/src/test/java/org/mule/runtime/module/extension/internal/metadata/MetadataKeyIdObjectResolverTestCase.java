@@ -17,8 +17,10 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -30,10 +32,8 @@ import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.test.metadata.extension.LocationKey;
-
-import java.lang.reflect.Field;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -42,6 +42,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.lang.reflect.Field;
+import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataKeyIdObjectResolverTestCase {
@@ -81,9 +84,10 @@ public class MetadataKeyIdObjectResolverTestCase {
     mockMetadataKeyModelProp(countryParam, 2);
     mockMetadataKeyModelProp(cityParam, 3);
 
-    mockDeclaringMemberModelProp(continentParam, CONTINENT);
-    mockDeclaringMemberModelProp(countryParam, COUNTRY);
-    mockDeclaringMemberModelProp(cityParam, CITY);
+    ReflectionCache reflectionCache = new ReflectionCache();
+    mockDeclaringMemberModelProp(continentParam, CONTINENT, reflectionCache);
+    mockDeclaringMemberModelProp(countryParam, COUNTRY, reflectionCache);
+    mockDeclaringMemberModelProp(cityParam, CITY, reflectionCache);
 
     mockQueryModelProp(continentParam);
     mockQueryModelProp(countryParam);
@@ -96,8 +100,8 @@ public class MetadataKeyIdObjectResolverTestCase {
     when(param.getModelProperty(MetadataKeyPartModelProperty.class)).thenReturn(of(new MetadataKeyPartModelProperty(pos)));
   }
 
-  private void mockDeclaringMemberModelProp(ParameterModel param, String name) {
-    Field f = getField(LocationKey.class, name).get();
+  private void mockDeclaringMemberModelProp(ParameterModel param, String name, ReflectionCache reflectionCache) {
+    Field f = getField(LocationKey.class, name, reflectionCache).get();
     when(param.getModelProperty(DeclaringMemberModelProperty.class)).thenReturn(of(new DeclaringMemberModelProperty(f)));
   }
 

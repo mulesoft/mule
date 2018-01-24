@@ -11,11 +11,13 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
  * {@link ExtensionModelLoader} implementation to be used for extensions which model is {@code hand crafted}.
@@ -48,7 +50,7 @@ public class CraftedExtensionModelLoader extends ExtensionModelLoader {
                                                 delegateType.getClass().getName()));
     }
 
-    if (!isInstantiable(delegateType)) {
+    if (!isInstantiable(delegateType, new ReflectionCache())) {
       throw new IllegalArgumentException(format(
                                                 "Type '%s' is not instantiable. A concrete class with a public default constructor was expected",
                                                 delegateType.getName()));

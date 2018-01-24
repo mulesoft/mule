@@ -13,6 +13,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -90,6 +91,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
                                                                               resolverSet,
                                                                               connectionProviderResolver,
                                                                               expirationPolicy,
+                                                                              reflectionCache,
                                                                               muleContext);
         } else {
           configurationProvider = configurationProviderFactory
@@ -98,6 +100,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
                                                  configurationModel,
                                                  resolverSet,
                                                  connectionProviderResolver,
+                                                 reflectionCache,
                                                  muleContext);
         }
 
@@ -118,7 +121,8 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private ConnectionProviderValueResolver getConnectionProviderResolver() {
     return connectionProviderResolver.orElseGet(() -> {
       if (requiresConnection) {
-        return new ImplicitConnectionProviderValueResolver(name, extensionModel, configurationModel, muleContext);
+        return new ImplicitConnectionProviderValueResolver(name, extensionModel, configurationModel, reflectionCache,
+                                                           muleContext);
       }
       return new StaticConnectionProviderResolver(null, null);
     });

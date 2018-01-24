@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -28,9 +29,8 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
-import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
@@ -40,6 +40,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.config.ConfigurationDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.connection.ConnectionProviderDefinitionParser;
@@ -48,6 +49,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.operation.Operation
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.source.SourceDefinitionParser;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import com.google.common.collect.ImmutableList;
 
@@ -106,6 +108,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
     } else {
       final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
       withContextClassLoader(extensionClassLoader, () -> {
+        ReflectionCache reflectionCache = new ReflectionCache();
         new IdempotentExtensionWalker() {
 
           @Override
@@ -141,15 +144,15 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
           @Override
           protected void onParameter(ParameterGroupModel groupModel, ParameterModel model) {
             registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                      parsingContext);
+                                      parsingContext, reflectionCache);
           }
 
         }.walk(extensionModel);
 
         registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                             parsingContext);
+                                             parsingContext, reflectionCache);
 
-        registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
+        registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext, reflectionCache);
       });
     }
   }
@@ -182,7 +185,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
   private void registerSubTypes(MetadataType type, Builder definitionBuilder,
                                 ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
-                                ExtensionParsingContext parsingContext) {
+                                ExtensionParsingContext parsingContext, ReflectionCache reflectionCache) {
     type.accept(new MetadataTypeVisitor() {
 
       @Override
@@ -202,7 +205,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
         } else {
           parsingContext.getSubTypes(objectType)
               .forEach(subtype -> registerTopLevelParameter(subtype, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                                            parsingContext));
+                                                            parsingContext, reflectionCache));
         }
       }
     });
@@ -218,11 +221,11 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
   private void registerTopLevelParameter(final MetadataType parameterType, Builder definitionBuilder,
                                          ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
-                                         ExtensionParsingContext parsingContext) {
+                                         ExtensionParsingContext parsingContext, ReflectionCache reflectionCache) {
     Optional<DslElementSyntax> dslElement = dslSyntaxResolver.resolve(parameterType);
     if (!dslElement.isPresent() ||
         parsingContext.isRegistered(dslElement.get().getElementName(), dslElement.get().getPrefix())
-        || !IntrospectionUtils.isInstantiable(parameterType)) {
+        || !IntrospectionUtils.isInstantiable(parameterType, reflectionCache)) {
       return;
     }
 
@@ -239,13 +242,13 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
                                                   parsingContext));
         }
 
-        registerSubTypes(objectType, definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
+        registerSubTypes(objectType, definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext, reflectionCache);
       }
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
         registerTopLevelParameter(arrayType.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                  parsingContext);
+                                  parsingContext, reflectionCache);
       }
 
       @Override
@@ -259,17 +262,18 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
   private void registerExportedTypesTopLevelParsers(ExtensionModel extensionModel,
                                                     Builder definitionBuilder,
                                                     ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
-                                                    ExtensionParsingContext parsingContext) {
+                                                    ExtensionParsingContext parsingContext, ReflectionCache reflectionCache) {
     registerTopLevelParameters(extensionModel.getTypes().stream(),
                                definitionBuilder,
                                extensionClassLoader,
                                dslSyntaxResolver,
-                               parsingContext);
+                               parsingContext,
+                               reflectionCache);
   }
 
   private void registerSubTypes(Builder definitionBuilder,
                                 ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
-                                ExtensionParsingContext parsingContext) {
+                                ExtensionParsingContext parsingContext, ReflectionCache reflectionCache) {
 
 
     ImmutableList<MetadataType> mappedTypes = new ImmutableList.Builder<MetadataType>()
@@ -279,19 +283,20 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
     registerTopLevelParameters(mappedTypes.stream(), definitionBuilder, extensionClassLoader,
                                dslSyntaxResolver,
-                               parsingContext);
+                               parsingContext, reflectionCache);
   }
 
   private void registerTopLevelParameters(Stream<? extends MetadataType> parameters, Builder definitionBuilder,
                                           ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
-                                          ExtensionParsingContext parsingContext) {
+                                          ExtensionParsingContext parsingContext, ReflectionCache reflectionCache) {
 
-    parameters.filter(IntrospectionUtils::isInstantiable)
+    parameters.filter(p -> IntrospectionUtils.isInstantiable(p, reflectionCache))
         .forEach(subType -> registerTopLevelParameter(subType,
                                                       definitionBuilder,
                                                       extensionClassLoader,
                                                       dslSyntaxResolver,
-                                                      parsingContext));
+                                                      parsingContext,
+                                                      reflectionCache));
 
   }
 

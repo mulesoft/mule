@@ -32,6 +32,7 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
  * An implementation of a {@link ComponentMessageProcessor} for {@link OperationModel operation models}
@@ -55,9 +56,10 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
-                                   PolicyManager policyManager) {
+                                   PolicyManager policyManager,
+                                   ReflectionCache reflectionCache) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
-          cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager);
+          cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
 
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
   }

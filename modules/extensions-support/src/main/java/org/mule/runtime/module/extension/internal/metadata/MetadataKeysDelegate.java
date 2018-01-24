@@ -14,6 +14,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -30,6 +31,7 @@ import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -66,11 +68,12 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
    * @return Successful {@link MetadataResult} if the keys are obtained without errors Failure {@link MetadataResult} when no
    * Dynamic keys are a available or the retrieval fails for any reason
    */
-  MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context) {
-    return getMetadataKeys(context, null);
+  MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context, ReflectionCache reflectionCache) {
+    return getMetadataKeys(context, null, reflectionCache);
   }
 
-  MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context, Object partialKey) {
+  MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context, Object partialKey,
+                                                        ReflectionCache reflectionCache) {
     final TypeKeysResolver keyResolver = resolverFactory.getKeyResolver();
     final String componentResolverName = keyResolver.getCategoryName();
     final MetadataKeysContainerBuilder keysContainer = MetadataKeysContainerBuilder.getInstance();
@@ -82,7 +85,7 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
     try {
       final Map<Integer, ParameterModel> partsByOrder = getPartOrderMapping(keyParts);
       Set<MetadataKey> metadataKeys;
-      if (keyResolver instanceof PartialTypeKeysResolver && hasInitialLevel(partialKey, partsByOrder)) {
+      if (keyResolver instanceof PartialTypeKeysResolver && hasInitialLevel(partialKey, partsByOrder, reflectionCache)) {
         metadataKeys = singleton(((PartialTypeKeysResolver) keyResolver).resolveChilds(context, partialKey));
       } else {
         metadataKeys = keyResolver.getKeys(context);
@@ -100,7 +103,7 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
     }
   }
 
-  private boolean hasInitialLevel(Object keyValue, Map<Integer, ParameterModel> partsByOrder) {
+  private boolean hasInitialLevel(Object keyValue, Map<Integer, ParameterModel> partsByOrder, ReflectionCache reflectionCache) {
     if (keyValue == null) {
       return false;
     }
@@ -112,7 +115,7 @@ class MetadataKeysDelegate extends BaseMetadataDelegate {
       return false;
     }
 
-    return getField(keyValue.getClass(), member.get().getDeclaringField().getName())
+    return getField(keyValue.getClass(), member.get().getDeclaringField().getName(), reflectionCache)
         .map(field -> {
           field.setAccessible(true);
           try {

@@ -24,6 +24,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -40,30 +41,33 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
 
   private final ValueResolver<T> delegate;
   private final String parameterName;
+  private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
   private Function<Object, Object> defaultValueResolver;
 
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ValueResolver delegate} used to obtain a value in the first place.
-   *                 Only if this {@code delegate} returns a {@code null} value will the resolution using
-   *                 a {@link ConfigurationInstance config} will be attempted.
-   * @param <T>      the generic type of the produced values.
+   * @param delegate the {@link ValueResolver delegate} used to obtain a value in the first place. Only if this {@code delegate}
+   *        returns a {@code null} value will the resolution using a {@link ConfigurationInstance config} will be attempted.
+   * @param reflectionCache the cache for expensive reflection lookups
+   * @param <T> the generic type of the produced values.
    * @return a new instance of {@link ConfigOverrideValueResolverWrapper}
    */
-  public static <T> ValueResolver<T> of(ValueResolver<T> delegate, String parameterName, MuleContext muleContext) {
+  public static <T> ValueResolver<T> of(ValueResolver<T> delegate, String parameterName, ReflectionCache reflectionCache,
+                                        MuleContext muleContext) {
     checkArgument(delegate != null, "A ValueResolver is required in order to delegate the value resolution.");
     checkArgument(!isBlank(parameterName), "A parameter name is required in order to use the config as a fallback.");
-    return new ConfigOverrideValueResolverWrapper<>(delegate, parameterName, muleContext);
+    return new ConfigOverrideValueResolverWrapper<>(delegate, parameterName, reflectionCache, muleContext);
   }
 
   private ConfigOverrideValueResolverWrapper(ValueResolver<T> delegate, String parameterName,
-                                             MuleContext muleContext) {
+                                             ReflectionCache reflectionCache, MuleContext muleContext) {
     this.muleContext = muleContext;
     checkArgument(delegate != null, "A ConfigOverride value resolver requires a non-null delegate");
     this.delegate = delegate;
     this.parameterName = parameterName;
+    this.reflectionCache = reflectionCache;
   }
 
   @Override
@@ -153,7 +157,7 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
   }
 
   private Function<Object, Object> getParameterValueFromConfigField(ConfigurationInstance config, String fieldName) {
-    Field parameterField = getField(config.getValue().getClass(), fieldName)
+    Field parameterField = getField(config.getValue().getClass(), fieldName, reflectionCache)
         .orElseThrow(() -> new IllegalArgumentException("Missing field with name [" + fieldName
             + "] in config [" + config.getName() + "]"));
     parameterField.setAccessible(true);
@@ -178,7 +182,7 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
                                                                group.getName(), config.getName())));
 
     Field groupField = (Field) descriptor.getContainer();
-    Field parameterField = getField(descriptor.getType().getDeclaringClass().get(), fieldName)
+    Field parameterField = getField(descriptor.getType().getDeclaringClass().get(), fieldName, reflectionCache)
         .orElseThrow(() -> new IllegalArgumentException("Missing field with name [" + fieldName
             + "] in group [" + descriptor.getName() + "] of config ["
             + config.getName() + "]"));

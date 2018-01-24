@@ -20,20 +20,21 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -52,6 +53,8 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
   @Mock
   private MuleContext muleContext;
 
+  private ReflectionCache reflectionCache = new ReflectionCache();
+
   private DefaultObjectBuilder<PersonalInfo> builder;
   private Field nameField;
   private Field ageField;
@@ -62,8 +65,8 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
   public void before() {
     builder = new DefaultObjectBuilder(PROTOTYPE_CLASS);
 
-    nameField = getField(PROTOTYPE_CLASS, "name").get();
-    ageField = getField(PROTOTYPE_CLASS, "age").get();
+    nameField = getField(PROTOTYPE_CLASS, "name", reflectionCache).get();
+    ageField = getField(PROTOTYPE_CLASS, "age", reflectionCache).get();
 
     when(resolvingContext.getEvent()).thenReturn(event);
     when(resolvingContext.getConfig()).thenReturn(empty());

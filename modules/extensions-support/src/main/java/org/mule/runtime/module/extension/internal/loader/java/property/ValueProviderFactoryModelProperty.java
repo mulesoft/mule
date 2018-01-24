@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java.property;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
@@ -15,6 +16,7 @@ import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderFactory;
 
 import java.lang.reflect.Field;
@@ -121,9 +123,10 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
   }
 
   public ValueProviderFactory createFactory(ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
-                                            Supplier<Object> configurationSupplier, MuleContext muleContext) {
+                                            Supplier<Object> configurationSupplier, ReflectionCache reflectionCache,
+                                            MuleContext muleContext) {
     return new ValueProviderFactory(this, parameterValueResolver, connectionSupplier, configurationSupplier, connectionField,
-                                    configField, muleContext);
+                                    configField, reflectionCache, muleContext);
   }
 
   /**

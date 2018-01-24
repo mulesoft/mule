@@ -49,6 +49,7 @@ import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataReso
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
@@ -82,8 +83,16 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.reflect.TypeToken;
 
@@ -96,13 +105,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.runners.MockitoJUnitRunner;
-
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class OperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
@@ -113,12 +115,14 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Rule
   public ExpectedException expectedException = none();
 
+  private ReflectionCache reflectionCache = new ReflectionCache();
+
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
     OperationMessageProcessor operationMessageProcessor =
         new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
                                       cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
-                                      mockPolicyManager);
+                                      mockPolicyManager, reflectionCache);
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
     return operationMessageProcessor;
   }

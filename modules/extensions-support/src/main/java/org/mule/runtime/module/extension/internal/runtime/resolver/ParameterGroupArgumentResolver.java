@@ -8,20 +8,25 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ParameterGroupObjectBuilder;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver<T> {
 
   private final ParameterGroupDescriptor group;
 
-  public ParameterGroupArgumentResolver(ParameterGroupDescriptor group) {
+  private final ReflectionCache reflectionCache;
+
+  public ParameterGroupArgumentResolver(ParameterGroupDescriptor group, ReflectionCache reflectionCache) {
     checkState(group.getType().isInstantiable(), "Class %s cannot be instantiated.");
     this.group = group;
+    this.reflectionCache = reflectionCache;
   }
 
   /**
@@ -31,7 +36,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
   public LazyValue<T> resolve(ExecutionContext executionContext) {
     return new LazyValue<>(() -> {
       try {
-        return new ParameterGroupObjectBuilder<T>(group).build((EventedExecutionContext) executionContext);
+        return new ParameterGroupObjectBuilder<T>(group, reflectionCache).build((EventedExecutionContext) executionContext);
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage("Could not create parameter group"), e);
       }
