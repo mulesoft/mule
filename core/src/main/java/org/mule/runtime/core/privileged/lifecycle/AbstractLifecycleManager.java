@@ -17,22 +17,22 @@ import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleState;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.privileged.transport.LegacyConnector;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * This is a base implementation of the {@link org.mule.runtime.core.api.lifecycle.LifecycleManager} interface and provides almost
  * all the plumbing required to write a {@link org.mule.runtime.core.api.lifecycle.LifecycleManager} implementation. This class
- * handles the tracking ofg the phases, transition validation and checking state.
+ * handles the tracking of the phases, transition validation and checking state.
  *
  * @param <O> The object type being managed by this {@link org.mule.runtime.core.api.lifecycle.LifecycleManager}
  * @since 3.0
@@ -90,27 +90,30 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager {
     }
     if (executingPhase != null) {
       if (name.equalsIgnoreCase(executingPhase)) {
-        throw new IllegalStateException("Phase '" + name + "' is already currently being executed");
+        throw new IllegalStateException("Phase '" + name + "' is already currently being executed for object '"
+            + this.object.toString() + "'");
       } else {
-        throw new IllegalStateException("Cannot fire phase '" + name + "', currently executing lifecycle phase: "
+        throw new IllegalStateException("Cannot fire phase '" + name + "' for object '" + this.object.toString()
+            + "', currently executing lifecycle phase: "
             + executingPhase);
       }
     }
 
     if (name.equalsIgnoreCase(currentPhase)) {
-      throw new IllegalStateException("Already in lifecycle phase '" + name + "', cannot fire the same phase twice");
+      throw new IllegalStateException("Already in lifecycle phase '" + name + "' for object '" + this.object.toString()
+          + "', cannot fire the same phase twice");
     }
 
 
     if (!phaseNames.contains(name)) {
-      throw new IllegalStateException("Phase does not exist: " + name);
+      throw new IllegalStateException("Phase does not exist: '" + name + "' for object '" + this.object.toString() + "'");
     } else {
       if (isDirectTransition(name)) {
         return;
       }
 
       throw new IllegalStateException("Lifecycle Manager '" + lifecycleManagerId + "' phase '" + currentPhase
-          + "' does not support phase '" + name + "'");
+          + "' does not support phase '" + name + "' for object '" + this.object.toString() + "'");
     }
   }
 
