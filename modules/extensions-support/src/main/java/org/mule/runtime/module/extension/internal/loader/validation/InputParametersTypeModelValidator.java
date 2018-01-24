@@ -55,8 +55,6 @@ import java.util.Set;
  */
 public final class InputParametersTypeModelValidator implements ExtensionModelValidator {
 
-  private ReflectionCache reflectionCache = new ReflectionCache();
-
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problems) {
     final Set<Class<?>> validatedTypes = new HashSet<>();
@@ -109,6 +107,8 @@ public final class InputParametersTypeModelValidator implements ExtensionModelVa
 
   private void validateType(String message, NamedObject namedObject, MetadataType type, ProblemsReporter problems,
                             Set<Class<?>> validatedTypes) {
+    ReflectionCache reflectionCache = new ReflectionCache();
+
     getClassForValidation(type).ifPresent(parameterType -> type.accept(new MetadataTypeVisitor() {
 
       @Override
