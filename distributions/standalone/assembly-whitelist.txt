@@ -89,6 +89,9 @@
 /mule-standalone-${productVersion}/lib/boot/log4j-slf4j-impl-2.8.2.jar
 /mule-standalone-${productVersion}/lib/boot/log4j-jul-2.8.2.jar
 /mule-standalone-${productVersion}/lib/boot/slf4j-api-1.7.24.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-annotations-2.9.0.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-core-2.9.5.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-databind-2.9.5.jar
 
 #
 # /lib/boot/exec
@@ -273,11 +276,8 @@
 /mule-standalone-${productVersion}/lib/opt/hk2-utils-2.3.0-b05.jar
 /mule-standalone-${productVersion}/lib/opt/invokebinder-1.10.jar
 /mule-standalone-${productVersion}/lib/opt/isorelax-20030108.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-annotations-2.9.0.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-core-2.9.5.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-coreutils-1.8.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-core-asl-1.9.14-MULE-002.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-databind-2.9.5.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-jaxrs-1.9.14-MULE-002.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-mapper-asl-1.9.14-MULE-002.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-module-jsonSchema-2.9.5.jar
