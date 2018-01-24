@@ -10,8 +10,9 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -27,6 +28,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Collections;
 import java.util.Map;
@@ -60,13 +62,13 @@ public final class ConfigurationInstanceFactory<T> {
    * @param muleContext        the current {@link MuleContext}
    */
   public ConfigurationInstanceFactory(ExtensionModel extensionModel, ConfigurationModel configurationModel,
-                                      ResolverSet resolverSet, MuleContext muleContext) {
+                                      ResolverSet resolverSet, ReflectionCache reflectionCache, MuleContext muleContext) {
     this.configurationModel = configurationModel;
     this.muleContext = muleContext;
     configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
     requiresConnection = !getConnectedComponents(extensionModel, configurationModel).isEmpty();
     implicitConnectionProviderFactory =
-        new DefaultImplicitConnectionProviderFactory(extensionModel, configurationModel, muleContext);
+        new DefaultImplicitConnectionProviderFactory(extensionModel, configurationModel, reflectionCache, muleContext);
   }
 
   /**

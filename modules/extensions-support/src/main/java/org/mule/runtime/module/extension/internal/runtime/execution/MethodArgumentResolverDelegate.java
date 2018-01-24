@@ -7,16 +7,14 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
+
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
@@ -26,8 +24,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -76,6 +72,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.SourceResultA
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.VoidCallbackArgumentResolver;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -100,6 +97,9 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
   @Inject
   private PolicyManager policyManager;
+
+  @Inject
+  private ReflectionCache reflectionCache;
 
   private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
   private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectionArgumentResolver();
@@ -292,7 +292,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         .map(group -> group.getModelProperty(ParameterGroupModelProperty.class)
             .map(ParameterGroupModelProperty::getDescriptor).orElse(null))
         .filter(group -> group != null && group.getContainer() instanceof Parameter)
-        .collect(toImmutableMap(group -> (Parameter) group.getContainer(), ParameterGroupArgumentResolver::new));
+        .collect(toImmutableMap(group -> (Parameter) group.getContainer(),
+                                group -> new ParameterGroupArgumentResolver(group, reflectionCache)));
   }
 
   @Override

@@ -9,11 +9,13 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
-import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 
 /**
@@ -43,7 +45,7 @@ final class DefaultConnectionProviderFactory<C> implements ConnectionProviderFac
                   providerClass.getName(), ConnectionProvider.class.getName()));
     }
 
-    checkInstantiable(providerClass);
+    checkInstantiable(providerClass, new ReflectionCache());
     this.providerClass = (Class<? extends ConnectionProvider>) providerClass;
   }
 
@@ -53,7 +55,7 @@ final class DefaultConnectionProviderFactory<C> implements ConnectionProviderFac
   @Override
   public ConnectionProvider<C> newInstance() {
     try {
-      return (ConnectionProvider) withContextClassLoader(extensionClassLoader, providerClass::newInstance);
+      return withContextClassLoader(extensionClassLoader, providerClass::newInstance);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create connection provider of type "
           + providerClass.getName()), e);

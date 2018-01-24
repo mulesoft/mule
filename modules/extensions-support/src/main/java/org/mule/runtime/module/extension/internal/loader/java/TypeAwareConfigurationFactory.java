@@ -14,6 +14,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
  * Implementation of {@link ConfigurationFactory} which creates instances based on a given {@link Class} which is assumed to have
@@ -36,7 +37,7 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
   public TypeAwareConfigurationFactory(Class<?> configurationType, ClassLoader extensionClassLoader) {
     checkArgument(configurationType != null, "configuration type cannot be null");
     checkArgument(extensionClassLoader != null, "extensionClassLoader type cannot be null");
-    checkInstantiable(configurationType);
+    checkInstantiable(configurationType, new ReflectionCache());
 
     this.configurationType = withContextClassLoader(extensionClassLoader, () -> {
       // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an extension

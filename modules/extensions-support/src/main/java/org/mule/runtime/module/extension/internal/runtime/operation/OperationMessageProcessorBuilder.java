@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
  * Provides instances of {@link OperationMessageProcessor} for a given {@link OperationModel}
@@ -31,7 +32,8 @@ public final class OperationMessageProcessorBuilder
                                           MuleContext muleContext,
                                           Registry registry) {
 
-    super(extensionModel, operationModel, policyManager, muleContext, registry);
+    super(extensionModel, operationModel, policyManager, registry.lookupByType(ReflectionCache.class).get(), muleContext,
+          registry);
   }
 
   @Override
@@ -40,19 +42,19 @@ public final class OperationMessageProcessorBuilder
       return new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                 arguments,
                                                 cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
-                                                extensionConnectionSupplier);
+                                                reflectionCache, extensionConnectionSupplier);
     }
 
     if (supportsOAuth(extensionModel)) {
       return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                 arguments,
                                                 cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
-                                                oauthManager);
+                                                reflectionCache, oauthManager);
     }
     return new OperationMessageProcessor(extensionModel, operationModel,
                                          configurationProvider, target, targetValue,
                                          arguments,
                                          cursorProviderFactory, retryPolicyTemplate, extensionManager,
-                                         policyManager);
+                                         policyManager, reflectionCache);
   }
 }

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static com.google.common.cache.CacheBuilder.newBuilder;
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
@@ -51,7 +50,6 @@ import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -109,13 +107,17 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
+import org.reflections.ReflectionUtils;
+import org.springframework.core.ResolvableType;
+
+import com.google.common.collect.ImmutableList;
+
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -131,9 +133,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -147,13 +146,6 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Types;
-
-import org.reflections.ReflectionUtils;
-import org.springframework.core.ResolvableType;
-
-import com.google.common.cache.Cache;
-import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.UncheckedExecutionException;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -485,8 +477,8 @@ public final class IntrospectionUtils {
     return typeLoader.load(ResolvableType.forField(field).getType());
   }
 
-  public static Optional<Field> getFieldByNameOrAlias(Class<?> clazz, String nameOrAlias) {
-    Optional<Field> field = getField(clazz, nameOrAlias);
+  public static Optional<Field> getFieldByNameOrAlias(Class<?> clazz, String nameOrAlias, ReflectionCache reflectionCache) {
+    Optional<Field> field = getField(clazz, nameOrAlias, reflectionCache);
     if (!field.isPresent()) {
       field = getAllFields(clazz, f -> getAlias(f).equals(nameOrAlias)).stream().findFirst();
     }
@@ -494,39 +486,18 @@ public final class IntrospectionUtils {
     return field;
   }
 
-  public static Optional<Field> getField(Class<?> clazz, ParameterModel parameterModel) {
-    return getField(clazz, getMemberName(parameterModel, parameterModel.getName()));
+  public static Optional<Field> getField(Class<?> clazz, ParameterModel parameterModel, ReflectionCache reflectionCache) {
+    return getField(clazz, getMemberName(parameterModel, parameterModel.getName()), reflectionCache);
   }
 
-  public static Optional<Field> getField(Class<?> clazz, ParameterDeclaration parameterDeclaration) {
-    return getField(clazz, MuleExtensionAnnotationParser.getMemberName(parameterDeclaration, parameterDeclaration.getName()));
+  public static Optional<Field> getField(Class<?> clazz, ParameterDeclaration parameterDeclaration,
+                                         ReflectionCache reflectionCache) {
+    return getField(clazz, MuleExtensionAnnotationParser.getMemberName(parameterDeclaration, parameterDeclaration.getName()),
+                    reflectionCache);
   }
 
-  private static final Cache<Class<?>, List<Field>> fieldsByClassCache =
-      newBuilder().weakKeys().build();
-
-  public static Optional<Field> getField(Class<?> clazz, String name) {
-    try {
-      final List<Field> classFields = fieldsByClassCache.get(clazz, () -> {
-        List<Field> fields = new ArrayList<>();
-
-        for (Field field : clazz.getDeclaredFields()) {
-          fields.add(field);
-        }
-
-        for (Class<?> type : ReflectionUtils.getAllSuperTypes(clazz)) {
-          for (Field field : type.getDeclaredFields()) {
-            fields.add(field);
-          }
-        }
-
-        return fields;
-      });
-
-      return classFields.stream().filter(f -> f.getName().equals(name)).findFirst();
-    } catch (ExecutionException | UncheckedExecutionException e) {
-      throw new MuleRuntimeException(e.getCause());
-    }
+  public static Optional<Field> getField(Class<?> clazz, String name, ReflectionCache reflectionCache) {
+    return reflectionCache.getFields(clazz).stream().filter(f -> f.getName().equals(name)).findFirst();
   }
 
   /**
@@ -534,12 +505,14 @@ public final class IntrospectionUtils {
    *
    * @param object The object where grab the field value
    * @param fieldName The name of the field to obtain the value
+   * @param reflectionCache the cache for expensive reflection lookups
    * @return The value of the field with the given fieldName and object instance
    * @throws IllegalAccessException if is unavailable to access to the field
    * @throws NoSuchFieldException if the field doesn't exist in the given object instance
    */
-  public static Object getFieldValue(Object object, String fieldName) throws IllegalAccessException, NoSuchFieldException {
-    final Optional<Field> fieldOptional = getField(object.getClass(), fieldName);
+  public static Object getFieldValue(Object object, String fieldName, ReflectionCache reflectionCache)
+      throws IllegalAccessException, NoSuchFieldException {
+    final Optional<Field> fieldOptional = getField(object.getClass(), fieldName, reflectionCache);
     if (fieldOptional.isPresent()) {
       final Field field = fieldOptional.get();
       field.setAccessible(true);
@@ -557,18 +530,6 @@ public final class IntrospectionUtils {
     return enrichableModel.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField().getName())
         .orElse(defaultName);
   }
-
-  private static final Cache<Class<?>, Boolean> hasDefaultConstructorsByClassCache =
-      newBuilder().weakKeys().build();
-
-  public static boolean hasDefaultConstructor(Class<?> clazz) {
-    try {
-      return hasDefaultConstructorsByClassCache.get(clazz, () -> ClassUtils.getConstructor(clazz, new Class[] {}) != null);
-    } catch (ExecutionException | UncheckedExecutionException e) {
-      throw new MuleRuntimeException(e.getCause());
-    }
-  }
-
 
   public static List<TypeMirror> getInterfaceGenerics(TypeMirror type, TypeElement implementedInterface,
                                                       ProcessingEnvironment processingEnvironment) {
@@ -722,30 +683,32 @@ public final class IntrospectionUtils {
     return new LinkedList<>();
   }
 
-  public static void checkInstantiable(Class<?> declaringClass) {
-    checkInstantiable(declaringClass, true);
+  public static void checkInstantiable(Class<?> declaringClass, ReflectionCache reflectionCache) {
+    checkInstantiable(declaringClass, true, reflectionCache);
   }
 
-  public static void checkInstantiable(Class<?> declaringClass, boolean requireDefaultConstructor) {
-    if (!isInstantiable(declaringClass, requireDefaultConstructor)) {
+  public static void checkInstantiable(Class<?> declaringClass, boolean requireDefaultConstructor,
+                                       ReflectionCache reflectionCache) {
+    if (!isInstantiable(declaringClass, requireDefaultConstructor, reflectionCache)) {
       throw new IllegalArgumentException(format("Class %s cannot be instantiated.", declaringClass));
     }
   }
 
-  public static boolean isInstantiable(MetadataType type) {
+  public static boolean isInstantiable(MetadataType type, ReflectionCache reflectionCache) {
     return type.getAnnotation(ClassInformationAnnotation.class)
         .map(ClassInformationAnnotation::isInstantiable)
         .orElseGet(() -> getType(type)
-            .map(IntrospectionUtils::isInstantiable)
+            .map(t -> isInstantiable(t, reflectionCache))
             .orElse(false));
   }
 
-  public static boolean isInstantiable(Class<?> declaringClass) {
-    return isInstantiable(declaringClass, true);
+  public static boolean isInstantiable(Class<?> declaringClass, ReflectionCache reflectionCache) {
+    return isInstantiable(declaringClass, true, reflectionCache);
   }
 
-  public static boolean isInstantiable(Class<?> declaringClass, boolean requireDefaultConstructor) {
-    return declaringClass != null && (!requireDefaultConstructor || hasDefaultConstructor(declaringClass))
+  public static boolean isInstantiable(Class<?> declaringClass, boolean requireDefaultConstructor,
+                                       ReflectionCache reflectionCache) {
+    return declaringClass != null && (!requireDefaultConstructor || reflectionCache.hasDefaultConstructor(declaringClass))
         && !declaringClass.isInterface() && !Modifier.isAbstract(declaringClass.getModifiers());
   }
 
@@ -972,17 +935,17 @@ public final class IntrospectionUtils {
     return ImmutableList.copyOf(types);
   }
 
-  public static Collection<Field> getExposedFields(Class<?> extensionType) {
+  public static Collection<Field> getExposedFields(Class<?> extensionType, ReflectionCache reflectionCache) {
     Collection<Field> allFields = getAnnotatedFields(extensionType, Parameter.class);
     if (!allFields.isEmpty()) {
       return allFields;
     }
-    return getFieldsWithGetters(extensionType);
+    return getFieldsWithGetters(extensionType, reflectionCache);
   }
 
-  public static Set<Field> getFieldsWithGetters(Class<?> extensionType) {
+  public static Set<Field> getFieldsWithGetters(Class<?> extensionType, ReflectionCache reflectionCache) {
     return getPropertyDescriptors(extensionType).stream().filter(p -> p.getReadMethod() != null)
-        .map(p -> getField(extensionType, p.getName())).filter(Optional::isPresent).map(Optional::get)
+        .map(p -> getField(extensionType, p.getName(), reflectionCache)).filter(Optional::isPresent).map(Optional::get)
         .collect(toSet());
   }
 
@@ -1358,35 +1321,10 @@ public final class IntrospectionUtils {
     });
   }
 
-  private static final ConcurrentMap<Class<? extends Annotation>, Cache<Class<?>, Optional<FieldSetter>>> fieldSetterForAnnotatedFieldCache =
-      new ConcurrentHashMap<>(3, 0.9f);
-
   private static Optional<FieldSetter> getFieldSetterForAnnotatedField(Object target,
-                                                                       Class<? extends Annotation> annotationClass) {
-    Cache<Class<?>, Optional<FieldSetter>> cache = fieldSetterForAnnotatedFieldCache.get(annotationClass);
-    // This pre-check is made in order to avoid the synchronized block in the implementation of ConcurrentHashMap
-    // (https://bugs.openjdk.java.net/browse/JDK-8161372)
-    if (cache == null) {
-      cache = fieldSetterForAnnotatedFieldCache.computeIfAbsent(annotationClass, k -> newBuilder().weakKeys().build());
-    }
-
-    final Class<?> type = target.getClass();
-    try {
-      return cache.get(type, () -> {
-        List<Field> fields = getAnnotatedFields(type, annotationClass);
-        if (fields.isEmpty()) {
-          return empty();
-        } else if (fields.size() > 1) {
-          throw new IllegalModelDefinitionException(format(
-                                                           "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
-                                                           type.getName(), fields.size(), annotationClass));
-        }
-
-        return of(new FieldSetter<>(fields.get(0)));
-      });
-    } catch (ExecutionException | UncheckedExecutionException e) {
-      throw new MuleRuntimeException(e.getCause());
-    }
+                                                                       Class<? extends Annotation> annotationClass,
+                                                                       ReflectionCache reflectionCache) {
+    return reflectionCache.getFieldSetterForAnnotatedField(target, annotationClass);
   }
 
   private static void injectFieldOfType(Object target, Object value, Class<?> fieldType) {
@@ -1438,11 +1376,12 @@ public final class IntrospectionUtils {
    * @param target object in which the fields are going to be set
    * @param configName to be injected into the {@link String} field annotated with {@link RefName}
    * @param encoding to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   * @param reflectionCache the cache for expensive reflection lookups
    * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
    */
-  public static void injectFields(Object target, String configName, String encoding) {
-    injectDefaultEncoding(target, encoding);
-    set(getFieldSetterForAnnotatedField(target, RefName.class), target, configName);
+  public static void injectFields(Object target, String configName, String encoding, ReflectionCache reflectionCache) {
+    injectDefaultEncoding(target, encoding, reflectionCache);
+    set(getFieldSetterForAnnotatedField(target, RefName.class, reflectionCache), target, configName);
   }
 
   /**
@@ -1454,9 +1393,10 @@ public final class IntrospectionUtils {
    *
    * @param target object in which the value are going to be set
    * @param configName the value to be injected
+   * @param reflectionCache the cache for expensive reflection lookups
    */
-  public static void injectRefName(Object target, String configName) {
-    set(getFieldSetterForAnnotatedField(target, RefName.class), target, configName);
+  public static void injectRefName(Object target, String configName, ReflectionCache reflectionCache) {
+    set(getFieldSetterForAnnotatedField(target, RefName.class, reflectionCache), target, configName);
   }
 
   /**
@@ -1464,20 +1404,22 @@ public final class IntrospectionUtils {
    *
    * @param target object in which the fields are going to be set
    * @param encoding to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   * @param reflectionCache the cache for expensive reflection lookups
    * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
    */
-  public static void injectDefaultEncoding(Object target, String encoding) {
-    set(getDefaultEncodingFieldSetter(target), target, encoding);
+  public static void injectDefaultEncoding(Object target, String encoding, ReflectionCache reflectionCache) {
+    set(getDefaultEncodingFieldSetter(target, reflectionCache), target, encoding);
   }
 
   /**
    * Returns a {@link FieldSetter} for a field in the {@code target} annotated {@link DefaultEncoding} (if present)
    *
    * @param target object in which the fields are going to be set
+   * @param reflectionCache the cache for expensive reflection lookups
    * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
    */
-  public static Optional<FieldSetter> getDefaultEncodingFieldSetter(Object target) {
-    return getFieldSetterForAnnotatedField(target, DefaultEncoding.class);
+  public static Optional<FieldSetter> getDefaultEncodingFieldSetter(Object target, ReflectionCache reflectionCache) {
+    return getFieldSetterForAnnotatedField(target, DefaultEncoding.class, reflectionCache);
   }
 
   /**

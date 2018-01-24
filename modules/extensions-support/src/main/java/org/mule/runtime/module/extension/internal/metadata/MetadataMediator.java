@@ -12,6 +12,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADA
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -51,6 +52,8 @@ import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+
 import com.google.common.collect.ImmutableList;
 
 import java.util.LinkedList;
@@ -102,18 +105,19 @@ public final class MetadataMediator<T extends ComponentModel> {
    * @return Successful {@link MetadataResult} if the keys are obtained without errors Failure {@link MetadataResult} when no
    * Dynamic keys are a available or the retrieval fails for any reason
    */
-  public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context) {
-    return keysDelegate.getMetadataKeys(context);
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context, ReflectionCache reflectionCache) {
+    return keysDelegate.getMetadataKeys(context, reflectionCache);
   }
 
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context,
-                                                               ParameterValueResolver metadataKeyResolver) {
+                                                               ParameterValueResolver metadataKeyResolver,
+                                                               ReflectionCache reflectionCache) {
     MetadataResult keyValueResult = getMetadataKeyObjectValue(metadataKeyResolver);
     if (!keyValueResult.isSuccess()) {
       return keyValueResult;
     }
 
-    return keysDelegate.getMetadataKeys(context, keyValueResult.get());
+    return keysDelegate.getMetadataKeys(context, keyValueResult.get(), reflectionCache);
   }
 
   /**
@@ -143,7 +147,8 @@ public final class MetadataMediator<T extends ComponentModel> {
    *         when the Metadata retrieval of any element fails for any reason
    */
   public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataContext context,
-                                                                    ParameterValueResolver metadataKeyResolver) {
+                                                                    ParameterValueResolver metadataKeyResolver,
+                                                                    ReflectionCache reflectionCache) {
     try {
       Object keyValue;
       MetadataResult keyValueResult = getMetadataKeyObjectValue(metadataKeyResolver);
@@ -159,7 +164,7 @@ public final class MetadataMediator<T extends ComponentModel> {
 
       MetadataAttributes.MetadataAttributesBuilder builder = MetadataAttributes.builder();
       if (!keyIdObjectResolver.isKeyLess()) {
-        builder.withKey(keyIdObjectResolver.reconstructKeyFromType(keyValue));
+        builder.withKey(keyIdObjectResolver.reconstructKeyFromType(keyValue, reflectionCache));
       }
 
       return getMetadata(context, keyValue, builder);

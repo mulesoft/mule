@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.utils;
 
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -22,6 +23,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersRes
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Optional;
 
@@ -43,9 +45,10 @@ public final class ImplicitObjectUtils {
    * @param muleContext the Mule node.
    * @return a {@link ResolverSet}
    */
-  public static ResolverSet buildImplicitResolverSet(ParameterizedModel model, MuleContext muleContext) {
+  public static ResolverSet buildImplicitResolverSet(ParameterizedModel model, ReflectionCache reflectionCache,
+                                                     MuleContext muleContext) {
     ResolverSet resolverSet = new HashedResolverSet(muleContext);
-    ParametersResolver parametersResolver = ParametersResolver.fromDefaultValues(model, muleContext);
+    ParametersResolver parametersResolver = ParametersResolver.fromDefaultValues(model, muleContext, reflectionCache);
 
     for (ParameterGroupModel groupModel : model.getParameterGroupModels()) {
       Optional<ParameterGroupDescriptor> descriptor = groupModel.getModelProperty(ParameterGroupModelProperty.class)
@@ -55,7 +58,7 @@ public final class ImplicitObjectUtils {
         String groupKey = getContainerName(descriptor.get().getContainer());
         resolverSet.add(groupKey,
                         NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), descriptor.get().getMetadataType(),
-                                                        muleContext, parametersResolver));
+                                                        reflectionCache, muleContext, parametersResolver));
       } else {
         groupModel.getParameterModels().forEach(parameterModel -> {
           Object defaultValue = parameterModel.getDefaultValue();
@@ -68,7 +71,7 @@ public final class ImplicitObjectUtils {
 
           if (parameterModel.getModelProperty(NullSafeModelProperty.class).isPresent()) {
             MetadataType metadataType = parameterModel.getModelProperty(NullSafeModelProperty.class).get().defaultType();
-            resolver = NullSafeValueResolverWrapper.of(resolver, metadataType, muleContext, parametersResolver);
+            resolver = NullSafeValueResolverWrapper.of(resolver, metadataType, reflectionCache, muleContext, parametersResolver);
           }
 
           resolverSet.add(parameterModel.getName(), resolver);

@@ -22,15 +22,15 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -40,11 +40,12 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase {
   private static final Integer AGE = 50;
   private static final Date DATE = new Date();
 
-
   private ValueSetter valueSetter;
 
   @Mock
   private ResolverSetResult result;
+
+  private ReflectionCache reflectionCache = new ReflectionCache();
 
   @Before
   public void before() throws Exception {
@@ -53,7 +54,7 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase {
         new ParameterGroupDescriptor("group", new TypeWrapper(PersonalInfo.class,
                                                               new JavaTypeLoader(Thread.currentThread().getContextClassLoader())),
                                      ExtensionsTypeLoaderFactory.getDefault().createTypeLoader().load(PersonalInfo.class),
-                                     getField(HeisenbergExtension.class, personalInfo).get(), null);
+                                     getField(HeisenbergExtension.class, personalInfo, reflectionCache).get(), null);
 
     Map<String, Object> resultMap = new HashMap<>();
     resultMap.put("name", NAME);
@@ -62,7 +63,7 @@ public class GroupValueSetterTestCase extends AbstractMuleTestCase {
 
     when(result.asMap()).thenReturn(resultMap);
 
-    valueSetter = new GroupValueSetter(group);
+    valueSetter = new GroupValueSetter(group, () -> reflectionCache);
   }
 
   @Test

@@ -7,16 +7,18 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
  * An implementation of a {@link ComponentMessageProcessor} for {@link ConstructModel construct models}
@@ -35,9 +37,10 @@ public class ConstructMessageProcessor extends ComponentMessageProcessor<Constru
                                    CursorProviderFactory cursorProviderFactory,
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
-                                   PolicyManager policyManager) {
+                                   PolicyManager policyManager,
+                                   ReflectionCache reflectionCache) {
     super(extensionModel, constructModel, configurationProvider, target, targetValue,
-          resolverSet, cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager);
+          resolverSet, cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
   }
 
   @Override

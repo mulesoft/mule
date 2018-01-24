@@ -15,6 +15,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
  * A factory which creates instances of {@link ConfigurationProvider}
@@ -41,6 +42,7 @@ public interface ConfigurationProviderFactory {
                                                            ResolverSet resolverSet,
                                                            ConnectionProviderValueResolver connectionProviderResolver,
                                                            ExpirationPolicy expirationPolicy,
+                                                           ReflectionCache reflectionCache,
                                                            MuleContext muleContext)
       throws Exception;
 
@@ -62,6 +64,7 @@ public interface ConfigurationProviderFactory {
                                                           ConfigurationModel configurationModel,
                                                           ResolverSet resolverSet,
                                                           ConnectionProviderValueResolver connectionProviderResolver,
+                                                          ReflectionCache reflectionCache,
                                                           MuleContext muleContext)
       throws Exception;
 }

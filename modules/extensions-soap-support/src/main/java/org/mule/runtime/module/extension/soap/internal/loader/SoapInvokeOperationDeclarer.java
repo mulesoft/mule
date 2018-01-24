@@ -28,7 +28,6 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
-import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
@@ -43,6 +42,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Declaring
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeInputAttachmentsTypeResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeInputHeadersTypeResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeKeysResolver;
@@ -51,12 +51,12 @@ import org.mule.runtime.module.extension.soap.internal.metadata.InvokeRequestTyp
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.module.extension.soap.internal.runtime.operation.SoapOperationExecutorFactory;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Declares the invoke operation for a given Soap Extension {@link ExtensionDeclarer}.
@@ -91,6 +91,8 @@ public class SoapInvokeOperationDeclarer {
    */
   void declare(ConfigurationDeclarer configDeclarer, ClassTypeLoader loader, Set<ErrorModel> soapErrors) {
 
+    ReflectionCache reflectionCache = new ReflectionCache();
+
     OperationDeclarer operation = configDeclarer.withOperation(OPERATION_NAME)
         .describedAs(OPERATION_DESCRIPTION)
         .requiresConnection(true)
@@ -101,7 +103,7 @@ public class SoapInvokeOperationDeclarer {
     soapErrors.forEach(operation::withErrorModel);
     declareMetadata(operation, loader);
     declareOutput(operation, loader);
-    declareMetadataKeyParameters(operation, loader);
+    declareMetadataKeyParameters(operation, loader, reflectionCache);
     declareRequestParameters(operation, loader);
   }
 
@@ -184,7 +186,8 @@ public class SoapInvokeOperationDeclarer {
    *
    * @param operation the invoke operation declarer.
    */
-  private void declareMetadataKeyParameters(OperationDeclarer operation, ClassTypeLoader loader) {
+  private void declareMetadataKeyParameters(OperationDeclarer operation, ClassTypeLoader loader,
+                                            ReflectionCache reflectionCache) {
     TypeWrapper keyType = new TypeWrapper(WebServiceTypeKey.class, loader);
     ParameterGroupDeclarer group = operation
         .onParameterGroup(KEYS_GROUP)
@@ -193,13 +196,15 @@ public class SoapInvokeOperationDeclarer {
 
     StringType stringType = TYPE_BUILDER.stringType().build();
     group.withRequiredParameter(SERVICE_PARAM)
-        .withModelProperty(new DeclaringMemberModelProperty(getField(WebServiceTypeKey.class, SERVICE_PARAM).get()))
+        .withModelProperty(new DeclaringMemberModelProperty(getField(WebServiceTypeKey.class, SERVICE_PARAM, reflectionCache)
+            .get()))
         .ofType(stringType)
         .withModelProperty(new MetadataKeyPartModelProperty(1))
         .withLayout(getLayout(1));
     group.withRequiredParameter(OPERATION_PARAM)
         .ofType(stringType)
-        .withModelProperty(new DeclaringMemberModelProperty(getField(WebServiceTypeKey.class, OPERATION_PARAM).get()))
+        .withModelProperty(new DeclaringMemberModelProperty(getField(WebServiceTypeKey.class, OPERATION_PARAM, reflectionCache)
+            .get()))
         .withModelProperty(new MetadataKeyPartModelProperty(2))
         .withLayout(getLayout(2));
   }

@@ -7,16 +7,18 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
+
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
-import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 public final class DefaultSourceFactory implements SourceFactory {
 
   private final Class<? extends Source> sourceType;
 
   public DefaultSourceFactory(Class<? extends Source> sourceType) {
-    checkInstantiable(sourceType);
+    checkInstantiable(sourceType, new ReflectionCache());
     this.sourceType = sourceType;
   }
 

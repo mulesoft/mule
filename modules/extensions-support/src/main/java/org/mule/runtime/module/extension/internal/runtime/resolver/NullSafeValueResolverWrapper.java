@@ -20,6 +20,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
+
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
@@ -39,12 +40,13 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
-
-import java.lang.reflect.Field;
-import java.util.Optional;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.util.Optional;
 
 /**
  * A {@link ValueResolver} wrapper which generates and returns default instances if the {@link #delegate} returns {@code null}.
@@ -68,15 +70,17 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   /**
    * Creates a new instance
    *
-   * @param delegate    the {@link ValueResolver} to wrap
-   * @param type        the type of the value this resolver returns
+   * @param delegate the {@link ValueResolver} to wrap
+   * @param type the type of the value this resolver returns
+   * @param reflectionCache the cache for expensive reflection lookups
    * @param muleContext the current {@link MuleContext}
-   * @param <T>         the generic type of the produced values
+   * @param <T> the generic type of the produced values
    * @return a new null safe {@link ValueResolver}
    * @throws IllegalParameterModelDefinitionException if used on parameters of not supported types
    */
   public static <T> ValueResolver<T> of(ValueResolver<T> delegate,
                                         MetadataType type,
+                                        ReflectionCache reflectionCache,
                                         MuleContext muleContext,
                                         ObjectTypeParametersResolver parametersResolver) {
     checkArgument(delegate != null, "delegate cannot be null");
@@ -89,7 +93,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
         Class clazz = getType(objectType);
 
         if (isMap(objectType)) {
-          ValueResolver<?> fallback = MapValueResolver.of(clazz, emptyList(), emptyList(), muleContext);
+          ValueResolver<?> fallback = MapValueResolver.of(clazz, emptyList(), emptyList(), reflectionCache, muleContext);
           wrappedResolver.set(new NullSafeValueResolverWrapper(delegate, fallback, muleContext));
           return;
         }
@@ -140,13 +144,13 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
                     .build();
               }
 
-              fieldResolver = NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), nullSafeType,
+              fieldResolver = NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), nullSafeType, reflectionCache,
                                                               muleContext, parametersResolver);
             }
 
             if (field.getAnnotation(ConfigOverride.class) != null) {
               ValueResolver<?> fieldDelegate = fieldResolver != null ? fieldResolver : new StaticValueResolver<>(null);
-              fieldResolver = ConfigOverrideValueResolverWrapper.of(fieldDelegate, field.getName(), muleContext);
+              fieldResolver = ConfigOverrideValueResolverWrapper.of(fieldDelegate, field.getName(), reflectionCache, muleContext);
             }
           }
 

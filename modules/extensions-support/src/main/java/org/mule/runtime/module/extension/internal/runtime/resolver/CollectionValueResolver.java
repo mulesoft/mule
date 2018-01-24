@@ -10,11 +10,13 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import com.google.common.collect.ImmutableList;
 
@@ -51,7 +53,7 @@ public final class CollectionValueResolver<T> implements ValueResolver<Collectio
    * @param resolvers a not {@code null} {@link List} of resolvers
    */
   public CollectionValueResolver(Class<? extends Collection> collectionType, List<ValueResolver<T>> resolvers) {
-    checkInstantiable(collectionType);
+    checkInstantiable(collectionType, new ReflectionCache());
     checkArgument(resolvers != null, "resolvers cannot be null");
 
     this.collectionType = collectionType;
@@ -105,4 +107,5 @@ public final class CollectionValueResolver<T> implements ValueResolver<Collectio
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(resolvers, true, muleContext);
   }
+
 }

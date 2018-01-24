@@ -7,13 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -29,14 +26,13 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.Extension
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 /**
- *  Base class for creating MessageProcessor instances of a given {@link ComponentModel}
+ * Base class for creating MessageProcessor instances of a given {@link ComponentModel}
  *
  * @since 4.0
  */
@@ -45,6 +41,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected final ExtensionModel extensionModel;
   protected final M operationModel;
   protected final PolicyManager policyManager;
+  protected final ReflectionCache reflectionCache;
   protected final MuleContext muleContext;
   protected Registry registry;
   protected final ExtensionConnectionSupplier extensionConnectionSupplier;
@@ -61,6 +58,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   public ComponentMessageProcessorBuilder(ExtensionModel extensionModel,
                                           M operationModel,
                                           PolicyManager policyManager,
+                                          ReflectionCache reflectionCache,
                                           MuleContext muleContext,
                                           Registry registry) {
 
@@ -73,6 +71,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
     this.policyManager = policyManager;
+    this.reflectionCache = reflectionCache;
     this.registry = registry;
     this.extensionConnectionSupplier = registry.lookupByType(ExtensionConnectionSupplier.class).get();
     this.oauthManager = registry.lookupByType(ExtensionsOAuthManager.class).get();
@@ -98,11 +97,12 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
 
   protected ResolverSet getArgumentsResolverSet() throws ConfigurationException {
     final ResolverSet parametersResolverSet =
-        ParametersResolver.fromValues(parameters, muleContext, lazyModeEnabled).getParametersAsResolverSet(operationModel,
-                                                                                                           muleContext);
+        ParametersResolver.fromValues(parameters, muleContext, lazyModeEnabled, reflectionCache)
+            .getParametersAsResolverSet(operationModel, muleContext);
 
     final ResolverSet childsResolverSet =
-        ParametersResolver.fromValues(parameters, muleContext, lazyModeEnabled).getNestedComponentsAsResolverSet(operationModel);
+        ParametersResolver.fromValues(parameters, muleContext, lazyModeEnabled, reflectionCache)
+            .getNestedComponentsAsResolverSet(operationModel);
 
     return parametersResolverSet.merge(childsResolverSet);
   }
