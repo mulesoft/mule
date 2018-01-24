@@ -105,6 +105,9 @@
                 <include>org.apache.logging.log4j:log4j-jul</include>
                 <include>org.slf4j:jcl-over-slf4j</include>
                 <include>com.lmax:disruptor</include>
+                <include>com.fasterxml.jackson.core:jackson-databind</include>
+                <include>com.fasterxml.jackson.core:jackson-core</include>  
+                <include>com.fasterxml.jackson.core:jackson-annotations</include>              
             </includes>
         </dependencySet>
 
@@ -292,6 +295,9 @@
                 <exclude>org.slf4j:jcl-over-slf4j</exclude>
                 <exclude>commons-logging:commons-logging</exclude>
                 <exclude>com.lmax:disruptor</exclude>
+                <exclude>com.fasterxml.jackson.core:jackson-databind</exclude>
+                <exclude>com.fasterxml.jackson.core:jackson-core</exclude>  
+                <exclude>com.fasterxml.jackson.core:jackson-annotations</exclude>             
 
                 <!-- Distributed separately in profiler pack -->
                 <exclude>com.yourkit:yjp-controller-api-redist</exclude>
