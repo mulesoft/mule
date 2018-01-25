@@ -6,6 +6,7 @@
  */
 package org.mule.test.petstore.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
 import org.mule.metadata.api.model.MetadataType;
@@ -150,6 +151,21 @@ public class PetStoreOperations {
   }
 
   public void makePhoneCall(PhoneNumber phoneNumber) {}
+
+  @MediaType(ANY)
+  public Character spellObject(Character character) {
+    return character;
+  }
+
+  @MediaType(ANY)
+  public char spellBuiltIn(char character) {
+    return character;
+  }
+
+  @MediaType(ANY)
+  public Class spellClass(Class clazz) {
+    return clazz;
+  }
 
   public static class CorrelationInfoOutputResolver implements OutputTypeResolver<CorrelationInfo> {
 
