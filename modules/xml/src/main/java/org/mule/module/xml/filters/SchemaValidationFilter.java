@@ -285,6 +285,11 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
         Validator validator = getSchemaObject().newValidator();
         XMLSecureFactories.createDefault().configureValidator(validator);
 
+        if (errorHandler != null)
+        {
+            validator.setErrorHandler(errorHandler);
+        }
+
         if (this.validatorFeatures != null)
         {
             for (Map.Entry<String, Boolean> feature : this.validatorFeatures.entrySet())
