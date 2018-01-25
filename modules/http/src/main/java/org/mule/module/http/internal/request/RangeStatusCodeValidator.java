@@ -19,8 +19,8 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator
             if (valuePart.contains(".."))
             {
                 String[] limits = valuePart.split("\\.\\.");
-                int lower = Integer.parseInt(limits[0]);
-                int upper = Integer.parseInt(limits[1]) ;
+                int lower = Integer.parseInt(limits[0].trim());
+                int upper = Integer.parseInt(limits[1].trim()) ;
 
                 if (value >= lower && value <= upper)
                 {
@@ -29,7 +29,7 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator
             }
             else
             {
-                int code = Integer.parseInt(valuePart);
+                int code = Integer.parseInt(valuePart.trim());
 
                 if (code == value)
                 {
