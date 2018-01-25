@@ -65,7 +65,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return this builder
    */
   public B headers(MultiMap<String, String> headersMap) {
-    headersMap.keySet().forEach(key -> this.headers.put(key, headersMap.getAll(key)));
+    this.headers.putAll(headersMap);
     return (B) this;
   }
 
