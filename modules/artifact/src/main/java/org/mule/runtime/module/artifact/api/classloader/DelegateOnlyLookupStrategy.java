@@ -10,6 +10,8 @@ package org.mule.runtime.module.artifact.api.classloader;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.api.annotation.NoInstantiate;
+
 import java.util.List;
 
 /**
@@ -18,7 +20,8 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class DelegateOnlyLookupStrategy implements LookupStrategy {
+@NoInstantiate
+public final class DelegateOnlyLookupStrategy implements LookupStrategy {
 
   private final List<ClassLoader> classLoaders;
 

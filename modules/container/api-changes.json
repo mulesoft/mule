@@ -1,0 +1,16 @@
+{
+  "4.1.1": {
+    "revapi": {
+      "ignore": [
+         {
+         "code": "java.class.removed",
+         "old": "class org.mule.runtime.container.api.MetadataInvocationHandler<T extends java.lang.Object>",
+         "package": "org.mule.runtime.container.api",
+         "classSimpleName": "MetadataInvocationHandler",
+         "elementKind": "class",
+         "justification": "Class was not meant to be part of the API"
+         }
+      ]
+    }
+  }
+}

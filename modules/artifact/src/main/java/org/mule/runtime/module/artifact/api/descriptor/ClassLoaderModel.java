@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * Contains all the information needed to create a {@link ClassLoader} for a Mule artifact.
  */
-public class ClassLoaderModel {
+public final class ClassLoaderModel {
 
   /**
    * Defines a {@link ClassLoaderModel} with empty configuration

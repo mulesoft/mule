@@ -17,7 +17,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterface
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.container.api.MetadataInvocationHandler;
+import org.mule.runtime.container.internal.MetadataInvocationHandler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.internal.config.preferred.PreferredObjectSelector;

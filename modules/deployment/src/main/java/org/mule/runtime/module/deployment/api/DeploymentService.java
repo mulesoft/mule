@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.api;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 
@@ -19,6 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Manages deploy of mule applications
  */
+@NoImplement
 public interface DeploymentService extends DeploymentListenerManager, DomainDeploymentListenerManager,
     DomainBundleDeploymentListenerManager {
 

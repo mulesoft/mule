@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 
 import java.util.Optional;
@@ -14,6 +15,7 @@ import java.util.Optional;
 /**
  * Maintains the registered {@link DescriptorLoader}
  */
+@NoImplement
 public interface DescriptorLoaderRepository {
 
   /**

@@ -9,13 +9,16 @@ package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
+import org.mule.api.annotation.NoInstantiate;
+
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Creates {@link DefaultArtifactClassLoaderFilter} instances
  */
-public class ArtifactClassLoaderFilterFactory implements ClassLoaderFilterFactory {
+@NoInstantiate
+public final class ArtifactClassLoaderFilterFactory implements ClassLoaderFilterFactory {
 
   private static final String PACKAGE_SEPARATOR = "/";
 

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.deployment.model.api.application;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
@@ -14,6 +15,7 @@ import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 /**
  * Manages the policies that must be applied to a given application
  */
+@NoImplement
 public interface ApplicationPolicyManager {
 
   /**

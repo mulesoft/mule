@@ -11,6 +11,7 @@ import static java.util.Collections.unmodifiableSet;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -25,7 +26,8 @@ import java.util.stream.Collectors;
  * classes or subpackages from a blocked package.
  * </p>
  */
-public class DefaultArtifactClassLoaderFilter implements ArtifactClassLoaderFilter {
+@NoInstantiate
+public final class DefaultArtifactClassLoaderFilter implements ArtifactClassLoaderFilter {
 
   public static final ArtifactClassLoaderFilter NULL_CLASSLOADER_FILTER =
       new DefaultArtifactClassLoaderFilter(Collections.EMPTY_SET, Collections.EMPTY_SET);

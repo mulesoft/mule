@@ -16,7 +16,7 @@ import java.net.URI;
  *
  * @since 4.0
  */
-public class BundleDependency {
+public final class BundleDependency {
 
   private BundleDescriptor descriptor;
   private BundleScope scope;

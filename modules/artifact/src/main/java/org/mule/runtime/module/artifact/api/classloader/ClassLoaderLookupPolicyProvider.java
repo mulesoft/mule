@@ -7,9 +7,12 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Enables access {@link ClassLoaderLookupPolicy} used on a given classLoader.
  */
+@NoImplement
 public interface ClassLoaderLookupPolicyProvider {
 
   /**

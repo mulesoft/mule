@@ -10,7 +10,7 @@ package org.mule.runtime.module.artifact.api.descriptor;
 /**
  * Thrown to indicate any error related to errors in the structure of a plugin file or folder.
  */
-public class ArtifactDescriptorCreateException extends RuntimeException {
+public final class ArtifactDescriptorCreateException extends RuntimeException {
 
   /**
    * {@inheritDoc}

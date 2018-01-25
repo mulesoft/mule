@@ -11,7 +11,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 /**
  *
  */
-public class DeploymentStartException extends DeploymentException {
+public final class DeploymentStartException extends DeploymentException {
 
   public DeploymentStartException(I18nMessage message) {
     super(message);

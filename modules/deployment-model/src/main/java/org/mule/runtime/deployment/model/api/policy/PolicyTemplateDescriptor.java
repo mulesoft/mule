@@ -8,22 +8,21 @@
 package org.mule.runtime.deployment.model.api.policy;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
-
 /**
  * Describes how to create a {@link PolicyTemplate} artifact
  *
  * @since 4.0
  */
-public class PolicyTemplateDescriptor extends ArtifactDescriptor {
+public final class PolicyTemplateDescriptor extends ArtifactDescriptor {
 
   public static final String DEFAULT_POLICY_CONFIGURATION_RESOURCE = "policy.xml";
   public static final String META_INF = "META-INF";

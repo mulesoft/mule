@@ -1,4 +1,543 @@
 {
+  "4.1.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.Artifact<D extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "new": "interface org.mule.runtime.module.artifact.api.Artifact<D extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilterFactory",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilterFactory",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "ArtifactClassLoaderFilterFactory",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilterFactory",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilterFactory",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilterFactory",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilterFactory",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicyProvider",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicyProvider",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "DefaultArtifactClassLoaderFilter",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "annotation": "@org.mule.api.annotation.NoInstantiate",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "DefaultArtifactClassLoaderFilter",
+          "elementKind": "class",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "DelegateOnlyLookupStrategy",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "annotation": "@org.mule.api.annotation.NoInstantiate",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "DelegateOnlyLookupStrategy",
+          "elementKind": "class",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.DirectoryResourceLocator",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.DirectoryResourceLocator",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "DirectoryResourceLocator",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.DirectoryResourceLocator",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.DirectoryResourceLocator",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.ExportedService",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.ExportedService",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "ExportedService",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.ExportedService",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.ExportedService",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.LocalResourceLocator",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.LocalResourceLocator",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.LookupStrategy",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.LookupStrategy",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.RegionOwnerArtifact",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.RegionOwnerArtifact",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.ResourceReleaser",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.ResourceReleaser",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.classloader.ShutdownListener",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.ShutdownListener",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "TrackingArtifactClassLoaderFactory",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.TrackingDeployableArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.TrackingDeployableArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "TrackingDeployableArtifactClassLoaderFactory",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.TrackingDeployableArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.TrackingDeployableArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlConnection",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlConnection",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.classloader.net",
+          "classSimpleName": "MuleArtifactUrlConnection",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlConnection",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlConnection",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.classloader.net",
+          "classSimpleName": "MuleArtifactUrlStreamHandler",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.classloader.net",
+          "classSimpleName": "MuleUrlStreamHandlerFactory",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory",
+          "new": "class org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory<M extends org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel, T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory<M extends org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel, T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ArtifactDescriptorCreateException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "new": "interface org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.BundleDependency",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.BundleDependency",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "BundleDependency",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "BundleDescriptor",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ClassLoaderModel",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T extends java.lang.Object>",
+          "new": "interface org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T extends java.lang.Object>",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository",
+          "new": "interface org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.InvalidDependencyVersionException",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.InvalidDependencyVersionException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "InvalidDependencyVersionException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.InvalidDependencyVersionException",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.InvalidDependencyVersionException",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "InvalidDescriptorLoaderException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "LoaderNotFoundException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.serializer.ArtifactClassLoaderObjectInputStream",
+          "new": "class org.mule.runtime.module.artifact.api.serializer.ArtifactClassLoaderObjectInputStream",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.serializer",
+          "classSimpleName": "ArtifactClassLoaderObjectInputStream",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.serializer.ArtifactClassLoaderObjectInputStream",
+          "new": "class org.mule.runtime.module.artifact.api.serializer.ArtifactClassLoaderObjectInputStream",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.serializer.ArtifactClassLoaderObjectOutputStream",
+          "new": "class org.mule.runtime.module.artifact.api.serializer.ArtifactClassLoaderObjectOutputStream",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.serializer",
+          "classSimpleName": "ArtifactClassLoaderObjectOutputStream",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.serializer.ArtifactClassLoaderObjectOutputStream",
+          "new": "class org.mule.runtime.module.artifact.api.serializer.ArtifactClassLoaderObjectOutputStream",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer",
+          "new": "class org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.serializer",
+          "classSimpleName": "ArtifactObjectSerializer",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer",
+          "new": "class org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator",
+          "new": "interface org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder",
+          "new": "class org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.artifact.api.descriptor",
+          "classSimpleName": "ArtifactDescriptorValidatorBuilder",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        }
+      ]
+    }
+  },
   "4.1.0": {
     "revapi": {
       "ignore": [

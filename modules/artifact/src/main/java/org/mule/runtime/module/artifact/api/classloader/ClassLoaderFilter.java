@@ -7,9 +7,12 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Determines if a given class or resource is exported in a plugin classloader
  */
+@NoImplement
 public interface ClassLoaderFilter {
 
   /**

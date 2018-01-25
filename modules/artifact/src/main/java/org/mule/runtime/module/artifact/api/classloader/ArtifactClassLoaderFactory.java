@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 /**
  * Creates {@link ClassLoader} instances for Mule applications
  */
+@NoImplement
 public interface ArtifactClassLoaderFactory<T extends ArtifactDescriptor> {
 
   /**

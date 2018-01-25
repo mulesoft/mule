@@ -18,7 +18,7 @@ import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import java.util.Optional;
 import java.util.Properties;
 
-public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
+public final class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
 
   private static final String META_INF = "META-INF";
   public static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";

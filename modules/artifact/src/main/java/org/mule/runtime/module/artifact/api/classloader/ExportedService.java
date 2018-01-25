@@ -10,6 +10,8 @@ package org.mule.runtime.module.artifact.api.classloader;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.api.annotation.NoInstantiate;
+
 import java.net.URL;
 
 /**
@@ -17,7 +19,8 @@ import java.net.URL;
  *
  * @since 4.0
  */
-public class ExportedService {
+@NoInstantiate
+public final class ExportedService {
 
   private final String serviceInterface;
   private final URL resource;

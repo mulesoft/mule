@@ -9,13 +9,15 @@ package org.mule.runtime.module.artifact.api.classloader;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class DirectoryResourceLocator implements LocalResourceLocator {
+@NoInstantiate
+public final class DirectoryResourceLocator implements LocalResourceLocator {
 
   private String[] directories;
 

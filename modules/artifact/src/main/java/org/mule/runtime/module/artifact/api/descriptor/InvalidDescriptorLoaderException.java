@@ -8,10 +8,13 @@
 package org.mule.runtime.module.artifact.api.descriptor;
 
 
+import org.mule.api.annotation.NoInstantiate;
+
 /**
  * Thrown to indicate that is not possible to load an object from the provided descriptor configuration.
  */
-public class InvalidDescriptorLoaderException extends Exception {
+@NoInstantiate
+public final class InvalidDescriptorLoaderException extends Exception {
 
   /**
    * {@inheritDoc}
