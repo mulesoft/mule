@@ -85,8 +85,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
    * @return this builder
    */
   public HttpRequestBuilder queryParams(MultiMap<String, String> queryParams) {
-    queryParams.keySet()
-        .forEach(key -> this.queryParams.put(key, queryParams.getAll(key)));
+    this.queryParams.putAll(queryParams);
     return this;
   }
 
