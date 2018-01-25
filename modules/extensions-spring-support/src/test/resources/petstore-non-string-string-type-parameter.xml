@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
+
+    <flow name="spellObject">
+        <petstore:spell-object character="#[vars.character]"/>
+    </flow>
+
+    <flow name="spellBuiltIn">
+        <petstore:spell-built-in character="#[vars.char]"/>
+    </flow>
+
+    <flow name="spellClass">
+        <petstore:spell-class clazz="#[vars.class]"/>
+    </flow>
+
+</mule>
