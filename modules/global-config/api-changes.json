@@ -1,21 +1,4 @@
 {
-  "4.2.0": {
-    "revapi": {
-      "ignore": [
-        {
-          "code": "java.annotation.added",
-          "old": "interface org.mule.maven.client.api.model.MavenConfiguration",
-          "new": "interface org.mule.maven.client.api.model.MavenConfiguration",
-          "annotationType": "org.mule.api.annotation.NoImplement",
-          "annotation": "@org.mule.api.annotation.NoImplement",
-          "package": "org.mule.maven.client.api.model",
-          "classSimpleName": "MavenConfiguration",
-          "elementKind": "interface",
-          "justification": "Marked as not implemented interface as clients shouldn't implement this internal interface"
-        }
-      ]
-    }
-  },
   "4.1.0": {
     "revapi": {
       "ignore": [
