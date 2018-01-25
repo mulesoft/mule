@@ -23,14 +23,14 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.soap.api.exception.DispatchingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -58,13 +58,11 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
   @Override
   public DispatchingResponse dispatch(DispatchingRequest context) {
     InputStream content = logIfNeeded("Soap Request to [" + context.getAddress() + "]", context.getContent());
-    MultiMap<String, String> parameters = new MultiMap<>();
-    context.getHeaders().forEach(parameters::put);
     HttpRequest request = HttpRequest.builder()
         .uri(context.getAddress())
         .method(POST)
         .entity(new InputStreamHttpEntity(content))
-        .headers(parameters)
+        .headers(new MultiMap<>(context.getHeaders()))
         .build();
     try {
       HttpResponse response = client.send(request, DEFAULT_TIMEOUT_MILLIS, false, null);
