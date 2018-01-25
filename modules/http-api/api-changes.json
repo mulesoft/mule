@@ -31,7 +31,69 @@
           "package": "org.mule.runtime.http.api.domain",
           "classSimpleName": "OptimizedCaseInsensitiveMapWrapper",
           "elementKind": "class",
-          "justification": "-"
+          "justification": "This enables a performance optimization. It doesn't break the API"
+        },
+        {
+          "code": "java.field.added",
+          "new": "field org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.optimized",
+          "package": "org.mule.runtime.http.api.domain",
+          "classSimpleName": "CaseInsensitiveMultiMap",
+          "fieldName": "optimized",
+          "elementKind": "field",
+          "justification": "This enables a performance optimization. It doesn't break the API"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap::<init>(boolean)",
+          "package": "org.mule.runtime.http.api.domain",
+          "classSimpleName": "CaseInsensitiveMultiMap",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "This enables a performance optimization. It doesn't break the API"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap::<init>(org.mule.runtime.api.util.MultiMap<java.lang.String, java.lang.String>, boolean)",
+          "package": "org.mule.runtime.http.api.domain",
+          "classSimpleName": "CaseInsensitiveMultiMap",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "This enables a performance optimization. It doesn't break the API"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.http.api.domain.message.HttpMessageBuilder<B extends org.mule.runtime.http.api.domain.message.HttpMessageBuilder, M extends org.mule.runtime.http.api.domain.message.HttpMessage>::initHeaders()",
+          "package": "org.mule.runtime.http.api.domain.message",
+          "classSimpleName": "HttpMessageBuilder",
+          "methodName": "initHeaders",
+          "elementKind": "method",
+          "justification": "This enables a performance optimization. It doesn't break the API"
+        },
+        {
+          "code": "java.method.staticMethodAddedToInterface",
+          "new": "method org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder org.mule.runtime.http.api.domain.message.request.HttpRequest::builder(boolean)",
+          "package": "org.mule.runtime.http.api.domain.message.request",
+          "classSimpleName": "HttpRequest",
+          "methodName": "builder",
+          "elementKind": "method",
+          "justification": "This enables a performance optimization. It doesn't break the API"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder::initHeaders()",
+          "package": "org.mule.runtime.http.api.domain.message.response",
+          "classSimpleName": "HttpResponseBuilder",
+          "methodName": "initHeaders",
+          "elementKind": "method",
+          "justification": "This enables a performance optimization. It doesn't break the API"
+        },
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.server.HttpServerProperties",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "HttpServerProperties",
+          "elementKind": "class",
+          "justification": "This enables a performance optimization. It doesn't break the API"
         }
       ]
     }

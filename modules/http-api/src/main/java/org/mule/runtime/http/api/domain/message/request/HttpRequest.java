@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.http.api.domain.message.request;
 
-import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.http.api.domain.message.HttpMessage;
 
 import java.net.URI;
@@ -23,7 +23,11 @@ public interface HttpRequest extends HttpMessage {
    * @return an {@link HttpRequestBuilder}
    */
   static HttpRequestBuilder builder() {
-    return new HttpRequestBuilder();
+    return new HttpRequestBuilder(false);
+  }
+
+  static HttpRequestBuilder builder(boolean preserveHeadersCase) {
+    return new HttpRequestBuilder(preserveHeadersCase);
   }
 
   /**

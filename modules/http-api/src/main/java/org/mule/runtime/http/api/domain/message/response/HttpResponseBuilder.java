@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.http.api.domain.message.response;
 
+import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
+
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.message.HttpMessageBuilder;
 
 /**
@@ -28,6 +31,11 @@ public final class HttpResponseBuilder extends HttpMessageBuilder<HttpResponseBu
   public HttpResponseBuilder(HttpResponse httpResponse) {
     super(httpResponse);
     responseStatus(httpResponse);
+  }
+
+  @Override
+  protected void initHeaders() {
+    headers = new CaseInsensitiveMultiMap(!PRESERVE_HEADER_CASE);
   }
 
   private void responseStatus(HttpResponse httpResponse) {
