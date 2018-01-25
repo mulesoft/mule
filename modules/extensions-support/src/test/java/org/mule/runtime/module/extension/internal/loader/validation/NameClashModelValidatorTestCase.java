@@ -38,6 +38,7 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -80,6 +81,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   @Rule
   public ExpectedException exception = ExpectedException.none();
 
+  private static final String FUNCTION_NAME = "function";
   private static final String CONSTRUCT_NAME = "construct";
   private static final String TOP_LEVEL_CONSTRUCT_PARAM_NAME = "topLevelConstructParam";
   private static final String OPERATION_NAME = "operation";
@@ -118,6 +120,9 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   @Mock
   private ConstructModel constructModel;
 
+  @Mock
+  private FunctionModel functionModel;
+
   private XmlDslModel xmlDslModel = new XmlDslModel();
   private ParameterModel simpleConfigParam;
   private ParameterModel topLevelConfigParam;
@@ -127,6 +132,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   private ParameterModel topLevelConnectionProviderParam;
   private ParameterModel simpleConstructParam;
   private ParameterModel topLevelConstructParam;
+  private ParameterModel simpleFunctionParam;
   private BaseTypeBuilder baseTypeBuilder = BaseTypeBuilder.create(JAVA);
 
   private MetadataType childTestList = baseTypeBuilder.arrayType()
@@ -156,6 +162,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(extensionModel.getSourceModels()).thenReturn(singletonList(sourceModel));
     when(extensionModel.getConstructModels()).thenReturn(singletonList(constructModel));
     when(extensionModel.getXmlDslModel()).thenReturn(xmlDslModel);
+    when(extensionModel.getFunctionModels()).thenReturn(singletonList(functionModel));
 
     simpleConfigParam = getParameter(SIMPLE_PARAM_NAME, String.class);
     topLevelConfigParam = getParameter(TOP_LEVEL_OPERATION_PARAM_NAME, TopLevelTest.class);
@@ -169,6 +176,8 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     simpleConstructParam = getParameter(SIMPLE_PARAM_NAME, String.class);
     topLevelConstructParam = getParameter(TOP_LEVEL_CONSTRUCT_PARAM_NAME, TopLevelTest.class);
 
+    simpleFunctionParam = getParameter(SIMPLE_PARAM_NAME, String.class);
+
     when(configurationModel.getName()).thenReturn(CONFIG_NAME);
     when(configurationModel.getAllParameterModels()).thenReturn(asList(simpleConfigParam, topLevelConfigParam));
     when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
@@ -180,6 +189,9 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
     when(constructModel.getName()).thenReturn(CONSTRUCT_NAME);
     when(constructModel.getAllParameterModels()).thenReturn(asList(simpleConstructParam, topLevelConstructParam));
+
+    when(functionModel.getName()).thenReturn(FUNCTION_NAME);
+    when(functionModel.getAllParameterModels()).thenReturn(asList(simpleFunctionParam));
 
     mockModelProperties(operationModel);
     mockModelProperties(configurationModel);
@@ -762,6 +774,78 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestList);
     ParameterModel singular = getParameter(CHILD_SINGULAR_PARAM_NAME, ChildObjectTest.class);
     when(constructModel.getAllParameterModels()).thenReturn(asList(singular, offending));
+    validate();
+  }
+
+  @Test
+  public void repeatedFunctionNames() {
+    exception.expect(IllegalModelDefinitionException.class);
+    FunctionModel anotherFunctionModel = mock(FunctionModel.class);
+    when(anotherFunctionModel.getName()).thenReturn(FUNCTION_NAME);
+    when(anotherFunctionModel.getAllParameterModels()).thenReturn(emptyList());
+    when(extensionModel.getFunctionModels()).thenReturn(asList(functionModel, anotherFunctionModel));
+    validate();
+  }
+
+  @Test
+  public void differentFunctionNames() {
+    FunctionModel anotherFunctionModel = mock(FunctionModel.class);
+    when(anotherFunctionModel.getName()).thenReturn("another-" + FUNCTION_NAME);
+    when(anotherFunctionModel.getAllParameterModels()).thenReturn(emptyList());
+    when(extensionModel.getFunctionModels()).thenReturn(asList(functionModel, anotherFunctionModel));
+    validate();
+  }
+
+  @Test
+  public void functionNameClashWithOperationName() {
+    when(functionModel.getName()).thenReturn(OPERATION_NAME);
+    validate();
+  }
+
+  @Test
+  public void operationNameClashesWithAnotherOperationName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    OperationModel anotherOperationModel = mock(OperationModel.class);
+    when(anotherOperationModel.getName()).thenReturn(OPERATION_NAME);
+    when(extensionModel.getOperationModels()).thenReturn(asList(operationModel, anotherOperationModel));
+    validate();
+  }
+
+  @Test
+  public void configurationNameClashesWithAnotherConfigurationName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ConfigurationModel anotherConfigurationModel = mock(ConfigurationModel.class);
+    when(anotherConfigurationModel.getName()).thenReturn(CONFIG_NAME);
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel, anotherConfigurationModel));
+    validate();
+  }
+
+  @Test
+  public void sourceNameClashesWithSourceName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    SourceModel anotherSourceModel = mock(SourceModel.class);
+    when(anotherSourceModel.getName()).thenReturn(SOURCE_NAME);
+    when(anotherSourceModel.getErrorCallback()).thenReturn(empty());
+    when(anotherSourceModel.getSuccessCallback()).thenReturn(empty());
+    when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel, anotherSourceModel));
+    validate();
+  }
+
+  @Test
+  public void constructNameClashesWithAnotherConstructName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ConstructModel anotherConstructModel = mock(ConstructModel.class);
+    when(anotherConstructModel.getName()).thenReturn(CONSTRUCT_NAME);
+    when(extensionModel.getConstructModels()).thenReturn(asList(constructModel, anotherConstructModel));
+    validate();
+  }
+
+  @Test
+  public void connectionProviderNameClashesWithAnotherConnectionProviderName() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ConnectionProviderModel anotherConnectionProviderModel = mock(ConnectionProviderModel.class);
+    when(anotherConnectionProviderModel.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
+    when(extensionModel.getConnectionProviders()).thenReturn(asList(connectionProviderModel, anotherConnectionProviderModel));
     validate();
   }
 
