@@ -147,7 +147,8 @@ public class DefaultMuleContext implements MuleContext
      * as the one in the Registry.
      */
     protected MuleContextLifecycleManager lifecycleManager;
-
+    private Object lifecycleStateLock = new Object();
+    
     protected ServerNotificationManager notificationManager;
 
     private MuleConfiguration config;
@@ -249,87 +250,93 @@ public class DefaultMuleContext implements MuleContext
     }
 
     @Override
-    public synchronized void initialise() throws InitialisationException
+    public void initialise() throws InitialisationException
     {
-        lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
-
-        if (getNotificationManager() == null)
+        synchronized (lifecycleStateLock)
         {
-            throw new MuleRuntimeException(
-                    CoreMessages.objectIsNull(MuleProperties.OBJECT_NOTIFICATION_MANAGER));
-        }
-        if (workManager == null)
-        {
-            throw new MuleRuntimeException(CoreMessages.objectIsNull("workManager"));
-        }
-
-        try
-        {
-            JdkVersionUtils.validateJdk();
-        }
-        catch (RuntimeException e)
-        {
-            throw new InitialisationException(CoreMessages.invalidJdk(SystemUtils.JAVA_VERSION,
-                                                                      JdkVersionUtils.getSupportedJdks()), this);
-        }
-
-        try
-        {
-            // Initialize the helper, this only initialises the helper class and does not call the registry lifecycle manager
-            //The registry lifecycle is called below using 'getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);'
-            muleRegistryHelper.initialise();
-
-            //We need to start the work manager straight away since we need it to fire notifications
-            if (workManager instanceof MuleContextAware)
+            lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
+    
+            if (getNotificationManager() == null)
             {
-                MuleContextAware contextAware = (MuleContextAware) workManager;
-                contextAware.setMuleContext(this);
+                throw new MuleRuntimeException(
+                        CoreMessages.objectIsNull(MuleProperties.OBJECT_NOTIFICATION_MANAGER));
             }
-
-            workManager.start();
-            getNotificationManager().start(workManager, workListener);
-            fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISING));
-            getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
-
-            if (expressionManager instanceof Initialisable)
+            if (workManager == null)
             {
-                ((Initialisable) expressionManager).initialise();
+                throw new MuleRuntimeException(CoreMessages.objectIsNull("workManager"));
             }
-
-            fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISED));
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
+    
+            try
+            {
+                JdkVersionUtils.validateJdk();
+            }
+            catch (RuntimeException e)
+            {
+                throw new InitialisationException(CoreMessages.invalidJdk(SystemUtils.JAVA_VERSION,
+                                                                          JdkVersionUtils.getSupportedJdks()), this);
+            }
+    
+            try
+            {
+                // Initialize the helper, this only initialises the helper class and does not call the registry lifecycle manager
+                //The registry lifecycle is called below using 'getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);'
+                muleRegistryHelper.initialise();
+    
+                //We need to start the work manager straight away since we need it to fire notifications
+                if (workManager instanceof MuleContextAware)
+                {
+                    MuleContextAware contextAware = (MuleContextAware) workManager;
+                    contextAware.setMuleContext(this);
+                }
+    
+                workManager.start();
+                getNotificationManager().start(workManager, workListener);
+                fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISING));
+                getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
+    
+                if (expressionManager instanceof Initialisable)
+                {
+                    ((Initialisable) expressionManager).initialise();
+                }
+    
+                fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISED));
+            }
+            catch (Exception e)
+            {
+                throw new InitialisationException(e, this);
+            }
         }
     }
 
     @Override
-    public synchronized void start() throws MuleException
+    public void start() throws MuleException
     {
-        getLifecycleManager().checkPhase(Startable.PHASE_NAME);
-
-        if (getQueueManager() == null)
+        synchronized (lifecycleStateLock)
         {
-            throw new MuleRuntimeException(CoreMessages.objectIsNull("queueManager"));
-        }
+            getLifecycleManager().checkPhase(Startable.PHASE_NAME);
 
-        startDate = System.currentTimeMillis();
-
-        fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
-        getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
-        overridePollingController();
-        overrideClusterConfiguration();
-        startMessageSources();
-
-        fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
-
-        startLatch.release();
-
-        if (logger.isInfoEnabled())
-        {
-            SplashScreen startupScreen = buildStartupSplash();
-            logger.info(startupScreen.toString());
+            if (getQueueManager() == null)
+            {
+                throw new MuleRuntimeException(CoreMessages.objectIsNull("queueManager"));
+            }
+    
+            startDate = System.currentTimeMillis();
+    
+            fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTING));
+            getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
+            overridePollingController();
+            overrideClusterConfiguration();
+            startMessageSources();
+    
+            fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STARTED));
+    
+            startLatch.release();
+    
+            if (logger.isInfoEnabled())
+            {
+                SplashScreen startupScreen = buildStartupSplash();
+                logger.info(startupScreen.toString());
+            }
         }
     }
 
@@ -404,68 +411,74 @@ public class DefaultMuleContext implements MuleContext
      * @throws MuleException if either any of the sessions or connectors fail to stop
      */
     @Override
-    public synchronized void stop() throws MuleException
+    public void stop() throws MuleException
     {
-        startLatch.release();
-
-        getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
-        fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPING));
-        getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
-        fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPED));
+        synchronized (lifecycleStateLock)
+        {
+            startLatch.release();
+    
+            getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
+            fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPING));
+            getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
+            fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_STOPPED));
+        }
     }
 
     @Override
-    public synchronized void dispose()
+    public void dispose()
     {
-        if (isStarted() || (lifecycleManager.getLastPhaseExecuted() != null
-                            && (lifecycleManager.getLastPhaseExecuted().equals(Startable.PHASE_NAME)
-                                && lifecycleManager.isLastPhaseExecutionFailed())))
+        synchronized (lifecycleStateLock)
         {
+            if (isStarted() || (lifecycleManager.getLastPhaseExecuted() != null
+                                && (lifecycleManager.getLastPhaseExecuted().equals(Startable.PHASE_NAME)
+                                    && lifecycleManager.isLastPhaseExecutionFailed())))
+            {
+                try
+                {
+                    stop();
+                }
+                catch (MuleException e)
+                {
+                    logger.error("Failed to stop Mule context", e);
+                }
+            }
+    
+            getLifecycleManager().checkPhase(Disposable.PHASE_NAME);
+    
+            fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_DISPOSING));
+    
             try
             {
-                stop();
+                getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);
+    
+                // THis is a little odd. I find the relationship between the MuleRegistry Helper and the registry broker, too much abstraction?
+                muleRegistryHelper.dispose();
             }
-            catch (MuleException e)
+            catch (Exception e)
             {
-                logger.error("Failed to stop Mule context", e);
+                logger.debug("Failed to cleanly dispose Mule: " + e.getMessage(), e);
             }
+    
+            notificationManager.fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_DISPOSED));
+    
+            notificationManager.dispose();
+            workManager.dispose();
+    
+            if (expressionManager != null && expressionManager instanceof Disposable)
+            {
+                ((Disposable) expressionManager).dispose();
+            }
+    
+            if ((getStartDate() > 0) && logger.isInfoEnabled())
+            {
+                SplashScreen shutdownScreen = buildShutdownSplash();
+                logger.info(shutdownScreen.toString());
+            }
+    
+            //registryBroker.dispose();
+    
+            setExecutionClassLoader(null);
         }
-
-        getLifecycleManager().checkPhase(Disposable.PHASE_NAME);
-
-        fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_DISPOSING));
-
-        try
-        {
-            getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);
-
-            // THis is a little odd. I find the relationship between the MuleRegistry Helper and the registry broker, too much abstraction?
-            muleRegistryHelper.dispose();
-        }
-        catch (Exception e)
-        {
-            logger.debug("Failed to cleanly dispose Mule: " + e.getMessage(), e);
-        }
-
-        notificationManager.fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_DISPOSED));
-
-        notificationManager.dispose();
-        workManager.dispose();
-
-        if (expressionManager != null && expressionManager instanceof Disposable)
-        {
-            ((Disposable) expressionManager).dispose();
-        }
-
-        if ((getStartDate() > 0) && logger.isInfoEnabled())
-        {
-            SplashScreen shutdownScreen = buildShutdownSplash();
-            logger.info(shutdownScreen.toString());
-        }
-
-        //registryBroker.dispose();
-
-        setExecutionClassLoader(null);
     }
 
     /**
