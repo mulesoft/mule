@@ -27,14 +27,21 @@ import java.util.Optional;
  */
 public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends HttpMessage> {
 
-  protected MultiMap<String, String> headers = new CaseInsensitiveMultiMap();
+  protected MultiMap<String, String> headers;
   protected HttpEntity entity = new EmptyHttpEntity();
 
-  public HttpMessageBuilder() {}
+  public HttpMessageBuilder() {
+    initHeaders();
+  }
 
   protected HttpMessageBuilder(HttpMessage httpMessage) {
     entity(httpMessage.getEntity());
+    initHeaders();
     headers(httpMessage);
+  }
+
+  protected void initHeaders() {
+    headers = new CaseInsensitiveMultiMap();
   }
 
   private void headers(HttpMessage httpMessage) {

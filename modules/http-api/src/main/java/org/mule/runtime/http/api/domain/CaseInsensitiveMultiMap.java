@@ -11,6 +11,7 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.toCollection;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.api.util.MultiMap;
 
 import java.util.LinkedHashMap;
@@ -24,14 +25,27 @@ import java.util.LinkedList;
 @NoExtend
 public class CaseInsensitiveMultiMap extends MultiMap<String, String> {
 
-  private static final long serialVersionUID = -7231875232585176671L;
+  private static final long serialVersionUID = -3754163327838153655L;
+
+  protected final boolean optimized;
 
   public CaseInsensitiveMultiMap() {
     this(new MultiMap<>());
   }
 
+  public CaseInsensitiveMultiMap(boolean optimized) {
+    this(new MultiMap<>(), optimized);
+  }
+
   public CaseInsensitiveMultiMap(MultiMap<String, String> paramsMap) {
-    this.paramsMap = new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+    this(paramsMap, true);
+  }
+
+  public CaseInsensitiveMultiMap(MultiMap<String, String> paramsMap, boolean optimized) {
+    this.optimized = optimized;
+    this.paramsMap = optimized
+        ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
+        : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
     for (String key : paramsMap.keySet()) {
       this.paramsMap.put(key, paramsMap.getAll(key).stream().collect(toCollection(LinkedList::new)));
     }
@@ -50,9 +64,8 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> {
     private static final long serialVersionUID = -1048913048598100657L;
 
     public ImmutableCaseInsensitiveMultiMap(CaseInsensitiveMultiMap caseInsensitiveMultiMap) {
-      super(caseInsensitiveMultiMap);
+      super(caseInsensitiveMultiMap, caseInsensitiveMultiMap.optimized);
       this.paramsMap = unmodifiableMap(paramsMap);
     }
   }
-
 }

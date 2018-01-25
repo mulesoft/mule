@@ -9,9 +9,11 @@ package org.mule.runtime.http.api.domain.message.request;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 import static org.mule.runtime.http.api.utils.UriCache.getUriFromString;
+
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.HttpConstants.Method;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
+import org.mule.runtime.http.api.domain.message.HttpMessage;
 import org.mule.runtime.http.api.domain.message.HttpMessageBuilder;
 
 import java.net.URI;
@@ -30,7 +32,9 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   private String method = GET.name();
   private MultiMap<String, String> queryParams = new MultiMap<>();
 
-  HttpRequestBuilder() {}
+  HttpRequestBuilder(boolean preserveHeadersCase) {
+    headers = new CaseInsensitiveMultiMap(!preserveHeadersCase);
+  }
 
   /**
    * Declares the URI where this {@link HttpRequest} will be sent. Minimum required configuration.
@@ -58,7 +62,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
 
   /**
    * Allows for using extension methods, as defined in the rfc. In general, {@link #method(Method)} should be used.
-   * 
+   *
    * @param method the HTTP method of the {@link HttpRequest} desired. Non null.
    * @return this builder
    */
