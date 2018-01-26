@@ -19,6 +19,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.TLS_CRL_FILE_ELEMENT_ID
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CUSTOM_OCSP_RESPONDER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_STANDARD_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
+
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tx.TransactionType;
@@ -58,7 +59,8 @@ public final class InfrastructureTypeMapping {
   private static Map<Type, InfrastructureType> TYPE_MAPPING = MAPPING.entrySet()
       .stream()
       .collect(toImmutableMap(entry -> new TypeWrapper(entry.getKey(),
-                                                       new DefaultExtensionsTypeLoaderFactory().createTypeLoader()),
+                                                       new DefaultExtensionsTypeLoaderFactory()
+                                                           .createTypeLoader(InfrastructureTypeMapping.class.getClassLoader())),
                               Map.Entry::getValue));
 
   public static Optional<InfrastructureType> getInfrastructureType(Type type) {
