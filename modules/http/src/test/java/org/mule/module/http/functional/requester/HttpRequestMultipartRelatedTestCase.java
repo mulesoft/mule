@@ -48,18 +48,13 @@ public class HttpRequestMultipartRelatedTestCase extends AbstractHttpRequestTest
     }
 
     @Test
-    public void getMultipartContentWithoutContentDisposition() throws Exception
-    {
-        testWithPath("/");
-    }
-
-    private void testWithPath(String path) throws Exception
+    public void testMultipartRelated() throws Exception
     {
         MuleEvent testEvent = getTestEvent(null);
-        testEvent.getMessage().setInvocationProperty("requestPath", path);
         MuleEvent response = runFlow("requestFlow", testEvent);
         DataHandler attachment = response.getMessage().getInboundAttachment(CONTENT_ID_VALUE);
         assertThat(IOUtils.toString(attachment.getDataSource().getInputStream()), is("test"));
         assertThat(response.getMessage().getInboundProperty("content-type").toString(), containsString(CONTENT_TYPE_VALUE));
     }
+
 }

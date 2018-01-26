@@ -9,7 +9,7 @@
     <http:request-config name="requestConfig" host="localhost" port="${httpPort}" />
 
     <flow name="requestFlow">
-        <http:request config-ref="requestConfig" method="GET" path="#[requestPath]" />
+        <http:request config-ref="requestConfig" method="GET" path="/" />
     </flow>
 
 </mule>

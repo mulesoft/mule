@@ -41,7 +41,7 @@ public class HttpListenerMultipartRelatedTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testStateOfMessageAfterMultiFormRequest() throws Exception
+    public void testMultipartRelatedWithContentID() throws Exception
     {
         MuleEvent request = getTestEvent(null);
         request.getMessage().setOutboundProperty("Content-Type", "multipart/related");

@@ -92,7 +92,6 @@ public class HttpParser
 
                 String filename = part.getFileName();
                 String partName = filename;
-
                 String[] contentDispositions = part.getHeader(CONTENT_DISPOSITION);
                 if (contentDispositions != null)
                 {
