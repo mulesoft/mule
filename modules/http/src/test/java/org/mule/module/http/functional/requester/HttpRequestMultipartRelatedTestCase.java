@@ -51,6 +51,7 @@ public class HttpRequestMultipartRelatedTestCase extends AbstractHttpRequestTest
     public void testMultipartRelated() throws Exception
     {
         MuleEvent testEvent = getTestEvent(null);
+        testEvent.getMessage().setInvocationProperty("requestPath", "/");
         MuleEvent response = runFlow("requestFlow", testEvent);
         DataHandler attachment = response.getMessage().getInboundAttachment(CONTENT_ID_VALUE);
         assertThat(IOUtils.toString(attachment.getDataSource().getInputStream()), is("test"));
