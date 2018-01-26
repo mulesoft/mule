@@ -25,7 +25,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader implements ApplicationClassLoader {
 
@@ -56,6 +58,23 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
     // Always the first element corresponds to the application's classes folder
     ClassLoaderModel classLoaderModel = this.<ApplicationDescriptor>getArtifactDescriptor().getClassLoaderModel();
     return new String[] {toFile(classLoaderModel.getUrls()[0]).getPath()};
+  }
+
+  /**
+   * Resolves the plugin classloader of the thread context class loader artifact and all it's ancestor
+   */
+  public static List<ClassLoader> resolveContextArtifactAndAncestorsPluginClassLoaders() {
+    Set<ClassLoader> resolvedClassLoaders = new HashSet<>();
+    ClassLoader originalClassLoader = currentThread().getContextClassLoader();
+    ClassLoader tmpClassLoader = originalClassLoader;
+    resolvedClassLoaders.addAll(resolveContextArtifactPluginClassLoaders());
+    while (tmpClassLoader.getParent() != null) {
+      tmpClassLoader = tmpClassLoader.getParent();
+      currentThread().setContextClassLoader(tmpClassLoader);
+      resolvedClassLoaders.addAll(resolveContextArtifactPluginClassLoaders());
+    }
+    currentThread().setContextClassLoader(originalClassLoader);
+    return new ArrayList<>(resolvedClassLoaders);
   }
 
   /**
