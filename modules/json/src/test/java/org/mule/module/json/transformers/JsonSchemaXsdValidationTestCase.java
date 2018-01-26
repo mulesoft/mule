@@ -154,12 +154,14 @@ public class JsonSchemaXsdValidationTestCase extends AbstractMuleContextTestCase
         public void error(SAXParseException exception) throws SAXException
         {
             errorCount++;
+            throw exception;
         }
 
         @Override
         public void fatalError(SAXParseException exception) throws SAXException
         {
             errorCount++;
+            throw exception;
         }
 
         public int getErrorCount()
