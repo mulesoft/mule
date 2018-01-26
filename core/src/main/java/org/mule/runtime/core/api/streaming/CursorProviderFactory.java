@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.streaming;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -16,6 +17,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
  * @param <T> the generic type of the streams being cursored
  * @since 4.0
  */
+@NoImplement
 public interface CursorProviderFactory<T> {
 
   /**

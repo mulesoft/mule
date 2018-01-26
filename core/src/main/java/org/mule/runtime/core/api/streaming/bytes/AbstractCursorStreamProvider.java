@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.streaming.bytes;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -20,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @since 4.0
  */
+@NoExtend
 public abstract class AbstractCursorStreamProvider extends AbstractComponent implements CursorStreamProvider {
 
   protected final InputStream wrappedStream;

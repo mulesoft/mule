@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
 
+@NoImplement
 public interface ServerNotificationHandler {
 
   /**

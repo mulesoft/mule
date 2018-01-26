@@ -111,4 +111,6 @@ public class Once {
     protected final ReentrantLock lock = new ReentrantLock();
     protected volatile boolean done = false;
   }
+
+  private Once() {}
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.event;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
@@ -33,6 +34,7 @@ import java.util.Optional;
  *
  * @see Message
  */
+@NoImplement
 public interface CoreEvent extends Serializable, Event {
 
   /**

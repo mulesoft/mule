@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.api.extension;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 
+@NoImplement
 public interface RuntimeExtensionModelProvider {
 
   ExtensionModel createExtensionModel();

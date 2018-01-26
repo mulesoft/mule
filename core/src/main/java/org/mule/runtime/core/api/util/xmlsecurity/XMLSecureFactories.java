@@ -21,7 +21,7 @@ import javax.xml.validation.Validator;
 /**
  * Provide XML parser factories configured to avoid XXE and BL attacks according to global configuration (safe by default)
  */
-public class XMLSecureFactories {
+public final class XMLSecureFactories {
 
   public static final String EXTERNAL_ENTITIES_PROPERTY =
       SYSTEM_PROPERTY_PREFIX + "xml.expandExternalEntities";

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
 
 import java.util.Collection;
@@ -15,6 +16,7 @@ import java.util.Map;
 /**
  * <code>AllStatistics</code> TODO
  */
+@NoExtend
 public class AllStatistics {
 
   private boolean isStatisticsEnabled;

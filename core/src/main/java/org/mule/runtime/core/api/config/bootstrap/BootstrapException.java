@@ -12,7 +12,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 /**
  * Represents exceptions during the bootstrap configuration process
  */
-public class BootstrapException extends ConfigurationException {
+public final class BootstrapException extends ConfigurationException {
 
   /**
    * Serial version

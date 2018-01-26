@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.processor.objectfactory;
 
 import static java.lang.String.format;
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+@NoExtend
 public class MessageProcessorChainObjectFactory extends AbstractComponentFactory<MessageProcessorChain> {
 
   @Inject

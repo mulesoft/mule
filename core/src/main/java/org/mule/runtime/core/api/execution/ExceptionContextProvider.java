@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.execution;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 
@@ -19,6 +20,7 @@ import java.util.Map;
  *
  * @since 3.8.0
  */
+@NoImplement
 public interface ExceptionContextProvider {
 
   /**

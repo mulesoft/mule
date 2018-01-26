@@ -18,4 +18,5 @@ public class MuleDeploymentProperties {
       MULE_LAZY_INIT_DEPLOYMENT_PROPERTY + ".enableXmlValidations";
   public static final String MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY = DEPLOYMENT_PROPERTY_PREFIX + ".lazyConnections";
 
+  private MuleDeploymentProperties() {}
 }

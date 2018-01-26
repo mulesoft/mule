@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.configurationBu
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
  * {@link ConfigResource} objects are used over strings since they can be more descriptive, but Strings will be supported for
  * quite some time.
  */
+@NoExtend
 public abstract class AbstractResourceConfigurationBuilder extends AbstractConfigurationBuilder {
 
   private static final Logger LOGGER = getLogger(AbstractResourceConfigurationBuilder.class);

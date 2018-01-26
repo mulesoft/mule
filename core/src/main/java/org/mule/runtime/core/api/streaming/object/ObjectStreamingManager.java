@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.streaming.object;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 
 /**
@@ -14,6 +15,7 @@ import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ObjectStreamingManager {
 
   /**

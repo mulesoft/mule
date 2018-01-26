@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.policy;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -22,6 +23,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
+@NoImplement
 public interface PolicyStateHandler {
 
   /**

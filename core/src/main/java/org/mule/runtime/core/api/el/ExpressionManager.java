@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.el;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
@@ -21,6 +22,7 @@ import java.util.Iterator;
  * Provides universal access for evaluating expressions embedded in Mule configurations, such as XML, Java, scripting and
  * annotations.
  */
+@NoImplement
 public interface ExpressionManager extends MuleExpressionLanguage {
 
   String DEFAULT_EXPRESSION_PREFIX = "#[";

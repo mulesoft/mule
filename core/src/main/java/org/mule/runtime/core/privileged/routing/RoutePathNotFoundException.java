@@ -13,7 +13,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
  * <code>RoutePathNotFoundException</code> is thrown if a routing path for an event cannot be found. This can be caused if there
  * is no (or no matching) endpoint for the event to route through.
  */
-public class RoutePathNotFoundException extends RoutingException {
+public final class RoutePathNotFoundException extends RoutingException {
 
   /**
    * Serial version

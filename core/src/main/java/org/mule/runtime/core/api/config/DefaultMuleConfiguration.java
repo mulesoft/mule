@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.serialization.ObjectSerializer;
@@ -46,6 +47,7 @@ import org.slf4j.Logger;
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after starting the MuleContext. TODO
  * MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
  */
+@NoExtend
 public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware, InternalComponent {
 
   protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);

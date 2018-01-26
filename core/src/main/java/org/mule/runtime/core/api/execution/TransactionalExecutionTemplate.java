@@ -37,7 +37,7 @@ import org.mule.runtime.core.internal.execution.ValidateTransactionalStateInterc
  * </ul>
  *
  */
-public class TransactionalExecutionTemplate<T> implements ExecutionTemplate<T> {
+public final class TransactionalExecutionTemplate<T> implements ExecutionTemplate<T> {
 
   private ExecutionInterceptor<T> executionInterceptor;
 

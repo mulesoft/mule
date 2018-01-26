@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * This class acts as a wrapper for configuration attributes that support simple text, expression or regular expressions. It can
  * be extended to support other cases too.
  */
-public class AttributeEvaluator {
+public final class AttributeEvaluator {
 
   private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = compile("^#\\[(?:(?!#\\[).)*]$", DOTALL);
   private static final List<Class<?>> BLACK_LIST_TYPES =

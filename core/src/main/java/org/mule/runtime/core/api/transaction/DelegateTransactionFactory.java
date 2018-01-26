@@ -16,7 +16,7 @@ import org.mule.runtime.core.internal.processor.DelegateTransaction;
  * Transaction factory for DelegateTransaction. Used for transactional element since transaction type is not known until the first
  * transactional message processor is executed.
  */
-public class DelegateTransactionFactory implements TypedTransactionFactory {
+public final class DelegateTransactionFactory implements TypedTransactionFactory {
 
   @Override
   public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {

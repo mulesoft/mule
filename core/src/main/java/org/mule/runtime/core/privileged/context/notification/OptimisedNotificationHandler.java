@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 /**
  * Optimized to make a quick decision on a particular class of messages.
  */
-public class OptimisedNotificationHandler implements ServerNotificationHandler {
+public final class OptimisedNotificationHandler implements ServerNotificationHandler {
 
   private ServerNotificationHandler delegate;
   private Class<? extends Notification> type;

@@ -139,4 +139,6 @@ public class BeanUtils {
     }
     return name;
   }
+
+  private BeanUtils() {}
 }

@@ -10,7 +10,7 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessage;
 
-public class TransactionRollbackException extends TransactionException {
+public final class TransactionRollbackException extends TransactionException {
 
   /**
    * Serial version

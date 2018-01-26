@@ -12,7 +12,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 /**
  * <code>MuleContextException</code> is thrown when an exception occurs with Mule Context objects
  */
-public class MuleContextException extends MuleException {
+public final class MuleContextException extends MuleException {
 
   /**
    * Serial version

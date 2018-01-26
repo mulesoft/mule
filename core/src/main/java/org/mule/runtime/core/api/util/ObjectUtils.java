@@ -250,4 +250,6 @@ public class ObjectUtils {
     }
     return str;
   }
+
+  private ObjectUtils() {}
 }

@@ -29,7 +29,7 @@ import java.util.List;
  * @see InternalMessage
  * @see org.mule.runtime.core.DefaultMessageCollection
  */
-public class DefaultRouterResultsHandler implements RouterResultsHandler {
+public final class DefaultRouterResultsHandler implements RouterResultsHandler {
 
   private boolean returnCollectionWithSingleResult = false;
 

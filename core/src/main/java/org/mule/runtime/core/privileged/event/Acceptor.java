@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.privileged.event;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
  * Provides capability to only accept handling certain MuleEvents.
  */
+@NoImplement
 public interface Acceptor {
 
   /**

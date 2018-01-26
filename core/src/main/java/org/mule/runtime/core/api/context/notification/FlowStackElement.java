@@ -13,7 +13,7 @@ import java.io.Serializable;
  * 
  * @since 3.8.0
  */
-public class FlowStackElement implements Serializable {
+public final class FlowStackElement implements Serializable {
 
   private static final long serialVersionUID = -851491195125245390L;
 

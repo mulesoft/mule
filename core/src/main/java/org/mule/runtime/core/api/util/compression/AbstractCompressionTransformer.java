@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.util.compression;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 
 /**
@@ -13,6 +14,7 @@ import org.mule.runtime.core.api.transformer.AbstractTransformer;
  * performa message transformation. Compression is done via a pluggable strategy.
  */
 
+@NoExtend
 public abstract class AbstractCompressionTransformer extends AbstractTransformer {
 
   private CompressionStrategy strategy;

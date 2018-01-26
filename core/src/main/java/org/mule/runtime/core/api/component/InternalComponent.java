@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.component;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -17,6 +18,7 @@ import javax.xml.namespace.QName;
 /**
  * Marker interface that tells that an object is created internally and not from an xml configuration.
  */
+@NoImplement
 public interface InternalComponent extends Component {
 
   @Override

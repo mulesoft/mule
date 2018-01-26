@@ -10,7 +10,7 @@ import org.mule.runtime.api.message.ErrorType;
 
 import java.util.List;
 
-public class DisjunctiveErrorTypeMatcher implements ErrorTypeMatcher {
+public final class DisjunctiveErrorTypeMatcher implements ErrorTypeMatcher {
 
   List<ErrorTypeMatcher> errorTypeMatchers;
 

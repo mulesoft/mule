@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.retry.policy;
 /**
  * This policy is basically a placeholder. It does not attempt to retry at all.
  */
-public class NoRetryPolicyTemplate extends AbstractPolicyTemplate {
+public final class NoRetryPolicyTemplate extends AbstractPolicyTemplate {
 
   public RetryPolicy createRetryInstance() {
     return new NoRetryPolicy();

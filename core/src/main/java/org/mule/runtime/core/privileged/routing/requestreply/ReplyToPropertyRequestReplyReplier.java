@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-public class ReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier {
+public final class ReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier {
 
   private FlowConstruct flowConstruct;
 

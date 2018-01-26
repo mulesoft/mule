@@ -18,7 +18,7 @@ import java.util.OptionalInt;
  * @since 4.0
  * @deprecated use {@link ItemSequenceInfo} instead
  */
-public class GroupCorrelation implements Serializable {
+public final class GroupCorrelation implements Serializable {
 
 
   public static final String NOT_SET = "<not set>";

@@ -115,4 +115,5 @@ public class MapUtils {
     return buf.toString();
   }
 
+  private MapUtils() {}
 }

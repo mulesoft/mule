@@ -17,7 +17,7 @@ import javax.activation.DataSource;
 /**
  * {@link DataSource} wapper for an {@link InputStream}.
  */
-public class InputStreamDataSource implements DataSource {
+public final class InputStreamDataSource implements DataSource {
 
   private final InputStream data;
   private final MediaType contentType;

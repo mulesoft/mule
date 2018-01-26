@@ -20,7 +20,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
-
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -40,8 +40,6 @@ import org.mule.runtime.core.internal.util.store.ObjectStorePartition;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 
-import org.slf4j.Logger;
-
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,10 +51,13 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.slf4j.Logger;
+
 /**
  * Implement a retry policy for Mule. This is similar to JMS retry policies that will redeliver a message a maximum number of
  * times. If this maximum is exceeded, fails with an exception.
  */
+@NoExtend
 public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
   public static final String SECURE_HASH_EXPR_FORMAT = "" +

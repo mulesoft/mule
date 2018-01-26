@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.context;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -18,6 +19,7 @@ import java.util.List;
  * A MuleContextFactory is used to create instances of {@link MuleContext}. The instances of {@link MuleContext} returned by this
  * factory are initialised but not started.
  */
+@NoImplement
 public interface MuleContextFactory {
 
   /**

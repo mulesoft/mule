@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 
 import java.io.Serializable;
@@ -17,6 +18,7 @@ import java.util.List;
  * 
  * @since 3.8.0
  */
+@NoImplement
 public interface FlowCallStack extends Serializable, Cloneable {
 
   /**

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.streaming.bytes.factory;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -25,6 +26,7 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
+@NoExtend
 public abstract class AbstractCursorStreamProviderFactory extends AbstractComponent implements CursorStreamProviderFactory {
 
   private final ByteBufferManager bufferManager;

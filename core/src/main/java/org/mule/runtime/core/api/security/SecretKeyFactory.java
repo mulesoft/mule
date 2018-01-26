@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.security;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
 
 /**
@@ -13,6 +14,7 @@ import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
  * 
  * @see SecretKeyEncryptionStrategy
  */
+@NoImplement
 public interface SecretKeyFactory {
 
   byte[] getKey();

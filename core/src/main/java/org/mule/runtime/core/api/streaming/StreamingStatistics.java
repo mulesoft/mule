@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.streaming;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 
@@ -14,6 +15,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
  *
  * @since 4.0
  */
+@NoImplement
 public interface StreamingStatistics {
 
   /**

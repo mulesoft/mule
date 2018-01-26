@@ -7,12 +7,15 @@
 
 package org.mule.runtime.core.api.config.bootstrap;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
 /**
  * Creates objects from bootstrap.properties files
  */
+@NoImplement
 public interface BootstrapService {
 
   /**
