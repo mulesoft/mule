@@ -15,10 +15,10 @@ import static org.mule.runtime.module.extension.api.loader.java.type.PropertyEle
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.WRITE_ONLY;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPropertyDescriptors;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.PropertyElement;
@@ -26,10 +26,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.springframework.core.ResolvableType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -40,6 +36,10 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.lang.model.element.TypeElement;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springframework.core.ResolvableType;
 
 /**
  * Wrapper for {@link Class} that provide utility methods to facilitate the introspection of a {@link Class}
@@ -53,18 +53,18 @@ public class TypeWrapper implements Type {
   private List<TypeGeneric> generics = emptyList();
   private ResolvableType[] resolvableTypeGenerics = new ResolvableType[] {};
   ClassTypeLoader typeLoader;
-  private boolean instantiable;
+  private LazyValue<Boolean> instantiable;
 
   public TypeWrapper(Class<?> aClass, ClassTypeLoader typeLoader) {
     this.aClass = aClass;
-    instantiable = IntrospectionUtils.isInstantiable(aClass, new ReflectionCache());
+    instantiable = new LazyValue<>(() -> IntrospectionUtils.isInstantiable(aClass, new ReflectionCache()));
     this.type = aClass;
     this.typeLoader = typeLoader;
   }
 
   public TypeWrapper(ResolvableType resolvableType, ClassTypeLoader typeLoader) {
     this.aClass = resolvableType.getRawClass();
-    instantiable = IntrospectionUtils.isInstantiable(aClass, new ReflectionCache());
+    instantiable = new LazyValue<>(() -> IntrospectionUtils.isInstantiable(aClass, new ReflectionCache()));
     this.type = resolvableType.getType();
     this.generics = new ArrayList<>();
     this.typeLoader = typeLoader;
@@ -195,7 +195,7 @@ public class TypeWrapper implements Type {
 
   @Override
   public boolean isInstantiable() {
-    return instantiable;
+    return instantiable.get();
   }
 
   @Override
