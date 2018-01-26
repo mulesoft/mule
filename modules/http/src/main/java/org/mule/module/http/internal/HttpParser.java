@@ -6,6 +6,9 @@
  */
 package org.mule.module.http.internal;
 
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
+import static org.mule.transformer.types.MimeTypes.MULTIPART_RELATED;
 import static org.mule.util.StringUtils.WHITE_SPACE;
 import org.mule.api.MuleRuntimeException;
 import org.mule.module.http.internal.multipart.HttpPart;
@@ -41,7 +44,6 @@ public class HttpParser
 
     private static final String SPACE_ENTITY = "%20";
     private static final String PLUS_SIGN = "\\+";
-    private static final String CONTENT_DISPOSITION_PART_HEADER = "Content-Disposition";
     private static final String NAME_ATTRIBUTE = "name";
 
     public static String extractPath(String uri)
@@ -90,7 +92,8 @@ public class HttpParser
 
                 String filename = part.getFileName();
                 String partName = filename;
-                String[] contentDispositions = part.getHeader(CONTENT_DISPOSITION_PART_HEADER);
+
+                String[] contentDispositions = part.getHeader(CONTENT_DISPOSITION);
                 if (contentDispositions != null)
                 {
                     String contentDisposition = contentDispositions[0];
@@ -100,6 +103,16 @@ public class HttpParser
                         partName = partName.substring(0, partName.indexOf("\""));
                     }
                 }
+
+                if (partName == null && mimeMultipart.getContentType().contains(MULTIPART_RELATED))
+                {
+                    String[] contentIdHeader = part.getHeader(CONTENT_ID);
+                    if (contentIdHeader != null && contentIdHeader.length > 0)
+                    {
+                        partName = contentIdHeader[0];
+                    }
+                }
+
                 HttpPart httpPart = new HttpPart(partName, filename, IOUtils.toByteArray(part.getInputStream()), part.getContentType(), part.getSize());
 
                 Enumeration<Header> headers = part.getAllHeaders();

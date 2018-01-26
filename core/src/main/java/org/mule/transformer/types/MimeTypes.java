@@ -13,21 +13,21 @@ package org.mule.transformer.types;
  */
 public interface MimeTypes
 {
-    public static final String ANY = "*/*";
+    String ANY = "*/*";
 
-    public static final String JSON = "text/json";
-    public static final String APPLICATION_JSON = "application/json";
-    public static final String ATOM = "application/atom+xml";
-    public static final String RSS = "application/rss+xml";
-    public static final String APPLICATION_XML = "application/xml";
-    public static final String XML = "text/xml";
-    public static final String TEXT = "text/plain";
-    public static final String HTML = "text/html";
+    String JSON = "text/json";
+    String APPLICATION_JSON = "application/json";
+    String ATOM = "application/atom+xml";
+    String RSS = "application/rss+xml";
+    String APPLICATION_XML = "application/xml";
+    String XML = "text/xml";
+    String TEXT = "text/plain";
+    String HTML = "text/html";
 
-    public static final String BINARY = "application/octet-stream";
-    public static final String UNKNOWN = "content/unknown";
-    public static final String MULTIPART_MIXED="multipart/mixed";
-    public static final String MULTIPART_RELATED="multipart/related";
-    public static final String MULTIPART_X_MIXED_REPLACE="multipart/x-mixed-replace";
+    String BINARY = "application/octet-stream";
+    String UNKNOWN = "content/unknown";
+    String MULTIPART_MIXED="multipart/mixed";
+    String MULTIPART_RELATED="multipart/related";
+    String MULTIPART_X_MIXED_REPLACE="multipart/x-mixed-replace";
 
 }
