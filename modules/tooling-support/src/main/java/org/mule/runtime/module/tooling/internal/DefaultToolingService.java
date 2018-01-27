@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUT
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.lookupPomFromMavenLocation;
+import org.mule.api.annotation.NoImplement;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -54,6 +55,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
+@NoImplement
 public class DefaultToolingService implements ToolingService {
 
   private static final String MULE_TMP_FILENAME = "tmp";
