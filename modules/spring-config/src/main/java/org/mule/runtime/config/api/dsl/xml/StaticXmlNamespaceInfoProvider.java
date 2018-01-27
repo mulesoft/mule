@@ -19,7 +19,7 @@ import java.util.Collection;
  *
  * @since 4.0
  */
-public class StaticXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
+public final class StaticXmlNamespaceInfoProvider implements XmlNamespaceInfoProvider {
 
   private final Collection<XmlNamespaceInfo> namespaceInfos;
 

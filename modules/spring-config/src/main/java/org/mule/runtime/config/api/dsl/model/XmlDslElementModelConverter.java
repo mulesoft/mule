@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api.dsl.model;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.config.internal.dsl.model.DefaultXmlDslElementModelConverter;
 
 import org.w3c.dom.Document;
@@ -17,6 +18,7 @@ import org.w3c.dom.Element;
  *
  * @since 4.0
  */
+@NoImplement
 public interface XmlDslElementModelConverter {
 
   /**

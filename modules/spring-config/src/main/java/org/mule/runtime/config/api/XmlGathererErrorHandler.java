@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.api;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +27,7 @@ import org.xml.sax.SAXParseException;
  *
  * @since 4.0
  */
+@NoImplement
 public interface XmlGathererErrorHandler extends ErrorHandler {
 
   /**

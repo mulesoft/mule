@@ -10,6 +10,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.ComponentIdentifier;
 
 /**
@@ -17,6 +18,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
  * 
  * @since 4.0
  */
+@NoImplement
 public interface CoreDslConstants {
 
   String MULE_ROOT_ELEMENT = "mule";

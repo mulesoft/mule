@@ -20,7 +20,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class ArtifactConfig {
+public final class ArtifactConfig {
 
   private String artifactName;
   private List<ConfigFile> configFiles = new ArrayList<>();

@@ -24,7 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class MessageProcessorChainFactoryBean extends AbstractComponentFactory<MessageProcessorChain>
+public final class MessageProcessorChainFactoryBean extends AbstractComponentFactory<MessageProcessorChain>
     implements MuleContextAware {
 
   protected List processors;

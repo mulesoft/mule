@@ -22,7 +22,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ConfigurableObjectFactory<T> extends AbstractComponentFactory<T> {
+public final class ConfigurableObjectFactory<T> extends AbstractComponentFactory<T> {
 
   @Inject
   private MuleContext muleContext;

@@ -24,7 +24,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class TransformerConfigurator implements ObjectFactoryCommonConfigurator<AbstractTransformer> {
+public final class TransformerConfigurator implements ObjectFactoryCommonConfigurator<AbstractTransformer> {
 
   private Class<?> getReturnType(String returnClass) {
     Class<?> returnType = Object.class;

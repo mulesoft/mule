@@ -33,7 +33,7 @@ import java.util.function.Function;
  *
  * @since 4.0
  */
-public class DslElementModel<T> {
+public final class DslElementModel<T> {
 
   private final T model;
   private final String value;
