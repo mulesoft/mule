@@ -24,7 +24,7 @@ import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
  *
  * @since 4.0
  */
-public class DefaultTlsContextFactoryBuilderFactory extends AbstractTlsContextFactoryBuilderFactory {
+public final class DefaultTlsContextFactoryBuilderFactory extends AbstractTlsContextFactoryBuilderFactory {
 
   private TlsContextFactory defaultTlsContextFactory = new DefaultTlsContextFactory(emptyMap());
 
