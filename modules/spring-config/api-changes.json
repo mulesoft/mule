@@ -42,11 +42,11 @@
           "justification": "This interface is not meant to be implemented by the user"
         },
         {
-          "code": "java.class.nowFinal",
+          "code": "java.annotation.added",
           "old": "class org.mule.runtime.config.api.dsl.ConfigurableObjectFactory<T extends java.lang.Object>",
           "new": "class org.mule.runtime.config.api.dsl.ConfigurableObjectFactory<T extends java.lang.Object>",
-          "oldModifiers": "public",
-          "newModifiers": "public final",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
           "package": "org.mule.runtime.config.api.dsl",
           "classSimpleName": "ConfigurableObjectFactory",
           "elementKind": "class",
@@ -310,11 +310,11 @@
           "justification": "This class is not meant to be extended by the user"
         },
         {
-          "code": "java.class.nowFinal",
+          "code": "java.annotation.added",
           "old": "class org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean",
           "new": "class org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean",
-          "oldModifiers": "public",
-          "newModifiers": "public final",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
           "package": "org.mule.runtime.config.privileged.dsl.processor",
           "classSimpleName": "MessageProcessorChainFactoryBean",
           "elementKind": "class",

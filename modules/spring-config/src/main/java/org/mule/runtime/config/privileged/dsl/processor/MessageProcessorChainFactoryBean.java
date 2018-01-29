@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -24,7 +25,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public final class MessageProcessorChainFactoryBean extends AbstractComponentFactory<MessageProcessorChain>
+@NoExtend
+public class MessageProcessorChainFactoryBean extends AbstractComponentFactory<MessageProcessorChain>
     implements MuleContextAware {
 
   protected List processors;

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api.dsl;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -22,7 +23,8 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public final class ConfigurableObjectFactory<T> extends AbstractComponentFactory<T> {
+@NoExtend
+public class ConfigurableObjectFactory<T> extends AbstractComponentFactory<T> {
 
   @Inject
   private MuleContext muleContext;
