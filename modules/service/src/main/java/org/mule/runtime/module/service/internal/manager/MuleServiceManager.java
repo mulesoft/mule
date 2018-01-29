@@ -14,7 +14,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.module.service.internal.manager.LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -25,11 +24,11 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
 
 /**
  * Service manager to use in the Mule container.
@@ -106,13 +105,13 @@ public class MuleServiceManager implements ServiceManager {
         try {
           ((Stoppable) service).stop();
         } catch (Exception e) {
-          logger.warn("Service {s} was not stopped properly: {s}", service.getName(), e.getMessage());
+          logger.warn("Service '{}' was not stopped properly: {}", service.getName(), e.getMessage());
         }
       }
       try {
         registeredServices.get(i).getFirst().dispose();
       } catch (Exception e) {
-        logger.warn("Service {s} class loader was not stopped properly: {s}", service.getName(), e.getMessage());
+        logger.warn("Service '{}' class loader was not stopped properly: {}", service.getName(), e.getMessage());
       }
     }
   }
