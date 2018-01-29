@@ -38,7 +38,7 @@ public class NamelessConfigTestCase extends AbstractMuleTestCase {
   @Test
   public void useDefaultConfigurationNameTwiceAnnotated() throws Exception {
     expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException.expectMessage("Configurations [config] were defined multiple times");
+    expectedException.expectMessage("contains 2 components 'config' which it's transformed DSL name is 'config'");
     validate(TwoConfigAnnotatedExtension.class);
   }
 
@@ -50,14 +50,14 @@ public class NamelessConfigTestCase extends AbstractMuleTestCase {
   @Test
   public void useDefaultConfigurationNameTwiceNonAnnotated() throws Exception {
     expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException.expectMessage("Configurations [config] were defined multiple times");
+    expectedException.expectMessage("contains 2 components 'config' which it's transformed DSL name is 'config'");
     validate(TwoConfigNonAnnotatedExtension.class);
   }
 
   @Test
   public void useDefaultConfigurationNameMixedAnnotation() throws Exception {
     expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException.expectMessage("Configurations [config] were defined multiple times");
+    expectedException.expectMessage("contains 2 components 'config' which it's transformed DSL name is 'config'");
     validate(MixedConfigExtension.class);
   }
 
