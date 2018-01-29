@@ -9,6 +9,7 @@ package org.mule.module.cxf;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.util.IOUtils.getResourceAsString;
 import org.mule.api.MuleEvent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -34,7 +35,7 @@ public class MtomWithPayloadModificationsTestCase extends FunctionalTestCase
     @Test
     public void testWithPayloadModifications() throws Exception
     {
-        String body = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("./direct/direct-request.xml"));
+        String body = getResourceAsString("./direct/direct-request.xml", getClass());
         MuleEvent request = getTestEvent(body);
         request.getMessage().addOutboundAttachment("body", body, "text/xml");
         MuleEvent response = runFlow("testMtomWithPayloadModifications", request);
