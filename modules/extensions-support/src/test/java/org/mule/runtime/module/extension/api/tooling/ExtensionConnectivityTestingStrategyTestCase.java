@@ -42,9 +42,6 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
   private ConnectionProviderResolver connectionProviderResolver;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private ConnectionValidationResult validationResult;
-
-  @Mock(answer = RETURNS_DEEP_STUBS)
   private ConnectionProvider connectionProvider;
 
   private ConnectionManager connectionManager = new DefaultConnectionManager(muleContext);
@@ -78,11 +75,16 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
 
   private ConnectionValidationResult testConnectivityWithConnectionProvider(boolean isValidConnection) throws MuleException {
     when(connectionProviderResolver.resolve(any())).thenReturn(new Pair<>(connectionProvider, mock(ResolverSetResult.class)));
+    ConnectionValidationResult validationResult;
+    if (isValidConnection) {
+      validationResult = ConnectionValidationResult.success();
+    } else {
+      validationResult = ConnectionValidationResult.failure("", null);
+    }
     when(connectionProvider.validate(any())).thenReturn(validationResult);
-    when(validationResult.isValid()).thenReturn(isValidConnection);
+
     ConnectionValidationResult connectionResult =
         extensionConnectivityTestingStrategy.testConnectivity(connectionProviderResolver);
     return connectionResult;
   }
-
 }
