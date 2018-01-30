@@ -60,6 +60,7 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
     return new String[] {toFile(classLoaderModel.getUrls()[0]).getPath()};
   }
 
+
   /**
    * Resolves the plugin classloader of the thread context class loader artifact and all it's ancestor
    */
@@ -69,7 +70,8 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
     ClassLoader tmpClassLoader = originalClassLoader;
     resolvedClassLoaders.addAll(resolveContextArtifactPluginClassLoadersForCurrentClassLoader());
     try {
-      while (tmpClassLoader.getParent() != null) {
+      while (tmpClassLoader.getParent() != null
+          && MuleDeployableArtifactClassLoader.class.isAssignableFrom(tmpClassLoader.getParent().getClass())) {
         tmpClassLoader = tmpClassLoader.getParent();
         currentThread().setContextClassLoader(tmpClassLoader);
         resolvedClassLoaders.addAll(resolveContextArtifactPluginClassLoadersForCurrentClassLoader());
