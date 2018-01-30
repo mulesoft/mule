@@ -24,6 +24,7 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(DIRECT)
@@ -132,6 +133,14 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
   public void asyncCpuLight() throws Exception {
     super.asyncCpuLight();
     assertAsyncCpuLight();
+  }
+
+  @Test
+  @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
+               + "synchronously in a caller thread.")
+  public void singleIORW() throws Exception {
+    super.singleIORW(() -> testEvent());
+    assertSynchronous(1);
   }
 
   @Override

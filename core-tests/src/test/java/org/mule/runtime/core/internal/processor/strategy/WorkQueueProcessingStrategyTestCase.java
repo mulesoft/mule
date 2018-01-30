@@ -290,4 +290,12 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     processFlow(testEvent());
   }
 
+  @Test
+  @Description("Regardless of processor type, when the WorkQueueProcessingStrategy is configured, the pipeline is executed "
+               + "synchronously in a single IO thead.")
+  public void singleIORW() throws Exception {
+    super.singleIORW(() -> testEvent());
+    assertSynchronousIOScheduler(1);
+  }
+
 }
