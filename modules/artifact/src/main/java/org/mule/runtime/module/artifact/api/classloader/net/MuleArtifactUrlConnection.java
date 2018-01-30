@@ -12,6 +12,8 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 
+import org.mule.api.annotation.NoInstantiate;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -67,7 +69,8 @@ import sun.net.www.ParseUtil;
  * 
  * @since 4.0
  */
-public class MuleArtifactUrlConnection extends URLConnection {
+@NoInstantiate
+public final class MuleArtifactUrlConnection extends URLConnection {
 
   static final String SEPARATOR = "!/";
   private static final List<String> SUPPORTED_PROTOCOLS = asList("file");

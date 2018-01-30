@@ -7,10 +7,13 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import org.mule.api.annotation.NoInstantiate;
+
 /**
  * Thrown to indicate that a given bundle dependency version is not well formed.
  */
-public class InvalidDependencyVersionException extends RuntimeException {
+@NoInstantiate
+public final class InvalidDependencyVersionException extends RuntimeException {
 
   /**
    * {@inheritDoc}

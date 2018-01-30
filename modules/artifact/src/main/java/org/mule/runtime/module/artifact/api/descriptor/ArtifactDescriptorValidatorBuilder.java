@@ -21,7 +21,7 @@ import java.util.function.Supplier;
  *
  * @since 4.1
  */
-public class ArtifactDescriptorValidatorBuilder {
+public final class ArtifactDescriptorValidatorBuilder {
 
   private boolean minMuleVersionArtifactDescriptorValidator;
   private boolean validateMinMuleVersionWithSemanticVersioning;

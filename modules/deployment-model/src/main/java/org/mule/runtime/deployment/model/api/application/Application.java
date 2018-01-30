@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.deployment.model.api.application;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.classloader.RegionOwnerArtifact;
 
+@NoImplement
 public interface Application extends DeployableArtifact<ApplicationDescriptor>, RegionOwnerArtifact {
 
   /**

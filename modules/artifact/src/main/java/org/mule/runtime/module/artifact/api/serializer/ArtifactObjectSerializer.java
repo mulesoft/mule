@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.api.serializer;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -20,7 +21,8 @@ import org.mule.runtime.core.internal.serialization.JavaExternalSerializerProtoc
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.protocol.CustomJavaSerializationProtocol;
 
-public class ArtifactObjectSerializer implements ObjectSerializer, Initialisable, MuleContextAware {
+@NoInstantiate
+public final class ArtifactObjectSerializer implements ObjectSerializer, Initialisable, MuleContextAware {
 
   private volatile JavaExternalSerializerProtocol javaExternalSerializerProtocol;
   private volatile CustomJavaSerializationProtocol javaInternalSerializerProtocol;

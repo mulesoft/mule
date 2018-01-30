@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 
+@NoImplement
 public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourceLocator, ClassLoaderLookupPolicyProvider {
 
   /**

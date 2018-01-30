@@ -16,7 +16,7 @@ import java.io.IOException;
  * 
  * @since 4.0
  */
-public class RuntimeGlobalConfigException extends MuleRuntimeException {
+public final class RuntimeGlobalConfigException extends MuleRuntimeException {
 
   public RuntimeGlobalConfigException(I18nMessage message) {
     super(message);

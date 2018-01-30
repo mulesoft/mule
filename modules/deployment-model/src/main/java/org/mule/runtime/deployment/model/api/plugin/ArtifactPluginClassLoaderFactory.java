@@ -15,7 +15,7 @@ import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 /**
  * Creates {@link ArtifactClassLoader} for application or domain plugin descriptors.
  */
-public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFactory<ArtifactPluginDescriptor> {
+public final class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFactory<ArtifactPluginDescriptor> {
 
   @Override
   public ArtifactClassLoader create(String artifactId, ArtifactPluginDescriptor descriptor,

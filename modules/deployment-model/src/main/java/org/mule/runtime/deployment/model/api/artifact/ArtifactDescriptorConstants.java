@@ -15,7 +15,7 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel;
  *
  * @since 4.0
  */
-public final class ArtifactDescriptorConstants {
+public class ArtifactDescriptorConstants {
 
   /**
    * Default descriptor loader ID for Mule artifacts
@@ -41,4 +41,7 @@ public final class ArtifactDescriptorConstants {
    */
   public static final String INCLUDE_TEST_DEPENDENCIES = "includeTestDependencies";
 
+  private ArtifactDescriptorConstants() {
+
+  }
 }

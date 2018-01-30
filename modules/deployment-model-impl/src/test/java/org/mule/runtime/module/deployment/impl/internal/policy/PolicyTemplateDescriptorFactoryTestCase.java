@@ -30,7 +30,6 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR;
 import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.invalidClassLoaderModelIdError;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
-import static org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.FILE_SYSTEM_POLICY_MODEL_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.LIB_DIR;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.invalidBundleDescriptorLoaderIdError;
@@ -209,13 +208,9 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
         new PolicyTemplateDescriptorFactory(new ArtifactPluginDescriptorLoader(pluginDescriptorFactory),
                                             descriptorLoaderRepository, ArtifactDescriptorValidatorBuilder.builder());
 
-    final ArtifactPluginDescriptor expectedPluginDescriptor1 = mock(ArtifactPluginDescriptor.class);
-    when(expectedPluginDescriptor1.getName()).thenReturn("plugin1");
-    when(expectedPluginDescriptor1.getClassLoaderModel()).thenReturn(NULL_CLASSLOADER_MODEL);
+    final ArtifactPluginDescriptor expectedPluginDescriptor1 = new ArtifactPluginDescriptor("plugin1");
+    final ArtifactPluginDescriptor expectedPluginDescriptor2 = new ArtifactPluginDescriptor("plugin2");
 
-    final ArtifactPluginDescriptor expectedPluginDescriptor2 = mock(ArtifactPluginDescriptor.class);
-    when(expectedPluginDescriptor2.getName()).thenReturn("plugin2");
-    when(expectedPluginDescriptor2.getClassLoaderModel()).thenReturn(NULL_CLASSLOADER_MODEL);
     when(pluginDescriptorFactory.create(any(), any())).thenReturn(expectedPluginDescriptor1)
         .thenReturn(expectedPluginDescriptor2);
 

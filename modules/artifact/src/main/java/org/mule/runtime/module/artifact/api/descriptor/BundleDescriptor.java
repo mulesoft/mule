@@ -17,7 +17,7 @@ import java.util.Optional;
 /**
  * Describes a bundle by its Maven coordinates.
  */
-public class BundleDescriptor {
+public final class BundleDescriptor {
 
   private static final String STRINGARTIFACT_FILENAME_SEPARATOR = "-";
   private String groupId;

@@ -11,6 +11,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,7 +26,8 @@ import java.util.Optional;
  * 
  * @since 4.0
  */
-public class ArtifactContextConfiguration {
+@NoInstantiate
+public final class ArtifactContextConfiguration {
 
   private MuleContext muleContext;
   private String[] configResources;

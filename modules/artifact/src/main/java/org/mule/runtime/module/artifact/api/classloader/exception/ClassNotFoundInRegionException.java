@@ -9,13 +9,15 @@ package org.mule.runtime.module.artifact.api.classloader.exception;
 
 import static java.lang.String.format;
 
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 
 /**
  * Extends {@link ClassNotFoundException} providing additional troubleshooting information from the context of the
  * {@link RegionClassLoader}.
  */
-public class ClassNotFoundInRegionException extends ClassNotFoundException {
+@NoInstantiate
+public final class ClassNotFoundInRegionException extends ClassNotFoundException {
 
   private static final long serialVersionUID = -2800293812538208279L;
 

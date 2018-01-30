@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
  *
  * @since 4.0
  */
+@NoImplement
 public interface DeployableArtifactClassLoaderFactory<T extends ArtifactDescriptor> {
 
   /**

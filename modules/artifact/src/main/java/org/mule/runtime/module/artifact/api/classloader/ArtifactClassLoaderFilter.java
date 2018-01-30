@@ -7,11 +7,14 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.util.Set;
 
 /**
  * Filter that provides access to the configured exported packages and resources.
  */
+@NoImplement
 public interface ArtifactClassLoaderFilter extends ClassLoaderFilter {
 
 

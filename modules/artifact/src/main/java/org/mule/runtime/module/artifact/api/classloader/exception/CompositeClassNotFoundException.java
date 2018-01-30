@@ -10,6 +10,7 @@ import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.toList;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
 import java.util.List;
@@ -18,7 +19,8 @@ import java.util.List;
  * Extends {@link ClassNotFoundException}, composing the individual exceptions of each place where the class was looked for and
  * wasn't found.
  */
-public class CompositeClassNotFoundException extends ClassNotFoundException {
+@NoInstantiate
+public final class CompositeClassNotFoundException extends ClassNotFoundException {
 
   private static final long serialVersionUID = -6941980241656380059L;
 

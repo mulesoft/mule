@@ -10,6 +10,7 @@ package org.mule.runtime.module.artifact.api.serializer.protocol;
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.internal.serialization.AbstractSerializationProtocol;
@@ -29,7 +30,8 @@ import java.io.Serializable;
  * Custom serialization protocol that uses {@link ArtifactClassLoaderObjectInputStream} and {@link ArtifactClassLoaderObjectOutputStream}
  * to write and read serialized objects to support deserialization of non exported classes.
  */
-public class CustomJavaSerializationProtocol extends AbstractSerializationProtocol {
+@NoInstantiate
+public final class CustomJavaSerializationProtocol extends AbstractSerializationProtocol {
 
   private final ClassLoaderRepository classLoaderRepository;
 

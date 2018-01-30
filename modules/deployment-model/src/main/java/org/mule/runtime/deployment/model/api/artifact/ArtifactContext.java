@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.deployment.model.api.artifact;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.artifact.api.Artifact;
@@ -16,6 +17,7 @@ import org.mule.runtime.module.artifact.api.Artifact;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ArtifactContext {
 
   /**

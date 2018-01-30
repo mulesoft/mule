@@ -1,0 +1,54 @@
+{
+  "4.1.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer",
+          "new": "interface org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer",
+          "new": "interface org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.service.api.discoverer.ServiceResolutionError",
+          "new": "class org.mule.runtime.module.service.api.discoverer.ServiceResolutionError",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.service.api.discoverer",
+          "classSimpleName": "ServiceResolutionError",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.module.service.api.discoverer.ServiceResolutionError",
+          "new": "class org.mule.runtime.module.service.api.discoverer.ServiceResolutionError",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.service.api.manager.ServiceManager",
+          "new": "interface org.mule.runtime.module.service.api.manager.ServiceManager",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.service.api.manager.ServiceRepository",
+          "new": "interface org.mule.runtime.module.service.api.manager.ServiceRepository",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        }
+      ]
+    }
+  }
+}

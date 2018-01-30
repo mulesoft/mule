@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * This class has the constants of the mule maven plugin used to package artifacts.
  * <p>
@@ -15,6 +17,7 @@ package org.mule.runtime.module.artifact.api.classloader;
  * 
  * @since 4.0
  */
+@NoImplement
 public interface MuleMavenPlugin {
 
   String MULE_MAVEN_PLUGIN_GROUP_ID = "org.mule.tools.maven";
