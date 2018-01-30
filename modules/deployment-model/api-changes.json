@@ -1,0 +1,214 @@
+{
+  "4.1.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.deployment.model.api.DeployableArtifact<D extends org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor>",
+          "new": "interface org.mule.runtime.deployment.model.api.DeployableArtifact<D extends org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor>",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.deployment.model.api.DeploymentException",
+          "new": "class org.mule.runtime.deployment.model.api.DeploymentException",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.deployment.model.api.DeploymentInitException",
+          "new": "class org.mule.runtime.deployment.model.api.DeploymentInitException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeploymentInitException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.deployment.model.api.DeploymentStartException",
+          "new": "class org.mule.runtime.deployment.model.api.DeploymentStartException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeploymentStartException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.deployment.model.api.DeploymentStopException",
+          "new": "class org.mule.runtime.deployment.model.api.DeploymentStopException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeploymentStopException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.deployment.model.api.InstallException",
+          "new": "class org.mule.runtime.deployment.model.api.InstallException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "InstallException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.deployment.model.api.application.Application",
+          "new": "interface org.mule.runtime.deployment.model.api.application.Application",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.deployment.model.api.application.ApplicationClassLoader",
+          "new": "interface org.mule.runtime.deployment.model.api.application.ApplicationClassLoader",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.deployment.model.api.application.ApplicationPolicyManager",
+          "new": "interface org.mule.runtime.deployment.model.api.application.ApplicationPolicyManager",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor",
+          "new": "interface org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.deployment.model.api.artifact.ArtifactContext",
+          "new": "interface org.mule.runtime.deployment.model.api.artifact.ArtifactContext",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration",
+          "new": "class org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.deployment.model.api.artifact",
+          "classSimpleName": "ArtifactContextConfiguration",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration",
+          "new": "class org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.method.visibilityReduced",
+          "old": "method void org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants::<init>()",
+          "new": "method void org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants::<init>()",
+          "oldVisibility": "public",
+          "newVisibility": "private",
+          "package": "org.mule.runtime.deployment.model.api.artifact",
+          "classSimpleName": "ArtifactDescriptorConstants",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "Utility class that is not meant to be extended or instantiated by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.deployment.model.api.domain.Domain",
+          "new": "interface org.mule.runtime.deployment.model.api.domain.Domain",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin",
+          "new": "interface org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory",
+          "new": "class org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.deployment.model.api.plugin",
+          "classSimpleName": "ArtifactPluginClassLoaderFactory",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor",
+          "new": "class org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.deployment.model.api.plugin",
+          "classSimpleName": "ArtifactPluginDescriptor",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.deployment.model.api.plugin.LoaderDescriber",
+          "new": "class org.mule.runtime.deployment.model.api.plugin.LoaderDescriber",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.deployment.model.api.plugin",
+          "classSimpleName": "LoaderDescriber",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.deployment.model.api.plugin.LoaderDescriber",
+          "new": "class org.mule.runtime.deployment.model.api.plugin.LoaderDescriber",
+          "annotationType": "org.mule.api.annotation.NoInstantiate",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException",
+          "new": "class org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.deployment.model.api.policy",
+          "classSimpleName": "PolicyRegistrationException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.deployment.model.api.policy.PolicyTemplate",
+          "new": "interface org.mule.runtime.deployment.model.api.policy.PolicyTemplate",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor",
+          "new": "class org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.deployment.model.api.policy",
+          "classSimpleName": "PolicyTemplateDescriptor",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        }
+      ]
+    }
+  }
+}

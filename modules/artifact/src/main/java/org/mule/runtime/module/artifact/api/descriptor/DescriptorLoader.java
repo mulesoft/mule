@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 
 import java.io.File;
@@ -17,6 +18,7 @@ import java.util.Map;
  *
  * @param <T> type of loaded objects
  */
+@NoImplement
 public interface DescriptorLoader<T> {
 
   /**

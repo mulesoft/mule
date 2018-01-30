@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.io.File;
 import java.util.Optional;
 import java.util.Properties;
@@ -16,6 +18,7 @@ import java.util.Properties;
  *
  * @param <T> type of created descriptors
  */
+@NoImplement
 public interface ArtifactDescriptorFactory<T extends ArtifactDescriptor> {
 
 

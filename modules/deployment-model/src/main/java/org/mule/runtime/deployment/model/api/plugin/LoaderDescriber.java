@@ -8,6 +8,7 @@ package org.mule.runtime.deployment.model.api.plugin;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 
 import java.util.HashMap;
@@ -23,7 +24,8 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class LoaderDescriber {
+@NoInstantiate
+public final class LoaderDescriber {
 
   private final String id;
   private final Map<String, Object> attributes = new HashMap<>();

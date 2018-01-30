@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.net.URL;
 
+@NoImplement
 public interface LocalResourceLocator {
 
   /**

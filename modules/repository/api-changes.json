@@ -1,0 +1,48 @@
+{
+  "4.1.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.repository.api.BundleNotFoundException",
+          "new": "class org.mule.runtime.module.repository.api.BundleNotFoundException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.repository.api",
+          "classSimpleName": "BundleNotFoundException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.repository.api.RepositoryConnectionException",
+          "new": "class org.mule.runtime.module.repository.api.RepositoryConnectionException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.repository.api",
+          "classSimpleName": "RepositoryConnectionException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.repository.api.RepositoryService",
+          "new": "interface org.mule.runtime.module.repository.api.RepositoryService",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.repository.api.RepositoryServiceDisabledException",
+          "new": "class org.mule.runtime.module.repository.api.RepositoryServiceDisabledException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.repository.api",
+          "classSimpleName": "RepositoryServiceDisabledException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        }
+      ]
+    }
+  }
+}

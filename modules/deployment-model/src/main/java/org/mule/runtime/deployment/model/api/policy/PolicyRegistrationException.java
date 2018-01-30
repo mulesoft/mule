@@ -9,7 +9,7 @@ package org.mule.runtime.deployment.model.api.policy;
 /**
  * Thrown to indicate that an error was found while attempting to add a policy instance to an application.
  */
-public class PolicyRegistrationException extends Exception {
+public final class PolicyRegistrationException extends Exception {
 
   /**
    * {@inheritDoc}

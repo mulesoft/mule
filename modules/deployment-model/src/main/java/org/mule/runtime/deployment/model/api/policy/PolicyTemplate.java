@@ -7,6 +7,7 @@
 
 package org.mule.runtime.deployment.model.api.policy;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.Artifact;
 
@@ -17,6 +18,7 @@ import java.util.List;
  *
  * @since 4.0
  */
+@NoImplement
 public interface PolicyTemplate extends Artifact<PolicyTemplateDescriptor> {
 
   /**

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.api;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -16,6 +17,7 @@ import java.io.File;
  *
  * @param <D> The type of the artifact's descriptor
  */
+@NoImplement
 public interface Artifact<D extends ArtifactDescriptor> {
 
   /**

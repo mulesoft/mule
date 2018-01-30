@@ -1,0 +1,36 @@
+{
+  "4.1.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.deployment.api.DeploymentListenerManager",
+          "new": "interface org.mule.runtime.module.deployment.api.DeploymentListenerManager",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.deployment.api.DeploymentService",
+          "new": "interface org.mule.runtime.module.deployment.api.DeploymentService",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.deployment.api.DomainBundleDeploymentListenerManager",
+          "new": "interface org.mule.runtime.module.deployment.api.DomainBundleDeploymentListenerManager",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.module.deployment.api.DomainDeploymentListenerManager",
+          "new": "interface org.mule.runtime.module.deployment.api.DomainDeploymentListenerManager",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        }
+      ]
+    }
+  }
+}

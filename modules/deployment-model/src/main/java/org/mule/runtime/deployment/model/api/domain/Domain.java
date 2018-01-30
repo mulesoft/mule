@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.deployment.model.api.domain;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.application.Application;
 
@@ -15,6 +16,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
  * A domain can just consist of a set of jar libraries to share between the domain applications or it can also contain shared
  * resources such as connectors or other mule components.
  */
+@NoImplement
 public interface Domain extends DeployableArtifact<DomainDescriptor> {
 
   /**

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.artifact.api.serializer;
 
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 
 import java.io.IOException;
@@ -20,7 +21,8 @@ import java.util.Optional;
  * <p>
  * Is intended to be used along with {@link ArtifactClassLoaderObjectInputStream}.
  */
-public class ArtifactClassLoaderObjectOutputStream extends ObjectOutputStream {
+@NoInstantiate
+public final class ArtifactClassLoaderObjectOutputStream extends ObjectOutputStream {
 
   private final ClassLoaderRepository classLoaderRepository;
 

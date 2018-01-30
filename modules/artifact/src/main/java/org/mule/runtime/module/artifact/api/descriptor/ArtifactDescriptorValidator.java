@@ -7,11 +7,14 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * {@link ArtifactDescriptorValidator} for {@link ArtifactDescriptor}.
  *
  * @since 4.1
  */
+@NoImplement
 public interface ArtifactDescriptorValidator {
 
   /**

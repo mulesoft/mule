@@ -8,8 +8,6 @@
 package org.mule.runtime.deployment.model.api.policy;
 
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.POLICY_EXPORTED_PACKAGES_ERROR;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.POLICY_EXPORTED_RESOURCE_ERROR;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
@@ -33,8 +31,8 @@ public class PolicyTemplateDescriptorTestCase extends AbstractMuleTestCase {
   @Test
   public void verifiesPolicyTemplateDoesNotExportPackages() throws Exception {
     PolicyTemplateDescriptor policyTemplateDescriptor = new PolicyTemplateDescriptor(POLICY_NAME);
-    ClassLoaderModel classLoaderModel = mock(ClassLoaderModel.class);
-    when(classLoaderModel.getExportedPackages()).thenReturn(Collections.singleton("org.foo"));
+    ClassLoaderModel classLoaderModel =
+        new ClassLoaderModel.ClassLoaderModelBuilder().exportingPackages(Collections.singleton("org.foo")).build();
 
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(POLICY_EXPORTED_PACKAGES_ERROR);
@@ -44,8 +42,8 @@ public class PolicyTemplateDescriptorTestCase extends AbstractMuleTestCase {
   @Test
   public void verifiesPolicyTemplateDoesNotExportResources() throws Exception {
     PolicyTemplateDescriptor policyTemplateDescriptor = new PolicyTemplateDescriptor(POLICY_NAME);
-    ClassLoaderModel classLoaderModel = mock(ClassLoaderModel.class);
-    when(classLoaderModel.getExportedResources()).thenReturn(Collections.singleton("META-INF/foo.xml"));
+    ClassLoaderModel classLoaderModel =
+        new ClassLoaderModel.ClassLoaderModelBuilder().exportingResources(Collections.singleton("META-INF/foo.xml")).build();
 
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(POLICY_EXPORTED_RESOURCE_ERROR);

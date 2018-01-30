@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.meta.MuleVersion;
 
@@ -19,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Properties;
 
+@NoExtend
 public class ArtifactDescriptor {
 
   public static final String MULE_ARTIFACT = "mule-artifact";

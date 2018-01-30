@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.util.Map;
 
 /**
@@ -15,6 +17,7 @@ import java.util.Map;
  * Default lookup strategy is parent first. To use child-first, the corresponding package must be added as an overridden. To use
  * child-only, the corresponding package must be added as blocked.
  */
+@NoImplement
 public interface ClassLoaderLookupPolicy {
 
   /**

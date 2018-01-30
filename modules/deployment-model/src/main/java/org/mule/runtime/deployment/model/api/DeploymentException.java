@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.deployment.model.api;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 
-/**
- *
- */
+@NoExtend
 public class DeploymentException extends MuleRuntimeException {
 
   public DeploymentException(I18nMessage message) {

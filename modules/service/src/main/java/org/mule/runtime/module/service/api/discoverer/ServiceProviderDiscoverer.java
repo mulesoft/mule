@@ -8,6 +8,7 @@
 package org.mule.runtime.module.service.api.discoverer;
 
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -17,6 +18,7 @@ import java.util.List;
 /**
  * Discovers the {@link ServiceProvider} available in the container.
  */
+@NoImplement
 public interface ServiceProviderDiscoverer {
 
   /**

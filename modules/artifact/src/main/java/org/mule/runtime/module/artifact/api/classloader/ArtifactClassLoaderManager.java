@@ -7,9 +7,12 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Tracks {@link ArtifactClassLoader} instances created on the container.
  */
+@NoImplement
 public interface ArtifactClassLoaderManager {
 
   /**

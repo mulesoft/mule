@@ -16,6 +16,24 @@
       ]
     }
   },
+  "4.1.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.visibilityReduced",
+          "old": "method void org.mule.runtime.globalconfig.api.GlobalConfigLoader::<init>()",
+          "new": "method void org.mule.runtime.globalconfig.api.GlobalConfigLoader::<init>()",
+          "oldVisibility": "public",
+          "newVisibility": "private",
+          "package": "org.mule.runtime.globalconfig.api",
+          "classSimpleName": "GlobalConfigLoader",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "Utility class is not meant to be extended or instantiated by the user"
+        }
+      ]
+    }
+  },
   "4.1.0": {
     "revapi": {
       "ignore": [
