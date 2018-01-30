@@ -59,12 +59,11 @@ public interface ReactiveProcessor extends Function<Publisher<CoreEvent>, Publis
     BLOCKING,
 
     /**
-     * Blocking IO read/write operations. This is treated separately to {@link #BLOCKING} to allow for potential optimizations
-     * when IO is fast and/or message sizes smalls.
-     * 
-     * @deprecated instead use {@link #BLOCKING}.
+     * IO read/write operations. This is treated separately to {@link #BLOCKING} to allow support for conditional scheduling based
+     * on payload type and size.
+     *
+     * TODO: MULE-14562 Use Publisher<Buffer> instead of InputStream for streaming payloads
      */
-    @Deprecated
     IO_RW,
 
     /**

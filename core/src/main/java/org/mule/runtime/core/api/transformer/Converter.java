@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.transformer;
 
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 
 /**
  * Defines a {@link Transformer} that is a data type converters, ie: convert data from a type to another without modifying the
@@ -38,7 +38,7 @@ public interface Converter extends Transformer {
   @Override
   default ProcessingType getProcessingType() {
     if (getReturnDataType().isStreamType() || getSourceDataTypes().stream().anyMatch(dataType -> dataType.isStreamType())) {
-      return BLOCKING;
+      return IO_RW;
     } else {
       return CPU_LITE;
     }
