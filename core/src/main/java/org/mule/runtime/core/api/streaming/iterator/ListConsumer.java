@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.api.streaming.iterator;
 
+import org.mule.api.annotation.NoExtend;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -17,6 +19,7 @@ import java.util.NoSuchElementException;
  * 
  * @since 3.5.0
  */
+@NoExtend
 public class ListConsumer<T> extends AbstractConsumer<T, List<T>> {
 
   private List<T> currentPage = null;

@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * A safe facade for lifecycle manager that objects can use to monitor its own state
  *
  * @since 3.0
  */
+@NoImplement
 public interface LifecycleState {
 
   boolean isInitialised();

@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Creates a new instance of the object on each call.
  */
-public class PrototypeObjectFactory extends AbstractObjectFactory {
+public final class PrototypeObjectFactory extends AbstractObjectFactory {
 
   /** For Spring only */
   public PrototypeObjectFactory() {

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
@@ -14,6 +15,7 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
  *
  * @since 4.0
  */
+@NoImplement
 public interface PrivilegedMuleContext extends MuleContext {
 
   /**

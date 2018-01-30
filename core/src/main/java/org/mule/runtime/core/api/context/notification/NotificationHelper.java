@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Simple class to fire notifications of a specified type over a {@link ServerNotificationHandler}.
  */
-public class NotificationHelper {
+public final class NotificationHelper {
 
   private static final Logger logger = LoggerFactory.getLogger(NotificationHelper.class);
 

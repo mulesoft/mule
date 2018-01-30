@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.event;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -17,6 +18,7 @@ import java.util.List;
  *
  * @since 4.1
  */
+@NoImplement
 public interface EventContextService {
 
   public static final String REGISTRY_KEY = "_muleEventContextService";

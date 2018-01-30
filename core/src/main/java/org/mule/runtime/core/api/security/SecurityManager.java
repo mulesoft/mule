@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.security;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
@@ -20,6 +21,7 @@ import java.util.Collection;
  *
  * @since 4.0
  */
+@NoImplement
 public interface SecurityManager extends Initialisable {
 
   /**

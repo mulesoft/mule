@@ -18,7 +18,7 @@ import java.util.ServiceLoader;
  *
  * @since 3.7.0
  */
-public class SpiServiceRegistry extends AbstractServiceRegistry {
+public final class SpiServiceRegistry extends AbstractServiceRegistry {
 
   @Override
   protected synchronized <T> Collection<T> doLookupProviders(Class<T> providerClass, ClassLoader classLoader) {

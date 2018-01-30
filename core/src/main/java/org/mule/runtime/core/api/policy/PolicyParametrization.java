@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class PolicyParametrization {
+public final class PolicyParametrization {
 
   private final String id;
   private final PolicyPointcut pointcut;

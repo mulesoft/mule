@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.core.api.util.compression;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * <code>CompressionStrategy</code> is a base interface for Different compression strategies
  */
+@NoImplement
 public interface CompressionStrategy {
 
   /**

@@ -39,7 +39,7 @@ import net.sf.cglib.proxy.NoOp;
  *
  * @since 4.0
  */
-public class AnnotatedObjectInvocationHandler {
+public final class AnnotatedObjectInvocationHandler {
 
   private static final Set<Method> MANAGED_METHODS =
       unmodifiableSet(new HashSet<>(asList(Component.class.getDeclaredMethods())));

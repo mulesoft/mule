@@ -8,6 +8,7 @@ package org.mule.runtime.core.privileged.execution;
 
 import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.ComponentLocationProvider;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
@@ -23,6 +24,7 @@ import javax.xml.namespace.QName;
  *
  * @since 3.8.0
  */
+@NoExtend
 public abstract class LocationExecutionContextProvider extends ComponentLocationProvider implements ExceptionContextProvider {
 
   protected static final QName SOURCE_ELEMENT_ANNOTATION_KEY =

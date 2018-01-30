@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.processor.strategy;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
@@ -13,6 +14,7 @@ import org.mule.runtime.core.api.MuleContext;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ProcessingStrategyFactory {
 
   /**

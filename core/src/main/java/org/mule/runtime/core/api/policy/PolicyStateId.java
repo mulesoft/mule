@@ -17,7 +17,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
  * 
  * @since 4.0
  */
-public class PolicyStateId {
+public final class PolicyStateId {
 
   private String executionIdentifier;
   private String policyId;

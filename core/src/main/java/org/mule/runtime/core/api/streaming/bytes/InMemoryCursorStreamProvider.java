@@ -18,7 +18,7 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
-public class InMemoryCursorStreamProvider extends AbstractCursorStreamProvider {
+public final class InMemoryCursorStreamProvider extends AbstractCursorStreamProvider {
 
   private final InMemoryStreamBuffer buffer;
 

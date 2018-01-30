@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Discovers {@link BootstrapService} instances corresponding to bootstrap.properties files
  */
-public class PropertiesBootstrapServiceDiscoverer implements BootstrapServiceDiscoverer {
+public final class PropertiesBootstrapServiceDiscoverer implements BootstrapServiceDiscoverer {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private final ClassLoader classLoader;

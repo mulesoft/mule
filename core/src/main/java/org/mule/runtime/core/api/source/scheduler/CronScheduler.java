@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * @since 3.5.0
  */
 @Alias("cron")
-public class CronScheduler extends PeriodicScheduler implements CronSchedulerConfiguration {
+public final class CronScheduler extends PeriodicScheduler implements CronSchedulerConfiguration {
 
   private static final Logger logger = LoggerFactory.getLogger(CronScheduler.class);
 

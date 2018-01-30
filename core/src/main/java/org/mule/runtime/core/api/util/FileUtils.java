@@ -787,4 +787,6 @@ public class FileUtils {
   public static File createTempFile(String prefix, String suffix) {
     return new File(TEMP_DIR, prefix + random.nextLong() + suffix);
   }
+
+  private FileUtils() {}
 }

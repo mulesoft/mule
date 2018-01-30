@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.policy;
 
-import org.mule.runtime.core.api.policy.PolicyChain;
+import org.mule.api.annotation.NoExtend;
 
 /**
  * This class represents a policy injection.
@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.policy.PolicyChain;
  * It contains the set of parameters configured to apply the policy and the chain of
  * {@link org.mule.runtime.core.api.processor.Processor}s to be applied.
  */
+@NoExtend
 public class Policy {
 
   private final PolicyChain policyChain;

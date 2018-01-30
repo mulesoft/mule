@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleContext;
  * <code>MuleContextNotification</code> is fired when an event such as the mule context starting occurs. The payload of this event
  * will always be a reference to the muleContext.
  */
-public class MuleContextNotification extends AbstractServerNotification {
+public final class MuleContextNotification extends AbstractServerNotification {
 
   /**
    * Serial version

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.transaction;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.api.tx.TransactionException;
@@ -34,6 +35,7 @@ import javax.transaction.xa.XAResource;
 /**
  * <code>XaTransaction</code> represents an XA transaction in Mule.
  */
+@NoExtend
 public class XaTransaction extends AbstractTransaction {
 
   /**

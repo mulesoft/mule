@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.connector;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -27,6 +28,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ConnectionManager {
 
   /**

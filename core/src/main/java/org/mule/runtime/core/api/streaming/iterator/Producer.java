@@ -8,6 +8,7 @@
 package org.mule.runtime.core.api.streaming.iterator;
 
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.streaming.HasSize;
 
 import java.io.Closeable;
@@ -18,6 +19,7 @@ import java.io.Closeable;
  * 
  * @since 3.5.0
  */
+@NoImplement
 public interface Producer<T> extends Closeable, HasSize {
 
   /**

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -14,6 +15,7 @@ import org.mule.runtime.core.api.processor.Processor;
  * 
  * @since 4.0
  */
+@NoImplement
 public interface AnnotatedProcessor extends Component, Processor {
 
 }

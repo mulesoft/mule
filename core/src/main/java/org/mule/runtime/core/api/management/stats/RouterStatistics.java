@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
+import org.mule.api.annotation.NoExtend;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +18,7 @@ import java.util.Map;
  * <code>RouterStatistics</code> TODO
  *
  */
+@NoExtend
 public class RouterStatistics implements Statistics {
 
   /**

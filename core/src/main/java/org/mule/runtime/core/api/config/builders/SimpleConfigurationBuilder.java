@@ -18,7 +18,7 @@ import java.util.Map;
  * the {@link ConfigurationBuilder} interface. This is useful for example for the registration of "startup properties" which are
  * provided at startup and then used to fill "property placeholders" in other configuration mechanisms such as XML.
  */
-public class SimpleConfigurationBuilder extends AbstractConfigurationBuilder {
+public final class SimpleConfigurationBuilder extends AbstractConfigurationBuilder {
 
   protected Map<String, ?> objects;
 

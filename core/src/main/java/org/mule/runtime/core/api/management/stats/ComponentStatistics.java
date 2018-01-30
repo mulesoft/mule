@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.api.util.StringUtils;
 
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
  * ComponentStatistics is a basic metrics aggregation class that is accessible via the JMX api. This class is not thread-safe -
  * occasional errors in reported statistics should be expected, especially when the {@link #clear()} method is used.
  */
+@NoExtend
 public class ComponentStatistics implements Statistics {
 
   private static final Logger logger = LoggerFactory.getLogger(ComponentStatistics.class);

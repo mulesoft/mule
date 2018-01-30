@@ -14,7 +14,7 @@ import java.lang.reflect.Member;
  * A data class that associates context information about an annotation. This class allows for associated annotation data to be
  * passed between methods.
  */
-public class AnnotationMetaData {
+public final class AnnotationMetaData {
 
   private ElementType type;
 

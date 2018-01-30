@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.context;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
@@ -24,6 +25,7 @@ import java.util.Properties;
  * Builder that is used to build instances of {@link MuleContext}. Implementing classes are stateful and should provide public
  * chainable setters for configuring the builder instance and no public getters.
  */
+@NoImplement
 public interface MuleContextBuilder {
 
   /**

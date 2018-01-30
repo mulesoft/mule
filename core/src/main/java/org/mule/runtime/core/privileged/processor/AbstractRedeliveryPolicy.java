@@ -8,6 +8,7 @@ package org.mule.runtime.core.privileged.processor;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -21,6 +22,7 @@ import org.mule.runtime.core.api.processor.Processor;
  * too often, the message is sent to the failedMessageProcessor MP, whence success is force to be returned, to allow the message
  * to be considered "consumed".
  */
+@NoExtend
 public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessageProcessor
     implements Processor, Lifecycle, MuleContextAware {
 

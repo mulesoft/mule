@@ -347,4 +347,6 @@ public class IOUtils {
   public static void closeQuietly(Closeable closeable) {
     org.apache.commons.io.IOUtils.closeQuietly(closeable);
   }
+
+  private IOUtils() {}
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.transaction.xa;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
@@ -20,6 +21,7 @@ import javax.transaction.TransactionManager;
  * <code>XaTransactionFactory</code> Is used to create/retrieve a Transaction from a transaction manager configured on the
  * MuleManager.
  */
+@NoExtend
 public class XaTransactionFactory implements ExternalTransactionAwareTransactionFactory {
 
   private int timeout;

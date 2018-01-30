@@ -10,14 +10,16 @@ import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.join;
 
+import org.mule.api.annotation.NoExtend;
+
 import java.util.Collection;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 /**
  * Base implementation of {@link ServiceRegistry} that enforce common behaviour for all implementations.
  */
+@NoExtend
 public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
   /**

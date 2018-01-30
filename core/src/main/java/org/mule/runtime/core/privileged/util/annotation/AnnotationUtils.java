@@ -29,4 +29,6 @@ public class AnnotationUtils {
   public static <T extends Annotation> Optional<T> getAnnotation(Class<?> aClass, Class<T> annotationType) {
     return aClass != null ? ofNullable(aClass.getAnnotation(annotationType)) : empty();
   }
+
+  private AnnotationUtils() {}
 }

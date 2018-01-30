@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  *
  */
-public class SingleResourceTransactionFactoryManager {
+public final class SingleResourceTransactionFactoryManager {
 
   private Map<Class, TransactionFactory> transactionFactories = new HashMap<>();
   private Map<Class, TransactionFactory> transactionFactoriesCache = new HashMap<>();

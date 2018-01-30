@@ -69,8 +69,7 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
 
       try {
         currentThread().setContextClassLoader(newClassLoader);
-        Object newInstance = clazz.newInstance();
-        clazz.getMethod("copyLarge", InputStream.class, OutputStream.class).invoke(newInstance, in, out);
+        clazz.getMethod("copyLarge", InputStream.class, OutputStream.class).invoke(clazz, in, out);
       } finally {
         currentThread().setContextClassLoader(contextClassLoader);
       }

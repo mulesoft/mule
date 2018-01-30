@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.exception.MuleException;
 
 /**
@@ -13,6 +14,7 @@ import org.mule.runtime.api.exception.MuleException;
  *
  * @since 3.7.0
  */
+@NoImplement
 public interface Injector {
 
   /**

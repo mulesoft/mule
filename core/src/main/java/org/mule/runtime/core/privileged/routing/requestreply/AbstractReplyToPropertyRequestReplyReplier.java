@@ -8,6 +8,7 @@ package org.mule.runtime.core.privileged.routing.requestreply;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -17,6 +18,7 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 
+@NoExtend
 public abstract class AbstractReplyToPropertyRequestReplyReplier extends AbstractInterceptingMessageProcessor
     implements RequestReplyReplierMessageProcessor, InternalProcessor {
 

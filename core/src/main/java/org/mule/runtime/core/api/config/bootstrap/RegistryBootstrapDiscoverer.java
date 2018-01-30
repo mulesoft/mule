@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.config.bootstrap;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.util.List;
 import java.util.Properties;
 
@@ -13,6 +15,7 @@ import java.util.Properties;
  * Allows to discover properties to be used during the bootstrap process. Implementing this interface you will be able to
  * customize which Properties are taken into account at the bootstrap process, and the order they are processed.
  */
+@NoImplement
 public interface RegistryBootstrapDiscoverer {
 
   /**

@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.util;
 
-import org.apache.commons.collections.map.AbstractHashedMap;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -15,6 +13,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.collections.map.AbstractHashedMap;
 
 /**
  * A case-insensitive <code>Map</code>.
@@ -31,7 +31,7 @@ import java.util.Set;
  *
  * @since 3.0.0
  */
-public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
+public final class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
 
   /**
    * Serialisation version

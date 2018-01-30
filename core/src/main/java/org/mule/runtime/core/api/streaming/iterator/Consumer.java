@@ -8,6 +8,7 @@
 package org.mule.runtime.core.api.streaming.iterator;
 
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.streaming.HasSize;
 import org.mule.runtime.core.internal.streaming.object.iterator.ClosedConsumerException;
 
@@ -21,6 +22,7 @@ import java.util.NoSuchElementException;
  * 
  * @since 3.5.0
  */
+@NoImplement
 public interface Consumer<T> extends Closeable, HasSize {
 
   /**

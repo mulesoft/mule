@@ -25,7 +25,7 @@ import org.slf4j.Logger;
  * <code>ExpiryMonitor</code> can monitor objects beased on an expiry time and can invoke a callback method once the object time
  * has expired. If the object does expire it is removed from this monitor.
  */
-public class ExpiryMonitor implements Runnable, Disposable {
+public final class ExpiryMonitor implements Runnable, Disposable {
 
   /**
    * logger used by this class

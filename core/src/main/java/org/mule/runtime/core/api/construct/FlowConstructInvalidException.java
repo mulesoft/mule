@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.construct;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 
-public class FlowConstructInvalidException extends MuleException {
+public final class FlowConstructInvalidException extends MuleException {
 
   private static final long serialVersionUID = -8170840339166473625L;
 

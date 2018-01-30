@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * This class will start an Startable mule object that must only be started in the primary node.
  *
  */
-public class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNotificationListener {
+public final class PrimaryNodeLifecycleNotificationListener implements ClusterNodeNotificationListener {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
   private Startable startMeOnPrimaryNodeNotification;

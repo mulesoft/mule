@@ -24,7 +24,7 @@ import java.util.TreeSet;
  * 
  * @since 4.0
  */
-public class ExceptionMapper {
+public final class ExceptionMapper {
 
   private Set<ExceptionMapping> exceptionMappings = new TreeSet<>();
 

@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Default implementation that uses {@link DefaultMuleContextBuilder} to build new {@link MuleContext} instances.
  */
-public class DefaultMuleContextFactory implements MuleContextFactory {
+public final class DefaultMuleContextFactory implements MuleContextFactory {
 
   protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleContextFactory.class);
 
