@@ -310,7 +310,7 @@
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
-        <oldMuleArtifactVersion>4.1.0-SNAPSHOT</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.1.1-SNAPSHOT</oldMuleArtifactVersion>
     </properties>
 
     <dependencies>
