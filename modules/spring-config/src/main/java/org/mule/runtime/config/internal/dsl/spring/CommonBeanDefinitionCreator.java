@@ -21,7 +21,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.CUSTOM_TRA
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
-import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactAndAncestorsPluginClassLoaders;
+import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
@@ -89,7 +89,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   }
 
   private BeanDefinitionPostProcessor resolvePostProcessor() {
-    for (ClassLoader classLoader : resolveContextArtifactAndAncestorsPluginClassLoaders()) {
+    for (ClassLoader classLoader : resolveContextArtifactPluginClassLoaders()) {
       try {
         final BeanDefinitionPostProcessor foundProvider =
             new SpiServiceRegistry().lookupProvider(BeanDefinitionPostProcessor.class, classLoader);

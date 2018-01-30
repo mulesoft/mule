@@ -151,35 +151,14 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       return new LazyMuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration,
                                          optionalObjectsController,
                                          getArtifactProperties(), artifactType,
-                                         resolveArtifactContextPluginClassLoadersRecursively(),
+                                         resolveContextArtifactPluginClassLoaders(),
                                          resolveComponentModelInitializer(),
                                          resolveParentConfigurationProperties(), disableXmlValidations);
     }
 
     return new MuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration, optionalObjectsController,
-                                   getArtifactProperties(), artifactType, resolveArtifactContextPluginClassLoadersRecursively(),
+                                   getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders(),
                                    resolveParentConfigurationProperties(), disableXmlValidations);
-  }
-
-  private List<ClassLoader> resolveArtifactContextPluginClassLoadersRecursively() {
-    Set<ClassLoader> artifactContextPluginClassLoaders = new HashSet<>(resolveContextArtifactPluginClassLoaders());
-    artifactContextPluginClassLoaders.addAll(resolveArtifactContextPluginClassLoaders(parentContext));
-    return new ArrayList<>(artifactContextPluginClassLoaders);
-  }
-
-  private Set<ClassLoader> resolveArtifactContextPluginClassLoaders(ApplicationContext context) {
-    Set<ClassLoader> artifactContextPluginClassLoaders = new HashSet<>();
-    if (context != null) {
-      ClassLoader currentClassLoader = currentThread().getContextClassLoader();
-      try {
-        currentThread().setContextClassLoader(context.getClassLoader());
-        artifactContextPluginClassLoaders.addAll(resolveContextArtifactPluginClassLoaders());
-        artifactContextPluginClassLoaders.addAll(resolveArtifactContextPluginClassLoaders(context.getParent()));
-      } finally {
-        currentThread().setContextClassLoader(currentClassLoader);
-      }
-    }
-    return artifactContextPluginClassLoaders;
   }
 
   private ConfigResource[] resolveArtifactConfigResources() {

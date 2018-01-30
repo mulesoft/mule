@@ -63,17 +63,20 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
   /**
    * Resolves the plugin classloader of the thread context class loader artifact and all it's ancestor
    */
-  public static List<ClassLoader> resolveContextArtifactAndAncestorsPluginClassLoaders() {
+  public static List<ClassLoader> resolveContextArtifactPluginClassLoaders() {
     Set<ClassLoader> resolvedClassLoaders = new HashSet<>();
     ClassLoader originalClassLoader = currentThread().getContextClassLoader();
     ClassLoader tmpClassLoader = originalClassLoader;
-    resolvedClassLoaders.addAll(resolveContextArtifactPluginClassLoaders());
-    while (tmpClassLoader.getParent() != null) {
-      tmpClassLoader = tmpClassLoader.getParent();
-      currentThread().setContextClassLoader(tmpClassLoader);
-      resolvedClassLoaders.addAll(resolveContextArtifactPluginClassLoaders());
+    resolvedClassLoaders.addAll(resolveContextArtifactPluginClassLoadersForCurrentClassLoader());
+    try {
+      while (tmpClassLoader.getParent() != null) {
+        tmpClassLoader = tmpClassLoader.getParent();
+        currentThread().setContextClassLoader(tmpClassLoader);
+        resolvedClassLoaders.addAll(resolveContextArtifactPluginClassLoadersForCurrentClassLoader());
+      }
+    } finally {
+      currentThread().setContextClassLoader(originalClassLoader);
     }
-    currentThread().setContextClassLoader(originalClassLoader);
     return new ArrayList<>(resolvedClassLoaders);
   }
 
@@ -84,7 +87,7 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
    * 
    * @return the plugin classloader of the current thread context artifact.
    */
-  public static List<ClassLoader> resolveContextArtifactPluginClassLoaders() {
+  private static List<ClassLoader> resolveContextArtifactPluginClassLoadersForCurrentClassLoader() {
     // TODO MULE-12254
     // When running the tests, the classloader hierarchy is build with the launcher, but when executing here we are with the
     // container.
