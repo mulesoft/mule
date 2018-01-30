@@ -79,14 +79,25 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     @Override
     public boolean emit(CoreEvent event) {
       onEventConsumer.accept(event);
-      // Optimization to avoid a sync block here while also minimizing the possibility of blocking source threads if next is
-      // called when there are no pending requests. Optimization is not applied is buffer size is small relative to the number of
-      // cores. See also: https://github.com/reactor/reactor-core/issues/1037
-      if (fluxSink.requestedFromDownstream() > (bufferSize > CORES * 4 ? CORES : 0)) {
+      // Optimization to avoid using synchronized block for all emissions.
+      // See: https://github.com/reactor/reactor-core/issues/1037
+      if (fluxSink.requestedFromDownstream() == 0) {
+        return false;
+      } else if (fluxSink.requestedFromDownstream() > (bufferSize > CORES * 4 ? CORES : 0)) {
+        // If there is sufficient room in buffer to significantly reduce change of concurrent emission when buffer is full then
+        // emit without synchronized block.
         fluxSink.next(event);
         return true;
       } else {
-        return false;
+        // If there is very little room in buffer also emit but synchronized.
+        synchronized (fluxSink) {
+          if (fluxSink.requestedFromDownstream() > 0) {
+            fluxSink.next(event);
+            return true;
+          } else {
+            return false;
+          }
+        }
       }
     }
 
