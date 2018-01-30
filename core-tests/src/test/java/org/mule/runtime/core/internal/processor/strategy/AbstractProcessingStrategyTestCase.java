@@ -26,6 +26,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
@@ -170,6 +171,14 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       } else {
         return failingProcessor.process(event);
       }
+    }
+  };
+
+  protected Processor ioRWProcessor = new ThreadTrackingProcessor() {
+
+    @Override
+    public ProcessingType getProcessingType() {
+      return IO_RW;
     }
   };
 
@@ -428,6 +437,14 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Test
   public abstract void tx() throws Exception;
+
+  protected void singleIORW(Callable<CoreEvent> eventSupplier) throws Exception {
+    flow = flowBuilder.get().processors(ioRWProcessor).build();
+
+    flow.initialise();
+    flow.start();
+    processFlow(eventSupplier.call());
+  }
 
   protected CoreEvent processFlow(CoreEvent event) throws Exception {
     setMuleContextIfNeeded(flow, muleContext);

@@ -236,4 +236,12 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
     testBackPressure(DROP, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
   }
 
+  @Test
+  @Description("Regardless of processor type, when the ReactorProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a single cpu light thread.")
+  public void singleIORW() throws Exception {
+    super.singleIORW(() -> testEvent());
+    assertEverythingOnEventLoop();
+  }
+
 }
