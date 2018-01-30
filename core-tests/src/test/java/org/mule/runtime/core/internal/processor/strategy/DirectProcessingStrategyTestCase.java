@@ -137,7 +137,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
 
   @Test
   @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
-               + "synchronously in a caller thread.")
+      + "synchronously in a caller thread.")
   public void singleIORW() throws Exception {
     super.singleIORW(() -> testEvent());
     assertSynchronous(1);
