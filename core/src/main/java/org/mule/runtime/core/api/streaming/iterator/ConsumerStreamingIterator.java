@@ -20,7 +20,7 @@ import java.io.IOException;
  *
  * @since 4.0
  */
-public class ConsumerStreamingIterator<T> implements StreamingIterator<T> {
+public final class ConsumerStreamingIterator<T> implements StreamingIterator<T> {
 
   private Consumer<T> consumer;
 

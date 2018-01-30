@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 /**
  * <code>QueueProfile</code> determines how an internal queue for a service will behave
  */
-public class QueueProfile extends AbstractComponent {
+public final class QueueProfile extends AbstractComponent {
 
   private int maxOutstandingMessages = 0;
   private boolean persistent;

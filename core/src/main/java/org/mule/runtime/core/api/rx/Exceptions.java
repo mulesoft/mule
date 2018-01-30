@@ -194,4 +194,6 @@ public class Exceptions {
       return t;
     }
   }
+
+  private Exceptions() {}
 }

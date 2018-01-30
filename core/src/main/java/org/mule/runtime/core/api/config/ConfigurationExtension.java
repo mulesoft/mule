@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.config;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Marker interface for custom configuration extensions defined inside {@link MuleConfiguration}
  *
@@ -13,6 +15,7 @@ package org.mule.runtime.core.api.config;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ConfigurationExtension {
 
 }

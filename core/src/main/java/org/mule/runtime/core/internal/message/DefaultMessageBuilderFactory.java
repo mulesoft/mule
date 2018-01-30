@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.Message;
 /**
  *
  */
-public class DefaultMessageBuilderFactory extends AbstractMuleMessageBuilderFactory {
+public final class DefaultMessageBuilderFactory extends AbstractMuleMessageBuilderFactory {
 
   private static DefaultMessageBuilderFactory INSTANCE = new DefaultMessageBuilderFactory();
 

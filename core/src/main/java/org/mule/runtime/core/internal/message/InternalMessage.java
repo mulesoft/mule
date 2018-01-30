@@ -6,22 +6,24 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 
-import javax.activation.DataHandler;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.activation.DataHandler;
+
 /**
  * Message
  */
+@NoImplement
 public interface InternalMessage extends Message, MessageProperties, MessageAttachments {
 
   /**

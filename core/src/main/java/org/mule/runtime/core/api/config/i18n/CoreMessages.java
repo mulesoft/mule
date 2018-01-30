@@ -967,4 +967,6 @@ public class CoreMessages extends I18nMessageFactory {
   public static I18nMessage nullWatermark() {
     return factory.createMessage(BUNDLE_PATH, 350);
   }
+
+  private CoreMessages() {}
 }

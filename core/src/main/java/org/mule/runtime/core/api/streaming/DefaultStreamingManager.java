@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -37,6 +38,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
+@NoExtend
 public class DefaultStreamingManager implements StreamingManager, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(DefaultStreamingManager.class);

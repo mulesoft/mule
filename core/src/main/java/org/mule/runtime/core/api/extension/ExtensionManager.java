@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.extension;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -29,6 +30,7 @@ import java.util.Set;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ExtensionManager {
 
   /**

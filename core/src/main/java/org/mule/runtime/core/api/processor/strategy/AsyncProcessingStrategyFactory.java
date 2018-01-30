@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.getInteger;
+import org.mule.api.annotation.NoImplement;
 
 /**
  *
@@ -15,6 +16,7 @@ import static java.lang.Integer.getInteger;
  *
  * @since 4.0
  */
+@NoImplement
 public interface AsyncProcessingStrategyFactory extends ProcessingStrategyFactory {
 
   int DEFAULT_MAX_CONCURRENCY =

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.api.util.queue;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.NamedObject;
 
@@ -15,6 +16,7 @@ import java.io.Serializable;
 /**
  * Interface for mule queues used for VM.
  */
+@NoImplement
 public interface Queue extends NamedObject {
 
   /**

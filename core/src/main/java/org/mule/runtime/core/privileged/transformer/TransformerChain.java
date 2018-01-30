@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * A referencable chain of transformers that can be used as a single transformer
  */
-public class TransformerChain extends AbstractMessageTransformer {
+public final class TransformerChain extends AbstractMessageTransformer {
 
   private List<Transformer> transformers;
 

@@ -17,7 +17,7 @@ import java.util.Set;
  * Session variables wrapper {@link Map} for exposing Session variables via an
  * {@link ExtendedExpressionLanguageAdaptor}
  */
-public class SessionVariableMapContext extends AbstractMapContext<Object> {
+public final class SessionVariableMapContext extends AbstractMapContext<Object> {
 
   private MuleSession session;
 

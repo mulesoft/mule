@@ -33,7 +33,7 @@ import java.util.Map.Entry;
  * @since 3.5.0
  * @see RoutingResult
  */
-public class CompositeRoutingException extends MuleException implements ComposedErrorException, ErrorMessageAwareException {
+public final class CompositeRoutingException extends MuleException implements ComposedErrorException, ErrorMessageAwareException {
 
   private static final String MESSAGE_TITLE = "Exception(s) were found for route(s): ";
 

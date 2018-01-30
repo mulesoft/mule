@@ -7,9 +7,12 @@
 
 package org.mule.runtime.core.api.management.stats;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Maintains different statistics for {@link org.mule.runtime.core.api.construct.FlowConstruct} instances
  */
+@NoImplement
 public interface FlowConstructStatistics extends Statistics {
 
   /**

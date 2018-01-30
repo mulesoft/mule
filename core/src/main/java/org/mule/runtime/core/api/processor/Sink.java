@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
@@ -25,6 +26,7 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
+@NoImplement
 public interface Sink extends Consumer<CoreEvent> {
 
   /**

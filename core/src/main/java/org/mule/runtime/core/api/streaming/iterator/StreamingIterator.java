@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.api.streaming.iterator;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.streaming.HasSize;
 
 import java.io.Closeable;
@@ -19,6 +20,7 @@ import java.util.Iterator;
  * 
  * @param <T> the type of elements returned by this iterator
  */
+@NoImplement
 public interface StreamingIterator<T> extends Iterator<T>, Closeable, HasSize {
 
   /**

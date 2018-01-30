@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.retry.policy;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -16,6 +18,7 @@ import org.reactivestreams.Publisher;
  * A RetryPolicy takes some action each time an exception occurs and returns a {@link PolicyStatus} which indicates whether the
  * policy is exhausted or should continue to retry.
  */
+@NoImplement
 public interface RetryPolicy {
 
   /**

@@ -21,7 +21,7 @@ import org.apache.commons.lang3.ArrayUtils;
  *
  * @since 4.0
  */
-public class DefaultMuleCredentials implements Credentials, Serializable {
+public final class DefaultMuleCredentials implements Credentials, Serializable {
 
   private static final String TOKEN_DELIM = "::";
 

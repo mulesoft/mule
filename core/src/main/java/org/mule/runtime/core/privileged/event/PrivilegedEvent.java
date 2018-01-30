@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.event;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -21,17 +22,18 @@ import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 
-import org.slf4j.MDC;
-
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
+
+import org.slf4j.MDC;
 
 /**
  * Allows access to the privileged behavior of the {@link Event} implementation.
  *
  * @since 4.0
  */
+@NoImplement
 public interface PrivilegedEvent extends CoreEvent {
 
   public static final String CORRELATION_ID_MDC_KEY = "correlationId";

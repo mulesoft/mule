@@ -255,4 +255,5 @@ public class SystemUtils {
     }
   }
 
+  private SystemUtils() {}
 }

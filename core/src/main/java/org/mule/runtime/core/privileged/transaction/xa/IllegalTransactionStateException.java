@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.transaction.TransactionStatusException;
 /**
  * <code>IllegalTransactionStateException</code> TODO (document class)
  */
-public class IllegalTransactionStateException extends TransactionStatusException {
+public final class IllegalTransactionStateException extends TransactionStatusException {
 
   /**
    * Serial version

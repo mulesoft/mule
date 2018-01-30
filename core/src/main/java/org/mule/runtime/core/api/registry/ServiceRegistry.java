@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.registry;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.util.Collection;
 import java.util.ServiceLoader;
 
@@ -15,6 +17,7 @@ import java.util.ServiceLoader;
  *
  * @since 3.7.0
  */
+@NoImplement
 public interface ServiceRegistry {
 
   /**

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
 import java.io.Serializable;
@@ -14,6 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Accumulates the processing time for all branches of a flow
  */
+@NoExtend
 public class ProcessingTime implements Serializable {
 
   /**

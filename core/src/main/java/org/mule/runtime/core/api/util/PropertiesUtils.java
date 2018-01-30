@@ -48,7 +48,7 @@ public final class PropertiesUtils {
   }
 
   /** Do not instanciate. */
-  protected PropertiesUtils() {
+  private PropertiesUtils() {
     // no-op
   }
 

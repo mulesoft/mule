@@ -8,6 +8,7 @@
 package org.mule.runtime.core.api.construct;
 
 import static org.mule.runtime.api.deployment.management.ComponentInitialStateManager.SERVICE_ID;
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
@@ -32,6 +33,7 @@ import java.util.List;
  * <li>Supports the optional configuration of a {@link ProcessingStrategy} that determines how message processors are processed.
  * </ul>
  */
+@NoImplement
 public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processor {
 
   String INITIAL_STATE_STOPPED = "stopped";
@@ -100,7 +102,6 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
      *
      * @return same builder instance.
      */
-    // TODO(pablo.kraan): MULE-13545 - added as a workaround to avoid exposing DirectProcessingStrategyFactory on the API
     Builder withDirectProcessingStrategyFactory();
 
     /**

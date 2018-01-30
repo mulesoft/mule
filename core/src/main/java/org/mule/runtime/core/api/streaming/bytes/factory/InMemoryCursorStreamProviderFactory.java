@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.streaming.bytes.factory;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -22,6 +23,7 @@ import java.io.InputStream;
  * @see InMemoryCursorStreamProvider
  * @since 4.0
  */
+@NoExtend
 public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamProviderFactory {
 
   private final InMemoryCursorStreamConfig config;

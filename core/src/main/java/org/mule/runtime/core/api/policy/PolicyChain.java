@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.from;
-
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -32,18 +32,19 @@ import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import org.reactivestreams.Publisher;
-
 import java.util.List;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Policy chain for handling the message processor associated to a policy.
  *
  * @since 4.0
  */
+@NoExtend
 public class PolicyChain extends AbstractComponent
     implements Initialisable, Startable, Stoppable, Disposable, Processor {
 

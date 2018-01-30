@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * <code>TransactionConfig</code> defines transaction configuration for a transactional endpoint.
  */
+@NoImplement
 public interface TransactionConfig {
 
   /**

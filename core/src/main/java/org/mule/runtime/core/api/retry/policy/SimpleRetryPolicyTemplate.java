@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This policy allows the user to configure how many times a retry should be attempted and how long to wait between retries.
  */
-public class SimpleRetryPolicyTemplate extends AbstractPolicyTemplate {
+public final class SimpleRetryPolicyTemplate extends AbstractPolicyTemplate {
 
   /**
    * logger used by this class

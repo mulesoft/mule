@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  * Implementation of {@link PeriodicScheduler} for a fixed-frequency job.
  */
 @Alias("fixed-frequency")
-public class FixedFrequencyScheduler extends PeriodicScheduler implements FixedFrequencySchedulerConfiguration {
+public final class FixedFrequencyScheduler extends PeriodicScheduler implements FixedFrequencySchedulerConfiguration {
 
   @Parameter
   @Optional(defaultValue = "MILLISECONDS")

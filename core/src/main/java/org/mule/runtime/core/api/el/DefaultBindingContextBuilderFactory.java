@@ -10,7 +10,7 @@ import org.mule.runtime.api.el.AbstractBindingContextBuilderFactory;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
 
-public class DefaultBindingContextBuilderFactory extends AbstractBindingContextBuilderFactory {
+public final class DefaultBindingContextBuilderFactory extends AbstractBindingContextBuilderFactory {
 
   @Override
   protected BindingContext.Builder create() {

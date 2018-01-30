@@ -122,4 +122,5 @@ public class NumberUtils {
         + "] to target class [" + targetClass.getName() + "]: overflow");
   }
 
+  private NumberUtils() {}
 }

@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Fires a {@link ConnectionNotification} each time a retry attempt is made.
  */
-public class ConnectNotifier implements RetryNotifier {
+public final class ConnectNotifier implements RetryNotifier {
 
   protected transient final Logger logger = LoggerFactory.getLogger(ConnectNotifier.class);
 

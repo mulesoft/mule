@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.source.scheduler;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 import java.util.concurrent.ScheduledFuture;
@@ -16,6 +17,7 @@ import java.util.concurrent.ScheduledFuture;
  * @since 4.0
  */
 @Alias("scheduling-strategy")
+@NoImplement
 public interface Scheduler {
 
   /**

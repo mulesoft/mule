@@ -12,7 +12,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 
 /** <code>DisposeException</code> TODO (document class) */
 
-public class StopException extends LifecycleException {
+public final class StopException extends LifecycleException {
 
   /** Serial version */
   private static final long serialVersionUID = 1714192220605243678L;

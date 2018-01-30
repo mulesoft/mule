@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 /**
  * A simple tuple that stores a listener with an optional subscription (used to match a resource ID).
  */
-public class ListenerSubscriptionPair<N extends Notification> extends AbstractComponent {
+public final class ListenerSubscriptionPair<N extends Notification> extends AbstractComponent {
 
   public final static String ANY_SELECTOR_STRING = "*";
 

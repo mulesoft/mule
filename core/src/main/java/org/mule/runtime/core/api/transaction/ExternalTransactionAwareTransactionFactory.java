@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 
@@ -15,6 +16,7 @@ import org.mule.runtime.core.api.MuleContext;
  * outside Mule.
  *
  */
+@NoImplement
 public interface ExternalTransactionAwareTransactionFactory extends TransactionFactory {
 
   /**

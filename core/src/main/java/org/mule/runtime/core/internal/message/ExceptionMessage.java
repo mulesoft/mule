@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import org.mule.runtime.core.api.event.CoreEvent;
+
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -15,8 +17,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mule.runtime.core.api.event.CoreEvent;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * <code>ExceptionMessage</code> is used by the DefaultServiceExceptionStrategy for wrapping an exception with a message to send
  * via an endpointUri.
  */
-public class ExceptionMessage implements Serializable {
+public final class ExceptionMessage implements Serializable {
 
   /**
    * Serial version

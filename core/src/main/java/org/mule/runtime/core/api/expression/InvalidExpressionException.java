@@ -12,7 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
  * Is thrown explicitly when an expression is Malformed or invalid. Malformed means the syntax is not correct, but an expression
  * can be invalid if it refers to an expression namespace or function that does not exist
  */
-public class InvalidExpressionException extends ExpressionRuntimeException {
+public final class InvalidExpressionException extends ExpressionRuntimeException {
 
   private static final long serialVersionUID = 7812777734559472971L;
 

@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * <p/>
  * <code>MuleTransactionConfig</code> defines transaction configuration for a transactional endpoint.
  */
-public class MuleTransactionConfig implements TransactionConfig, MuleContextAware {
+public final class MuleTransactionConfig implements TransactionConfig, MuleContextAware {
 
   /**
    * logger used by this class

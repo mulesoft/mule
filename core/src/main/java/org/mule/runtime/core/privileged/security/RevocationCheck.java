@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.privileged.security;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.security.KeyStore;
 import java.security.cert.TrustAnchor;
 import java.util.Set;
@@ -17,6 +19,7 @@ import javax.net.ssl.ManagerFactoryParameters;
  *
  * @since 4.1
  */
+@NoImplement
 public interface RevocationCheck {
 
   /**

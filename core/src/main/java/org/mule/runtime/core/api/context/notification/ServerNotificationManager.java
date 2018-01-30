@@ -10,6 +10,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.AsyncMessageNotification;
@@ -86,6 +87,7 @@ import org.slf4j.Logger;
  * <li>Enquiring whether an event is enabled returns true if any subclass is enabled.</li>
  * </ul>
  */
+@NoExtend
 public class ServerNotificationManager implements ServerNotificationHandler, MuleContextAware {
 
   private static final Logger logger = getLogger(ServerNotificationManager.class);

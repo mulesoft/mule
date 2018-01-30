@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.retry.policy;
 
 import static org.slf4j.LoggerFactory.getLogger;
-
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.retry.RetryCallback;
@@ -15,17 +15,18 @@ import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.internal.retry.DefaultRetryContext;
 
-import org.slf4j.Logger;
-
 import java.io.InterruptedIOException;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+
 /**
  * Base class for RetryPolicyTemplate implementations. Uses ConnectNotifier as RetryNotifier by default.
  */
+@NoExtend
 public abstract class AbstractPolicyTemplate extends AbstractComponent implements RetryPolicyTemplate {
 
   protected RetryNotifier notifier = new ConnectNotifier();

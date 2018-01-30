@@ -264,4 +264,5 @@ public class ExceptionUtils {
     return Optional.ofNullable((ComponentIdentifier) obj.getAnnotation(ANNOTATION_NAME));
   }
 
+  private ExceptionUtils() {}
 }

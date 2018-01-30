@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.el;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.el.Binding;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
@@ -16,6 +17,7 @@ import org.mule.runtime.api.el.ExpressionFunction;
  *
  * @since 4.0
  */
+@NoImplement
 public interface GlobalBindingContextProvider {
 
   /**

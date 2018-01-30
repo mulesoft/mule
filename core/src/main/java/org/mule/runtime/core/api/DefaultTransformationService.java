@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectNotOfSpecifiedType;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -34,6 +35,7 @@ import javax.inject.Inject;
  *
  * TODO Redefine this interface as part of Mule 4.0 transformation improvements (MULE-9141)
  */
+@NoExtend
 public class DefaultTransformationService implements TransformationService {
 
   protected MuleContext muleContext;

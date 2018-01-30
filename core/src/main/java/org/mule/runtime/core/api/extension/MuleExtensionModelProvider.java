@@ -19,7 +19,7 @@ import org.mule.runtime.internal.dsl.NullDslResolvingContext;
  *
  * @since 4.0
  */
-public class MuleExtensionModelProvider {
+public final class MuleExtensionModelProvider {
 
   public static final String MULE_NAME = CORE_PREFIX;
   public static final String MULE_VERSION = getProductVersion();

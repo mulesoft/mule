@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.util.queue;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
 import javax.transaction.xa.XAResource;
@@ -13,6 +14,7 @@ import javax.transaction.xa.XAResource;
 /**
  * Session for executing operation over queues.
  */
+@NoImplement
 public interface QueueSession extends XAResource {
 
   /**

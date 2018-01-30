@@ -15,7 +15,7 @@ import java.io.OutputStream;
 
 import javax.activation.DataSource;
 
-public class StringDataSource implements DataSource {
+public final class StringDataSource implements DataSource {
 
   protected String content;
   protected MediaType contentType = MediaType.TEXT;

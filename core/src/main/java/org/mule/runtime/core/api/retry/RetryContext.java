@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.retry;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 
@@ -14,6 +15,7 @@ import java.util.Map;
 /**
  * The RetryContext is used to store any data which carries over from attempt to attempt such as response messages.
  */
+@NoImplement
 public interface RetryContext {
 
   String FAILED_RECEIVER = "failedReceiver";

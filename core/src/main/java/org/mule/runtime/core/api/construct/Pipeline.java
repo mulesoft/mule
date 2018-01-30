@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.construct;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -17,6 +18,7 @@ import java.util.List;
  * A pipeline has an ordered list of {@link Processor}'s that are invoked in order to processor new messages received from it's
  * {@link MessageSource}
  */
+@NoImplement
 public interface Pipeline extends FlowConstruct, ProcessingDescriptor {
 
   /**
