@@ -8,6 +8,7 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.List;
 /**
  * Tracks {@link ArtifactClassLoader} created by {@link DeployableArtifactClassLoaderFactory}
  */
-public class TrackingDeployableArtifactClassLoaderFactory<T extends ArtifactDescriptor>
+@NoInstantiate
+public final class TrackingDeployableArtifactClassLoaderFactory<T extends ArtifactDescriptor>
     implements DeployableArtifactClassLoaderFactory<T> {
 
   private final ArtifactClassLoaderManager artifactClassLoaderManager;

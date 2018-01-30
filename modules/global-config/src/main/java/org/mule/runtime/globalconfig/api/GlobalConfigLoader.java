@@ -48,6 +48,10 @@ public class GlobalConfigLoader {
 
   private static final String MULE_SCHEMA_JSON_LOCATION = "mule-schema.json";
 
+  private GlobalConfigLoader() {
+
+  }
+
   /**
    * Initialise the global config if not yet initialised.
    * <p>

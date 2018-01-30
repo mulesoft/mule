@@ -7,6 +7,7 @@
 package org.mule.runtime.deployment.model.api.artifact;
 
 import static java.lang.Thread.currentThread;
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 
@@ -16,6 +17,7 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
  * 
  * @since 4.0
  */
+@NoImplement
 public interface ArtifactConfigurationProcessor {
 
   /**

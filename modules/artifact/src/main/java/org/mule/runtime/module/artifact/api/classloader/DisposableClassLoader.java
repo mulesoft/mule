@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
 
+@NoImplement
 public interface DisposableClassLoader {
 
   /**

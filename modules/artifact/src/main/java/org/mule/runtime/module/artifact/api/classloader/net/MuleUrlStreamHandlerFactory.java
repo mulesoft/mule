@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.api.classloader.net;
 
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.net.URL;
@@ -29,7 +30,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @see java.net.URL#URL(String, String, int, String)
  */
-public class MuleUrlStreamHandlerFactory extends Object implements URLStreamHandlerFactory {
+@NoInstantiate
+public final class MuleUrlStreamHandlerFactory extends Object implements URLStreamHandlerFactory {
 
   private static final String HANDLER_PKGS_SYSTEM_PROPERTY = "java.protocol.handler.pkgs";
   private static final Logger log = LoggerFactory.getLogger(MuleUrlStreamHandlerFactory.class);

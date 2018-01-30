@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Implementations of this class should take care about resources that may leak memory after application undeployment. Mule
  * ensures to create an instance of this class with the same class loader that loaded the application resources in order to ensure
  * the access to them.
  */
+@NoImplement
 public interface ResourceReleaser {
 
   /**

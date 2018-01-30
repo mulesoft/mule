@@ -12,6 +12,7 @@ import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.exception.CompositeClassNotFoundException;
 
@@ -36,6 +37,7 @@ import sun.net.www.protocol.jar.Handler;
  * By using a {@link ClassLoaderLookupPolicy} this classLoader can use parent-first, parent-only or child-first classloading
  * lookup mode per package.
  */
+@NoInstantiate
 public class FineGrainedControlClassLoader extends URLClassLoader
     implements DisposableClassLoader, ClassLoaderLookupPolicyProvider {
 

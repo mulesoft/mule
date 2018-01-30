@@ -38,8 +38,8 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
   private static final String MY_JAR = "myLib.jar";
 
   private ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
-  private ClassLoaderModel classLoaderModel = mock(ClassLoaderModel.class);
-  private ArtifactPluginDescriptor pluginDescriptor = mock(ArtifactPluginDescriptor.class);
+  private ClassLoaderModel classLoaderModel;
+  private ArtifactPluginDescriptor pluginDescriptor = new ArtifactPluginDescriptor(PLUGIN_NAME);
   private Set<ArtifactPluginDescriptor> plugins = Sets.newHashSet(pluginDescriptor);
   private static List<URL> runtimeLibs = newArrayList();
 
@@ -60,13 +60,14 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
   @Before
   public void setUp() {
     splashScreen = new ApplicationStartedSplashScreen();
+    ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
+    runtimeLibs.stream().forEach(classLoaderModelBuilder::containing);
+    classLoaderModel = classLoaderModelBuilder.build();
+
     when(descriptor.getName()).thenReturn(APP_NAME);
     when(descriptor.getAppProperties()).thenReturn(new HashMap<>());
     when(descriptor.getPlugins()).thenReturn(plugins);
-    when(pluginDescriptor.getName()).thenReturn(PLUGIN_NAME);
     when(descriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
-
-    when(classLoaderModel.getUrls()).thenReturn(runtimeLibs.toArray(new URL[0]));
   }
 
   @Override

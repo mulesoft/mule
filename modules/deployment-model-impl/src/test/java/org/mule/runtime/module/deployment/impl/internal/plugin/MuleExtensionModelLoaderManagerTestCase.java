@@ -11,7 +11,6 @@ import static java.nio.file.Files.newBufferedWriter;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.exception.MuleException;
@@ -30,7 +29,6 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -43,17 +41,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class MuleExtensionModelLoaderManagerTestCase extends AbstractMuleTestCase {
 
   private static final String ID = "ID";
-  @Mock
-  private LoaderDescriber loaderDescriber;
+  private LoaderDescriber loaderDescriber = new LoaderDescriber(ID);
   @Mock
   private ArtifactClassLoader containerClassLoader;
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-  @Before
-  public void before() {
-    when(loaderDescriber.getId()).thenReturn(ID);
-  }
 
   @After
   public void after() {
@@ -70,8 +62,6 @@ public class MuleExtensionModelLoaderManagerTestCase extends AbstractMuleTestCas
 
     Optional<ExtensionModelLoader> loader = manager.getExtensionModelLoader(loaderDescriber);
     assertThat(loader.isPresent(), is(false));
-
-    verify(loaderDescriber).getId();
   }
 
   @Test
@@ -92,8 +82,6 @@ public class MuleExtensionModelLoaderManagerTestCase extends AbstractMuleTestCas
     Optional<ExtensionModelLoader> loader = manager.getExtensionModelLoader(loaderDescriber);
     assertThat(loader.isPresent(), is(true));
     assertThat(loader.get(), instanceOf(TestExtensionModelLoader.class));
-
-    verify(loaderDescriber, times(2)).getId();
   }
 
   private ClassLoader getLauncherClassLoader(ClassLoader classLoader) {

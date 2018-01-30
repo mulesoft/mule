@@ -7,11 +7,14 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.util.List;
 
 /**
  * Defines how a given class should be searched based on a given {@link ClassLoader}
  */
+@NoImplement
 public interface LookupStrategy {
 
   /**

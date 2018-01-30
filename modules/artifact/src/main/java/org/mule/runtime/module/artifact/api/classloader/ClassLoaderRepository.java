@@ -7,11 +7,14 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.util.Optional;
 
 /**
  * Provides access to the {@link ClassLoader} registered on the container.
  */
+@NoImplement
 public interface ClassLoaderRepository {
 
   /**

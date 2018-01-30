@@ -11,7 +11,7 @@ package org.mule.runtime.module.repository.api;
  *
  * @since 4.0
  */
-public class RepositoryConnectionException extends RuntimeException {
+public final class RepositoryConnectionException extends RuntimeException {
 
   /**
    * {@inheritDoc}

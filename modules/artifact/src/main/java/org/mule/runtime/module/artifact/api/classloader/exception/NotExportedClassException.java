@@ -12,6 +12,7 @@ import static java.lang.System.getProperty;
 import static java.lang.System.lineSeparator;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
 
@@ -22,7 +23,8 @@ import org.slf4j.LoggerFactory;
  * Extends {@link ClassNotFoundException} providing additional troubleshooting information from the context of the
  * {@link FilteringArtifactClassLoader}.
  */
-public class NotExportedClassException extends ClassNotFoundException {
+@NoInstantiate
+public final class NotExportedClassException extends ClassNotFoundException {
 
   private static final Logger logger = LoggerFactory.getLogger(NotExportedClassException.class);
 

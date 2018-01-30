@@ -7,10 +7,13 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import org.mule.api.annotation.NoInstantiate;
+
 /**
  * Thrown to indicate that a loader was not found in the repository
  */
-public class LoaderNotFoundException extends Exception {
+@NoInstantiate
+public final class LoaderNotFoundException extends Exception {
 
   /**
    * {@inheritDoc}

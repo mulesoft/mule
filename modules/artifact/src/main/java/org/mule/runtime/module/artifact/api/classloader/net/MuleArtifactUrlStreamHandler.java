@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.api.classloader.net;
 
+import org.mule.api.annotation.NoInstantiate;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -18,7 +20,8 @@ import java.net.URLStreamHandlerFactory;
  *
  * @since 4.0
  */
-public class MuleArtifactUrlStreamHandler extends URLStreamHandler {
+@NoInstantiate
+public final class MuleArtifactUrlStreamHandler extends URLStreamHandler {
 
   /**
    * Mule Protocol that will be used to reference artifacts.

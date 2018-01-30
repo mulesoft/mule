@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.repository.api;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 
 import java.io.File;
@@ -19,6 +20,7 @@ import java.io.File;
  *
  * @since 4.0
  */
+@NoImplement
 public interface RepositoryService {
 
   /**

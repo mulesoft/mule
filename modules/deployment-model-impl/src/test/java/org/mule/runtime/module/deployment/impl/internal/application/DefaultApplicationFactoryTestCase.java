@@ -89,14 +89,13 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     final File[] resourceFiles = new File[] {new File("mule-config.xml")};
     when(applicationDescriptorFactory.create(any(), any())).thenReturn(descriptor);
 
-    final ArtifactPluginDescriptor coreArtifactPluginDescriptor = mock(ArtifactPluginDescriptor.class);
+    final ArtifactPluginDescriptor coreArtifactPluginDescriptor = new ArtifactPluginDescriptor(FAKE_ARTIFACT_PLUGIN);
+    coreArtifactPluginDescriptor.setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().build());
 
     final ArtifactPlugin appPlugin = mock(ArtifactPlugin.class);
     final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
     when(appPlugin.getArtifactClassLoader()).thenReturn(artifactClassLoader);
     when(artifactClassLoader.getArtifactId()).thenReturn(FAKE_ARTIFACT_PLUGIN);
-    when(coreArtifactPluginDescriptor.getClassLoaderModel()).thenReturn(mock(ClassLoaderModel.class));
-    when(coreArtifactPluginDescriptor.getName()).thenReturn(FAKE_ARTIFACT_PLUGIN);
     when(appPlugin.getDescriptor()).thenReturn(coreArtifactPluginDescriptor);
 
     final Domain domain = createDomain(DOMAIN_NAME);

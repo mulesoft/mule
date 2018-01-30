@@ -7,6 +7,7 @@
 
 package org.mule.runtime.deployment.model.api;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -23,6 +24,7 @@ import java.util.List;
  *
  * @param <D> The type of the artifact's descriptor
  */
+@NoImplement
 public interface DeployableArtifact<D extends DeployableArtifactDescriptor> extends Artifact<D> {
 
   /**
