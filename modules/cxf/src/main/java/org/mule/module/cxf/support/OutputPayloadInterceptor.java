@@ -64,33 +64,19 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
                 {
                     MuleMessage muleMsg = (MuleMessage) o;
                     final Object payload = cleanUpPayload(muleMsg.getPayload());
-                    
+
+                    if (payload instanceof NullPayload)
+                    {
+                        break;
+                    }
                     if (payload instanceof DelayedResult)
                     {
                         o = getDelayedResultCallback((DelayedResult)payload);
                     }
-                    else if (payload instanceof XMLStreamReader)
-                    {
-                        o = new XMLStreamWriterCallback()
-                        {
-                            public void write(XMLStreamWriter writer) throws Fault, XMLStreamException
-                            {
-                                XMLStreamReader xsr = (XMLStreamReader)payload;
-                                StaxUtils.copy(xsr, writer);      
-                                writer.flush();
-                                xsr.close();
-                            }
-                        };
-                    } 
-                    else if (payload instanceof NullPayload)
-                    {
-                        break;
-                    }
                     else
                     {
-                        o = muleMsg.getPayload(DataTypeFactory.create(XMLStreamReader.class));
+                        o = createXMLStreamWriterCallback(payload, muleMsg);
                     }
-    
                     objs.add(o);
                 }
                 catch (TransformerException e)
@@ -240,6 +226,30 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
                 {
                     throw new Fault(e);
                 }
+            }
+        };
+    }
+
+    private XMLStreamWriterCallback createXMLStreamWriterCallback(final Object payload, MuleMessage muleMessage) throws TransformerException
+    {
+        final XMLStreamReader reader;
+
+        if (payload instanceof XMLStreamReader)
+        {
+            reader = (XMLStreamReader) payload;
+        }
+        else
+        {
+            reader = muleMessage.getPayload(DataTypeFactory.create(XMLStreamReader.class));
+        }
+
+        return new XMLStreamWriterCallback()
+        {
+            public void write(XMLStreamWriter writer) throws Fault, XMLStreamException
+            {
+                StaxUtils.copy(reader, writer);
+                writer.flush();
+                reader.close();
             }
         };
     }
