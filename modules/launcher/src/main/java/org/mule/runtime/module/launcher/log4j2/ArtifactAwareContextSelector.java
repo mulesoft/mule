@@ -9,6 +9,7 @@ package org.mule.runtime.module.launcher.log4j2;
 import static com.google.common.cache.CacheBuilder.newBuilder;
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.Thread.currentThread;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
@@ -16,15 +17,16 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
 
-import com.google.common.cache.Cache;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.selector.ContextSelector;
+import org.apache.logging.log4j.status.StatusLogger;
+
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.selector.ContextSelector;
-import org.apache.logging.log4j.status.StatusLogger;
 
 /**
  * Implementation of {@link org.apache.logging.log4j.core.selector.ContextSelector} which is used to implement log separation
@@ -60,7 +62,14 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
   private final MuleLoggerContextFactory loggerContextFactory = new MuleLoggerContextFactory();
 
   private LoggerContextCache cache = new LoggerContextCache(this, getClass().getClassLoader());
-  private static final Cache<ClassLoader, ClassLoader> classLoaderLoggerCache = newBuilder().weakKeys().weakValues().build();
+  private static final LoadingCache<ClassLoader, ClassLoader> classLoaderLoggerCache =
+      newBuilder().weakKeys().weakValues().build(new CacheLoader<ClassLoader, ClassLoader>() {
+
+        @Override
+        public ClassLoader load(ClassLoader key) throws Exception {
+          return getLoggerClassLoader(key);
+        }
+      });
 
   ArtifactAwareContextSelector() {}
 
@@ -105,11 +114,7 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
     }
 
     try {
-      final ClassLoader classLoaderToResolve = classLoader == null ? currentThread().getContextClassLoader() : classLoader;
-      ClassLoader loggerClassLoader =
-          classLoaderLoggerCache.get(classLoaderToResolve, () -> getLoggerClassLoader(classLoaderToResolve));
-
-      return loggerClassLoader;
+      return classLoaderLoggerCache.get(classLoader == null ? currentThread().getContextClassLoader() : classLoader);
     } catch (ExecutionException e) {
       throw new IllegalStateException("Unable to obtain logger context classLoader for: " + classLoader, e.getCause());
     }
