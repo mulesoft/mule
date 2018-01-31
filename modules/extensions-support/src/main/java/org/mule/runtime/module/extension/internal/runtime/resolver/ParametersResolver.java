@@ -122,15 +122,6 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     return resolverSet;
   }
 
-    /**
-     * Constructs a {@link ResolverSet} from the parameters, using {@link #toValueResolver(Object, Set)} to process the values.
-     *
-     * @return a {@link ResolverSet}
-     */
-    public ResolverSet getParametersAsResolverSet(List<ParameterModel> parameters, MuleContext muleContext) throws ConfigurationException {
-        ResolverSet resolverSet = getParametersAsResolverSet(model, flatParameters, muleContext);
-    }
-
   public ResolverSet getNestedComponentsAsResolverSet(ComponentModel model) {
     List<? extends NestableElementModel> nestedComponents = model.getNestedComponents();
     ResolverSet resolverSet = new ResolverSet(muleContext);
@@ -187,6 +178,19 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       resolverSet.add(groupKey,
                       NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), descriptor.get().getMetadataType(),
                                                       reflectionCache, muleContext, this));
+    } else {
+      List<ValueResolver<Object>> keyResolvers = new LinkedList<>();
+      List<ValueResolver<Object>> valueResolvers = new LinkedList<>();
+
+      group.getParameterModels().forEach(param -> {
+        ValueResolver<Object> parameterValueResolver = getParameterValueResolver(param, param.getName(), muleContext);
+        if (parameterValueResolver != null) {
+          keyResolvers.add(new StaticValueResolver<>(param.getName()));
+          valueResolvers.add(parameterValueResolver);
+        }
+      });
+
+      resolverSet.add(groupKey, MapValueResolver.of(HashMap.class, keyResolvers, valueResolvers, reflectionCache, muleContext));
     }
   }
 
@@ -204,12 +208,12 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     return getResolverSet(Optional.of(model), model.getParameterGroupModels(), parameterModels, muleContext, resolverSet);
   }
 
-    public ResolverSet getParametersAsResolverSet(List<ParameterGroupModel> groups, List<ParameterModel> parameterModels,
-                                                  MuleContext muleContext)
-            throws ConfigurationException {
-        ResolverSet resolverSet = new ResolverSet(muleContext);
-        return getResolverSet(Optional.empty(), groups, parameterModels, muleContext, resolverSet);
-    }
+  public ResolverSet getParametersAsResolverSet(List<ParameterGroupModel> groups, List<ParameterModel> parameterModels,
+                                                MuleContext muleContext)
+      throws ConfigurationException {
+    ResolverSet resolverSet = new ResolverSet(muleContext);
+    return getResolverSet(Optional.empty(), groups, parameterModels, muleContext, resolverSet);
+  }
 
   private ResolverSet getResolverSet(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups,
                                      List<ParameterModel> parameterModels, MuleContext muleContext,
@@ -221,24 +225,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       if (!parameterName.equals(p.getName())) {
         aliasedParameterNames.put(parameterName, p.getName());
       }
-      ValueResolver<?> resolver;
-      if (parameters.containsKey(parameterName)) {
-        resolver = toValueResolver(parameters.get(parameterName), p.getModelProperties());
-      } else {
-        // TODO MULE-13066 Extract ParameterResolver logic into a centralized resolver
-        resolver = getDefaultValueResolver(p, muleContext);
-      }
-
-      if (isNullSafe(p)) {
-        ValueResolver<?> delegate = resolver != null ? resolver : new StaticValueResolver<>(null);
-        MetadataType type = p.getModelProperty(NullSafeModelProperty.class).get().defaultType();
-        resolver = NullSafeValueResolverWrapper.of(delegate, type, reflectionCache, muleContext, this);
-      }
-
-      if (p.isOverrideFromConfig()) {
-        resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
-                                                         parameterName, reflectionCache, muleContext);
-      }
+      ValueResolver<?> resolver = getParameterValueResolver(p, parameterName, muleContext);
 
       if (resolver != null) {
         resolverSet.add(parameterName, resolver);
@@ -247,9 +234,33 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       }
     });
 
-    checkParameterGroupExclusiveness(model, groups, parameters.keySet().stream().map(k -> aliasedParameterNames.getOrDefault(k, k))
-        .collect(Collectors.toSet()));
+    checkParameterGroupExclusiveness(model, groups,
+                                     parameters.keySet().stream().map(k -> aliasedParameterNames.getOrDefault(k, k))
+                                         .collect(Collectors.toSet()));
     return resolverSet;
+  }
+
+  private ValueResolver<Object> getParameterValueResolver(ParameterModel parameterModel, String parameterName,
+                                                          MuleContext muleContext) {
+    ValueResolver<?> resolver;
+    if (parameters.containsKey(parameterName)) {
+      resolver = toValueResolver(parameters.get(parameterName), parameterModel.getModelProperties());
+    } else {
+      // TODO MULE-13066 Extract ParameterResolver logic into a centralized resolver
+      resolver = getDefaultValueResolver(parameterModel, this.muleContext);
+    }
+
+    if (isNullSafe(parameterModel)) {
+      ValueResolver<?> delegate = resolver != null ? resolver : new StaticValueResolver<>(null);
+      MetadataType type = parameterModel.getModelProperty(NullSafeModelProperty.class).get().defaultType();
+      resolver = NullSafeValueResolverWrapper.of(delegate, type, reflectionCache, this.muleContext, this);
+    }
+
+    if (parameterModel.isOverrideFromConfig()) {
+      resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
+                                                       parameterName, reflectionCache, this.muleContext);
+    }
+    return (ValueResolver<Object>) resolver;
   }
 
   private List<ParameterGroupModel> getInlineGroups(List<ParameterGroupModel> groups) {
@@ -350,7 +361,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
                                                                       key)));
   }
 
-  public void checkParameterGroupExclusiveness(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups, Set<String> resolverKeys)
+  public void checkParameterGroupExclusiveness(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups,
+                                               Set<String> resolverKeys)
       throws ConfigurationException {
     if (!lazyInitEnabled) {
       for (ParameterGroupModel group : groups) {
@@ -365,11 +377,17 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
                                                                              .join(exclusiveModel
                                                                                  .getExclusiveParameterNames())))));
           } else if (definedExclusiveParameters.size() > 1) {
-            throw new ConfigurationException(
-                                             createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
-                                                                        // TODO
-                                                                        getComponentModelTypeName(model), getModelName(model),
-                                                                        Joiner.on(", ").join(definedExclusiveParameters))));
+            if (model.isPresent()) {
+              throw new ConfigurationException(
+                                               createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
+                                                                          getComponentModelTypeName(model.get()),
+                                                                          getModelName(model.get()),
+                                                                          Joiner.on(", ").join(definedExclusiveParameters))));
+            } else {
+              throw new ConfigurationException(
+                                               createStaticMessage(format("The following parameters cannot be set at the same time: [%s]",
+                                                                          Joiner.on(", ").join(definedExclusiveParameters))));
+            }
           }
         }
       }

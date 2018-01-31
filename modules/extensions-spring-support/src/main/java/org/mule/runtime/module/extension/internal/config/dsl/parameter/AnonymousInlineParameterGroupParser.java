@@ -24,7 +24,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,10 +50,10 @@ public class AnonymousInlineParameterGroupParser extends ParameterGroupParser {
   protected Builder doParse(Builder definitionBuilder) throws ConfigurationException {
     Builder finalBuilder =
         definitionBuilder.withIdentifier(name).withNamespace(namespace).asNamed()
-                .withTypeDefinition(fromType(Map.class))
+            .withTypeDefinition(fromType(Map.class))
             .withObjectFactoryType(AnonymousGroupObjectFactory.class)
             .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-                .withConstructorParameterDefinition(fromFixedValue(group).build());
+            .withConstructorParameterDefinition(fromFixedValue(group).build());
 
     this.parseParameters(group.getParameterModels());
 
@@ -63,24 +62,25 @@ public class AnonymousInlineParameterGroupParser extends ParameterGroupParser {
 
   public static class AnonymousGroupObjectFactory extends AbstractExtensionObjectFactory<Object> {
 
-      private final ParameterGroupModel group;
+    private final ParameterGroupModel group;
 
-      public AnonymousGroupObjectFactory(MuleContext muleContext, ParameterGroupModel group) {
-        super(muleContext);
-        this.group = group;
+    public AnonymousGroupObjectFactory(MuleContext muleContext, ParameterGroupModel group) {
+      super(muleContext);
+      this.group = group;
     }
 
     @Override
     public Object getObject() throws Exception {
-        ResolverSet resolverSet = this.getParametersResolver().getParametersAsResolverSet(singletonList(group), group.getParameterModels(), muleContext);
+      ResolverSet resolverSet =
+          this.getParametersResolver().getParametersAsResolverSet(singletonList(group), group.getParameterModels(), muleContext);
 
-        List<ValueResolver<Object>> keyResolvers = new LinkedList<>();
-        List<ValueResolver<Object>> valueResolvers = new LinkedList<>();
-        resolverSet.getResolvers().forEach((key, value) -> {
-            keyResolvers.add(new StaticValueResolver<>(key));
-            valueResolvers.add((ValueResolver<Object>) value);
-        });
-        return MapValueResolver.of(HashMap.class, keyResolvers, valueResolvers, reflectionCache, muleContext);
+      List<ValueResolver<Object>> keyResolvers = new LinkedList<>();
+      List<ValueResolver<Object>> valueResolvers = new LinkedList<>();
+      resolverSet.getResolvers().forEach((key, value) -> {
+        keyResolvers.add(new StaticValueResolver<>(key));
+        valueResolvers.add((ValueResolver<Object>) value);
+      });
+      return MapValueResolver.of(HashMap.class, keyResolvers, valueResolvers, reflectionCache, muleContext);
     }
 
     @Override
