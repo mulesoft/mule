@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  * @since 4.0
  */
-public class FunctionalReadWriteLock {
+public final class FunctionalReadWriteLock {
 
   /**
    * Functional interface for releasing a subject lock.

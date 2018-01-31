@@ -28,7 +28,6 @@ import static org.mule.runtime.core.api.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.api.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.api.util.ObjectUtils.getString;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -46,8 +45,6 @@ import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
-import javax.activation.DataHandler;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -63,10 +60,12 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 
+import javax.activation.DataHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultMessageBuilder
+public final class DefaultMessageBuilder
     implements InternalMessage.Builder, InternalMessage.PayloadBuilder, InternalMessage.CollectionBuilder,
     InternalMessage.MapBuilder {
 

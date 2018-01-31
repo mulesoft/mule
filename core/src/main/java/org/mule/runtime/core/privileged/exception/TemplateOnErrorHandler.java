@@ -25,6 +25,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -56,6 +57,7 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 
+@NoExtend
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     implements MessagingExceptionHandlerAcceptor {
 

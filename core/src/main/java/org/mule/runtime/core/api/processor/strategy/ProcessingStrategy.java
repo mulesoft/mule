@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.processor.strategy;
 
 import static reactor.core.publisher.Flux.from;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -18,6 +19,7 @@ import org.mule.runtime.core.api.processor.Sink;
 /**
  * Determines how a list of message processors should processed.
  */
+@NoImplement
 public interface ProcessingStrategy {
 
   /**

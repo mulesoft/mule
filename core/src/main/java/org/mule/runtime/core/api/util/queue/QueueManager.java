@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.api.util.queue;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
  * A Queue manager is responsible for managing one or more Queue resources and providing common support for transactions and
  * persistence.
  */
+@NoImplement
 public interface QueueManager extends Startable, Stoppable {
 
   /**

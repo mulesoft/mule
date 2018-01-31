@@ -14,8 +14,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.nio.charset.Charset;
 
-/** TODO */
-public class TransformerTemplate extends AbstractMessageTransformer {
+public final class TransformerTemplate extends AbstractMessageTransformer {
 
   private TransformerCallback callback;
 

@@ -10,7 +10,7 @@ import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.util.ClassUtils;
 
-public class LifecycleObject {
+public final class LifecycleObject {
 
   private Class type;
   private Notification preNotification;

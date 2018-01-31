@@ -99,4 +99,6 @@ public class CollectionUtils {
     buf.append(']');
     return buf.toString();
   }
+
+  private CollectionUtils() {}
 }

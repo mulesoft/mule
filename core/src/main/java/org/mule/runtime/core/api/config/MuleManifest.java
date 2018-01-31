@@ -166,4 +166,6 @@ public class MuleManifest {
       return null;
     }
   }
+
+  private MuleManifest() {}
 }

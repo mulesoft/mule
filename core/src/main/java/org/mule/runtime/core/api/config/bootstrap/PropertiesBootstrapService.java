@@ -15,7 +15,7 @@ import java.util.Properties;
 /**
  * Provides a bootstrapping service from a given set of properties
  */
-public class PropertiesBootstrapService implements BootstrapService {
+public final class PropertiesBootstrapService implements BootstrapService {
 
   private final ClassLoader classLoader;
   private final Properties properties;

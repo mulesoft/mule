@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.streaming;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -21,6 +22,7 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
+@NoImplement
 public interface StreamingManager {
 
   /**

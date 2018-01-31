@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.routing.requestreply;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -21,6 +22,7 @@ import org.mule.runtime.core.api.source.MessageSource;
  * 
  * @since 3.0
  */
+@NoImplement
 public interface RequestReplyReplierMessageProcessor extends InterceptingMessageProcessor {
 
   /**

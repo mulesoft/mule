@@ -16,7 +16,7 @@ import org.mule.runtime.api.message.Message;
  *
  * @since 4.0
  */
-public class MessageTransformerException extends MuleException implements ErrorMessageAwareException {
+public final class MessageTransformerException extends MuleException implements ErrorMessageAwareException {
 
   private transient Transformer transformer;
   private final Message message;

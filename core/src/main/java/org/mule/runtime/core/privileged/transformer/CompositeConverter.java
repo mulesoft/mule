@@ -27,7 +27,7 @@ import java.util.List;
  * When {@link #transform(Object)} is called each converter in the same order they are included in the composition. The output of
  * a given converter is the input of the next composed converter.
  */
-public class CompositeConverter extends AbstractComponent implements Converter, MuleContextAware {
+public final class CompositeConverter extends AbstractComponent implements Converter, MuleContextAware {
 
   private String name;
 

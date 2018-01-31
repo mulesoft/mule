@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -26,6 +27,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
+@NoImplement
 public interface InternalEvent extends PrivilegedEvent {
 
   /**

@@ -9,17 +9,18 @@ package org.mule.runtime.core.api.exception;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Mono.just;
-
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
-import org.reactivestreams.Publisher;
-
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Take some action when an exception has occurred while executing a Flow for an event.
  */
+@NoImplement
 public interface FlowExceptionHandler extends Function<Exception, Publisher<CoreEvent>> {
 
   /**

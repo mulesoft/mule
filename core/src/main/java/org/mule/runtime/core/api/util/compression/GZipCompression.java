@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * <code>GZipCompression</code> is a CompressionStrategy implementation using the GZip library included in the JDK java.util.zip.
  */
-public class GZipCompression implements CompressionStrategy {
+public final class GZipCompression implements CompressionStrategy {
 
   public static final int DEFAULT_BUFFER_SIZE = 32768;
 

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.privileged.el.context;
 
+import org.mule.api.annotation.NoExtend;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -16,6 +18,7 @@ import java.util.Set;
 
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 
+@NoExtend
 public abstract class AbstractMapContext<V> implements Map<String, V> {
 
   @Override

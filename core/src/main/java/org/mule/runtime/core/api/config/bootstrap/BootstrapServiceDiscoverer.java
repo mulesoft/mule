@@ -7,11 +7,14 @@
 
 package org.mule.runtime.core.api.config.bootstrap;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.util.List;
 
 /**
  * Discovers available {@link BootstrapService} instances
  */
+@NoImplement
 public interface BootstrapServiceDiscoverer {
 
   /**

@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.retry.policy;
 
 
 import static java.util.function.Function.identity;
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
@@ -27,6 +28,7 @@ import org.reactivestreams.Publisher;
  * 
  * A {@link RetryNotifier} may be set in order to take action upon each retry attempt.
  */
+@NoImplement
 public interface RetryPolicyTemplate {
 
   RetryPolicy createRetryInstance();

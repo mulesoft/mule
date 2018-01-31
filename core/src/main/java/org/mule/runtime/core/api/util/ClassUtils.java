@@ -886,4 +886,6 @@ public class ClassUtils {
 
     return foundInterfaces.toArray(new Class<?>[0]);
   }
+
+  private ClassUtils() {}
 }

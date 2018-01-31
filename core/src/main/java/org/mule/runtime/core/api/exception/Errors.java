@@ -45,6 +45,10 @@ public abstract class Errors {
 
   public static final String CORE_NAMESPACE_NAME = CORE_PREFIX.toUpperCase();
 
+  private Errors() {
+
+  }
+
   public static final class Identifiers {
 
     // HANDLEABLE

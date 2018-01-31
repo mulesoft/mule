@@ -16,7 +16,7 @@ import java.io.OutputStream;
 
 import javax.activation.DataSource;
 
-public class ByteArrayDataSource implements DataSource {
+public final class ByteArrayDataSource implements DataSource {
 
   private final byte[] data;
   private final MediaType contentType;

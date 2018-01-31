@@ -18,7 +18,7 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
  *
  * @since 4.0
  */
-public class CryptoFailureException extends MuleException {
+public final class CryptoFailureException extends MuleException {
 
   /**
    * Serial version

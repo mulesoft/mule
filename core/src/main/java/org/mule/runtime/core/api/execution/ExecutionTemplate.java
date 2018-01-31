@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.execution;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * ExecutionTemplate provides an execution context for message processing.
  *
@@ -13,6 +15,7 @@ package org.mule.runtime.core.api.execution;
  *
  * @param <T> type of the return value of the processing execution
  */
+@NoImplement
 public interface ExecutionTemplate<T> {
 
   T execute(ExecutionCallback<T> callback) throws Exception;

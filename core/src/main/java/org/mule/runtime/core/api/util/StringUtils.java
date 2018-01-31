@@ -168,4 +168,6 @@ public class StringUtils {
   public static String trim(String str) {
     return org.apache.commons.lang3.StringUtils.trim(str);
   }
+
+  private StringUtils() {}
 }

@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Creates an instance of the object once and then always returns the same instance.
  */
-public class SingletonObjectFactory extends AbstractObjectFactory {
+public final class SingletonObjectFactory extends AbstractObjectFactory {
 
   private Object instance;
 

@@ -23,7 +23,7 @@ import java.util.concurrent.Executor;
  * This class is a wrapper for a {@link RetryPolicyTemplate} and will execute any retry work within a separate thread. An optional
  * {@link Latch} can be passed into this template, in which case execution will only occur once the latch is released.
  */
-public class AsynchronousRetryTemplate extends AbstractComponent implements RetryPolicyTemplate {
+public final class AsynchronousRetryTemplate extends AbstractComponent implements RetryPolicyTemplate {
 
   private final RetryPolicyTemplate delegate;
   private Latch startLatch;

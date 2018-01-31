@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.policy;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
  * 
  * @since 4.0
  */
+@NoImplement
 public interface PolicyInstance extends Initialisable, Startable {
 
   /**

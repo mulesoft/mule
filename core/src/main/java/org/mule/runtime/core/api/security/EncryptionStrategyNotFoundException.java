@@ -15,7 +15,7 @@ import org.mule.runtime.api.exception.MuleException;
  *
  * @since 4.0
  */
-public class EncryptionStrategyNotFoundException extends MuleException {
+public final class EncryptionStrategyNotFoundException extends MuleException {
 
   /**
    * Serial version

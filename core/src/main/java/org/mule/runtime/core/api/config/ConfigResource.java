@@ -17,7 +17,7 @@ import java.net.URL;
  * A ConfigResource holds the url description (or location) and the url stream. It is useful to associate the two for error
  * reporting when the stream cannot be read.
  */
-public class ConfigResource {
+public final class ConfigResource {
 
   protected String resourceName;
   private URL url;

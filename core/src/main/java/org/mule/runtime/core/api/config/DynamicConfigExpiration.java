@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.config;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.time.Time;
 import org.mule.runtime.core.internal.config.ImmutableDynamicConfigExpiration;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
@@ -17,6 +18,7 @@ import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
  *
  * @since 4.0
  */
+@NoImplement
 public interface DynamicConfigExpiration {
 
   static DynamicConfigExpiration getDefault() {

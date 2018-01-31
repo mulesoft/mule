@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.api.expression;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * Thrown by the {@link org.mule.runtime.core.api.el.ExpressionManager} when a failure occurs evaluating an expression.
  */
+@NoExtend
 public class ExpressionRuntimeException extends MuleRuntimeException {
 
   /**

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.api.streaming.iterator;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.internal.streaming.object.iterator.ClosedConsumerException;
 
 import java.io.IOException;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
  * @param <P> the type that the producer generates
  * @since 3.5.0
  */
+@NoExtend
 public abstract class AbstractConsumer<T, P> implements Consumer<T> {
 
   private static final transient Logger logger = LoggerFactory.getLogger(AbstractConsumer.class);

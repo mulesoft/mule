@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.config;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
@@ -16,6 +17,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after startup.
  * TODO MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
  */
+@NoImplement
 public interface MuleConfiguration {
 
   int getDefaultResponseTimeout();

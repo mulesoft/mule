@@ -28,7 +28,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class RaiseErrorProcessor extends AbstractComponent implements Processor, Initialisable {
+public final class RaiseErrorProcessor extends AbstractComponent implements Processor, Initialisable {
 
   private static final String ERROR_MESSAGE = "An error occurred.";
 

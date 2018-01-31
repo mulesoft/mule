@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.exception;
 
 import org.mule.runtime.api.message.ErrorType;
 
-public class SingleErrorTypeMatcher implements ErrorTypeMatcher {
+public final class SingleErrorTypeMatcher implements ErrorTypeMatcher {
 
   private final ErrorType errorType;
 

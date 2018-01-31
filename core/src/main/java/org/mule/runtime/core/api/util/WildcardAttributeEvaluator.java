@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.util;
 
 import java.util.Collection;
 
-public class WildcardAttributeEvaluator {
+public final class WildcardAttributeEvaluator {
 
   private String escapedValue;
   private Boolean hasWildcards;

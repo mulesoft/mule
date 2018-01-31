@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.security;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.NamedObject;
 
@@ -19,6 +20,7 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
+@NoImplement
 public interface EncryptionStrategy extends Initialisable, NamedObject {
 
   /**

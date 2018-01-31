@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 
 import javax.transaction.TransactionManager;
@@ -14,6 +15,7 @@ import javax.transaction.TransactionManager;
  * <code>TransactionManagerFactory</code> is a factory class for creating a transaction manager for the Mule container.
  * 
  */
+@NoImplement
 public interface TransactionManagerFactory {
 
   /**

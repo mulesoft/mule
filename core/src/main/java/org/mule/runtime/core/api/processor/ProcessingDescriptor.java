@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Provides information about a processing unit represented by this instance
  */
+@NoImplement
 public interface ProcessingDescriptor {
 
   /**

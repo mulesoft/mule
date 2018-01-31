@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.el;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -21,6 +22,7 @@ import org.mule.runtime.core.internal.message.InternalMessage;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ExtendedExpressionManager extends ExpressionManager {
 
   /**

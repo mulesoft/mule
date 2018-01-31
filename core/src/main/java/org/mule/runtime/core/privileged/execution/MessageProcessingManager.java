@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.execution;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.internal.execution.EndProcessPhase;
 import org.mule.runtime.core.internal.execution.FlowProcessingPhase;
 import org.mule.runtime.core.internal.execution.ValidationPhase;
@@ -13,6 +14,7 @@ import org.mule.runtime.core.internal.execution.ValidationPhase;
 /**
  * In charge of processing messages through mule.
  */
+@NoImplement
 public interface MessageProcessingManager {
 
   /**

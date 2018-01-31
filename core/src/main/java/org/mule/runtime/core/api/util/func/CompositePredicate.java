@@ -20,7 +20,7 @@ import java.util.function.Predicate;
  * @param <T> the generic type of the predicate
  * @since 4.0
  */
-public class CompositePredicate<T> implements Predicate<T> {
+public final class CompositePredicate<T> implements Predicate<T> {
 
   private final List<Predicate<T>> predicates;
 

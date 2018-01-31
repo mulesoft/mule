@@ -19,7 +19,7 @@ import java.util.Set;
 /**
  * Flow variables wrapper {@link Map} for exposing Flow variables via an {@link ExtendedExpressionLanguageAdaptor}
  */
-public class EventVariablesMapContext extends AbstractMapContext<Object> {
+public final class EventVariablesMapContext extends AbstractMapContext<Object> {
 
   private CoreEvent event;
   private CoreEvent.Builder eventBuider;

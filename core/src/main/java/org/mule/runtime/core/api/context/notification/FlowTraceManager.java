@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 
 /**
@@ -13,6 +14,7 @@ import org.mule.runtime.api.notification.EnrichedNotificationInfo;
  * 
  * @since 3.8.0
  */
+@NoImplement
 public interface FlowTraceManager {
 
   /**

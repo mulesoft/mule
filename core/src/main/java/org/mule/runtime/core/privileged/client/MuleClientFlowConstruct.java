@@ -22,7 +22,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 /**
  * Placeholder class which makes the default exception handler available.
  */
-public class MuleClientFlowConstruct extends AbstractComponent implements FlowConstruct {
+public final class MuleClientFlowConstruct extends AbstractComponent implements FlowConstruct {
 
   MuleContext muleContext;
 

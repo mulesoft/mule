@@ -13,7 +13,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
  * <code>CouldNotRouteOutboundMessageException</code> thrown if Mule fails to route the current outbound event.
  */
 
-public class CouldNotRouteOutboundMessageException extends RoutingException {
+public final class CouldNotRouteOutboundMessageException extends RoutingException {
 
   /**
    * Serial version

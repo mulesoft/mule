@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
+import org.mule.api.annotation.NoImplement;
+
 import java.io.Serializable;
 
 /**
  * <code>Statistics</code> TODO
  * 
  */
+@NoImplement
 public interface Statistics extends Serializable {
 
   /**

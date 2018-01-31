@@ -12,7 +12,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 
 /** <code>DisposeException</code> TODO (document class) */
 
-public class DisposeException extends LifecycleException {
+public final class DisposeException extends LifecycleException {
 
   /** Serial version */
   private static final long serialVersionUID = 1714192290605243678L;
