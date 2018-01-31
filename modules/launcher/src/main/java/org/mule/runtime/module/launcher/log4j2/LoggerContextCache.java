@@ -25,9 +25,11 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * A cache which relates {@link ClassLoader} instances with {@link LoggerContext}s
@@ -55,7 +57,7 @@ final class LoggerContextCache implements Disposable {
   private final ArtifactAwareContextSelector artifactAwareContextSelector;
   // Extra cache layer to avid some nasty implications for using Guava cache at this point. See the comments in
   // #doGetLoggerContext(final ClassLoader classLoader) for details.
-  private final Map<Integer, LoggerContext> builtContexts = new ConcurrentHashMap<>();
+  private volatile Int2ObjectMap<LoggerContext> builtContexts = new Int2ObjectOpenHashMap<>();
   private final Cache<Integer, LoggerContext> activeContexts;
   private final Cache<Integer, LoggerContext> disposedContexts;
   private final ScheduledExecutorService executorService;
@@ -70,7 +72,10 @@ final class LoggerContextCache implements Disposable {
         .removalListener(notification -> {
           stop((LoggerContext) notification.getValue());
           activeContexts.invalidate(notification.getKey());
-          builtContexts.remove(notification.getKey());
+
+          Int2ObjectMap<LoggerContext> newBuiltContexts = new Int2ObjectOpenHashMap<>(builtContexts);
+          newBuiltContexts.remove(((Integer) notification.getKey()).intValue());
+          builtContexts = newBuiltContexts;
         }).build();
 
     executorService = newScheduledThreadPool(1, new LoggerContextReaperThreadFactory(reaperContextClassLoader));
@@ -97,7 +102,7 @@ final class LoggerContextCache implements Disposable {
   LoggerContext getLoggerContext(final ClassLoader classLoader) {
     LoggerContext ctx;
     try {
-      final Integer key = computeKey(classLoader);
+      final int key = computeKey(classLoader);
       // If possible, avoid using Guava cache since the callable puts unwanted pressure on the garbage collector.
       ctx = builtContexts.get(key);
 
@@ -140,11 +145,15 @@ final class LoggerContextCache implements Disposable {
    */
   protected LoggerContext doGetLoggerContext(final ClassLoader classLoader, final Integer key) throws ExecutionException {
     return activeContexts.get(key, () -> {
-      if (builtContexts.containsKey(key)) {
-        return builtContexts.get(key);
+      if (builtContexts.containsKey(key.intValue())) {
+        return builtContexts.get(key.intValue());
       } else {
         LoggerContext context = artifactAwareContextSelector.buildContext(classLoader);
-        builtContexts.put(key, context);
+
+        Int2ObjectMap<LoggerContext> newBuiltContexts = new Int2ObjectOpenHashMap<>(builtContexts);
+        newBuiltContexts.put(key.intValue(), context);
+        builtContexts = newBuiltContexts;
+
         return context;
       }
     });
