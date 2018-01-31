@@ -11,7 +11,7 @@ package org.mule.runtime.config.api.dsl.processor;
  *
  * @since 4.0
  */
-public class SimpleConfigAttribute {
+public final class SimpleConfigAttribute {
 
   private final String name;
   private final String value;

@@ -13,7 +13,7 @@ import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
  *
  * @since 4.0
  */
-public class StaticXmlNamespaceInfo implements XmlNamespaceInfo {
+public final class StaticXmlNamespaceInfo implements XmlNamespaceInfo {
 
   private final String namespaceUriPrefix;
   private final String namespace;

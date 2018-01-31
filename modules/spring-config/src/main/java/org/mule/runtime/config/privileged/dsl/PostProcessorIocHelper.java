@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.privileged.dsl;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Map;
  * 
  * @since 4.0
  */
+@NoImplement
 public interface PostProcessorIocHelper {
 
   void replaceDefinitionWithRoot(Class beanClass, boolean wrap, Object... constructorArgs);

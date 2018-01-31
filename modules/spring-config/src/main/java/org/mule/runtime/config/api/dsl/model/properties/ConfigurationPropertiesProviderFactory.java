@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api.dsl.model.properties;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
@@ -15,6 +16,7 @@ import org.mule.runtime.config.api.dsl.model.ResourceProvider;
  *
  * @since 4.1
  */
+@NoImplement
 public interface ConfigurationPropertiesProviderFactory {
 
   /**

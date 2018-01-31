@@ -39,7 +39,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @see {@link #loadDocument(Set, String, InputStream)}
  * @since 4.0
  */
-public class XmlConfigurationDocumentLoader {
+public final class XmlConfigurationDocumentLoader {
 
   /**
    * Indicates that XSD validation should be used (found no "DOCTYPE" declaration).

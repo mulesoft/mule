@@ -18,7 +18,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfigurati
  *
  * @since 4.0
  */
-public class SpringArtifactConfigurationProcessor implements ArtifactConfigurationProcessor {
+public final class SpringArtifactConfigurationProcessor implements ArtifactConfigurationProcessor {
 
   @Override
   public ArtifactContext createArtifactContext(ArtifactContextConfiguration artifactContextConfiguration)

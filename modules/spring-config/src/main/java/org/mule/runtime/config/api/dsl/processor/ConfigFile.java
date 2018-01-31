@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class ConfigFile implements Comparable<ConfigFile> {
+public final class ConfigFile implements Comparable<ConfigFile> {
 
   private String filename;
   private List<ConfigLine> configLines;

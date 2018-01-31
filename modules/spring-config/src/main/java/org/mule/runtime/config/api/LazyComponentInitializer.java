@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -16,6 +17,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
  *
  * @since 4.0
  */
+@NoImplement
 public interface LazyComponentInitializer {
 
   /**

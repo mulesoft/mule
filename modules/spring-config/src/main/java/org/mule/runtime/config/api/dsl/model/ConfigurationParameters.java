@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api.dsl.model;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.util.Pair;
 
@@ -16,6 +17,7 @@ import java.util.List;
  * 
  * @since 4.1
  */
+@NoImplement
 public interface ConfigurationParameters {
 
   /**

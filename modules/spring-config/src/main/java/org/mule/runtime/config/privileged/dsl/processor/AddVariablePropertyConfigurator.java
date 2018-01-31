@@ -23,7 +23,8 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class AddVariablePropertyConfigurator implements ObjectFactoryCommonConfigurator<AbstractAddVariablePropertyProcessor> {
+public final class AddVariablePropertyConfigurator
+    implements ObjectFactoryCommonConfigurator<AbstractAddVariablePropertyProcessor> {
 
   /**
    * Configures the common parameters of every transformer.
