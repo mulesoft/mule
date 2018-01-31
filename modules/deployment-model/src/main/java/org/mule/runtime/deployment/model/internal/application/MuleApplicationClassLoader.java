@@ -62,23 +62,31 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
 
 
   /**
-   * Resolves the plugin classloader of the thread context class loader artifact and all it's ancestor
+   * Collects all the plugin classloaders that are available in the deployable artifact classloader hierarchy.
+   * <p/>
+   * For every class loader in the artifact class loader hierarchy, if that classloader does not contain plugins, the same classloader
+   * is added to the list.
+   *
+   * @return a {@link List<ClassLoader>} containing all the plugin class loaders in the artifact classloader hierarchy.
    */
   public static List<ClassLoader> resolveContextArtifactPluginClassLoaders() {
     Set<ClassLoader> resolvedClassLoaders = new HashSet<>();
     ClassLoader originalClassLoader = currentThread().getContextClassLoader();
-    ClassLoader tmpClassLoader = originalClassLoader;
+
     resolvedClassLoaders.addAll(resolveContextArtifactPluginClassLoadersForCurrentClassLoader());
-    try {
-      while (tmpClassLoader.getParent() != null
-          && MuleDeployableArtifactClassLoader.class.isAssignableFrom(tmpClassLoader.getParent().getClass())) {
+
+    ClassLoader tmpClassLoader = originalClassLoader;
+    while (tmpClassLoader.getParent() != null
+        && MuleDeployableArtifactClassLoader.class.isAssignableFrom(tmpClassLoader.getParent().getClass())) {
+      try {
         tmpClassLoader = tmpClassLoader.getParent();
         currentThread().setContextClassLoader(tmpClassLoader);
         resolvedClassLoaders.addAll(resolveContextArtifactPluginClassLoadersForCurrentClassLoader());
+      } finally {
+        currentThread().setContextClassLoader(originalClassLoader);
       }
-    } finally {
-      currentThread().setContextClassLoader(originalClassLoader);
     }
+
     return new ArrayList<>(resolvedClassLoaders);
   }
 
