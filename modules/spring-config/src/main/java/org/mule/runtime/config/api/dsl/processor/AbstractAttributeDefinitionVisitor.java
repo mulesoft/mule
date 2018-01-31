@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api.dsl.processor;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.dsl.api.component.AttributeDefinitionVisitor;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
@@ -17,6 +18,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
+@NoExtend
 public class AbstractAttributeDefinitionVisitor implements AttributeDefinitionVisitor {
 
   @Override

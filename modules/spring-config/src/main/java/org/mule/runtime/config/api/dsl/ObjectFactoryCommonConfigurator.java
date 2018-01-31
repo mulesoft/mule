@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api.dsl;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Map;
  * @param <T> type of the object to configure.
  * @since 4.0
  */
+@NoImplement
 public interface ObjectFactoryCommonConfigurator<T> {
 
   /**

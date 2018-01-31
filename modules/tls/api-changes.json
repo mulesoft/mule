@@ -1,0 +1,19 @@
+{
+  "4.1.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilderFactory",
+          "new": "class org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilderFactory",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.module.tls.api",
+          "classSimpleName": "DefaultTlsContextFactoryBuilderFactory",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        }
+      ]
+    }
+  }
+}

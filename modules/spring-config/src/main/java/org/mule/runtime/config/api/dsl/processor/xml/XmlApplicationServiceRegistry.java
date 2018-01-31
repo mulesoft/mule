@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class XmlApplicationServiceRegistry extends AbstractServiceRegistry {
+public final class XmlApplicationServiceRegistry extends AbstractServiceRegistry {
 
   private final ServiceRegistry delegate;
   private final XmlNamespaceInfoProvider extensionsXmlInfoProvider;

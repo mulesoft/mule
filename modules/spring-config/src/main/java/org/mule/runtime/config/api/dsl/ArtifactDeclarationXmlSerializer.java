@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api.dsl;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.internal.dsl.model.DefaultArtifactDeclarationXmlSerializer;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -22,6 +23,7 @@ import org.w3c.dom.Document;
  *
  * @since 4.0
  */
+@NoImplement
 public interface ArtifactDeclarationXmlSerializer {
 
   /**

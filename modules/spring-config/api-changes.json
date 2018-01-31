@@ -1,46 +1,325 @@
 {
-  "4.2.0": {
+  "4.1.1": {
     "revapi": {
       "ignore": [
         {
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.config.internal.dsl.model.properties.DefaultConfigurationPropertiesProvider",
-          "package": "org.mule.runtime.config.internal.dsl.model.properties",
-          "classSimpleName": "DefaultConfigurationPropertiesProvider",
-          "elementKind": "class",
-          "justification": "Class was moved to api and this change will be cherry-picked to 4.1.0"
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.LazyComponentInitializer",
+          "new": "interface org.mule.runtime.config.api.LazyComponentInitializer",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
         },
         {
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.config.internal.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory",
-          "package": "org.mule.runtime.config.internal.dsl.model.properties",
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.XmlConfigurationDocumentLoader",
+          "new": "class org.mule.runtime.config.api.XmlConfigurationDocumentLoader",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api",
+          "classSimpleName": "XmlConfigurationDocumentLoader",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.XmlGathererErrorHandler",
+          "new": "interface org.mule.runtime.config.api.XmlGathererErrorHandler",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.XmlGathererErrorHandlerFactory",
+          "new": "interface org.mule.runtime.config.api.XmlGathererErrorHandlerFactory",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.dsl.ArtifactDeclarationXmlSerializer",
+          "new": "interface org.mule.runtime.config.api.dsl.ArtifactDeclarationXmlSerializer",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.config.api.dsl.ConfigurableObjectFactory<T extends java.lang.Object>",
+          "new": "class org.mule.runtime.config.api.dsl.ConfigurableObjectFactory<T extends java.lang.Object>",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "ConfigurableObjectFactory",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.dsl.CoreDslConstants",
+          "new": "interface org.mule.runtime.config.api.dsl.CoreDslConstants",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.dsl.ObjectFactoryCommonConfigurator<T extends java.lang.Object>",
+          "new": "interface org.mule.runtime.config.api.dsl.ObjectFactoryCommonConfigurator<T extends java.lang.Object>",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.artifact.SpringArtifactConfigurationProcessor",
+          "new": "class org.mule.runtime.config.api.dsl.artifact.SpringArtifactConfigurationProcessor",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.artifact",
+          "classSimpleName": "SpringArtifactConfigurationProcessor",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.method.visibilityReduced",
+          "old": "method void org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils::<init>()",
+          "new": "method void org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils::<init>()",
+          "oldVisibility": "public",
+          "newVisibility": "private",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "ComponentBuildingDefinitionProviderUtils",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "Utility class is not meant to be instantiated by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry",
+          "new": "class org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "ComponentBuildingDefinitionRegistry",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.dsl.model.ConfigurationParameters",
+          "new": "interface org.mule.runtime.config.api.dsl.model.ConfigurationParameters",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.model.DslElementModel<T extends java.lang.Object>",
+          "new": "class org.mule.runtime.config.api.dsl.model.DslElementModel<T extends java.lang.Object>",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "DslElementModel",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.dsl.model.DslElementModelFactory",
+          "new": "interface org.mule.runtime.config.api.dsl.model.DslElementModelFactory",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.dsl.model.ResourceProvider",
+          "new": "interface org.mule.runtime.config.api.dsl.model.ResourceProvider",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.dsl.model.XmlDslElementModelConverter",
+          "new": "interface org.mule.runtime.config.api.dsl.model.XmlDslElementModelConverter",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider",
+          "new": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory",
+          "new": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty",
+          "new": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider",
+          "new": "class org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory",
+          "new": "class org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
           "classSimpleName": "DefaultConfigurationPropertiesProviderFactory",
           "elementKind": "class",
-          "justification": "Class was moved to api and this change will be cherry-picked to 4.1.0"
-        }
-        ,
+          "justification": "This class is not meant to be extended by the user"
+        },
         {
-          "code": "java.method.parameterTypeChanged",
-          "old": "parameter org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory::createProvider(===java.util.Map<java.lang.String, java.lang.String>===, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
-          "new": "parameter org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory::createProvider(===org.mule.runtime.config.api.dsl.model.ConfigurationParameters===, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
-          "oldType": "java.util.Map<java.lang.String, java.lang.String>",
-          "newType": "org.mule.runtime.config.api.dsl.model.ConfigurationParameters",
-          "package": "org.mule.runtime.config.api.dsl.model.properties",
-          "methodName": "createProvider",
-          "parameterIndex": "0",
-          "justification": "Never used since it was never released"
-         },
-         {
-           "code": "java.method.parameterTypeChanged",
-           "old": "parameter org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory::createProvider(===java.util.Map<java.lang.String, java.lang.String>===, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
-           "new": "parameter org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory::createProvider(===org.mule.runtime.config.api.dsl.model.ConfigurationParameters===, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
-           "oldType": "java.util.Map<java.lang.String, java.lang.String>",
-           "newType": "org.mule.runtime.config.api.dsl.model.ConfigurationParameters",
-           "package": "org.mule.runtime.config.api.dsl.model.properties",
-           "methodName": "createProvider",
-           "parameterIndex": "0",
-           "justification": "Never used since it was never released"
-         }
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor",
+          "new": "class org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.processor.ArtifactConfig",
+          "new": "class org.mule.runtime.config.api.dsl.processor.ArtifactConfig",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "ArtifactConfig",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.processor.ConfigFile",
+          "new": "class org.mule.runtime.config.api.dsl.processor.ConfigFile",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "ConfigFile",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.processor.ConfigLine",
+          "new": "class org.mule.runtime.config.api.dsl.processor.ConfigLine",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "ConfigLine",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute",
+          "new": "class org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "SimpleConfigAttribute",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.processor.TransformerConfigurator",
+          "new": "class org.mule.runtime.config.api.dsl.processor.TransformerConfigurator",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.processor",
+          "classSimpleName": "TransformerConfigurator",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser",
+          "new": "class org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.processor.xml",
+          "classSimpleName": "XmlApplicationParser",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationServiceRegistry",
+          "new": "class org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationServiceRegistry",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.processor.xml",
+          "classSimpleName": "XmlApplicationServiceRegistry",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.xml.StaticXmlNamespaceInfo",
+          "new": "class org.mule.runtime.config.api.dsl.xml.StaticXmlNamespaceInfo",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.xml",
+          "classSimpleName": "StaticXmlNamespaceInfo",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.api.dsl.xml.StaticXmlNamespaceInfoProvider",
+          "new": "class org.mule.runtime.config.api.dsl.xml.StaticXmlNamespaceInfoProvider",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.api.dsl.xml",
+          "classSimpleName": "StaticXmlNamespaceInfoProvider",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T extends java.lang.Object>",
+          "new": "class org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T extends java.lang.Object>",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.config.privileged.dsl.PostProcessorIocHelper",
+          "new": "interface org.mule.runtime.config.privileged.dsl.PostProcessorIocHelper",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.config.privileged.dsl.processor.AddVariablePropertyConfigurator",
+          "new": "class org.mule.runtime.config.privileged.dsl.processor.AddVariablePropertyConfigurator",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.config.privileged.dsl.processor",
+          "classSimpleName": "AddVariablePropertyConfigurator",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean",
+          "new": "class org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.config.privileged.dsl.processor",
+          "classSimpleName": "MessageProcessorChainFactoryBean",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        }
       ]
     }
   }

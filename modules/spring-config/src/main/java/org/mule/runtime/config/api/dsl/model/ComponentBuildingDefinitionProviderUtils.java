@@ -100,4 +100,5 @@ public class ComponentBuildingDefinitionProviderUtils {
     }
   }
 
+  private ComponentBuildingDefinitionProviderUtils() {}
 }

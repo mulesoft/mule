@@ -21,7 +21,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class ComponentBuildingDefinitionRegistry {
+public final class ComponentBuildingDefinitionRegistry {
 
   private Map<ComponentIdentifier, ComponentBuildingDefinition<?>> builderDefinitionsMap = new HashMap<>();
 
