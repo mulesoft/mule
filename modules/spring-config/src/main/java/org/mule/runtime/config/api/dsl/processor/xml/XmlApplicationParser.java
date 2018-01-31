@@ -22,21 +22,21 @@ import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
-import org.w3c.dom.Attr;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Simple parser that transforms an XML document to a set of {@link org.mule.runtime.config.api.dsl.processor.ConfigLine}
@@ -47,7 +47,7 @@ import com.google.common.collect.ImmutableList.Builder;
  *
  * @since 4.0
  */
-public class XmlApplicationParser {
+public final class XmlApplicationParser {
 
   private static final String COLON = ":";
   private static final Map<String, String> predefinedNamespace = new HashMap<>();

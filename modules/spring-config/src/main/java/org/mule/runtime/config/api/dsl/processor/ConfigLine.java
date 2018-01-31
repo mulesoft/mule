@@ -22,7 +22,7 @@ import org.w3c.dom.Node;
  *
  * @since 4.0
  */
-public class ConfigLine {
+public final class ConfigLine {
 
   /**
    * Provides access to the parent configuration line of this config line

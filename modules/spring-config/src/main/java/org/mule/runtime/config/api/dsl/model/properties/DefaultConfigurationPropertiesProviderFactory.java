@@ -18,7 +18,7 @@ import org.mule.runtime.config.api.dsl.model.ResourceProvider;
  *
  * @since 4.1
  */
-public class DefaultConfigurationPropertiesProviderFactory implements ConfigurationPropertiesProviderFactory {
+public final class DefaultConfigurationPropertiesProviderFactory implements ConfigurationPropertiesProviderFactory {
 
   public static final String CONFIGURATION_PROPERTIES_ELEMENT = "configuration-properties";
   public static final ComponentIdentifier CONFIGURATION_PROPERTIES =

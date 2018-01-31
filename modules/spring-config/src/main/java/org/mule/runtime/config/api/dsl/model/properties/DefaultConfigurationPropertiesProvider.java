@@ -10,14 +10,12 @@ import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
 
@@ -36,6 +34,7 @@ import org.yaml.snakeyaml.Yaml;
  *
  * @since 4.0
  */
+@NoExtend
 public class DefaultConfigurationPropertiesProvider extends AbstractComponent
     implements ConfigurationPropertiesProvider, Initialisable {
 

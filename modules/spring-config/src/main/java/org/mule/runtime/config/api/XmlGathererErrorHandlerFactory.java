@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.api;
 
+import org.mule.api.annotation.NoImplement;
+
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -15,6 +17,7 @@ import org.xml.sax.InputSource;
  *
  * @since 4.0
  */
+@NoImplement
 public interface XmlGathererErrorHandlerFactory {
 
   /**

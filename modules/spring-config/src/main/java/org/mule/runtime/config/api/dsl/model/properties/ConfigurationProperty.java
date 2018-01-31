@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.api.dsl.model.properties;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.Component;
 
 /**
@@ -13,6 +14,7 @@ import org.mule.runtime.api.component.Component;
  *
  * @since 4.1
  */
+@NoImplement
 public interface ConfigurationProperty {
 
   /**
