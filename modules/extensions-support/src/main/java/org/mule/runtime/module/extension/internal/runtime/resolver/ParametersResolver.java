@@ -65,6 +65,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -120,6 +121,15 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     }
     return resolverSet;
   }
+
+    /**
+     * Constructs a {@link ResolverSet} from the parameters, using {@link #toValueResolver(Object, Set)} to process the values.
+     *
+     * @return a {@link ResolverSet}
+     */
+    public ResolverSet getParametersAsResolverSet(List<ParameterModel> parameters, MuleContext muleContext) throws ConfigurationException {
+        ResolverSet resolverSet = getParametersAsResolverSet(model, flatParameters, muleContext);
+    }
 
   public ResolverSet getNestedComponentsAsResolverSet(ComponentModel model) {
     List<? extends NestableElementModel> nestedComponents = model.getNestedComponents();
@@ -184,17 +194,25 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
                                                 MuleContext muleContext)
       throws ConfigurationException {
     ResolverSet resolverSet = new ResolverSet(muleContext);
-    return getResolverSet(model, parameterModels, muleContext, resolverSet);
+    return getResolverSet(Optional.of(model), model.getParameterGroupModels(), parameterModels, muleContext, resolverSet);
   }
 
   public ResolverSet getParametersAsHashedResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels,
                                                       MuleContext muleContext)
       throws ConfigurationException {
     ResolverSet resolverSet = new HashedResolverSet(muleContext);
-    return getResolverSet(model, parameterModels, muleContext, resolverSet);
+    return getResolverSet(Optional.of(model), model.getParameterGroupModels(), parameterModels, muleContext, resolverSet);
   }
 
-  private ResolverSet getResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels, MuleContext muleContext,
+    public ResolverSet getParametersAsResolverSet(List<ParameterGroupModel> groups, List<ParameterModel> parameterModels,
+                                                  MuleContext muleContext)
+            throws ConfigurationException {
+        ResolverSet resolverSet = new ResolverSet(muleContext);
+        return getResolverSet(Optional.empty(), groups, parameterModels, muleContext, resolverSet);
+    }
+
+  private ResolverSet getResolverSet(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups,
+                                     List<ParameterModel> parameterModels, MuleContext muleContext,
                                      ResolverSet resolverSet)
       throws ConfigurationException {
     Map<String, String> aliasedParameterNames = new HashMap<>();
@@ -229,7 +247,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       }
     });
 
-    checkParameterGroupExclusiveness(model, parameters.keySet().stream().map(k -> aliasedParameterNames.getOrDefault(k, k))
+    checkParameterGroupExclusiveness(model, groups, parameters.keySet().stream().map(k -> aliasedParameterNames.getOrDefault(k, k))
         .collect(Collectors.toSet()));
     return resolverSet;
   }
@@ -332,10 +350,10 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
                                                                       key)));
   }
 
-  public void checkParameterGroupExclusiveness(ParameterizedModel model, Set<String> resolverKeys)
+  public void checkParameterGroupExclusiveness(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups, Set<String> resolverKeys)
       throws ConfigurationException {
     if (!lazyInitEnabled) {
-      for (ParameterGroupModel group : model.getParameterGroupModels()) {
+      for (ParameterGroupModel group : groups) {
         for (ExclusiveParametersModel exclusiveModel : group.getExclusiveParametersModels()) {
           Collection<String> definedExclusiveParameters = intersection(exclusiveModel.getExclusiveParameterNames(), resolverKeys);
           if (definedExclusiveParameters.isEmpty() && exclusiveModel.isOneRequired()) {
@@ -349,6 +367,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
           } else if (definedExclusiveParameters.size() > 1) {
             throw new ConfigurationException(
                                              createStaticMessage(format("In %s '%s', the following parameters cannot be set at the same time: [%s]",
+                                                                        // TODO
                                                                         getComponentModelTypeName(model), getModelName(model),
                                                                         Joiner.on(", ").join(definedExclusiveParameters))));
           }
