@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.soap.internal.metadata;
 
 import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -14,13 +15,14 @@ import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
+import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.soap.api.client.metadata.SoapMetadataResolver;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Resolves the metadata keys for a given Soap Extension {@link ForwardingSoapClient} connection.
@@ -53,7 +55,7 @@ public final class InvokeKeysResolver extends BaseInvokeResolver implements Type
     List<String> excludedOperations = ws.getExcludedOperations();
     resolver.getAvailableOperations().stream()
         .filter(ope -> !excludedOperations.contains(ope))
-        .forEach(ope -> key.withChild(newKey(ope)));
+        .forEach(ope -> key.withChild(newKey(ope).withDisplayName(NameUtils.titleize(ope))));
     return key.build();
   }
 }
