@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.construct;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -15,29 +16,36 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.Sink;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
@@ -54,6 +62,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.InOrder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -270,13 +279,44 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   }
 
   @Test
-  public void illegalCustomMaxConcurrency() throws Exception {
+  public void illegalCustomMaxConcurrency() {
     expectedException.expect(IllegalArgumentException.class);
     Flow.builder(FLOW_NAME, muleContext)
         .source(directInboundMessageSource)
         .processors(getSensingNullMessageProcessor())
         .maxConcurrency(0)
         .build();
+  }
+
+  @Test
+  public void lifecycleOrder() throws MuleException {
+    Sink sink = mock(Sink.class, withSettings().extraInterfaces(Disposable.class));
+    Processor processor = mock(Processor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+    ProcessingStrategy processingStrategy =
+        mock(ProcessingStrategy.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+    when(processingStrategy.createSink(any(FlowConstruct.class), any(ReactiveProcessor.class)))
+        .thenReturn(sink);
+    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .source(directInboundMessageSource)
+        .processors(singletonList(processor))
+        .processingStrategyFactory((muleContext, s) -> processingStrategy)
+        .build();
+
+    flow.initialise();
+    flow.start();
+
+    InOrder inOrder = inOrder(sink, processor, processingStrategy);
+
+    inOrder.verify((Startable) processingStrategy).start();
+    inOrder.verify(processingStrategy).createSink(any(FlowConstruct.class), any(ReactiveProcessor.class));
+    inOrder.verify((Startable) processor).start();
+
+    flow.stop();
+
+    inOrder.verify((Disposable) sink).dispose();
+    inOrder.verify((Stoppable) processor).stop();
+    inOrder.verify((Stoppable) processingStrategy).stop();
+
   }
 
 }

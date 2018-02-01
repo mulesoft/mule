@@ -20,8 +20,8 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.internal.construct.FlowBackPressureException.BACK_PRESSURE_ERROR_MESSAGE;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -348,8 +348,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     disposeIfDisposable(sink);
     sink = null;
-    stopIfStoppable(processingStrategy);
     stopIfStoppable(pipeline);
+    stopIfStoppable(processingStrategy);
     super.doStop();
   }
 
