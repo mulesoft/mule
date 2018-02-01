@@ -12,7 +12,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 /**
  * Exception throw when it's not possible to create the authentication request for a given request.
  */
-public class RequestAuthenticationException extends MuleException {
+public final class RequestAuthenticationException extends MuleException {
 
   private static final long serialVersionUID = 5053323135035970690L;
 
