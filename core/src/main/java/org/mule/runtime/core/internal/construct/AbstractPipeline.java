@@ -260,7 +260,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   boolean isCompleteSignalRejectedExecutionException(Throwable throwable) {
     if (throwable instanceof RejectedExecutionException) {
       for (StackTraceElement element : throwable.getStackTrace()) {
-        if (element.getMethodName().contains("onComplete")) {
+        if (element.getMethodName().contains("onComplete")
+            && element.getClassName().startsWith("reactor.core.publisher.FluxPublishOn")) {
           return true;
         }
       }
