@@ -24,6 +24,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -100,17 +101,69 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     assertThat(childErrors.get(1).getCause(), is(instanceOf(IOException.class)));
   }
 
+  @Test
+  public void givesStringRepresentation() {
+    ErrorType anyError = ErrorTypeBuilder.builder().namespace("MULE").identifier("ANY").build();
+    ErrorType testError = ErrorTypeBuilder.builder().namespace("MULE").identifier("TEST").parentErrorType(anyError).build();
+    Error error = builder(new ComposedErrorMessageAwareException(createStaticMessage(EXCEPTION_MESSAGE), testError))
+        .errorType(testError)
+        .build();
+
+    assertThat(error.toString(), is("\norg.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
+        + "{\n"
+        + "  description=message\n"
+        + "  detailedDescription=message\n"
+        + "  errorType=MULE:TEST\n"
+        + "  cause=org.mule.runtime.core.api.message.ErrorBuilderTestCase$ComposedErrorMessageAwareException\n"
+        + "  errorMessage=\n"
+        + "org.mule.runtime.core.internal.message.DefaultMessageBuilder$MessageImplementation\n"
+        + "{\n"
+        + "  payload=java.lang.String\n"
+        + "  mediaType=*/*\n"
+        + "  attributes=null\n"
+        + "  attributesMediaType=*/*\n"
+        + "  exceptionPayload=<not set>\n"
+        + "}\n"
+        + "  childErrors=[\n"
+        + "org.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
+        + "{\n"
+        + "  description=unknown description\n"
+        + "  detailedDescription=unknown description\n"
+        + "  errorType=MULE:TEST\n"
+        + "  cause=java.lang.RuntimeException\n"
+        + "  errorMessage=-\n"
+        + "  childErrors=[]\n"
+        + "}, \n"
+        + "org.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
+        + "{\n"
+        + "  description=unknown description\n"
+        + "  detailedDescription=unknown description\n"
+        + "  errorType=MULE:TEST\n"
+        + "  cause=java.io.IOException\n"
+        + "  errorMessage=-\n"
+        + "  childErrors=[]\n"
+        + "}]\n"
+        + "}"));
+  }
+
   private class ComposedErrorMessageAwareException extends MuleException implements ErrorMessageAwareException,
       ComposedErrorException {
 
+    private ErrorType errorType;
+
     public ComposedErrorMessageAwareException(I18nMessage message) {
+      this(message, mockErrorType);
+    }
+
+    public ComposedErrorMessageAwareException(I18nMessage message, ErrorType errorType) {
       super(message);
+      this.errorType = errorType;
     }
 
     @Override
     public List<Error> getErrors() {
-      return asList(builder(new RuntimeException()).errorType(mockErrorType).build(),
-                    builder(new IOException()).errorType(mockErrorType).build());
+      return asList(builder(new RuntimeException()).errorType(errorType).build(),
+                    builder(new IOException()).errorType(errorType).build());
     }
 
     @Override
