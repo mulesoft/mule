@@ -25,7 +25,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader implements ApplicationClassLoader {
 
@@ -58,6 +60,36 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
     return new String[] {toFile(classLoaderModel.getUrls()[0]).getPath()};
   }
 
+
+  /**
+   * Collects all the plugin classloaders that are available in the deployable artifact classloader hierarchy.
+   * <p/>
+   * For every class loader in the artifact class loader hierarchy, if that classloader does not contain plugins, the same classloader
+   * is added to the list.
+   *
+   * @return a {@link List<ClassLoader>} containing all the plugin class loaders in the artifact classloader hierarchy.
+   */
+  public static List<ClassLoader> resolveContextArtifactPluginClassLoaders() {
+    Set<ClassLoader> resolvedClassLoaders = new HashSet<>();
+    ClassLoader originalClassLoader = currentThread().getContextClassLoader();
+
+    resolvedClassLoaders.addAll(resolveContextArtifactPluginClassLoadersForCurrentClassLoader());
+
+    ClassLoader tmpClassLoader = originalClassLoader;
+    while (tmpClassLoader.getParent() != null
+        && MuleDeployableArtifactClassLoader.class.isAssignableFrom(tmpClassLoader.getParent().getClass())) {
+      try {
+        tmpClassLoader = tmpClassLoader.getParent();
+        currentThread().setContextClassLoader(tmpClassLoader);
+        resolvedClassLoaders.addAll(resolveContextArtifactPluginClassLoadersForCurrentClassLoader());
+      } finally {
+        currentThread().setContextClassLoader(originalClassLoader);
+      }
+    }
+
+    return new ArrayList<>(resolvedClassLoaders);
+  }
+
   /**
    * Resolves the plugin classloader of the thread context classloader artifact.
    * <p>
@@ -65,7 +97,7 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
    * 
    * @return the plugin classloader of the current thread context artifact.
    */
-  public static List<ClassLoader> resolveContextArtifactPluginClassLoaders() {
+  private static List<ClassLoader> resolveContextArtifactPluginClassLoadersForCurrentClassLoader() {
     // TODO MULE-12254
     // When running the tests, the classloader hierarchy is build with the launcher, but when executing here we are with the
     // container.
