@@ -248,14 +248,24 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         .transform(processingStrategy.onPipeline(pipeline))
         .doOnNext(afterProcessors())
         .doOnError(throwable -> {
-          if (throwable instanceof RejectedExecutionException
-              && throwable.getStackTrace()[3].getMethodName().contains("onComplete")) {
+          if (isCompleteSignalRejectedExecutionException(throwable)) {
             LOGGER.debug("Scheduler busy when propagating 'complete' signal due to graceful shutdown timeout being exceeded.",
                          throwable);
           } else {
             LOGGER.error("Unhandled exception in Flow ", throwable);
           }
         });
+  }
+
+  boolean isCompleteSignalRejectedExecutionException(Throwable throwable) {
+    if (throwable instanceof RejectedExecutionException) {
+      for (StackTraceElement element : throwable.getStackTrace()) {
+        if (element.getMethodName().contains("onComplete")) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private Consumer<CoreEvent> beforeProcessors() {
