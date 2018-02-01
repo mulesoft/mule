@@ -135,6 +135,8 @@ public class FakeMuleServer {
     coreExtensionManager.setDeploymentService(deploymentService);
     coreExtensionManager.setToolingService(toolingService);
     coreExtensionManager.setArtifactClassLoaderManager(muleArtifactResourcesRegistry.getArtifactClassLoaderManager());
+    coreExtensionManager.setRepositoryService(repositoryService);
+    coreExtensionManager.setServiceRepository(serviceManager);
   }
 
   public void stop() throws MuleException {
@@ -146,9 +148,9 @@ public class FakeMuleServer {
   }
 
   public void start() throws IOException, MuleException {
+    serviceManager.start();
     coreExtensionManager.initialise();
     coreExtensionManager.start();
-    serviceManager.start();
     extensionModelLoaderManager.start();
     deploymentService.start();
   }
