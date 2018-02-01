@@ -16,7 +16,7 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 /**
  * It was not possible to retrieve the access token or the refresh token from the token URL response
  */
-public class TokenNotFoundException extends MuleException {
+public final class TokenNotFoundException extends MuleException {
 
   private static final long serialVersionUID = -4527896867466127563L;
 
