@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import static java.lang.System.lineSeparator;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.exception.ComposedErrorException;
@@ -245,6 +247,33 @@ public final class ErrorBuilder {
     public List<Error> getChildErrors() {
       return errors;
     }
+
+    @Override
+    public String toString() {
+      StringBuilder buf = new StringBuilder(120);
+
+      // format message for multi-line output, single-line is not readable
+      buf.append(lineSeparator());
+      buf.append(getClass().getName());
+      buf.append(lineSeparator());
+      buf.append("{");
+      buf.append(lineSeparator());
+      buf.append("  description=").append(description);
+      buf.append(lineSeparator());
+      buf.append("  detailedDescription=").append(detailedDescription);
+      buf.append(lineSeparator());
+      buf.append("  errorType=").append(errorType);
+      buf.append(lineSeparator());
+      buf.append("  cause=").append(exception.getClass().getName());
+      buf.append(lineSeparator());
+      buf.append("  errorMessage=").append(defaultIfNull(muleMessage, "-"));
+      buf.append(lineSeparator());
+      buf.append("  childErrors=").append(errors);
+      buf.append(lineSeparator());
+      buf.append('}');
+      return buf.toString();
+    }
+
   }
 
 }
