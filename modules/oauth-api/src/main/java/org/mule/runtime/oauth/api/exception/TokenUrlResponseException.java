@@ -18,7 +18,7 @@ import java.io.IOException;
 /**
  * There was a problem with the call to the tokenUrl.
  */
-public class TokenUrlResponseException extends MuleException {
+public final class TokenUrlResponseException extends MuleException {
 
   private static final long serialVersionUID = 201036315336735350L;
 

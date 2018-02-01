@@ -1,0 +1,41 @@
+{
+  "4.1.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.oauth.api.exception.RequestAuthenticationException",
+          "new": "class org.mule.runtime.oauth.api.exception.RequestAuthenticationException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.oauth.api.exception",
+          "classSimpleName": "RequestAuthenticationException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.oauth.api.exception.TokenNotFoundException",
+          "new": "class org.mule.runtime.oauth.api.exception.TokenNotFoundException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.oauth.api.exception",
+          "classSimpleName": "TokenNotFoundException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.oauth.api.exception.TokenUrlResponseException",
+          "new": "class org.mule.runtime.oauth.api.exception.TokenUrlResponseException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.oauth.api.exception",
+          "classSimpleName": "TokenUrlResponseException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        }
+      ]
+    }
+  }
+}
