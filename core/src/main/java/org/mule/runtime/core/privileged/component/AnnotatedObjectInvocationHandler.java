@@ -94,6 +94,7 @@ public final class AnnotatedObjectInvocationHandler {
     if (Enhancer.class.getClassLoader() != clazz.getClassLoader()) {
       enhancer.setClassLoader(new CompositeClassLoader(AnnotatedObjectInvocationHandler.class.getClassLoader(),
                                                        clazz.getClassLoader()));
+      enhancer.setUseCache(false);
     }
 
     Class<A> annotatedClass = enhancer.createClass();

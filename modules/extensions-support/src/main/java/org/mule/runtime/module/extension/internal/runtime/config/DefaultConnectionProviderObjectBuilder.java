@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
@@ -25,16 +28,20 @@ import org.mule.runtime.core.internal.connection.HasDelegate;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
+import org.apache.commons.lang3.ClassUtils;
+
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
+import net.sf.cglib.proxy.CallbackHelper;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
-import org.apache.commons.lang3.ClassUtils;
 
 
 /**
@@ -104,18 +111,18 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     Enhancer enhancer = new Enhancer();
     ClassLoader classLoader = getClassLoader(extensionModel);
 
-    enhancer.setInterfaces(getProxyInterfaces(provider));
-    enhancer.setCallback((MethodInterceptor) (o, method, objects, methodProxy) -> {
+    Class[] proxyInterfaces = getProxyInterfaces(provider);
+    enhancer.setInterfaces(proxyInterfaces);
+
+    MethodInterceptor returnProviderInterceptor = (obj, method, args, proxy) -> provider;
+
+    MethodInterceptor invokerInterceptor = (obj, method, args, proxy) -> {
       Reference<Object> resultReference = new Reference<>();
       Reference<Throwable> errorReference = new Reference<>();
 
-      if (method.getDeclaringClass().equals(HasDelegate.class) && method.getName().equals("getDelegate")) {
-        return provider;
-      }
-
       withContextClassLoader(classLoader, () -> {
         try {
-          resultReference.set(method.invoke(provider, objects));
+          resultReference.set(method.invoke(provider, args));
         } catch (InvocationTargetException e) {
           errorReference.set(e.getTargetException());
         } catch (Throwable t) {
@@ -128,12 +135,36 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
       } else {
         return resultReference.get();
       }
-    });
+    };
+
+    CallbackHelper callbackHelper = new CallbackHelper(Object.class, proxyInterfaces) {
+
+      @Override
+      protected Object getCallback(Method method) {
+        if (method.getDeclaringClass().equals(HasDelegate.class) && method.getName().equals("getDelegate")) {
+          return returnProviderInterceptor;
+        } else {
+          return invokerInterceptor;
+        }
+      }
+    };
+
+    enhancer.setCallbackTypes(callbackHelper.getCallbackTypes());
+    enhancer.setCallbackFilter(callbackHelper);
+
+    if (Enhancer.class.getClassLoader() != classLoader) {
+      enhancer.setClassLoader(new CompositeClassLoader(DefaultConnectionProviderObjectBuilder.class.getClassLoader(),
+                                                       classLoader));
+      enhancer.setUseCache(false);
+    }
+
+    Class<ConnectionProvider<C>> proxyClass = enhancer.createClass();
+    registerStaticCallbacks(proxyClass, callbackHelper.getCallbacks());
 
     try {
-      return (ConnectionProvider<C>) enhancer.create();
-    } catch (ClassCastException e) {
-      throw e;
+      return proxyClass.newInstance();
+    } catch (InstantiationException | IllegalAccessException e) {
+      throw new MuleRuntimeException(e);
     }
   }
 
