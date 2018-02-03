@@ -7,6 +7,7 @@
 package org.mule.tck;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -144,8 +145,14 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
       try {
         command.run();
       } catch (Throwable t) {
-        LOGGER.error(format("Task '%s' finished with exception in test scheduler '%s'", command.toString(), decorated.getName()),
+        if (t instanceof InterruptedException || t.getCause() instanceof InterruptedException) {
+          LOGGER.info(format("Task '%s' interrupted in test scheduler '%s'", command.toString(), decorated.getName()));
+          currentThread().interrupt();
+        } else {
+          LOGGER
+              .error(format("Task '%s' finished with exception in test scheduler '%s'", command.toString(), decorated.getName()),
                      t);
+        }
       }
     };
   }
@@ -155,8 +162,14 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
       try {
         return callable.call();
       } catch (Throwable t) {
-        LOGGER.error(format("Task '%s' finished with exception in test scheduler '%s'", callable.toString(), decorated.getName()),
+        if (t instanceof InterruptedException || t.getCause() instanceof InterruptedException) {
+          LOGGER.info(format("Task '%s' interrupted in test scheduler '%s'", callable.toString(), decorated.getName()));
+          currentThread().interrupt();
+        } else {
+          LOGGER
+              .error(format("Task '%s' finished with exception in test scheduler '%s'", callable.toString(), decorated.getName()),
                      t);
+        }
         return null;
       }
     };
