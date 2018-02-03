@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
@@ -32,12 +33,13 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import org.reactivestreams.Publisher;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -127,7 +129,11 @@ public class MessageProcessors {
           .doOnError(completeErrorIfNeeded((event.getContext()), completeContext))
           .block();
     } catch (Throwable e) {
-      throw rxExceptionToMuleException(e);
+      MuleException muleException = rxExceptionToMuleException(e);
+      if (e.getCause() instanceof InterruptedException) {
+        currentThread().interrupt();
+      }
+      throw muleException;
     }
   }
 
@@ -198,7 +204,7 @@ public class MessageProcessors {
 
   /**
    * Creates a new {@link BaseEventContext} which is child of the one in the given {@code event}
-   * 
+   *
    * @param event the parent event
    * @param componentLocation the location of the component creating the child context
    * @return a child {@link BaseEventContext}
