@@ -169,7 +169,7 @@
         }
       ],
       "name": "flowRef",
-      "description": "Allows a \u0027flow\u0027 to be referenced such that the message processing will continue in the referenced flow before returning. Message processing in the referenced \u0027flow\u0027 will occur within the context of the referenced flow and will therefore use its exception strategy etc.",
+      "description": "Allows a \u0027flow\u0027 to be referenced so that message processing will continue in the referenced flow before returning. Message processing in the referenced \u0027flow\u0027 will occur within the context of the referenced flow and will therefore use its exception strategy, etc.",
       "modelProperties": {},
       "kind": "operation"
     },
@@ -293,7 +293,7 @@
                 }
               ],
               "name": "objectStore",
-              "description": "The object store where the IDs of the processed events are going to be stored. If defined as argument it should reference a globally created object store. Otherwise, it can be defined inline or not at all. In the last case, a default object store will be provided.",
+              "description": "The object store where the IDs of the processed events are going to be stored. If defined as an argument, it should reference a globally created object store. Otherwise, it can be defined inline or not at all. If not at all, a default object store will be provided.",
               "modelProperties": {}
             }
           ],
@@ -305,7 +305,7 @@
         }
       ],
       "name": "idempotentMessageValidator",
-      "description": "Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the \u0027idExpression\u0027 attribute. Otherwise, a \u0027DUPLICATE_MESSAGE\u0027 error is generated.",
+      "description": "Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the \u0027idExpression\u0027 attribute. Otherwise, an \u0027DUPLICATE_MESSAGE\u0027 error is generated.",
       "modelProperties": {},
       "kind": "operation"
     },
@@ -360,7 +360,7 @@
               },
               "allowedStereotypeModels": [],
               "name": "message",
-              "description": "Message that will be logged. Embedded expressions can be used to extract value from the current message. If no message is specified then the current message is used.",
+              "description": "The message that will be logged. Embedded expressions can be used to extract values from the current message. If no message is specified, then the current message is used.",
               "modelProperties": {}
             },
             {
@@ -393,7 +393,7 @@
               },
               "allowedStereotypeModels": [],
               "name": "level",
-              "description": "The logging level to be used. Default is DEBUG.",
+              "description": "Sets the log level. Default is DEBUG.",
               "modelProperties": {}
             },
             {
@@ -413,7 +413,7 @@
               },
               "allowedStereotypeModels": [],
               "name": "category",
-              "description": "The log category to be used",
+              "description": "Sets the log category",
               "modelProperties": {}
             }
           ],
@@ -425,7 +425,7 @@
         }
       ],
       "name": "logger",
-      "description": "Performs logging using an expression that determines what should be logged. By default the current messages is logged using the DEBUG level to the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category but the level and category can both be configured to suit your needs. message is specified then the current message is used.",
+      "description": "Performs logging using an expression to determine the message to be logged. By default, if a message is not specified, the current Mule Message is logged using the DEBUG level with the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category, but the level and category can both be configured to suit your needs.",
       "modelProperties": {},
       "kind": "operation"
     },
@@ -500,7 +500,7 @@
               },
               "allowedStereotypeModels": [],
               "name": "location",
-              "description": "The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL or from the classpath.",
+              "description": "The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL, then from the classpath.",
               "modelProperties": {}
             }
           ],
@@ -538,7 +538,7 @@
               "displayModel": {
                 "displayName": "Target Variable"
               },
-              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "description": "The variable name on which to store the operation\u0027s output",
               "modelProperties": {}
             },
             {
@@ -568,7 +568,7 @@
               "displayModel": {
                 "displayName": "Target Value"
               },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "description": "The expression that will be evaluated against the operation\u0027s output then stored in the variable name specified by the target.",
               "modelProperties": {}
             }
           ],
@@ -580,7 +580,7 @@
         }
       ],
       "name": "parseTemplate",
-      "description": "A transformer that parses a template defined inline.",
+      "description": "Parses a template defined inline.",
       "modelProperties": {},
       "kind": "operation"
     },
@@ -734,7 +734,7 @@
         }
       ],
       "name": "removeVariable",
-      "description": "A processor that remove variables by name or regular expression.",
+      "description": "A processor that removes variables by name or regular expression.",
       "modelProperties": {},
       "kind": "operation"
     },
@@ -1126,7 +1126,7 @@
       },
       "parameterGroupModels": [],
       "name": "choice",
-      "description": "Sends the message to the first message processor whose condition has been satisfied. If no conditions were satisfied, sends to the configured default message processor if configured, or throws an exception if not configured.",
+      "description": "Sends the message to the first message processor whose condition has been satisfied. If no conditions were satisfied, sends to the configured default message processor (if configured), or throws an exception (if not configured).",
       "modelProperties": {},
       "kind": "construct"
     },
@@ -1276,7 +1276,7 @@
               },
               "allowedStereotypeModels": [],
               "name": "maxQueueTransactionFilesSize",
-              "description": "The approximated maximum space in megabytes used by the transaction log files for transactional persistent queues. Take into account that this number applies both to the set of transaction log files for XA and for local transactions. If both type of transactions are used then the approximated maximum space used will be twice the configured value.",
+              "description": "Sets the approximate maximum space in megabytes allowed for the transaction log files for transactional persistent queues. Take into account that this number applies both to the set of transaction log files for XA and for local transactions. If both types of transactions are used, then the approximate maximum space used will be twice the configured value.",
               "modelProperties": {}
             },
             {
@@ -1516,7 +1516,7 @@
                   "location": "EMBEDDED"
                 }
               },
-              "description": " The location of the file with the configuration properties to use. It may be a location in the classpath or an absolute location. The file location\n value may also contains references to properties that will only be resolved based on system properties or properties set at deployment time.",
+              "description": " The location of the file with the configuration properties to use. It may be a location in the classpath or an absolute location. \nThe file location value may also contains references to properties that will only be resolved based on system properties or properties set at deployment time.",
               "modelProperties": {}
             }
           ],
@@ -1528,7 +1528,7 @@
         }
       ],
       "name": "configurationProperties",
-      "description": "References a file with configuration properties. Each property has a key and a value. \nThe key can be referenced from the mule configuration files using the following semantics: \n${key_name}. This allows to externalize configuration and change it based\non the environment the application is being deployed to.",
+      "description": "Configuration properties are key/value pairs that can be stored in configuration files or set as system environment variables. \nEach property%2Cs value can be referenced inside the attributes of a mule configuration file by wrapping the property%2Cs key name in the syntax: \n${key_name}. \n At runtime, each property placeholder expression is substituted with the property's value. \nThis allows you to externalize configuration of properties outside the Mule application's deployable archive, and to allow others to change these properties based on the environment the application is being deployed to. Note that a system environment variable with a matching key name will override the same key%2Cs value from a properties file.",
       "modelProperties": {},
       "kind": "construct"
     },
@@ -2995,7 +2995,7 @@
       "annotations": {
         "typeId": "DynamicConfigExpiration",
         "description": {
-          "value": "Configuration about how should the runtime handle the expiration of dynamic configurations"
+          "value": "Configures how the runtime should handle the expiration of dynamic configurations"
         },
         "typeDsl": {
           "allowInlineDefinition": true,
