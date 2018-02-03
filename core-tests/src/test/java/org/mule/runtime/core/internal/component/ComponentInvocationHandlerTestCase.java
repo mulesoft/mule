@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.removeDynamicAnnotations;
 
@@ -24,6 +25,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -82,6 +84,38 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
     assertThat(annotated.getAnnotations().keySet(), empty());
     annotated.setAnnotations(singletonMap(LOCATION_KEY, "value"));
     assertThat(annotated.getAnnotations().keySet(), contains(LOCATION_KEY));
+  }
+
+  @Test
+  public void differentClassLoader() throws Exception {
+    ClassLoader childCl = createDelegatorClassLoader();
+
+    // Class<Component> annotatedClass = addAnnotationsToClass(childCl.loadClass(Delegator.class.getName()));
+    Class<Component> annotatedClass = addAnnotationsToClass(Delegator.class);
+
+    assertThat(annotatedClass.getClassLoader(), instanceOf(CompositeClassLoader.class));
+  }
+
+  private ClassLoader createDelegatorClassLoader() {
+    ClassLoader testClassLoader = new ClassLoader(this.getClass().getClassLoader()) {
+
+      @Override
+      public Class<?> loadClass(String name) throws ClassNotFoundException {
+        if (Delegator.class.getName().equals(name)) {
+          byte[] classBytes;
+          try {
+            classBytes =
+                toByteArray(this.getClass().getResourceAsStream("/org/mule/runtime/core/internal/component/Delegator.class"));
+            return this.defineClass(null, classBytes, 0, classBytes.length);
+          } catch (Exception e) {
+            return super.loadClass(name);
+          }
+        } else {
+          return super.loadClass(name);
+        }
+      }
+    };
+    return testClassLoader;
   }
 
   public static class NotAnnotated {
