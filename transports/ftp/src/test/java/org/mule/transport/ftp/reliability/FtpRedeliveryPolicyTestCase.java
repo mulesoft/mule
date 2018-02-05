@@ -12,6 +12,8 @@ import static org.junit.Assert.assertThat;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.listener.ExceptionListener;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 import org.mule.transport.ftp.AbstractFtpServerTestCase;
 
 import java.util.Arrays;
@@ -42,6 +44,7 @@ public class FtpRedeliveryPolicyTestCase extends AbstractFtpServerTestCase
                 {ConfigVariant.FLOW, "reliability/ftp-redelivery-policy-config.xml"}
         });
     }
+
     @Test
     public void testRedeliveryPolicyDLQConsumesMessage() throws Exception
     {
@@ -51,6 +54,20 @@ public class FtpRedeliveryPolicyTestCase extends AbstractFtpServerTestCase
         MuleMessage message = muleContext.getClient().request("vm://error-queue", RECEIVE_TIMEOUT);
         assertThat(message, is(notNullValue()));
         assertThat(message.getPayloadAsString(), is(TEST_MESSAGE));
-        assertThat(fileExists(FILE_TXT), is(false));
+        PollingProber prober = new PollingProber(3000, 500);
+        prober.check((new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                return !fileExists(FILE_TXT);
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "As file was consumed, it should not exist in the server anymore.";
+            }
+        }));
     }
 }
