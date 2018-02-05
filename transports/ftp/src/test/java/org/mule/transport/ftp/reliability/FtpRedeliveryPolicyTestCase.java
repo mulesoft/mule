@@ -66,7 +66,7 @@ public class FtpRedeliveryPolicyTestCase extends AbstractFtpServerTestCase
             @Override
             public String describeFailure()
             {
-                return "As file was consumed, it should not exist in the server anymore.";
+                return "As the file was consumed, it should not exist in the server anymore.";
             }
         }));
     }
