@@ -8,7 +8,7 @@ package org.mule.module.json.validation;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.STRICT_DUPLICATE_DETECTION;
 import static java.lang.Boolean.getBoolean;
-import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_PREFIX;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Initialisable;
@@ -30,7 +30,7 @@ import com.fasterxml.jackson.core.JsonParser.Feature;
  */
 public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Initialisable
 {
-    public static String ALLOW_DUPLICATE_KEYS_SYSTEM_PROPERTY = MULE_PREFIX + ".json.validator.allowDuplicateKeys";
+    public static String ALLOW_DUPLICATE_KEYS_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "json.validator.allowDuplicateKeys";
 
     private boolean allowDuplicateKeys = getBoolean(ALLOW_DUPLICATE_KEYS_SYSTEM_PROPERTY);
     private String schemaLocation;
