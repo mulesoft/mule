@@ -39,6 +39,7 @@ public final class TemplateParser {
     // Such a complex regex is needed to support nested expressions, otherwise we
     // have to do this manually or using an ANTLR grammar etc.
 
+    //TODO MULE-14603 - Expression Regex fails on detect expression when this have an unbalanced opening bracket
     // Support for 6 levels (5 nested)
     patterns.put(WIGGLY_MULE_TEMPLATE_STYLE,
                  new PatternInfo(WIGGLY_MULE_TEMPLATE_STYLE,
