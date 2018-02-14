@@ -493,4 +493,20 @@ public class MuleExtensionUtils {
     return format("%s-%s-implicit", extensionModel.getName(), implicitConfigurationModel.getName());
   }
 
+  /**
+   * TODO MULE-14603 - This should not exist after MULE-14603 is fixed
+   *
+   * Indicates if the given value is considered as an expression
+   * @param value Value to check
+   * @return a boolean indicating if the value is an expression or not.
+   */
+  public static boolean isExpression(Object value) {
+    if (value instanceof String) {
+      String trim = ((String) value).trim();
+      return trim.startsWith("#[") && trim.endsWith("]");
+    } else {
+      return false;
+    }
+  }
+
 }
