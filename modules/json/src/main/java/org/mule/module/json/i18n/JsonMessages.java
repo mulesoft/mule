@@ -22,4 +22,10 @@ public class JsonMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 1);
     }
+
+    public static Message cannotConvertJsonBeforeValidation()
+    {
+        return factory.createMessage(BUNDLE_PATH, 2);
+    }
+
 }

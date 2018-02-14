@@ -6,16 +6,21 @@
  */
 package org.mule.module.json.validation;
 
+import static java.lang.Boolean.getBoolean;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.module.extension.internal.capability.xml.schema.model.SchemaConstants.MULE_PREFIX;
+import static org.mule.module.json.i18n.JsonMessages.cannotConvertJsonBeforeValidation;
 import static org.mule.util.Preconditions.checkArgument;
 import static org.mule.util.Preconditions.checkState;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.json.DefaultJsonParser;
 import org.mule.util.StringUtils;
 
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.load.Dereferencing;
 import com.github.fge.jsonschema.core.load.configuration.LoadingConfiguration;
@@ -30,7 +35,10 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,7 +51,6 @@ import java.util.Map;
  */
 public class JsonSchemaValidator
 {
-
     /**
      * An implementation of the builder design pattern to create
      * instances of {@link JsonSchemaValidator}.
@@ -57,11 +64,11 @@ public class JsonSchemaValidator
      */
     public static final class Builder
     {
-
         private static final String RESOURCE_PREFIX = "resource:/";
         private String schemaLocation;
         private JsonSchemaDereferencing dereferencing = JsonSchemaDereferencing.CANONICAL;
         private final Map<String, String> schemaRedirects = new HashMap<>();
+        private Collection<Feature> features = new ArrayList<>();
 
         private Builder()
         {
@@ -138,6 +145,15 @@ public class JsonSchemaValidator
             return this;
         }
 
+
+        /**
+         */
+        public Builder addFeatures(Collection<Feature> features)
+        {
+            this.features = features;
+            return this;
+        }
+
         /**
          * Builds a new instance per the given configuration. This method can be
          * safely invoked many times, returning a different instance each.
@@ -170,7 +186,7 @@ public class JsonSchemaValidator
 
             try
             {
-                return new JsonSchemaValidator(loadSchema(factory, loadingConfiguration));
+                return new JsonSchemaValidator(loadSchema(factory, loadingConfiguration), features);
             }
             catch (Exception e)
             {
@@ -238,9 +254,12 @@ public class JsonSchemaValidator
 
     private final JsonSchema schema;
 
-    private JsonSchemaValidator(JsonSchema schema)
+    private final Collection<Feature> features;
+
+    private JsonSchemaValidator(JsonSchema schema, Collection<Feature> features)
     {
         this.schema = schema;
+        this.features = features;
     }
 
     /**
@@ -260,23 +279,30 @@ public class JsonSchemaValidator
     public void validate(MuleEvent event) throws MuleException
     {
         Object input = event.getMessage().getPayload();
+
+        if ((input instanceof Reader) || (input instanceof InputStream))
+        {
+            try
+            {
+                input = event.getMessage().getPayloadAsString();
+            }
+            catch (Exception e)
+            {
+                throw new TransformerException(cannotConvertJsonBeforeValidation(), e);
+            }
+        }
+
         ProcessingReport report;
         JsonNode jsonNode = null;
 
         try
         {
-            jsonNode = new DefaultJsonParser(event.getMuleContext()).asJsonNode(input);
-
-            if ((input instanceof Reader) || (input instanceof InputStream))
-            {
-                event.getMessage().setPayload(jsonNode.toString());
-            }
-
+            jsonNode = new DefaultJsonParser(event.getMuleContext(), features).asJsonNode(input);
             report = schema.validate(jsonNode);
         }
         catch (Exception e)
         {
-            throw new JsonSchemaValidationException("Exception was found while trying to validate json schema",
+            throw new JsonSchemaValidationException("Exception was found while trying to validate json schema: " + e.getMessage(),
                                                     jsonNode == null ? StringUtils.EMPTY : jsonNode.toString(),
                                                     e);
         }

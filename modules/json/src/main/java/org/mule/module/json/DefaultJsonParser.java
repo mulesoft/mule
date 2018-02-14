@@ -13,6 +13,7 @@ import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jackson.JsonLoader;
 import com.google.common.base.Joiner;
 
@@ -22,6 +23,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Collection;
+import com.fasterxml.jackson.core.JsonParser.Feature;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +44,24 @@ public final class DefaultJsonParser implements JsonParser
     private static final String TRANSFORMABLE_SUPPORTED_TYPES_AS_STRING = Joiner.on(',').join(TRANSFORMABLE_SUPPORTED_TYPES);
 
     private final MuleContext muleContext;
+    private final ObjectMapper objectMapper;
+
+
+    public DefaultJsonParser(MuleContext muleContext, Collection<Feature> features)
+    {
+        this.muleContext = muleContext;
+        objectMapper = new ObjectMapper();
+        for (Feature feature : features)
+        {
+            objectMapper.enable(feature);
+        }
+    }
+
 
     public DefaultJsonParser(MuleContext muleContext)
     {
         this.muleContext = muleContext;
+        objectMapper = new ObjectMapper();
     }
 
     /**
@@ -96,19 +113,19 @@ public final class DefaultJsonParser implements JsonParser
     {
         if (input instanceof String)
         {
-            return JsonLoader.fromString((String) input);
+            return objectMapper.readTree((String) input);
         }
         else if (input instanceof Reader)
         {
-            return JsonLoader.fromReader((Reader) input);
+            return objectMapper.readTree((Reader) input);
         }
         else if (input instanceof InputStream)
         {
-            return JsonLoader.fromReader(new InputStreamReader((InputStream) input));
+            return objectMapper.readTree((InputStream) input);
         }
         else if (input instanceof byte[])
         {
-            return JsonLoader.fromReader(new InputStreamReader(new ByteArrayInputStream((byte[]) input)));
+            return objectMapper.readTree((byte[]) input);
         }
         else if (input instanceof JsonNode)
         {
@@ -117,7 +134,7 @@ public final class DefaultJsonParser implements JsonParser
         else if (input instanceof JsonData)
         {
             JsonData jsonData = (JsonData) input;
-            return JsonLoader.fromReader(new StringReader(jsonData.toString()));
+            return objectMapper.readTree(new StringReader(jsonData.toString()));
         }
 
         return null;
