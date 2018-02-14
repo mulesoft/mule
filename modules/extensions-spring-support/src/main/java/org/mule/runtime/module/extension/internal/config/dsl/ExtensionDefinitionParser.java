@@ -42,6 +42,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTargetParameter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -116,8 +118,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValue
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import com.google.common.collect.ImmutableList;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -138,6 +138,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.core.convert.ConversionService;
@@ -690,11 +691,11 @@ public abstract class ExtensionDefinitionParser {
 
     final Class<?> expectedClass = ExtensionMetadataTypeUtils.getType(expectedType).orElse(Object.class);
 
-    if (isExpression(value, parser)) {
+    if (isExpression(value)) {
       final String expression = (String) value;
       resolver = getExpressionBasedValueResolver(expectedType, expression, modelProperties, expectedClass);
       if (required || isRequiredByExclusiveOptional(modelProperties)) {
-        resolver = new RequiredParameterValueResolverWrapper(resolver, parameterName, expression);
+        resolver = new RequiredParameterValueResolverWrapper<>(resolver, parameterName, expression);
       }
     } else {
       resolver = getStaticValueResolver(parameterName, expectedType, value, defaultValue, modelProperties, acceptsReferences,
@@ -737,7 +738,7 @@ public abstract class ExtensionDefinitionParser {
     } else if (isLiteral(expectedType) || isTargetParameter(modelProperties)) {
       resolver = new StaticLiteralValueResolver<>(value, expectedClass);
     } else {
-      resolver = new TypeSafeExpressionValueResolver(value, expectedClass, expectedType);
+      resolver = new TypeSafeExpressionValueResolver<>(value, expectedClass, expectedType);
     }
     return resolver;
   }
@@ -856,10 +857,6 @@ public abstract class ExtensionDefinitionParser {
         .withTypeDefinition(fromType(String.class))
         .withTypeConverter(typeConverter.get())
         .build());
-  }
-
-  private boolean isExpression(Object value, TemplateParser parser) {
-    return value instanceof String && parser.isContainsTemplate((String) value);
   }
 
   /**
@@ -1085,7 +1082,7 @@ public abstract class ExtensionDefinitionParser {
 
   private ValueResolver parseDate(Object value, MetadataType dateType, Object defaultValue) {
     Class<?> type = getType(dateType);
-    if (isExpression(value, parser)) {
+    if (isExpression(value)) {
       return new TypeSafeExpressionValueResolver<>((String) value, type, dateType);
     }
 
