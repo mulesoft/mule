@@ -51,6 +51,7 @@ import java.util.Map;
  */
 public class JsonSchemaValidator
 {
+
     /**
      * An implementation of the builder design pattern to create
      * instances of {@link JsonSchemaValidator}.
@@ -64,6 +65,7 @@ public class JsonSchemaValidator
      */
     public static final class Builder
     {
+
         private static final String RESOURCE_PREFIX = "resource:/";
         private String schemaLocation;
         private JsonSchemaDereferencing dereferencing = JsonSchemaDereferencing.CANONICAL;
@@ -146,8 +148,6 @@ public class JsonSchemaValidator
         }
 
 
-        /**
-         */
         public Builder addFeatures(Collection<Feature> features)
         {
             this.features = features;

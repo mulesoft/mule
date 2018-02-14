@@ -12,6 +12,8 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_JSON;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.getFstabWithDuplicateKeys;
 import static org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor.ALLOW_DUPLICATE_KEYS_SYSTEM_PROPERTY;
+import static org.mule.module.json.validation.ValidateSchemaFunctionalTestCase.DEREFERENCING;
+import static org.mule.module.json.validation.ValidateSchemaFunctionalTestCase.SCHEMA_LOCATION;
 
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -30,7 +32,10 @@ public class ValidateSchemaDuplicateKeysTestCase extends AbstractValidateSchemaF
 {
 
     @Rule
-    public SystemProperty schemaLocation = new SystemProperty("schemaLocation", SCHEMA_FSTAB_JSON);
+    public SystemProperty dereferencing = new SystemProperty(DEREFERENCING, "false");
+
+    @Rule
+    public SystemProperty schemaLocation = new SystemProperty(SCHEMA_LOCATION, SCHEMA_FSTAB_JSON);
 
     @Rule
     public SystemProperty duplicateKeys;
@@ -56,7 +61,7 @@ public class ValidateSchemaDuplicateKeysTestCase extends AbstractValidateSchemaF
     @Override
     protected String getConfigFile()
     {
-        return "validate-schema-config.xml";
+        return "validate-schema-duplicate-keys-config.xml";
     }
 
     @Test
