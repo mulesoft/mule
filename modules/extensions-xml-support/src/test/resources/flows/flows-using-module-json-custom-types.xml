@@ -15,6 +15,19 @@
         <modulejson:is-jsontype1 aParameter="#[{ 'street_type': 'Avenue', 'street_name': 'calle 7'}]" />
     </flow>
 
+    <flow name="testIsJsonType1ContentFromPayloadFlow">
+        <modulejson:is-jsontype1-content>
+            <modulejson:rules>#[payload]</modulejson:rules>
+        </modulejson:is-jsontype1-content>
+    </flow>
+
+    <flow name="testIsJsonType1ContentFromExpressionFlow">
+        <modulejson:is-jsontype1-content>
+            <modulejson:rules>#[{ 'street_type': 'Avenue', 'street_name': 'calle 7'}]</modulejson:rules>
+        </modulejson:is-jsontype1-content>
+    </flow>
+
+
     <flow name="testIsJsonType2FromPayloadFlow">
         <modulejson:is-jsontype2 aParameter="#[payload]" />
     </flow>
