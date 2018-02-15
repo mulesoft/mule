@@ -27,6 +27,16 @@
         <output type="boolean"/>
     </operation>
 
+    <operation name="is-jsontype1-content">
+        <parameters>
+            <parameter name="rules" type="Type1" role="CONTENT"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[output application/java --- vars.rules is {street_type: String , street_name: String} ]"/>
+        </body>
+        <output type="boolean"/>
+    </operation>
+
     <operation name="is-jsontype2">
         <parameters>
             <parameter name="aParameter" type="Type2"/>

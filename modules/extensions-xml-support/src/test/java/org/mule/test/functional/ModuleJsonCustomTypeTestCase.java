@@ -49,6 +49,18 @@ public class ModuleJsonCustomTypeTestCase extends AbstractXmlExtensionMuleArtifa
   }
 
   @Test
+  public void testSendingJsonType1ContentFromMap() throws Exception {
+    final CoreEvent muleEvent = flowRunner("testIsJsonType1ContentFromPayloadFlow").withPayload(EXPECTED_TYPE_1).run();
+    assertIsExpectedType(muleEvent);
+  }
+
+  @Test
+  public void testSendingJsonType1ContentFromExpression() throws Exception {
+    final CoreEvent muleEvent = flowRunner("testIsJsonType1ContentFromExpressionFlow").run();
+    assertIsExpectedType(muleEvent);
+  }
+
+  @Test
   public void testSendingJsonType2FromMap() throws Exception {
     final CoreEvent muleEvent = flowRunner("testIsJsonType2FromPayloadFlow").withPayload(EXPECTED_TYPE_2).run();
     assertIsExpectedType(muleEvent);
