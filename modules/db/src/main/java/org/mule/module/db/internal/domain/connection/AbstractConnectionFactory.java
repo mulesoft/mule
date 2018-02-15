@@ -18,15 +18,9 @@ import javax.sql.DataSource;
 public abstract class AbstractConnectionFactory implements ConnectionFactory
 {
 
-    /**
-     * Ensures DriverManager classloading takes place before any connection creation.
-     * It prevents a JDK deadlock that only occurs when two JDBC Connections of different DB vendors
-     * are created concurrently and the {@link DriverManager} hasn't been loaded yet.
-     * For more information, see MULE-14605.
-     */
-    static
+    protected AbstractConnectionFactory()
     {
-        DriverManager.getLoginTimeout();
+        initializeDriverMamager();
     }
 
     @Override
@@ -43,4 +37,15 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
     }
 
     protected abstract Connection doCreateConnection(DataSource dataSource);
+
+    /**
+     * Ensures DriverManager classloading takes place before any connection creation.
+     * It prevents a JDK deadlock that only occurs when two JDBC Connections of different DB vendors
+     * are created concurrently and the {@link DriverManager} hasn't been loaded yet.
+     * For more information, see MULE-14605.
+     */
+    private void initializeDriverMamager()
+    {
+        DriverManager.getLoginTimeout();
+    }
 }
