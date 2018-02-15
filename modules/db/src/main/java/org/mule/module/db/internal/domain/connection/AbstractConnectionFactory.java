@@ -43,6 +43,4 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
     }
 
     protected abstract Connection doCreateConnection(DataSource dataSource);
-
-
 }
