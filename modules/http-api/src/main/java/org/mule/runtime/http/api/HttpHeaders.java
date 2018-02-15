@@ -11,7 +11,9 @@ import org.mule.runtime.api.metadata.MediaType;
 /**
  * Provides the constants for the standard HTTP header names and values
  */
-public abstract class HttpHeaders {
+public class HttpHeaders {
+
+  private HttpHeaders() {}
 
   /**
    * Standard HTTP header names.

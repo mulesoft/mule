@@ -28,7 +28,7 @@ import org.mule.runtime.soap.api.exception.SoapFaultException;
  *
  * @since 4.0
  */
-public class SoapExceptionEnricher {
+public final class SoapExceptionEnricher {
 
   /**
    * Wraps an exception in a {@link ModuleException} specifying an error type.

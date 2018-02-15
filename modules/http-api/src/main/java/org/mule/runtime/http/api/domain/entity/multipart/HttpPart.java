@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Default implementation of a {@link Part}.
  */
-public class HttpPart implements Part {
+public final class HttpPart implements Part {
 
   public static final int NO_SIZE = -1;
 

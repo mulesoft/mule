@@ -20,7 +20,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class EmptyHttpEntity implements HttpEntity {
+public final class EmptyHttpEntity implements HttpEntity {
 
   private byte[] noBytes = new byte[0];
 

@@ -19,7 +19,7 @@ import javax.xml.namespace.QName;
  *
  * @since 4.0
  */
-public class SoapFaultException extends MuleRuntimeException {
+public final class SoapFaultException extends MuleRuntimeException {
 
   private final QName faultCode;
   private final QName subCode;

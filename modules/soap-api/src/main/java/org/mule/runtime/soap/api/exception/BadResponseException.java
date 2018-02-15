@@ -14,7 +14,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
  *
  * @since 4.0
  */
-public class BadResponseException extends MuleRuntimeException {
+public final class BadResponseException extends MuleRuntimeException {
 
   public BadResponseException(String message) {
     super(createStaticMessage(message));

@@ -16,7 +16,7 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
-public class HttpResourceLocator implements TransportResourceLocator {
+public final class HttpResourceLocator implements TransportResourceLocator {
 
   private final ReflectiveHttpConfigBasedRequester requester;
 

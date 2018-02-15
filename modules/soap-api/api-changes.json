@@ -1,0 +1,118 @@
+{
+  "4.1.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.soap.api.exception.BadRequestException",
+          "new": "class org.mule.runtime.soap.api.exception.BadRequestException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.soap.api.exception",
+          "classSimpleName": "BadRequestException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.soap.api.exception.BadResponseException",
+          "new": "class org.mule.runtime.soap.api.exception.BadResponseException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.soap.api.exception",
+          "classSimpleName": "BadResponseException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.soap.api.exception.DispatchingException",
+          "new": "class org.mule.runtime.soap.api.exception.DispatchingException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.soap.api.exception",
+          "classSimpleName": "DispatchingException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.soap.api.exception.EncodingException",
+          "new": "class org.mule.runtime.soap.api.exception.EncodingException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.soap.api.exception",
+          "classSimpleName": "EncodingException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.soap.api.exception.InvalidWsdlException",
+          "new": "class org.mule.runtime.soap.api.exception.InvalidWsdlException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.soap.api.exception",
+          "classSimpleName": "InvalidWsdlException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.soap.api.exception.SoapFaultException",
+          "new": "class org.mule.runtime.soap.api.exception.SoapFaultException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.soap.api.exception",
+          "classSimpleName": "SoapFaultException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.soap.api.exception.SoapServiceException",
+          "new": "class org.mule.runtime.soap.api.exception.SoapServiceException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.soap.api.exception",
+          "classSimpleName": "SoapServiceException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.soap.api.exception.error.SoapExceptionEnricher",
+          "new": "class org.mule.runtime.soap.api.exception.error.SoapExceptionEnricher",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.soap.api.exception.error",
+          "classSimpleName": "SoapExceptionEnricher",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.soap.api.transport.HttpResourceLocator",
+          "new": "class org.mule.runtime.soap.api.transport.HttpResourceLocator",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.soap.api.transport",
+          "classSimpleName": "HttpResourceLocator",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.soap.api.transport.NullTransportResourceLocator",
+          "new": "class org.mule.runtime.soap.api.transport.NullTransportResourceLocator",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.soap.api.transport",
+          "classSimpleName": "NullTransportResourceLocator",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        }
+      ]
+    }
+  }
+}

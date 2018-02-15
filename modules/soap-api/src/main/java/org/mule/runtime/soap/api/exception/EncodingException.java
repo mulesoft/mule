@@ -15,7 +15,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
  *
  * @since 4.0
  */
-public class EncodingException extends MuleRuntimeException {
+public final class EncodingException extends MuleRuntimeException {
 
   public EncodingException(String message) {
     super(createStaticMessage(message));

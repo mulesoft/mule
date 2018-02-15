@@ -17,7 +17,7 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
-public class NullTransportResourceLocator implements TransportResourceLocator {
+public final class NullTransportResourceLocator implements TransportResourceLocator {
 
   @Override
   public boolean handles(String url) {
