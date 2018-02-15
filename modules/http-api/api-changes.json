@@ -146,21 +146,13 @@
           "old": "class org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity",
           "new": "class org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity",
           "annotationType": "org.mule.api.annotation.NoExtend",
-          "annotation": "@org.mule.api.annotation.NoExtend",
-          "package": "org.mule.runtime.http.api.domain.entity",
-          "classSimpleName": "InputStreamHttpEntity",
-          "elementKind": "class",
           "justification": "This class is not meant to be extended by the user"
         },
         {
-          "code": "java.class.nowFinal",
+          "code": "java.annotation.added",
           "old": "class org.mule.runtime.http.api.domain.entity.multipart.HttpPart",
           "new": "class org.mule.runtime.http.api.domain.entity.multipart.HttpPart",
-          "oldModifiers": "public",
-          "newModifiers": "public final",
-          "package": "org.mule.runtime.http.api.domain.entity.multipart",
-          "classSimpleName": "HttpPart",
-          "elementKind": "class",
+          "annotationType": "org.mule.api.annotation.NoExtend",
           "justification": "This class is not meant to be extended by the user"
         },
         {
