@@ -21,7 +21,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class ByteArrayHttpEntity implements HttpEntity {
+public final class ByteArrayHttpEntity implements HttpEntity {
 
   private byte[] content;
 

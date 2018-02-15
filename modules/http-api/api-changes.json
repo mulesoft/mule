@@ -94,6 +94,107 @@
           "classSimpleName": "HttpServerProperties",
           "elementKind": "class",
           "justification": "This enables a performance optimization. It doesn't break the API"
+        },
+        {
+          "code": "java.method.visibilityReduced",
+          "old": "method void org.mule.runtime.http.api.HttpConstants::<init>()",
+          "new": "method void org.mule.runtime.http.api.HttpConstants::<init>()",
+          "oldVisibility": "public",
+          "newVisibility": "private",
+          "package": "org.mule.runtime.http.api",
+          "classSimpleName": "HttpConstants",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.method.visibilityReduced",
+          "old": "method void org.mule.runtime.http.api.HttpHeaders::<init>()",
+          "new": "method void org.mule.runtime.http.api.HttpHeaders::<init>()",
+          "oldVisibility": "public",
+          "newVisibility": "private",
+          "package": "org.mule.runtime.http.api",
+          "classSimpleName": "HttpHeaders",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity",
+          "new": "class org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.http.api.domain.entity",
+          "classSimpleName": "ByteArrayHttpEntity",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.http.api.domain.entity.EmptyHttpEntity",
+          "new": "class org.mule.runtime.http.api.domain.entity.EmptyHttpEntity",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.http.api.domain.entity",
+          "classSimpleName": "EmptyHttpEntity",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity",
+          "new": "class org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.http.api.domain.entity",
+          "classSimpleName": "InputStreamHttpEntity",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.http.api.domain.entity.multipart.HttpPart",
+          "new": "class org.mule.runtime.http.api.domain.entity.multipart.HttpPart",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.http.api.domain.entity.multipart",
+          "classSimpleName": "HttpPart",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.http.api.domain.entity.multipart.MultipartHttpEntity",
+          "new": "class org.mule.runtime.http.api.domain.entity.multipart.MultipartHttpEntity",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.http.api.domain.entity.multipart",
+          "classSimpleName": "MultipartHttpEntity",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.http.api.server.ServerAlreadyExistsException",
+          "new": "class org.mule.runtime.http.api.server.ServerAlreadyExistsException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "ServerAlreadyExistsException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.class.nowFinal",
+          "old": "class org.mule.runtime.http.api.server.ServerNotFoundException",
+          "new": "class org.mule.runtime.http.api.server.ServerNotFoundException",
+          "oldModifiers": "public",
+          "newModifiers": "public final",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "ServerNotFoundException",
+          "elementKind": "class",
+          "justification": "This class is not meant to be extended by the user"
         }
       ]
     }

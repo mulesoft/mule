@@ -9,6 +9,7 @@ package org.mule.runtime.http.api.domain.entity;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 
 import java.io.IOException;
@@ -23,6 +24,7 @@ import sun.misc.IOUtils;
  *
  * @since 4.0
  */
+@NoExtend
 public class InputStreamHttpEntity implements HttpEntity {
 
   private Long contentLength;
