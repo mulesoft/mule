@@ -8,6 +8,7 @@
 package org.mule.module.db.internal.domain.connection;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 
 import javax.sql.DataSource;
 
@@ -17,6 +18,17 @@ import javax.sql.DataSource;
 public abstract class AbstractConnectionFactory implements ConnectionFactory
 {
 
+    /**
+     * Ensures DriverManager classloading takes places before any connection creation.
+     * It prevents a JDK deadlock that only occurs when two JDBC Connections of different DB vendors
+     * are created concurrently and the {@link DriverManager} hasn't been loaded yet.
+     * For more information, see MULE-14605.
+     */
+    static
+    {
+        DriverManager.getLoginTimeout();
+    }
+
     @Override
     public final Connection create(DataSource dataSource)
     {
@@ -24,11 +36,13 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory
 
         if (connection == null)
         {
-          throw new ConnectionCreationException("Unable to create connection to the provided dataSource: " + dataSource);
+            throw new ConnectionCreationException("Unable to create connection to the provided dataSource: " + dataSource);
         }
 
         return connection;
     }
 
     protected abstract Connection doCreateConnection(DataSource dataSource);
+
+
 }
