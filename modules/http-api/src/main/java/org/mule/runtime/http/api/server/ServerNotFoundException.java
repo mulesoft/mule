@@ -14,7 +14,7 @@ import org.mule.runtime.api.exception.MuleException;
  *
  * @since 4.0
  */
-public class ServerNotFoundException extends MuleException {
+public final class ServerNotFoundException extends MuleException {
 
   private static final long serialVersionUID = 2587466114314625848L;
 

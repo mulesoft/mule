@@ -11,7 +11,7 @@ package org.mule.runtime.soap.api.exception;
  *
  * @since 4.0
  */
-public class SoapServiceException extends RuntimeException {
+public final class SoapServiceException extends RuntimeException {
 
   public SoapServiceException(String message, Throwable cause) {
     super(message, cause);

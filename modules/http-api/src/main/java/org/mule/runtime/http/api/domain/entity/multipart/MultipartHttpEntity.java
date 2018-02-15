@@ -19,7 +19,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class MultipartHttpEntity implements HttpEntity {
+public final class MultipartHttpEntity implements HttpEntity {
 
   private final Collection<HttpPart> parts;
 

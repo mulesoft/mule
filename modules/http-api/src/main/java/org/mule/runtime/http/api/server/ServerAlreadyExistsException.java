@@ -13,7 +13,7 @@ import static java.lang.String.format;
  *
  * @since 4.0
  */
-public class ServerAlreadyExistsException extends ServerCreationException {
+public final class ServerAlreadyExistsException extends ServerCreationException {
 
   private static final long serialVersionUID = -3622168573395746887L;
   private static final String SERVER_ALREADY_EXISTS_FORMAT =

@@ -15,7 +15,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
  *
  * @since 4.0
  */
-public class InvalidWsdlException extends MuleRuntimeException {
+public final class InvalidWsdlException extends MuleRuntimeException {
 
   public InvalidWsdlException(String message) {
     super(createStaticMessage(message));

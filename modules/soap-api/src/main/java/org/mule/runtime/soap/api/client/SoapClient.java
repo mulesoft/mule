@@ -6,14 +6,12 @@
  */
 package org.mule.runtime.soap.api.client;
 
-import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.soap.api.client.metadata.SoapMetadataResolver;
 import org.mule.runtime.soap.api.message.SoapRequest;
 import org.mule.runtime.soap.api.message.SoapResponse;
-import org.mule.runtime.soap.api.message.dispatcher.DefaultHttpMessageDispatcher;
 
 /**
  * Contract for clients that consumes SOAP Web Services, and returns the response.

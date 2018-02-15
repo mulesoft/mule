@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.api.domain.entity.multipart;
 
+import org.mule.api.annotation.NoExtend;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +20,7 @@ import java.util.Map;
 /**
  * Default implementation of a {@link Part}.
  */
+@NoExtend
 public class HttpPart implements Part {
 
   public static final int NO_SIZE = -1;

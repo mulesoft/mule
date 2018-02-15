@@ -14,7 +14,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
  *
  * @since 4.0
  */
-public class DispatchingException extends MuleRuntimeException {
+public final class DispatchingException extends MuleRuntimeException {
 
   public DispatchingException(String message) {
     super(createStaticMessage(message));

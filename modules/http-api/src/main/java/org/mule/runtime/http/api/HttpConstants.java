@@ -9,7 +9,9 @@ package org.mule.runtime.http.api;
 /**
  * General purpose HTTP constants
  */
-public abstract class HttpConstants {
+public class HttpConstants {
+
+  private HttpConstants() {}
 
   public enum Method {
     POST, GET, PUT, PATCH, OPTIONS, HEAD, DELETE;
