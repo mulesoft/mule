@@ -7,13 +7,15 @@
 
 package org.mule.runtime.module.artifact.internal.classloader;
 
+import java.sql.DriverManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementations of this class should take care of resources initialization with System Class Loader
- * as if they are loaded with application's Class Loader it may leak memory after application is undeployment. Mule
- * ensures to create an instance of this class with the System Class Loader.
+ * Implementations of this class should take care of resources initialization with System Class Loader as if they are loaded with
+ * application's Class Loader it may leak memory after application is undeployment. Mule ensures to create an instance of this
+ * class with the System Class Loader.
  *
  * @since 4.0
  */
@@ -22,9 +24,8 @@ public class DefaultResourceInitializer {
   private final transient Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
-   * Attempts to initialize resources that should not be initialized from an application class loader.
-   * system or parent class loader is the {@link Thread#contextClassLoader} of the current
-   * thread when method is invoked.
+   * Attempts to initialize resources that should not be initialized from an application class loader. system or parent class
+   * loader is the {@link Thread#contextClassLoader} of the current thread when method is invoked.
    */
   public void initialize() {
     // When plugins have com.sun.xml.bind:jaxb-impl:jar a reference to the MuleArtifactClassLoader (plugin) will be
@@ -37,6 +38,17 @@ public class DefaultResourceInitializer {
     } catch (Throwable t) {
       logger.warn("Couldn't initialize DataTypeConverterImpl in order to prevent a class loader leak", t);
     }
+
+    initializeDriverManager();
+  }
+
+  /**
+   * Ensures DriverManager classloading takes place before any connection creation. It prevents a JDK deadlock that only occurs
+   * when two JDBC Connections of different DB vendors are created concurrently and the {@link DriverManager} hasn't been loaded
+   * yet. For more information, see MULE-14605.
+   */
+  private void initializeDriverManager() {
+    DriverManager.getLoginTimeout();
   }
 
 }
