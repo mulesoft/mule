@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static java.lang.Boolean.FALSE;
 import static java.util.Arrays.asList;
+import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import java.net.URL;
@@ -152,7 +153,7 @@ public final class ClassLoaderModel {
      */
     public ClassLoaderModelBuilder exportingResources(Set<String> resources) {
       checkArgument(resources != null, "resources cannot be null");
-      this.resources.addAll(resources);
+      resources.stream().forEach(r -> this.resources.add(separatorsToUnix(r)));
       return this;
     }
 
