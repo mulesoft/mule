@@ -7,6 +7,8 @@
 package org.mule.runtime.deployment.model.api;
 
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -72,7 +74,15 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   }
 
   public void setConfigResources(Set<String> configResources) {
-    this.configResources = configResources;
+    this.configResources = sanitizePaths(configResources);
+  }
+
+  private Set<String> sanitizePaths(Set<String> configResources) {
+    if (configResources == null || configResources.isEmpty()) {
+      return configResources;
+    }
+
+    return configResources.stream().map(s -> separatorsToUnix(s)).collect(toSet());
   }
 
   /**
