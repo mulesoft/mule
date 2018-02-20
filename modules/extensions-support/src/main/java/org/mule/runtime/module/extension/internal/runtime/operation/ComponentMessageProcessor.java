@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -47,7 +48,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -184,15 +184,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           } catch (MuleException e) {
             return error(e);
           }
-          // While a hook in reactor is used to map Throwable to MessagingException when an error occurs this does not cover
-          // the case where an error is explicitly triggered via a Sink such as such as when using Mono.create in
-          // ReactorCompletionCallback rather than being thrown by a reactor operator. Although changes could be made to Mule
-          // to cater for this in AbstractMessageProcessorChain, this is not trivial given processor interceptors and a potent
-          // performance overhead associated with the addition of many additional flatMaps. It would be slightly clearer to
-          // create the MessagingException in ReactorCompletionCallback where Mono.error is used but we don't have a reference
-          // to the processor there.
-          return doProcess(operationEvent, operationContext)
-              .onErrorMap(e -> !(e instanceof MessagingException), e -> new MessagingException(event, e, this));
+          return doProcess(operationEvent, operationContext);
         };
       }
       if (getLocation() != null) {
@@ -219,7 +211,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return executeOperation(operationContext)
         .map(value -> asReturnValue(operationContext, value))
         .switchIfEmpty(fromCallable(() -> asReturnValue(operationContext, null)))
-        .onErrorMap(Exceptions::unwrap);
+        // While a hook in reactor is used to map Throwable to MessagingException when an error occurs this does not cover
+        // the case where an error is explicitly triggered via a Sink such as such as when using Mono.create in
+        // ReactorCompletionCallback rather than being thrown by a reactor operator. Although changes could be made to Mule
+        // to cater for this in AbstractMessageProcessorChain, this is not trivial given processor interceptors and a potent
+        // performance overhead associated with the addition of many additional flatMaps. It would be slightly clearer to
+        // create the MessagingException in ReactorCompletionCallback where Mono.error is used but we don't have a reference
+        // to the processor there.
+        .onErrorMap(e -> !(unwrap(e) instanceof MessagingException), e -> new MessagingException(event, unwrap(e), this));
   }
 
   private CoreEvent asReturnValue(ExecutionContextAdapter<T> operationContext, Object value) {

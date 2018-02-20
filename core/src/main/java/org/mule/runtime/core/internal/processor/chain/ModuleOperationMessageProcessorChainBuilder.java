@@ -18,6 +18,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
@@ -42,8 +43,8 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +52,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+
+import reactor.core.publisher.Mono;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -212,7 +215,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
                                                                                                  CoreEvent originalRequest) {
       return throwable -> {
         throwable = handleSubChainException(throwable, originalRequest);
-        return Mono.from(((BaseEventContext) originalRequest.getContext()).error(throwable)).then(Mono.empty());
+        return Mono.from(((BaseEventContext) originalRequest.getContext()).error(throwable)).then(Mono.error(throwable));
       };
     }
 
