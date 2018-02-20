@@ -23,7 +23,10 @@ import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -52,6 +55,7 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
     doBody(CoreMessages.serverStartedAt(System.currentTimeMillis()).getMessage());
 
     doBody(String.format("JDK: %s (%s)", System.getProperty("java.version"), System.getProperty("java.vm.info")));
+    listJavaSystemProperties();
 
     String patch = System.getProperty("sun.os.patch.level", null);
 
@@ -103,5 +107,14 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
     System.getProperties().stringPropertyNames().stream().filter(property -> property.startsWith(SYSTEM_PROPERTY_PREFIX))
         .forEach(property -> muleProperties.put(property, System.getProperty(property)));
     listItems(muleProperties, "Mule system properties:");
+  }
+
+  private void listJavaSystemProperties() {
+    List<String> javaPropertiesNamesToList = new ArrayList<>(Arrays.asList("java.vendor", "java.vm.name", "java.home"));
+    Map<String, String> javaProperties = new HashMap<>();
+
+    javaPropertiesNamesToList.stream()
+        .forEachOrdered(propertyName -> javaProperties.put(propertyName, System.getProperty(propertyName)));
+    listItems(javaProperties, "JDK properties:");
   }
 }
