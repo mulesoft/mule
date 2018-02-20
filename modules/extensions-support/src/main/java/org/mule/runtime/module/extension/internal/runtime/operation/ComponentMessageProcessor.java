@@ -172,7 +172,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
         configuration = operationContext.getConfiguration();
 
-        operationExecutionFunction = (parameters, operationEvent) -> doProcess(operationEvent, operationContext);
+        operationExecutionFunction = (parameters, operationEvent) -> doProcessWithErrorMapping(operationEvent, operationContext);
       } else {
         // Otherwise, generate the context as usual.
         configuration = getConfiguration(event);
@@ -184,15 +184,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           } catch (MuleException e) {
             return error(e);
           }
-          // While a hook in reactor is used to map Throwable to MessagingException when an error occurs this does not cover
-          // the case where an error is explicitly triggered via a Sink such as such as when using Mono.create in
-          // ReactorCompletionCallback rather than being thrown by a reactor operator. Although changes could be made to Mule
-          // to cater for this in AbstractMessageProcessorChain, this is not trivial given processor interceptors and a potent
-          // performance overhead associated with the addition of many additional flatMaps. It would be slightly clearer to
-          // create the MessagingException in ReactorCompletionCallback where Mono.error is used but we don't have a reference
-          // to the processor there.
-          return doProcess(operationEvent, operationContext)
-              .onErrorMap(e -> !(e instanceof MessagingException), e -> new MessagingException(event, e, this));
+          return doProcessWithErrorMapping(operationEvent, operationContext);
         };
       }
       if (getLocation() != null) {
@@ -208,6 +200,19 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         return operationExecutionFunction.execute(getResolutionResult(event, configuration), event);
       }
     }));
+  }
+
+  /**
+   * While a hook in reactor is used to map Throwable to MessagingException when an error occurs this does not cover the case
+   * where an error is explicitly triggered via a Sink such as such as when using Mono.create in ReactorCompletionCallback rather
+   * than being thrown by a reactor operator. Although changes could be made to Mule to cater for this in
+   * AbstractMessageProcessorChain, this is not trivial given processor interceptors and a potent performance overhead associated
+   * with the addition of many additional flatMaps. It would be slightly clearer to create the MessagingException in
+   * ReactorCompletionCallback where Mono.error is used but we don't have a reference to the processor there.
+   */
+  private Publisher<CoreEvent> doProcessWithErrorMapping(CoreEvent operationEvent, ExecutionContextAdapter<T> operationContext) {
+    return doProcess(operationEvent, operationContext)
+        .onErrorMap(e -> !(e instanceof MessagingException), e -> new MessagingException(operationEvent, e, this));
   }
 
   private PrecalculatedExecutionContextAdapter<T> getPrecalculatedContext(CoreEvent event) {

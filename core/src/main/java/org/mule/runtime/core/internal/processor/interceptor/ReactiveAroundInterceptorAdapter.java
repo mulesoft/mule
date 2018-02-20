@@ -103,7 +103,9 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
                                                                                  ((Component) component)));
                         }
                       })
-                      .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
+                      .thenApply(interceptedEvent -> interceptedEvent != null
+                          ? ((DefaultInterceptionEvent) interceptedEvent).resolve()
+                          : null);
     } catch (Exception e) {
       throw propagate(createMessagingException(interceptionEvent.resolve(), e, (Component) component));
     }

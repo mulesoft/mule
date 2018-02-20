@@ -33,8 +33,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
@@ -42,6 +42,7 @@ import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorTypeThat;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -63,13 +64,17 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 
 import com.google.common.collect.ImmutableMap;
+
+import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -1619,6 +1624,41 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor).after(any(), any(), any());
 
       verifyParametersResolvedAndDisposed(times(1));
+    }
+  }
+
+  @Test
+  @io.qameta.allure.Description("Simulates the error handling scenario for XML SDK operations")
+  public void interceptorErrorResumeAround() throws Exception {
+    Exception thrown = new Exception();
+
+    ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
+                                                         InterceptionEvent event, InterceptionAction action) {
+        Mono<InterceptionEvent> errorMono = Mono.error(thrown);
+        return Mono.from(((BaseEventContext) event.getContext()).error(thrown)).then(errorMono).toFuture();
+      }
+
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    expected.expectCause(sameInstance(thrown));
+    try {
+      process(flow, eventBuilder(muleContext).message(Message.of("")).build());
+    } finally {
+      if (useMockInterceptor) {
+        new PollingProber().probe(() -> {
+          verify(interceptor).after(any(), any(), eq(Optional.of(thrown)));
+          return true;
+        });
+      }
     }
   }
 
