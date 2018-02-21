@@ -8,7 +8,6 @@ package org.mule.runtime.module.launcher;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
-import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getPatchesLibFolder;
@@ -29,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.stream.Stream;
 
 public class MuleContainerStartupSplashScreen extends SplashScreen {
 
@@ -109,7 +109,7 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
   }
 
   private void listJavaSystemProperties() {
-    listItems(stream(new String[] {"java.vendor", "java.vm.name", "java.home"})
+    listItems(Stream.of("java.vendor", "java.vm.name", "java.home")
         .collect(toMap(String::toString, propertyName -> System.getProperty(propertyName))), "JDK properties:");
   }
 }
