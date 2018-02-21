@@ -114,7 +114,7 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void avoidNPEInDebugMode() throws Exception
+    public void avoidNPEInDebugModeWithNullTextMessage() throws Exception
     {
         TextMessage textMessage = mock(TextMessage.class);
         when(textMessage.getText()).thenReturn(null);
@@ -123,4 +123,5 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase
         JMSMessageToObject jmsMessageToObject = new JMSMessageToObject();
         assertThat(jmsMessageToObject.transformMessage(message, null), is(nullValue()));
     }
+
 }

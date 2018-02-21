@@ -6,10 +6,10 @@
  */
 package org.mule.transport.jms.transformers;
 
+import static org.mule.util.ClassUtils.getSimpleName;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.types.DataTypeFactory;
-import org.mule.util.ClassUtils;
 
 import javax.jms.BytesMessage;
 import javax.jms.MapMessage;
@@ -58,7 +58,7 @@ public class JMSMessageToObject extends AbstractJmsTransformer
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Source object is " + ClassUtils.getSimpleName(message.getPayload().getClass()));
+                logger.debug("Source object is " + getSimpleName(message.getPayload().getClass()));
             }
 
             Object result = transformFromMessage((Message) message.getPayload(), outputEncoding);
@@ -77,7 +77,7 @@ public class JMSMessageToObject extends AbstractJmsTransformer
 
             if (logger.isDebugEnabled())
             {
-                logger.debug("Resulting object is " + ClassUtils.getSimpleName(result != null ? result.getClass() : null));
+                logger.debug("Resulting object is " + getSimpleName(result));
             }
 
             return result;
