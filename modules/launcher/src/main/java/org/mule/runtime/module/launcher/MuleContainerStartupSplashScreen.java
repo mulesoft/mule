@@ -23,13 +23,12 @@ import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MuleContainerStartupSplashScreen extends SplashScreen {
 
@@ -110,11 +109,9 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
   }
 
   private void listJavaSystemProperties() {
-    List<String> javaPropertiesNamesToList = new ArrayList<>(Arrays.asList("java.vendor", "java.vm.name", "java.home"));
-    Map<String, String> javaProperties = new HashMap<>();
-
-    javaPropertiesNamesToList.stream()
-        .forEachOrdered(propertyName -> javaProperties.put(propertyName, System.getProperty(propertyName)));
+    Stream<String> javaPropertiesNamesToList = Stream.of("java.vendor", "java.vm.name", "java.home");
+    Map<String, String> javaProperties =
+        javaPropertiesNamesToList.collect(Collectors.toMap(String::toString, propertyName -> System.getProperty(propertyName)));
     listItems(javaProperties, "JDK properties:");
   }
 }
