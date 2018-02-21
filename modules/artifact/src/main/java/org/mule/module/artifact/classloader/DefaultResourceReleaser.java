@@ -11,11 +11,7 @@ import static java.lang.String.format;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
-
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
-
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +21,9 @@ import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.ResourceBundle;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -202,11 +201,18 @@ public class DefaultResourceReleaser implements ResourceReleaser {
    * Workaround for http://bugs.mysql.com/bug.php?id=65909
    */
   private void shutdownMySqlAbandonedConnectionCleanupThread() {
+
+    Class<?> classAbandonedConnectionCleanupThread;
     try {
-      Class<?> classAbandonedConnectionCleanupThread =
+      classAbandonedConnectionCleanupThread =
           this.getClass().getClassLoader().loadClass("com.mysql.jdbc.AbandonedConnectionCleanupThread");
-      Method methodShutdown = classAbandonedConnectionCleanupThread.getMethod("shutdown");
-      methodShutdown.invoke(null);
+      try {
+        Method uncheckedShutdown = classAbandonedConnectionCleanupThread.getMethod("uncheckedShutdown");
+        uncheckedShutdown.invoke(null);
+      } catch (NoSuchMethodException e) {
+        Method checkedShutdown = classAbandonedConnectionCleanupThread.getMethod("shutdown");
+        checkedShutdown.invoke(null);
+      }
     } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
       logger.warn("Unable to shutdown MySql's AbandonedConnectionCleanupThread", e);
