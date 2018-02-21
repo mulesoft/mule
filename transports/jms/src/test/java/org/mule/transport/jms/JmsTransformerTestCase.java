@@ -12,8 +12,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -23,15 +25,36 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.TransformerWeighting;
 import org.mule.transformer.simple.ObjectToString;
+import org.mule.transport.jms.transformers.JMSMessageToObject;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
 
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(LogFactory.class)
+@PowerMockIgnore("javax.management.*")
 public class JmsTransformerTestCase extends AbstractMuleContextTestCase
 {
+
+    @Before
+    public void setUp()
+    {
+        mockStatic(LogFactory.class);
+        Log log = mock(Log.class);
+        when(log.isDebugEnabled()).thenReturn(true);
+        when(LogFactory.getLog(any(Class.class))).thenReturn(log);
+    }
+
     @Test
     public void testCustomJMSProperty() throws Exception
     {
@@ -89,4 +112,16 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase
         assertThat(objectToStringTransformer.getPriorityWeighting(), greaterThan(objectToJmsMessageTransformer.getPriorityWeighting()));
         assertThat(weightingJmsMessageTransformer.compareTo(weightingObjectToStringTransformer), equalTo(-1));
     }
+
+    @Test
+    public void avoidNPEInDebugModeWithNullTextMessage() throws Exception
+    {
+        TextMessage textMessage = mock(TextMessage.class);
+        when(textMessage.getText()).thenReturn(null);
+        MuleMessage message = getTestMuleMessage();
+        message.setPayload(textMessage);
+        JMSMessageToObject jmsMessageToObject = new JMSMessageToObject();
+        assertThat(jmsMessageToObject.transformMessage(message, null), is(nullValue()));
+    }
+
 }
