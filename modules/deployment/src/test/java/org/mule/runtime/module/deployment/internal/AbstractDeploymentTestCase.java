@@ -73,7 +73,6 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.in
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -139,15 +138,6 @@ import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.test.runner.classloader.TestModuleDiscoverer;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -164,6 +154,15 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 /**
@@ -346,6 +345,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       createPolicyIncludingHelloPluginV2FileBuilder();
   protected final PolicyFileBuilder exceptionThrowingPluginImportingPolicyFileBuilder =
       createExceptionThrowingPluginImportingPolicyFileBuilder();
+  protected final PolicyFileBuilder policyIncludingDependantPluginFileBuilder =
+      createPolicyIncludingDependantPluginFileBuilder();
 
   protected final DomainFileBuilder exceptionThrowingPluginImportingDomain =
       new DomainFileBuilder("exception-throwing-plugin-importing-domain").definedBy("empty-domain-config.xml")
@@ -1371,6 +1372,28 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
         .build()).dependingOn(helloExtensionV1Plugin);
+  }
+
+  private PolicyFileBuilder createPolicyIncludingDependantPluginFileBuilder() {
+    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
+        .setRequiredProduct(Product.MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
+    ArtifactPluginFileBuilder dependantPlugin;
+    try {
+      dependantPlugin =
+          new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+              .containingClass(new SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java")),
+                               "org/foo/echo/Plugin3Echo.class")
+              .dependingOn(helloExtensionV1Plugin);
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+
+    return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
+        .build()).dependingOn(dependantPlugin);
   }
 
   protected ServiceRegistryDescriptorLoaderRepository createDescriptorLoaderRepository() {

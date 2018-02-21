@@ -7,6 +7,7 @@
 package org.mule.runtime.deployment.model.internal.tooling;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
@@ -100,7 +101,7 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
     setArtifactDescriptor(new ArtifactDescriptor(TOOLING_EXTENSION_MODEL));
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver
-            .resolve(ImmutableList.<ArtifactPluginDescriptor>builder().add(artifactPluginDescriptor).build());
+            .resolve(emptySet(), ImmutableList.<ArtifactPluginDescriptor>builder().add(artifactPluginDescriptor).build());
     this.addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors
         .toArray(new ArtifactPluginDescriptor[resolvedArtifactPluginDescriptors.size()]));
     ArtifactClassLoader ownerArtifactClassLoader = super.build();

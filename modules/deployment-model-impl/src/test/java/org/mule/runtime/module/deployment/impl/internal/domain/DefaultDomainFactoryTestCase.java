@@ -7,12 +7,14 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
@@ -26,7 +28,6 @@ import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilde
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.license.api.LicenseValidator;
-import org.mule.runtime.module.license.internal.DefaultLicenseValidator;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
   @Before
   public void setUp() throws Exception {
-    when(pluginDependenciesResolver.resolve(anyList())).thenReturn(emptyList());
+    when(pluginDependenciesResolver.resolve(argThat(is(emptySet())), anyList())).thenReturn(emptyList());
   }
 
   @Test

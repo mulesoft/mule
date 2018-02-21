@@ -95,7 +95,7 @@ public class TestPolicyManager implements DeploymentListener {
   }
 
   /**
-   * Removes a parametized policy
+   * Removes a parameterized policy
    *
    * @param appName application where the policy is applied. Non empty.
    * @param policyId identifies the policy parametrization. Non empty.

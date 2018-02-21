@@ -7,11 +7,11 @@
 
 package org.mule.runtime.deployment.model.internal.plugin;
 
-import static java.util.Optional.empty;
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
-
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -51,13 +51,51 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   }
 
   @Override
-  public List<ArtifactPluginDescriptor> resolve(List<ArtifactPluginDescriptor> descriptors) {
+  public List<ArtifactPluginDescriptor> resolve(
+                                                Set<ArtifactPluginDescriptor> providedPluginDescriptors,
+                                                List<ArtifactPluginDescriptor> descriptors) {
 
     List<ArtifactPluginDescriptor> resolvedPlugins = resolvePluginsDependencies(descriptors);
 
-    verifyPluginExportedPackages(resolvedPlugins);
+    List<ArtifactPluginDescriptor> filteredPluginDescriptors =
+        getArtifactPluginDescriptors(providedPluginDescriptors, resolvedPlugins);
 
-    return resolvedPlugins;
+    verifyPluginExportedPackages(filteredPluginDescriptors);
+
+    return filteredPluginDescriptors;
+  }
+
+  private List<ArtifactPluginDescriptor> getArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> domainPlugins,
+                                                                      List<ArtifactPluginDescriptor> resolvedPlugins) {
+    List<ArtifactPluginDescriptor> filteredPluginDescriptors = new ArrayList<>();
+
+    for (ArtifactPluginDescriptor appPluginDescriptor : resolvedPlugins) {
+      Optional<ArtifactPluginDescriptor> pluginDescriptor = findPlugin(domainPlugins, appPluginDescriptor.getBundleDescriptor());
+
+      if (!pluginDescriptor.isPresent()) {
+        filteredPluginDescriptors.add(appPluginDescriptor);
+      } else if (!isCompatibleVersion(pluginDescriptor.get().getBundleDescriptor().getVersion(),
+                                      appPluginDescriptor.getBundleDescriptor().getVersion())) {
+        throw new IllegalStateException(
+                                        format("Incompatible version of plugin '%s' found. Application requires version'%s' but domain provides version'%s'",
+                                               appPluginDescriptor.getName(),
+                                               appPluginDescriptor.getBundleDescriptor().getVersion(),
+                                               pluginDescriptor.get().getBundleDescriptor().getVersion()));
+      }
+    }
+    return filteredPluginDescriptors;
+  }
+
+  private Optional<ArtifactPluginDescriptor> findPlugin(Set<ArtifactPluginDescriptor> appPlugins,
+                                                        BundleDescriptor bundleDescriptor) {
+    for (ArtifactPluginDescriptor appPlugin : appPlugins) {
+      if (appPlugin.getBundleDescriptor().getArtifactId().equals(bundleDescriptor.getArtifactId())
+          && appPlugin.getBundleDescriptor().getGroupId().equals(bundleDescriptor.getGroupId())) {
+        return of(appPlugin);
+      }
+    }
+
+    return empty();
   }
 
   private List<ArtifactPluginDescriptor> resolvePluginsDependencies(List<ArtifactPluginDescriptor> descriptors) {

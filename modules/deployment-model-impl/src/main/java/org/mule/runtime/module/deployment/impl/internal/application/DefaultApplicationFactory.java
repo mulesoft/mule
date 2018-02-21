@@ -39,6 +39,7 @@ import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +62,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
   private final LicenseValidator licenseValidator;
-  private final ApplicationPluginDescriptorsResolver applicationPluginDescriptorsResolver;
 
   public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                    ApplicationDescriptorFactory applicationDescriptorFactory,
@@ -72,8 +72,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
                                    PluginDependenciesResolver pluginDependenciesResolver,
                                    ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
-                                   LicenseValidator licenseValidator,
-                                   ApplicationPluginDescriptorsResolver applicationPluginDescriptorsResolver) {
+                                   LicenseValidator licenseValidator) {
     super(licenseValidator);
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
     checkArgument(applicationDescriptorFactory != null, "Application descriptor factory cannot be null");
@@ -84,7 +83,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     checkArgument(policyTemplateClassLoaderBuilderFactory != null, "policyClassLoaderBuilderFactory cannot be null");
     checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
     checkArgument(artifactPluginDescriptorLoader != null, "artifactPluginDescriptorLoader cannot be null");
-    checkArgument(applicationPluginDescriptorsResolver != null, "applicationPluginDescriptorsResolver cannot be null");
 
     this.classLoaderRepository = classLoaderRepository;
     this.applicationClassLoaderBuilderFactory = applicationClassLoaderBuilderFactory;
@@ -96,7 +94,6 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     this.pluginDependenciesResolver = pluginDependenciesResolver;
     this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
     this.licenseValidator = licenseValidator;
-    this.applicationPluginDescriptorsResolver = applicationPluginDescriptorsResolver;
   }
 
   @Override
@@ -124,11 +121,9 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   public Application createArtifact(ApplicationDescriptor descriptor) throws IOException {
     Domain domain = getApplicationDomain(descriptor);
 
-    List<ArtifactPluginDescriptor> applicationPluginDescriptors =
-        applicationPluginDescriptorsResolver.resolveArtifactPluginDescriptors(domain.getDescriptor().getPlugins(),
-                                                                              getArtifactPluginDescriptors(descriptor));
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
-        pluginDependenciesResolver.resolve(applicationPluginDescriptors);
+        pluginDependenciesResolver.resolve(domain.getDescriptor().getPlugins(),
+                                           new ArrayList<>(getArtifactPluginDescriptors(descriptor)));
 
     ApplicationClassLoaderBuilder artifactClassLoaderBuilder =
         applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();
