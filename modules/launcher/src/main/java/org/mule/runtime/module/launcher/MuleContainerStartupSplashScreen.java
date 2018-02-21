@@ -8,6 +8,7 @@ package org.mule.runtime.module.launcher;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getPatchesLibFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServerPluginsFolder;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.stream.Stream;
 
 public class MuleContainerStartupSplashScreen extends SplashScreen {
 
@@ -52,6 +54,7 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
     doBody(CoreMessages.serverStartedAt(System.currentTimeMillis()).getMessage());
 
     doBody(String.format("JDK: %s (%s)", System.getProperty("java.version"), System.getProperty("java.vm.info")));
+    listJavaSystemProperties();
 
     String patch = System.getProperty("sun.os.patch.level", null);
 
@@ -103,5 +106,10 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
     System.getProperties().stringPropertyNames().stream().filter(property -> property.startsWith(SYSTEM_PROPERTY_PREFIX))
         .forEach(property -> muleProperties.put(property, System.getProperty(property)));
     listItems(muleProperties, "Mule system properties:");
+  }
+
+  private void listJavaSystemProperties() {
+    listItems(Stream.of("java.vendor", "java.vm.name", "java.home")
+        .collect(toMap(String::toString, propertyName -> System.getProperty(propertyName))), "JDK properties:");
   }
 }
