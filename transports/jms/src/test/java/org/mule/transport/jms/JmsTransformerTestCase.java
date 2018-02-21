@@ -120,7 +120,7 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase
         when(textMessage.getText()).thenReturn(null);
         MuleMessage message = getTestMuleMessage();
         message.setPayload(textMessage);
-        JMSMessageToObject jmsMessageToObject= new JMSMessageToObject();
+        JMSMessageToObject jmsMessageToObject = new JMSMessageToObject();
         assertThat(jmsMessageToObject.transformMessage(message, null), is(nullValue()));
     }
 }
