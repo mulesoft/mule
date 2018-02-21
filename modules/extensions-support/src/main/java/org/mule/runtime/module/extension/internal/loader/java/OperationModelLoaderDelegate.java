@@ -109,7 +109,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       checkDefinition(!loader.isInvalidConfigSupport(supportsConfig, configParameter, connectionParameter),
                       format("Operation '%s' is defined at the extension level but it requires a config. "
-                          + "Remove such parameter or move the operation to the proper config", "TODO"));
+                          + "Remove such parameter or move the operation to the proper config", operationMethod.getName()));
 
       HasOperationDeclarer actualDeclarer = selectDeclarer(extensionDeclarer, (Declarer) ownerDeclarer,
                                                            operationMethod, configParameter, connectionParameter);
