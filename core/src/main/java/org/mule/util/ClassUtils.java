@@ -921,6 +921,22 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     }
 
     /**
+     * Provide a simple-to-understand class name.
+     *
+     * @param object The object whose class name we will generate
+     * @return A readable name for the class
+     */
+    public static String getSimpleName(Object object)
+    {
+        if (object == null)
+        {
+            return "null";
+        }
+
+        return getSimpleName(object.getClass());
+    }
+
+    /**
      * Provide a simple-to-understand class name (with access to only Java 1.4 API).
      *
      * @param clazz The class whose name we will generate
