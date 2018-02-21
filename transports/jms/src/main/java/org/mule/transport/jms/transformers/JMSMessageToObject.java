@@ -77,7 +77,7 @@ public class JMSMessageToObject extends AbstractJmsTransformer
 
             if (logger.isDebugEnabled())
             {
-                logger.debug("Resulting object is " + ClassUtils.getSimpleName(result.getClass()));
+                logger.debug("Resulting object is " + ClassUtils.getSimpleName(result != null ? result.getClass() : null));
             }
 
             return result;
