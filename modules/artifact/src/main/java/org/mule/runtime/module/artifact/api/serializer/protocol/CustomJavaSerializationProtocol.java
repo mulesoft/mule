@@ -31,7 +31,7 @@ import java.io.Serializable;
  * to write and read serialized objects to support deserialization of non exported classes.
  */
 @NoInstantiate
-public final class CustomJavaSerializationProtocol extends AbstractSerializationProtocol {
+public class CustomJavaSerializationProtocol extends AbstractSerializationProtocol {
 
   private final ClassLoaderRepository classLoaderRepository;
 
