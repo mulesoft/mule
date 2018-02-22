@@ -20,7 +20,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -287,13 +289,13 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
    * @return a collection of all the compile dependencies of this artifact including the transitive ones
    */
   public List<AbstractDependencyFileBuilder> getAllCompileDependencies() {
-    List<AbstractDependencyFileBuilder> allCompileDependencies = new ArrayList<>();
+    Set<AbstractDependencyFileBuilder> allCompileDependencies = new HashSet<>();
     for (AbstractDependencyFileBuilder dependency : dependencies) {
       if (dependency.getAsMavenDependency().getScope().equals(COMPILE_SCOPE)) {
         allCompileDependencies.addAll(dependency.getAllCompileDependencies());
         allCompileDependencies.add(dependency);
       }
     }
-    return allCompileDependencies;
+    return new ArrayList<>(allCompileDependencies);
   }
 }

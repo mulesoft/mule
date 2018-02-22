@@ -22,9 +22,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidat
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactory;
-import org.mule.runtime.module.deployment.impl.internal.application.ApplicationPluginDescriptorsResolver;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
-import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationPluginDescriptorsResolver;
 import org.mule.runtime.module.deployment.impl.internal.application.TestApplicationWrapper;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainManager;
@@ -56,12 +54,11 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
                                  ClassLoaderRepository classLoaderRepository,
                                  PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
                                  PluginDependenciesResolver pluginDependenciesResolver,
-                                 ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
-                                 ApplicationPluginDescriptorsResolver applicationPluginDescriptorsResolver) {
+                                 ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader) {
     super(applicationClassLoaderBuilderFactory, applicationDescriptorFactory, domainRepository,
           serviceRepository, extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
           pluginDependenciesResolver, artifactPluginDescriptorLoader,
-          discoverLicenseValidator(TestApplicationFactory.class.getClassLoader()), applicationPluginDescriptorsResolver);
+          discoverLicenseValidator(TestApplicationFactory.class.getClassLoader()));
   }
 
   public static TestApplicationFactory createTestApplicationFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory,
@@ -91,7 +88,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
                                       domainManager, serviceRepository,
                                       extensionModelLoaderRepository, artifactClassLoaderManager,
                                       mock(PolicyTemplateClassLoaderBuilderFactory.class), pluginDependenciesResolver,
-                                      artifactPluginDescriptorLoader, new DefaultApplicationPluginDescriptorsResolver());
+                                      artifactPluginDescriptorLoader);
   }
 
   @Override

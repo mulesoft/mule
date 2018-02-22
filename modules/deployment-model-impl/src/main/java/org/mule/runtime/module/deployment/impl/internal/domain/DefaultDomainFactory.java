@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
@@ -141,10 +142,8 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
     DomainDescriptor domainDescriptor = findDomain(domainName, domainLocation, deploymentProperties);
 
-    List<ArtifactPluginDescriptor> artifactPluginDescriptors =
-        domainDescriptor.getPlugins().stream().collect(toList());
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
-        pluginDependenciesResolver.resolve(artifactPluginDescriptors);
+        pluginDependenciesResolver.resolve(emptySet(), domainDescriptor.getPlugins().stream().collect(toList()));
 
     DomainClassLoaderBuilder artifactClassLoaderBuilder =
         domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();

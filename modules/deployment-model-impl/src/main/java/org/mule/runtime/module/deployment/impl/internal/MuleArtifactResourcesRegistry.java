@@ -37,9 +37,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactory;
-import org.mule.runtime.module.deployment.impl.internal.application.ApplicationPluginDescriptorsResolver;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
-import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationPluginDescriptorsResolver;
 import org.mule.runtime.module.deployment.impl.internal.application.ToolingApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
@@ -180,16 +178,13 @@ public class MuleArtifactResourcesRegistry {
     PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
         new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory);
 
-    ApplicationPluginDescriptorsResolver applicationPluginDescriptorsResolver = new DefaultApplicationPluginDescriptorsResolver();
-
     applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
                                                        domainManager, serviceManager,
                                                        extensionModelLoaderManager,
                                                        artifactClassLoaderManager, policyTemplateClassLoaderBuilderFactory,
                                                        pluginDependenciesResolver,
                                                        artifactPluginDescriptorLoader,
-                                                       licenseValidator,
-                                                       applicationPluginDescriptorsResolver);
+                                                       licenseValidator);
     toolingApplicationDescriptorFactory =
         new ToolingApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                                 artifactDescriptorValidatorBuilder);

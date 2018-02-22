@@ -34,7 +34,6 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationStatu
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -49,9 +48,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
-
-import org.junit.Ignore;
-import org.junit.Test;
+import org.mule.tck.util.CompilerUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -63,7 +60,9 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
+
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Contains test for domain deployment
@@ -512,6 +511,34 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  public void deploysAppWithPluginDependingOnDomainPlugin() throws Exception {
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("dummy-domain-bundle")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(echoPlugin);
+
+    ArtifactPluginFileBuilder dependantPlugin =
+        new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+            .containingClass(new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java")),
+                             "org/foo/echo/Plugin3Echo.class")
+            .dependingOn(echoPlugin);
+
+    ApplicationFileBuilder echoPluginAppFileBuilder =
+        new ApplicationFileBuilder("dummyWithEchoPlugin").definedBy("app-with-echo-plugin-config.xml")
+            .dependingOn(domainFileBuilder).dependingOn(dependantPlugin);
+
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(echoPluginAppFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, echoPluginAppFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
   public void deploysAppUsingDomainExtension() throws Exception {
     installEchoService();
     installFooService();
@@ -600,6 +627,35 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
         new ApplicationFileBuilder("dummyWithHelloExtension").definedBy(APP_WITH_EXTENSION_PLUGIN_CONFIG)
             .dependingOn(domainFileBuilder);
 
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  public void appliesApplicationPolicyWithPluginDependingOnDomainPlugin() throws Exception {
+    installEchoService();
+    installFooService();
+
+    policyManager.registerPolicyTemplate(policyIncludingDependantPluginFileBuilder.getArtifactFile());
+
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("dummy-domain-bundle")
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(helloExtensionV1Plugin);
+
+    ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder("dummyWithHelloExtension").definedBy(APP_WITH_EXTENSION_PLUGIN_CONFIG)
+            .dependingOn(domainFileBuilder);
 
     addPackedDomainFromBuilder(domainFileBuilder);
     addPackedAppFromBuilder(applicationFileBuilder);

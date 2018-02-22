@@ -76,8 +76,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
                                     extensionModelLoaderRepository,
                                     classLoaderRepository, policyTemplateClassLoaderBuilderFactory, pluginDependenciesResolver,
                                     artifactPluginDescriptorLoader,
-                                    discoverLicenseValidator(getClass().getClassLoader()),
-                                    new DefaultApplicationPluginDescriptorsResolver());
+                                    discoverLicenseValidator(getClass().getClassLoader()));
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();

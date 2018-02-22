@@ -8,13 +8,11 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.validateArtifactLicense;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
@@ -22,16 +20,15 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
+import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -62,23 +59,20 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
   @Override
   public PolicyTemplate createArtifact(Application application, PolicyTemplateDescriptor descriptor) {
     MuleDeployableArtifactClassLoader policyClassLoader;
-    Set<ArtifactPlugin> plugins = new HashSet<>(application.getArtifactPlugins());
-    plugins.addAll(application.getDomain().getArtifactPlugins());
-    List<ArtifactPluginDescriptor> resolvedPolicyPluginsDescriptors =
-        pluginDependenciesResolver.resolve(new ArrayList<>(descriptor.getPlugins()));
-    List<ArtifactPluginDescriptor> policyClassLoaderPluginDescriptors =
-        filterPolicyPluginsBasedOnApplicationPlugins(plugins, resolvedPolicyPluginsDescriptors);
+
+    List<ArtifactPluginDescriptor> resolvedPolicyPluginsDescriptors = resolvePolicyPluginDescriptors(application, descriptor);
+
     try {
       policyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
-          .addArtifactPluginDescriptors(policyClassLoaderPluginDescriptors
-              .toArray(new ArtifactPluginDescriptor[policyClassLoaderPluginDescriptors.size()]))
+          .addArtifactPluginDescriptors(resolvedPolicyPluginsDescriptors
+              .toArray(new ArtifactPluginDescriptor[resolvedPolicyPluginsDescriptors.size()]))
           .setParentClassLoader(application.getRegionClassLoader()).setArtifactDescriptor(descriptor).build();
     } catch (IOException e) {
       throw new PolicyTemplateCreationException(createPolicyTemplateCreationErrorMessage(descriptor.getName()), e);
     }
     application.getRegionClassLoader().addClassLoader(policyClassLoader, NULL_CLASSLOADER_FILTER);
 
-    List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(policyClassLoader, policyClassLoaderPluginDescriptors);
+    List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(policyClassLoader, resolvedPolicyPluginsDescriptors);
 
     validateArtifactLicense(policyClassLoader.getClassLoader(), artifactPlugins, licenseValidator);
 
@@ -88,38 +82,16 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     return policy;
   }
 
-  private List<ArtifactPluginDescriptor> filterPolicyPluginsBasedOnApplicationPlugins(Set<ArtifactPlugin> appPlugins,
-                                                                                      List<ArtifactPluginDescriptor> policyPlugins) {
-    List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
-    for (ArtifactPluginDescriptor policyPluginDescriptor : policyPlugins) {
-      Optional<ArtifactPlugin> appPluginDescriptor =
-          findPlugin(appPlugins, policyPluginDescriptor.getBundleDescriptor());
+  private List<ArtifactPluginDescriptor> resolvePolicyPluginDescriptors(Application application,
+                                                                        PolicyTemplateDescriptor descriptor) {
+    LinkedList<ArtifactPlugin> providedArtifactPlugins = new LinkedList<>();
+    providedArtifactPlugins.addAll(application.getArtifactPlugins());
+    providedArtifactPlugins.addAll(application.getDomain().getArtifactPlugins());
 
-      if (!appPluginDescriptor.isPresent()) {
-        artifactPluginDescriptors.add(policyPluginDescriptor);
-      } else if (!isCompatibleVersion(appPluginDescriptor.get().getDescriptor().getBundleDescriptor().getVersion(),
-                                      policyPluginDescriptor.getBundleDescriptor().getVersion())) {
-        throw new IllegalStateException(
-                                        format("Incompatible version of plugin '%s' found. Policy requires version'%s' but application provides version'%s'",
-                                               policyPluginDescriptor.getName(),
-                                               policyPluginDescriptor.getBundleDescriptor().getVersion(),
-                                               appPluginDescriptor.get().getDescriptor().getBundleDescriptor().getVersion()));
-      }
-    }
+    Set<ArtifactPluginDescriptor> providedArtifactPluginsDescriptors =
+        providedArtifactPlugins.stream().map(Artifact::getDescriptor).collect(toSet());
 
-    return artifactPluginDescriptors;
-  }
-
-  private Optional<ArtifactPlugin> findPlugin(Set<ArtifactPlugin> appPlugins,
-                                              BundleDescriptor bundleDescriptor) {
-    for (ArtifactPlugin appPlugin : appPlugins) {
-      if (appPlugin.getDescriptor().getBundleDescriptor().getArtifactId().equals(bundleDescriptor.getArtifactId())
-          && appPlugin.getDescriptor().getBundleDescriptor().getGroupId().equals(bundleDescriptor.getGroupId())) {
-        return of(appPlugin);
-      }
-    }
-
-    return empty();
+    return pluginDependenciesResolver.resolve(providedArtifactPluginsDescriptors, new ArrayList<>(descriptor.getPlugins()));
   }
 
   private List<ArtifactPlugin> createArtifactPluginList(MuleDeployableArtifactClassLoader policyClassLoader,
