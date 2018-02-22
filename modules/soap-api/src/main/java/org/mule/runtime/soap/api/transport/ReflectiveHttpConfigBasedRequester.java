@@ -9,7 +9,6 @@ package org.mule.runtime.soap.api.transport;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
-import static org.mule.runtime.core.internal.el.mvel.MessageVariableResolverFactory.PAYLOAD;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
@@ -77,7 +76,7 @@ public final class ReflectiveHttpConfigBasedRequester {
         .addParameter("url", url)
         .addParameter("headers", new MultiMap<>(headers))
         // TODO(MULE-14632): REMOVE THIS LINE WHEN DONE!
-        .addParameter("targetValue", "#[" + PAYLOAD + "]");
+        .addParameter("targetValue", "#[payload]");
 
     if (body != null) {
       params.addParameter("body", new TypedValue<>(body, INPUT_STREAM));
