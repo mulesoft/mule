@@ -7,7 +7,6 @@ Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for mo
 Migration changes from 3.9.x to 3.10.x
 MULE-14381: By default, the File Connector processes empty files. For disabling this behavior use the mule.transport.file.ignoreEmptyFiles=true system property.
 MULE-14507: The HTTP Requester now sends a zero content length in empty payloads scenarios. For disabling this behavior use the mule.http.client.avoidZeroContentLength=true system property.
-MULE-14601: The JSON Schema Validator now fails if it receives a payload with duplicate keys. For allowing duplicate keys use the mule.json.validator.allowDuplicateKeys=true system property.
 
 Migration changes from 3.8.x to 3.9.x
 MULE-12245: Old Xalan and Xerces implementations were removed in favor of the newer versions included in Java. Only minor incompatibilities could result such as ordering changes of some XML attributes.
