@@ -8,8 +8,6 @@ package org.mule.test.heisenberg.extension;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.metadata.TypedValue.of;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
@@ -37,6 +35,7 @@ import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.notification.Fires;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -44,19 +43,18 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
+import org.mule.runtime.extension.api.client.DefaultOperationParametersBuilder;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
-import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
-import org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KillParameters;
@@ -66,6 +64,7 @@ import org.mule.test.heisenberg.extension.model.RecursiveChainA;
 import org.mule.test.heisenberg.extension.model.RecursiveChainB;
 import org.mule.test.heisenberg.extension.model.RecursivePojo;
 import org.mule.test.heisenberg.extension.model.SaleInfo;
+import org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
@@ -75,11 +74,11 @@ import com.google.common.collect.ImmutableMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
@@ -332,9 +331,25 @@ public class HeisenbergOperations implements Disposable {
         .addParameter("victim", "Juani")
         .addParameter("goodbyeMessage", "ADIOS")
         .build();
-    Result<String, Object> result = null;
     try {
       return (String) client.execute(HEISENBERG, "kill", params).getOutput();
+    } catch (MuleException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public String executeRemoteKill(String extension, String configName, String operation,
+                                  @Content Map<String, String> parameters,
+                                  ExtensionsClient client) {
+    DefaultOperationParametersBuilder paramsBuilder = builder().configName(configName);
+    for (Entry<String, String> param : parameters.entrySet()) {
+      paramsBuilder = paramsBuilder.addParameter(param.getKey(), param.getValue());
+    }
+
+    try {
+      client.execute(extension, operation, paramsBuilder.build()).getOutput();
+      return "Now he sleeps with the fishes.";
     } catch (MuleException e) {
       throw new RuntimeException(e);
     }
