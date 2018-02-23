@@ -91,6 +91,11 @@ public final class DefaultJsonParser implements JsonParser
     @Override
     public JsonNode asJsonNode(Object input) throws IOException
     {
+        if (input == null || "".equals(input))
+        {
+            return null;
+        }
+
         JsonNode jsonNode = toJsonNode(input);
         if (jsonNode == null)
         {
