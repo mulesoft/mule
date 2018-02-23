@@ -30,9 +30,8 @@ import com.fasterxml.jackson.core.JsonParser.Feature;
  */
 public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Initialisable
 {
-    public static String ALLOW_DUPLICATE_KEYS_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "json.validator.allowDuplicateKeys";
 
-    private boolean allowDuplicateKeys = getBoolean(ALLOW_DUPLICATE_KEYS_SYSTEM_PROPERTY);
+    private boolean allowDuplicateKeys;
     private String schemaLocation;
     private JsonSchemaDereferencing dereferencing = JsonSchemaDereferencing.CANONICAL;
     private Map<String, String> schemaRedirects = new HashMap<>();
@@ -77,5 +76,15 @@ public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Ini
     public void setSchemaRedirects(Map<String, String> schemaRedirects)
     {
         this.schemaRedirects = schemaRedirects;
+    }
+
+    public boolean isAllowDuplicateKeys()
+    {
+        return allowDuplicateKeys;
+    }
+
+    public void setAllowDuplicateKeys(boolean allowDuplicateKeys)
+    {
+        this.allowDuplicateKeys = allowDuplicateKeys;
     }
 }

@@ -6,7 +6,7 @@
        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
 
     <flow name="validate">
-        <json:validate-schema schemaLocation="${schemaLocation}"/>
+        <json:validate-schema schemaLocation="${schemaLocation}" allowDuplicateKeys="${allowDuplicateKeys}"/>
     </flow>
 
 </mule>

@@ -11,7 +11,6 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_JSON;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.getFstabWithDuplicateKeys;
-import static org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor.ALLOW_DUPLICATE_KEYS_SYSTEM_PROPERTY;
 import static org.mule.module.json.validation.ValidateSchemaFunctionalTestCase.DEREFERENCING;
 import static org.mule.module.json.validation.ValidateSchemaFunctionalTestCase.SCHEMA_LOCATION;
 
@@ -46,7 +45,7 @@ public class ValidateSchemaDuplicateKeysTestCase extends AbstractValidateSchemaF
     public ValidateSchemaDuplicateKeysTestCase(String allowDuplicateKeys, ExpectedException expectedException)
     {
         this.expectedException = expectedException;
-        duplicateKeys = new SystemProperty(ALLOW_DUPLICATE_KEYS_SYSTEM_PROPERTY, allowDuplicateKeys);
+        duplicateKeys = new SystemProperty("allowDuplicateKeys", allowDuplicateKeys);
     }
 
     @Parameters
