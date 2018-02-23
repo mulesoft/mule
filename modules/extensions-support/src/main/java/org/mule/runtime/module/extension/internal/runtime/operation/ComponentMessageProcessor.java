@@ -167,8 +167,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       Optional<ConfigurationInstance> configuration;
       OperationExecutionFunction operationExecutionFunction;
 
-      if (((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+      if (getLocation() != null && ((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
         // If the event already contains an execution context, use that one.
+        // Only for interceptable components!
         ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
         configuration = operationContext.getConfiguration();
 
