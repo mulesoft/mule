@@ -192,11 +192,22 @@ public class DefaultResourceReleaser implements ResourceReleaser
      */
     private void shutdownMySqlAbandonedConnectionCleanupThread()
     {
+
+        Class<?> classAbandonedConnectionCleanupThread;
         try
         {
-            Class<?> classAbandonedConnectionCleanupThread = this.getClass().getClassLoader().loadClass("com.mysql.jdbc.AbandonedConnectionCleanupThread");
-            Method methodShutdown = classAbandonedConnectionCleanupThread.getMethod("shutdown");
-            methodShutdown.invoke(null);
+            classAbandonedConnectionCleanupThread =
+                    this.getClass().getClassLoader().loadClass("com.mysql.jdbc.AbandonedConnectionCleanupThread");
+            try
+            {
+                Method uncheckedShutdown = classAbandonedConnectionCleanupThread.getMethod("uncheckedShutdown");
+                uncheckedShutdown.invoke(null);
+            }
+            catch (NoSuchMethodException e)
+            {
+                Method checkedShutdown = classAbandonedConnectionCleanupThread.getMethod("shutdown");
+                checkedShutdown.invoke(null);
+            }
         }
         catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
         {
