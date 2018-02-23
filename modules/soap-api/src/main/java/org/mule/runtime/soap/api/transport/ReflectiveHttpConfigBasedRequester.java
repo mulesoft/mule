@@ -75,7 +75,7 @@ public final class ReflectiveHttpConfigBasedRequester {
         .addParameter("method", method)
         .addParameter("url", url)
         .addParameter("headers", new MultiMap<>(headers))
-        // TODO(MULE-14632): REMOVE THIS LINE WHEN DONE!
+        // TODO(MULE-13066): REMOVE THIS LINE WHEN DONE!
         .addParameter("targetValue", "#[payload]");
 
     if (body != null) {
