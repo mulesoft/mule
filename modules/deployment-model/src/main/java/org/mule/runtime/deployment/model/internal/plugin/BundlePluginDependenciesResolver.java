@@ -77,8 +77,10 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
       } else if (!isCompatibleVersion(pluginDescriptor.get().getBundleDescriptor().getVersion(),
                                       appPluginDescriptor.getBundleDescriptor().getVersion())) {
         throw new IllegalStateException(
-                                        format("Incompatible version of plugin '%s' found. Application requires version'%s' but domain provides version'%s'",
+                                        format("Incompatible version of plugin '%s' (%s:%s) found. Artifact requires version '%s' but context provides version '%s'",
                                                appPluginDescriptor.getName(),
+                                               appPluginDescriptor.getBundleDescriptor().getGroupId(),
+                                               appPluginDescriptor.getBundleDescriptor().getArtifactId(),
                                                appPluginDescriptor.getBundleDescriptor().getVersion(),
                                                pluginDescriptor.get().getBundleDescriptor().getVersion()));
       }
