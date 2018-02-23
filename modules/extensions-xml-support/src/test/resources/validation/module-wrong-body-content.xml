@@ -13,9 +13,9 @@
 
     <property name="a-property" type="string"/>
 
-    <http:fake-request-config fake-name="pointeless value" basePath="pointeless value">
-        <http:fake-request-connection fake-host="pointeless value" fake-protocol="pointeless value" fake-port="pointeless value"/>
-    </http:fake-request-config>
+    <mule:fake-request-config fake-name="pointeless value" basePath="pointeless value">
+        <mule:fake-request-connection fake-host="pointeless value" fake-protocol="pointeless value" fake-port="pointeless value"/>
+    </mule:fake-request-config>
     
     <operation name="operation-with-non-valid-body">
         <body>
