@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.policy.PolicyStateId.POLICY_ID;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
@@ -99,7 +100,9 @@ public class OperationPolicyProcessor implements Processor {
         .cast(CoreEvent.class)
         .transform(policy.getPolicyChain())
         .cast(PrivilegedEvent.class)
+        .subscriberContext(ctx -> ctx.put(POLICY_ID, policy.getPolicyId()))
         .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
+        .subscriberContext(ctx -> ctx.delete(POLICY_ID))
         .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent))
         .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
                                      getMessageAttributesAsString(event), "After operation"));
