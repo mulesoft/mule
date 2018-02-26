@@ -19,6 +19,8 @@ import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -65,6 +67,14 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
 
   }
 
+  private boolean isAbsolutePath(String file) {
+    return new File(file).isAbsolute();
+  }
+
+  private InputStream getResourceInputStream(String file) throws IOException {
+    return isAbsolutePath(fileLocation) ? new FileInputStream(file) : resourceProvider.getResourceAsStream(file);
+  }
+
   @Override
   public void initialise() throws InitialisationException {
     if (!fileLocation.endsWith(PROPERTIES_EXTENSION) && !fileLocation.endsWith(YAML_EXTENSION)) {
@@ -73,7 +83,7 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
                                                  this);
     }
 
-    try (InputStream is = resourceProvider.getResourceAsStream(fileLocation)) {
+    try (InputStream is = getResourceInputStream(fileLocation)) {
       if (is == null) {
         throw new ConfigurationPropertiesException(createStaticMessage(format("Couldn't find configuration properties file %s neither on classpath or in file system",
                                                                               fileLocation)),
