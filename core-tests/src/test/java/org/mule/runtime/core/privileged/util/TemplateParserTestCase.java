@@ -203,22 +203,6 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void muleParserManagesNestedExpressions() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
-    final String expectedResult = "mel:zero#[mel:one#[mel:two#[mel:three#[mel:four#[mel:five]]]]]";
-    String expression = "#[mel:zero#[mel:one#[mel:two#[mel:three#[mel:four#[mel:five]]]]]]";
-    assertTrue(tp.isValid(expression));
-    String result = tp.parse(null, expression, new TemplateParser.TemplateCallback() {
-
-      @Override
-      public Object match(String token) {
-        return token;
-      }
-    });
-    assertEquals(expectedResult, result);
-  }
-
-  @Test
   public void muleParserManagesConcatenation() {
     TemplateParser tp = TemplateParser.createMuleStyleParser();
 
@@ -272,14 +256,18 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
     assertTrue(tp.isValid("# []"));
     assertTrue(tp.isValid("#[mel:one[]two[]three[]four[]five[]six[]seven[]eight[]]"));
 
-    // can't have unbalanced brackets
-    assertFalse(tp.isValid("#[mel:#[mel:]#[mel:]"));
-    assertFalse(tp.isValid("#[mel:[][]"));
+    assertTrue(tp.isValid("#[mel:#[mel:]#[mel:]"));
+    assertTrue(tp.isValid("#[mel:[][]"));
+    assertTrue(tp.isValid("#[mel:'[']"));
 
     assertTrue(tp.isValid("#[mel:foo:blah[4] = 'foo']"));
     assertTrue(tp.isValid("#[mel:foo:blah[4] = '#foo']"));
     assertTrue(tp.isValid("#[mel:foo:blah4] = '#foo']"));
     assertTrue(tp.isValid("#[mel:foo:blah = '#[mel:foo]']"));
+
+    assertTrue(tp.isValid("just a plain string with no actual expressions"));
+
+    assertFalse(tp.isValid("#[mel:"));
   }
 
   private Map<String, Object> buildMap() {
