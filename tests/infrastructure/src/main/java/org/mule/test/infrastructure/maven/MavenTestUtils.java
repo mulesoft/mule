@@ -9,9 +9,12 @@ package org.mule.test.infrastructure.maven;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
@@ -34,8 +37,8 @@ public class MavenTestUtils {
 
   private static final String M_2_REPO = "/.m2/repository";
   private static final String USER_HOME = "user.home";
-  private static final String MAVEN_ARTIFACTS_DIRECTORY =
-      MavenTestUtils.class.getClassLoader().getResource("artifacts").getPath();
+  private static final URL MAVEN_ARTIFACTS_DIRECTORY =
+      MavenTestUtils.class.getClassLoader().getResource("artifacts");
 
   private static final List<String> INSTALL_GOALS = Collections.singletonList("install");
   private static final List<String> CLEAN_GOALS = Collections.singletonList("clean");
@@ -101,8 +104,10 @@ public class MavenTestUtils {
     InvocationRequest request = new DefaultInvocationRequest();
     request.setGoals(goals);
     request.setBatchMode(true);
-    request.setBaseDirectory(Paths.get(MAVEN_ARTIFACTS_DIRECTORY, baseDirectory).toFile());
-    request.setPomFile(Paths.get(MAVEN_ARTIFACTS_DIRECTORY, baseDirectory, "pom.xml").toFile());
+
+    String mavenArtifactsAndBaseDirectory = MAVEN_ARTIFACTS_DIRECTORY.toString() + "/" + baseDirectory;
+    request.setBaseDirectory(Paths.get(URI.create(mavenArtifactsAndBaseDirectory)).toFile());
+    request.setPomFile(Paths.get(URI.create(mavenArtifactsAndBaseDirectory + "/pom.xml")).toFile());
     request.setShowErrors(true);
     request.setUserSettingsFile(MAVEN_SETTINGS);
     try {
