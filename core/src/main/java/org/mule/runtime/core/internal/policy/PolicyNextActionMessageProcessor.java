@@ -17,6 +17,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
@@ -41,6 +42,7 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -89,12 +91,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    Reference<Optional<String>> policyIdReference = new Reference<>();
     return from(publisher)
-        .subscriberContext(ctx -> {
-          policyIdReference.set(ctx.getOrEmpty(POLICY_ID));
-          return ctx;
-        })
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
                                                    coreEvent.getMessage(), this.muleContext.getConfiguration().getId()))
         .flatMap(event -> {
@@ -115,8 +112,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                 // to propagate the error to parent context manually.
                 ((BaseEventContext) event.getContext())
                     .error(resolveMessagingException(t.getFailingComponent(), muleContext).apply(t));
-                policyIdReference.get().ifPresent(policyId -> policyStateHandler
-                    .updateState(new PolicyStateId(event.getContext().getCorrelationId(), policyId), t.getEvent()));
+                subscriberContext().doOnNext(ctx -> policyStateHandler
+                    .updateState(new PolicyStateId(event.getContext().getCorrelationId(), ctx.get(POLICY_ID)), t.getEvent()));
                 return empty();
               })
               .doOnNext(coreEvent -> logExecuteNextEvent("After execute-next",
