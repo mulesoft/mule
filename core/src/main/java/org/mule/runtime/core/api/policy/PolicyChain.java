@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.policy;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
@@ -18,14 +19,12 @@ import static reactor.core.publisher.Mono.from;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -39,6 +38,8 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -67,8 +68,7 @@ public class PolicyChain extends AbstractComponent
 
   private boolean propagateMessageTransformations;
 
-  private PolicyStateHandler policyStateHandler;
-  private String policyId;
+  private Optional<BiConsumer<MessagingException, CoreEvent>> onError = empty();
 
   public void setProcessors(List<Processor> processors) {
     this.processors = processors;
@@ -124,12 +124,7 @@ public class PolicyChain extends AbstractComponent
               .andThen(notificationHelper.notification(PROCESS_START))
               .accept(event);
           return from(processWithChildContext(event, chainWithMPs, ofNullable(getLocation())))
-              .doOnError(MessagingException.class, t -> {
-                if (policyStateHandler != null && policyId != null) {
-                  policyStateHandler.updateState(new PolicyStateId(event.getContext().getCorrelationId(), policyId),
-                                                 t.getEvent());
-                }
-              });
+              .doOnError(MessagingException.class, t -> this.onError.ifPresent(onError -> onError.accept(t, event)));
         });
   }
 
@@ -150,11 +145,7 @@ public class PolicyChain extends AbstractComponent
     this.propagateMessageTransformations = propagateMessageTransformations;
   }
 
-  public void setPolicyId(String policyId) {
-    this.policyId = policyId;
-  }
-
-  public void setPolicyStateHandler(PolicyStateHandler policyStateHandler) {
-    this.policyStateHandler = policyStateHandler;
+  public void onChainError(BiConsumer<MessagingException, CoreEvent> onError) {
+    this.onError = of(onError);
   }
 }

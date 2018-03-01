@@ -59,9 +59,7 @@ public class OperationPolicyProcessor implements Processor {
     this.policy = policy;
     this.policyStateHandler = policyStateHandler;
     this.nextProcessor = nextProcessor;
-
-    policy.getPolicyChain().setPolicyId(policy.getPolicyId());
-    policy.getPolicyChain().setPolicyStateHandler(policyStateHandler);
+      policy.getPolicyChain().onChainError((t, event) -> policyStateHandler.updateState(new PolicyStateId(event.getContext().getCorrelationId(), policy.getPolicyId()), t.getEvent()));
   }
 
   /**
