@@ -39,7 +39,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -68,7 +67,7 @@ public class PolicyChain extends AbstractComponent
 
   private boolean propagateMessageTransformations;
 
-  private Optional<BiConsumer<MessagingException, CoreEvent>> onError = empty();
+  private Optional<Consumer<Exception>> onError = empty();
 
   public void setProcessors(List<Processor> processors) {
     this.processors = processors;
@@ -124,7 +123,7 @@ public class PolicyChain extends AbstractComponent
               .andThen(notificationHelper.notification(PROCESS_START))
               .accept(event);
           return from(processWithChildContext(event, chainWithMPs, ofNullable(getLocation())))
-              .doOnError(MessagingException.class, t -> this.onError.ifPresent(onError -> onError.accept(t, event)));
+              .doOnError(MessagingException.class, t -> this.onError.ifPresent(onError -> onError.accept(t)));
         });
   }
 
@@ -145,7 +144,7 @@ public class PolicyChain extends AbstractComponent
     this.propagateMessageTransformations = propagateMessageTransformations;
   }
 
-  public void onChainError(BiConsumer<MessagingException, CoreEvent> onError) {
+  public void onChainError(Consumer<Exception> onError) {
     this.onError = of(onError);
   }
 }
