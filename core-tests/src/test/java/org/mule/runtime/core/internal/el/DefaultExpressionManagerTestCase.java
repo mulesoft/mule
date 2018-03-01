@@ -238,13 +238,6 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   }
 
   @Test
-  @Description("Verifies that parsing works with unbalanced brakets")
-  public void parseUnbalancedBrackets() throws Exception {
-    String expression = "This is just a bracket: #[mel:']']";
-    assertThat(expressionManager.parse(expression, testEvent(), TEST_CONNECTOR_LOCATION), is("This is just a bracket: ]"));
-  }
-
-  @Test
   @Description("Verifies that parsing works for log template scenarios for both DW and MVEL.")
   public void parseLog() throws MuleException {
     assertThat(expressionManager.parseLogTemplate("this is #[mel:payload]", testEvent(), TEST_CONNECTOR_LOCATION,
@@ -306,8 +299,8 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void isInvalid() {
-    assertThat(expressionManager.isValid("2*'2"), is(false));
-    assertThat(expressionManager.isValid("#[mel:"), is(false));
+    String expression = "2*'2";
+    assertThat(expressionManager.isValid(expression), is(false));
   }
 
   @Test
@@ -367,14 +360,5 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     expectedException.expectMessage("There is no expression language registered for 'mel'");
 
     expressionManager.isValid("mel:'Hello'");
-  }
-
-  @Test
-  public void parseInnerExpressions() throws Exception {
-    String expression = "This is a #[mel:#[mel:\"]\"]]";
-    assertThat(expressionManager.isValid(expression), is(true));
-    assertThat(expressionManager.parse(expression, testEvent(), TEST_CONNECTOR_LOCATION), is("This is a ]"));
-
-
   }
 }
