@@ -96,7 +96,7 @@ public class SftpAutoDeleteTestCase extends AbstractSftpFunctionalTestCase
     public void endpointAutoDeleteTrue() throws Exception
     {
         testDirectory(AUTO_DELETE_ON);
-        Prober prober = new PollingProber(10000, 1000);
+        Prober prober = new PollingProber(5000, 1000);
         prober.check(new Probe()
         {
             @Override
