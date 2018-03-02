@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.core.api.policy;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -28,11 +32,13 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -60,6 +66,8 @@ public class PolicyChain extends AbstractComponent
   private PolicyNotificationHelper notificationHelper;
 
   private boolean propagateMessageTransformations;
+
+  private Optional<Consumer<Exception>> onError = empty();
 
   public void setProcessors(List<Processor> processors) {
     this.processors = processors;
@@ -108,12 +116,15 @@ public class PolicyChain extends AbstractComponent
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
-        .doOnNext(pushBeforeNextFlowStackElement()
-            .andThen(req -> ((BaseEventContext) req.getContext())
-                .onResponse(notificationHelper.successOrErrorNotification(PROCESS_END)
-                    .andThen((resp, t) -> popFlowFlowStackElement().accept(req))))
-            .andThen(notificationHelper.notification(PROCESS_START)))
-        .transform(chainWithMPs);
+        .flatMap(event -> {
+          pushBeforeNextFlowStackElement()
+              .andThen(req -> ((BaseEventContext) req.getContext()).onResponse(notificationHelper
+                  .successOrErrorNotification(PROCESS_END).andThen((resp, t) -> popFlowFlowStackElement().accept(req))))
+              .andThen(notificationHelper.notification(PROCESS_START))
+              .accept(event);
+          return from(processWithChildContext(event, chainWithMPs, ofNullable(getLocation())))
+              .doOnError(MessagingException.class, t -> this.onError.ifPresent(onError -> onError.accept(t)));
+        });
   }
 
   private Consumer<CoreEvent> pushBeforeNextFlowStackElement() {
@@ -131,5 +142,9 @@ public class PolicyChain extends AbstractComponent
 
   public void setPropagateMessageTransformations(boolean propagateMessageTransformations) {
     this.propagateMessageTransformations = propagateMessageTransformations;
+  }
+
+  public void onChainError(Consumer<Exception> onError) {
+    this.onError = of(onError);
   }
 }

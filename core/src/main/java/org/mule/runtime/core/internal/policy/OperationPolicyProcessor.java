@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.policy.PolicyStateId.POLICY_ID;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
@@ -19,6 +20,7 @@ import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
@@ -93,13 +95,21 @@ public class OperationPolicyProcessor implements Processor {
 
   private Mono<PrivilegedEvent> executePolicyChain(PrivilegedEvent operationEvent, PolicyStateId policyStateId,
                                                    PrivilegedEvent policyEvent) {
+
+    PolicyChain policyChain = policy.getPolicyChain();
+    policyChain.onChainError(t -> policyStateHandler
+        .updateState(new PolicyStateId(policyEvent.getContext().getCorrelationId(), policy.getPolicyId()),
+                     ((MessagingException) t).getEvent()));
+
     return just(policyEvent)
         .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
                                      getMessageAttributesAsString(event), "Before operation"))
         .cast(CoreEvent.class)
-        .transform(policy.getPolicyChain())
+        .transform(policyChain)
         .cast(PrivilegedEvent.class)
+        .subscriberContext(ctx -> ctx.put(POLICY_ID, policy.getPolicyId()))
         .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
+        .subscriberContext(ctx -> ctx.delete(POLICY_ID))
         .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent))
         .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
                                      getMessageAttributesAsString(event), "After operation"));
