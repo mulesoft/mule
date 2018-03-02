@@ -8,7 +8,9 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;
@@ -59,5 +61,15 @@ public abstract class AbstractAnnotatedDeclarationEnricher implements Declaratio
    */
   protected Optional<Class> extractImplementingType(BaseDeclaration<? extends BaseDeclaration> declaration) {
     return extractImplementingTypeProperty(declaration).map(ImplementingTypeModelProperty::getType);
+  }
+
+  /**
+   * @param declaration a {@link BaseDeclaration}
+   * @return The type from which the {@code declaration} was derived or {@link Optional#empty()} if it couldn't
+   * be determined or the declaration is synthetic
+   */
+  protected Optional<Type> extractType(BaseDeclaration<? extends BaseDeclaration> declaration) {
+    return declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+        .map(ExtensionTypeDescriptorModelProperty::getType);
   }
 }

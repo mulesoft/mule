@@ -16,7 +16,32 @@
   "privilegedPackages": [],
   "privilegedArtifacts": [],
   "externalLibraries": [],
-  "importedTypes": [],
+  "importedTypes": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.runtime.api.store.ObjectStore",
+        "extensibleType": {},
+        "typeAlias": {
+          "value": "ObjectStore"
+        },
+        "classInformation": {
+          "classname": "org.mule.runtime.api.store.ObjectStore",
+          "hasDefaultConstructor": false,
+          "isInterface": true,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        }
+      },
+      "fields": []
+    }
+  ],
   "configurations": [
     {
       "stereotype": {
@@ -3571,27 +3596,7 @@
                           "name": "objectStore"
                         },
                         "model": {
-                          "type": "Object",
-                          "annotations": {
-                            "typeId": "org.mule.runtime.api.store.ObjectStore",
-                            "extensibleType": {},
-                            "typeAlias": {
-                              "value": "ObjectStore"
-                            },
-                            "classInformation": {
-                              "classname": "org.mule.runtime.api.store.ObjectStore",
-                              "hasDefaultConstructor": false,
-                              "isInterface": true,
-                              "isInstantiable": false,
-                              "isAbstract": true,
-                              "isFinal": false,
-                              "implementedInterfaces": [],
-                              "parent": "",
-                              "genericTypes": [],
-                              "isMap": false
-                            }
-                          },
-                          "fields": []
+                          "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                         },
                         "annotations": {
                           "stereotype": {
@@ -4057,27 +4062,7 @@
                           "name": "objectStore"
                         },
                         "model": {
-                          "type": "Object",
-                          "annotations": {
-                            "typeId": "org.mule.runtime.api.store.ObjectStore",
-                            "extensibleType": {},
-                            "typeAlias": {
-                              "value": "ObjectStore"
-                            },
-                            "classInformation": {
-                              "classname": "org.mule.runtime.api.store.ObjectStore",
-                              "hasDefaultConstructor": false,
-                              "isInterface": true,
-                              "isInstantiable": false,
-                              "isAbstract": true,
-                              "isFinal": false,
-                              "implementedInterfaces": [],
-                              "parent": "",
-                              "genericTypes": [],
-                              "isMap": false
-                            }
-                          },
-                          "fields": []
+                          "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                         },
                         "annotations": {
                           "stereotype": {
