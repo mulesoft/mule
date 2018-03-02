@@ -16,6 +16,7 @@
       "exportedPackages": [
         "org.mule.test.heisenberg.extension.model.types",
         "org.mule.test.heisenberg.extension.exception",
+        "org.mule.tck.testmodels.fruit",
         "org.mule.test.heisenberg.extension",
         "org.mule.test.heisenberg.extension.model"
       ],
