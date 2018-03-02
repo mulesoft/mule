@@ -21,6 +21,7 @@ public final class PolicyStateId {
 
   private String executionIdentifier;
   private String policyId;
+  public static final String POLICY_ID = "policyID";
 
   /**
    * Creates a new policy state id.
