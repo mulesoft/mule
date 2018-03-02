@@ -11,15 +11,20 @@ import static java.lang.Math.toIntExact;
 import static java.lang.System.arraycopy;
 import static java.nio.channels.Channels.newChannel;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ReadableByteChannel;
+
+import org.slf4j.Logger;
 
 /**
  * Base class for implementations of {@link InputStreamBuffer}.
@@ -29,6 +34,8 @@ import java.nio.channels.ReadableByteChannel;
  * @since 4.0
  */
 public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer implements InputStreamBuffer {
+
+  private static final Logger LOGGER = getLogger(AbstractInputStreamBuffer.class);
 
   protected final ByteBufferManager bufferManager;
 
@@ -40,8 +47,8 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   /**
    * Creates a new instance
    *
-   * @param stream        The stream being buffered. This is the original data source
-   * @param bufferSize    the buffer size
+   * @param stream The stream being buffered. This is the original data source
+   * @param bufferSize the buffer size
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    */
   public AbstractInputStreamBuffer(InputStream stream, ByteBufferManager bufferManager, int bufferSize) {
@@ -51,10 +58,10 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   /**
    * Creates a new instance
    *
-   * @param stream        The stream being buffered. This is the original data source
+   * @param stream The stream being buffered. This is the original data source
    * @param streamChannel a {@link ReadableByteChannel} used to read from the {@code stream}
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
-   * @param bufferSize    the buffer size
+   * @param bufferSize the buffer size
    */
   public AbstractInputStreamBuffer(InputStream stream, ReadableByteChannel streamChannel, ByteBufferManager bufferManager,
                                    int bufferSize) {
@@ -143,7 +150,16 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     try {
       result = streamChannel.read(buffer);
     } catch (ClosedChannelException e) {
-      result = -1;
+      // The condition used here is copied from Channels.newChannel(java.io.InputStream)
+      if (stream instanceof FileInputStream && FileInputStream.class.equals(stream.getClass())) {
+        // Delegate FileChannel is being used, handle ClosedChannelException by returning -1.
+        LOGGER.debug("FileChannel closed.", e);
+        result = -1;
+      } else {
+        // ReadableByteChannel is being used, ClosedChannelException is not expected.
+        LOGGER.error("ReadableByteChannel closed.", e);
+        throw e;
+      }
     }
     return result;
   }

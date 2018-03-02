@@ -65,8 +65,9 @@
             <artifactId>spring-core</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- TODO MULE-14667 Upgrade to reactor 3.2.0 -->
         <dependency>
-            <groupId>io.projectreactor</groupId>
+            <groupId>org.mule.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
         </dependency>
         <!--Test Dependencies-->
