@@ -150,11 +150,12 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     try {
       result = streamChannel.read(buffer);
     } catch (ClosedChannelException e) {
-      if (stream instanceof FileInputStream) {
+      if (stream instanceof FileInputStream && FileInputStream.class.equals(stream.getClass())) {
+        // Delegate FileChannel is being used, handle ClosedChannelException by returning -1.
         LOGGER.debug("FileChannel closed.", e);
         result = -1;
       } else {
-        // ReadableByteChannel is created by AbstractInputStreamBuffer and ClosedChannelException is not expected.
+        // ReadableByteChannel is being used, ClosedChannelException is not expected.
         LOGGER.error("ReadableByteChannel closed.", e);
         throw e;
       }
