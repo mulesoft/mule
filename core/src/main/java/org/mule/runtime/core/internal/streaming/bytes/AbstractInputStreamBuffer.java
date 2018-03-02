@@ -17,10 +17,11 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousCloseException;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ReadableByteChannel;
 
@@ -149,17 +150,17 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     int result;
     try {
       result = streamChannel.read(buffer);
-    } catch (ClosedChannelException e) {
-      // The condition used here is copied from Channels.newChannel(java.io.InputStream)
-      if (stream instanceof FileInputStream && FileInputStream.class.equals(stream.getClass())) {
-        // Delegate FileChannel is being used, handle ClosedChannelException by returning -1.
-        LOGGER.debug("FileChannel closed.", e);
-        result = -1;
-      } else {
-        // ReadableByteChannel is being used, ClosedChannelException is not expected.
-        LOGGER.error("ReadableByteChannel closed.", e);
-        throw e;
-      }
+    } catch (ClosedByInterruptException cbie) {
+      LOGGER.error("Channel interrupted.", cbie);
+      throw cbie;
+    } catch (AsynchronousCloseException ace) {
+      LOGGER.error("Channel closed asynchronously.", ace);
+      throw ace;
+    } catch (ClosedChannelException cce) {
+      // Assume ClosedChannelException means there is no more data. AsynchronousCloseException which are not expected are handled
+      // separably above.
+      LOGGER.debug("Channel closed.", cce);
+      result = -1;
     }
     return result;
   }
