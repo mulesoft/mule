@@ -2055,6 +2055,24 @@
           "classSimpleName": "ExpiryMonitor",
           "elementKind": "class",
           "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.policy.PolicyChain::onChainError(java.util.function.Consumer<java.lang.Exception>)",
+          "package": "org.mule.runtime.core.api.policy",
+          "classSimpleName": "PolicyChain",
+          "methodName": "onChainError",
+          "elementKind": "method",
+          "justification": "Method needed to allow error handling of PolicyChain"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.core.api.policy.PolicyStateId.POLICY_ID",
+          "package": "org.mule.runtime.core.api.policy",
+          "classSimpleName": "PolicyStateId",
+          "fieldName": "POLICY_ID",
+          "elementKind": "field",
+          "justification": "Constant added"
         }
       ]
     }
