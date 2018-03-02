@@ -97,9 +97,7 @@ public class OperationPolicyProcessor implements Processor {
                                                    PrivilegedEvent policyEvent) {
 
     PolicyChain policyChain = policy.getPolicyChain();
-    policyChain.onChainError(t -> policyStateHandler
-        .updateState(new PolicyStateId(policyEvent.getContext().getCorrelationId(), policy.getPolicyId()),
-                     ((MessagingException) t).getEvent()));
+    policyChain.onChainError(t -> policyStateHandler.updateState(policyStateId, ((MessagingException) t).getEvent()));
 
     return just(policyEvent)
         .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
