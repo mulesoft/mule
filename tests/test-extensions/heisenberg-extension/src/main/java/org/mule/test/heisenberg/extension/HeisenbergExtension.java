@@ -36,6 +36,9 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
@@ -64,6 +67,7 @@ import javax.inject.Inject;
 @Sources({HeisenbergSource.class, DEARadioSource.class, AsyncHeisenbergSource.class, ReconnectableHeisenbergSource.class})
 @Export(classes = {HeisenbergExtension.class, HeisenbergException.class}, resources = "methRecipe.json")
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
+@SubTypeMapping(baseType = Fruit.class, subTypes = {Banana.class, Apple.class})
 @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
 @ExternalLib(name = HeisenbergExtension.HEISENBERG_LIB_NAME, description = HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION,
     nameRegexpMatcher = HeisenbergExtension.HEISENBERG_LIB_FILE_NAME,
