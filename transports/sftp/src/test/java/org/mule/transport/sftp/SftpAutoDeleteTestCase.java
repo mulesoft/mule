@@ -6,7 +6,6 @@
  */
 package org.mule.transport.sftp;
 
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -18,6 +17,9 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
@@ -94,7 +96,28 @@ public class SftpAutoDeleteTestCase extends AbstractSftpFunctionalTestCase
     public void endpointAutoDeleteTrue() throws Exception
     {
         testDirectory(AUTO_DELETE_ON);
-        assertThat(Arrays.asList(sftpClient.listFiles()), is(empty()));
+        Prober prober = new PollingProber(5000, 500);
+        prober.check(new Probe()
+        {
+            @Override
+            public boolean isSatisfied()
+            {
+                try
+                {
+                    return sftpClient.listFiles().length == 0;
+                }
+                catch (IOException e)
+                {
+                    return false;
+                }
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "The file wasn't deleted, although the autoDelete feature is enabled.";
+            }
+        });
     }
 
     private void testDirectory(String directory) throws Exception
