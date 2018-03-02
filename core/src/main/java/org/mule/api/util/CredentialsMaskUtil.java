@@ -44,9 +44,8 @@ public class CredentialsMaskUtil
         Matcher matcher = PASSWORD_PATTERN.matcher(input);
         if (matcher.find() && matcher.groupCount() > 0)
         {
-            input = input.replaceAll(maskPasswordAttribute(matcher.group(1)), maskPasswordAttribute(PASSWORD_MASK));
+            input = input.replace(maskPasswordAttribute(matcher.group(1)), maskPasswordAttribute(PASSWORD_MASK));
         }
-        input = maskUrlPassword(input, PASSWORD_PATTERN);
 
         return input;
     }
