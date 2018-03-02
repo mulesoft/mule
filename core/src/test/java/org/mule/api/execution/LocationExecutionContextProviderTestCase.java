@@ -6,6 +6,7 @@
  */
 package org.mule.api.execution;
 
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
@@ -56,10 +57,14 @@ public class LocationExecutionContextProviderTestCase extends AbstractMuleTestCa
     @Test
     public void sanitizedPasswordAttributeWhenUsingRegExpCharactersInPassword()
     {
-        withXmlElement(annotatedObject, "<sftp:config username=\"user\" password=\"pass^word\" />");
-        String sanitized = getSourceXML(annotatedObject);
-        assertThat(sanitized, equalTo("<sftp:config username=\"user\" password=\"<<credentials>>\" />"));
-
+        String [] specialCharacters = new String[]{"^", ")"};
+        String input = "<sftp:config username=\"user\" password=\"pass%sword\" />";
+        for(String specialCharacter : specialCharacters)
+        {
+            withXmlElement(annotatedObject, format(input, specialCharacter));
+            String sanitized = getSourceXML(annotatedObject);
+            assertThat(sanitized, equalTo("<sftp:config username=\"user\" password=\"<<credentials>>\" />"));
+        }
     }
 
     private void withXmlElement(AnnotatedObject annotatedObject, String value)
