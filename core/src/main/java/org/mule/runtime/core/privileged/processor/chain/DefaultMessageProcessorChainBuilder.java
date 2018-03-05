@@ -8,11 +8,13 @@ package org.mule.runtime.core.privileged.processor.chain;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -78,7 +80,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         if (i + 1 < processors.size()) {
           // Wrap processors in chain, unless single processor that is already a chain
           final MessageProcessorChain innerChain =
-              createSimpleChain(tempList, interceptingProcessor.isBlocking() ? empty() : ofNullable(processingStrategy));
+              createSimpleChain(tempList, interceptingProcessor.isBlocking() ? of(BLOCKING_PROCESSING_STRATEGY_INSTANCE)
+                  : ofNullable(processingStrategy));
           processorsForLifecycle.addFirst(innerChain);
           interceptingProcessor.setListener(innerChain);
         }
