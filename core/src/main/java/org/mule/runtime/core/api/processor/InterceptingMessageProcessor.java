@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 /**
  * <p>
@@ -15,9 +17,12 @@ import org.mule.runtime.core.api.event.CoreEvent;
  * </p>
  * Although not normal, it is valid for the <i>listener</i> MessageProcessor to be <i>null</i> and implementations should handle
  * this case.
- * 
+ *
  * @since 3.0
+ *
+ * @deprecated Use interception API instead of this interface. Ref: {@link ProcessorInterceptorFactory}.
  */
+@Deprecated
 public interface InterceptingMessageProcessor extends Processor {
 
   /**
@@ -25,4 +30,13 @@ public interface InterceptingMessageProcessor extends Processor {
    */
   void setListener(Processor listener);
 
+  /**
+   * Indicates if the processing strategy of the parent flow is applied to the intercepted processor's chain.
+   *
+   * @return {@code true} if the {@code listener} will run wholly in the same thread and blocking if needed. {@code false} if the
+   *         lfow's {@link ProcessingStrategy} will be used.
+   */
+  default boolean isBlocking() {
+    return false;
+  }
 }

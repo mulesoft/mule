@@ -13,27 +13,27 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -77,7 +77,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         // Processor is intercepting so we can't simply iterate
         if (i + 1 < processors.size()) {
           // Wrap processors in chain, unless single processor that is already a chain
-          final MessageProcessorChain innerChain = createSimpleChain(tempList);
+          final MessageProcessorChain innerChain =
+              createSimpleChain(tempList, interceptingProcessor.isBlocking() ? empty() : ofNullable(processingStrategy));
           processorsForLifecycle.addFirst(innerChain);
           interceptingProcessor.setListener(innerChain);
         }
@@ -91,16 +92,17 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     // Create the final chain using the current tempList after reserve iteration is complete. This temp
     // list contains the first n processors in the chain that are not intercepting.. with processor n+1
     // having been injected as the listener of processor n
-    Processor head = tempList.size() == 1 ? tempList.get(0) : createSimpleChain(tempList);
+    Processor head = tempList.size() == 1 ? tempList.get(0) : createSimpleChain(tempList, ofNullable(processingStrategy));
     processorsForLifecycle.addFirst(head);
     return createInterceptingChain(head, processors, processorsForLifecycle);
   }
 
-  protected MessageProcessorChain createSimpleChain(List<Processor> tempList) {
+  protected MessageProcessorChain createSimpleChain(List<Processor> tempList,
+                                                    Optional<ProcessingStrategy> processingStrategyOptional) {
     if (tempList.size() == 1 && tempList.get(0) instanceof SimpleMessageProcessorChain) {
       return (MessageProcessorChain) tempList.get(0);
     } else {
-      return new SimpleMessageProcessorChain("(inner chain) of " + name, ofNullable(processingStrategy),
+      return new SimpleMessageProcessorChain("(inner chain) of " + name, processingStrategyOptional,
                                              new ArrayList<>(tempList));
     }
   }
@@ -212,6 +214,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         disposeIfNeeded(delegate, LOGGER);
       }
 
+      @Override
       public void stop() throws MuleException {
         stopIfNeeded(delegate);
       }

@@ -2055,6 +2055,25 @@
           "classSimpleName": "ExpiryMonitor",
           "elementKind": "class",
           "justification": "This class is not meant to be extended by the user"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method boolean org.mule.runtime.core.api.processor.InterceptingMessageProcessor::isBlocking()",
+          "package": "org.mule.runtime.core.api.processor",
+          "classSimpleName": "InterceptingMessageProcessor",
+          "methodName": "isBlocking",
+          "elementKind": "method",
+          "justification": "This interface should not be API"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder::createSimpleChain(java.util.List<org.mule.runtime.core.api.processor.Processor>)",
+          "new": "method org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder::createSimpleChain(java.util.List<org.mule.runtime.core.api.processor.Processor>, java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>)",
+          "package": "org.mule.runtime.core.privileged.processor.chain",
+          "classSimpleName": "DefaultMessageProcessorChainBuilder",
+          "methodName": "createSimpleChain",
+          "elementKind": "method",
+          "justification": "This interface should not be API"
         }
       ]
     }
