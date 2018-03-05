@@ -54,11 +54,13 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
@@ -100,6 +102,7 @@ import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
+import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
@@ -306,6 +309,9 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected final ArtifactPluginFileBuilder helloExtensionV2Plugin = createHelloExtensionV2PluginFileBuilder();
 
   protected final ArtifactPluginFileBuilder exceptionThrowingPlugin = createExceptionThrowingPluginFileBuilder();
+
+  protected final ArtifactPluginFileBuilder byeXmlExtensionPlugin = createByeXmlPluginFileBuilder();
+  protected final ArtifactPluginFileBuilder moduleUsingByeXmlExtensionPlugin = createModuleUsingByeXmlPluginFileBuilder();
 
   // Application file builders
   protected final ApplicationFileBuilder emptyAppFileBuilder =
@@ -1292,17 +1298,57 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   private PolicyFileBuilder createExceptionThrowingPluginImportingPolicyFileBuilder() {
-    PolicyFileBuilder exceptionPolicyFileBuilder =
-        new PolicyFileBuilder(EXCEPTION_POLICY_NAME).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
-            .setMinMuleVersion(MIN_MULE_VERSION)
-            .setName(EXCEPTION_POLICY_NAME)
-            .setRequiredProduct(MULE)
-            .withBundleDescriptorLoader(createBundleDescriptorLoader(EXCEPTION_POLICY_NAME, MULE_POLICY_CLASSIFIER,
-                                                                     PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-            .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
-            .build())
-            .dependingOn(exceptionThrowingPlugin);
-    return exceptionPolicyFileBuilder;
+    return new PolicyFileBuilder(EXCEPTION_POLICY_NAME).describedBy(new MulePolicyModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION)
+        .setName(EXCEPTION_POLICY_NAME)
+        .setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader(EXCEPTION_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+        .build())
+        .dependingOn(exceptionThrowingPlugin);
+  }
+
+  private ArtifactPluginFileBuilder createByeXmlPluginFileBuilder() {
+    final String prefixModuleName = "module-bye";
+    String extensionName = "bye-extension";
+    final String resources = "org/mule/module/";
+    String moduleDestination = resources + prefixModuleName + ".xml";
+    MulePluginModel.MulePluginModelBuilder builder =
+        new MulePluginModel.MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
+    builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
+                                                                                                  moduleDestination);
+    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
+    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
+    builder.setRequiredProduct(MULE).setMinMuleVersion(MIN_MULE_VERSION);
+
+    return new ArtifactPluginFileBuilder(extensionName)
+        .containingResource("module-byeSource.xml", moduleDestination)
+        .containingResource("module-using-bye-catalogSource.xml", resources + prefixModuleName + "-catalog.xml")
+        .containingResource("module-bye-type-schemaSource.json", resources + "type1-schema.json")
+        .containingResource("module-bye-type-schemaSource.json", resources + "inner/folder/type2-schema.json")
+        .containingResource("module-bye-type-schemaSource.json", "org/mule/type3-schema.json")
+        .describedBy(builder.build());
+  }
+
+  private ArtifactPluginFileBuilder createModuleUsingByeXmlPluginFileBuilder() {
+    String moduleFileName = "module-using-bye.xml";
+    String extensionName = "using-bye-extension";
+    String moduleDestination = "org/mule/module/" + moduleFileName;
+
+    MulePluginModel.MulePluginModelBuilder builder =
+        new MulePluginModel.MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION)
+            .setRequiredProduct(MULE);
+    builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
+                                                                                                  moduleDestination);
+    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
+        .addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID).build());
+    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
+
+    return new ArtifactPluginFileBuilder(extensionName)
+        .containingResource("module-using-byeSource.xml", moduleDestination)
+        .dependingOn(byeXmlExtensionPlugin)
+        .describedBy(builder.build());
   }
 
   private ArtifactPluginFileBuilder createExceptionThrowingPluginFileBuilder() {
