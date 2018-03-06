@@ -6,23 +6,28 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static org.mule.runtime.extension.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
+import static org.mule.runtime.extension.api.annotation.source.SourceClusterSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addPrimaryNodeParameter;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.ExtensionConstants;
-import org.mule.runtime.extension.api.annotation.source.PrimaryNodeOnly;
+import org.mule.runtime.extension.api.annotation.source.ClusterSupport;
+import org.mule.runtime.extension.api.annotation.source.SourceClusterSupport;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+
+import java.lang.annotation.Annotation;
+import java.util.Optional;
 
 /**
  * Adds a #{@link ExtensionConstants#PRIMARY_NODE_ONLY_PARAMETER_NAME} parameter on all sources for which
  * {@link SourceModel#runsOnPrimaryNodeOnly()} is {@code false}
  *
- * @since 1.1
+ * @since 4.1
  */
-public class PrimaryNodeEnricher extends AbstractAnnotatedDeclarationEnricher {
+public class ClusterSupportEnricher extends AbstractAnnotatedDeclarationEnricher {
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
@@ -30,20 +35,29 @@ public class PrimaryNodeEnricher extends AbstractAnnotatedDeclarationEnricher {
 
       @Override
       protected void onSource(SourceDeclaration declaration) {
-        if (isPrimaryNodeOnly(declaration)) {
-          declaration.setRunsOnPrimaryNodeOnly(true);
+        ClusterSupport annotation = getAnnotation(declaration, ClusterSupport.class).orElse(null);
+
+        if (annotation != null) {
+          SourceClusterSupport clusterSupport = annotation.value();
+          if (clusterSupport == NOT_SUPPORTED) {
+            declaration.setRunsOnPrimaryNodeOnly(true);
+          } else {
+            declaration.setRunsOnPrimaryNodeOnly(false);
+            addPrimaryNodeParameter(declaration, clusterSupport == DEFAULT_PRIMARY_NODE_ONLY);
+          }
         } else {
           declaration.setRunsOnPrimaryNodeOnly(false);
-          addPrimaryNodeParameter(declaration);
+          addPrimaryNodeParameter(declaration, false);
         }
       }
     }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
   }
 
-  private boolean isPrimaryNodeOnly(SourceDeclaration declaration) {
+  private <T extends Annotation> Optional<T> getAnnotation(SourceDeclaration declaration, Class<T> annotation) {
     return declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
         .map(ExtensionTypeDescriptorModelProperty::getType)
-        .map(type -> type.isAnnotatedWith(PrimaryNodeOnly.class))
-        .orElse(false);
+        .filter(type -> type.isAnnotatedWith(annotation))
+        .flatMap(type -> type.getAnnotation(annotation));
   }
+
 }
