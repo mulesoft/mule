@@ -67,138 +67,28 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:complexType name="org.mule.tck.testmodels.fruit.Fruit">
+  <xs:complexType name="org.mule.test.heisenberg.extension.model.drugs.Drug">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.tck.testmodels.fruit.Fruit" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-fruit"></xs:element>
-  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.tck.testmodels.fruit.Fruit" abstract="true" name="abstract-fruit"></xs:element>
-  <xs:complexType name="org.mule.tck.testmodels.fruit.Banana">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.drugs.Drug" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-drug"></xs:element>
+  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.drugs.Drug" abstract="true" name="abstract-drug"></xs:element>
+  <xs:complexType name="org.mule.test.heisenberg.extension.model.drugs.Meta">
     <xs:complexContent>
-      <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.tck.testmodels.fruit.Fruit">
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionBoolean" use="optional" name="bitten"></xs:attribute>
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" name="origin"></xs:attribute>
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionBoolean" use="optional" name="peeled"></xs:attribute>
+      <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.drugs.Drug">
+        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="required" name="purity"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.tck.testmodels.fruit.Banana" substitutionGroup="heisenberg:abstract-fruit" abstract="true" name="abstract-banana"></xs:element>
-  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-banana" name="banana">
+  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.drugs.Meta" substitutionGroup="heisenberg:abstract-drug" abstract="true" name="abstract-meta"></xs:element>
+  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-meta" name="meta">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="heisenberg:org.mule.tck.testmodels.fruit.Banana"></xs:extension>
+        <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.drugs.Meta"></xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.tck.testmodels.fruit.peel.ApplePeel" abstract="true" name="abstract-apple-peel"></xs:element>
-  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-apple-peel" name="apple-peel">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="heisenberg:org.mule.tck.testmodels.fruit.peel.ApplePeel"></xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.tck.testmodels.fruit.seed.AppleSeed">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionString" use="optional" name="seedName"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.tck.testmodels.fruit.seed.AppleSeed" abstract="true" name="abstract-apple-seed"></xs:element>
-  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-apple-seed" name="apple-seed">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="heisenberg:org.mule.tck.testmodels.fruit.seed.AppleSeed"></xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.tck.testmodels.fruit.peel.ApplePeel">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="peels">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-apple-peel"></xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="recursive-peel">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.tck.testmodels.fruit.peel.ApplePeel"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="seeds">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-apple-seed"></xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:expressionBoolean" use="optional" name="eatable"></xs:attribute>
-        <xs:attribute type="mule:expressionList" use="optional" name="peels"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="recursivePeel"></xs:attribute>
-        <xs:attribute type="mule:expressionList" use="optional" name="seeds"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.tck.testmodels.fruit.Apple" substitutionGroup="heisenberg:abstract-fruit" abstract="true" name="abstract-apple"></xs:element>
-  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-apple" name="apple">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="heisenberg:org.mule.tck.testmodels.fruit.Apple"></xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.tck.testmodels.fruit.Seed">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="fruit">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-fruit"></xs:element>
-                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-fruit"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="fruit"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="org.mule.tck.testmodels.fruit.Apple">
-    <xs:complexContent>
-      <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.tck.testmodels.fruit.Fruit">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="peel">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="heisenberg:org.mule.tck.testmodels.fruit.peel.ApplePeel"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="seed">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="heisenberg:org.mule.tck.testmodels.fruit.Seed"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="appleCleaner"></xs:attribute>
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionBoolean" use="optional" name="bitten"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="peel"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="seed"></xs:attribute>
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionBoolean" use="optional" name="washed"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.Investment" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-investment"></xs:element>
   <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.Investment" abstract="true" name="abstract-investment"></xs:element>
   <xs:complexType name="org.mule.test.heisenberg.extension.model.CarWash">

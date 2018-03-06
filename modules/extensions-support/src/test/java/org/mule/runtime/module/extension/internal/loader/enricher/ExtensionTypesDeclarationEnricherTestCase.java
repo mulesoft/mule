@@ -16,9 +16,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.CarWash;
@@ -27,6 +24,8 @@ import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
+import org.mule.test.heisenberg.extension.model.drugs.Drug;
+import org.mule.test.heisenberg.extension.model.drugs.Meta;
 
 import java.util.Map;
 import java.util.Optional;
@@ -79,6 +78,6 @@ public class ExtensionTypesDeclarationEnricherTestCase extends AbstractMuleTestC
   @Test
   @Description("Checks that types that are declared in the extension but not used explicitly are added")
   public void addsUnusedDeclaredTypes() throws Exception {
-    assertTypes(extensionModel.getTypes(), true, "Type %s was not present", Apple.class, Banana.class, Fruit.class);
+    assertTypes(extensionModel.getTypes(), true, "Type %s was not present", Drug.class, Meta.class);
   }
 }
