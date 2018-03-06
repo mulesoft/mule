@@ -44,7 +44,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.ObjectStorePar
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterAllowedStereotypesDeclarionEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.PollingSourceDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.PrimaryNodeEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ClusterSupportEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RedeliveryPolicyDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
@@ -124,7 +124,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ValueProvidersParameterDeclarationEnricher(),
                                                                                                new ParameterAllowedStereotypesDeclarionEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher(),
-                                                                                               new PrimaryNodeEnricher(),
+                                                                                               new ClusterSupportEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher(),
                                                                                                new BackPressureDeclarationEnricher(),
                                                                                                new ObjectStoreParameterDeclarationEnricher(),
