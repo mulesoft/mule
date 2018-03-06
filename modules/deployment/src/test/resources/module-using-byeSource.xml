@@ -14,4 +14,11 @@
         <output type="string"/>
     </operation>
 
+    <operation name="adios-again">
+        <body>
+            <module-bye:say-bye/>
+        </body>
+        <output type="string"/>
+    </operation>
+
 </module>
