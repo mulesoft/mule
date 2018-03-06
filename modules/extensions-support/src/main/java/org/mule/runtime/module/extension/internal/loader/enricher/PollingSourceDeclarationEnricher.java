@@ -57,6 +57,9 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
       protected void onSource(SourceDeclaration source) {
         extractType(source).ifPresent(type -> {
           if (type.isAssignableTo(PollingSource.class)) {
+
+            source.setRunsOnPrimaryNodeOnly(true);
+
             ParameterDeclaration parameter = new ParameterDeclaration(SCHEDULING_STRATEGY_PARAMETER_NAME);
             parameter.setDescription(SCHEDULING_STRATEGY_PARAMETER_DESCRIPTION);
             parameter.setRequired(true);
