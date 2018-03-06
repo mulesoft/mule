@@ -51,6 +51,8 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
+import org.mule.test.heisenberg.extension.model.drugs.Drug;
+import org.mule.test.heisenberg.extension.model.drugs.Meta;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -67,7 +69,7 @@ import javax.inject.Inject;
 @Sources({HeisenbergSource.class, DEARadioSource.class, AsyncHeisenbergSource.class, ReconnectableHeisenbergSource.class})
 @Export(classes = {HeisenbergExtension.class, HeisenbergException.class}, resources = "methRecipe.json")
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
-@SubTypeMapping(baseType = Fruit.class, subTypes = {Banana.class, Apple.class})
+@SubTypeMapping(baseType = Drug.class, subTypes = {Meta.class})
 @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
 @ExternalLib(name = HeisenbergExtension.HEISENBERG_LIB_NAME, description = HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION,
     nameRegexpMatcher = HeisenbergExtension.HEISENBERG_LIB_FILE_NAME,
