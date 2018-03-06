@@ -1407,8 +1407,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   public void deploysWithExtensionXmlPlugin() throws Exception {
-    final ArtifactPluginFileBuilder byeXmlExtensionPlugin = getByeXmlPlugin();
-
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPlugin")
         .definedBy("app-with-extension-xml-plugin-module-bye.xml").dependingOn(byeXmlExtensionPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -1427,51 +1425,11 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
   }
 
-  private ArtifactPluginFileBuilder getByeXmlPlugin() {
-    final String prefixModuleName = "module-bye";
-    String extensionName = "bye-extension";
-    final String resources = "org/mule/module/";
-    String moduleDestination = resources + prefixModuleName + ".xml";
-    MulePluginModel.MulePluginModelBuilder builder =
-        new MulePluginModel.MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
-    builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
-                                                                                                  moduleDestination);
-    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
-    builder.setRequiredProduct(MULE).setMinMuleVersion(MIN_MULE_VERSION);
-
-    return new ArtifactPluginFileBuilder(extensionName)
-        .containingResource("module-byeSource.xml", moduleDestination)
-        .containingResource("module-using-bye-catalogSource.xml", resources + prefixModuleName + "-catalog.xml")
-        .containingResource("module-bye-type-schemaSource.json", resources + "type1-schema.json")
-        .containingResource("module-bye-type-schemaSource.json", resources + "inner/folder/type2-schema.json")
-        .containingResource("module-bye-type-schemaSource.json", "org/mule/type3-schema.json")
-        .describedBy(builder.build());
-  }
-
   @Test
   public void deploysWithExtensionXmlPluginWithXmlDependencies() throws Exception {
-    final ArtifactPluginFileBuilder byeXmlExtensionPlugin = getByeXmlPlugin();
-    String moduleFileName = "module-using-bye.xml";
-    String extensionName = "using-bye-extension";
-    String moduleDestination = "org/mule/module/" + moduleFileName;
-    MulePluginModel.MulePluginModelBuilder builder =
-        new MulePluginModel.MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION)
-            .setRequiredProduct(MULE);
-    builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
-                                                                                                  moduleDestination);
-    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
-        .addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID).build());
-    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
-
-    final ArtifactPluginFileBuilder usingByeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
-        .containingResource("module-using-byeSource.xml", moduleDestination)
-        .dependingOn(byeXmlExtensionPlugin)
-        .describedBy(builder.build());
-
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPluginWithXmlDependencies")
         .definedBy("app-with-extension-xml-plugin-module-using-bye.xml")
-        .dependingOn(usingByeXmlExtensionPlugin);
+        .dependingOn(moduleUsingByeXmlExtensionPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     final DefaultDomainManager domainManager = new DefaultDomainManager();

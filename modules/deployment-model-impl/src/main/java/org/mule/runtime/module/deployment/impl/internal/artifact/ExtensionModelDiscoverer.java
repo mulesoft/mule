@@ -10,7 +10,6 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
@@ -46,9 +45,26 @@ public class ExtensionModelDiscoverer {
    */
   public Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> discoverPluginsExtensionModels(ExtensionModelLoaderRepository loaderRepository,
                                                                                             List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins) {
+    return discoverPluginsExtensionModels(loaderRepository, artifactPlugins, new HashSet<>());
+  }
+
+  /**
+   * For each artifactPlugin discovers the {@link ExtensionModel}.
+   *
+   * @param loaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders.
+   * @param artifactPlugins {@link Pair} of {@link ArtifactPluginDescriptor} and {@link ArtifactClassLoader} for artifact plugins
+   *        deployed inside the artifact. Non null.
+   * @param parentArtifactExtensions {@link Set} of {@link ExtensionModel} to also take into account when parsing extensions
+   * @return {@link Set} of {@link Pair} carrying the {@link ArtifactPluginDescriptor} and it's corresponding
+   *         {@link ExtensionModel}.
+   */
+  public Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> discoverPluginsExtensionModels(ExtensionModelLoaderRepository loaderRepository,
+                                                                                            List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins,
+                                                                                            Set<ExtensionModel> parentArtifactExtensions) {
     final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions = new HashSet<>();
     artifactPlugins.forEach(artifactPlugin -> {
       Set<ExtensionModel> extensions = descriptorsWithExtensions.stream().map(Pair::getSecond).collect(toSet());
+      extensions.addAll(parentArtifactExtensions);
       final ArtifactPluginDescriptor artifactPluginDescriptor = artifactPlugin.getFirst();
       Optional<LoaderDescriber> loaderDescriber = artifactPluginDescriptor.getExtensionModelDescriptorProperty();
       ClassLoader artifactClassloader = artifactPlugin.getSecond().getClassLoader();

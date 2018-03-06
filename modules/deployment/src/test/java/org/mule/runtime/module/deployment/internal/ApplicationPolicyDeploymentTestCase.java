@@ -25,8 +25,10 @@ import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
@@ -46,6 +48,7 @@ import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.policy.PolicyPointcut;
 import org.mule.runtime.core.api.security.AbstractSecurityProvider;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
+import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
@@ -68,6 +71,7 @@ import org.junit.Test;
 public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestCase {
 
   private static final String APP_WITH_SIMPLE_EXTENSION_CONFIG = "app-with-simple-extension-config.xml";
+  private static final String APP_WITH_MODULE_BYE_CONFIG = "app-with-module-bye-config.xml";
 
   private static final int POLICY_NOTIFICATION_TIMEOUT = 5000;
 
@@ -86,7 +90,6 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                                    PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
           .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
-
 
   public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
@@ -323,6 +326,46 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  public void appliesApplicationPolicyUsingModuleThatUsesPlugin() throws Exception {
+    PolicyFileBuilder policyIncludingByePlugin = createPolicyIncludingByePlugin();
+    policyManager.registerPolicyTemplate(policyIncludingByePlugin.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder =
+        createExtensionApplicationWithServices(APP_WITH_SIMPLE_EXTENSION_CONFIG, createSingleExtensionPlugin());
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingByePlugin.getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/module-using-bye-policy.xml"), emptyList()));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  public void appliesApplicationPolicyUsingModuleThatUsesPluginDuplicatedInTheApplication() throws Exception {
+    PolicyFileBuilder policyIncludingByePlugin = createPolicyIncludingByePlugin();
+    policyManager.registerPolicyTemplate(policyIncludingByePlugin.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder =
+        createExtensionApplicationWithServices(APP_WITH_MODULE_BYE_CONFIG, createSingleExtensionPlugin(), byeXmlExtensionPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingByePlugin.getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/module-using-bye-policy.xml"), emptyList()));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
   public void appliesApplicationPolicyDuplicatingPlugin() throws Exception {
 
     policyManager.registerPolicyTemplate(exceptionThrowingPluginImportingPolicyFileBuilder.getArtifactFile());
@@ -534,6 +577,17 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0")
         .dependingOn(new JarFileBuilder("helloExtensionV1", injectedHelloExtensionJarFile))
         .describedBy((mulePluginModelBuilder.build()));
+  }
+
+  private PolicyFileBuilder createPolicyIncludingByePlugin() {
+    MulePolicyModel.MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModel.MulePolicyModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
+        .setRequiredProduct(Product.MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
+    return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
+        .build()).dependingOn(moduleUsingByeXmlExtensionPlugin);
   }
 
   public static class TestSecurityProvider extends AbstractSecurityProvider {
