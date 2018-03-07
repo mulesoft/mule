@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.streaming.bytes;
 import static java.lang.Math.toIntExact;
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
@@ -21,25 +22,29 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.nio.ByteBuffer;
-
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.nio.ByteBuffer;
+import java.util.concurrent.ExecutorService;
+
 import io.qameta.allure.Feature;
 
 @SmallTest
 @Feature(STREAMING)
 public class PoolingByteBufferManagerTestCase extends AbstractMuleTestCase {
 
-  private PoolingByteBufferManager bufferManager = new PoolingByteBufferManager();
+  private ExecutorService allocateExecutor = newSingleThreadExecutor();
+  private PoolingByteBufferManager bufferManager = new PoolingByteBufferManager(allocateExecutor);
   private static final int CAPACITY = 100;
   private static final int OTHER_CAPACITY = CAPACITY + 1;
 
@@ -49,6 +54,7 @@ public class PoolingByteBufferManagerTestCase extends AbstractMuleTestCase {
   @After
   public void after() {
     bufferManager.dispose();
+    allocateExecutor.shutdownNow();
   }
 
   @Test
@@ -100,7 +106,8 @@ public class PoolingByteBufferManagerTestCase extends AbstractMuleTestCase {
     MemoryManager memoryManager = mock(MemoryManager.class);
     when(memoryManager.getMaxMemory()).thenReturn(maxMemory);
 
-    bufferManager = new PoolingByteBufferManager(memoryManager, waitTimeoutMillis);
+    bufferManager.dispose();
+    bufferManager = new PoolingByteBufferManager(allocateExecutor, memoryManager, waitTimeoutMillis);
 
     assertMemoryLimit(bufferCapacity, waitTimeoutMillis);
   }
@@ -113,9 +120,10 @@ public class PoolingByteBufferManagerTestCase extends AbstractMuleTestCase {
 
     MemoryManager memoryManager = mock(MemoryManager.class);
 
+    bufferManager.dispose();
     setProperty(MULE_STREAMING_MAX_MEMORY, String.valueOf(maxMemory / 2));
     try {
-      bufferManager = new PoolingByteBufferManager(memoryManager, waitTimeoutMillis);
+      bufferManager = new PoolingByteBufferManager(allocateExecutor, memoryManager, waitTimeoutMillis);
       assertMemoryLimit(bufferCapacity, waitTimeoutMillis);
       verify(memoryManager, never()).getMaxMemory();
     } finally {
@@ -126,9 +134,10 @@ public class PoolingByteBufferManagerTestCase extends AbstractMuleTestCase {
   @Test
   public void invalidMemoryCapThroughSystemProperty() throws Exception {
     setProperty(MULE_STREAMING_MAX_MEMORY, "don't spend that much memory please");
+    bufferManager.dispose();
     try {
       expectedException.expect(IllegalArgumentException.class);
-      bufferManager = new PoolingByteBufferManager(mock(MemoryManager.class), 10);
+      bufferManager = new PoolingByteBufferManager(allocateExecutor, mock(MemoryManager.class), 10);
     } finally {
       clearProperty(MULE_STREAMING_MAX_MEMORY);
     }
