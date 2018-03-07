@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.policy.PolicyStateId.POLICY_ID;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
@@ -98,16 +97,23 @@ public class OperationPolicyProcessor implements Processor {
 
     PolicyChain policyChain = policy.getPolicyChain();
     policyChain.onChainError(t -> {
-        MessagingException messagingException = (MessagingException) t;
-        CoreEvent.Builder builder = CoreEvent.builder(messagingException.getEvent());
-
-        for (String variable : messagingException.getEvent().getVariables().keySet()) {
-            if (operationEvent.getVariables().containsKey(variable)) {
-                builder.removeVariable(variable);
-            }
+      MessagingException messagingException = (MessagingException) t;
+      CoreEvent.Builder builder = CoreEvent.builder(messagingException.getEvent());
+      // Remove variables that where added by the flow
+      for (String variable : messagingException.getEvent().getVariables().keySet()) {
+        if (operationEvent.getVariables().containsKey(variable)) {
+          builder.removeVariable(variable);
         }
+      }
 
-        policyStateHandler.updateState(policyStateId, builder.build());
+      if (!messagingException.getFailingComponent().getLocation().getLocation().contains("/operation/")) {
+        // If the error was in the operation policy, then set the operation event to the messaging exception
+        // to have only the variables created in the operation, but with the corresponding error
+        CoreEvent.Builder replaceBuilder = CoreEvent.builder(operationEvent);
+        replaceBuilder.error(messagingException.getEvent().getError().get());
+        messagingException.setProcessedEvent(replaceBuilder.build());
+      }
+      policyStateHandler.updateState(policyStateId, builder.build());
     });
 
     return just(policyEvent)
