@@ -97,7 +97,18 @@ public class OperationPolicyProcessor implements Processor {
                                                    PrivilegedEvent policyEvent) {
 
     PolicyChain policyChain = policy.getPolicyChain();
-    policyChain.onChainError(t -> policyStateHandler.updateState(policyStateId, ((MessagingException) t).getEvent()));
+    policyChain.onChainError(t -> {
+        MessagingException messagingException = (MessagingException) t;
+        CoreEvent.Builder builder = CoreEvent.builder(messagingException.getEvent());
+
+        for (String variable : messagingException.getEvent().getVariables().keySet()) {
+            if (operationEvent.getVariables().containsKey(variable)) {
+                builder.removeVariable(variable);
+            }
+        }
+
+        policyStateHandler.updateState(policyStateId, builder.build());
+    });
 
     return just(policyEvent)
         .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
@@ -105,9 +116,7 @@ public class OperationPolicyProcessor implements Processor {
         .cast(CoreEvent.class)
         .transform(policyChain)
         .cast(PrivilegedEvent.class)
-        .subscriberContext(ctx -> ctx.put(POLICY_ID, policy.getPolicyId()))
         .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
-        .subscriberContext(ctx -> ctx.delete(POLICY_ID))
         .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent))
         .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
                                      getMessageAttributesAsString(event), "After operation"));
