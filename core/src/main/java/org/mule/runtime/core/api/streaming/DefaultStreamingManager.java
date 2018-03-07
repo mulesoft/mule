@@ -32,11 +32,11 @@ import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
 import org.mule.runtime.core.internal.streaming.object.DefaultObjectStreamingManager;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import org.slf4j.Logger;
+
 import java.io.InputStream;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 @NoExtend
 public class DefaultStreamingManager implements StreamingManager, Initialisable, Disposable {
@@ -50,6 +50,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   private MutableStreamingStatistics statistics;
   private boolean initialised = false;
 
+  private Scheduler allocationScheduler;
   private Scheduler disposalScheduler;
 
   @Inject
@@ -65,10 +66,12 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   public void initialise() throws InitialisationException {
     if (!initialised) {
       statistics = new MutableStreamingStatistics();
+      allocationScheduler =
+          schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig().withName("StreamingManager-allocate"));
       disposalScheduler =
           schedulerService.cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig().withName("StreamingManager-dispose"));
       cursorManager = new CursorManager(statistics, disposalScheduler);
-      bufferManager = new PoolingByteBufferManager();
+      bufferManager = new PoolingByteBufferManager(allocationScheduler);
       byteStreamingManager = createByteStreamingManager();
       objectStreamingManager = createObjectStreamingManager();
 
@@ -96,6 +99,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     disposeIfNeeded(bufferManager, LOGGER);
     disposeIfNeeded(cursorManager, LOGGER);
     disposalScheduler.stop();
+    allocationScheduler.stop();
 
     initialised = false;
   }

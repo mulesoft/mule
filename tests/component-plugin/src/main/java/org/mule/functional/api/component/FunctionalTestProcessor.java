@@ -6,6 +6,7 @@
  */
 package org.mule.functional.api.component;
 
+import static java.lang.Thread.currentThread;
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.functional.api.notification.FunctionalTestNotification.EVENT_RECEIVED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -267,6 +268,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
       try {
         Thread.sleep(waitTime);
       } catch (InterruptedException e) {
+        currentThread().interrupt();
         LOGGER.info("FunctionalTestProcessor waitTime was interrupted");
       }
     }
