@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import static java.lang.Math.toIntExact;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -16,6 +17,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.DataUnit.BYTE;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
@@ -25,20 +27,23 @@ import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.tck.size.SmallTest;
 
+import org.apache.commons.io.IOUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import io.qameta.allure.Feature;
 
 @RunWith(Parameterized.class)
@@ -62,7 +67,8 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   private CursorStreamProvider streamProvider;
   private CountDownLatch controlLatch;
   private CountDownLatch mainThreadLatch;
-  protected PoolingByteBufferManager bufferManager = new PoolingByteBufferManager();
+  private ExecutorService allocationScheduler;
+  protected PoolingByteBufferManager bufferManager;
 
   public CursorStreamProviderTestCase(String name, int dataSize, int bufferSize, int maxBufferSize) {
     super(dataSize);
@@ -70,11 +76,16 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     this.bufferSize = bufferSize;
     this.maxBufferSize = maxBufferSize;
     halfDataLength = data.length() / 2;
-    final ByteArrayInputStream dataStream = new ByteArrayInputStream(data.getBytes());
-
-    streamProvider = createStreamProvider(bufferSize, maxBufferSize, dataStream);
 
     resetLatches();
+  }
+
+  @Before
+  public void before() {
+    allocationScheduler = newSingleThreadExecutor();
+    bufferManager = new PoolingByteBufferManager(allocationScheduler);
+    final ByteArrayInputStream dataStream = new ByteArrayInputStream(data.getBytes());
+    streamProvider = createStreamProvider(bufferSize, maxBufferSize, dataStream);
   }
 
   protected CursorStreamProvider createStreamProvider(int bufferSize, int maxBufferSize, ByteArrayInputStream dataStream) {
@@ -91,6 +102,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     streamProvider.close();
     executorService.shutdownNow();
     bufferManager.dispose();
+    allocationScheduler.shutdownNow();
   }
 
   @Test

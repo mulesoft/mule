@@ -8,16 +8,20 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Sink;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Delegate {@link Sink} that uses one of two {@link Sink}'s depending on if a transaction is in context or not.
  */
 final class TransactionalDelegateSink implements Sink, Disposable {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(TransactionalDelegateSink.class);
 
   private final Sink transactionalSink;
   private final Sink sink;
@@ -47,7 +51,7 @@ final class TransactionalDelegateSink implements Sink, Disposable {
 
   @Override
   public void dispose() {
-    disposeIfNeeded(transactionalSink, NOP_LOGGER);
-    disposeIfNeeded(sink, NOP_LOGGER);
+    disposeIfNeeded(transactionalSink, LOGGER);
+    disposeIfNeeded(sink, LOGGER);
   }
 }

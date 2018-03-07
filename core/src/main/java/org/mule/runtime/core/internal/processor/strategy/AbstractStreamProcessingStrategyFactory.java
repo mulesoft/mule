@@ -12,6 +12,7 @@ import static java.lang.Runtime.getRuntime;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
+import static java.time.Duration.ofMillis;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy.WaitStrategy.LITE_BLOCKING;
@@ -167,12 +168,16 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
       }
       return new ReactorSink(processor.sink(), () -> {
         long start = currentTimeMillis();
-        processor.awaitAndShutdown(shutdownTimeout, MILLISECONDS);
+        if (!processor.awaitAndShutdown(ofMillis(shutdownTimeout))) {
+          processor.forceShutdown();
+        }
         try {
           completionLatch.await(max(start - currentTimeMillis() + shutdownTimeout, 0l), MILLISECONDS);
         } catch (InterruptedException e) {
+          currentThread().interrupt();
           throw new MuleRuntimeException(e);
         }
+
       }, createOnEventConsumer(), bufferSize);
     }
 
