@@ -13,6 +13,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
@@ -92,29 +93,40 @@ public class OperationPolicyProcessor implements Processor {
         });
   }
 
+  private void manageError(PolicyStateId policyStateId, PrivilegedEvent operationEvent, MessagingException messagingException) {
+    CoreEvent.Builder builder = CoreEvent.builder(messagingException.getEvent());
+
+    // Remove variables that where added by the flow
+    for (String variable : messagingException.getEvent().getVariables().keySet()) {
+      if (operationEvent.getVariables().containsKey(variable)) {
+        builder.removeVariable(variable);
+      }
+    }
+
+    // Adding variables that where available before
+    policyStateHandler.getLatestState(policyStateId).ifPresent(lastEvent -> {
+      for (String variable : lastEvent.getVariables().keySet()) {
+        TypedValue value = lastEvent.getVariables().get(variable);
+        builder.addVariable(variable, value.getValue(), value.getDataType());
+      }
+    });
+
+    policyStateHandler.updateState(policyStateId, builder.build());
+
+    if (!messagingException.getFailingComponent().getLocation().getLocation().contains("/operation/")) {
+      // If the error was in the operation policy, then set the operation event to the messaging exception
+      // to have only the variables created in the operation, but with the corresponding error
+      CoreEvent.Builder replaceBuilder = CoreEvent.builder(operationEvent);
+      replaceBuilder.error(messagingException.getEvent().getError().get());
+      messagingException.setProcessedEvent(replaceBuilder.build());
+    }
+  }
+
   private Mono<PrivilegedEvent> executePolicyChain(PrivilegedEvent operationEvent, PolicyStateId policyStateId,
                                                    PrivilegedEvent policyEvent) {
 
     PolicyChain policyChain = policy.getPolicyChain();
-    policyChain.onChainError(t -> {
-      MessagingException messagingException = (MessagingException) t;
-      CoreEvent.Builder builder = CoreEvent.builder(messagingException.getEvent());
-      // Remove variables that where added by the flow
-      for (String variable : messagingException.getEvent().getVariables().keySet()) {
-        if (operationEvent.getVariables().containsKey(variable)) {
-          builder.removeVariable(variable);
-        }
-      }
-
-      if (!messagingException.getFailingComponent().getLocation().getLocation().contains("/operation/")) {
-        // If the error was in the operation policy, then set the operation event to the messaging exception
-        // to have only the variables created in the operation, but with the corresponding error
-        CoreEvent.Builder replaceBuilder = CoreEvent.builder(operationEvent);
-        replaceBuilder.error(messagingException.getEvent().getError().get());
-        messagingException.setProcessedEvent(replaceBuilder.build());
-      }
-      policyStateHandler.updateState(policyStateId, builder.build());
-    });
+    policyChain.onChainError(t -> manageError(policyStateId, operationEvent, (MessagingException) t));
 
     return just(policyEvent)
         .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
