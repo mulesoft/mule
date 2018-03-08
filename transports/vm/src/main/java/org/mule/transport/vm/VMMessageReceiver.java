@@ -32,7 +32,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.resource.spi.work.Work;
@@ -106,10 +105,10 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     protected void pollMessagesOutsideTransactions() throws Exception
     {
         ExecutionTemplate<MuleEvent> pt = createExecutionTemplate();
-        List<MuleMessage> messages = getMessages();
+        List messages = getMessages();
         if (messages != null && messages.size() > 0)
         {
-            for (MuleMessage message : messages)
+            for (Object message : messages)
             {
                 try
                 {
@@ -295,7 +294,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                 message = getMessage(queue, 0);
                 if (message != null)
                 {
-                    messages.add(new DefaultMuleMessage(message, null, (Map<String, Object>) null, null, endpoint.getMuleContext(), message.getDataType()));
+                    messages.add(new DefaultMuleMessage(message, endpoint.getMuleContext()));
                 }
             }
         }
