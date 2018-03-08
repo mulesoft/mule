@@ -20,6 +20,7 @@ import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.management.MBeanServer;
@@ -43,6 +44,8 @@ public class DefaultResourceReleaser implements ResourceReleaser {
   @Override
   public void release() {
     deregisterJdbcDrivers();
+
+    shutdownAwsIdleConnectionReaperThread();
 
     cleanUpResourceBundle();
   }
@@ -218,4 +221,43 @@ public class DefaultResourceReleaser implements ResourceReleaser {
       logger.warn("Unable to shutdown MySql's AbandonedConnectionCleanupThread", e);
     }
   }
+
+  /**
+   *  Shutdowns the AWS IdleConnectionReaper Thread if one is present, since it will cause a leak if not closed correctly.
+   */
+  private void shutdownAwsIdleConnectionReaperThread() {
+
+    Class<?> idleConnectionReaper;
+    try {
+      idleConnectionReaper = this.getClass().getClassLoader().loadClass("com.amazonaws.http.IdleConnectionReaper");
+      try {
+        Method registeredManagers = idleConnectionReaper.getMethod("getRegisteredConnectionManagers");
+        List<Object> httpClientConnectionManagers = (List<Object>) registeredManagers.invoke(null);
+        if (!httpClientConnectionManagers.isEmpty()) {
+          Method removeConnectionManager = idleConnectionReaper.getMethod("removeConnectionManager");
+          for (Object connectionManager : httpClientConnectionManagers) {
+            boolean removed = (boolean) removeConnectionManager.invoke(null, connectionManager);
+            if (!removed && logger.isDebugEnabled()) {
+              logger
+                  .debug(format("Unable to unregister HttpClientConnectionManager instance [%s] associated to AWS's IdleConnectionReaperThread",
+                                connectionManager));
+            }
+          }
+        }
+
+      } finally {
+        Method shutdown = idleConnectionReaper.getMethod("shutdown");
+        shutdown.invoke(null);
+      }
+
+    } catch (ClassNotFoundException e) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("No AWS's IdleConnectionReaperThread found in current classpath", e);
+      }
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      logger.warn("Unable to shutdown AWS's IdleConnectionReaperThread, an error occurred: " + e.getMessage(), e);
+    }
+  }
+
 }
