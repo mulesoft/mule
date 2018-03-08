@@ -6,6 +6,7 @@
  */
 package org.mule.transport.vm;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -108,16 +109,16 @@ public class VMQueueTestCase extends AbstractServiceAndFlowTestCase
     public void testPassThroughKeepsMimeType() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        Set<String> polos = new HashSet<String>(Arrays.asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
-        Iterator<String> people = polos.iterator();
         SimpleDataType<Object> customDataType = new SimpleDataType<>(String.class, "application/custom");
-        while (people.hasNext())
+
+        Set<String> people = new HashSet<String>(asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
+        for (String polo : people)
         {
-            DefaultMuleMessage message = new DefaultMuleMessage(people.next(), null, (Map<String, Object>) null, null, muleContext, customDataType);
+            DefaultMuleMessage message = new DefaultMuleMessage(polo, null, (Map<String, Object>) null, null, muleContext, customDataType);
             client.dispatch("vm://entry", message);
         }
         
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < people.size(); ++i)
         {
             MuleMessage response = client.request("queue", WAIT);
             assertNotNull("Response is null", response);
