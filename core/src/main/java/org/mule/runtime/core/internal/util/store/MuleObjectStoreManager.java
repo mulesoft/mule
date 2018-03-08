@@ -24,9 +24,9 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
+import org.mule.runtime.api.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.store.PartitionableExpirableObjectStore;
 
 import org.slf4j.Logger;
 
@@ -34,7 +34,6 @@ import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ScheduledFuture;
 
 import javax.inject.Inject;
 
@@ -48,7 +47,7 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
   private MuleContext muleContext;
 
   private final ConcurrentMap<String, ObjectStore<?>> stores = new ConcurrentHashMap<>();
-  private final ConcurrentMap<String, ScheduledFuture<?>> monitors = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Scheduler> expirationSchedulers = new ConcurrentHashMap<>();
 
   private String baseTransientStoreKey = BASE_IN_MEMORY_OBJECT_STORE_KEY;
   private String basePersistentStoreKey = BASE_PERSISTENT_OBJECT_STORE_KEY;
@@ -57,7 +56,6 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
   private ObjectStore<?> basePersistentStore;
   private ObjectStore<?> baseTransientPartition;
   private ObjectStore<?> basePersistentPartition;
-  private Scheduler scheduler;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -70,9 +68,6 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
     } catch (ObjectStoreException e) {
       throw new InitialisationException(e, this);
     }
-
-    scheduler = schedulerService
-        .customScheduler(muleContext.getSchedulerBaseConfig().withName("ObjectStoreManager-Monitor").withMaxConcurrentTasks(1));
   }
 
   private ObjectStore<?> lookupBaseStore(String key, String baseType) throws InitialisationException {
@@ -84,9 +79,10 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
 
   @Override
   public void dispose() {
-    if (scheduler != null) {
+    for (Scheduler scheduler : expirationSchedulers.values()) {
       scheduler.stop();
     }
+    expirationSchedulers.clear();
 
     basePersistentPartition = null;
     baseTransientPartition = null;
@@ -193,14 +189,16 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
                                                                                     T store,
                                                                                     ObjectStoreSettings settings) {
     if (baseStore instanceof PartitionableExpirableObjectStore) {
-      ScheduledFuture<?> future = scheduler
-          .scheduleWithFixedDelay(new Monitor(name,
-                                              (PartitionableExpirableObjectStore) baseStore,
-                                              settings.getEntryTTL().orElse(0L),
-                                              settings.getMaxEntries().orElse(UNBOUNDED)),
-                                  0,
-                                  settings.getExpirationInterval(), MILLISECONDS);
-      monitors.put(name, future);
+      Scheduler scheduler = schedulerService.customScheduler(muleContext.getSchedulerBaseConfig()
+          .withName("ObjectStoreManager-Monitor-" + name).withMaxConcurrentTasks(1));
+
+      scheduler.scheduleWithFixedDelay(new Monitor(name,
+                                                   (PartitionableExpirableObjectStore) baseStore,
+                                                   settings.getEntryTTL().orElse(0L),
+                                                   settings.getMaxEntries().orElse(UNBOUNDED)),
+                                       0,
+                                       settings.getExpirationInterval(), MILLISECONDS);
+      expirationSchedulers.put(name, scheduler);
       return store;
     } else {
       MonitoredObjectStoreWrapper monObjectStore;
@@ -244,9 +242,9 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
         String partitionName = partition.getPartitionName();
         partition.getBaseStore().disposePartition(partitionName);
 
-        ScheduledFuture<?> future = monitors.remove(partitionName);
-        if (future != null) {
-          future.cancel(false);
+        Scheduler scheduler = expirationSchedulers.remove(partitionName);
+        if (scheduler != null) {
+          scheduler.stop();
         }
       } else {
         try {
@@ -293,7 +291,7 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
   }
 
   int getMonitorsCount() {
-    return monitors.size();
+    return expirationSchedulers.size();
   }
 
   public void setBasePersistentStoreKey(String basePersistentStoreKey) {

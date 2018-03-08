@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.util.store;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
@@ -32,6 +33,7 @@ import org.mule.runtime.core.internal.store.PartitionedInMemoryObjectStore;
 import org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.size.SmallTest;
@@ -44,6 +46,8 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.Serializable;
 import java.util.NoSuchElementException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SmallTest
 public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
@@ -58,6 +62,9 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
 
   private MuleContextWithRegistries muleContext;
   private MuleObjectStoreManager storeManager;
+
+  private volatile CountDownLatch expireDelayLatch = new CountDownLatch(0);
+  private AtomicInteger expires = new AtomicInteger();
 
   @Rule
   public TemporaryFolder tempWorkDir = new TemporaryFolder();
@@ -94,6 +101,34 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
   @Test
   public void ensurePersistentPartitionIsCleared() throws ObjectStoreException, InitialisationException {
     ensurePartitionIsCleared(true);
+  }
+
+  @Test
+  public void expireTwoStoresInParallel() throws ObjectStoreException, InitialisationException, InterruptedException {
+    when(muleContext.isPrimaryPollingInstance()).thenReturn(true);
+    expireDelayLatch = new CountDownLatch(1);
+
+    addJavaSerializerToMockMuleContext(muleContext);
+    storeManager.initialise();
+
+    storeManager.createObjectStore(TEST_PARTITION_NAME + "_1", ObjectStoreSettings.builder()
+        .persistent(false)
+        .entryTtl(10L)
+        .expirationInterval(10L)
+        .build());
+
+    storeManager.createObjectStore(TEST_PARTITION_NAME + "_2", ObjectStoreSettings.builder()
+        .persistent(false)
+        .entryTtl(10L)
+        .expirationInterval(10L)
+        .build());
+
+    new PollingProber(POLLING_TIMEOUT, POLLING_DELAY).check(new JUnitLambdaProbe(() -> {
+      assertThat(expires.get(), is(2));
+      return true;
+    }));
+
+    expireDelayLatch.countDown();
   }
 
   private void ensurePartitionIsCleared(boolean isPersistent) throws ObjectStoreException, InitialisationException {
@@ -187,10 +222,35 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
   }
 
   private PartitionableObjectStore<?> createTransientPartitionableObjectStore() {
-    return new PartitionedInMemoryObjectStore<>();
+    return new PartitionedInMemoryObjectStore() {
+
+      @Override
+      public void expire(long entryTTL, int maxEntries, String partitionName) throws ObjectStoreException {
+        expires.incrementAndGet();
+        super.expire(entryTTL, maxEntries, partitionName);
+        expireDelay();
+      }
+    };
   }
 
   private PartitionableObjectStore<?> createPersistentPartitionableObjectStore(MuleContext muleContext) {
-    return new PartitionedPersistentObjectStore<>(muleContext);
+    return new PartitionedPersistentObjectStore(muleContext) {
+
+      @Override
+      public void expire(long entryTTL, int maxEntries, String partitionName) throws ObjectStoreException {
+        expires.incrementAndGet();
+        super.expire(entryTTL, maxEntries, partitionName);
+        expireDelay();
+      }
+    };
+  }
+
+  private void expireDelay() {
+    try {
+      expireDelayLatch.await();
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
+      return;
+    }
   }
 }
