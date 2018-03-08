@@ -110,7 +110,7 @@ public class DefaultStreamingHelper implements StreamingHelper {
     return factory.of(event, value);
   }
 
-  private Object resolveCursorTypedValueProvider(TypedValue value) {
+  private TypedValue resolveCursorTypedValueProvider(TypedValue value) {
     Object resolvedValue = resolveCursorProvider(value.getValue());
     if (resolvedValue != value.getValue()) {
       return new TypedValue(resolvedValue, value.getDataType());
