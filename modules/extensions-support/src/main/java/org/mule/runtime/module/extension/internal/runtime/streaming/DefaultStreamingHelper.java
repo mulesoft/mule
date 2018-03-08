@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -85,6 +87,8 @@ public class DefaultStreamingHelper implements StreamingHelper {
       value = resolveCursorStreamProvider((InputStream) value);
     } else if (value instanceof Iterator) {
       value = resolveCursorIteratorProvider((Iterator) value);
+    } else if (value instanceof TypedValue) {
+      value = resolveCursorTypedValueProvider((TypedValue) value);
     }
 
     return value;
@@ -104,6 +108,14 @@ public class DefaultStreamingHelper implements StreamingHelper {
         : streamingManager.forObjects().getDefaultCursorProviderFactory();
 
     return factory.of(event, value);
+  }
+
+  private Object resolveCursorTypedValueProvider(TypedValue value) {
+    Object resolvedValue = resolveCursorProvider(value.getValue());
+    if (resolvedValue != value.getValue()) {
+      return new TypedValue(resolvedValue, value.getDataType());
+    }
+    return value;
   }
 
   private <K> Map<K, Object> resolveMap(Map<K, Object> map, boolean recursive, Function<Object, Object> valueMapper) {
