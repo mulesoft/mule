@@ -123,7 +123,10 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     mockMuleContext.getInjector().inject(this);
 
     when(locator.find(any(Location.class))).thenReturn(of(mock(Flow.class)));
+    when(locator.find(Location.builder().globalName("flow").build())).thenReturn(of(callerFlow));
     when(callerFlow.getProcessingStrategy()).thenReturn(callerFlowProcessingStrategy);
+
+    when(callerFlowProcessingStrategy.onProcessor(any())).thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
   }
 
   @Test
