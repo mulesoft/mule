@@ -45,6 +45,7 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
     this.name = name;
   }
 
+  @Override
   public void setProcessingStrategy(ProcessingStrategy processingStrategy) {
     this.processingStrategy = processingStrategy;
   }
