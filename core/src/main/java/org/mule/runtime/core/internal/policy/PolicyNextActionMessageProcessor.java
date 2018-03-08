@@ -26,6 +26,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -102,6 +103,14 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
               .doOnSuccessOrError(notificationHelper.successOrErrorNotification(AFTER_NEXT)
                   .andThen((ev, t) -> pushAfterNextFlowStackElement().accept(event)))
               .onErrorResume(MessagingException.class, t -> {
+                // Adding the variables that were available form the operation policy
+                CoreEvent.Builder builder = CoreEvent.builder(t.getEvent());
+                for (String variable : event.getVariables().keySet()) {
+                  TypedValue value = event.getVariables().get(variable);
+                  builder.addVariable(variable, value.getValue(), value.getDataType());
+                }
+                t.setProcessedEvent(builder.build());
+
                 // Given we've used child context to ensure AFTER_NEXT notifications are fired at exactly the right time we need
                 // to propagate the error to parent context manually.
                 ((BaseEventContext) event.getContext())

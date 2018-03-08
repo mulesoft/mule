@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.policy;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -48,6 +49,7 @@ import reactor.core.publisher.Mono;
 public class OperationPolicyProcessor implements Processor {
 
   private static final Logger LOGGER = getLogger(OperationPolicyProcessor.class);
+  private static final String OPERATION_LOCATION = "/operation/";
 
   private final Policy policy;
   private final PolicyStateHandler policyStateHandler;
@@ -113,13 +115,17 @@ public class OperationPolicyProcessor implements Processor {
 
     policyStateHandler.updateState(policyStateId, builder.build());
 
-    if (!messagingException.getFailingComponent().getLocation().getLocation().contains("/operation/")) {
-      // If the error was in the operation policy, then set the operation event to the messaging exception
+    if (errorIsNotFromOperationPolicy(messagingException)) {
+      // If the error was not in the operation policy, then set the operation event to the messaging exception
       // to have only the variables created in the operation, but with the corresponding error
       CoreEvent.Builder replaceBuilder = CoreEvent.builder(operationEvent);
       replaceBuilder.error(messagingException.getEvent().getError().get());
       messagingException.setProcessedEvent(replaceBuilder.build());
     }
+  }
+
+  private static boolean errorIsNotFromOperationPolicy(MessagingException messagingException) {
+    return !messagingException.getFailingComponent().getLocation().getLocation().contains(OPERATION_LOCATION);
   }
 
   private Mono<PrivilegedEvent> executePolicyChain(PrivilegedEvent operationEvent, PolicyStateId policyStateId,
