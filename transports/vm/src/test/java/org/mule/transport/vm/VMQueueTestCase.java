@@ -6,23 +6,32 @@
  */
 package org.mule.transport.vm;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
+import static org.mule.api.transformer.DataType.STRING_DATA_TYPE;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
+import org.mule.api.transformer.DataType;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transformer.types.SimpleDataType;
+
+import junit.framework.Assert;
 
 public class VMQueueTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -95,6 +104,28 @@ public class VMQueueTestCase extends AbstractServiceAndFlowTestCase
         }
     }
 
+    @Test
+    public void testPassThroughKeepsMimeType() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        Set<String> polos = new HashSet<String>(Arrays.asList(new String[]{"Marco", "Niccolo", "Maffeo"}));
+        Iterator<String> people = polos.iterator();
+        SimpleDataType<Object> customDataType = new SimpleDataType<>(String.class, "application/custom");
+        while (people.hasNext())
+        {
+            DefaultMuleMessage message = new DefaultMuleMessage(people.next(), null, (Map<String, Object>) null, null, muleContext, customDataType);
+            client.dispatch("vm://entry", message);
+        }
+        
+        for (int i = 0; i < 3; ++i)
+        {
+            MuleMessage response = client.request("queue", WAIT);
+            assertNotNull("Response is null", response);
+            
+            assertThat(response.getDataType().getMimeType(), is(customDataType.getMimeType()));
+        }
+    }
+    
     @Test
     public void testNamedEndpoint() throws Exception
     {
