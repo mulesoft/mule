@@ -14,6 +14,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_MAX_MEMORY;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -96,7 +97,8 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
           // If this code runs in the same thread, it may be a 'custom' scheduler (for instance, a HTTP requester selector) and
           // the created pool evictor thread will have that custom scheduler thread group. This will fail the destruction of the
           // custom thread group when the app is undeployed, and that will cause a memory leak.
-          return allocationScheduler.submit(() -> new BufferPool(capacity)).get();
+          return withContextClassLoader(PoolingByteBufferManager.class.getClassLoader(),
+                                        () -> allocationScheduler.submit(() -> new BufferPool(capacity)).get());
         }
       });
 
