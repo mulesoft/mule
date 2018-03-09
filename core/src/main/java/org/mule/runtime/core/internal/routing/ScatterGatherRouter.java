@@ -15,6 +15,7 @@ import static org.mule.runtime.core.internal.routing.FirstSuccessfulRoutingStrat
 import static reactor.core.publisher.Flux.fromIterable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
 
@@ -36,7 +37,7 @@ import org.reactivestreams.Publisher;
  *
  * @since 3.5.0
  */
-public class ScatterGatherRouter extends AbstractForkJoinRouter {
+public class ScatterGatherRouter extends AbstractForkJoinRouter implements Router {
 
   private List<MessageProcessorChain> routes = emptyList();
 

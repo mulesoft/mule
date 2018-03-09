@@ -2571,6 +2571,58 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:element name="split-aggregate" substitutionGroup="abstract-routing-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Splits the incoming message using the collection DataWeave script processing each part in parallel.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractRoutingMessageProcessorType">
+                    <xsd:sequence>
+                        <xsd:element name="collection" type="xsd:string" minOccurs="0">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    DataWeave script used to evaluate the collection of parts to be processed.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                    <xsd:attribute name="timeout" type="substitutableLong">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Sets a timeout in milliseconds for each route. The default behaviour is that of no timeout.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="maxConcurrency" type="substitutableInt">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The maximum concurrency. This value determines the maximum level of parallelism that will be used by this router. By default all routes will run in parallel (assuming available resources) but this can be limited or sequential behaviour achieved via the use of this attribute.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="target" type="substitutableString">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Variable where to save processed payload
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="targetValue" type="expressionString" default="#[payload]">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
     <xsd:element name="abstract-fork-join-strategy" abstract="true">
         <xsd:annotation>
             <xsd:documentation>

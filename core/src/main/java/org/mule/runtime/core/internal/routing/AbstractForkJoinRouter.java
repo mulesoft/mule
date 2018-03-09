@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.privileged.processor.Router;
+import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 
@@ -43,7 +44,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<MessageProcessorChain> implements Router {
+public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<MessageProcessorChain> implements Scope {
 
   @Inject
   private SchedulerService schedulerService;
@@ -51,7 +52,6 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   @Inject
   private ConfigurationComponentLocator componentLocator;
 
-  private ProcessingStrategy processingStrategy;
   private ForkJoinStrategyFactory forkJoinStrategyFactory;
   private ForkJoinStrategy forkJoinStrategy;
   private long timeout = Long.MAX_VALUE;
@@ -102,9 +102,6 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    processingStrategy = getFromAnnotatedObject(componentLocator, this)
-        .map(flow -> flow.getProcessingStrategy())
-        .orElse(DIRECT_PROCESSING_STRATEGY_INSTANCE);
     expressionManager = muleContext.getExpressionManager();
     timeoutScheduler = schedulerService.cpuLightScheduler();
     timeoutErrorType = muleContext.getErrorTypeRepository().getErrorType(TIMEOUT).get();
@@ -112,8 +109,14 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
     forkJoinStrategyFactory = forkJoinStrategyFactory != null ? forkJoinStrategyFactory : getDefaultForkJoinStrategyFactory();
 
     forkJoinStrategy =
-        forkJoinStrategyFactory.createForkJoinStrategy(processingStrategy, maxConcurrency,
+        forkJoinStrategyFactory.createForkJoinStrategy(resolveProcessingStrategy(), maxConcurrency,
                                                        isDelayErrors(), timeout, timeoutScheduler, timeoutErrorType);
+  }
+
+  protected ProcessingStrategy resolveProcessingStrategy() {
+    return getFromAnnotatedObject(componentLocator, this)
+        .map(flow -> flow.getProcessingStrategy())
+        .orElse(DIRECT_PROCESSING_STRATEGY_INSTANCE);
   }
 
   @Override
