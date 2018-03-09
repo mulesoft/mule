@@ -427,7 +427,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     if (isRunning()) {
       super.close();
     }
-    beanDefinitionFactory.destroy();
   }
 
   public static Resource[] convert(ConfigResource[] resources) {

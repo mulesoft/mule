@@ -7,8 +7,8 @@
 package org.mule.runtime.config.dsl.spring;
 
 import static java.util.Optional.empty;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -43,7 +43,7 @@ public class ObjectFactoryClassRepositoryTestCase {
     objectFactory = objectFactoryClass.newInstance();
     assertThat(((SmartFactoryBean) objectFactory).isSingleton(), is(true));
 
-    assertThat(firstProxyGenerated, equalTo(objectFactory.getClass()));
+    assertThat(firstProxyGenerated, sameInstance(objectFactory.getClass()));
   }
 
   public Class<ObjectFactory> getObjectFactoryClass() {
