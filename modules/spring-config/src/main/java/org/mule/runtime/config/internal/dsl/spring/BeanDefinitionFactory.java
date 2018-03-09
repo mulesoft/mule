@@ -462,7 +462,5 @@ public class BeanDefinitionFactory {
   /**
    * Release resources from the bean factory.
    */
-  public void destroy() {
-    objectFactoryClassRepository.destroy();
-  }
+  public void destroy() {}
 }
