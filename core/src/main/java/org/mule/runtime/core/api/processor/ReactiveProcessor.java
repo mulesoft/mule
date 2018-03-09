@@ -8,14 +8,14 @@ package org.mule.runtime.core.api.processor;
 
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.api.scheduler.SchedulerService;
+
+import org.reactivestreams.Publisher;
 
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Processes streams of {@link CoreEvent}'s using a functional approach based on
@@ -30,7 +30,9 @@ public interface ReactiveProcessor extends Function<Publisher<CoreEvent>, Publis
    * In order for Mule to determine the best way to execute different processors based on the chosen {@link ProcessingStrategy} it
    * needs to know the type of work the message processor will be performing and if it is {@link ProcessingType#BLOCKING},
    * {@link ProcessingType#CPU_INTENSIVE} intensive or neither ({@link ProcessingType#CPU_LITE}).
-   *
+   * <p>
+   * This method must return the same value for the same processor every time.
+   * 
    * @return the processing type for this processor.
    */
   default ProcessingType getProcessingType() {

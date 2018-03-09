@@ -87,7 +87,7 @@ public final class MessageUtils {
                                   CursorProviderFactory cursorProviderFactory,
                                   CoreEvent event) {
     Object value = streamingContent(result.getOutput(), cursorProviderFactory, event);
-    return toMessage(result, mediaType, DataType.fromObject(value), value);
+    return toMessage(result, builder().fromObject(value).mediaType(mediaType).build(), value);
   }
 
   /**
@@ -107,7 +107,7 @@ public final class MessageUtils {
                                   CoreEvent event,
                                   DataType dataType) {
     Object value = streamingContent(result.getOutput(), cursorProviderFactory, event);
-    return toMessage(result, mediaType, dataType, value);
+    return toMessage(result, builder(dataType).mediaType(mediaType).build(), value);
   }
 
   /**
@@ -146,10 +146,8 @@ public final class MessageUtils {
     }
   }
 
-  private static Message toMessage(Result<?, ?> result, MediaType mediaType, DataType dataType, Object value) {
-    Message.Builder builder = Message.builder()
-        .payload(new TypedValue<>(value, builder(dataType).mediaType(mediaType).build(),
-                                  result.getLength()));
+  private static Message toMessage(Result<?, ?> result, DataType dataType, Object value) {
+    Message.Builder builder = Message.builder().payload(new TypedValue<>(value, dataType, result.getLength()));
 
     result.getAttributes().ifPresent(builder::attributesValue);
     result.getAttributesMediaType().ifPresent(builder::attributesMediaType);

@@ -17,11 +17,11 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Optional;
-
-import org.junit.Test;
+import java.util.OptionalLong;
 
 public class TypedValueTestCase {
 
@@ -33,21 +33,21 @@ public class TypedValueTestCase {
   public void string() {
     TypedValue<String> typedValue = of(STRING_VALUE);
     assertThat(typedValue.getLength().isPresent(), is(true));
-    assertThat(typedValue.getLength().get(), is((long) STRING_VALUE.length()));
+    assertThat(typedValue.getLength().getAsLong(), is((long) STRING_VALUE.length()));
   }
 
   @Test
   public void stringUTF16() {
     TypedValue<String> typedValue = new TypedValue<>(STRING_VALUE, builder(DataType.STRING).charset(UTF_16).build());
     assertThat(typedValue.getLength().isPresent(), is(true));
-    assertThat(typedValue.getLength().get(), is((long) STRING_VALUE.getBytes(UTF_16).length));
+    assertThat(typedValue.getLength().getAsLong(), is((long) STRING_VALUE.getBytes(UTF_16).length));
   }
 
   @Test
   public void byteArray() {
     TypedValue<byte[]> typedValue = of(BYTE_ARRAY_VALUE);
     assertThat(typedValue.getLength().isPresent(), is(true));
-    assertThat(typedValue.getLength().get(), is((long) BYTE_ARRAY_VALUE.length));
+    assertThat(typedValue.getLength().getAsLong(), is((long) BYTE_ARRAY_VALUE.length));
   }
 
   @Test
@@ -58,9 +58,9 @@ public class TypedValueTestCase {
   @Test
   public void inputStreamWithLength() {
     TypedValue<InputStream> typedValue =
-        new TypedValue<>(INPUT_STREAM_VALUE, OBJECT, Optional.of((long) BYTE_ARRAY_VALUE.length));
+        new TypedValue<>(INPUT_STREAM_VALUE, OBJECT, OptionalLong.of(BYTE_ARRAY_VALUE.length));
     assertThat(typedValue.getLength().isPresent(), is(true));
-    assertThat(typedValue.getLength().get(), is((long) BYTE_ARRAY_VALUE.length));
+    assertThat(typedValue.getLength().getAsLong(), is((long) BYTE_ARRAY_VALUE.length));
   }
 
   @Test
