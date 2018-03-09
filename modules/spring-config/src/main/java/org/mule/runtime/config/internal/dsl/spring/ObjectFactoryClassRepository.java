@@ -6,11 +6,8 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static java.util.Objects.hash;
-import static java.util.Optional.empty;
 import static org.springframework.cglib.proxy.Enhancer.registerStaticCallbacks;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
@@ -21,11 +18,7 @@ import org.springframework.cglib.proxy.Callback;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -37,16 +30,10 @@ import java.util.function.Supplier;
  * The created {@link org.springframework.beans.factory.FactoryBean} is the one that receives the injection of fields declared by
  * the {@link ObjectFactory}. It also provides information about the instance type that is creating since it's used to know the
  * order in which beans must be initialised based on the dependencies between them.
- * <p>
- * The repository has a cache of the created classes based on the configuration of the {@link ComponentBuildingDefinition} and the
- * component configuration.
  *
  * @since 4.0
  */
 public class ObjectFactoryClassRepository {
-
-  private Cache<ComponentBuildingDefinition, Class<ObjectFactory>> objectFactoryClassCache = CacheBuilder.newBuilder()
-      .removalListener(notification -> registerStaticCallbacks((Class<ObjectFactory>) notification.getValue(), null)).build();
 
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the
@@ -65,19 +52,8 @@ public class ObjectFactoryClassRepository {
                                                     Class createdObjectType,
                                                     Supplier<Boolean> isLazyInitFunction,
                                                     Optional<Consumer<Object>> instancePostCreationFunctionOptional) {
-    try {
-      if (instancePostCreationFunctionOptional.isPresent()) {
-        return getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType, createdObjectType, isLazyInitFunction,
-                                            instancePostCreationFunctionOptional);
-      } else {
-        // instancePostCreationFunctionOptional is used within the intercepted method so we can't use a cache.
-        return objectFactoryClassCache.get(componentBuildingDefinition,
-                                           () -> getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType,
-                                                                              createdObjectType, isLazyInitFunction, empty()));
-      }
-    } catch (ExecutionException e) {
-      throw new MuleRuntimeException(e);
-    }
+    return getObjectFactoryDynamicClass(componentBuildingDefinition, objectFactoryType, createdObjectType, isLazyInitFunction,
+                                        instancePostCreationFunctionOptional);
   }
 
   private Class<ObjectFactory> getObjectFactoryDynamicClass(final ComponentBuildingDefinition componentBuildingDefinition,
@@ -133,14 +109,6 @@ public class ObjectFactoryClassRepository {
         }
     });
     return factoryBeanClass;
-  }
-
-  /**
-   * Removes all registered callbacks create for each created {@code FactoryBean} class. This is a must since it prevents a memory
-   * leak in CGLIB
-   */
-  public void destroy() {
-    objectFactoryClassCache.invalidateAll();
   }
 
 }
