@@ -29,6 +29,7 @@ import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -37,15 +38,15 @@ import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import org.junit.Test;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.OptionalLong;
 
 import javax.activation.DataHandler;
-
-import org.junit.Test;
 
 public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
@@ -318,13 +319,13 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     Apple apple = new Apple();
     long appleSize = 111;
     Message message =
-        new DefaultMessageBuilder().payload(new TypedValue(apple, fromObject(apple), Optional.of(appleSize))).build();
+        new DefaultMessageBuilder().payload(new TypedValue(apple, fromObject(apple), OptionalLong.of(appleSize))).build();
     Message copy = new DefaultMessageBuilder(message).build();
 
     assertThat(copy.getPayload(), is(message.getPayload()));
     assertThat(copy.getAttributes(), is(message.getAttributes()));
-    assertThat(message.getPayload().getLength().get(), is(appleSize));
-    assertThat(copy.getPayload().getLength().get(), is(appleSize));
+    assertThat(message.getPayload().getByteLength().getAsLong(), is(appleSize));
+    assertThat(copy.getPayload().getByteLength().getAsLong(), is(appleSize));
   }
 
   private Message createTestMessage() {

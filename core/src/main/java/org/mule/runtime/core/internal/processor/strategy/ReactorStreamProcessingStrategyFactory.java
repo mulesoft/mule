@@ -17,10 +17,10 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.api.scheduler.SchedulerService;
 
 import java.util.function.Supplier;
 
@@ -81,10 +81,13 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
+      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
       if (maxConcurrency > subscribers) {
-        return publisher -> from(publisher).parallel(parallelism)
-            .runOn(fromExecutorService(decorateScheduler(getCpuLightScheduler())))
-            .composeGroup(pipeline);
+        return publisher -> {
+          return from(publisher).parallel(parallelism)
+              .runOn(scheduler)
+              .composeGroup(pipeline);
+        };
       } else {
         return super.onPipeline(pipeline);
       }
@@ -92,9 +95,12 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-        return publisher -> from(publisher).transform(processor).parallel(parallelism)
-            .runOn(fromExecutorService(decorateScheduler(getCpuLightScheduler())));
+        return publisher -> {
+          return from(publisher).transform(processor).parallel(parallelism)
+              .runOn(scheduler);
+        };
       } else {
         return super.onProcessor(processor);
       }
