@@ -9,12 +9,10 @@ package org.mule.runtime.core.internal.policy;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
@@ -24,10 +22,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import org.reactivestreams.Publisher;
-
 import java.util.Optional;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
@@ -49,7 +46,6 @@ import reactor.core.publisher.Mono;
 public class OperationPolicyProcessor implements Processor {
 
   private static final Logger LOGGER = getLogger(OperationPolicyProcessor.class);
-  private static final String OPERATION_LOCATION = "/operation/";
 
   private final Policy policy;
   private final PolicyStateHandler policyStateHandler;
@@ -89,43 +85,16 @@ public class OperationPolicyProcessor implements Processor {
                   .orElseGet(() -> PrivilegedEvent.builder(operationEvent.getContext()).message(of(null)).build());
           policyStateHandler.updateState(policyStateId, variablesProviderEvent);
           PrivilegedEvent policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
-          Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent);
+          Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent, policyStateId);
           policyStateHandler.updateNextOperation(policyStateId.getExecutionIdentifier(), operationCall);
           return executePolicyChain(operationEvent, policyStateId, policyEvent);
         });
   }
 
   private void manageError(PolicyStateId policyStateId, PrivilegedEvent operationEvent, MessagingException messagingException) {
-    CoreEvent.Builder builder = CoreEvent.builder(messagingException.getEvent());
-
-    // Remove variables that where added by the flow
-    for (String variable : messagingException.getEvent().getVariables().keySet()) {
-      if (operationEvent.getVariables().containsKey(variable)) {
-        builder.removeVariable(variable);
-      }
-    }
-
-    // Adding variables that where available before
-    policyStateHandler.getLatestState(policyStateId).ifPresent(lastEvent -> {
-      for (String variable : lastEvent.getVariables().keySet()) {
-        TypedValue value = lastEvent.getVariables().get(variable);
-        builder.addVariable(variable, value.getValue(), value.getDataType());
-      }
-    });
-
-    policyStateHandler.updateState(policyStateId, builder.build());
-
-    if (errorIsNotFromOperationPolicy(messagingException)) {
-      // If the error was not in the operation policy, then set the operation event to the messaging exception
-      // to have only the variables created in the operation, but with the corresponding error
-      CoreEvent.Builder replaceBuilder = CoreEvent.builder(operationEvent);
-      replaceBuilder.error(messagingException.getEvent().getError().get());
-      messagingException.setProcessedEvent(replaceBuilder.build());
-    }
-  }
-
-  private static boolean errorIsNotFromOperationPolicy(MessagingException messagingException) {
-    return !messagingException.getFailingComponent().getLocation().getLocation().contains(OPERATION_LOCATION);
+    policyStateHandler.updateState(policyStateId, messagingException.getEvent());
+    PrivilegedEvent newEvent = policyEventConverter.createEvent((PrivilegedEvent) messagingException.getEvent(), operationEvent);
+    messagingException.setProcessedEvent(newEvent);
   }
 
   private Mono<PrivilegedEvent> executePolicyChain(PrivilegedEvent operationEvent, PolicyStateId policyStateId,
@@ -146,7 +115,8 @@ public class OperationPolicyProcessor implements Processor {
                                      getMessageAttributesAsString(event), "After operation"));
   }
 
-  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, PrivilegedEvent operationEvent) {
+  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, PrivilegedEvent operationEvent,
+                                                              PolicyStateId policyStateId) {
     return new Processor() {
 
       @Override
@@ -159,7 +129,6 @@ public class OperationPolicyProcessor implements Processor {
         return from(publisher)
             .cast(PrivilegedEvent.class)
             .flatMap(policyExecuteNextEvent -> {
-              PolicyStateId policyStateId = new PolicyStateId(policyExecuteNextEvent.getContext().getId(), policy.getPolicyId());
               policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);
               return just(policyExecuteNextEvent)
                   .map(event -> policyEventConverter.createEvent(event, operationEvent))
@@ -182,7 +151,7 @@ public class OperationPolicyProcessor implements Processor {
 
   private void logPolicy(String eventId, String policyName, String message, String startingMessage) {
     if (LOGGER.isTraceEnabled()) {
-      //TODO Remove event id when first policy generates it. MULE-14455
+      // TODO Remove event id when first policy generates it. MULE-14455
       LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + "\nPolicy:" + policyName + "\n" + message);
     }
   }

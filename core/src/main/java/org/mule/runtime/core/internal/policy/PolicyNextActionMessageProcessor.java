@@ -26,24 +26,25 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
+import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * Next-operation message processor implementation.
@@ -64,6 +65,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private MuleContext muleContext;
 
   private PolicyNotificationHelper notificationHelper;
+
+  private PolicyEventConverter policyEventConverter = new PolicyEventConverter();
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
@@ -103,13 +106,12 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
               .doOnSuccessOrError(notificationHelper.successOrErrorNotification(AFTER_NEXT)
                   .andThen((ev, t) -> pushAfterNextFlowStackElement().accept(event)))
               .onErrorResume(MessagingException.class, t -> {
-                // Adding the variables that were available form the operation policy
-                CoreEvent.Builder builder = CoreEvent.builder(t.getEvent());
-                for (String variable : event.getVariables().keySet()) {
-                  TypedValue value = event.getVariables().get(variable);
-                  builder.addVariable(variable, value.getValue(), value.getDataType());
-                }
-                t.setProcessedEvent(builder.build());
+
+                PolicyStateId policyStateId =
+                    new PolicyStateId(event.getContext().getCorrelationId(), muleContext.getConfiguration().getId());
+                policyStateHandler.getLatestState(policyStateId)
+                    .ifPresent(latestStateEvent -> t.setProcessedEvent(policyEventConverter
+                        .createEvent((PrivilegedEvent) t.getEvent(), (PrivilegedEvent) latestStateEvent)));
 
                 // Given we've used child context to ensure AFTER_NEXT notifications are fired at exactly the right time we need
                 // to propagate the error to parent context manually.
