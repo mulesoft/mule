@@ -7,10 +7,15 @@
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -23,6 +28,7 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,4 +73,21 @@ public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase 
 
     assertThat(cursor.hasNext(), is(false));
   }
+
+  @Test
+  public void resolveStreamableTypedValueProvider() {
+    TypedValue typedValue = new TypedValue(new ByteArrayInputStream("Apple".getBytes()), DataType.INPUT_STREAM);
+    TypedValue repeatableTypedValue = (TypedValue) streamingHelper.resolveCursorProvider(typedValue);
+
+    assertThat(repeatableTypedValue.getValue(), instanceOf(CursorProvider.class));
+  }
+
+  @Test
+  public void resolveNonStreamableTypedValueProvider() {
+    TypedValue typedValue = new TypedValue("Apple", DataType.STRING);
+    TypedValue repeatableTypedValue = (TypedValue) streamingHelper.resolveCursorProvider(typedValue);
+
+    assertThat(repeatableTypedValue.getValue(), not(instanceOf(CursorProvider.class)));
+  }
+
 }
