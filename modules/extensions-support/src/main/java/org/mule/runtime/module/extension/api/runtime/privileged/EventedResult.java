@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.api.runtime.privileged;
 
 import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -14,6 +15,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Optional;
+import java.util.OptionalLong;
 
 /**
  * An operation execution {@link Result} that is created based on the resulting {@link CoreEvent}
@@ -102,5 +104,10 @@ public final class EventedResult<T, A> extends Result<T, A> {
   @Override
   public Optional<Long> getLength() {
     return event.getMessage().getPayload().getLength();
+  }
+
+  @Override
+  public OptionalLong getByteLength() {
+    return event.getMessage().getPayload().getByteLength();
   }
 }

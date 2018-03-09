@@ -73,5 +73,20 @@
         }
       ]
     }
+  },
+  "4.1.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method java.util.OptionalLong org.mule.runtime.module.extension.api.runtime.privileged.EventedResult<T, A>::getByteLength()",
+          "package": "org.mule.runtime.module.extension.api.runtime.privileged",
+          "classSimpleName": "EventedResult",
+          "methodName": "getByteLength",
+          "elementKind": "method",
+          "justification": "Avoid autoboxing/unboxing where possible"
+        }
+      ]
+    }
   }
 }

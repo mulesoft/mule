@@ -22,9 +22,11 @@ public final class InterceptedReactiveProcessor implements ReactiveProcessor {
 
   private final Processor processor;
   private final ReactiveProcessor next;
+  private final ProcessingType processingType;
 
   public InterceptedReactiveProcessor(Processor processor, ReactiveProcessor next) {
     this.processor = processor;
+    this.processingType = processor.getProcessingType();
     this.next = next;
   }
 
@@ -35,7 +37,7 @@ public final class InterceptedReactiveProcessor implements ReactiveProcessor {
 
   @Override
   public ProcessingType getProcessingType() {
-    return processor.getProcessingType();
+    return processingType;
   }
 
   public Processor getProcessor() {

@@ -37,13 +37,6 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.apache.commons.io.input.NullInputStream;
-import org.junit.Test;
-
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -56,6 +49,13 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
+
+import org.apache.commons.io.input.NullInputStream;
+import org.junit.Test;
+
+import java.util.OptionalLong;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -437,7 +437,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Test
   @Description("If the processing type is IO_RW and the payload is a stream with unknown length then processing occurs in BLOCKING thread.")
   public void singleIOWRWUnkownLengthStream() throws Exception {
-    super.singleIORW(() -> createStreamPayloadEventWithLength(Optional.empty()));
+    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.empty()));
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
@@ -448,7 +448,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Test
   @Description("If the processing type is IO_RW and the payload is a stream shorter that 16KB in length then processing occurs in CPU_LIGHT thread.")
   public void singleIOWRWSmallStream() throws Exception {
-    super.singleIORW(() -> createStreamPayloadEventWithLength(Optional.of((long) KB.toBytes(10))));
+    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.of(KB.toBytes(10))));
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(IO))));
@@ -459,7 +459,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Test
   @Description("If the processing type is IO_RW and the payload is a longer than 16KB in length then processing occurs in BLOCKING thread.")
   public void singleIOWRWLargeStream() throws Exception {
-    super.singleIORW(() -> createStreamPayloadEventWithLength(Optional.of((long) KB.toBytes(20))));
+    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.of(KB.toBytes(20))));
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
@@ -467,7 +467,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
-  private CoreEvent createStreamPayloadEventWithLength(Optional<Long> length) throws MuleException {
+  private CoreEvent createStreamPayloadEventWithLength(OptionalLong length) throws MuleException {
     return builder(testEvent())
         .message(Message.builder().payload(new TypedValue(new NullInputStream(length.orElse(-1l)), INPUT_STREAM, length))
             .build())
