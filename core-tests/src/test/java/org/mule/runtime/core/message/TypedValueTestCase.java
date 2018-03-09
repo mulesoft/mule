@@ -32,40 +32,40 @@ public class TypedValueTestCase {
   @Test
   public void string() {
     TypedValue<String> typedValue = of(STRING_VALUE);
-    assertThat(typedValue.getLength().isPresent(), is(true));
-    assertThat(typedValue.getLength().getAsLong(), is((long) STRING_VALUE.length()));
+    assertThat(typedValue.getByteLength().isPresent(), is(true));
+    assertThat(typedValue.getByteLength().getAsLong(), is((long) STRING_VALUE.length()));
   }
 
   @Test
   public void stringUTF16() {
     TypedValue<String> typedValue = new TypedValue<>(STRING_VALUE, builder(DataType.STRING).charset(UTF_16).build());
-    assertThat(typedValue.getLength().isPresent(), is(true));
-    assertThat(typedValue.getLength().getAsLong(), is((long) STRING_VALUE.getBytes(UTF_16).length));
+    assertThat(typedValue.getByteLength().isPresent(), is(true));
+    assertThat(typedValue.getByteLength().getAsLong(), is((long) STRING_VALUE.getBytes(UTF_16).length));
   }
 
   @Test
   public void byteArray() {
     TypedValue<byte[]> typedValue = of(BYTE_ARRAY_VALUE);
-    assertThat(typedValue.getLength().isPresent(), is(true));
-    assertThat(typedValue.getLength().getAsLong(), is((long) BYTE_ARRAY_VALUE.length));
+    assertThat(typedValue.getByteLength().isPresent(), is(true));
+    assertThat(typedValue.getByteLength().getAsLong(), is((long) BYTE_ARRAY_VALUE.length));
   }
 
   @Test
   public void inputStream() {
-    assertThat(of(INPUT_STREAM_VALUE).getLength().isPresent(), is(false));
+    assertThat(of(INPUT_STREAM_VALUE).getByteLength().isPresent(), is(false));
   }
 
   @Test
   public void inputStreamWithLength() {
     TypedValue<InputStream> typedValue =
         new TypedValue<>(INPUT_STREAM_VALUE, OBJECT, OptionalLong.of(BYTE_ARRAY_VALUE.length));
-    assertThat(typedValue.getLength().isPresent(), is(true));
-    assertThat(typedValue.getLength().getAsLong(), is((long) BYTE_ARRAY_VALUE.length));
+    assertThat(typedValue.getByteLength().isPresent(), is(true));
+    assertThat(typedValue.getByteLength().getAsLong(), is((long) BYTE_ARRAY_VALUE.length));
   }
 
   @Test
   public void object() {
-    assertThat(of(new Apple()).getLength().isPresent(), is(false));
+    assertThat(of(new Apple()).getByteLength().isPresent(), is(false));
   }
 
 }

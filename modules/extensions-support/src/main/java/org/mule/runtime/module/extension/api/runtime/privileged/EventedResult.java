@@ -102,7 +102,12 @@ public final class EventedResult<T, A> extends Result<T, A> {
   }
 
   @Override
-  public OptionalLong getLength() {
+  public Optional<Long> getLength() {
     return event.getMessage().getPayload().getLength();
+  }
+
+  @Override
+  public OptionalLong getByteLength() {
+    return event.getMessage().getPayload().getByteLength();
   }
 }

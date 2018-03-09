@@ -324,8 +324,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
     assertThat(copy.getPayload(), is(message.getPayload()));
     assertThat(copy.getAttributes(), is(message.getAttributes()));
-    assertThat(message.getPayload().getLength().getAsLong(), is(appleSize));
-    assertThat(copy.getPayload().getLength().getAsLong(), is(appleSize));
+    assertThat(message.getPayload().getByteLength().getAsLong(), is(appleSize));
+    assertThat(copy.getPayload().getByteLength().getAsLong(), is(appleSize));
   }
 
   private Message createTestMessage() {

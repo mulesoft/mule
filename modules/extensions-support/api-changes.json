@@ -78,16 +78,13 @@
     "revapi": {
       "ignore": [
         {
-          "code": "java.method.returnTypeChanged",
-          "old": "method java.util.Optional<java.lang.Long> org.mule.runtime.module.extension.api.runtime.privileged.EventedResult<T, A>::getLength()",
-          "new": "method java.util.OptionalLong org.mule.runtime.module.extension.api.runtime.privileged.EventedResult<T, A>::getLength()",
-          "oldType": "java.util.Optional<java.lang.Long>",
-          "newType": "java.util.OptionalLong",
+          "code": "java.method.added",
+          "new": "method java.util.OptionalLong org.mule.runtime.module.extension.api.runtime.privileged.EventedResult<T, A>::getByteLength()",
           "package": "org.mule.runtime.module.extension.api.runtime.privileged",
           "classSimpleName": "EventedResult",
-          "methodName": "getLength",
+          "methodName": "getByteLength",
           "elementKind": "method",
-          "justification": "There are no external users of this field yet"
+          "justification": "Avoid autoboxing/unboxing where possible"
         }
       ]
     }
