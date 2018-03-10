@@ -56,9 +56,6 @@ import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
@@ -70,6 +67,9 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@Link ExtensionsOAuthManager}
@@ -244,9 +244,8 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
         .externalCallbackUrl(getExternalCallback(httpServer, callbackConfig))
         .authorizationUrl(authCodeConfig.getAuthorizationUrl())
         .localAuthorizationUrlPath(callbackConfig.getLocalAuthorizePath())
-        .localAuthorizationUrlResourceOwnerId(
-                                              "#[if (attributes.queryParams.resourceOwnerId != null) attributes.queryParams.resourceOwnerId else '']")
-        .state("#[if (attributes.queryParams.state != null) attributes.queryParams.state else '']")
+        .localAuthorizationUrlResourceOwnerId("#[attributes.queryParams.resourceOwnerId]")
+        .state("#[attributes.queryParams.state]")
         .customParameters(config.getCustomParameters())
         .customParametersExtractorsExprs(getParameterExtractors(config));
 
