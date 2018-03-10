@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.policy.PolicyStateId.POLICY_ID;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
@@ -23,10 +22,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import org.reactivestreams.Publisher;
-
 import java.util.Optional;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
@@ -87,19 +85,23 @@ public class OperationPolicyProcessor implements Processor {
                   .orElseGet(() -> PrivilegedEvent.builder(operationEvent.getContext()).message(of(null)).build());
           policyStateHandler.updateState(policyStateId, variablesProviderEvent);
           PrivilegedEvent policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
-          Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent);
+          Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent, policyStateId);
           policyStateHandler.updateNextOperation(policyStateId.getExecutionIdentifier(), operationCall);
           return executePolicyChain(operationEvent, policyStateId, policyEvent);
         });
+  }
+
+  private void manageError(PolicyStateId policyStateId, PrivilegedEvent operationEvent, MessagingException messagingException) {
+    policyStateHandler.updateState(policyStateId, messagingException.getEvent());
+    PrivilegedEvent newEvent = policyEventConverter.createEvent((PrivilegedEvent) messagingException.getEvent(), operationEvent);
+    messagingException.setProcessedEvent(newEvent);
   }
 
   private Mono<PrivilegedEvent> executePolicyChain(PrivilegedEvent operationEvent, PolicyStateId policyStateId,
                                                    PrivilegedEvent policyEvent) {
 
     PolicyChain policyChain = policy.getPolicyChain();
-    policyChain.onChainError(t -> policyStateHandler
-        .updateState(new PolicyStateId(policyEvent.getContext().getCorrelationId(), policy.getPolicyId()),
-                     ((MessagingException) t).getEvent()));
+    policyChain.onChainError(t -> manageError(policyStateId, operationEvent, (MessagingException) t));
 
     return just(policyEvent)
         .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
@@ -107,15 +109,14 @@ public class OperationPolicyProcessor implements Processor {
         .cast(CoreEvent.class)
         .transform(policyChain)
         .cast(PrivilegedEvent.class)
-        .subscriberContext(ctx -> ctx.put(POLICY_ID, policy.getPolicyId()))
         .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
-        .subscriberContext(ctx -> ctx.delete(POLICY_ID))
         .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent))
         .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
                                      getMessageAttributesAsString(event), "After operation"));
   }
 
-  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, PrivilegedEvent operationEvent) {
+  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, PrivilegedEvent operationEvent,
+                                                              PolicyStateId policyStateId) {
     return new Processor() {
 
       @Override
@@ -128,7 +129,6 @@ public class OperationPolicyProcessor implements Processor {
         return from(publisher)
             .cast(PrivilegedEvent.class)
             .flatMap(policyExecuteNextEvent -> {
-              PolicyStateId policyStateId = new PolicyStateId(policyExecuteNextEvent.getContext().getId(), policy.getPolicyId());
               policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);
               return just(policyExecuteNextEvent)
                   .map(event -> policyEventConverter.createEvent(event, operationEvent))
@@ -151,7 +151,7 @@ public class OperationPolicyProcessor implements Processor {
 
   private void logPolicy(String eventId, String policyName, String message, String startingMessage) {
     if (LOGGER.isTraceEnabled()) {
-      //TODO Remove event id when first policy generates it. MULE-14455
+      // TODO Remove event id when first policy generates it. MULE-14455
       LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + "\nPolicy:" + policyName + "\n" + message);
     }
   }
