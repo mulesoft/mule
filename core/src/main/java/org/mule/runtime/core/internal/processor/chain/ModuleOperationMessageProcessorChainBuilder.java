@@ -33,10 +33,12 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
@@ -200,11 +202,15 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
+          .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack())
+              .push(new FlowStackElement(getLocation().getRootContainerName(), getLocation().getLocation())))
           .concatMap(request -> from(processWithChildContext(createEventWithParameters(request), super::apply,
                                                              ofNullable(getLocation())))
                                                                  .onErrorResume(MessagingException.class,
                                                                                 createErrorResumeMapper(request))
-                                                                 .map(eventResult -> processResult(request, eventResult)));
+                                                                 .map(eventResult -> processResult(request, eventResult)))
+          .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop())
+          .doOnError(MessagingException.class, me -> ((DefaultFlowCallStack) me.getEvent().getFlowCallStack()).pop());
     }
 
     /**
