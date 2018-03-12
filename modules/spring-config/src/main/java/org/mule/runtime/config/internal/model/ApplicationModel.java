@@ -382,7 +382,9 @@ public class ApplicationModel {
     ConfigurationPropertiesProvider globalPropertiesConfigurationAttributeProvider =
         createProviderFromGlobalProperties(artifactConfig);
     DefaultConfigurationPropertiesResolver localResolver =
-        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(empty(),
+        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(
+                                                                                                 of(new DefaultConfigurationPropertiesResolver(empty(),
+                                                                                                                                               environmentPropertiesConfigurationProvider)),
                                                                                                  globalPropertiesConfigurationAttributeProvider)),
                                                    environmentPropertiesConfigurationProvider);
     List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
