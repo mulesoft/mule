@@ -83,9 +83,10 @@ public class DefaultTransformationService implements TransformationService {
       try {
         transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(valueDataType, expectedDataType);
       } catch (TransformerException e) {
-        throw new TransformerException(createStaticMessage(String
-            .format("The value '%s' of type %s could not be transformed to the desired type %s",
-                    value.toString(), value.getClass().getName(), expectedDataType.getType().getName()), e));
+        throw new TransformerException(createStaticMessage("The value '%s' of type %s could not be transformed to the desired type %s",
+                                                           value.toString().trim(), value.getClass().getName(),
+                                                           expectedDataType.getType().getName()),
+                                       e);
       }
 
       return transformer.transform(value);
