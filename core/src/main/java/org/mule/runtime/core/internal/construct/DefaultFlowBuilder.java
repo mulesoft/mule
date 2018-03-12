@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.construct;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -17,13 +18,16 @@ import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.createFlowStatistics;
+import static org.mule.runtime.core.internal.construct.FlowBackPressureException.BACK_PRESSURE_ERROR_MESSAGE;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
@@ -36,6 +40,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamProcessingStrategyFactory;
@@ -52,6 +57,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.function.Function;
 
 import reactor.core.publisher.Mono;
 
@@ -244,31 +250,64 @@ public class DefaultFlowBuilder implements Builder {
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
           .doOnNext(assertStarted())
-          .flatMap(event -> {
-            CoreEvent request = createMuleEventForCurrentFlow((PrivilegedEvent) event);
-            // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
-            // response publisher to operate of the result of flow processing before returning
-            try {
-              getSink().accept(request);
-            } catch (RejectedExecutionException ree) {
-              Throwable overloadException = new FlowBackPressureException(ree.getMessage(), ree);
-              MessagingException me = new MessagingException(event, overloadException, this);
-              ((BaseEventContext) request.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
-            }
-            return Mono.from(((BaseEventContext) request.getContext()).getResponsePublisher())
-                .cast(PrivilegedEvent.class)
-                .map(r -> {
-                  CoreEvent result = createReturnEventForParentFlowConstruct(r, (InternalEvent) event);
-                  return result;
-                })
-                .onErrorMap(MessagingException.class, me -> {
-                  me.setProcessedEvent(createReturnEventForParentFlowConstruct((PrivilegedEvent) me.getEvent(),
-                                                                               (InternalEvent) event));
-                  return me;
-                });
-          })
+          .flatMap(flowWaitMapper())
           // Don't handle errors, these will be handled by parent flow
           .errorStrategyStop();
+    }
+
+    @Override
+    protected Function<? super CoreEvent, ? extends Publisher<? extends CoreEvent>> flowWaitMapper() {
+      return event -> {
+        CoreEvent request = createMuleEventForCurrentFlow((PrivilegedEvent) event);
+        Publisher<CoreEvent> responsePublisher = ((BaseEventContext) request.getContext()).getResponsePublisher();
+        // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
+        // response publisher to operate of the result of flow processing before returning
+        try {
+          getSink().accept(request);
+        } catch (RejectedExecutionException ree) {
+          Throwable overloadException = new FlowBackPressureException(ree.getMessage(), ree);
+          MessagingException me = new MessagingException(event, overloadException, this);
+          ((BaseEventContext) request.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
+        }
+        return flowResponse(event, responsePublisher);
+      };
+    }
+
+    protected Function<? super CoreEvent, ? extends Publisher<? extends CoreEvent>> flowFailDropMapper(ErrorType overloadErrorType) {
+      return event -> {
+        CoreEvent request = createMuleEventForCurrentFlow((PrivilegedEvent) event);
+        Publisher<CoreEvent> responsePublisher = ((BaseEventContext) request.getContext()).getResponsePublisher();
+
+        if (getSink().emit(event)) {
+          return flowResponse(event, responsePublisher);
+        } else {
+          // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with an OVERLOAD error.
+          FlowBackPressureException rejectedExecutionException = new FlowBackPressureException(getName());
+          PrivilegedEvent result = createReturnEventForParentFlowConstruct(PrivilegedEvent
+              .builder(event)
+              .error(ErrorBuilder.builder().errorType(overloadErrorType)
+                  .description(format("Flow '%s' Busy.", getName()))
+                  .detailedDescription(format(BACK_PRESSURE_ERROR_MESSAGE, getName()))
+                  .exception(rejectedExecutionException)
+                  .build())
+              .build(), (InternalEvent) event);
+          return Mono
+              .error(exceptionResolver.resolve(new MessagingException(result, rejectedExecutionException, this), muleContext));
+        }
+      };
+    }
+
+    private Publisher<? extends CoreEvent> flowResponse(CoreEvent event, Publisher<CoreEvent> responsePublisher) {
+      return Mono.from(responsePublisher)
+          .cast(PrivilegedEvent.class)
+          .map(r -> {
+            return createReturnEventForParentFlowConstruct(r, (InternalEvent) event);
+          })
+          .onErrorMap(MessagingException.class, me -> {
+            me.setProcessedEvent(createReturnEventForParentFlowConstruct((PrivilegedEvent) me.getEvent(),
+                                                                         (InternalEvent) event));
+            return me;
+          });
     }
 
     private PrivilegedEvent createMuleEventForCurrentFlow(PrivilegedEvent event) {
