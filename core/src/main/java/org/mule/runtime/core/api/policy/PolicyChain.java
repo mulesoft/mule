@@ -118,12 +118,16 @@ public class PolicyChain extends AbstractComponent
     return from(publisher)
         .flatMap(event -> {
           pushBeforeNextFlowStackElement()
-              .andThen(req -> ((BaseEventContext) req.getContext()).onResponse(notificationHelper
-                  .successOrErrorNotification(PROCESS_END).andThen((resp, t) -> popFlowFlowStackElement().accept(req))))
+              .andThen(req -> ((BaseEventContext) req.getContext())
+                  .onResponse((resp, t) -> popFlowFlowStackElement().accept(req)))
               .andThen(notificationHelper.notification(PROCESS_START))
               .accept(event);
           return from(processWithChildContext(event, chainWithMPs, ofNullable(getLocation())))
-              .doOnError(MessagingException.class, t -> this.onError.ifPresent(onError -> onError.accept(t)));
+              .doOnNext(e -> notificationHelper.fireNotification(e, null, PROCESS_END))
+              .doOnError(MessagingException.class, t -> {
+                notificationHelper.fireNotification(t.getEvent(), t, PROCESS_END);
+                this.onError.ifPresent(onError -> onError.accept(t));
+              });
         });
   }
 
