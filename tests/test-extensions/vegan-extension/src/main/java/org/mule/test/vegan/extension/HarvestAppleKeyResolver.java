@@ -12,18 +12,38 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.io.InputStream;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class HarvestAppleKeyResolver implements TypeKeysResolver, OutputTypeResolver {
 
   @Override
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
+    InputStream keysOverride = Thread.currentThread().getContextClassLoader()
+        .getResourceAsStream("HarvestAppleKeyResolver.keys");
+    if (keysOverride != null) {
+      try {
+        String keysCsv = IOUtils.toString(keysOverride);
+        if (!keysCsv.isEmpty()) {
+          return Stream.of(keysCsv.split(","))
+              .map(name -> MetadataKeyBuilder.newKey(name).build())
+              .collect(Collectors.toSet());
+        }
+      } catch (Exception e) {
+        throw new MetadataResolvingException(e.getMessage(), FailureCode.INVALID_METADATA_KEY, e);
+      }
+    }
+
     return ImmutableSet.of(MetadataKeyBuilder.newKey("HARVESTED").build());
   }
 
