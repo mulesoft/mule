@@ -119,9 +119,11 @@ public class DefaultMuleDomain implements Domain {
 
   @Override
   public void install() {
-    if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(format("New domain '%s'", getArtifactName())));
-    }
+    withContextClassLoader(null, () -> {
+      if (logger.isInfoEnabled()) {
+        logger.info(miniSplash(format("New domain '%s'", getArtifactName())));
+      }
+    });
   }
 
   @Override
@@ -140,10 +142,11 @@ public class DefaultMuleDomain implements Domain {
   }
 
   public void doInit(boolean lazy, boolean disableXmlValidations) throws DeploymentInitException {
-    if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(format("Initializing domain '%s'", getArtifactName())));
-    }
-
+    withContextClassLoader(null, () -> {
+      if (logger.isInfoEnabled()) {
+        logger.info(miniSplash(format("Initializing domain '%s'", getArtifactName())));
+      }
+    });
     try {
       ArtifactContextBuilder artifactBuilder = getArtifactContextBuilder().setArtifactName(getArtifactName())
           .setDataFolderName(getDescriptor().getDataFolderName())
@@ -215,9 +218,11 @@ public class DefaultMuleDomain implements Domain {
   @Override
   public void stop() {
     try {
-      if (logger.isInfoEnabled()) {
-        logger.info(miniSplash(format("Stopping domain '%s'", getArtifactName())));
-      }
+      withContextClassLoader(null, () -> {
+        if (logger.isInfoEnabled()) {
+          logger.info(miniSplash(format("Stopping domain '%s'", getArtifactName())));
+        }
+      });
       if (this.artifactContext != null) {
         withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> {
           this.artifactContext.getMuleContext().stop();
@@ -231,9 +236,11 @@ public class DefaultMuleDomain implements Domain {
 
   @Override
   public void dispose() {
-    if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(format("Disposing domain '%s'", getArtifactName())));
-    }
+    withContextClassLoader(null, () -> {
+      if (logger.isInfoEnabled()) {
+        logger.info(miniSplash(format("Disposing domain '%s'", getArtifactName())));
+      }
+    });
     if (this.artifactContext != null) {
       withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> this.artifactContext.getMuleContext().dispose());
     }

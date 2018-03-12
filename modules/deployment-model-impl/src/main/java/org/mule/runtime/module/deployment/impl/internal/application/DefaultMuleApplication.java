@@ -122,10 +122,11 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public void install() {
-    if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(format("New app '%s'", descriptor.getName())));
-    }
-
+    withContextClassLoader(null, () -> {
+      if (logger.isInfoEnabled()) {
+        logger.info(miniSplash(format("New app '%s'", descriptor.getName())));
+      }
+    });
     // set even though it might be redundant, just in case the app is been redeployed
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
 
@@ -155,19 +156,22 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public void start() {
-    if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(format("Starting app '%s'", descriptor.getName())));
-    }
-
+    withContextClassLoader(null, () -> {
+      if (logger.isInfoEnabled()) {
+        logger.info(miniSplash(format("Starting app '%s'", descriptor.getName())));
+      }
+    });
     try {
       this.artifactContext.getMuleContext().start();
 
       // null CCL ensures we log at 'system' level
       // TODO getDomainClassLoader a more usable wrapper for any logger to be logged at sys level
       withContextClassLoader(null, () -> {
-        ApplicationStartedSplashScreen splashScreen = new ApplicationStartedSplashScreen();
-        splashScreen.createMessage(descriptor);
-        logger.info(splashScreen.toString());
+        if (logger.isInfoEnabled()) {
+          ApplicationStartedSplashScreen splashScreen = new ApplicationStartedSplashScreen();
+          splashScreen.createMessage(descriptor);
+          logger.info(splashScreen.toString());
+        }
       });
     } catch (Exception e) {
       setStatusToFailed();
@@ -189,10 +193,11 @@ public class DefaultMuleApplication implements Application {
   }
 
   private void doInit(boolean lazy, boolean disableXmlValidations) {
-    if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(format("Initializing app '%s'", descriptor.getName())));
-    }
-
+    withContextClassLoader(null, () -> {
+      if (logger.isInfoEnabled()) {
+        logger.info(miniSplash(format("Initializing app '%s'", descriptor.getName())));
+      }
+    });
     try {
       ArtifactContextBuilder artifactBuilder =
           newBuilder().setArtifactProperties(merge(descriptor.getAppProperties(), getProperties())).setArtifactType(APP)
@@ -388,11 +393,12 @@ public class DefaultMuleApplication implements Application {
     }
 
     if (this.artifactContext == null) {
-      // app never started, maybe due to a previous error
-      if (logger.isInfoEnabled()) {
-        logger.info(format("Stopping app '%s' with no mule context", descriptor.getName()));
-      }
-
+      withContextClassLoader(null, () -> {
+        // app never started, maybe due to a previous error
+        if (logger.isInfoEnabled()) {
+          logger.info(format("Stopping app '%s' with no mule context", descriptor.getName()));
+        }
+      });
       status = ApplicationStatus.STOPPED;
       return;
     }
@@ -400,10 +406,11 @@ public class DefaultMuleApplication implements Application {
     artifactContext.getMuleContext().getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
 
     try {
-      if (logger.isInfoEnabled()) {
-        logger.info(miniSplash(format("Stopping app '%s'", descriptor.getName())));
-      }
-
+      withContextClassLoader(null, () -> {
+        if (logger.isInfoEnabled()) {
+          logger.info(miniSplash(format("Stopping app '%s'", descriptor.getName())));
+        }
+      });
       this.artifactContext.getMuleContext().stop();
     } catch (MuleException e) {
       throw new DeploymentStopException(createStaticMessage(format("Error stopping application '%s'", descriptor.getName())), e);
@@ -456,10 +463,11 @@ public class DefaultMuleApplication implements Application {
       logger.error("Error stopping application", e);
     }
 
-    if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(format("Disposing app '%s'", descriptor.getName())));
-    }
-
+    withContextClassLoader(null, () -> {
+      if (logger.isInfoEnabled()) {
+        logger.info(miniSplash(format("Disposing app '%s'", descriptor.getName())));
+      }
+    });
     artifactContext.getMuleContext().dispose();
     artifactContext = null;
   }
