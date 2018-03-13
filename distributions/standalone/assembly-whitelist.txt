@@ -271,13 +271,13 @@
 /mule-standalone-${productVersion}/lib/opt/invokebinder-1.10.jar
 /mule-standalone-${productVersion}/lib/opt/isorelax-20030108.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-annotations-2.9.0.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-core-2.9.2.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-core-2.9.4.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-coreutils-1.8.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-core-asl-1.9.14-MULE-001.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-databind-2.9.2.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-databind-2.9.4.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-jaxrs-1.9.14-MULE-001.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-mapper-asl-1.9.14-MULE-001.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-module-jsonSchema-2.9.2.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-module-jsonSchema-2.9.4.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-xc-1.9.14-MULE-001.jar
 /mule-standalone-${productVersion}/lib/opt/jasper-6.0.53.jar
 /mule-standalone-${productVersion}/lib/opt/jasper-el-6.0.53.jar
@@ -377,7 +377,7 @@
 /mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v2-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/opt/quartz-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/raml-parser-0.9-+
-/mule-standalone-${productVersion}/lib/opt/raml-parser-2-1.0.18-+
+/mule-standalone-${productVersion}/lib/opt/raml-parser-2-1.0.19-+
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
@@ -432,7 +432,7 @@
 /mule-standalone-${productVersion}/lib/opt/xmlbeans-2.6.3.jar
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
-/mule-standalone-${productVersion}/lib/opt/yagi-1.0.18-+
+/mule-standalone-${productVersion}/lib/opt/yagi-1.0.19-+
 /mule-standalone-${productVersion}/lib/opt/validation-api-1.1.0.Final.jar
 /mule-standalone-${productVersion}/lib/shared
 /mule-standalone-${productVersion}/lib/shared/README.txt
