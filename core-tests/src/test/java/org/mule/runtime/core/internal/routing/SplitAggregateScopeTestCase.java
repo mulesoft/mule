@@ -6,16 +6,14 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -25,50 +23,59 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
-import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_MAP;
-import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
+import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
-import static org.mule.test.allure.AllureConstants.RoutersFeature.ScatterGatherStory.SCATTER_GATHER;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.SplitAggregateStory.SPLIT_AGGREGATE;
 import static reactor.core.publisher.Flux.from;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.hamcrest.Matchers;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
-import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
+import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import java.io.StringBufferInputStream;
-import java.util.List;
-import java.util.Map;
+import javax.management.DescriptorKey;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
 @Feature(ROUTERS)
-@Story(SCATTER_GATHER)
-public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
+@Story(SPLIT_AGGREGATE)
+public class SplitAggregateScopeTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expectedException = none();
 
-  private ScatterGatherRouter router = new ScatterGatherRouter();
+  private SplitAggregateScope router = new SplitAggregateScope();
   private ForkJoinStrategyFactory mockForkJoinStrategyFactory = mock(ForkJoinStrategyFactory.class);
 
   @Override
@@ -78,44 +85,49 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     router.dispose();
   }
 
   @Test
   @Description("RoutingPairs are created for each route configured. Each RoutingPair has the same input event.")
   public void routingPairs() throws Exception {
-    CoreEvent event = mock(CoreEvent.class);
-    MessageProcessorChain route1 = mock(MessageProcessorChain.class);
-    MessageProcessorChain route2 = mock(MessageProcessorChain.class);
-    MessageProcessorChain route3 = mock(MessageProcessorChain.class);
+    CoreEvent event = createListEvent();
 
-    router.setRoutes(asList(route1, route2, route3));
+    MessageProcessorChain nested = mock(MessageProcessorChain.class);
+    muleContext.getInjector().inject(router);
+    router.setMessageProcessors(singletonList(nested));
+    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    router.initialise();
 
     List<RoutingPair> routingPairs = from(router.getRoutingPairs(event)).collectList().block();
-    assertThat(routingPairs, hasSize(3));
-    assertThat(routingPairs.get(0), equalTo(of(event, route1)));
-    assertThat(routingPairs.get(1), equalTo(of(event, route2)));
-    assertThat(routingPairs.get(2), equalTo(of(event, route3)));
+    assertThat(routingPairs, hasSize(2));
+    assertThat(routingPairs.get(0).getEvent().getMessage().getPayload().getValue(),
+               equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(0)));
+    assertThat(routingPairs.get(0).getRoute(), sameInstance(nested));
+    assertThat(routingPairs.get(1).getEvent().getMessage().getPayload().getValue(),
+               equalTo(((List<Message>) event.getMessage().getPayload().getValue()).get(1)));
+    assertThat(routingPairs.get(1).getRoute(), sameInstance(nested));
   }
 
   @Test
   @Description("By default the router result populates the outgoing message payload.")
   public void defaultTarget() throws Exception {
-    CoreEvent original = testEvent();
-    MessageProcessorChain route1 = newChain(empty(), event -> event);
-    MessageProcessorChain route2 = newChain(empty(), event -> event);
+    CoreEvent original = createListEvent();
 
-    router.setRoutes(asList(route1, route2));
+    MessageProcessorChain nested = newChain(empty(), event -> event);
+    nested.setMuleContext(muleContext);
+    router.setMessageProcessors(singletonList(nested));
+
     muleContext.getInjector().inject(router);
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     router.initialise();
 
     Event result = router.process(original);
 
-    assertThat(result.getMessage().getPayload().getValue(), instanceOf(Map.class));
-    Map<String, Message> resultMap = (Map) result.getMessage().getPayload().getValue();
-    assertThat(resultMap.values(), hasSize(2));
+    assertThat(result.getMessage().getPayload().getValue(), instanceOf(List.class));
+    List<Message> resultList = (List<Message>) result.getMessage().getPayload().getValue();
+    assertThat(resultList, hasSize(2));
   }
 
   @Test
@@ -123,11 +135,12 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   public void customTargetMessage() throws Exception {
     final String variableName = "foo";
 
-    CoreEvent original = testEvent();
-    MessageProcessorChain route1 = newChain(empty(), event -> event);
-    MessageProcessorChain route2 = newChain(empty(), event -> event);
+    CoreEvent original = createListEvent();
 
-    router.setRoutes(asList(route1, route2));
+    MessageProcessorChain nested = newChain(empty(), event -> event);
+    nested.setMuleContext(muleContext);
+    router.setMessageProcessors(singletonList(nested));
+
     router.setTarget(variableName);
     router.setTargetValue("#[message]");
     muleContext.getInjector().inject(router);
@@ -137,9 +150,10 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     Event result = router.process(original);
 
     assertThat(result.getMessage(), equalTo(original.getMessage()));
-    assertThat(((Message) result.getVariables().get(variableName).getValue()).getPayload().getValue(), instanceOf(Map.class));
-    Map<String, Message> resultMap = (Map) ((Message) result.getVariables().get(variableName).getValue()).getPayload().getValue();
-    assertThat(resultMap.values(), hasSize(2));
+    assertThat(((Message) result.getVariables().get(variableName).getValue()).getPayload().getValue(), instanceOf(List.class));
+    List<Message> resultList =
+        (List<Message>) ((Message) result.getVariables().get(variableName).getValue()).getPayload().getValue();
+    assertThat(resultList, hasSize(2));
   }
 
   @Test
@@ -147,11 +161,11 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   public void customTargetDefaultPayload() throws Exception {
     final String variableName = "foo";
 
-    CoreEvent original = testEvent();
-    MessageProcessorChain route1 = newChain(empty(), event -> event);
-    MessageProcessorChain route2 = newChain(empty(), event -> event);
+    CoreEvent original = createListEvent();
 
-    router.setRoutes(asList(route1, route2));
+    MessageProcessorChain nested = newChain(empty(), event -> event);
+    nested.setMuleContext(muleContext);
+    router.setMessageProcessors(singletonList(nested));
     router.setTarget(variableName);
     muleContext.getInjector().inject(router);
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
@@ -161,22 +175,21 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
     assertThat(result.getMessage(), equalTo(original.getMessage()));
     final TypedValue<?> typedValue = result.getVariables().get(variableName);
-    assertThat(typedValue.getValue(), instanceOf(Map.class));
-    assertThat(Map.class.isAssignableFrom(typedValue.getDataType().getType()), is(true));
-    Map<String, Message> resultMap = (Map<String, Message>) typedValue.getValue();
-    assertThat(resultMap.values(), hasSize(2));
+    assertThat(typedValue.getValue(), instanceOf(List.class));
+    assertThat(List.class.isAssignableFrom(typedValue.getDataType().getType()), is(true));
+    List<Message> resultList = (List<Message>) typedValue.getValue();
+    assertThat(resultList, hasSize(2));
   }
 
   @Test
   @Description("The router uses a fork-join strategy with concurrency and timeout configured via the router and delayErrors true.")
   public void forkJoinStrategyConfiguration() throws Exception {
-    final int routes = 21;
     final int concurrency = 3;
     final long timeout = 123;
 
     router.setMaxConcurrency(concurrency);
     router.setTimeout(timeout);
-    router.setRoutes(range(0, routes).mapToObj(i -> mock(MessageProcessorChain.class)).collect(toList()));
+    router.setMessageProcessors(singletonList(mock(MessageProcessorChain.class)));
     router.setForkJoinStrategyFactory(mockForkJoinStrategyFactory);
 
     muleContext.getInjector().inject(router);
@@ -188,40 +201,40 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
                                                                any(Scheduler.class), any(ErrorType.class));
   }
 
-
   @Test
-  @Description("By default CollectMapForkJoinStrategyFactory is used which aggregates routes into a message with a Map<Message> payload.")
+  @Description("By default CollectListForkJoinStrategyFactory is used which aggregates routes into a message with a List<Message> payload.")
   public void defaultForkJoinStrategyFactory() {
-    assertThat(router.getDefaultForkJoinStrategyFactory(), instanceOf(CollectMapForkJoinStrategyFactory.class));
-    assertThat(router.getDefaultForkJoinStrategyFactory().getResultDataType(), equalTo(MULE_MESSAGE_MAP));
-  }
-
-  @Test
-  @Description("The router must be configured with at least two routes.")
-  public void minimumTwoRoutes() {
-    expectedException.expect(instanceOf(IllegalArgumentException.class));
-    router.setRoutes(singletonList(mock(MessageProcessorChain.class)));
-  }
-
-  @Test
-  @Description("Consumable payloads are not supported.")
-  public void consumablePayload() throws Exception {
-    MessageProcessorChain route1 = newChain(empty(), event -> event);
-    MessageProcessorChain route2 = newChain(empty(), event -> event);
-
-    router.setRoutes(asList(route1, route2));
-    muleContext.getInjector().inject(router);
-    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
-    router.initialise();
-
-    expectedException.expect(instanceOf(MuleRuntimeException.class));
-    router.process(CoreEvent.builder(testEvent()).message(Message.of(new StringBufferInputStream(TEST_PAYLOAD))).build());
+    assertThat(router.getDefaultForkJoinStrategyFactory(), instanceOf(CollectListForkJoinStrategyFactory.class));
+    assertThat(router.getDefaultForkJoinStrategyFactory().getResultDataType(), equalTo(MULE_MESSAGE_LIST));
   }
 
   @Test
   @Description("Delay errors is always true for scatter-gather currently.")
   public void defaultDelayErrors() {
     assertThat(router.isDelayErrors(), equalTo(true));
+  }
+
+  @Test
+  @DescriptorKey("An invalid collection expression result in a ExpressionRuntimeException")
+  public void failingExpression() throws Exception {
+    SensingNullMessageProcessor nullMessageProcessor = new SensingNullMessageProcessor();
+    router.setMessageProcessors(singletonList(nullMessageProcessor));
+    router.setCollectionExpression("!@INVALID");
+
+    muleContext.getInjector().inject(router);
+    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    router.initialise();
+
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(ExpressionRuntimeException.class));
+    router.process(testEvent());
+  }
+
+  private CoreEvent createListEvent() throws MuleException {
+    List<String> arrayList = new ArrayList<>();
+    arrayList.add("bar");
+    arrayList.add("zip");
+    return getEventBuilder().message(Message.of(arrayList)).build();
   }
 
 }

@@ -393,6 +393,12 @@ public interface AllureConstants {
 
       String PROCESSOR_CHAIN_ROUTER = "Processor Chain Router";
     }
+
+    interface SplitAggregateStory {
+
+      String SPLIT_AGGREGATE = "Split Aggregate";
+    }
+
   }
 
   interface TransformMessageFeature {

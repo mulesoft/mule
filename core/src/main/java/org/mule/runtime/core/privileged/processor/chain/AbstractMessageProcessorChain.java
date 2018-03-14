@@ -156,7 +156,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         if (throwable instanceof MessagingException) {
           return resolveMessagingException(processor).apply((MessagingException) throwable);
         } else {
-          return resolveException((Component) processor, (CoreEvent) event, throwable);
+          return resolveException(processor, (CoreEvent) event, throwable);
         }
       } else {
         return throwable;
@@ -184,7 +184,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         } else {
           BaseEventContext context = ((BaseEventContext) event.getContext());
           errorNotification(processor).andThen(e -> context.error(e))
-              .accept(resolveException((Component) processor, event, throwable));
+              .accept(resolveException(processor, event, throwable));
         }
       }
     };
@@ -283,9 +283,13 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     });
   }
 
-  private MessagingException resolveException(Component processor, CoreEvent event, Throwable throwable) {
-    MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
-    return exceptionResolver.resolve(new MessagingException(event, throwable, processor), muleContext);
+  private MessagingException resolveException(Processor processor, CoreEvent event, Throwable throwable) {
+    if (processor instanceof Component) {
+      MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver((Component) processor);
+      return exceptionResolver.resolve(new MessagingException(event, throwable, (Component) processor), muleContext);
+    } else {
+      return new MessagingException(event, throwable);
+    }
   }
 
   private Function<MessagingException, MessagingException> resolveMessagingException(Processor processor) {

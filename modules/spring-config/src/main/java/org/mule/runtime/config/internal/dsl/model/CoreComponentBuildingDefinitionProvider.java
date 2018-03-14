@@ -160,6 +160,7 @@ import org.mule.runtime.core.internal.routing.Resequencer;
 import org.mule.runtime.core.internal.routing.RoundRobin;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.internal.routing.SimpleCollectionAggregator;
+import org.mule.runtime.core.internal.routing.SplitAggregateScope;
 import org.mule.runtime.core.internal.routing.Splitter;
 import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
@@ -242,6 +243,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String FLOW_REF = "flow-ref";
   private static final String EXCEPTION_LISTENER_ATTRIBUTE = "exceptionListener";
   private static final String SCATTER_GATHER = "scatter-gather";
+  private static final String SPLIT_AGGREGATE = "split-aggregate";
   private static final String FORK_JOIN_STRATEGY = "forkJoinStrategyFactory";
   private static final String COLLECT_LIST = "collect-list";
   private static final String ENRICHER = "enricher";
@@ -414,6 +416,20 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(ROUTES, fromChildCollectionConfiguration(MessageProcessorChain.class).build())
         .withSetterParameterDefinition(FORK_JOIN_STRATEGY, fromChildConfiguration(ForkJoinStrategyFactory.class).build())
         .asScope().build());
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(SPLIT_AGGREGATE)
+        .withTypeDefinition(fromType(SplitAggregateScope.class))
+        .withSetterParameterDefinition("collectionExpression",
+                                       fromChildConfiguration(String.class).withIdentifier("collection").build())
+        .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
+        .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
+        .withSetterParameterDefinition("target", fromSimpleParameter("target").build())
+        .withSetterParameterDefinition("targetValue", fromSimpleParameter("targetValue")
+            .withDefaultValue("#[payload]")
+            .build())
+        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+        .asScope().build());
+    componentBuildingDefinitions.add(baseDefinition
+        .withIdentifier("collection").withTypeDefinition(fromType(String.class)).build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ENRICHER)
         .withObjectFactoryType(MessageEnricherObjectFactory.class).withTypeDefinition(fromType(MessageEnricher.class))
         .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(Processor.class).build())
