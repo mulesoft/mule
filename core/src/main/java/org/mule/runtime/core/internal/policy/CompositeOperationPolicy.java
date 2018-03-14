@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.util.Optional.empty;
+import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueWithCursorProvider;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.error;
@@ -15,17 +16,20 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+
+import org.reactivestreams.Publisher;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
-
-import org.reactivestreams.Publisher;
 
 /**
  * {@link OperationPolicy} created from a list of {@link Policy}.
@@ -41,6 +45,7 @@ public class CompositeOperationPolicy extends
   private final Processor nextOperation;
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
   private CoreEvent nextOperationResponse;
+  private StreamingManager streamingManager;
 
   /**
    * Creates a new composite policy.
@@ -60,8 +65,10 @@ public class CompositeOperationPolicy extends
                                   Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
                                   OperationPolicyProcessorFactory operationPolicyProcessorFactory,
                                   OperationParametersProcessor operationParametersProcessor,
-                                  OperationExecutionFunction operationExecutionFunction) {
+                                  OperationExecutionFunction operationExecutionFunction,
+                                  StreamingManager streamingManager) {
     super(parameterizedPolicies, operationPolicyParametersTransformer, operationParametersProcessor);
+    this.streamingManager = streamingManager;
     this.nextOperation = new Processor() {
 
       @Override
@@ -131,8 +138,21 @@ public class CompositeOperationPolicy extends
   @Override
   public Publisher<CoreEvent> process(CoreEvent operationEvent) {
     try {
+      Map<String, Object> operationParameters = new HashMap<>(getParametersProcessor().getOperationParameters());
+      Map<String, Object> providers = new HashMap<>();
+
+      // TODO Avoid iterating this map every time
+      for (Entry<String, Object> e : operationParameters.entrySet()) {
+        if (e.getValue() instanceof TypedValue) {
+          providers.put(e.getKey(),
+                        updateTypedValueWithCursorProvider((TypedValue) e.getValue(), operationEvent, streamingManager));
+        }
+      }
+
+      operationParameters.putAll(providers);
+
       Message message = getParametersTransformer().isPresent()
-          ? getParametersTransformer().get().fromParametersToMessage(getParametersProcessor().getOperationParameters())
+          ? getParametersTransformer().get().fromParametersToMessage(operationParameters)
           : operationEvent.getMessage();
       return processWithChildContext(CoreEvent.builder(operationEvent).message(message).build(), getPolicyProcessor(),
                                      empty());

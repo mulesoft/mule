@@ -194,7 +194,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
         ((DefaultFlowCallStack) event.getFlowCallStack()).setCurrentProcessorPath(resolveProcessorRepresentation);
         return policyManager
-            .createOperationPolicy(this, event, getResolutionResult(event, configuration), operationExecutionFunction)
+            .createOperationPolicy(this, event, getResolutionResult(event, configuration),
+                                   operationExecutionFunction)
             .process(event);
       } else {
         // If this operation has no component location then it is internal. Don't apply policies on internal operations.

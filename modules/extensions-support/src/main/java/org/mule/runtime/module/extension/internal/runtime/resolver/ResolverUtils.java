@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.runtime.api.exception.MuleException;
@@ -105,7 +106,11 @@ public class ResolverUtils {
   public static <T> T resolveValue(ValueResolver<T> resolver, ValueResolvingContext context)
       throws MuleException {
     T value = resolveRecursively(resolver, context);
-    return (T) resolveCursor(value);
+    if (context == null || context.resolveCursors()) {
+      return (T) resolveCursor(value);
+    } else {
+      return value;
+    }
   }
 
   /**
