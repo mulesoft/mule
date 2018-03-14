@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.processor.FlowAssertion;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
@@ -32,7 +33,7 @@ public class AssertionMessageProcessor extends AbstractComponent implements Flow
   protected String expression = "#[true]";
   protected String message = "?";
   private int count = 1;
-  private int invocationCount = 0;
+  private final AtomicInteger invocationCount = new AtomicInteger(0);
   protected boolean needToMatchCount = false;
 
   public void setExpression(String expression) {
@@ -79,7 +80,7 @@ public class AssertionMessageProcessor extends AbstractComponent implements Flow
   public void verify() throws InterruptedException {
     if (countFailOrNullEvent()) {
       if (needToMatchCount) {
-        fail(format("%sExpected count of %d but got %d.", failureMessagePrefix(), count, invocationCount));
+        fail(format("%sExpected count of %d but got %d.", failureMessagePrefix(), count, invocationCount.get()));
       } else {
         fail(format("%sNo event was received.", failureMessagePrefix()));
       }
@@ -114,7 +115,7 @@ public class AssertionMessageProcessor extends AbstractComponent implements Flow
   }
 
   private void increaseCount() {
-    invocationCount++;
+    invocationCount.incrementAndGet();
   }
 
   /**
@@ -127,7 +128,7 @@ public class AssertionMessageProcessor extends AbstractComponent implements Flow
   synchronized private boolean isProcessesCountCorrect() throws InterruptedException {
     boolean countReached = latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
     if (needToMatchCount) {
-      return count == invocationCount;
+      return count == invocationCount.get();
     } else {
       return countReached;
     }

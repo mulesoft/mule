@@ -135,6 +135,7 @@ class MuleExtensionModelDeclarer {
     declareErrorHandler(extensionDeclarer, typeLoader);
     declareTry(extensionDeclarer, typeLoader);
     declareScatterGather(extensionDeclarer, typeLoader);
+    declareSplitAggregate(extensionDeclarer, typeLoader);
     declareFirstSuccessful(extensionDeclarer);
     declareRoundRobin(extensionDeclarer);
     declareConfiguration(extensionDeclarer, typeLoader);
@@ -549,7 +550,7 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(Integer.class))
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("This value determines the maximum level of parallelism that will be used by this router. .");
+        .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_PARAMETER_NAME)
         .ofType(typeLoader.load(String.class))
@@ -558,6 +559,47 @@ class MuleExtensionModelDeclarer {
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
 
     scatterGather.onDefaultParameterGroup()
+        .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
+        .ofType(typeLoader.load(String.class))
+        .defaultingTo(PAYLOAD)
+        .withExpressionSupport(REQUIRED)
+        .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
+        .withRole(BEHAVIOUR)
+        .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
+        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
+        .withModelProperty(new TargetModelProperty());
+
+    // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
+    // ConstructModel doesn't support it.)
+  }
+
+  private void declareSplitAggregate(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    ConstructDeclarer splitAggregate = extensionDeclarer.withConstruct("splitAggregate")
+        .describedAs("Splits the same message and processes each part in parallel.")
+        .withErrorModel(compositeRoutingError);
+
+    splitAggregate.withChain();
+
+    splitAggregate.onDefaultParameterGroup()
+        .withOptionalParameter("timeout")
+        .ofType(typeLoader.load(Long.class))
+        .defaultingTo(Long.MAX_VALUE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.");
+    splitAggregate.onDefaultParameterGroup()
+        .withOptionalParameter("maxConcurrency")
+        .ofType(typeLoader.load(Integer.class))
+        .defaultingTo(Integer.MAX_VALUE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
+    splitAggregate.onDefaultParameterGroup()
+        .withOptionalParameter(TARGET_PARAMETER_NAME)
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs(TARGET_PARAMETER_DESCRIPTION)
+        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
+
+    splitAggregate.onDefaultParameterGroup()
         .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
         .ofType(typeLoader.load(String.class))
         .defaultingTo(PAYLOAD)

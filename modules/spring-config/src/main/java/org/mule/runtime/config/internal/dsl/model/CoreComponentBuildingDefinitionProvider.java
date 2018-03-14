@@ -418,7 +418,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .asScope().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(SPLIT_AGGREGATE)
         .withTypeDefinition(fromType(SplitAggregateScope.class))
-        .withSetterParameterDefinition("collection", fromChildConfiguration(String.class).withIdentifier("expression").build())
+        .withSetterParameterDefinition("collectionExpression", fromChildConfiguration(String.class).withIdentifier("collection").build())
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
         .withSetterParameterDefinition("target", fromSimpleParameter("target").build())
@@ -427,6 +427,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asScope().build());
+    componentBuildingDefinitions.add(baseDefinition
+                                             .withIdentifier("collection").withTypeDefinition(fromType(String.class)).build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ENRICHER)
         .withObjectFactoryType(MessageEnricherObjectFactory.class).withTypeDefinition(fromType(MessageEnricher.class))
         .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(Processor.class).build())

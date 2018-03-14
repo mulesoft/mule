@@ -63,7 +63,8 @@ public class TestNonBlockingProcessor extends AbstractComponent
 
   @Override
   public void initialise() throws InitialisationException {
-    customScheduler = muleContext.getSchedulerService().customScheduler(config().withMaxConcurrentTasks(MAX_THREADS));
+    customScheduler =
+        muleContext.getSchedulerService().customScheduler(config().withWaitAllowed(true).withMaxConcurrentTasks(MAX_THREADS));
   }
 
   @Override

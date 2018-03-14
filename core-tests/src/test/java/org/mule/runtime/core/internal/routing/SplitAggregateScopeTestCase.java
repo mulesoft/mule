@@ -24,8 +24,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.SplitAggregateStory.SPLIT_AGGREGATE;
 import static reactor.core.publisher.Flux.from;
@@ -34,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,11 +51,18 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.testmodels.mule.TestMessageProcessor;
+
+import javax.management.DescriptorKey;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -202,6 +212,22 @@ public class SplitAggregateScopeTestCase extends AbstractMuleContextTestCase {
   @Description("Delay errors is always true for scatter-gather currently.")
   public void defaultDelayErrors() {
     assertThat(router.isDelayErrors(), equalTo(true));
+  }
+
+  @Test
+  @DescriptorKey("An invalid collection expression result in a ExpressionRuntimeException")
+  public void failingExpression() throws Exception {
+    SensingNullMessageProcessor nullMessageProcessor = new SensingNullMessageProcessor();
+    router.setMessageProcessors(singletonList(nullMessageProcessor));
+    router.setCollectionExpression("!@INVALID");
+
+    muleContext.getInjector().inject(router);
+    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    router.initialise();
+
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(ExpressionRuntimeException.class));
+    router.process(testEvent());
   }
 
   private CoreEvent createListEvent() throws MuleException {

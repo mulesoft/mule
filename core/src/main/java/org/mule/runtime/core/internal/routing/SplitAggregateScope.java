@@ -25,6 +25,8 @@ import static reactor.core.publisher.Flux.fromIterable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -56,7 +58,7 @@ import org.reactivestreams.Publisher;
  */
 public class SplitAggregateScope extends AbstractForkJoinRouter {
 
-  private String expression = DEFAULT_SPLIT_EXPRESSION;
+  private String collectionExpression = DEFAULT_SPLIT_EXPRESSION;
   private SplittingStrategy<CoreEvent, Iterator<TypedValue<?>>> splittingStrategy;
 
   private List<Processor> messageProcessors;
@@ -66,7 +68,7 @@ public class SplitAggregateScope extends AbstractForkJoinRouter {
   public void initialise() throws InitialisationException {
     nestedChain = newChain(Optional.of(resolveProcessingStrategy()), messageProcessors);
     nestedChain.setMuleContext(muleContext);
-    splittingStrategy = new ExpressionSplittingStrategy(muleContext.getExpressionManager(), expression);
+    splittingStrategy = new ExpressionSplittingStrategy(muleContext.getExpressionManager(), collectionExpression);
     super.initialise();
   }
 
@@ -99,5 +101,14 @@ public class SplitAggregateScope extends AbstractForkJoinRouter {
   @Override
   protected ForkJoinStrategyFactory getDefaultForkJoinStrategyFactory() {
     return new CollectListForkJoinStrategyFactory();
+  }
+
+  /**
+   * Set the expression used to split the incoming message.
+   * 
+   * @param collectionExpression
+   */
+  public void setCollectionExpression(String collectionExpression) {
+    this.collectionExpression = collectionExpression;
   }
 }
