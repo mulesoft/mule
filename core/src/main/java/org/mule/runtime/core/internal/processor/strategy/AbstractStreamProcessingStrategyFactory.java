@@ -164,7 +164,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
       CountDownLatch completionLatch = new CountDownLatch(subscriberCount);
       for (int i = 0; i < subscriberCount; i++) {
         processor.doOnSubscribe(subscription -> currentThread().setContextClassLoader(executionClassloader)).transform(function)
-            .doFinally(s -> completionLatch.countDown()).subscribe();
+            .subscribe(null, e -> completionLatch.countDown(), completionLatch::countDown);
       }
       return new ReactorSink(processor.sink(), () -> {
         long start = currentTimeMillis();
