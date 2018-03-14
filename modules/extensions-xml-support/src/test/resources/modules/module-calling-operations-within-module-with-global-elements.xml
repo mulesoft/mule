@@ -34,11 +34,11 @@
 
     <!--
     INTERNAL OPERATIONS BELOW.
-    Despite being seen from the outside of this <module> boundary (smart connector' <operation>s don't have "private" visibility),
+    The following operation will not bee seen outside this <module> boundary (see visibility attribute),
     they are all meant to be used through a proxy method for testing purposes, and that's why all of them start with the
     "internal-" prefix.
     -->
-    <operation name="internal-list">
+    <operation name="internal-list" visibility="PRIVATE">
         <parameters>
             <parameter name="myPath" type="string"/>
         </parameters>

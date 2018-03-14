@@ -30,6 +30,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.PrivateOperationsModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -612,13 +613,18 @@ public class MacroExpansionModuleModel {
    */
   private Optional<OperationModel> lookForOperation(ComponentIdentifier operationIdentifier, String prefix) {
     Optional<OperationModel> result = Optional.empty();
+    final String operationName = operationIdentifier.getName();
     if (operationIdentifier.getNamespace().equals(prefix)) {
       // As the operation can be inside the extension or the config, it has to be looked up in both elements.
       final HasOperationModels hasOperationModels =
           getConfigurationModel()
               .map(configurationModel -> (HasOperationModels) configurationModel)
               .orElse(extensionModel);
-      result = hasOperationModels.getOperationModel(operationIdentifier.getName());
+      result = hasOperationModels.getOperationModel(operationName);
+    }
+    // If the operation is not present, it might be a private one and it must be looked inside of the model property
+    if (!result.isPresent() && extensionModel.getModelProperty(PrivateOperationsModelProperty.class).isPresent()) {
+      result = extensionModel.getModelProperty(PrivateOperationsModelProperty.class).get().getOperationModel(operationName);
     }
     return result;
   }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-repeated-operations-tns"
+        namespace="http://www.mulesoft.org/schema/mule/module-repeated-operations-tns"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:tns="http://www.mulesoft.org/schema/mule/module-repeated-operations-tns"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/module-repeated-operations-tns http://www.mulesoft.org/schema/mule/module-repeated-operations-tns/current/mule-module-repeated-operations-tns.xsd">
+
+    <operation name="repeated-operation-tns">
+        <parameters>
+            <parameter name="value" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[vars.value]"/>
+            <tns:repeated-operation/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="repeated-operation-tns" visibility="PRIVATE">
+        <parameters>
+            <parameter name="value" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[vars.value]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>

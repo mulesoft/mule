@@ -159,7 +159,7 @@
     "internal-" prefix.
     Notice that ALL of the following operations call another module rather than setting the payload here.
     -->
-    <operation name="internal-set-payload-hardcoded-value">
+    <operation name="internal-set-payload-hardcoded-value" visibility="PRIVATE">
         <body>
             <mule:set-payload value="hardcoded value"/>
             <modified-prefix:set-payload-thru-internal-set-payload-hardcoded-value />
@@ -167,7 +167,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="internal-set-payload-param-value">
+    <operation name="internal-set-payload-param-value" visibility="PRIVATE">
         <parameters>
             <parameter name="aParameter" type="string"/>
         </parameters>
@@ -177,7 +177,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="internal-set-payload-using-content-parameter">
+    <operation name="internal-set-payload-using-content-parameter" visibility="PRIVATE">
         <parameters>
             <parameter name="content" type="string" role="CONTENT"/>
         </parameters>
@@ -189,7 +189,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="internal-set-payload-using-content-and-primary-and-simple-parameter">
+    <operation name="internal-set-payload-using-content-and-primary-and-simple-parameter" visibility="PRIVATE">
         <parameters>
             <parameter name="parameter1" type="string"/>
             <parameter name="content" type="string" role="CONTENT"/>
@@ -206,7 +206,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="internal-op1">
+    <operation name="internal-op1" visibility="PRIVATE">
         <parameters>
             <parameter name="op1Parameter" type="string"/>
         </parameters>
@@ -216,7 +216,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="internal-op2">
+    <operation name="internal-op2" visibility="PRIVATE">
         <parameters>
             <parameter name="op2Parameter" type="string"/>
         </parameters>
@@ -226,7 +226,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="internal-op3">
+    <operation name="internal-op3" visibility="PRIVATE">
         <parameters>
             <parameter name="op3Parameter" type="string"/>
         </parameters>

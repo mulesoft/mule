@@ -30,6 +30,15 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpa
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang3.StringUtils;
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -58,7 +67,6 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.api.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
@@ -68,7 +76,9 @@ import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionMo
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.PrivateOperationsModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.util.NoOpXmlErrorHandler;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -80,10 +90,13 @@ import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperatio
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
+import org.w3c.dom.Document;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
-
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -96,21 +109,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang3.StringUtils;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.CycleDetector;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-import org.w3c.dom.Document;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -148,6 +146,7 @@ public final class XmlExtensionLoaderDelegate {
   private static final String ERROR_TYPE_ATTRIBUTE = "type";
   private static final String ROLE = "role";
   private static final String ATTRIBUTE_USE = "use";
+  private static final String ATTRIBUTE_VISIBILITY = "visibility";
   private static final String NAMESPACE_SEPARATOR = ":";
 
   private static final String TRANSFORMATION_FOR_TNS_RESOURCE = "META-INF/transform_for_tns.xsl";
@@ -162,6 +161,15 @@ public final class XmlExtensionLoaderDelegate {
    */
   private enum UseEnum {
     REQUIRED, OPTIONAL, AUTO
+  }
+
+  /**
+   * ENUM used to discriminate which visibility an <operation/> has.
+   * TODO COMPLETR HERE
+   * @see
+   */
+  private enum OperationVisibility {
+    PRIVATE, PUBLIC
   }
 
   private static ParameterRole getRole(final String role) {
@@ -234,7 +242,7 @@ public final class XmlExtensionLoaderDelegate {
     loadDeclaration();
     Document moduleDocument = getModuleDocument(context, resource);
     loadModuleExtension(context.getExtensionDeclarer(), resource, moduleDocument,
-                        context.getDslResolvingContext().getExtensions());
+                        context.getDslResolvingContext().getExtensions(), false);
   }
 
   private URL getResource(String resource) {
@@ -330,11 +338,8 @@ public final class XmlExtensionLoaderDelegate {
         .loadDocument(extensions, resource.getFile(), new ByteArrayInputStream(resultStream.toByteArray()));
     if (StringUtils.isNotBlank(transformedModuleDocument.getDocumentElement().getAttribute(XMLNS_TNS))) {
       final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
-      loadModuleExtension(extensionDeclarer, resource, transformedModuleDocument, extensions);
-
-      result = new ExtensionModelFactory()
-          .create(new DefaultExtensionLoadingContext(extensionDeclarer, currentThread().getContextClassLoader(),
-                                                     new NullDslResolvingContext()));
+      loadModuleExtension(extensionDeclarer, resource, transformedModuleDocument, extensions, true);
+      result = createExtensionModel(extensionDeclarer);
     }
     return Optional.ofNullable(result);
   }
@@ -354,20 +359,19 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private void loadModuleExtension(ExtensionDeclarer declarer, URL resource, Document moduleDocument,
-                                   Set<ExtensionModel> extensions) {
+                                   Set<ExtensionModel> extensions, boolean comesFromTNS) {
     final ComponentModel moduleModel = getModuleComponentModel(resource, moduleDocument);
     if (!moduleModel.getIdentifier().equals(MODULE_IDENTIFIER)) {
       throw new MuleRuntimeException(createStaticMessage(format("The root element of a module must be '%s', but found '%s'",
                                                                 MODULE_IDENTIFIER.toString(),
                                                                 moduleModel.getIdentifier().toString())));
     }
-    String name = moduleModel.getParameters().get(MODULE_NAME);
-
-    String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
+    final String name = moduleModel.getParameters().get(MODULE_NAME);
+    final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
     final String category = moduleModel.getParameters().get(CATEGORY);
     final String vendor = moduleModel.getParameters().get(VENDOR);
     final XmlDslModel xmlDslModel = getXmlDslModel(moduleModel, name, version);
-
+    final String description = getDescription(moduleModel);
     final String xmlnsTnsValue = moduleModel.getParameters().get(XMLNS_TNS);
     if (xmlnsTnsValue != null && !xmlDslModel.getNamespace().equals(xmlnsTnsValue)) {
       throw new MuleRuntimeException(createStaticMessage(format("The %s attribute value of the module must be '%s', but found '%s'",
@@ -376,20 +380,25 @@ public final class XmlExtensionLoaderDelegate {
                                                                 xmlnsTnsValue)));
     }
 
-    DirectedGraph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
-
-    declarer.named(name)
-        .describedAs(getDescription(moduleModel))
-        .fromVendor(vendor)
-        .onVersion(version)
-        .withCategory(Category.valueOf(category.toUpperCase()))
-        .withXmlDsl(xmlDslModel);
+    fillDeclarer(declarer, name, version, category, vendor, xmlDslModel, description);
     declarer.withModelProperty(getXmlExtensionModelProperty(moduleModel, xmlDslModel));
+
+    DirectedGraph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
+    //loading public operations
     final Optional<ConfigurationDeclarer> configurationDeclarer = loadPropertiesFrom(declarer, moduleModel, extensions);
-    if (configurationDeclarer.isPresent()) {
-      loadOperationsFrom(configurationDeclarer.get(), moduleModel, directedGraph, xmlDslModel);
+    final HasOperationDeclarer hasOperationDeclarer = configurationDeclarer.isPresent() ? configurationDeclarer.get() : declarer;
+    loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel, OperationVisibility.PUBLIC);
+    //loading private operations
+    if (comesFromTNS) {
+      //when parsing for the TNS, we need the <operation/>s to be part of the extension model to validate the XML properly
+      loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel, OperationVisibility.PRIVATE);
     } else {
-      loadOperationsFrom(declarer, moduleModel, directedGraph, xmlDslModel);
+      //when parsing for the macro expansion, the <operation/>s will be left in the PrivateOperationsModelProperty model property
+      final ExtensionDeclarer temporalDeclarer = new ExtensionDeclarer();
+      fillDeclarer(temporalDeclarer, name, version, category, vendor, xmlDslModel, description);
+      loadOperationsFrom(temporalDeclarer, moduleModel, directedGraph, xmlDslModel, OperationVisibility.PRIVATE);
+      final ExtensionModel result = createExtensionModel(temporalDeclarer);
+      declarer.withModelProperty(new PrivateOperationsModelProperty(result.getOperationModels()));
     }
 
     final CycleDetector<String, DefaultEdge> cycleDetector = new CycleDetector<>(directedGraph);
@@ -397,6 +406,22 @@ public final class XmlExtensionLoaderDelegate {
     if (!cycles.isEmpty()) {
       throw new MuleRuntimeException(createStaticMessage(format(CYCLIC_OPERATIONS_ERROR, new TreeSet(cycles))));
     }
+  }
+
+  private ExtensionModel createExtensionModel(ExtensionDeclarer declarer) {
+    return new ExtensionModelFactory()
+        .create(new DefaultExtensionLoadingContext(declarer, currentThread().getContextClassLoader(),
+                                                   new NullDslResolvingContext()));
+  }
+
+  private void fillDeclarer(ExtensionDeclarer declarer, String name, String version, String category, String vendor,
+                            XmlDslModel xmlDslModel, String description) {
+    declarer.named(name)
+        .describedAs(description)
+        .fromVendor(vendor)
+        .onVersion(version)
+        .withCategory(Category.valueOf(category.toUpperCase()))
+        .withXmlDsl(xmlDslModel);
   }
 
   /**
@@ -603,9 +628,13 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private void loadOperationsFrom(HasOperationDeclarer declarer, ComponentModel moduleModel,
-                                  DirectedGraph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel) {
+                                  DirectedGraph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel,
+                                  final OperationVisibility visibility) {
+
     moduleModel.getInnerComponents().stream()
         .filter(child -> child.getIdentifier().equals(OPERATION_IDENTIFIER))
+        .filter(operationModel -> OperationVisibility
+            .valueOf(operationModel.getParameters().get(ATTRIBUTE_VISIBILITY)) == visibility)
         .forEach(operationModel -> extractOperationExtension(declarer, operationModel, directedGraph, xmlDslModel));
   }
 

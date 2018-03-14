@@ -359,7 +359,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         operationModel.getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
+    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(2));
   }
 
   @Test
@@ -418,7 +418,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getName(), is("module-calling-operations-within-module"));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
-    assertThat(extensionModel.getOperationModels().size(), is(18));
+    assertThat(extensionModel.getOperationModels().size(), is(11));
   }
 
   /**
@@ -433,7 +433,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     parameters.put(RESOURCE_XML, modulePath);
     parameters.put(XmlExtensionModelLoader.VALIDATE_XML, validateXml);
     final ExtensionModel extensionModel = new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(),
-                                                                                           //                                                                                           getDefault(Collections.emptySet()),
                                                                                            getDefault(getDependencyExtensions()),
                                                                                            parameters);
     assertNoReconnectionIsAdded(extensionModel);
@@ -456,10 +455,8 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
   }
 
   private Set<ExtensionModel> getDependencyExtensions() {
-    ExtensionModel sockets = loadExtension(PetStoreConnector.class, emptySet());
-    //      ExtensionModel sockets = loadExtension(SocketsExtension.class, emptySet());
-    //      ExtensionModel http = loadExtension(HttpConnector.class, singleton(sockets));
-    return ImmutableSet.<ExtensionModel>builder().add(sockets).build();
+    ExtensionModel petstore = loadExtension(PetStoreConnector.class, emptySet());
+    return ImmutableSet.<ExtensionModel>builder().add(petstore).build();
   }
 
   private ExtensionModel loadExtension(Class extension, Set<ExtensionModel> deps) {
