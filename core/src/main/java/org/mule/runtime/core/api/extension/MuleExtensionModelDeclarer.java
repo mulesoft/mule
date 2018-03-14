@@ -581,6 +581,12 @@ class MuleExtensionModelDeclarer {
     splitAggregate.withChain();
 
     splitAggregate.onDefaultParameterGroup()
+        .withOptionalParameter("collection")
+        .ofType(typeLoader.load(String.class))
+        .withRole(ParameterRole.PRIMARY_CONTENT)
+        .withExpressionSupport(SUPPORTED)
+        .describedAs("Expression that defines the collection of parts to be processed in parallel");
+    splitAggregate.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
         .ofType(typeLoader.load(Long.class))
         .defaultingTo(Long.MAX_VALUE)
@@ -609,9 +615,6 @@ class MuleExtensionModelDeclarer {
         .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
         .withModelProperty(new TargetModelProperty());
-
-    // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
-    // ConstructModel doesn't support it.)
   }
 
   private void declareTry(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
