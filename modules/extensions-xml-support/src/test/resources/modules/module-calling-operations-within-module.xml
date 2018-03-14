@@ -154,18 +154,18 @@
 
     <!--
     INTERNAL OPERATIONS BELOW.
-    Despite being seen from the outside of this <module> boundary (smart connector' <operation>s don't have "private" visibility),
+    The following operations will not bee seen outside this <module> boundary (see visibility attribute),
     they are all meant to be used through a proxy method for testing purposes, and that's why all of them start with the
     "internal-" prefix.
     -->
-    <operation name="internal-set-payload-hardcoded-value">
+    <operation name="internal-set-payload-hardcoded-value" visibility="PRIVATE">
         <body>
             <mule:set-payload value="hardcoded value"/>
         </body>
         <output type="string"/>
     </operation>
 
-    <operation name="internal-set-payload-param-value">
+    <operation name="internal-set-payload-param-value" visibility="PRIVATE">
         <parameters>
             <parameter name="aParameter" type="string"/>
         </parameters>
@@ -175,7 +175,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="internal-set-payload-using-content-parameter">
+    <operation name="internal-set-payload-using-content-parameter" visibility="PRIVATE">
         <parameters>
             <parameter name="content" type="string" role="CONTENT"/>
         </parameters>
@@ -185,7 +185,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="internal-set-payload-using-content-and-primary-and-simple-parameter">
+    <operation name="internal-set-payload-using-content-and-primary-and-simple-parameter" visibility="PRIVATE">
         <parameters>
             <parameter name="parameter1" type="string"/>
             <parameter name="content" type="string" role="CONTENT"/>
@@ -197,7 +197,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="internal-op1">
+    <operation name="internal-op1" visibility="PRIVATE">
         <parameters>
             <parameter name="op1Parameter" type="string"/>
         </parameters>
@@ -207,7 +207,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="internal-op2">
+    <operation name="internal-op2" visibility="PRIVATE">
         <parameters>
             <parameter name="op2Parameter" type="string"/>
         </parameters>
@@ -217,7 +217,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="internal-op3">
+    <operation name="internal-op3" visibility="PRIVATE">
         <parameters>
             <parameter name="op3Parameter" type="string"/>
         </parameters>

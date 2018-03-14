@@ -16,7 +16,7 @@
         <output type="string"/>
     </operation>
 
-    <operation name="internal-op">
+    <operation name="internal-op" visibility="PRIVATE">
         <body>
             <mule:set-payload value="w-internal-op"/>
         </body>

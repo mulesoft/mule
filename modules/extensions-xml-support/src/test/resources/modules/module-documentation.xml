@@ -5,10 +5,12 @@
         xmlns="http://www.mulesoft.org/schema/mule/module"
         xmlns:mule="http://www.mulesoft.org/schema/mule/core"
         xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+        xmlns:tns="http://www.mulesoft.org/schema/mule/module-documentation"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
-           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/module-documentation http://www.mulesoft.org/schema/mule/module-documentation/current/mule-module-documentation.xsd">
 
     <property name="aPropertyWithDoc" type="string" doc:description="Documentation for the property"/>
     <property name="aHiddenPropertyWithDoc" type="string" password="true" doc:description="Documentation for the hidden property"/>
@@ -25,6 +27,7 @@
         </parameters>
         <body>
             <mule:set-payload value="hardcoded value"/>
+            <tns:private-operation target="testingSyntheticParameter" someParameter="privateParameterValue"/>
         </body>
         <output type="string" doc:description="Documentation for the output"/>
         <output-attributes type="string" doc:description="Documentation for the output attributes"/>
@@ -32,5 +35,15 @@
             <error type="CUSTOM_ERROR_HERE"/>
             <error type="ANOTHER_CUSTOM_ERROR_HERE"/>
         </errors>
+    </operation>
+
+    <operation name="private-operation" visibility="PRIVATE">
+        <parameters>
+            <parameter name="someParameter" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="private operation"/>
+        </body>
+        <output type="number"/>
     </operation>
 </module>

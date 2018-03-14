@@ -97,6 +97,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="visibility" type="visibilityType" default="PUBLIC">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                        Describes weather the operation can be accessible outside the module or not.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -322,6 +329,20 @@
             <xsd:enumeration value="REQUIRED"/>
             <xsd:enumeration value="OPTIONAL"/>
             <xsd:enumeration value="AUTO"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="visibilityType">
+        <xsd:annotation>
+            <xsd:documentation>
+            Set of defined visibilities for a given operation.
+            PUBLIC will render the operation in the UI and can be consumed from the application.
+            PRIVATE implies no visibility of the operation from the UI neither being consumed by the application, but it can be accessed by the internals of the current module through the TNS support
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="PUBLIC"/>
+            <xsd:enumeration value="PRIVATE"/>
         </xsd:restriction>
     </xsd:simpleType>
 

@@ -9,11 +9,11 @@ package org.mule.runtime.config.internal.factories;
 import static java.lang.String.format;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.PrivateOperationsModelProperty;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
@@ -21,11 +21,10 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import javax.inject.Inject;
 
 public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProcessorChainObjectFactory {
 
@@ -78,11 +77,14 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
   private OperationModel getOperationModelOrFail(ExtensionModel extensionModel) {
     OperationSeeker operationSeeker = new OperationSeeker();
     operationSeeker.walk(extensionModel);
-    if (!operationSeeker.operationModel.isPresent()) {
-      throw new IllegalArgumentException(format("Could not find any operation under the name of [%s] for the extension [%s]",
-                                                moduleOperation, moduleName));
-    }
-    return operationSeeker.operationModel.get();
+    final OperationModel operationModel =
+        operationSeeker.operationModel
+            .orElseGet(
+                       () -> extensionModel.getModelProperty(PrivateOperationsModelProperty.class).get()
+                           .getOperationModel(moduleOperation)
+                           .orElseThrow(() -> new IllegalArgumentException(format("Could not find any operation under the name of [%s] for the extension [%s]",
+                                                                                  moduleOperation, moduleName))));
+    return operationModel;
   }
 
   public void setProperties(Map<String, String> properties) {
