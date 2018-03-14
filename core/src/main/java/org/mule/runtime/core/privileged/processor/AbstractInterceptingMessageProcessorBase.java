@@ -9,6 +9,7 @@ package org.mule.runtime.core.privileged.processor;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -18,9 +19,13 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.ObjectUtils;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import reactor.core.publisher.Mono;
 
 /**
  * Abstract implementation that provides the infrastructure for intercepting message processors. It doesn't implement
@@ -59,6 +64,10 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractC
   protected Processor next = event -> event;
 
   protected CoreEvent processNext(CoreEvent event) throws MuleException {
+    return processNext(event, Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher()));
+  }
+
+  protected CoreEvent processNext(CoreEvent event, Publisher<CoreEvent> responsePublisher) throws MuleException {
     if (event == null) {
       if (logger.isDebugEnabled()) {
         logger.trace("MuleEvent is null.  Next MessageProcessor '" + next.getClass().getName() + "' will not be invoked.");
@@ -68,7 +77,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractC
       if (logger.isTraceEnabled()) {
         logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
       }
-      return processToApply(event, next);
+      return processToApply(event, next, false, responsePublisher);
     }
   }
 
