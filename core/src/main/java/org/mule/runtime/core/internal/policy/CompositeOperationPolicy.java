@@ -141,7 +141,7 @@ public class CompositeOperationPolicy extends
       Map<String, Object> operationParameters = new HashMap<>(getParametersProcessor().getOperationParameters());
       Map<String, Object> providers = new HashMap<>();
 
-      // TODO Avoid iterating this map every time
+      // TODO MULE-14735 Avoid iterating this map every time
       for (Entry<String, Object> e : operationParameters.entrySet()) {
         if (e.getValue() instanceof TypedValue) {
           providers.put(e.getKey(),
