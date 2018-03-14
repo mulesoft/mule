@@ -41,7 +41,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Some convenience methods for message processors.
@@ -120,11 +119,35 @@ public class MessageProcessors {
    */
   public static CoreEvent processToApply(CoreEvent event, ReactiveProcessor processor, boolean completeContext)
       throws MuleException {
+    return processToApply(event, processor, completeContext,
+                          from(((BaseEventContext) event.getContext()).getResponsePublisher()));
+  }
+
+  /**
+   * Adapt a {@link ReactiveProcessor} that implements {@link ReactiveProcessor#apply(Object)} to a blocking API that blocks until
+   * a {@link CoreEvent} result is available or throws an exception in the case of an error. This is currently used widely to
+   * continue to support the blocking {@link Processor#process(CoreEvent)} API when the implementation of a {@link Processor} is
+   * implemented via {@link ReactiveProcessor#apply(Object)}.
+   * <p>
+   * The {@link CoreEvent} returned by this method will be completed with a {@link CoreEvent} or {@link Throwable} if
+   * {@code completeContext} is {@code true}.
+   *
+   * TODO MULE-13054 Remove blocking processor API
+   *
+   * @param event event to process
+   * @param processor processor to adapt
+   * @param alternate publisher to use if {@code processor} doesn't return data.
+   * @return result event
+   * @throws MuleException if an error occurs
+   */
+  public static CoreEvent processToApply(CoreEvent event, ReactiveProcessor processor, boolean completeContext,
+                                         Publisher<CoreEvent> alternate)
+      throws MuleException {
     try {
       return just(event)
           .transform(processor)
           // Ensure errors handled by MessageProcessorChains are returned
-          .switchIfEmpty(from(((BaseEventContext) event.getContext()).getResponsePublisher()))
+          .switchIfEmpty(from(alternate))
           .doOnSuccess(completeSuccessIfNeeded((event.getContext()), completeContext))
           .doOnError(completeErrorIfNeeded((event.getContext()), completeContext))
           .block();
@@ -152,10 +175,12 @@ public class MessageProcessors {
   public static CoreEvent processToApplyWithChildContext(CoreEvent event, ReactiveProcessor processor)
       throws MuleException {
     try {
+      BaseEventContext childContext = newChildContext(event, empty());
       return just(event)
-          .transform(publisher -> from(publisher).flatMap(request -> Mono
-              .from(internalProcessWithChildContext(request, processor,
-                                                    newChildContext(event, empty()), false))))
+          .transform(publisher -> from(publisher).flatMap(request -> {
+            return from(internalProcessWithChildContext(request, processor, childContext, false,
+                                                        childContext.getResponsePublisher()));
+          }))
           .block();
     } catch (Throwable e) {
       throw rxExceptionToMuleException(e);
@@ -198,8 +223,8 @@ public class MessageProcessors {
    */
   public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              Optional<ComponentLocation> componentLocation) {
-    return internalProcessWithChildContext(event, processor,
-                                           newChildContext(event, componentLocation), true);
+    BaseEventContext childContext = newChildContext(event, componentLocation);
+    return internalProcessWithChildContext(event, processor, childContext, true, childContext.getResponsePublisher());
   }
 
   /**
@@ -215,7 +240,7 @@ public class MessageProcessors {
 
   public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              BaseEventContext childContext) {
-    return internalProcessWithChildContext(event, processor, childContext, true);
+    return internalProcessWithChildContext(event, processor, childContext, true, childContext.getResponsePublisher());
   }
 
   /**
@@ -234,18 +259,17 @@ public class MessageProcessors {
   public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              Optional<ComponentLocation> componentLocation,
                                                              FlowExceptionHandler exceptionHandler) {
-    return internalProcessWithChildContext(event, processor,
-                                           child(((BaseEventContext) event.getContext()), componentLocation,
-                                                 exceptionHandler),
-                                           true);
+    BaseEventContext childContext = child(((BaseEventContext) event.getContext()), componentLocation, exceptionHandler);
+    return internalProcessWithChildContext(event, processor, childContext, true, childContext.getResponsePublisher());
   }
 
   private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
-                                                                      EventContext child, boolean completeParentOnEmpty) {
+                                                                      EventContext child, boolean completeParentOnEmpty,
+                                                                      Publisher<CoreEvent> responsePublisher) {
     return just(builder(child, event).build())
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded(child, true))
-        .switchIfEmpty(from(((BaseEventContext) child).getResponsePublisher()))
+        .switchIfEmpty(from(responsePublisher))
         .map(result -> builder(event.getContext(), result).build())
         .doOnError(MessagingException.class,
                    me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()))
