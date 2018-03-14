@@ -583,7 +583,8 @@ class MuleExtensionModelDeclarer {
     splitAggregate.onDefaultParameterGroup()
         .withOptionalParameter("collection")
         .ofType(typeLoader.load(String.class))
-        .withRole(ParameterRole.PRIMARY_CONTENT)
+        // TODO MULE-14734 Review collection parameter in splitAggregate
+        .withRole(ParameterRole.BEHAVIOUR)
         .withExpressionSupport(SUPPORTED)
         .describedAs("Expression that defines the collection of parts to be processed in parallel");
     splitAggregate.onDefaultParameterGroup()
