@@ -178,8 +178,8 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
                                                    String subscribeOnSchedulerName, CoreEvent event) {
       return just(event)
           .transform(processor)
-          .publishOn(publishOnScheduler)
           .subscribeOn(subscribeOnScheduler)
+          .publishOn(publishOnScheduler)
           .doOnError(RejectedExecutionException.class, throwable -> LOGGER.trace("Shared scheduler " + subscribeOnSchedulerName
               + " is busy.  Scheduling of the current event will be retried after " + SCHEDULER_BUSY_RETRY_INTERVAL_MS + "ms."))
           .retryWhen(errors -> errors

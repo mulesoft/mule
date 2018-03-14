@@ -83,11 +83,10 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
       if (maxConcurrency > subscribers) {
-        return publisher -> {
-          return from(publisher).parallel(parallelism)
-              .runOn(scheduler)
-              .composeGroup(pipeline);
-        };
+        return publisher -> from(publisher)
+            .parallel(parallelism)
+            .runOn(scheduler)
+            .composeGroup(pipeline);
       } else {
         return super.onPipeline(pipeline);
       }
@@ -95,12 +94,9 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-      reactor.core.scheduler.Scheduler scheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
+      reactor.core.scheduler.Scheduler cpuLightScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-        return publisher -> {
-          return from(publisher).transform(processor).parallel(parallelism)
-              .runOn(scheduler);
-        };
+        return publisher -> from(publisher).transform(processor).publishOn(cpuLightScheduler);
       } else {
         return super.onProcessor(processor);
       }
