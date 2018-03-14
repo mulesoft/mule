@@ -2092,6 +2092,24 @@
           "methodName": "createSimpleChain",
           "elementKind": "method",
           "justification": "This interface should not be API"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.api.event.CoreEvent org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessorBase::processNext(org.mule.runtime.core.api.event.CoreEvent, org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>) throws org.mule.runtime.api.exception.MuleException",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "AbstractInterceptingMessageProcessorBase",
+          "methodName": "processNext",
+          "elementKind": "method",
+          "justification": "This is required by compatibility plugin"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.core.api.event.CoreEvent org.mule.runtime.core.privileged.processor.MessageProcessors::processToApply(org.mule.runtime.core.api.event.CoreEvent, org.mule.runtime.core.api.processor.ReactiveProcessor, boolean, org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>) throws org.mule.runtime.api.exception.MuleException",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "processToApply",
+          "elementKind": "method",
+          "justification": "This is required by compatibility plugin"
         }
       ]
     }
