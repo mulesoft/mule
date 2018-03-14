@@ -165,8 +165,7 @@ public final class XmlExtensionLoaderDelegate {
 
   /**
    * ENUM used to discriminate which visibility an <operation/> has.
-   * TODO COMPLETR HERE
-   * @see
+   * @see {@link XmlExtensionLoaderDelegate#loadOperationsFrom(HasOperationDeclarer, ComponentModel, DirectedGraph, XmlDslModel, XmlExtensionLoaderDelegate.OperationVisibility)}
    */
   private enum OperationVisibility {
     PRIVATE, PUBLIC
