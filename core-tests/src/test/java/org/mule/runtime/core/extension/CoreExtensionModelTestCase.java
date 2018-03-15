@@ -124,7 +124,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
     assertThat(coreExtensionModel.getOperationModels(), hasSize(8));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(14));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(15));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -392,6 +392,42 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(routeModel.getMinOccurs(), is(2));
     assertThat(routeModel.getMaxOccurs(), is(Optional.empty()));
     assertThat(routeModel.getAllParameterModels(), empty());
+  }
+
+  @Test
+  public void splitAggregate() {
+    final ConstructModel splitAggregate = coreExtensionModel.getConstructModel("splitAggregate").get();
+
+    NestableElementModel processorsChain = splitAggregate.getNestedComponents().get(0);
+    assertThat(processorsChain, instanceOf(NestedChainModel.class));
+    assertThat(processorsChain.isRequired(), is(true));
+
+    assertThat(splitAggregate.getAllParameterModels(), hasSize(5));
+
+    assertThat(splitAggregate.getAllParameterModels().get(0).getName(), is("collection"));
+    assertThat(splitAggregate.getAllParameterModels().get(0).getExpressionSupport(), is(REQUIRED));
+    assertThat(splitAggregate.getAllParameterModels().get(0).getType(), instanceOf(DefaultStringType.class));
+    assertThat(splitAggregate.getAllParameterModels().get(0).isRequired(), is(false));
+
+    assertThat(splitAggregate.getAllParameterModels().get(1).getName(), is("timeout"));
+    assertThat(splitAggregate.getAllParameterModels().get(1).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(splitAggregate.getAllParameterModels().get(1).getType(), instanceOf(DefaultNumberType.class));
+    assertThat(splitAggregate.getAllParameterModels().get(1).isRequired(), is(false));
+
+    assertThat(splitAggregate.getAllParameterModels().get(2).getName(), is("maxConcurrency"));
+    assertThat(splitAggregate.getAllParameterModels().get(2).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(splitAggregate.getAllParameterModels().get(2).getType(), instanceOf(DefaultNumberType.class));
+    assertThat(splitAggregate.getAllParameterModels().get(2).isRequired(), is(false));
+
+    assertThat(splitAggregate.getAllParameterModels().get(3).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(splitAggregate.getAllParameterModels().get(3).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(splitAggregate.getAllParameterModels().get(3).getType(), instanceOf(DefaultStringType.class));
+    assertThat(splitAggregate.getAllParameterModels().get(3).isRequired(), is(false));
+
+    assertThat(splitAggregate.getAllParameterModels().get(4).getName(), is(TARGET_VALUE_PARAMETER_NAME));
+    assertThat(splitAggregate.getAllParameterModels().get(4).getExpressionSupport(), is(REQUIRED));
+    assertThat(splitAggregate.getAllParameterModels().get(4).getType(), instanceOf(StringType.class));
+    assertThat(splitAggregate.getAllParameterModels().get(4).isRequired(), is(false));
   }
 
   @Test
