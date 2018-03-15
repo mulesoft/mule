@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.util;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.CollectionDataType;
@@ -16,6 +17,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.Reference;
@@ -264,7 +266,7 @@ public final class StreamingUtils {
       if (payload instanceof CursorProvider) {
         CursorProvider cursorProvider = streamingManager.manage((CursorProvider) payload, event);
         DataType dataType = DataType.builder(value.getDataType()).type(cursorProvider.getClass()).build();
-        return new TypedValue<>(cursorProvider, dataType, value.getLength());
+        return new TypedValue<>(cursorProvider, dataType, value.getByteLength());
       }
       return value;
     }
@@ -289,4 +291,27 @@ public final class StreamingUtils {
     };
   }
 
+  /**
+   * Updates the {@link Cursor} value a given {@link TypedValue} instance by replacing it with a {@link CursorProvider}.
+   *
+   * @param value the typed value to update
+   * @param event the current event
+   * @param streamingManager the streaming manager
+   * @return updated {@link TypedValue instance}
+   */
+  public static TypedValue updateTypedValueWithCursorProvider(final TypedValue value, final CoreEvent event,
+                                                              final StreamingManager streamingManager) {
+    if (event == null) {
+      return value;
+    } else {
+      Object payload = value.getValue();
+      if (payload instanceof CursorStream) {
+        CursorProvider provider = ((CursorStream) value.getValue()).getProvider();
+        DataType dataType = DataType.builder(value.getDataType()).type(provider.getClass()).build();
+        return new TypedValue(provider, dataType, value.getByteLength());
+      } else {
+        return value;
+      }
+    }
+  }
 }

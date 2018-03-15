@@ -24,18 +24,24 @@ public class ValueResolvingContext {
 
   private CoreEvent event;
   private final ConfigurationInstance config;
+  private final boolean resolveCursors;
 
-  private ValueResolvingContext(CoreEvent event, ConfigurationInstance config) {
+  private ValueResolvingContext(CoreEvent event, ConfigurationInstance config, boolean resolveCursors) {
     this.event = event;
     this.config = config;
+    this.resolveCursors = resolveCursors;
   }
 
   public static ValueResolvingContext from(CoreEvent event) {
-    return new ValueResolvingContext(event, null);
+    return new ValueResolvingContext(event, null, true);
   }
 
   public static ValueResolvingContext from(CoreEvent event, Optional<ConfigurationInstance> config) {
-    return new ValueResolvingContext(event, config.orElse(null));
+    return new ValueResolvingContext(event, config.orElse(null), true);
+  }
+
+  public static ValueResolvingContext from(CoreEvent event, Optional<ConfigurationInstance> config, boolean resolveCursors) {
+    return new ValueResolvingContext(event, config.orElse(null), resolveCursors);
   }
 
   /**
@@ -77,6 +83,10 @@ public class ValueResolvingContext {
   @Override
   public int hashCode() {
     return Objects.hash(event, config);
+  }
+
+  public boolean resolveCursors() {
+    return resolveCursors;
   }
 
 }
