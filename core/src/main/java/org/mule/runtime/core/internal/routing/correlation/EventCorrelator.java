@@ -18,6 +18,8 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.correlationTime
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.message.GroupCorrelation.NOT_SET;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -329,7 +331,7 @@ public class EventCorrelator implements Startable, Stoppable {
             // TODO which use cases would need a sync reply event
             // returned?
             if (timeoutMessageProcessor != null) {
-              timeoutMessageProcessor.process(newEvent);
+              processToApply(newEvent, timeoutMessageProcessor, false, empty());
             } else {
               throw new MessagingException(createStaticMessage(MessageFormat
                   .format("Group {0} timed out, but no timeout message processor was " + "configured.", group.getGroupId())),

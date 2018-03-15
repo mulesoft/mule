@@ -6,18 +6,15 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
-import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
-import static org.mule.runtime.core.internal.construct.FlowBackPressureException.BACK_PRESSURE_ERROR_MESSAGE;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -46,7 +43,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -56,13 +52,15 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
+import org.reactivestreams.Publisher;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to process
@@ -194,8 +192,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         @Override
         public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
           return from(publisher)
-              .doOnNext(assertStarted())
-              .transform(dispatchToFlow(sink));
+              .transform(dispatchToFlow());
         }
       });
     }
@@ -208,39 +205,23 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    * Processor that dispatches incoming source Events to the internal pipeline the Sink. The way in which the Event is dispatched
    * and how overload is handled depends on the Source back-pressure strategy.
    */
-  private ReactiveProcessor dispatchToFlow(Sink sink) {
-    if (source.getBackPressureStrategy() == WAIT) {
-      // If back-pressure strategy is WAIT then use blocking `accept(Event event)` to dispatch Event
-      return publisher -> Mono.from(publisher)
-          .flatMap(event -> {
-            try {
-              sink.accept(event);
-            } catch (RejectedExecutionException ree) {
-              Throwable overloadException = new FlowBackPressureException(getName(), ree);
-              MessagingException me = new MessagingException(event, overloadException, this);
-              ((BaseEventContext) event.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
-            }
-            return Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher());
-          });
-    } else {
-      // If back-pressure strategy is FAIL/DROP then using back-pressure aware `emit(Event event)` to dispatch Event
-      return publisher -> Mono.from(publisher).flatMap(event -> {
-        if (sink.emit(event)) {
-          return Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher());
-        } else {
-          // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with an OVERLOAD error.
-          FlowBackPressureException rejectedExecutionException = new FlowBackPressureException(getName());
-          return Mono.error(exceptionResolver.resolve(new MessagingException(builder(event)
-              .error(ErrorBuilder.builder().errorType(overloadErrorType)
-                  .description(format("Flow '%s' Busy.", getName()))
-                  .detailedDescription(format(BACK_PRESSURE_ERROR_MESSAGE, getName()))
-                  .exception(rejectedExecutionException)
-                  .build())
-              .build(), rejectedExecutionException, this), muleContext));
-        }
-      });
-    }
+  private ReactiveProcessor dispatchToFlow() {
+    return publisher -> Flux.from(publisher)
+        .doOnNext(assertStarted())
+        .flatMap(source.getBackPressureStrategy() == WAIT
+            ? flowWaitMapper()
+            : flowFailDropMapper(overloadErrorType));
   }
+
+  /**
+   * If back-pressure strategy is WAIT then use blocking `accept(Event event)` to dispatch Event
+   */
+  protected abstract Function<? super CoreEvent, ? extends Publisher<? extends CoreEvent>> flowWaitMapper();
+
+  /**
+   * If back-pressure strategy is FAIL/DROP then using back-pressure aware `emit(Event event)` to dispatch Event
+   */
+  protected abstract Function<? super CoreEvent, ? extends Publisher<? extends CoreEvent>> flowFailDropMapper(ErrorType overloadErrorType);
 
   protected ReactiveProcessor processFlowFunction() {
     return stream -> from(stream)

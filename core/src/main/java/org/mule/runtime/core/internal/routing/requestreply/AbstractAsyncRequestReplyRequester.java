@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.responseTimedOu
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -38,7 +39,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -85,7 +85,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
     if (replyMessageSource == null) {
-      return processNext(event);
+      return processNext(event, empty());
     } else {
       addLock(event);
 
@@ -202,7 +202,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   }
 
   protected void sendAsyncRequest(CoreEvent event) throws MuleException {
-    processNext(event);
+    processNext(event, empty());
   }
 
   private PrivilegedEvent receiveAsyncReply(CoreEvent event) throws MuleException {

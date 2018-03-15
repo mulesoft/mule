@@ -6,15 +6,20 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.internal.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.internal.routing.correlation.ResequenceMessagesCorrelatorCallback;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.processor.Router;
+
+import org.reactivestreams.Publisher;
 
 import java.util.Comparator;
 
@@ -57,13 +62,14 @@ public class Resequencer extends AbstractAggregator implements Router {
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
+    Publisher<CoreEvent> responsePublisher = from(((BaseEventContext) event.getContext()).getResponsePublisher());
     CoreEvent result = eventCorrelator.process(event);
     if (!isEventValid(result)) {
       return result;
     }
     CoreEvent last = null;
     for (CoreEvent muleEvent : (CoreEvent[]) result.getMessage().getPayload().getValue()) {
-      last = processNext(muleEvent);
+      last = processNext(muleEvent, responsePublisher);
     }
     // Respect existing behaviour by returning last event
     return last;

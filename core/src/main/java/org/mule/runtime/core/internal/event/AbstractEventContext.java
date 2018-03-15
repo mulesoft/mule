@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.event;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
@@ -26,8 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -54,7 +57,7 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   private transient final List<BaseEventContext> childContexts = new ArrayList<>();
   private transient final FlowExceptionHandler exceptionHandler;
-  private transient final CompletableFuture externalCompletion;
+  private transient final CompletableFuture<Void> externalCompletion;
   private transient final List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
   private transient final List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>();
   private transient final List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
@@ -63,6 +66,8 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   private volatile int state = STATE_READY;
   private volatile Either<Throwable, CoreEvent> result;
+
+  private final Set<ResponsePublisher> responsePublishers = new HashSet<>();
 
   protected FlowCallStack flowCallStack = new DefaultFlowCallStack();
 
@@ -166,9 +171,10 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   private synchronized void responseDone(Either<Throwable, CoreEvent> result) {
     this.result = result;
+    responsePublishers.forEach(rp -> rp.result = result);
     state = STATE_RESPONSE;
-    tryComplete();
     onResponseConsumerList.stream().forEach(consumer -> signalConsumerSilently(consumer));
+    tryComplete();
   }
 
   protected void tryComplete() {
@@ -204,7 +210,18 @@ abstract class AbstractEventContext implements BaseEventContext {
         LOGGER.debug(this + " terminated.");
       }
       this.state = STATE_TERMINATED;
+
       onTerminatedConsumerList.forEach(consumer -> signalConsumerSilently(consumer));
+
+      childContextsReadWriteLock.writeLock().lock();
+      try {
+        this.childContexts.clear();
+      } finally {
+        childContextsReadWriteLock.writeLock().unlock();
+      }
+
+      result = null;
+      responsePublishers.clear();
     }
   }
 
@@ -212,7 +229,9 @@ abstract class AbstractEventContext implements BaseEventContext {
     try {
       consumer.accept(result.getRight(), result.getLeft());
     } catch (Throwable t) {
-      LOGGER.error("The event consumer {}, of EventContext {} failed with exception: {} ", consumer, this, t);
+      LOGGER.error(format("The event consumer %s, of EventContext %s failed with exception:",
+                          consumer.toString(), this.toString()),
+                   t);
     }
   }
 
@@ -266,28 +285,14 @@ abstract class AbstractEventContext implements BaseEventContext {
   }
 
   @Override
-  public Publisher<CoreEvent> getResponsePublisher() {
-    return Mono.create(sink -> {
-      if (isResponseDone()) {
-        signalPublisherSink(sink);
-      } else {
-        synchronized (this) {
-          if (isResponseDone()) {
-            signalPublisherSink(sink);
-          } else {
-            onResponse((event, throwable) -> signalPublisherSink(sink));
-          }
-        }
-      }
-    });
-  }
-
-  private void signalPublisherSink(MonoSink<CoreEvent> sink) {
-    if (result.isLeft()) {
-      sink.error(result.getLeft());
-    } else {
-      sink.success(result.getRight());
+  public synchronized Publisher<CoreEvent> getResponsePublisher() {
+    if (isTerminated()) {
+      throw new IllegalStateException("getResponsePublisher() cannot be called after eventContext termination.");
     }
+
+    final ResponsePublisher responsePublisher = new ResponsePublisher();
+    responsePublishers.add(responsePublisher);
+    return Mono.create(responsePublisher);
   }
 
   public void forEachChild(Consumer<BaseEventContext> childConsumer) {
@@ -303,6 +308,44 @@ abstract class AbstractEventContext implements BaseEventContext {
       }
     } finally {
       childContextsReadWriteLock.readLock().unlock();
+    }
+  }
+
+  /**
+   * Allows the result of the parent object to be available for the {@link Publisher} of this context's response even after the
+   * context has been terminated.
+   */
+  private final class ResponsePublisher implements Consumer<MonoSink<CoreEvent>> {
+
+    private volatile Either<Throwable, CoreEvent> result;
+
+    @Override
+    public void accept(MonoSink<CoreEvent> sink) {
+      if (isResponseDone()) {
+        signalPublisherSink(sink);
+      } else {
+        synchronized (this) {
+          if (isResponseDone()) {
+            signalPublisherSink(sink);
+          } else {
+            onResponse((event, throwable) -> {
+              if (throwable != null) {
+                sink.error(throwable);
+              } else {
+                sink.success(event);
+              }
+            });
+          }
+        }
+      }
+    }
+
+    private void signalPublisherSink(MonoSink<CoreEvent> sink) {
+      if (result.isLeft()) {
+        sink.error(result.getLeft());
+      } else {
+        sink.success(result.getRight());
+      }
     }
   }
 

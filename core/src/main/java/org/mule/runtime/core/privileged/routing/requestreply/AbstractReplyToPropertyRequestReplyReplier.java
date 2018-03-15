@@ -7,16 +7,17 @@
 package org.mule.runtime.core.privileged.routing.requestreply;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
+import static reactor.core.publisher.Mono.empty;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.privileged.processor.InternalProcessor;
 
 @NoExtend
 public abstract class AbstractReplyToPropertyRequestReplyReplier extends AbstractInterceptingMessageProcessor
@@ -30,7 +31,7 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
       Object replyTo = privilegedEvent.getReplyToDestination();
       ReplyToHandler replyToHandler = privilegedEvent.getReplyToHandler();
 
-      resultEvent = processNext(event);
+      resultEvent = processNext(event, empty());
 
       // Allow components to stop processing of the ReplyTo property (e.g. CXF)
       if (resultEvent != null) {
@@ -38,7 +39,7 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
         event = processReplyTo(event, resultEvent, replyToHandler, replyTo);
       }
     } else {
-      resultEvent = processNext(event);
+      resultEvent = processNext(event, empty());
     }
     return resultEvent;
   }
