@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -20,12 +21,16 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.RESPONSE_AND_COMPLETION_PUBLISHERS;
+import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -35,7 +40,26 @@ import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
+import org.hamcrest.core.IsCollectionContaining;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,14 +70,7 @@ import java.util.function.Supplier;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import reactor.core.publisher.Mono;
 
 /**
  * TODO MULE-14000 Create hamcrest matchers to assert EventContext state
@@ -62,6 +79,8 @@ import org.junit.runners.Parameterized.Parameters;
 @Story(RESPONSE_AND_COMPLETION_PUBLISHERS)
 @RunWith(Parameterized.class)
 public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
+
+  private static final int GC_POLLING_TIMEOUT = 10000;
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -192,6 +211,57 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     parent.success(event);
 
     assertParent(is(event), is(nullValue()), true, true);
+  }
+
+  @Test
+  @Description("Once a child context is completed, its event is not kept in memory.")
+  public void childSuccessWithResultFreesChild() throws Exception {
+    child = addChild(parent);
+
+    CoreEvent eventChild = getEventBuilder().message(Message.of(TEST_PAYLOAD)).build();
+    CoreEvent eventParent = getEventBuilder().message(Message.of(TEST_PAYLOAD)).build();
+
+    PhantomReference<CoreEvent> childRef = new PhantomReference<>(eventChild, new ReferenceQueue<>());
+    child.success(eventChild);
+    eventChild = null;
+    childResultValue.set(null);
+
+    new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      System.gc();
+      assertThat(childRef.isEnqueued(), is(true));
+      return true;
+    }, "A hard reference is being mantained to the child event."));
+
+    parent.success(eventParent);
+  }
+
+  @Test
+  @Description("Once a child context is completed, its event is not kept in memory after the response publisher is consumed.")
+  public void childSuccessWithResultForPublisherFreesChild() throws Exception {
+    child = addChild(parent);
+
+    CoreEvent eventChild = getEventBuilder().message(Message.of(TEST_PAYLOAD)).build();
+    CoreEvent eventParent = getEventBuilder().message(Message.of(TEST_PAYLOAD)).build();
+
+    PhantomReference<CoreEvent> childRef = new PhantomReference<>(eventChild, new ReferenceQueue<>());
+
+    Publisher<CoreEvent> responsePublisher = child.getResponsePublisher();
+
+    child.success(eventChild);
+    eventChild = null;
+    childResultValue.set(null);
+
+    // Force finalization of the response publisher
+    from(responsePublisher).block();
+    responsePublisher = null;
+
+    new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      System.gc();
+      assertThat(childRef.isEnqueued(), is(true));
+      return true;
+    }, "A hard reference is being mantained to the child event."));
+
+    parent.success(eventParent);
   }
 
   @Test
@@ -488,6 +558,51 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
     assertThat(context.getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), is(CORE_PREFIX));
     assertThat(context.getOriginatingLocation().getComponentIdentifier().getIdentifier().getName(), is("test"));
+  }
+
+  @Test
+  public void callbacksOrderSuccess() throws MuleException {
+    List<String> callbacks = new ArrayList<>();
+
+    final DefaultEventContext eventContext = context.get();
+
+    eventContext.onResponse((e, t) -> callbacks.add("onResponse"));
+    eventContext.onComplete((e, t) -> callbacks.add("onComplete"));
+    eventContext.onTerminated((e, t) -> callbacks.add("onTerminated"));
+
+    eventContext.success(testEvent());
+
+    assertThat(callbacks, contains("onResponse", "onComplete", "onTerminated"));
+  }
+
+  @Test
+  public void callbacksOrderSuccessEmpty() {
+    List<String> callbacks = new ArrayList<>();
+
+    final DefaultEventContext eventContext = context.get();
+
+    eventContext.onResponse((e, t) -> callbacks.add("onResponse"));
+    eventContext.onComplete((e, t) -> callbacks.add("onComplete"));
+    eventContext.onTerminated((e, t) -> callbacks.add("onTerminated"));
+
+    eventContext.success();
+
+    assertThat(callbacks, contains("onResponse", "onComplete", "onTerminated"));
+  }
+
+  @Test
+  public void callbacksOrderError() {
+    List<String> callbacks = new ArrayList<>();
+
+    final DefaultEventContext eventContext = context.get();
+
+    eventContext.onResponse((e, t) -> callbacks.add("onResponse"));
+    eventContext.onComplete((e, t) -> callbacks.add("onComplete"));
+    eventContext.onTerminated((e, t) -> callbacks.add("onTerminated"));
+
+    eventContext.error(new NullPointerException());
+
+    assertThat(callbacks, contains("onResponse", "onComplete", "onTerminated"));
   }
 
   private void assertParent(Matcher<Object> eventMatcher, Matcher<Object> errorMatcher, boolean complete, boolean terminated) {
