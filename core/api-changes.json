@@ -2110,6 +2110,15 @@
           "methodName": "processToApply",
           "elementKind": "method",
           "justification": "This is required by compatibility plugin"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.api.metadata.TypedValue org.mule.runtime.core.api.util.StreamingUtils::updateTypedValueWithCursorProvider(org.mule.runtime.api.metadata.TypedValue, org.mule.runtime.core.api.event.CoreEvent, org.mule.runtime.core.api.streaming.StreamingManager)",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "StreamingUtils",
+          "methodName": "updateTypedValueWithCursorProvider",
+          "elementKind": "method",
+          "justification": "This is required by policies"
         }
       ]
     }
