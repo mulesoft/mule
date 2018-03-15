@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
@@ -57,6 +58,9 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
 
   @Inject
   private PolicyStateHandler policyStateHandler;
+
+  @Inject
+  private StreamingManager streamingManager;
 
   private Collection<OperationPolicyParametersTransformer> operationPolicyParametersTransformerCollection = emptyList();
   private Collection<SourcePolicyParametersTransformer> sourcePolicyParametersTransformerCollection = emptyList();
@@ -110,7 +114,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
     return new CompositeOperationPolicy(parameterizedPolicies,
                                         lookupOperationParametersTransformer(operation.getLocation().getComponentIdentifier()
                                             .getIdentifier()),
-                                        operationPolicyProcessorFactory, () -> operationParameters, operationExecutionFunction);
+                                        operationPolicyProcessorFactory, () -> operationParameters, operationExecutionFunction,
+                                        streamingManager);
   }
 
   private Optional<OperationPolicyParametersTransformer> lookupOperationParametersTransformer(ComponentIdentifier componentIdentifier) {

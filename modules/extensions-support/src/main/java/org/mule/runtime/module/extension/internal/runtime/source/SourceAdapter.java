@@ -28,6 +28,7 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -74,6 +75,10 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -84,10 +89,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
@@ -307,7 +308,8 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
     @Override
     public Map<String, Object> createResponseParameters(CoreEvent event) throws MessagingException {
       try {
-        ResolverSetResult parameters = SourceAdapter.this.successCallbackParameters.resolve(from(event, configurationInstance));
+        ResolverSetResult parameters =
+            SourceAdapter.this.successCallbackParameters.resolve(from(event, configurationInstance, false));
         return parameters.asMap();
       } catch (Exception e) {
         throw createSourceException(event, e);
@@ -317,7 +319,8 @@ public class SourceAdapter implements Startable, Stoppable, Initialisable {
     @Override
     public Map<String, Object> createFailureResponseParameters(CoreEvent event) throws MessagingException {
       try {
-        ResolverSetResult parameters = SourceAdapter.this.errorCallbackParameters.resolve(from(event, configurationInstance));
+        ResolverSetResult parameters =
+            SourceAdapter.this.errorCallbackParameters.resolve(from(event, configurationInstance, false));
         return parameters.asMap();
       } catch (Exception e) {
         throw createSourceException(event, e);
