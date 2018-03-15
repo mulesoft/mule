@@ -322,6 +322,7 @@ abstract class AbstractEventContext implements BaseEventContext {
     @Override
     public void accept(MonoSink<CoreEvent> sink) {
       Either<Throwable, CoreEvent> localResult = result;
+      result = null;
 
       if (isResponseDone()) {
         signalPublisherSink(sink, localResult);
