@@ -69,6 +69,18 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -90,17 +102,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -197,7 +198,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     this.mode = mode;
   }
 
-  @Parameterized.Parameters
+  @Parameterized.Parameters(name = "{0}")
   public static Collection<Mode> modeParameters() {
     return asList(new Mode[] {Mode.FLOW, SOURCE});
   }
@@ -452,9 +453,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       case FLOW:
         return flow.process(event);
       case SOURCE:
+        Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
         just(event).transform(triggerableMessageSource.getListener()).subscribe(requestUnbounded());
         try {
-          return Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher()).block();
+          return Mono.from(responsePublisher).block();
         } catch (Throwable throwable) {
           throw rxExceptionToMuleException(throwable);
         }
