@@ -321,15 +321,12 @@ abstract class AbstractEventContext implements BaseEventContext {
 
     @Override
     public void accept(MonoSink<CoreEvent> sink) {
-      Either<Throwable, CoreEvent> localResult = result;
-      result = null;
-
       if (isResponseDone()) {
-        signalPublisherSink(sink, localResult);
+        signalPublisherSink(sink);
       } else {
         synchronized (this) {
           if (isResponseDone()) {
-            signalPublisherSink(sink, localResult);
+            signalPublisherSink(sink);
           } else {
             onResponse((event, throwable) -> {
               if (throwable != null) {
@@ -343,11 +340,11 @@ abstract class AbstractEventContext implements BaseEventContext {
       }
     }
 
-    private void signalPublisherSink(MonoSink<CoreEvent> sink, Either<Throwable, CoreEvent> localResult) {
-      if (localResult.isLeft()) {
-        sink.error(localResult.getLeft());
+    private void signalPublisherSink(MonoSink<CoreEvent> sink) {
+      if (result.isLeft()) {
+        sink.error(result.getLeft());
       } else {
-        sink.success(localResult.getRight());
+        sink.success(result.getRight());
       }
     }
   }
