@@ -27,6 +27,10 @@ import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.retry.Retry.onlyIf;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.function.Supplier;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -42,10 +46,6 @@ import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingE
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.function.Supplier;
 
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
@@ -145,6 +145,8 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     {
       this(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
            blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, parallelism, maxConcurrency, false);
+        this.blockingSchedulerSupplier = blockingSchedulerSupplier;
+        this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
     }
 
     @Override
@@ -189,6 +191,17 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
         cpuIntensiveScheduler.stop();
       }
       super.stop();
+    }
+
+    @Override
+    public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
+      if (maxConcurrency > subscribers) {
+        return publisher -> from(publisher).parallel(CORES * 2)
+            .runOn(fromExecutorService(decorateScheduler(getCpuLightScheduler())))
+            .composeGroup(pipeline);
+      } else {
+        return super.onPipeline(pipeline);
+      }
     }
 
     @Override
