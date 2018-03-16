@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static com.google.common.base.Functions.identity;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
@@ -56,6 +57,7 @@ import org.reactivestreams.Publisher;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -206,19 +208,22 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return publisher -> Mono.from(publisher)
         .doOnNext(assertStarted())
         .flatMap(source.getBackPressureStrategy() == WAIT
-            ? flowWaitMapper()
-            : flowFailDropMapper(overloadErrorType));
+            ? flowWaitMapper(identity(), (result, event) -> result)
+            : flowFailDropMapper(identity(), (result, event) -> result, overloadErrorType));
   }
 
   /**
    * If back-pressure strategy is WAIT then use blocking `accept(Event event)` to dispatch Event
    */
-  protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowWaitMapper();
+  protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowWaitMapper(Function<CoreEvent, CoreEvent> eventForFlowMapper,
+                                                                                           BiFunction<CoreEvent, CoreEvent, CoreEvent> returnEventFromFlowMapper);
 
   /**
    * If back-pressure strategy is FAIL/DROP then using back-pressure aware `emit(Event event)` to dispatch Event
    */
-  protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowFailDropMapper(ErrorType overloadErrorType);
+  protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowFailDropMapper(Function<CoreEvent, CoreEvent> eventForFlowMapper,
+                                                                                               BiFunction<CoreEvent, CoreEvent, CoreEvent> returnEventFromFlowMapper,
+                                                                                               ErrorType overloadErrorType);
 
   protected ReactiveProcessor processFlowFunction() {
     return stream -> from(stream)
