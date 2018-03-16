@@ -19,8 +19,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
+import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
@@ -41,6 +44,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.util.LazyLookup;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
@@ -68,6 +72,7 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -349,12 +354,12 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
   }
 
   private CoreEvent runFlow(Flow flow, CoreEvent event, OAuthConfig config, String callbackType) {
-    try {
-      return flow.process(event);
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(
-                                     createStaticMessage(format("Error found while execution flow '%s' which is configured in the '%s' parameter "
-                                         + "of the '%s' config", flow.getName(), callbackType, config.getOwnerConfigName()), e));
-    }
+    final Publisher<CoreEvent> childPublisher =
+        processWithChildContext(event, flow, child((BaseEventContext) event.getContext(), of(flow.getLocation())));
+    return from(childPublisher)
+        .onErrorMap(MuleException.class,
+                    e -> new MuleRuntimeException(createStaticMessage(format("Error found while execution flow '%s' which is configured in the '%s' parameter "
+                        + "of the '%s' config", flow.getName(), callbackType, config.getOwnerConfigName()), e)))
+        .block();
   }
 }
