@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static java.lang.String.format;
+
 import java.io.Serializable;
 
 /**
  * Keeps context information about the processors that a flow executed.
- * 
+ *
  * @since 3.8.0
  */
 public final class FlowStackElement implements Serializable {
@@ -42,9 +44,9 @@ public final class FlowStackElement implements Serializable {
   @Override
   public String toString() {
     if (processorPath == null) {
-      return String.format("%s", flowName);
+      return format("%s", flowName);
     } else {
-      return String.format("%s(%s)", flowName, processorPath);
+      return format("%s(%s)", flowName, processorPath);
     }
   }
 }
