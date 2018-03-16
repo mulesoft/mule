@@ -211,14 +211,16 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
 
         @Override
         public void visitArrayType(ArrayType arrayType) {
-          arrayType.getType().accept(this);
+          if (!isCustomStaticType(arrayType)) {
+            arrayType.getType().accept(this);
+          }
         }
       });
     }
   }
 
-  private boolean isCustomStaticType(ObjectType objectType) {
-    return objectType.getAnnotation(CustomDefinedStaticTypeAnnotation.class).isPresent();
+  private boolean isCustomStaticType(MetadataType metadataType) {
+    return metadataType.getAnnotation(CustomDefinedStaticTypeAnnotation.class).isPresent();
   }
 
   // todo refactor with metadata factory getCategoryName()
