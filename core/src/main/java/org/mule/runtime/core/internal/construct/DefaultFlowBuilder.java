@@ -256,7 +256,7 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     @Override
-    protected Function<? super CoreEvent, ? extends Publisher<? extends CoreEvent>> flowWaitMapper() {
+    protected Function<? super CoreEvent, Mono<? extends CoreEvent>> flowWaitMapper() {
       return event -> {
         CoreEvent request = createMuleEventForCurrentFlow((PrivilegedEvent) event);
         Publisher<CoreEvent> responsePublisher = ((BaseEventContext) request.getContext()).getResponsePublisher();
@@ -273,7 +273,8 @@ public class DefaultFlowBuilder implements Builder {
       };
     }
 
-    protected Function<? super CoreEvent, ? extends Publisher<? extends CoreEvent>> flowFailDropMapper(ErrorType overloadErrorType) {
+    @Override
+    protected Function<? super CoreEvent, Mono<? extends CoreEvent>> flowFailDropMapper(ErrorType overloadErrorType) {
       return event -> {
         CoreEvent request = createMuleEventForCurrentFlow((PrivilegedEvent) event);
         Publisher<CoreEvent> responsePublisher = ((BaseEventContext) request.getContext()).getResponsePublisher();
@@ -297,7 +298,7 @@ public class DefaultFlowBuilder implements Builder {
       };
     }
 
-    private Publisher<? extends CoreEvent> flowResponse(CoreEvent event, Publisher<CoreEvent> responsePublisher) {
+    private Mono<? extends CoreEvent> flowResponse(CoreEvent event, Publisher<CoreEvent> responsePublisher) {
       return Mono.from(responsePublisher)
           .cast(PrivilegedEvent.class)
           .map(r -> {
