@@ -44,7 +44,6 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -60,7 +59,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to process
@@ -69,8 +68,6 @@ import reactor.core.publisher.Flux;
  * If no message processors are configured then the source message is simply returned.
  */
 public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline {
-
-  private final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(this);
 
   private final NotificationDispatcher notificationFirer;
 
@@ -206,7 +203,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    * and how overload is handled depends on the Source back-pressure strategy.
    */
   private ReactiveProcessor dispatchToFlow() {
-    return publisher -> Flux.from(publisher)
+    return publisher -> Mono.from(publisher)
         .doOnNext(assertStarted())
         .flatMap(source.getBackPressureStrategy() == WAIT
             ? flowWaitMapper()
@@ -216,12 +213,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   /**
    * If back-pressure strategy is WAIT then use blocking `accept(Event event)` to dispatch Event
    */
-  protected abstract Function<? super CoreEvent, ? extends Publisher<? extends CoreEvent>> flowWaitMapper();
+  protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowWaitMapper();
 
   /**
    * If back-pressure strategy is FAIL/DROP then using back-pressure aware `emit(Event event)` to dispatch Event
    */
-  protected abstract Function<? super CoreEvent, ? extends Publisher<? extends CoreEvent>> flowFailDropMapper(ErrorType overloadErrorType);
+  protected abstract Function<? super CoreEvent, Mono<? extends CoreEvent>> flowFailDropMapper(ErrorType overloadErrorType);
 
   protected ReactiveProcessor processFlowFunction() {
     return stream -> from(stream)

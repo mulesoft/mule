@@ -324,7 +324,7 @@ abstract class AbstractEventContext implements BaseEventContext {
       if (isResponseDone()) {
         signalPublisherSink(sink);
       } else {
-        synchronized (this) {
+        synchronized (AbstractEventContext.this) {
           if (isResponseDone()) {
             signalPublisherSink(sink);
           } else {
