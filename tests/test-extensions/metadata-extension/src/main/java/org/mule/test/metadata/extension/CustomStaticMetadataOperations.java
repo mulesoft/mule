@@ -34,6 +34,7 @@ public class CustomStaticMetadataOperations {
   public static final String CSV_VALUE = "Name,LastName\\njuan,desimoni\\nesteban,wasinger";
   public static final String XML_VALUE = IOUtils.toString(cl.getResourceAsStream("order.xml"));
   public static final String JSON_VALUE = "{\"age\":12,\"dni\": 1478231}";
+  public static final String JSON_ARRAY_VALUE = "[{\"age\":12,\"dni\": 1478231}, {\"age\":25,\"dni\": 37562148]";
 
   @OutputXmlType(schema = "order.xsd", qname = "shiporder")
   public InputStream xmlOutput() {
@@ -48,6 +49,11 @@ public class CustomStaticMetadataOperations {
   @OutputJsonType(schema = "person-schema.json")
   public InputStream jsonOutput() {
     return new ByteArrayInputStream(JSON_VALUE.getBytes());
+  }
+
+  @OutputJsonType(schema = "persons-schema.json")
+  public InputStream jsonOutputArray() {
+    return new ByteArrayInputStream(JSON_ARRAY_VALUE.getBytes());
   }
 
   @MediaType(value = "application/json")
