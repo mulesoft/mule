@@ -34,8 +34,8 @@ import org.junit.runners.Parameterized;
 public class ValidateSchemaFunctionalTestCase extends AbstractValidateSchemaFunctionalTestCase
 {
 
-    private static final String SCHEMA_LOCATION = "schemaLocation";
-    private static final String DEREFERENCING = "dereferencing";
+    static final String SCHEMA_LOCATION = "schemaLocation";
+    static final String DEREFERENCING = "dereferencing";
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() throws Exception
