@@ -20,6 +20,7 @@ MULE-12147: added proxy support to the SFTP connector through system properties:
 MULE-12612: As FTP reconnection is at operation level, FTP connector does not support asynchronous reconnection strategies because it only makes sense if reconnection takes place during the start phase of the connector lifecycle. In case you use this kind of reconnection, please change them as follows: <reconnect blocking="true"/> inside FTP Connector, or just remove the blocking attribute.
 MULE-14381: By default, the File Connector processes empty files. For disabling this behavior use the mule.transport.file.ignoreEmptyFiles=true system property.
 MULE-14507: The HTTP Requester now sends a zero content length in empty payloads scenarios. For disabling this behavior use the mule.http.client.avoidZeroContentLength=true system property.
+MULE-14601: For that Json Schema Validator refuses payloads with duplicate keys, set the mule.json.validator.allowDuplicateKeys system property to false.
 
 Migration changes from 3.7.x to 3.8.x
 MULE-9368: System property mule.sftp.knownHostsFile is now removed. Instead, the file with the known hosts must now be provided through the mule xml config file, in the knownHostsFile attribute of the connector or the endpoints.
