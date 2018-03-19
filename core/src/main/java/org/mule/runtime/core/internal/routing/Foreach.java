@@ -50,6 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * The {@code foreach} {@link Processor} allows iterating over a collection payload, or any collection obtained by an expression,
@@ -151,7 +152,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                                 ? from(p).buffer(batchSize).map(list -> new TypedValue<>(list, fromObject(list)))
                                 : p)
                             // For each TypedValue part process the nested chain using the event from the previous part.
-                            .concatMap(typedValue -> {
+                            .map(typedValue -> {
                               Builder partEventBuilder = builder(currentEvent.get());
                               if (typedValue.getValue() instanceof EventBuilderConfigurer) {
                                 // Support EventBuilderConfigurer currently used by Batch Module
@@ -163,11 +164,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                                 // Otherwise create a new message
                                 partEventBuilder.message(Message.builder().payload(typedValue).build());
                               }
-                              return from(processWithChildContext(partEventBuilder
+                              return Mono.from(processWithChildContext(partEventBuilder
                                   .addVariable(counterVariableName, count.incrementAndGet()).build(), nestedChain,
-                                                                  ofNullable(getLocation())))
-                                                                      .doOnNext(result -> currentEvent
-                                                                          .set(CoreEvent.builder(result).build()));
+                                                                       ofNullable(getLocation())))
+                                  .doOnNext(result -> currentEvent.set(CoreEvent.builder(result).build()))
+                                  .block();
                             })
                             // This can potentially be improved but simplest way currently to determine if split results in empty
                             // iterator is to check atomic count
