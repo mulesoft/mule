@@ -6,14 +6,21 @@
  */
 package org.mule.module.json.validation;
 
+import static com.fasterxml.jackson.core.JsonParser.Feature.STRICT_DUPLICATE_DETECTION;
+import static java.lang.Boolean.getBoolean;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonParser.Feature;
 
 /**
  * A {@link MessageProcessor} that uses a {@link JsonSchemaValidator}
@@ -24,6 +31,7 @@ import java.util.Map;
 public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Initialisable
 {
 
+    private boolean allowDuplicateKeys;
     private String schemaLocation;
     private JsonSchemaDereferencing dereferencing = JsonSchemaDereferencing.CANONICAL;
     private Map<String, String> schemaRedirects = new HashMap<>();
@@ -33,10 +41,18 @@ public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Ini
     @Override
     public void initialise() throws InitialisationException
     {
+        List<Feature> features = new ArrayList<>();
+
+        if (!allowDuplicateKeys)
+        {
+            features.add(STRICT_DUPLICATE_DETECTION);
+        }
+
         validator = JsonSchemaValidator.builder()
                 .setSchemaLocation(schemaLocation)
                 .setDereferencing(dereferencing)
                 .addSchemaRedirects(schemaRedirects)
+                .addFeatures(features)
                 .build();
     }
 
@@ -60,5 +76,15 @@ public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Ini
     public void setSchemaRedirects(Map<String, String> schemaRedirects)
     {
         this.schemaRedirects = schemaRedirects;
+    }
+
+    public boolean isAllowDuplicateKeys()
+    {
+        return allowDuplicateKeys;
+    }
+
+    public void setAllowDuplicateKeys(boolean allowDuplicateKeys)
+    {
+        this.allowDuplicateKeys = allowDuplicateKeys;
     }
 }
