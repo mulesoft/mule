@@ -32,6 +32,7 @@ import org.mule.runtime.module.tooling.api.ToolingServiceAware;
 
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,6 +51,9 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   private ServiceRepository serviceRepository;
   private EventContextService eventContextService;
 
+  private List<MuleCoreExtension> initializedCoreExtensions = new ArrayList<>();
+  private List<MuleCoreExtension> startedCoreExtensions = new ArrayList<>();
+
   public DefaultMuleCoreExtensionManagerServer(MuleCoreExtensionDiscoverer coreExtensionDiscoverer,
                                                MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver) {
     this.coreExtensionDiscoverer = coreExtensionDiscoverer;
@@ -60,13 +64,17 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   public void dispose() {
     LOGGER.info("Disposing core extensions");
     for (MuleCoreExtension extension : coreExtensions) {
-      try {
-        extension.dispose();
-        LOGGER.info("Core extension '{}' disposed", extension.toString());
-      } catch (Exception ex) {
-        LOGGER.error("Error disposing core extension " + extension.getName(), ex);
+
+      if (initializedCoreExtensions.contains(extension)) {
+        try {
+          extension.dispose();
+          LOGGER.info("Core extension '{}' disposed", extension.toString());
+        } catch (Exception ex) {
+          LOGGER.error("Error disposing core extension " + extension.getName(), ex);
+        }
       }
     }
+    initializedCoreExtensions.clear();
   }
 
   @Override
@@ -88,6 +96,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     LOGGER.info("Starting core extensions");
     for (MuleCoreExtension extension : orderedCoreExtensions) {
       extension.start();
+      startedCoreExtensions.add(extension);
       LOGGER.info("Core extension '{}' started", extension.toString());
     }
   }
@@ -102,13 +111,16 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     for (int i = orderedCoreExtensions.size() - 1; i >= 0; i--) {
       MuleCoreExtension extension = orderedCoreExtensions.get(i);
 
-      try {
-        extension.stop();
-        LOGGER.info("Core extension '{}' stopped", extension.toString());
-      } catch (Throwable e) {
-        LOGGER.warn("Error stopping core extension: " + extension.getName(), e);
+      if (startedCoreExtensions.contains(extension)) {
+        try {
+          extension.stop();
+          LOGGER.info("Core extension '{}' stopped", extension.toString());
+        } catch (Throwable e) {
+          LOGGER.warn("Error stopping core extension: " + extension.getName(), e);
+        }
       }
     }
+    startedCoreExtensions.clear();
   }
 
   private void initializeCoreExtensions() throws MuleException {
@@ -150,6 +162,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
       simpleRegistry.inject(extension);
 
       extension.initialise();
+      initializedCoreExtensions.add(extension);
       LOGGER.info("Core extension '{}' initialized", extension.toString());
     }
   }
