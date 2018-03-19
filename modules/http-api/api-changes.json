@@ -1,4 +1,28 @@
 {
+  "4.2.0":{
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.http.api.domain.message.response.HttpResponse org.mule.runtime.http.api.client.HttpClient::send(org.mule.runtime.http.api.domain.message.request.HttpRequest, org.mule.runtime.http.api.client.HttpRequestOptions) throws java.io.IOException, java.util.concurrent.TimeoutException",
+          "package": "org.mule.runtime.http.api.client",
+          "classSimpleName": "HttpClient",
+          "methodName": "send",
+          "elementKind": "method",
+          "justification": "Services implementations should match container API"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.concurrent.CompletableFuture<org.mule.runtime.http.api.domain.message.response.HttpResponse> org.mule.runtime.http.api.client.HttpClient::sendAsync(org.mule.runtime.http.api.domain.message.request.HttpRequest, org.mule.runtime.http.api.client.HttpRequestOptions)",
+          "package": "org.mule.runtime.http.api.client",
+          "classSimpleName": "HttpClient",
+          "methodName": "sendAsync",
+          "elementKind": "method",
+          "justification": "Services implementations should match container API"
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [
