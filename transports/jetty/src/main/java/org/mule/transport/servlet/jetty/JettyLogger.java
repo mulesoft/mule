@@ -81,6 +81,11 @@ public class JettyLogger implements Logger
     }
 
     @Override
+    public void debug(String msg, long l) {
+        logger.debug(msg, l);
+    }
+
+    @Override
     public void warn(String msg, Throwable thrown)
     {
         logger.warn(msg, thrown);
