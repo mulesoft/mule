@@ -7,14 +7,16 @@
 package org.mule.module.json.validation;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.SCHEMA_FSTAB_JSON;
 import static org.mule.module.json.validation.JsonSchemaTestUtils.getFstabWithDuplicateKeys;
 import static org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor.ALLOW_DUPLICATE_KEYS_SYSTEM_PROPERTY;
-import static org.mule.module.json.validation.ValidateSchemaFunctionalTestCase.DEREFERENCING;
 import static org.mule.module.json.validation.ValidateSchemaFunctionalTestCase.SCHEMA_LOCATION;
 
+import org.mule.api.MuleEvent;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Collection;
@@ -30,9 +32,6 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class ValidateSchemaDuplicateKeysTestCase extends AbstractValidateSchemaFunctionalTestCase
 {
-
-    @Rule
-    public SystemProperty dereferencing = new SystemProperty(DEREFERENCING, "false");
 
     @Rule
     public SystemProperty schemaLocation = new SystemProperty(SCHEMA_LOCATION, SCHEMA_FSTAB_JSON);
@@ -67,7 +66,8 @@ public class ValidateSchemaDuplicateKeysTestCase extends AbstractValidateSchemaF
     @Test
     public void duplicateKeys() throws Exception
     {
-        runFlow(VALIDATE_FLOW, getFstabWithDuplicateKeys());
+        MuleEvent result = runFlow(VALIDATE_FLOW, getFstabWithDuplicateKeys());
+        assertThat(result.getMessage().getPayloadAsString(), is(getFstabWithDuplicateKeys()));
     }
 
     private static ExpectedException getExpectedExceptionForDuplicateKeys()
