@@ -116,10 +116,10 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
     }
 
     @Test
-    public void disposeInvalidatesCache() throws Exception
+    public void stopInvalidatesCache () throws Exception
     {
         final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
-        httpConnectorMessageProcessorProvider.dispose();
+        httpConnectorMessageProcessorProvider.stop();
         assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE), not(is(messageProcessor)));
     }
 
