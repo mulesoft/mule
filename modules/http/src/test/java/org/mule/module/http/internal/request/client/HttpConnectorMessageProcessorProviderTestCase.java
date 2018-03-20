@@ -129,7 +129,6 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
         final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
         httpConnectorMessageProcessorProvider.stop();
         assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE), not(is(messageProcessor)));
-
     }
 
     @Test(expected = IllegalArgumentException.class)
