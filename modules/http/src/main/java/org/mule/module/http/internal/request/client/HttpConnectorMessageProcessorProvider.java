@@ -17,6 +17,7 @@ import org.mule.api.client.OperationOptions;
 import org.mule.api.connector.ConnectorOperationProvider;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.internal.config.HttpConfiguration;
@@ -31,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Provider for operations of the HTTP module.
  */
-public class HttpConnectorMessageProcessorProvider implements ConnectorOperationProvider, MuleContextAware, Disposable
+public class HttpConnectorMessageProcessorProvider implements ConnectorOperationProvider, MuleContextAware, Stoppable
 {
 
     private static final int CACHE_SIZE = 1000;
@@ -109,8 +110,9 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
     }
 
     @Override
-    public void dispose()
+    public void stop() throws MuleException
     {
         cachedMessageProcessors.invalidateAll();
     }
+
 }
