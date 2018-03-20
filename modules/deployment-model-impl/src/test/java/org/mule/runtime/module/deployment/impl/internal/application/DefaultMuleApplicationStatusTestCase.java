@@ -13,11 +13,15 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -47,13 +51,15 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
   @Inject
   private NotificationDispatcher notificationDispatcher;
 
+  private ArtifactContext mockArtifactContext;
+
   private DefaultMuleApplication application;
   private File appLocation = new File("fakeLocation");
 
   @Override
   protected void doSetUp() throws Exception {
     MuleApplicationClassLoader parentArtifactClassLoader = mock(MuleApplicationClassLoader.class);
-    ArtifactContext mockArtifactContext = mock(ArtifactContext.class);
+    mockArtifactContext = mock(ArtifactContext.class);
     when(mockArtifactContext.getMuleContext()).thenReturn(muleContext);
     when(mockArtifactContext.getRegistry()).thenReturn(new DefaultRegistry(muleContext));
     application = new DefaultMuleApplication(null, parentArtifactClassLoader, emptyList(),
@@ -123,12 +129,15 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
 
   @Test
   public void deploymentFailedOnStart() throws Exception {
+    MuleContext mockedMuleContext = mock(MuleContext.class);
+    when(mockArtifactContext.getMuleContext()).thenReturn(mockedMuleContext);
+    mockedMuleContext.start();
+    doThrow(new MuleRuntimeException(createStaticMessage("error")));
+
     try {
       application.start();
       fail("Was expecting start to fail");
     } catch (Exception e) {
-      muleContext.stop();
-      muleContext.dispose();
       assertStatus(ApplicationStatus.DEPLOYMENT_FAILED);
     }
   }
