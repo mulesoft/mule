@@ -44,9 +44,36 @@ public interface HttpClient {
    * @return the received {@link HttpResponse}
    * @throws IOException if an error occurs while executing
    * @throws TimeoutException if {@code responseTimeout} is exceeded
+   * @deprecated use {@link #send(HttpRequest, HttpRequestOptions)} instead
    */
-  HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication)
-      throws IOException, TimeoutException;
+  @Deprecated
+  default HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication)
+      throws IOException, TimeoutException {
+    return send(request, new DefaultHttpRequestOptions(responseTimeout, followRedirects, authentication));
+  }
+
+  /**
+   * Same as {@link #send(HttpRequest, HttpRequestOptions)} but using default options.
+   *
+   * @param request the {@link HttpRequest} to send
+   * @return the received {@link HttpResponse}
+   * @throws IOException if an error occurs while executing
+   * @throws TimeoutException if {@code responseTimeout} is exceeded
+   */
+  default HttpResponse send(HttpRequest request) throws IOException, TimeoutException {
+    return send(request, HttpRequestOptions.builder().build());
+  }
+
+  /**
+   * Sends a HttpRequest blocking the current thread until a response is available or the request times out.
+   *
+   * @param request the {@link HttpRequest} to send
+   * @param options the {@link HttpRequestOptions} to use
+   * @return the received {@link HttpResponse}
+   * @throws IOException if an error occurs while executing
+   * @throws TimeoutException if {@code responseTimeout} is exceeded
+   */
+  HttpResponse send(HttpRequest request, HttpRequestOptions options) throws IOException, TimeoutException;
 
   /**
    * Sends a HttpRequest without blocking the current thread. When a response is available or the request times out the returned
@@ -62,8 +89,37 @@ public interface HttpClient {
    * @param followRedirects whether or not to follow redirect responses
    * @param authentication the optional {@link HttpAuthentication} to use
    * @return a {@link CompletableFuture} that will complete once the {@link HttpResponse} is available
+   * @deprecated use {@link #sendAsync(HttpRequest, HttpRequestOptions)} instead
    */
-  CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                            HttpAuthentication authentication);
+  @Deprecated
+  default CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
+                                                    HttpAuthentication authentication) {
+    return sendAsync(request, new DefaultHttpRequestOptions(responseTimeout, followRedirects, authentication));
+  }
+
+  /**
+   * Same as {@link #sendAsync(HttpRequest, HttpRequestOptions)} but using default options.
+   *
+   * @param request the {@link HttpRequest} to send
+   * @return a {@link CompletableFuture} that will complete once the {@link HttpResponse} is available
+   */
+  default CompletableFuture<HttpResponse> sendAsync(HttpRequest request) {
+    return sendAsync(request, HttpRequestOptions.builder().build());
+  }
+
+  /**
+   * Sends a HttpRequest without blocking the current thread. When a response is available or the request times out the returned
+   * {@link CompletableFuture} will be completed. Be aware that the response body processing will be deferred so that the response can
+   * be processed even when a large body is still being received. If the full response is needed right away then the provided
+   * {@link HttpResponse} must be read in a different thread so that it does not block the {@link HttpClient} threads handling the
+   * response. It's therefore recommended to use {@link CompletableFuture#get()} or any of the async methods available, such as
+   * {@link CompletableFuture#whenCompleteAsync(BiConsumer, Executor)}, to handle the response is those scenarios since they guarantee
+   * executing on a different thread.
+   *
+   * @param request the {@link HttpRequest} to send
+   * @param options the {@link HttpRequestOptions} to use
+   * @return a {@link CompletableFuture} that will complete once the {@link HttpResponse} is available
+   */
+  CompletableFuture<HttpResponse> sendAsync(HttpRequest request, HttpRequestOptions options);
 
 }
