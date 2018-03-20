@@ -166,6 +166,7 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
             {
                 requestConfig.start();
             }
+
             httpRequester.setConfig(requestConfig);
         }
 
