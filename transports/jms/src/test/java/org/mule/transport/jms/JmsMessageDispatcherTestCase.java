@@ -40,9 +40,9 @@ import static org.mule.transport.jms.JmsConstants.PERSISTENT_DELIVERY_PROPERTY;
 import static org.mule.transport.jms.JmsConstants.PRIORITY_PROPERTY;
 import static org.mule.transport.jms.JmsConstants.TIME_TO_LIVE_PROPERTY;
 
-@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.management.*", "org.mule.mvel2.*", "com.google.common.*", "org.apache.commons.*"})
 @PrepareForTest(JmsMessageDispatcher.class)
-@PowerMockIgnore("javax.management.*")
+@RunWith(PowerMockRunner.class)
 public class JmsMessageDispatcherTestCase extends AbstractMuleContextTestCase
 {
     final private boolean defaultPersistentDelivery = true;
