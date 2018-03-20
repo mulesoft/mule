@@ -41,6 +41,7 @@ public class MuleServiceManager implements ServiceManager {
   private final ServiceDiscoverer serviceDiscoverer;
   private List<Pair<ArtifactClassLoader, Service>> registeredServices = new ArrayList<>();
   private List<Service> wrappedServices;
+  private List<Service> startedServices = new ArrayList<>();
 
   /**
    * Creates a new instance.
@@ -88,6 +89,8 @@ public class MuleServiceManager implements ServiceManager {
           currentThread().setContextClassLoader(service.getClass().getClassLoader());
           ((Startable) service).start();
 
+          startedServices.add(service);
+
           if (isNotEmpty(service.getSplashMessage())) {
             logger.info(new ServiceSplashScreen(service).toString());
           }
@@ -102,13 +105,15 @@ public class MuleServiceManager implements ServiceManager {
   public void stop() throws MuleException {
     for (int i = registeredServices.size() - 1; i >= 0; i--) {
       Service service = registeredServices.get(i).getSecond();
-      if (service instanceof Stoppable) {
+      if (service instanceof Stoppable
+          && (!(service instanceof Startable) || (service instanceof Startable && startedServices.contains(service)))) {
         try {
           ((Stoppable) service).stop();
         } catch (Exception e) {
           logger.warn("Service {s} was not stopped properly: {s}", service.getName(), e.getMessage());
         }
       }
+      startedServices.clear();
       try {
         registeredServices.get(i).getFirst().dispose();
       } catch (Exception e) {

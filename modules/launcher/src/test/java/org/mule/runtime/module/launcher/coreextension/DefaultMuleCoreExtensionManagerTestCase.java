@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
@@ -229,12 +233,43 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     orderedExtensions.add(extension2);
     when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(orderedExtensions);
     coreExtensionManager.initialise();
+    coreExtensionManager.start();
 
     coreExtensionManager.stop();
 
     InOrder ordered = inOrder(extension1, extension2);
     ordered.verify(extension2).stop();
     ordered.verify(extension1).stop();
+  }
+
+  @Test
+  public void stopsCoreExtensionsAfterStartFail() throws Exception {
+    List<MuleCoreExtension> extensions = new LinkedList<>();
+    MuleCoreExtension extension1 = mock(MuleCoreExtension.class);
+    MuleCoreExtension extension2 = mock(MuleCoreExtension.class);
+
+    Exception firstStartFailure = new RuntimeException();
+    doThrow(firstStartFailure).when(extension1).start();
+
+    when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+
+    extensions.add(extension1);
+    extensions.add(extension2);
+    List<MuleCoreExtension> orderedExtensions = new LinkedList<>();
+    orderedExtensions.add(extension1);
+    orderedExtensions.add(extension2);
+    when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(orderedExtensions);
+
+    coreExtensionManager.initialise();
+    try {
+      coreExtensionManager.start();
+      fail();
+    } catch (Exception e) {
+      assertThat(e, sameInstance(firstStartFailure));
+    }
+    coreExtensionManager.stop();
+
+    verify(extension2, never()).stop();
   }
 
   @Test
@@ -280,6 +315,35 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
   }
 
   @Test
+  public void disposesCoreExtensionsAfterStartFail() throws Exception {
+    List<MuleCoreExtension> extensions = new LinkedList<>();
+    MuleCoreExtension extension1 = mock(MuleCoreExtension.class);
+    MuleCoreExtension extension2 = mock(MuleCoreExtension.class);
+
+    Exception firstStartFailure = new RuntimeException();
+    doThrow(firstStartFailure).when(extension1).initialise();
+
+    when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+
+    extensions.add(extension1);
+    extensions.add(extension2);
+    List<MuleCoreExtension> orderedExtensions = new LinkedList<>();
+    orderedExtensions.add(extension1);
+    orderedExtensions.add(extension2);
+    when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(orderedExtensions);
+
+    try {
+      coreExtensionManager.initialise();
+      fail();
+    } catch (Exception e) {
+      assertThat(e.getCause(), sameInstance(firstStartFailure));
+    }
+    coreExtensionManager.dispose();
+
+    verify(extension2, never()).dispose();
+  }
+
+  @Test
   public void resolvesCoreExtensionDependencies() throws Exception {
 
     List<MuleCoreExtension> extensions = new LinkedList<>();
@@ -304,6 +368,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     extensions.add(extensionStopsOk);
     extensions.add(extensionFailsStops);
     coreExtensionManager.initialise();
+    coreExtensionManager.start();
     try {
       coreExtensionManager.stop();
     } finally {
