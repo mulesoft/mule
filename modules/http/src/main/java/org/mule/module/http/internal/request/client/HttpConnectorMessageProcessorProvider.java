@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Provider for operations of the HTTP module.
  */
-public class HttpConnectorMessageProcessorProvider implements ConnectorOperationProvider, MuleContextAware, Disposable, Stoppable
+public class HttpConnectorMessageProcessorProvider implements ConnectorOperationProvider, MuleContextAware, Stoppable
 {
 
     private static final int CACHE_SIZE = 1000;
@@ -107,12 +107,6 @@ public class HttpConnectorMessageProcessorProvider implements ConnectorOperation
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
-    }
-
-    @Override
-    public void dispose()
-    {
-        cachedMessageProcessors.invalidateAll();
     }
 
     @Override
