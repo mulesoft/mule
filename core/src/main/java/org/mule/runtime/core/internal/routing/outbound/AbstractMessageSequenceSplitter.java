@@ -14,17 +14,17 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.privileged.event.Acceptor;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.message.GroupCorrelation;
-import org.mule.runtime.core.internal.routing.MessageSequence;
-import org.mule.runtime.core.privileged.routing.RouterResultsHandler;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.AbstractSplitter;
+import org.mule.runtime.core.internal.routing.MessageSequence;
+import org.mule.runtime.core.privileged.event.Acceptor;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.privileged.routing.DefaultRouterResultsHandler;
+import org.mule.runtime.core.privileged.routing.RouterResultsHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +37,7 @@ import java.util.Optional;
  * element of it. Implementations must implement {@link #splitMessageIntoSequence(CoreEvent)} and determine how the message is split.
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http://www .eaipatterns.com/Sequencer.html</a>
- * 
+ *
  * @author flbulgarelli
  * @see AbstractSplitter
  */
@@ -81,7 +81,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
   /**
    * Converts the event into a {@link MessageSequence} that will retrieve each of the event elements
-   * 
+   *
    * @param event the event to split
    * @return a sequence of elements
    * @throws MuleException
@@ -109,7 +109,8 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
       builder.groupCorrelation(Optional
           .of(count != null ? GroupCorrelation.of(correlationSequence, count) : GroupCorrelation.of(correlationSequence)));
-      initEventBuilder(messageSequence.next(), originalEvent, builder, resolvePropagatedFlowVars(lastResult));
+      Object nextValue = messageSequence.next();
+      initEventBuilder(nextValue, originalEvent, builder, resolvePropagatedFlowVars(lastResult));
 
       try {
         // TODO MULE-13052 Migrate Splitter and Foreach implementation to non-blocking
@@ -121,6 +122,10 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
       } catch (MessagingException e) {
         if (!filterOnErrorTypeAcceptor.accept(e.getEvent())) {
           throw e;
+        }
+      } finally {
+        if (nextValue instanceof EventBuilderConfigurer) {
+          ((EventBuilderConfigurer) nextValue).eventCompleted();
         }
       }
     }

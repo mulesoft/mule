@@ -14,14 +14,21 @@ import org.mule.runtime.core.api.event.CoreEvent.Builder;
  *
  * @since 4.0
  */
-@FunctionalInterface
 public interface EventBuilderConfigurer {
 
   /**
    * Applies changes on the given {@code builder}.
-   * 
+   *
    * @param builder the {@link CoreEvent} builder to configure.
    */
   void configure(Builder builder);
 
+  /**
+   * Notifies that the processing of the target {@link CoreEvent} of the {@link #configure(Builder) configured} {@link Builder} is
+   * complete.
+   *
+   * @since 4.2
+   * @since 4.1.2
+   */
+  void eventCompleted();
 }

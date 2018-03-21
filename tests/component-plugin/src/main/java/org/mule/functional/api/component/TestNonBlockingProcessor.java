@@ -6,35 +6,39 @@
  */
 package org.mule.functional.api.component;
 
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import org.reactivestreams.Publisher;
+
+import javax.inject.Inject;
 
 /**
  * Test async non-blocking {@link Processor} implementation that will return control to the Flow in a custom {@link Scheduler}
  * thread in the same way as, for example, a HTTP requester would.
  */
 public class TestNonBlockingProcessor extends AbstractComponent
-    implements Processor, Initialisable, Disposable, MuleContextAware {
+    implements Processor, Initialisable, Disposable {
 
   private static int MAX_THREADS = 8;
-  private MuleContext muleContext;
+
+  @Inject
+  private SchedulerService schedulerService;
+
   private Scheduler customScheduler;
 
   /**
@@ -63,17 +67,11 @@ public class TestNonBlockingProcessor extends AbstractComponent
 
   @Override
   public void initialise() throws InitialisationException {
-    customScheduler =
-        muleContext.getSchedulerService().customScheduler(config().withWaitAllowed(true).withMaxConcurrentTasks(MAX_THREADS));
+    customScheduler = schedulerService.customScheduler(config().withWaitAllowed(true).withMaxConcurrentTasks(MAX_THREADS));
   }
 
   @Override
   public void dispose() {
     customScheduler.stop();
-  }
-
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
   }
 }

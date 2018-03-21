@@ -280,7 +280,7 @@ public class MessageProcessors {
         });
   }
 
-  private static Consumer<CoreEvent> completeSuccessIfNeeded(EventContext child, boolean complete) {
+  public static Consumer<CoreEvent> completeSuccessIfNeeded(EventContext child, boolean complete) {
     return result -> {
       if (!((BaseEventContext) child).isComplete() && complete) {
         ((BaseEventContext) child).success(result);
@@ -288,7 +288,7 @@ public class MessageProcessors {
     };
   }
 
-  private static Consumer<Throwable> completeErrorIfNeeded(EventContext child, boolean complete) {
+  public static Consumer<Throwable> completeErrorIfNeeded(EventContext child, boolean complete) {
     return throwable -> {
       if (!((BaseEventContext) child).isComplete() && complete) {
         ((BaseEventContext) child).error(throwable);
