@@ -11,16 +11,18 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.completeSuccessIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -35,6 +37,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerList;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -49,7 +52,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -107,7 +109,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
           final CoreEvent requestEvent =
               builder(originalEvent).addVariable(rootMessageVariableName, originalEvent.getMessage()).build();
 
-          return splitAndProcess(requestEvent)
+          return Mono.from(splitAndProcess(requestEvent))
               .map(result -> {
                 final Builder responseBuilder = builder(result).message(originalEvent.getMessage());
                 restoreVariables(previousCounterVar, previousRootMessageVar, responseBuilder);
@@ -137,53 +139,72 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     }
   }
 
-  private Flux<CoreEvent> splitAndProcess(CoreEvent request) {
+  private Publisher<CoreEvent> splitAndProcess(CoreEvent request) {
     AtomicInteger count = new AtomicInteger();
     final AtomicReference<CoreEvent> currentEvent = new AtomicReference<>(request);
-    return fromIterable(
-                        // Split into sequence of TypedValue
-                        () -> splitRequest(request))
-                            // Wrap any exception that occurs during split in a MessagingException. This is required as the
-                            // automatic wrapping is only applied when the signal is an Event.
-                            .onErrorMap(throwable -> new MessagingException(request, throwable, Foreach.this))
-                            // If batchSize > 1 then buffer sequence into List<TypedValue<T>> and convert to
-                            // TypedValue<List<TypedValue<T>>>.
-                            .transform(p -> batchSize > 1
-                                ? from(p).buffer(batchSize).map(list -> new TypedValue<>(list, fromObject(list)))
-                                : p)
-                            // For each TypedValue part process the nested chain using the event from the previous part.
-                            .map(typedValue -> {
-                              Builder partEventBuilder = builder(currentEvent.get());
-                              if (typedValue.getValue() instanceof EventBuilderConfigurer) {
-                                // Support EventBuilderConfigurer currently used by Batch Module
-                                ((EventBuilderConfigurer) typedValue.getValue()).configure(partEventBuilder);
-                              } else if (typedValue.getValue() instanceof Message) {
-                                // If value is a Message then use it directly conserving attributes and properties.
-                                partEventBuilder.message((Message) typedValue.getValue());
-                              } else {
-                                // Otherwise create a new message
-                                partEventBuilder.message(Message.builder().payload(typedValue).build());
-                              }
-                              return Mono.from(processWithChildContext(partEventBuilder
-                                  .addVariable(counterVariableName, count.incrementAndGet()).build(), nestedChain,
-                                                                       ofNullable(getLocation())))
-                                  .doOnNext(result -> currentEvent.set(CoreEvent.builder(result).build()))
-                                  .block();
-                            })
-                            // This can potentially be improved but simplest way currently to determine if split results in empty
-                            // iterator is to check atomic count
-                            .switchIfEmpty(defer(() -> {
-                              if (count.get() == 0) {
-                                logger
-                                    .warn("Split expression returned no results. If this is not expected please check your expression");
-                                return just(request);
-                              } else {
-                                return empty();
-                              }
-                            }))
-                            .takeLast(1)
-                            .map(s -> CoreEvent.builder(currentEvent.get()).message(request.getMessage()).build())
-                            .errorStrategyStop();
+
+    // Split into sequence of TypedValue
+    return fromIterable(() -> splitRequest(request))
+        // Wrap any exception that occurs during split in a MessagingException. This is required as the
+        // automatic wrapping is only applied when the signal is an Event.
+        .onErrorMap(throwable -> new MessagingException(request, throwable, Foreach.this))
+        // If batchSize > 1 then buffer sequence into List<TypedValue<T>> and convert to
+        // TypedValue<List<TypedValue<T>>>.
+        .transform(p -> batchSize > 1
+            ? from(p).buffer(batchSize).map(list -> new TypedValue<>(list, fromObject(list)))
+            : p)
+        // For each TypedValue part process the nested chain using the event from the previous part.
+        .flatMapSequential(typedValue -> {
+          EventContext parentContext = currentEvent.get().getContext();
+          BaseEventContext childContext = newChildContext(currentEvent.get(), ofNullable(getLocation()));
+
+          Builder partEventBuilder = builder(childContext, currentEvent.get());
+          if (typedValue.getValue() instanceof EventBuilderConfigurer) {
+            // Support EventBuilderConfigurer currently used by Batch Module
+            EventBuilderConfigurer configurer = (EventBuilderConfigurer) typedValue.getValue();
+            configurer.configure(partEventBuilder);
+
+            childContext.onResponse((e, t) -> {
+              configurer.eventCompleted();
+            });
+          } else if (typedValue.getValue() instanceof Message) {
+            // If value is a Message then use it directly conserving attributes and properties.
+            partEventBuilder.message((Message) typedValue.getValue());
+          } else {
+            // Otherwise create a new message
+            partEventBuilder.message(Message.builder().payload(typedValue).build());
+          }
+
+          return Mono.from(just(partEventBuilder.addVariable(counterVariableName, count.incrementAndGet()).build())
+              .transform(nestedChain)
+              .doOnNext(completeSuccessIfNeeded(childContext, true))
+              .switchIfEmpty(Mono.from(childContext.getResponsePublisher()))
+              .map(result -> builder(parentContext, result).build())
+              .doOnNext(result -> currentEvent.set(CoreEvent.builder(result).build()))
+              .doOnError(MessagingException.class,
+                         me -> me.setProcessedEvent(builder(parentContext, me.getEvent()).build()))
+              .doOnSuccess(result -> {
+                if (result == null) {
+                  childContext.success();
+                }
+              }));
+        },
+                           // Force sequential execution of the chain for each element
+                           1)
+        // This can potentially be improved but simplest way currently to determine if split results in empty
+        // iterator is to check atomic count
+        .switchIfEmpty(defer(() -> {
+          if (count.get() == 0) {
+            logger
+                .warn("Split expression returned no results. If this is not expected please check your expression");
+            return just(request);
+          } else {
+            return empty();
+          }
+        }))
+        .takeLast(1)
+        .map(s -> CoreEvent.builder(currentEvent.get()).message(request.getMessage()).build())
+        .errorStrategyStop();
   }
 
   private Iterator<TypedValue<?>> splitRequest(CoreEvent request) {
