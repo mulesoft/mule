@@ -62,11 +62,11 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.Test;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-
-import org.junit.Test;
 
 public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
@@ -439,11 +439,15 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(processors, instanceOf(NestedChainModel.class));
     assertThat(processors.isRequired(), is(true));
 
-    assertThat(asyncModel.getAllParameterModels(), hasSize(1));
+    assertThat(asyncModel.getAllParameterModels(), hasSize(2));
     assertThat(asyncModel.getAllParameterModels().get(0).getName(), is("name"));
     assertThat(asyncModel.getAllParameterModels().get(0).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(asyncModel.getAllParameterModels().get(0).getType(), instanceOf(DefaultStringType.class));
     assertThat(asyncModel.getAllParameterModels().get(0).isRequired(), is(false));
+
+    assertThat(asyncModel.getAllParameterModels().get(1).getName(), is("maxConcurrency"));
+    assertThat(asyncModel.getAllParameterModels().get(1).getType(), instanceOf(DefaultNumberType.class));
+    assertThat(asyncModel.getAllParameterModels().get(1).isRequired(), is(false));
   }
 
   @Test

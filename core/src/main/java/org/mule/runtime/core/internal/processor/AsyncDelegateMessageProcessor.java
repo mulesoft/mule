@@ -37,12 +37,15 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
+import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
@@ -88,6 +91,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private Scheduler scheduler;
   private reactor.core.scheduler.Scheduler reactorScheduler;
   protected String name;
+  private Integer maxConcurrency;
 
   public AsyncDelegateMessageProcessor(MessageProcessorChainBuilder delegate) {
     this.delegateBuilder = delegate;
@@ -102,7 +106,19 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   public void initialise() throws InitialisationException {
     Object rootContainer = getFromAnnotatedObject(componentLocator, this).orElse(null);
     if (rootContainer instanceof FlowConstruct) {
-      processingStrategy = ((FlowConstruct) rootContainer).getProcessingStrategy();
+      if (maxConcurrency != null && rootContainer instanceof Pipeline) {
+        ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
+
+        if (flowPsFactory instanceof AsyncProcessingStrategyFactory) {
+          ((AsyncProcessingStrategyFactory) flowPsFactory).setMaxConcurrency(maxConcurrency);
+        } else {
+          logger.warn("{} does not support 'maxConcurrency'. Ignoring the value.", flowPsFactory.getClass().getSimpleName());
+        }
+        processingStrategy = flowPsFactory.create(muleContext, getLocation().getLocation());
+        ownProcessingStrategy = true;
+      } else {
+        processingStrategy = ((FlowConstruct) rootContainer).getProcessingStrategy();
+      }
     } else {
       processingStrategy = DIRECT_PROCESSING_STRATEGY_INSTANCE;
     }
@@ -230,6 +246,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
     return singletonList(delegate);
+  }
+
+  public void setMaxConcurrency(Integer maxConcurrency) {
+    this.maxConcurrency = maxConcurrency;
   }
 
   @Override

@@ -249,6 +249,10 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(String.class))
         .describedAs("Name that will be used to name the async scheduler");
 
+    async.onDefaultParameterGroup()
+        .withOptionalParameter("maxConcurrency")
+        .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that this async router can use to optimize for performance when processing messages.")
+        .ofType(typeLoader.load(Integer.class));
   }
 
   private void declareFlowRef(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {

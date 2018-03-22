@@ -65,6 +65,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.AbstractServerNotification;
@@ -445,7 +446,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .add(baseDefinition.withIdentifier(ASYNC).withTypeDefinition(fromType(AsyncDelegateMessageProcessor.class))
             .withObjectFactoryType(AsyncMessageProcessorsFactoryBean.class)
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-            .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build()).build());
+            .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
+            .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
+            .build());
     // TODO MULE-12726 Remove TryProcessorFactoryBean
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(TRY).withTypeDefinition(fromType(TryScope.class))
