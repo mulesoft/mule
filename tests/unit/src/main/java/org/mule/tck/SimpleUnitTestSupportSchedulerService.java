@@ -16,10 +16,10 @@ import static org.mockito.Mockito.spy;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerPoolsConfigFactory;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 
 import java.util.ArrayList;
@@ -113,10 +113,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   public Scheduler customScheduler(SchedulerConfig config) {
     final SimpleUnitTestSupportScheduler customScheduler =
         new SimpleUnitTestSupportCustomScheduler(config.getMaxConcurrentTasks(),
-                                                 new NamedThreadFactory(config
-                                                     .getSchedulerName() != null
-                                                         ? config.getSchedulerName()
-                                                         : "SimpleUnitTestSupportSchedulerService_custom"),
+                                                 buildThreadFactory(config),
                                                  new AbortPolicy());
     customSchedulers.add(customScheduler);
     final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(customScheduler);
@@ -128,15 +125,26 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
     final SimpleUnitTestSupportScheduler customScheduler =
         new SimpleUnitTestSupportCustomScheduler(config.getMaxConcurrentTasks(),
-                                                 new NamedThreadFactory(config
-                                                     .getSchedulerName() != null
-                                                         ? config.getSchedulerName()
-                                                         : "SimpleUnitTestSupportSchedulerService_custom"),
+                                                 buildThreadFactory(config),
                                                  new AbortPolicy());
     customSchedulers.add(customScheduler);
     final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(customScheduler);
     decorators.add(decorator);
     return decorator;
+  }
+
+  private NamedThreadFactory buildThreadFactory(SchedulerConfig config) {
+    return new NamedThreadFactory(config.getSchedulerName() != null
+        ? config.getSchedulerName()
+        : "SimpleUnitTestSupportSchedulerService_custom") {
+
+      @Override
+      public Thread newThread(Runnable runnable) {
+        Thread t = new Thread(new ThreadGroup(config.getSchedulerName()), runnable);
+        configureThread(t);
+        return t;
+      }
+    };
   }
 
   protected SimpleUnitTestSupportLifecycleSchedulerDecorator decorateScheduler(SimpleUnitTestSupportScheduler scheduler) {
