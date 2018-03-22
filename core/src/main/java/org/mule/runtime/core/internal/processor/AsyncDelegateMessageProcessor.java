@@ -6,15 +6,20 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.api.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.api.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
+import static org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
@@ -27,20 +32,24 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.api.notification.AsyncMessageNotification;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.privileged.processor.Scope;
+import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.processor.Scope;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -61,24 +70,31 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     implements Scope, Initialisable, Startable, Stoppable {
 
   @Inject
+  private MuleContext muleContext;
+  @Inject
   private SchedulerService schedulerService;
   @Inject
   private ConfigurationComponentLocator componentLocator;
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
+
+  private boolean ownProcessingStrategy = false;
   private ProcessingStrategy processingStrategy;
 
+  private Sink sink;
+
+  private MessageProcessorChainBuilder delegateBuilder;
   protected MessageProcessorChain delegate;
   private Scheduler scheduler;
   private reactor.core.scheduler.Scheduler reactorScheduler;
   protected String name;
 
-  public AsyncDelegateMessageProcessor(MessageProcessorChain delegate) {
-    this.delegate = delegate;
+  public AsyncDelegateMessageProcessor(MessageProcessorChainBuilder delegate) {
+    this.delegateBuilder = delegate;
   }
 
-  public AsyncDelegateMessageProcessor(MessageProcessorChain delegate, String name) {
-    this.delegate = delegate;
+  public AsyncDelegateMessageProcessor(MessageProcessorChainBuilder delegate, String name) {
+    this.delegateBuilder = delegate;
     this.name = name;
   }
 
@@ -90,31 +106,62 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     } else {
       processingStrategy = DIRECT_PROCESSING_STRATEGY_INSTANCE;
     }
-    if (delegate == null) {
+    if (delegateBuilder == null) {
       throw new InitialisationException(objectIsNull("delegate message processor"), this);
     }
+
+    delegateBuilder.setProcessingStrategy(processingStrategy);
+    delegate = delegateBuilder.build();
+    initialiseIfNeeded(delegate, muleContext);
+
     super.initialise();
   }
 
   @Override
   public void start() throws MuleException {
-    scheduler = schedulerService
-        .ioScheduler(muleContext.getSchedulerBaseConfig().withName(name != null ? name : getLocation().getLocation()));
-    reactorScheduler = fromExecutorService(scheduler);
+    if (ownProcessingStrategy) {
+      startIfNeeded(processingStrategy);
+    }
+
+    sink = processingStrategy
+        .createSink(getFromAnnotatedObject(componentLocator, this).filter(c -> c instanceof FlowConstruct).orElse(null),
+                    processAsyncChainFunction());
+
+    if (processingStrategy.isSynchronous()) {
+      scheduler = schedulerService
+          .ioScheduler(muleContext.getSchedulerBaseConfig().withName(name != null ? name : getLocation().getLocation()));
+      reactorScheduler = fromExecutorService(scheduler);
+    }
+
+    startIfNeeded(delegate);
     super.start();
   }
 
   @Override
   public void stop() throws MuleException {
     super.stop();
+    stopIfNeeded(delegate);
     if (scheduler != null) {
       scheduler.stop();
       scheduler = null;
     }
-    if (reactorScheduler != null) {
+    if (processingStrategy.isSynchronous() && reactorScheduler != null) {
       reactorScheduler.dispose();
       reactorScheduler = null;
     }
+
+    disposeIfNeeded(sink, logger);
+    sink = null;
+
+    if (ownProcessingStrategy) {
+      stopIfNeeded(processingStrategy);
+    }
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    disposeIfNeeded(delegate, logger);
   }
 
   @Override
@@ -127,41 +174,46 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     return from(publisher)
         .cast(PrivilegedEvent.class)
         .doOnNext(request -> just(request)
-            .map(event -> asyncEvent(request))
-            .transform(innerPublisher -> from(innerPublisher)
-                .doOnNext(fireAsyncScheduledNotification())
-                .doOnNext(asyncRequest -> just(asyncRequest)
-                    .cast(CoreEvent.class)
-                    .transform(scheduleAsync(delegate))
-                    .doOnNext(event -> fireAsyncCompleteNotification(event, null))
-                    .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), e))
-                    .doOnError(throwable -> logger
-                        .warn("Error occurred during asynchronous processing at:" + getLocation().getLocation()
-                            + " . To handle this error include a <try> scope in the <async> scope.",
-                              throwable))
-                    .subscribe(event -> asyncRequest.getContext().success(event),
-                               throwable -> asyncRequest.getContext().error(throwable))))
+            .map(event -> asyncEvent(event))
+            .map(event -> {
+              sink.accept(event);
+              return event;
+            })
             .subscribe(requestUnbounded()))
         .cast(CoreEvent.class);
   }
 
-
-  private ReactiveProcessor scheduleAsync(Processor delegate) {
-    if (!processingStrategy.isSynchronous()) {
-      // If an async processing strategy is in use then use it to schedule async
-      return publisher -> from(publisher).transform(processingStrategy.onPipeline(delegate));
-    } else {
-      // Otherwise schedule async processing using IO pool.
-      return publisher -> from(publisher).transform(delegate).subscribeOn(reactorScheduler);
-    }
-  }
-
-  private PrivilegedEvent asyncEvent(PrivilegedEvent event) {
+  private CoreEvent asyncEvent(PrivilegedEvent event) {
     // Clone event, make it async and remove ReplyToHandler
     return PrivilegedEvent
         .builder(child((event.getContext()), ofNullable(getLocation())), event)
         .replyToHandler(null)
         .session(new DefaultMuleSession(event.getSession())).build();
+  }
+
+  private ReactiveProcessor processAsyncChainFunction() {
+    return innerPublisher -> from(innerPublisher)
+        .doOnNext(fireAsyncScheduledNotification())
+        .transform(scheduleAsync(delegate))
+        .doOnNext(event -> {
+          fireAsyncCompleteNotification(event, null);
+          ((BaseEventContext) event.getContext()).success(event);
+        })
+        .doOnError(MessagingException.class, e -> {
+          fireAsyncCompleteNotification(e.getEvent(), e);
+          ((BaseEventContext) e.getEvent().getContext()).error(e);
+        })
+        .doOnError(throwable -> logger.warn("Error occurred during asynchronous processing at:" + getLocation().getLocation()
+            + " . To handle this error include a <try> scope in the <async> scope.", throwable));
+  }
+
+  private ReactiveProcessor scheduleAsync(Processor delegate) {
+    if (processingStrategy.isSynchronous()) {
+      // schedule async processing using IO pool.
+      return publisher -> from(publisher).transform(delegate).subscribeOn(reactorScheduler);
+    } else {
+      return delegate;
+    }
   }
 
   private Consumer<CoreEvent> fireAsyncScheduledNotification() {
@@ -180,4 +232,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     return singletonList(delegate);
   }
 
+  @Override
+  protected List<Processor> getOwnedObjects() {
+    // Lifecycle of inner objects is already handled by this class' lifecycle methods
+    return emptyList();
+  }
 }

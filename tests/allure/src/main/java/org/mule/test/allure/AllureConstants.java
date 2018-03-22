@@ -389,6 +389,11 @@ public interface AllureConstants {
       String UNTIL_SUCCESSFUL = "Until Successful";
     }
 
+    interface AsyncStory {
+
+      String ASYNC = "Async";
+    }
+
     interface ProcessorChainRouterStory {
 
       String PROCESSOR_CHAIN_ROUTER = "Processor Chain Router";

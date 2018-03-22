@@ -15,6 +15,7 @@ import static org.mule.runtime.api.notification.PipelineMessageNotification.PROC
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
@@ -78,6 +79,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private MessageProcessorChain pipeline;
   private final ErrorType overloadErrorType;
 
+  private final ProcessingStrategyFactory processingStrategyFactory;
   private final ProcessingStrategy processingStrategy;
 
   private volatile boolean canProcessMessage = false;
@@ -88,7 +90,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
-                          int maxConcurrency, FlowConstructStatistics flowConstructStatistics,
+                          Integer maxConcurrency, FlowConstructStatistics flowConstructStatistics,
                           ComponentInitialStateManager componentInitialStateManager) {
     super(name, muleContext, exceptionListener, initialState, flowConstructStatistics);
 
@@ -101,13 +103,17 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     this.source = source;
     this.componentInitialStateManager = componentInitialStateManager;
     this.processors = unmodifiableList(processors);
-    this.maxConcurrency = maxConcurrency;
+    this.maxConcurrency = maxConcurrency != null ? maxConcurrency : DEFAULT_MAX_CONCURRENCY;
 
-    ProcessingStrategyFactory psFactory = processingStrategyFactory.orElseGet(() -> defaultProcessingStrategy());
-    if (psFactory instanceof AsyncProcessingStrategyFactory) {
-      ((AsyncProcessingStrategyFactory) psFactory).setMaxConcurrency(maxConcurrency);
+    this.processingStrategyFactory = processingStrategyFactory.orElseGet(() -> defaultProcessingStrategy());
+    if (this.processingStrategyFactory instanceof AsyncProcessingStrategyFactory) {
+      ((AsyncProcessingStrategyFactory) this.processingStrategyFactory).setMaxConcurrency(this.maxConcurrency);
+    } else if (maxConcurrency != null) {
+      LOGGER.warn("{} does not support 'maxConcurrency'. Ignoring the value.",
+                  this.processingStrategyFactory.getClass().getSimpleName());
     }
-    processingStrategy = psFactory.create(muleContext, getName());
+
+    processingStrategy = this.processingStrategyFactory.create(muleContext, getName());
     overloadErrorType = muleContext.getErrorTypeRepository().getErrorType(OVERLOAD).orElse(null);
   }
 
@@ -371,4 +377,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return maxConcurrency;
   }
 
+  @Override
+  public ProcessingStrategyFactory getProcessingStrategyFactory() {
+    return processingStrategyFactory;
+  }
 }

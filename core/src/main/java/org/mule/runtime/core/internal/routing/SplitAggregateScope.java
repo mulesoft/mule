@@ -7,40 +7,26 @@
 
 package org.mule.runtime.core.internal.routing;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEndpointsForRouter;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
-import static org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
+import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
-import static org.mule.runtime.core.internal.routing.FirstSuccessfulRoutingStrategy.validateMessageIsNotConsumable;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static reactor.core.publisher.Flux.fromIterable;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Consumer;
-
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
-import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.reactivestreams.Publisher;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>
@@ -95,7 +81,7 @@ public class SplitAggregateScope extends AbstractForkJoinRouter {
 
   @Override
   protected int getDefaultMaxConcurrency() {
-    return MAX_VALUE;
+    return DEFAULT_MAX_CONCURRENCY;
   }
 
   @Override
@@ -105,7 +91,7 @@ public class SplitAggregateScope extends AbstractForkJoinRouter {
 
   /**
    * Set the expression used to split the incoming message.
-   * 
+   *
    * @param collectionExpression
    */
   public void setCollectionExpression(String collectionExpression) {
