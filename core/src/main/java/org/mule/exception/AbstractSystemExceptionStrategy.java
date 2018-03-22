@@ -86,17 +86,26 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionListener i
         }
             
         logger.info("Exception caught is a ConnectException, attempting to reconnect...");
-        
+
         // Disconnect
         try
         {
-            logger.debug("Disconnecting " + connector.getName());
+            logger.debug("Stopping " + connector.getName());
             connector.stop();
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getMessage());
+        }
+
+        try
+        {
+            logger.debug("Disconnecting " + connector.getName());
             connector.disconnect();
         }
-        catch (Exception e1)
+        catch (Exception e)
         {
-            logger.error(e1.getMessage());
+            logger.error(e.getMessage());
         }
 
         // Reconnect (retry policy will go into effect here if configured)
