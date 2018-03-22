@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * MessageProcessor implementation that logs the current element of a value evaluated from it using an expression evaluator. By
- * default the current messages is logged using the {@link Level#DEBUG} level to the
+ * default the current messages is logged using the {@link Level#INFO} level to the
  * 'org.mule.runtime.core.internal.processor.LoggerMessageProcessor' category. The level and category can both be configured to suit
  * your needs.
  */
