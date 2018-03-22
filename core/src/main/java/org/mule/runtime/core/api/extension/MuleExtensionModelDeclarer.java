@@ -105,6 +105,7 @@ class MuleExtensionModelDeclarer {
   final ErrorModel compositeRoutingError = newError(COMPOSITE_ROUTING).withParent(routingError).build();
   final ErrorModel validationError = newError(VALIDATION).withParent(anyError).build();
   final ErrorModel duplicateMessageError = newError(DUPLICATE_MESSAGE).withParent(validationError).build();
+  static final String DEFAULT_LOG_LEVEL = "INFO";
 
   ExtensionDeclarer createExtensionModel() {
 
@@ -270,7 +271,8 @@ class MuleExtensionModelDeclarer {
   private void declareLogger(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer logger = extensionDeclarer.withOperation("logger")
         .describedAs("Performs logging using an expression that determines what should be logged. By default the current messages is logged "
-            + "using the DEBUG level to the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category but "
+            + "using the " + DEFAULT_LOG_LEVEL
+            + " level to the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category but "
             + "the level and category can both be configured to suit your needs. message is specified then the current message is used.");
 
     logger.withOutput().ofType(typeLoader.load(void.class));
@@ -284,11 +286,11 @@ class MuleExtensionModelDeclarer {
 
     logger.onDefaultParameterGroup()
         .withOptionalParameter("level")
-        .defaultingTo("DEBUG")
+        .defaultingTo(DEFAULT_LOG_LEVEL)
         .ofType(BaseTypeBuilder.create(JAVA).stringType()
             .enumOf("ERROR", "WARN", "INFO", "DEBUG", "TRACE").build())
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The logging level to be used. Default is DEBUG.");
+        .describedAs("The logging level to be used. Default is " + DEFAULT_LOG_LEVEL + ".");
 
     logger.onDefaultParameterGroup()
         .withOptionalParameter("category")
