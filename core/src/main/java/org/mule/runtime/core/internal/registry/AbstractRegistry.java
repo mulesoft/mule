@@ -127,7 +127,9 @@ public abstract class AbstractRegistry implements Registry {
     if (Disposable.PHASE_NAME.equals(phase) && lifecycleManager.getState().isStarted()) {
       getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
     }
-    getLifecycleManager().fireLifecycle(phase);
+    if (!Stoppable.PHASE_NAME.equals(phase) || lifecycleManager.getState().isStarted()) {
+      getLifecycleManager().fireLifecycle(phase);
+    }
   }
 
   @Override
