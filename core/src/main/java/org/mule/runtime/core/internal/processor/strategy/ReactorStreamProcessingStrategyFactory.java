@@ -93,12 +93,12 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
     }
 
     @Override
-    public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+    public ReactiveProcessor afterProcessor(ReactiveProcessor processor) {
       reactor.core.scheduler.Scheduler cpuLightScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
         return publisher -> from(publisher).transform(processor).publishOn(cpuLightScheduler);
       } else {
-        return super.onProcessor(processor);
+        return super.afterProcessor(processor);
       }
     }
 
