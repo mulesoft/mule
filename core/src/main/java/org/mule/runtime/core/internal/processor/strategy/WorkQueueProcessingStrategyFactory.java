@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -66,11 +65,11 @@ public class WorkQueueProcessingStrategyFactory extends AbstractProcessingStrate
     }
 
     @Override
-    public ReactiveProcessor afterProcessor(ReactiveProcessor processor) {
+    public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
         return publisher -> from(publisher).transform(processor).publishOn(fromExecutorService(decorateScheduler(ioScheduler)));
       } else {
-        return super.afterProcessor(processor);
+        return super.onProcessor(processor);
       }
     }
 

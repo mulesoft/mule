@@ -43,22 +43,12 @@ public interface ProcessingStrategy {
   }
 
   /**
-   * Enrich {@link Processor} function by adding pre operators to implement processing strategy behaviour.
+   * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.
    *
    * @param processor processor instance.
    * @return enriched processor function
    */
   default ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-    return publisher -> from(publisher).transform(processor);
-  }
-
-  /**
-   * Enrich {@link Processor} function by adding post operators to implement processing strategy behaviour.
-   *
-   * @param processor processor instance.
-   * @return enriched processor function
-   */
-  default ReactiveProcessor afterProcessor(ReactiveProcessor processor) {
     return publisher -> from(publisher).transform(processor);
   }
 

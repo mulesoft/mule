@@ -11,13 +11,13 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.concurrent.ExecutorService;
@@ -91,12 +91,6 @@ public class TransactionAwareWorkQueueStreamProcessingStrategyFactory extends Wo
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       return isTransactionActive() ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor) : super.onProcessor(processor);
-    }
-
-    @Override
-    public ReactiveProcessor afterProcessor(ReactiveProcessor processor) {
-      return isTransactionActive() ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.afterProcessor(processor)
-          : super.afterProcessor(processor);
     }
 
   }

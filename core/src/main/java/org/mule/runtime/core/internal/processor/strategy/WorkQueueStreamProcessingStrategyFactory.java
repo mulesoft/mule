@@ -18,11 +18,13 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,12 +86,12 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
     }
 
     @Override
-    public ReactiveProcessor afterProcessor(ReactiveProcessor processor) {
+    public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
         return publisher -> from(publisher).transform(processor)
             .publishOn(fromExecutorService(decorateScheduler(blockingScheduler)));
       } else {
-        return super.afterProcessor(processor);
+        return super.onProcessor(processor);
       }
     }
 

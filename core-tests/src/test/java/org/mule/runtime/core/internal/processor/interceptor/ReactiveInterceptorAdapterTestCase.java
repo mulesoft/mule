@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
@@ -38,14 +37,11 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorTypeThat;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-import static reactor.core.publisher.Mono.from;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
@@ -57,20 +53,14 @@ import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
@@ -81,6 +71,21 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
+
+import com.google.common.collect.ImmutableMap;
+
+import reactor.core.publisher.Mono;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -95,23 +100,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
 import org.mockito.verification.VerificationMode;
-import org.reactivestreams.Publisher;
-
-import com.google.common.collect.ImmutableMap;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
-
-import reactor.core.publisher.Mono;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -141,14 +129,12 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
    * The cases with no mocks exercise the optimized interception path when 'around' is not implemented. This is needed because
    * Mockito mocks override the methods.
    */
-  @Parameters(name = "{1}, {0}")
+  @Parameters
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
         {true, new ProcessorInApp()},
-        {true, new NonBlockingProcessorInApp()},
         {true, new OperationProcessorInApp()},
         {false, new ProcessorInApp()},
-        {false, new NonBlockingProcessorInApp()},
         {false, new OperationProcessorInApp()}
     });
   }
@@ -1642,34 +1628,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   @Test
-  public void threadForBeforeAfter() throws Exception {
-    AtomicReference<Thread> threadBefore = new AtomicReference<>();
-    AtomicReference<Thread> threadAfter = new AtomicReference<>();
-
-    ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
-
-      @Override
-      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
-        threadBefore.set(currentThread());
-      }
-
-      @Override
-      public void after(ComponentLocation location, InterceptionEvent event, java.util.Optional<Throwable> thrown) {
-        threadAfter.set(currentThread());
-      };
-
-    });
-    startFlowWithInterceptors(interceptor);
-
-    process(flow, eventBuilder(muleContext).message(Message.of("")).build());
-
-    assertThat(threadAfter.get().getName(), threadAfter.get().getName(),
-               not(is("selector-emulator")));
-    assertThat(threadAfter.get().getName(), threadAfter.get().getThreadGroup().getName(),
-               is(threadBefore.get().getThreadGroup().getName()));
-  }
-
-  @Test
   @io.qameta.allure.Description("Simulates the error handling scenario for XML SDK operations")
   public void interceptorErrorResumeAround() throws Exception {
     Exception thrown = new Exception();
@@ -1740,58 +1698,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     public CoreEvent process(CoreEvent event) throws MuleException {
       return event;
     }
-
-    @Override
-    public String toString() {
-      return "Processor";
-    }
-  }
-
-  private static class NonBlockingProcessorInApp extends AbstractComponent implements Processor, Initialisable, Disposable {
-
-    private Scheduler scheduler;
-
-    public NonBlockingProcessorInApp() {
-      setAnnotations(ImmutableMap.<QName, Object>builder()
-          .put(ANNOTATION_PARAMETERS, singletonMap("param", "#[payload]"))
-          .put(LOCATION_KEY, buildLocation("test:nb-processor"))
-          .build());
-    }
-
-    @Override
-    public void initialise() throws InitialisationException {
-      scheduler = muleContext.getSchedulerService()
-          .customScheduler(SchedulerConfig.config().withMaxConcurrentTasks(1).withName("selector-emulator"));
-    }
-
-    @Override
-    public void dispose() {
-      scheduler.stop();
-    }
-
-    @Override
-    public ProcessingType getProcessingType() {
-      return CPU_LITE_ASYNC;
-    }
-
-    @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
-      // Nothing to do.
-      return event;
-    }
-
-    @Override
-    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-      return from(publisher)
-          .publishOn(fromExecutorService(scheduler))
-          // Just call `process` here to keep the assertions in the tests working and not having to introspect reactor stuff
-          .doOnNext((CheckedConsumer<CoreEvent>) (event -> process(event)));
-    }
-
-    @Override
-    public String toString() {
-      return "NonBlockingProcessor";
-    }
   }
 
   private static class OperationProcessorInApp extends AbstractComponent
@@ -1836,11 +1742,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
           return "operationParamValue";
         }
       })), executionContext);
-    }
-
-    @Override
-    public String toString() {
-      return "OperationProcessor";
     }
   }
 
