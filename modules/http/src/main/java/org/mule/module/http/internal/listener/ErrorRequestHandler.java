@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.listener;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
@@ -60,9 +61,12 @@ public class ErrorRequestHandler implements RequestHandler
         });
     }
 
-    protected String getResolvedEntity (String uri)
+    /**
+     * Escapes the URI since it's externally defined and we're using it in the response body.
+     */
+    private String getResolvedEntity (String uri)
     {
-        return  format(entityFormat, uri);
+        return  format(entityFormat, escapeHtml(uri));
     }
 
 }
