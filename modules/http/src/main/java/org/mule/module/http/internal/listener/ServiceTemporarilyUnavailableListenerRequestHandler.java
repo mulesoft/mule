@@ -13,11 +13,13 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILA
  */
 public class ServiceTemporarilyUnavailableListenerRequestHandler extends ErrorRequestHandler
 {
+
+    public static final String SERVICE_NOT_AVAILABLE_FORMAT = "Service not available for request uri: %s";
     private static ServiceTemporarilyUnavailableListenerRequestHandler instance = new ServiceTemporarilyUnavailableListenerRequestHandler();
 
     private ServiceTemporarilyUnavailableListenerRequestHandler()
     {
-        super(SERVICE_UNAVAILABLE.getStatusCode(), SERVICE_UNAVAILABLE.getReasonPhrase(), "Service not available for request uri: %s");
+        super(SERVICE_UNAVAILABLE.getStatusCode(), SERVICE_UNAVAILABLE.getReasonPhrase(), SERVICE_NOT_AVAILABLE_FORMAT);
     }
 
     public static ServiceTemporarilyUnavailableListenerRequestHandler getInstance()

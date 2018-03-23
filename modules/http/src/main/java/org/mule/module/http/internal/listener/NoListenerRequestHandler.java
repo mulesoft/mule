@@ -6,8 +6,6 @@
  */
 package org.mule.module.http.internal.listener;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 
 /**
@@ -30,11 +28,6 @@ public class NoListenerRequestHandler extends ErrorRequestHandler
     public static NoListenerRequestHandler getInstance()
     {
         return instance;
-    }
-
-    protected String getResolvedEntity (String uri)
-    {
-        return  format(entityFormat, escapeHtml(uri));
     }
 
 }
