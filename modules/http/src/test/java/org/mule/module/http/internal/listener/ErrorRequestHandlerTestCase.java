@@ -8,6 +8,7 @@
 package org.mule.module.http.internal.listener;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -27,13 +28,13 @@ import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -44,16 +45,16 @@ public class ErrorRequestHandlerTestCase extends AbstractMuleTestCase
     private final HttpRequestContext context = mock(HttpRequestContext.class, RETURNS_DEEP_STUBS);
     private final HttpResponseReadyCallback responseReadyCallback = mock(HttpResponseReadyCallback.class);
 
-    @Parameterized.Parameter(0)
+    @Parameter(0)
     public ErrorRequestHandler errorRequestHandler;
 
-    @Parameterized.Parameter(1)
+    @Parameter(1)
     public String format;
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][] {
+        return asList(new Object[][] {
           {NoListenerRequestHandler.getInstance(), NO_LISTENER_ENTITY_FORMAT},
           {NoMethodRequestHandler.getInstance(), METHOD_NOT_ALLOWED_FORMAT},
           {ServiceTemporarilyUnavailableListenerRequestHandler.getInstance(), SERVICE_NOT_AVAILABLE_FORMAT}
