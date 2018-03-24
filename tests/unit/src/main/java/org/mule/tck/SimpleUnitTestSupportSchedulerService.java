@@ -207,6 +207,12 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   void stoppedScheduler(Scheduler scheduler) {
     decorators.remove(scheduler);
+
+    if (scheduler instanceof SimpleUnitTestSupportLifecycleSchedulerDecorator
+        && ((SimpleUnitTestSupportLifecycleSchedulerDecorator) scheduler)
+            .getDecorated() instanceof SimpleUnitTestSupportCustomScheduler) {
+      customSchedulers.remove(((SimpleUnitTestSupportLifecycleSchedulerDecorator) scheduler).getDecorated());
+    }
   }
 
   public int getScheduledTasks() {
