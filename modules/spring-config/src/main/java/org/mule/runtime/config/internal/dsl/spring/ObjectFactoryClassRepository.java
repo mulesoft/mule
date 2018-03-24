@@ -88,6 +88,8 @@ public class ObjectFactoryClassRepository {
     Class<ObjectFactory> factoryBeanClass = enhancer.createClass();
     registerStaticCallbacks(factoryBeanClass, new Callback[] {
         (MethodInterceptor) (obj, method, args, proxy) -> {
+          final boolean eager = !isLazyInitFunction.get();
+
           if (method.getName().equals("isSingleton")) {
             return !componentBuildingDefinition.isPrototype();
           }
@@ -103,7 +105,7 @@ public class ObjectFactoryClassRepository {
             return componentBuildingDefinition.isPrototype();
           }
           if (method.getName().equals("isEagerInit")) {
-            return !isLazyInitFunction.get();
+            return eager;
           }
           return proxy.invokeSuper(obj, args);
         }
