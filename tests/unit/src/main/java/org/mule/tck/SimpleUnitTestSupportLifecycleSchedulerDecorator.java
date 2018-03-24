@@ -11,10 +11,12 @@ import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 
 import org.slf4j.Logger;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,13 +49,7 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
 
   @Override
   public void stop() {
-    List<ScheduledFuture> stillaCtiveRecurrentTasks = recurrentTasks.stream()
-        .filter(recurrentTask -> !(recurrentTask.isDone() || recurrentTask.isCancelled())).collect(toList());
-    if (!stillaCtiveRecurrentTasks.isEmpty()) {
-      LOGGER.warn("Scheduler '" + name + "' stopped while it still has active recurrent tasks:"
-          + stillaCtiveRecurrentTasks.toString());
-    }
-    stillaCtiveRecurrentTasks.forEach(recurrentTask -> recurrentTask.cancel(true));
+    cancelStillActiveTasks();
 
     this.stopped = true;
     decorated.stop();
@@ -140,6 +136,25 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
     return decorated.invokeAny(tasks.stream().map(t -> wrap(t)).collect(toList()), timeout, unit);
   }
 
+  private static Field threadLocalsField;
+
+  static {
+    try {
+      threadLocalsField = Thread.class.getDeclaredField("threadLocals");
+      threadLocalsField.setAccessible(true);
+    } catch (NoSuchFieldException | SecurityException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected static void clearAllThreadLocals() {
+    try {
+      threadLocalsField.set(currentThread(), null);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
   private Runnable wrap(Runnable command) {
     return () -> {
       try {
@@ -153,6 +168,8 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
               .error(format("Task '%s' finished with exception in test scheduler '%s'", command.toString(), decorated.getName()),
                      t);
         }
+      } finally {
+        clearAllThreadLocals();
       }
     };
   }
@@ -175,6 +192,16 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
     };
   }
 
+  protected void cancelStillActiveTasks() {
+    List<ScheduledFuture> stillaCtiveRecurrentTasks = recurrentTasks.stream()
+        .filter(recurrentTask -> !(recurrentTask.isDone() || recurrentTask.isCancelled())).collect(toList());
+    if (!stillaCtiveRecurrentTasks.isEmpty()) {
+      LOGGER.warn("Scheduler '" + name + "' stopped while it still has active recurrent tasks:"
+          + stillaCtiveRecurrentTasks.toString());
+    }
+    stillaCtiveRecurrentTasks.forEach(recurrentTask -> recurrentTask.cancel(true));
+  }
+
   @Override
   public void shutdown() {
     this.stopped = true;
@@ -184,6 +211,8 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
 
   @Override
   public List<Runnable> shutdownNow() {
+    cancelStillActiveTasks();
+
     this.stopped = true;
     final List<Runnable> cancelledJobs = decorated.shutdownNow();
     ownerService.stoppedScheduler(this);
@@ -213,5 +242,9 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
   @Override
   public String toString() {
     return getName();
+  }
+
+  public Scheduler getDecorated() {
+    return decorated;
   }
 }
