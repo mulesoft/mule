@@ -57,6 +57,7 @@ public class EventBenchmark extends AbstractBenchmark {
 
   @TearDown
   public void teardown() throws MuleException {
+    muleContext.stop();
     stopIfNeeded(lookupObject(muleContext, SchedulerService.class));
     muleContext.dispose();
   }
