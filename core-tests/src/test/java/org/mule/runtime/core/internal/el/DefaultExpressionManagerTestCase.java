@@ -253,7 +253,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   public void parseLogMessage() throws MuleException {
     String expectedOutput =
         "current message is \norg.mule.runtime.core.internal.message.DefaultMessageBuilder$MessageImplementation\n{"
-            + "\n  payload=java.lang.String\n  mediaType=*/*\n  attributes=null\n  attributesMediaType=*/*\n  exceptionPayload=<not set>\n}";
+            + "\n  payload=test\n  mediaType=*/*\n  attributes=<not set>\n  attributesMediaType=*/*\n}";
     assertThat(expressionManager.parseLogTemplate("current message is #[mel:message]", testEvent(), TEST_CONNECTOR_LOCATION,
                                                   NULL_BINDING_CONTEXT),
                is(expectedOutput));

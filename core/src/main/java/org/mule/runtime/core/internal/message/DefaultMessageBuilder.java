@@ -440,17 +440,22 @@ public final class DefaultMessageBuilder
       buf.append(lineSeparator());
       buf.append("{");
       buf.append(lineSeparator());
-      buf.append("  payload=").append(getPayload().getDataType().getType().getName());
+      buf.append("  payload=").append(defaultIfNull(getPayload().getValue(), NOT_SET));
       buf.append(lineSeparator());
       buf.append("  mediaType=").append(getPayload().getDataType().getMediaType());
       buf.append(lineSeparator());
-      buf.append("  attributes=").append(String.valueOf(getAttributes().getValue()));
+      buf.append("  attributes=").append(defaultIfNull(getAttributes().getValue(), NOT_SET));
       buf.append(lineSeparator());
       buf.append("  attributesMediaType=").append(getAttributes().getDataType().getMediaType());
       buf.append(lineSeparator());
-      buf.append("  exceptionPayload=").append(defaultIfNull(exceptionPayload, NOT_SET));
-      buf.append(lineSeparator());
-
+      if (exceptionPayload != null) {
+        buf.append("  exceptionPayload:");
+        buf.append(lineSeparator());
+        buf.append("    message=").append(exceptionPayload.getMessage());
+        buf.append(lineSeparator());
+        buf.append("    exception=").append(exceptionPayload.getException());
+        buf.append(lineSeparator());
+      }
       if (!getInboundPropertyNames().isEmpty() || !getOutboundPropertyNames().isEmpty()) {
         headersToStringBuilder(this, buf);
       }
