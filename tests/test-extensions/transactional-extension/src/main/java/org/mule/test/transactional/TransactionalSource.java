@@ -27,6 +27,8 @@ import org.mule.test.transactional.connection.DummyXaResource;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
 import org.mule.test.transactional.connection.TestXaTransactionalConnection;
 
+import java.util.concurrent.ExecutorService;
+
 @MetadataScope(outputResolver = TransactionalMetadataResolver.class)
 public class TransactionalSource extends Source<TestTransactionalConnection, Object> {
 
@@ -41,6 +43,8 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
   @Connection
   private ConnectionProvider<TestTransactionalConnection> connectionProvider;
 
+  private ExecutorService connectExecutor;
+
   public TransactionalSource() {
     isSuccess = null;
     xaResource = null;
@@ -48,7 +52,8 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
 
   @Override
   public void onStart(SourceCallback<TestTransactionalConnection, Object> sourceCallback) throws MuleException {
-    newFixedThreadPool(1).execute(() -> {
+    connectExecutor = newFixedThreadPool(1);
+    connectExecutor.execute(() -> {
       SourceCallbackContext ctx = sourceCallback.createContext();
       try {
         TestTransactionalConnection connection = connectionProvider.connect();
@@ -72,7 +77,8 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
 
   @Override
   public void onStop() {
-
+    connectExecutor.shutdownNow();
+    connectExecutor = null;
   }
 
   @OnSuccess

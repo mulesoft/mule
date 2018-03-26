@@ -30,6 +30,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
@@ -44,8 +45,6 @@ import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +63,8 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Processor in the chain of responsibility that knows how to handle a generic {@code ComponentBuildingDefinition}.
@@ -225,7 +226,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
     return rootBeanDefinition(objectFactoryClassRepository
         .getObjectFactoryClass(componentBuildingDefinition, objectFactoryType, objectTypeVisitor.getType(),
-                               () -> componentModel.getBeanDefinition().isLazyInit(), instanceCustomizationFunctionOptional));
+                               new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit()),
+                               instanceCustomizationFunctionOptional));
   }
 
   private void injectSpringProperties(Map<String, Object> customProperties, Object createdInstance) {

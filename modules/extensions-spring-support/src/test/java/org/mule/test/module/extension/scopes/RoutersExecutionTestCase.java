@@ -31,6 +31,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -45,6 +46,8 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
+  private ExecutorService executor = null;
+
   @Override
   protected String[] getConfigFiles() {
     return new String[] {"scopes/heisenberg-router-config.xml"};
@@ -53,6 +56,13 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
   @Override
   protected boolean isDisposeContextPerClass() {
     return true;
+  }
+
+  @After
+  public void after() {
+    if (executor != null) {
+      executor.shutdownNow();
+    }
   }
 
   @Test
@@ -104,8 +114,7 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
    */
   @Test
   public void concurrentRouterExecution() throws Exception {
-
-    final ExecutorService executor = newFixedThreadPool(2);
+    executor = newFixedThreadPool(2);
 
     final Latch beginLatch = new Latch();
     final CountDownLatch assertLatch = new CountDownLatch(2);
