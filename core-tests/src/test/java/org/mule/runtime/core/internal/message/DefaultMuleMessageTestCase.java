@@ -16,17 +16,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+import static org.mule.runtime.api.metadata.DataType.JSON_STRING;
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 
-import org.junit.Test;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
 
 public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
 
@@ -121,6 +123,53 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
     Message message = InternalMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, null).build();
 
     assertThat(((InternalMessage) message).getOutboundProperty(FOO_PROPERTY), is(nullValue()));
+  }
+
+  @Test
+  public void regularToString() {
+    Message message = Message.builder()
+        .payload(TypedValue.of("test"))
+        .attributes(new TypedValue<>("{}", JSON_STRING))
+        .mediaType(TEXT)
+        .build();
+
+    assertThat(message.toString(), is("\n" +
+        "org.mule.runtime.core.internal.message.DefaultMessageBuilder$MessageImplementation\n"
+        + "{\n"
+        + "  payload=test\n"
+        + "  mediaType=text/plain\n"
+        + "  attributes={}\n"
+        + "  attributesMediaType=application/json\n"
+        + "}"));
+  }
+
+  @Test
+  public void compatibilityToString() {
+    Message message = InternalMessage.builder()
+        .payload(TypedValue.of("test"))
+        .attributes(new TypedValue<>("{}", JSON_STRING))
+        .mediaType(TEXT)
+        .addInboundProperty("bar", "in")
+        .addOutboundProperty(FOO_PROPERTY, "out")
+        .exceptionPayload(new DefaultExceptionPayload(new NullPointerException("error")))
+        .build();
+
+    assertThat(message.toString(), is("\n"
+        + "org.mule.runtime.core.internal.message.DefaultMessageBuilder$MessageImplementation\n"
+        + "{\n"
+        + "  payload=test\n"
+        + "  mediaType=text/plain\n"
+        + "  attributes={}\n"
+        + "  attributesMediaType=application/json\n"
+        + "  exceptionPayload:\n"
+        + "    message=error\n"
+        + "    exception=java.lang.NullPointerException: error\n"
+        + "  Message properties:\n"
+        + "    INBOUND scoped properties:\n"
+        + "    bar=in\n"
+        + "    OUTBOUND scoped properties:\n"
+        + "    foo=out\n"
+        + "}"));
   }
 
 }
