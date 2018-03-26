@@ -84,6 +84,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -238,6 +239,12 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void getRawListReturnTypeNoGenerics() {
+    Collection<Field> fieldsWithGetters = getFieldsWithGetters(PhoneNumber.class, reflectionCache);
+    assertThat(fieldsWithGetters.size(), is(4));
+  }
+
+  @Test
   public void getWildCardFieldsDataTypes() {
 
     Collection<Field> exposedFields = getFieldsWithGetters(FruitBox.class, reflectionCache);
@@ -351,6 +358,20 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertThat(fieldsWithGetters.size(), is(fields.size()));
   }
 
+  @Test
+  public void listWithNoGenerics() throws Exception {
+    MetadataType returnType = IntrospectionUtils.getMethodReturnType(getMethod("listNoGenerics"));
+    assertThat(returnType, instanceOf(ArrayType.class));
+    assertThat(((ArrayType) returnType).getType(), instanceOf(ObjectType.class));
+  }
+
+  @Test
+  public void mapWithNoGenerics() throws Exception {
+    MetadataType returnType = IntrospectionUtils.getMethodReturnType(getMethod("mapNoGenerics"));
+    assertThat(returnType, instanceOf(ObjectType.class));
+    assertThat(((ObjectType) returnType).getOpenRestriction().get(), instanceOf(AnyType.class));
+  }
+
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {
     Field field = findField(name, fields);
     assertThat(field, is(notNullValue()));
@@ -388,6 +409,14 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   public Map<String, Apple> foo() {
     return new HashMap<>();
+  }
+
+  public List listNoGenerics() {
+    return new ArrayList();
+  }
+
+  public Map mapNoGenerics() {
+    return new LinkedHashMap();
   }
 
   public Result<String, Object> operationResult() {
