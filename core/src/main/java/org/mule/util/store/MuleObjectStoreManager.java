@@ -123,6 +123,11 @@ public class MuleObjectStoreManager
         }
         else
         {
+            if (baseStore instanceof ExpirationDelegatableObjectStore)
+            {
+                ((ExpirationDelegatableObjectStore) baseStore).setExpirationPolicyProperties(entryTTL);
+            }
+            
             return getMonitorablePartition(name, baseStore, store, entryTTL, maxEntries, expirationInterval);
         }
     }

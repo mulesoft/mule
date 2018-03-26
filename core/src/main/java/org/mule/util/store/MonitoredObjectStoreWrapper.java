@@ -201,19 +201,9 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
             }
 
             ListableObjectStore<StoredObject<T>> store = getStore();
-            for (Serializable key : keys)
+            if (!(store instanceof ExpirationDelegatableObjectStore))
             {
-                StoredObject<T> obj = store.retrieve(key);
-
-                if (entryTTL != UNBOUNDED && now - obj.getTimestamp() >= entryTTL)
-                {
-                    remove(key);
-                    excess--;
-                }
-                else if (maxEntries != UNBOUNDED && excess > 0)
-                {
-                    sortedMaxEntries.offer(obj);
-                }
+                excess = expireDueToTTL(now, keys, excess, sortedMaxEntries, store);
             }
 
             if (sortedMaxEntries != null)
@@ -231,6 +221,26 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
         {
             logger.warn("Running expirty on " + baseStore + " threw " + e + ":" + e.getMessage());
         }
+    }
+
+    private int expireDueToTTL(final long now, List<Serializable> keys, int excess, PriorityQueue<StoredObject<T>> sortedMaxEntries, ListableObjectStore<StoredObject<T>> store)
+            throws ObjectStoreException
+    {
+        for (Serializable key : keys)
+        {
+            StoredObject<T> obj = store.retrieve(key);
+
+            if (entryTTL != UNBOUNDED && now - obj.getTimestamp() >= entryTTL)
+            {
+                remove(key);
+                excess--;
+            }
+            else if (maxEntries != UNBOUNDED && excess > 0)
+            {
+                sortedMaxEntries.offer(obj);
+            }
+        }
+        return excess;
     }
 
     @Override
