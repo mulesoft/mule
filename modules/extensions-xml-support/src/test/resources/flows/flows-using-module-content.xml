@@ -8,7 +8,9 @@
 
     <flow name="testSetPayloadUsingContent">
         <module-content:set-payload-using-content-parameter>
-            <module-content:content>#['smart' ++ ' connector content']</module-content:content>
+            <module-content:content>
+                #['smart' ++ ' connector content']
+            </module-content:content>
         </module-content:set-payload-using-content-parameter>
     </flow>
 
