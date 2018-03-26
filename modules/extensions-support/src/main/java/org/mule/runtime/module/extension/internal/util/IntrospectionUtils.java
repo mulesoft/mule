@@ -282,9 +282,8 @@ public final class IntrospectionUtils {
       type = returnType.getGenerics().get(0).getConcreteType();
     }
 
-    if (isCollection(returnType)) {
-      Type itemType =
-          returnType.getGenerics().get(0).getConcreteType();
+    if (isCollection(returnType) && !returnType.getGenerics().isEmpty()) {
+      Type itemType = returnType.getGenerics().get(0).getConcreteType();
       if (itemType.isAssignableTo(Result.class)) {
         return returnListOfMessagesType(returnType, itemType);
       }
