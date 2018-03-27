@@ -13,6 +13,7 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -33,8 +34,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
  */
 public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> implements ObjectTypeProvider {
 
-  private DefaultObjectBuilder builder;
-  private Class<?> objectClass;
+  private LazyValue<DefaultObjectBuilder> builder;
+  private LazyValue<Class<?>> objectClass;
   private final ObjectType objectType;
   private final ClassLoader classLoader;
   private String name;
@@ -45,12 +46,12 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
     this.classLoader = classLoader;
     this.objectType = type;
 
-    objectClass = withContextClassLoader(classLoader, () -> {
+    objectClass = new LazyValue<>(() -> withContextClassLoader(classLoader, () -> {
       // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an extension
       // with the annotations stuff.
       return addAnnotationsToClass(getType(type));
-    });
-    builder = new DefaultObjectBuilder(objectClass);
+    }));
+    builder = new LazyValue<>(() -> new DefaultObjectBuilder(objectClass.get()));
   }
 
   @Override
@@ -59,6 +60,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
       // TODO MULE-10919 - This logic is similar to that of the resolverset object builder and should
       // be generalized
 
+      DefaultObjectBuilder builder = this.builder.get();
       resolveParameters(objectType, builder);
       resolveParameterGroups(objectType, builder);
 
@@ -86,6 +88,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
   }
 
   private void injectFields() {
+    DefaultObjectBuilder builder = this.builder.get();
     builder.setEncoding(muleContext.getConfiguration().getDefaultEncoding());
     if (name != null) {
       builder.setName(name);
@@ -98,6 +101,6 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
 
   @Override
   public Class<?> getObjectType() {
-    return objectClass;
+    return objectClass.get();
   }
 }

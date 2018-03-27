@@ -13,6 +13,7 @@ import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocati
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -24,7 +25,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
  */
 public final class TypeAwareConfigurationFactory implements ConfigurationFactory {
 
-  private final Class<?> configurationType;
+  private final LazyValue<Class<?>> configurationType;
   private final ClassLoader extensionClassLoader;
 
   /**
@@ -39,12 +40,13 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
     checkArgument(extensionClassLoader != null, "extensionClassLoader type cannot be null");
     checkInstantiable(configurationType, new ReflectionCache());
 
-    this.configurationType = withContextClassLoader(extensionClassLoader, () -> {
+    this.extensionClassLoader = extensionClassLoader;
+
+    this.configurationType = new LazyValue<>(() -> withContextClassLoader(this.extensionClassLoader, () -> {
       // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an extension
       // with the annotations stuff.
       return addAnnotationsToClass(configurationType);
-    });
-    this.extensionClassLoader = extensionClassLoader;
+    }));
   }
 
   /**
@@ -53,10 +55,10 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
   @Override
   public Object newInstance() {
     try {
-      return withContextClassLoader(extensionClassLoader, configurationType::newInstance);
+      return withContextClassLoader(extensionClassLoader, configurationType.get()::newInstance);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not instantiate configuration of type "
-          + configurationType.getName()), e);
+          + configurationType.get().getName()), e);
     }
   }
 
@@ -65,6 +67,6 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
    */
   @Override
   public Class<?> getObjectType() {
-    return configurationType;
+    return configurationType.get();
   }
 }
