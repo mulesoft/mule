@@ -31,9 +31,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -147,7 +148,9 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
   public void asyncDelegateChain() throws Exception {
     Latch latch = new Latch();
     Latch asyncLatch = new Latch();
-    async = new AsyncDelegateMessageProcessor(newChain(empty(), event -> {
+
+    DefaultMessageProcessorChainBuilder delegateBuilder = new DefaultMessageProcessorChainBuilder();
+    delegateBuilder.chain(event -> {
       try {
         asyncLatch.countDown();
         latch.await();
@@ -155,7 +158,9 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
         throw new RuntimeException(e);
       }
       return event;
-    }));
+    });
+
+    async = new AsyncDelegateMessageProcessor(delegateBuilder);
     muleContext.getInjector().inject(async);
     async.setAnnotations(getAppleFlowComponentLocationAnnotations());
 

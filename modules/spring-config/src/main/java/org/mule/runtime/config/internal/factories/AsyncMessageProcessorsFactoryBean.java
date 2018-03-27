@@ -10,14 +10,14 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
+import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
-import java.util.List;
-
 import org.springframework.beans.factory.FactoryBean;
+
+import java.util.List;
 
 public class AsyncMessageProcessorsFactoryBean extends AbstractComponent
     implements FactoryBean<Processor>, MuleContextAware, NameableObject {
@@ -50,7 +50,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractComponent
         throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
       }
     }
-    AsyncDelegateMessageProcessor delegate = new AsyncDelegateMessageProcessor(builder.build(), name);
+    AsyncDelegateMessageProcessor delegate = new AsyncDelegateMessageProcessor(builder, name);
     delegate.setAnnotations(getAnnotations());
     return delegate;
   }

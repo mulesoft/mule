@@ -23,7 +23,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAG
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
@@ -43,6 +42,7 @@ import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorTestCase;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.ResponseTimeoutException;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -267,7 +267,10 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
   protected AsyncDelegateMessageProcessor createAsyncMessageProcessor(SensingNullMessageProcessor target)
       throws InitialisationException {
-    asyncMP = new AsyncDelegateMessageProcessor(newChain(Optional.empty(), target));
+    DefaultMessageProcessorChainBuilder delegateBuilder = new DefaultMessageProcessorChainBuilder();
+    delegateBuilder.chain(target);
+
+    asyncMP = new AsyncDelegateMessageProcessor(delegateBuilder);
     asyncMP.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(asyncMP, true, muleContext);
     return asyncMP;

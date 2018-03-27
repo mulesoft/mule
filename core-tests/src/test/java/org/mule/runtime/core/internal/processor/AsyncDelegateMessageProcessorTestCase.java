@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.processor;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonMap;
-import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.locks.LockSupport.parkNanos;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -22,7 +21,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 
@@ -30,13 +28,14 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -180,8 +179,11 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
   private AsyncDelegateMessageProcessor createAsyncDelegateMessageProcessor(Processor listener, FlowConstruct flowConstruct)
       throws Exception {
-    AsyncDelegateMessageProcessor mp =
-        new AsyncDelegateMessageProcessor(newChain(of(flowConstruct.getProcessingStrategy()), listener), "thread");
+    DefaultMessageProcessorChainBuilder delegateBuilder = new DefaultMessageProcessorChainBuilder();
+    delegateBuilder.setProcessingStrategy(flowConstruct.getProcessingStrategy());
+    delegateBuilder.chain(listener);
+
+    AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(delegateBuilder, "thread");
     mp.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(mp, true, muleContext);
     return mp;

@@ -59,7 +59,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
     this.mode = mode;
   }
 
-  @Parameterized.Parameters
+  @Parameterized.Parameters(name = "{0}")
   public static Collection<Mode> modeParameters() {
     return asList(new Mode[] {BLOCKING, NON_BLOCKING});
   }

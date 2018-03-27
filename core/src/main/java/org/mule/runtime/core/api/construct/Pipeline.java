@@ -10,6 +10,7 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 
 import java.util.List;
@@ -36,4 +37,8 @@ public interface Pipeline extends FlowConstruct, ProcessingDescriptor {
    */
   int getMaxConcurrency();
 
+  /**
+   * @return the {@link ProcessingStrategyFactory} applied to this Pipeline.
+   */
+  ProcessingStrategyFactory getProcessingStrategyFactory();
 }
