@@ -188,7 +188,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
       for (ParameterModel parameterModel : parameterModels) {
         final String parameterName = parameterModel.getName();
         if (parameters.containsKey(parameterName)) {
-          final String xmlValue = parameters.get(parameterName);
+          final String xmlValue = parameters.get(parameterName).trim();
           result.put(parameterName, new Pair<>(xmlValue, parameterModel.getType()));
         }
       }
