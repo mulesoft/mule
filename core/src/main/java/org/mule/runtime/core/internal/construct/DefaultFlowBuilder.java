@@ -16,7 +16,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.createFlowStatistics;
 import static org.mule.runtime.core.internal.construct.FlowBackPressureException.BACK_PRESSURE_ERROR_MESSAGE;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
@@ -79,7 +78,7 @@ public class DefaultFlowBuilder implements Builder {
   private FlowExceptionHandler exceptionListener;
   private ProcessingStrategyFactory processingStrategyFactory;
   private String initialState = INITIAL_STATE_STARTED;
-  private int maxConcurrency = DEFAULT_MAX_CONCURRENCY;
+  private Integer maxConcurrency;
 
   private DefaultFlow flow;
 
@@ -227,7 +226,7 @@ public class DefaultFlowBuilder implements Builder {
     protected DefaultFlow(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
-                          int maxConcurrency, FlowConstructStatistics flowConstructStatistics,
+                          Integer maxConcurrency, FlowConstructStatistics flowConstructStatistics,
                           ComponentInitialStateManager componentInitialStateManager) {
       super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
             flowConstructStatistics, componentInitialStateManager);

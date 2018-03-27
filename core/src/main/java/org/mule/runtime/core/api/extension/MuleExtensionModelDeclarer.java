@@ -65,6 +65,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -502,6 +503,7 @@ class MuleExtensionModelDeclarer {
     flow.onDefaultParameterGroup().withOptionalParameter("initialState").defaultingTo("started")
         .ofType(BaseTypeBuilder.create(JAVA).stringType().enumOf("started", "stopped").build());
     flow.onDefaultParameterGroup().withOptionalParameter("maxConcurrency")
+        .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that the Flow can use to optimize for performance when processing messages.")
         .ofType(typeLoader.load(Integer.class));
 
     flow.withComponent("source")

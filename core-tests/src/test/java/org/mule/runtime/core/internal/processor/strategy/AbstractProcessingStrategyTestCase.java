@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedSet;
 import static java.util.concurrent.Executors.newFixedThreadPool;
@@ -516,8 +517,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
                 @Override
                 public CoreEvent process(CoreEvent event) throws MuleException {
                   try {
-                    Thread.sleep(3);
+                    sleep(3);
                   } catch (InterruptedException e) {
+                    currentThread().interrupt();
                     throw new RuntimeException(e);
                   }
                   return super.process(event);
@@ -546,8 +548,12 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       new PollingProber(DEFAULT_TIMEOUT * 10, DEFAULT_POLLING_INTERVAL)
           .check(new JUnitLambdaProbe(() -> {
             LOGGER.info("DONE " + processed.get() + " , REJECTED " + rejected.get() + ", ");
-            return totalAssertion.matches(rejected.get() + processed.get())
-                && processedAssertion.matches(processed.get()) && rejectedAssertion.matches(rejected.get());
+
+            assertThat(rejected.get() + processed.get(), totalAssertion);
+            assertThat(processed.get(), processedAssertion);
+            assertThat(rejected.get(), rejectedAssertion);
+
+            return true;
           }));
     }
   }
