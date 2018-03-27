@@ -218,7 +218,6 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
   private String sanitize(String expression) {
     String sanitizedExpression;
-    expression = expression.trim();
     if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
       if (!expression.endsWith(DEFAULT_EXPRESSION_POSTFIX)) {
         throw new ExpressionExecutionException(createStaticMessage(format("Unbalanced brackets in expression '%s'", expression)));
