@@ -111,14 +111,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
                                                                            .expirationInterval(20000L)
                                                                            .build());
 
-    recentlyProcessedIds = objectStoreManager.getOrCreateObjectStore(formatKey("recently-processed-ids"),
-                                                                     ObjectStoreSettings.builder()
-                                                                         .persistent(true)
-                                                                         .maxEntries(1000)
-                                                                         .entryTtl(60000L)
-                                                                         .expirationInterval(20000L)
-                                                                         .build());
-
+    recentlyProcessedIds = objectStoreManager.getOrCreateObjectStore(formatKey("recently-processed-ids"), unmanagedPersistent());
 
     watermarkObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey("watermark"), unmanagedPersistent());
     executor = schedulerService.customScheduler(SchedulerConfig.config()
