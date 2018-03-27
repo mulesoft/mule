@@ -26,6 +26,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractComponent
 
   protected List messageProcessors;
   protected String name;
+  protected Integer maxConcurrency;
 
   @Override
   public Class getObjectType() {
@@ -52,6 +53,9 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractComponent
     }
     AsyncDelegateMessageProcessor delegate = new AsyncDelegateMessageProcessor(builder, name);
     delegate.setAnnotations(getAnnotations());
+    if (getMaxConcurrency() != null) {
+      delegate.setMaxConcurrency(getMaxConcurrency());
+    }
     return delegate;
   }
 
@@ -73,5 +77,13 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractComponent
   @Override
   public void setName(String name) {
     this.name = name;
+  }
+
+  public Integer getMaxConcurrency() {
+    return maxConcurrency;
+  }
+
+  public void setMaxConcurrency(Integer maxConcurrency) {
+    this.maxConcurrency = maxConcurrency;
   }
 }
