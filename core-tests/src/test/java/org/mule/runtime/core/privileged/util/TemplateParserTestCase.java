@@ -173,9 +173,9 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
   public void muleParserManagesPipeCharacter() {
     TemplateParser tp = TemplateParser.createMuleStyleParser();
 
-    final String expectedResult = "Hello|Hi";
+    final String expectedResult = "mel:evaluator: 'Hello|Hi'";
 
-    String result = tp.parse(null, "#[mel:evaluator: 'Hello|Hi']", token -> expectedResult);
+    String result = tp.parse(null, "#[mel:evaluator: 'Hello|Hi']", token -> token);
 
     assertEquals(expectedResult, result);
   }
