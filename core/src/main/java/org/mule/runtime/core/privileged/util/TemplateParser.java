@@ -8,10 +8,7 @@ package org.mule.runtime.core.privileged.util;
 
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -112,6 +109,9 @@ public final class TemplateParser {
       newProps = new CaseInsensitiveHashMap(props);
     }
 
+    if (this.getStyle().getName().equals(WIGGLY_MULE_TEMPLATE_STYLE) && !this.validateBalanceMuleStyle(template)) {
+      throw new RuntimeException("Sarlanga");
+    }
     Matcher m = pattern.matcher(result);
 
     while (m.find()) {
@@ -143,6 +143,63 @@ public final class TemplateParser {
       }
     }
     return result;
+  }
+
+  private boolean styleIs(String style) {
+    return this.getStyle().getName().equals(style);
+  }
+
+  private boolean validateBalanceMuleStyle(String template) {
+    Stack<Character> stack = new Stack<>();
+    boolean lastSharp = false;
+    int openBraces = 0;
+    int openSingleQuotes = 0;
+    int openDoubleQuotes = 0;
+
+    for (int i = 0; i < template.length(); i++) {
+      char c = template.charAt(i);
+      switch (c) {
+        case '\'':
+          if (!stack.empty() && stack.peek().equals('\'')) {
+            stack.pop();
+            openSingleQuotes--;
+          } else {
+            stack.push(c);
+            openSingleQuotes++;
+          }
+          lastSharp = false;
+          break;
+        case '"':
+          if (!stack.empty() && stack.peek().equals('"')) {
+            stack.pop();
+            openDoubleQuotes--;
+          } else {
+            stack.push(c);
+            openDoubleQuotes++;
+          }
+          lastSharp = false;
+          break;
+        case ']':
+          if (!stack.empty() && stack.peek().equals('[')) {
+            stack.pop();
+            openBraces--;
+          }
+          lastSharp = false;
+          break;
+        case '[':
+          if ((lastSharp || openBraces > 0) && !(openDoubleQuotes > 0 || openSingleQuotes > 0)) {
+            stack.push(c);
+            openBraces++;
+          }
+          lastSharp = false;
+          break;
+        case '#':
+          lastSharp = true;
+          break;
+      }
+    }
+
+    return stack.empty();
   }
 
   private String replaceDollarSign(String valueString) {
@@ -216,6 +273,10 @@ public final class TemplateParser {
   }
 
   public boolean isValid(String expression) {
+    if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE)) {
+      return validateBalanceMuleStyle(expression);
+    }
+
     try {
       style.validate(expression);
       return true;
