@@ -7,7 +7,6 @@
 
 package org.mule.test.runner.api;
 
-import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -23,6 +22,8 @@ import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -103,7 +104,6 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
   public void loadExtensionModels() {
     try {
       loadRuntimeExtensionModels().forEach(extensionModels::add);
-
       for (Object pluginClassLoader : pluginsClassLoaders) {
         String artifactName = (String) pluginClassLoader.getClass().getMethod("getArtifactId").invoke(pluginClassLoader);
         ClassLoader classLoader =
@@ -119,7 +119,8 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
             MulePluginBasedLoaderFinder finder = new MulePluginBasedLoaderFinder(json.openStream());
             if (finder.isExtensionModelLoaderDescriptorDefined()) {
               ExtensionModel extension =
-                  finder.getLoader().loadExtensionModel(classLoader, getDefault(emptySet()), finder.getParams());
+                  finder.getLoader().loadExtensionModel(classLoader, getDefault(ImmutableSet.copyOf(extensionModels)),
+                                                        finder.getParams());
               extensionModels.add(extension);
             } else {
               LOGGER
