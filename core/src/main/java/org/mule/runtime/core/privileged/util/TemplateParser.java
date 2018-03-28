@@ -109,7 +109,7 @@ public final class TemplateParser {
       newProps = new CaseInsensitiveHashMap(props);
     }
 
-    if (this.getStyle().getName().equals(WIGGLY_MULE_TEMPLATE_STYLE) && !this.validateBalanceMuleStyle(template)) {
+    if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE) && !this.validateBalanceMuleStyle(template)) {
       throw new RuntimeException("Sarlanga");
     }
     Matcher m = pattern.matcher(result);
@@ -122,6 +122,11 @@ public final class TemplateParser {
 
       if (callback != null) {
         value = callback.match(propname);
+
+        if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE) && value instanceof String && pattern.matcher((String)value).find()) {
+          value = parse(props, (String) value, callback);
+        }
+
         if (value == null) {
           value = NULL_AS_STRING;
         }

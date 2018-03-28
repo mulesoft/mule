@@ -193,8 +193,8 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
   @Test
   public void muleParserManagesNestedExpressions() {
     TemplateParser tp = TemplateParser.createMuleStyleParser();
-    final String expectedResult = "mel:zero#[mel:one#[mel:two#[mel:three#[mel:four#[mel:five]]]]]";
-    String expression = "#[mel:zero#[mel:one#[mel:two#[mel:three#[mel:four#[mel:five]]]]]]";
+    final String expectedResult = "mel:zero mel:one mel:two mel:three mel:four mel:five";
+    String expression = "#[mel:zero #[mel:one #[mel:two #[mel:three #[mel:four #[mel:five]]]]]]";
     assertTrue(tp.isValid(expression));
     String result = tp.parse(null, expression, token -> token);
     assertEquals(expectedResult, result);
@@ -303,6 +303,67 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
     assertTrue(tp.isValid("asjdhkasdhaskldh #['asdadasd[asdadasdasdadsadasd]asdasdasd#[']"));
     assertTrue(tp.isValid("#[]#[]"));
     assertTrue(tp.isValid("#[[]]"));
+  }
+
+  @Test
+  public void muleParserWithStringBracesInside() {
+    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    final String expectedResult = "'['";
+    String expression = "#['[']";
+    assertTrue(tp.isValid(expression));
+    String result = tp.parse(null, expression, token -> token);
+    assertEquals(expectedResult, result);
+  }
+
+  @Test
+  public void muleParserWithExpresionInside() {
+    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    final String expression = "#[hello #[mule]]";
+    String expectedResult = "hello mule";
+    assertTrue(tp.isValid(expression));
+
+    String result = tp.parse(null, expression, token -> token);
+    assertEquals(expectedResult, result);
+  }
+
+  @Test
+  public void muleParserWithExpresionInsideWithoutSharp() {
+    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    final String expression = "#[hello [mule]]";
+    String expectedResult = "hello [mule]";
+    assertTrue(tp.isValid(expression));
+    String result = tp.parse(null, expression, token -> token);
+    assertEquals(expectedResult, result);
+  }
+
+  @Test
+  public void muleParserWithExpresionInsideWithoutLiteralWithoutSharp() {
+    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    final String expression = "#[[mule]]";
+    String expectedResult = "[mule]";
+    assertTrue(tp.isValid(expression));
+    String result = tp.parse(null, expression, token -> token);
+    assertEquals(expectedResult, result);
+  }
+
+  @Test
+  public void muleParserWithExpresionInsideWithoutLiteral() {
+    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    final String expression = "#[#[mule]]";
+    String expectedResult = "mule";
+    assertTrue(tp.isValid(expression));
+    String result = tp.parse(null, expression, token -> token);
+    assertEquals(expectedResult, result);
+  }
+
+  @Test
+  public void muleParserWithLiteralBefore() {
+    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    final String expectedResult = "muleman 'value'";
+    String expression = "muleman #['value']";
+    assertTrue(tp.isValid(expression));
+    String result = tp.parse(null, expression, token -> token);
+    assertEquals(expectedResult, result);
   }
 
   private Map<String, Object> buildMap() {
