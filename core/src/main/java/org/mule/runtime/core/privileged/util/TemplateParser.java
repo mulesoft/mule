@@ -8,7 +8,11 @@ package org.mule.runtime.core.privileged.util;
 
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +29,9 @@ public final class TemplateParser {
   public static final String CURLY_TEMPLATE_STYLE = "curly";
   public static final String WIGGLY_MULE_TEMPLATE_STYLE = "mule";
   private static final String NULL_AS_STRING = "null";
+  private static final char START_EXPRESSION = '#';
+  private static final char OPEN_EXPRESSION = '[';
+  private static final char CLOSE_EXPRESSION = ']';
 
   private static final Map<String, PatternInfo> patterns = new HashMap<>();
 
@@ -103,95 +110,65 @@ public final class TemplateParser {
   }
 
   private String parseMule(Map<?, ?> props, String template, TemplateCallback callback) {
+    if (!validateBalanceMuleStyle(template)) {
+      return template;
+    }
 
-    Stack<Character> stack = new Stack<>();
     boolean lastSharp = false;
-    int openSingleQuotes = 0;
-    int openDoubleQuotes = 0;
+    boolean openSingleQuotes = false;
+    boolean openDoubleQuotes = false;
 
-    String value = "";
+    StringBuilder result = new StringBuilder();
     int currentPosition = 0;
     while (currentPosition < template.length()) {
       char c = template.charAt(currentPosition);
 
-      if (lastSharp && c != '[') {
-        value += '#';
+      if (lastSharp && c != OPEN_EXPRESSION) {
+        result.append(START_EXPRESSION);
       }
 
-      switch (c) {
-        case '\'':
-          if (!stack.empty() && stack.peek().equals('\'')) {
-            stack.pop();
-            openSingleQuotes--;
-          } else {
-            stack.push(c);
-            openSingleQuotes++;
-          }
-          value += c;
-          lastSharp = false;
-          break;
-        case '"':
-          if (!stack.empty() && stack.peek().equals('"')) {
-            stack.pop();
-            openDoubleQuotes--;
-          } else {
-            stack.push(c);
-            openDoubleQuotes++;
-          }
-          value += c;
-          lastSharp = false;
-          break;
-        case ']':
-          if (!stack.empty() && stack.peek().equals('[')) {
-            stack.pop();
-          } else {
-            value += c;
-          }
-          lastSharp = false;
-          break;
-        case '[':
-          if (lastSharp && !(openDoubleQuotes > 0 || openSingleQuotes > 0)) {
-            stack.push(c);
-            int closing = closingBracesPosition(template, currentPosition);
-            String enclosingTemplate = template.substring(currentPosition + 1, closing);
-
-            // NPE, bla bla
-            Object newValue = callback.match(enclosingTemplate);
-            if (newValue == null) {
-              value += NULL_AS_STRING;
-            } else {
-              value += parseMule(props, newValue.toString(), callback);
-            }
-
-            currentPosition = closing;
-          } else {
-            value += c;
-          }
-          lastSharp = false;
-          break;
-        case '#':
-          lastSharp = true;
-          break;
-        default:
-          value += c;
-          lastSharp = false;
-          break;
+      if (c == '\'') {
+        openSingleQuotes = !openDoubleQuotes;
       }
+      if (c == '"') {
+        openDoubleQuotes = !openDoubleQuotes;
+      }
+      if (c == OPEN_EXPRESSION && lastSharp && !(openDoubleQuotes || openSingleQuotes)) {
+        int closing = closingBracesPosition(template, currentPosition);
+        String enclosingTemplate = template.substring(currentPosition + 1, closing);
+
+        Object value = enclosingTemplate;
+        if (callback != null) {
+          value = callback.match(enclosingTemplate);
+          if (value == null) {
+            value = NULL_AS_STRING;
+          } else {
+            value = parseMule(props, value.toString(), callback);
+          }
+        }
+        result.append(value);
+
+        currentPosition = closing;
+      } else if (c != START_EXPRESSION) {
+        result.append(c);
+      }
+
+      lastSharp = c == START_EXPRESSION;
       currentPosition++;
     }
 
-    return value;
+    return result.toString();
   }
 
   private int closingBracesPosition(String template, int startingPosition) {
-    // This assumes that the template is balanced
+    // This assumes that the template is balanced (simply validate first)
     int openingBraces = 1;
     boolean openSingleQuotes = false;
     boolean openDoubleQuotes = false;
     for (int i = startingPosition + 1; i < template.length(); i++) {
-      if (template.charAt(i) == ']' && !(openSingleQuotes || openDoubleQuotes)) {
+      if (template.charAt(i) == CLOSE_EXPRESSION && !(openSingleQuotes || openDoubleQuotes)) {
         openingBraces--;
-      } else if (template.charAt(i) == '[' && !(openSingleQuotes || openDoubleQuotes)) {
+      } else if (template.charAt(i) == OPEN_EXPRESSION && !(openSingleQuotes || openDoubleQuotes)) {
         openingBraces++;
       } else if (template.charAt(i) == '\'') {
         openSingleQuotes = !openSingleQuotes;
@@ -283,21 +260,21 @@ public final class TemplateParser {
           }
           lastSharp = false;
           break;
-        case ']':
-          if (!stack.empty() && stack.peek().equals('[')) {
+        case CLOSE_EXPRESSION:
+          if (!stack.empty() && stack.peek().equals(OPEN_EXPRESSION)) {
             stack.pop();
             openBraces--;
           }
           lastSharp = false;
           break;
-        case '[':
+        case OPEN_EXPRESSION:
           if ((lastSharp || openBraces > 0) && !(openDoubleQuotes > 0 || openSingleQuotes > 0)) {
             stack.push(c);
             openBraces++;
           }
           lastSharp = false;
           break;
-        case '#':
+        case START_EXPRESSION:
           lastSharp = true;
           break;
       }
