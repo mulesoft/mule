@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
 import java.io.InputStream;
@@ -48,7 +49,9 @@ import org.junit.Test;
 public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";
-  public static final String TOO_BIG = "Too big!";
+  private static final String TOO_BIG = "Too big!";
+  private static final int TIMEOUT = 2000;
+  private static final int DELAY = 200;
   private static List<String> CASTED_SPELLS = new LinkedList<>();
 
   public static void addSpell(String spell) {
@@ -223,7 +226,21 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   public void nonRepeatableStreamIsAutomaticallyClosed() throws Exception {
     InputStream stream = (InputStream) flowRunner("toNonRepeatableStream")
         .withPayload(data).run().getMessage().getPayload().getValue();
-    assertThat(stream.read(), is(-1));
+    // Stream will close on terminate but flowRunner will be done on response
+    new PollingProber(TIMEOUT, DELAY).check(new JUnitProbe() {
+
+      @Override
+      protected boolean test() throws Exception {
+        assertThat(stream.read(), is(-1));
+        return true;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "Stream was not automatically closed.";
+      }
+    });
+
   }
 
   @Test
