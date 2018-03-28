@@ -10,16 +10,19 @@ import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.getLong;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.time.Duration.ZERO;
 import static java.time.Duration.ofMillis;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.delay;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import static reactor.retry.Retry.onlyIf;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -33,6 +36,10 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import reactor.retry.BackoffDelay;
+import reactor.retry.Retry;
+
+import java.time.Duration;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Supplier;
 
@@ -182,8 +189,9 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
           .publishOn(publishOnScheduler)
           .doOnError(RejectedExecutionException.class, throwable -> LOGGER.trace("Shared scheduler " + subscribeOnSchedulerName
               + " is busy.  Scheduling of the current event will be retried after " + SCHEDULER_BUSY_RETRY_INTERVAL_MS + "ms."))
-          .retryWhen(errors -> errors
-              .flatMap(error -> delay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS), fromExecutorService(getCpuLightScheduler()))));
+          .retryWhen(onlyIf(ctx -> RejectedExecutionException.class.isAssignableFrom(unwrap(ctx.exception()).getClass()))
+              .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS), ZERO, ZERO))
+              .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));
     }
 
   }
