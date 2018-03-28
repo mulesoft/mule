@@ -9,16 +9,10 @@ package org.mule.test.infrastructure.maven;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
@@ -29,21 +23,36 @@ import org.apache.maven.shared.invoker.InvokerLogger;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.apache.maven.shared.invoker.SystemOutLogger;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+
 
 /**
  * Provides Maven related utilities for testing purposes
  */
 public class MavenTestUtils {
 
+  private static final InvokerLogger LOGGER = new SystemOutLogger();
+
   private static final String M_2_REPO = "/.m2/repository";
   private static final String USER_HOME = "user.home";
-  private static final URL MAVEN_ARTIFACTS_DIRECTORY =
-      MavenTestUtils.class.getClassLoader().getResource("artifacts");
+  private static final URI MAVEN_ARTIFACTS_DIRECTORY = ofNullable(getProperty("mule.test.maven.artifacts.dir"))
+      .map(dir -> new File(dir).toURI())
+      .orElseGet(() -> {
+        try {
+          return MavenTestUtils.class.getClassLoader().getResource("artifacts").toURI();
+        } catch (URISyntaxException e) {
+          LOGGER.error("Could not resolve default Maven artifacts directory", e);
+          return null;
+        }
+      });
 
-  private static final List<String> INSTALL_GOALS = Collections.singletonList("install");
-  private static final List<String> CLEAN_GOALS = Collections.singletonList("clean");
-
-  private static final InvokerLogger LOGGER = new SystemOutLogger();
+  private static final List<String> INSTALL_GOALS = singletonList("install");
+  private static final List<String> CLEAN_GOALS = singletonList("clean");
 
   private static final File MAVEN_SETTINGS = new File(getProperty("settings.file"));
 
@@ -52,7 +61,7 @@ public class MavenTestUtils {
   /**
    * Runs the Maven install goal using the project on the given directory for the artifact defined by the given descriptor. After
    * the artifact has been installed, performs the Maven clean goal to delete the intermediate resources.
-   * 
+   *
    * @param baseDirectory directory on which the POM resides.
    * @param descriptor the artifact descriptor for the project being built.
    * @return the installed artifact on the Maven repository.
@@ -105,9 +114,11 @@ public class MavenTestUtils {
     request.setGoals(goals);
     request.setBatchMode(true);
 
-    String mavenArtifactsAndBaseDirectory = MAVEN_ARTIFACTS_DIRECTORY.toString() + "/" + baseDirectory;
-    request.setBaseDirectory(Paths.get(URI.create(mavenArtifactsAndBaseDirectory)).toFile());
-    request.setPomFile(Paths.get(URI.create(mavenArtifactsAndBaseDirectory + "/pom.xml")).toFile());
+    File mavenArtifactsAndBaseDirectory = new File(new File(MAVEN_ARTIFACTS_DIRECTORY), baseDirectory);
+    LOGGER.info("Using Maven artifacts base directory: '" + mavenArtifactsAndBaseDirectory.getAbsolutePath() + "'...");
+
+    request.setBaseDirectory(mavenArtifactsAndBaseDirectory);
+    request.setPomFile(new File(mavenArtifactsAndBaseDirectory, "pom.xml"));
     request.setShowErrors(true);
     request.setUserSettingsFile(MAVEN_SETTINGS);
     try {
