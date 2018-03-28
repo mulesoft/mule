@@ -366,6 +366,42 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
     assertEquals(expectedResult, result);
   }
 
+  @Test
+  public void muleParseConsecutiveExpressions() {
+    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    final String expectedResult = "muleman value";
+    String expression = "#[muleman] #[value]";
+    assertTrue(tp.isValid(expression));
+    String result = tp.parse(null, expression, token -> token);
+    assertEquals(expectedResult, result);
+  }
+
+  @Test
+  public void muleParseConsecutiveSharps() {
+    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    final String expectedResult = "#muleman # ##value";
+    String expression = "##[muleman] # ###[value]";
+    assertTrue(tp.isValid(expression));
+    String result = tp.parse(null, expression, token -> token);
+    assertEquals(expectedResult, result);
+  }
+
+  @Test
+  public void muleParseMultiLine() {
+    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    final String expectedResult = "{\n" +
+        "    \"text\" : \"#\n" +
+        "    3\"\n" +
+        "}";
+    String expression = "#[{\n" +
+        "    \"text\" : \"#\n" +
+        "    3\"\n" +
+        "}]";
+    assertTrue(tp.isValid(expression));
+    String result = tp.parse(null, expression, token -> token);
+    assertEquals(expectedResult, result);
+  }
+
   private Map<String, Object> buildMap() {
     Map<String, Object> props = new HashMap<String, Object>();
     props.put("prop1", "value1");

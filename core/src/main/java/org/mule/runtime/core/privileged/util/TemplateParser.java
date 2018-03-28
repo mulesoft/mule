@@ -102,16 +102,120 @@ public final class TemplateParser {
     return parse(null, template, callback);
   }
 
+  private String parseMule(Map<?, ?> props, String template, TemplateCallback callback) {
+
+    Stack<Character> stack = new Stack<>();
+    boolean lastSharp = false;
+    int openSingleQuotes = 0;
+    int openDoubleQuotes = 0;
+
+    String value = "";
+    int currentPosition = 0;
+    while (currentPosition < template.length()) {
+      char c = template.charAt(currentPosition);
+
+      if (lastSharp && c != '[') {
+        value += '#';
+      }
+
+      switch (c) {
+        case '\'':
+          if (!stack.empty() && stack.peek().equals('\'')) {
+            stack.pop();
+            openSingleQuotes--;
+          } else {
+            stack.push(c);
+            openSingleQuotes++;
+          }
+          value += c;
+          lastSharp = false;
+          break;
+        case '"':
+          if (!stack.empty() && stack.peek().equals('"')) {
+            stack.pop();
+            openDoubleQuotes--;
+          } else {
+            stack.push(c);
+            openDoubleQuotes++;
+          }
+          value += c;
+          lastSharp = false;
+          break;
+        case ']':
+          if (!stack.empty() && stack.peek().equals('[')) {
+            stack.pop();
+          } else {
+            value += c;
+          }
+          lastSharp = false;
+          break;
+        case '[':
+          if (lastSharp && !(openDoubleQuotes > 0 || openSingleQuotes > 0)) {
+            stack.push(c);
+            int closing = closingBracesPosition(template, currentPosition);
+            String enclosingTemplate = template.substring(currentPosition + 1, closing);
+
+            // NPE, bla bla
+            Object newValue = callback.match(enclosingTemplate);
+            if (newValue == null) {
+              value += NULL_AS_STRING;
+            } else {
+              value += parseMule(props, newValue.toString(), callback);
+            }
+
+            currentPosition = closing;
+          } else {
+            value += c;
+          }
+          lastSharp = false;
+          break;
+        case '#':
+          lastSharp = true;
+          break;
+        default:
+          value += c;
+          lastSharp = false;
+          break;
+      }
+      currentPosition++;
+    }
+
+    return value;
+  }
+
+  private int closingBracesPosition(String template, int startingPosition) {
+    // This assumes that the template is balanced
+    int openingBraces = 1;
+    boolean openSingleQuotes = false;
+    boolean openDoubleQuotes = false;
+    for (int i = startingPosition + 1; i < template.length(); i++) {
+      if (template.charAt(i) == ']' && !(openSingleQuotes || openDoubleQuotes)) {
+        openingBraces--;
+      } else if (template.charAt(i) == '[' && !(openSingleQuotes || openDoubleQuotes)) {
+        openingBraces++;
+      } else if (template.charAt(i) == '\'') {
+        openSingleQuotes = !openSingleQuotes;
+      } else if (template.charAt(i) == '"') {
+        openDoubleQuotes = !openDoubleQuotes;
+      }
+
+      if (openingBraces == 0) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   protected String parse(Map<?, ?> props, String template, TemplateCallback callback) {
+    if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE)) {
+      return parseMule(props, template, callback);
+    }
     String result = template;
     Map<?, ?> newProps = props;
     if (props != null && !(props instanceof CaseInsensitiveHashMap)) {
       newProps = new CaseInsensitiveHashMap(props);
     }
 
-    if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE) && !this.validateBalanceMuleStyle(template)) {
-      throw new RuntimeException("Sarlanga");
-    }
     Matcher m = pattern.matcher(result);
 
     while (m.find()) {
@@ -122,11 +226,6 @@ public final class TemplateParser {
 
       if (callback != null) {
         value = callback.match(propname);
-
-        if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE) && value instanceof String && pattern.matcher((String)value).find()) {
-          value = parse(props, (String) value, callback);
-        }
-
         if (value == null) {
           value = NULL_AS_STRING;
         }
