@@ -95,8 +95,10 @@ public class MuleServiceManagerTestCase extends AbstractMuleTestCase {
   public void stopsStartableStoppableServices() throws Exception {
     final ServiceDiscoverer serviceDiscoverer = mock(ServiceDiscoverer.class);
     final List<Pair<ArtifactClassLoader, Service>> services = new ArrayList<>();
-    Pair<ArtifactClassLoader, Service> service1Pairs = new Pair(mock(ArtifactClassLoader.class), mock(StartableStoppableService.class));
-    Pair<ArtifactClassLoader, Service> service2Pairs = new Pair(mock(ArtifactClassLoader.class), mock(StartableStoppableService.class));
+    Pair<ArtifactClassLoader, Service> service1Pairs =
+        new Pair(mock(ArtifactClassLoader.class), mock(StartableStoppableService.class));
+    Pair<ArtifactClassLoader, Service> service2Pairs =
+        new Pair(mock(ArtifactClassLoader.class), mock(StartableStoppableService.class));
     services.add(service1Pairs);
     services.add(service2Pairs);
     when(serviceDiscoverer.discoverServices()).thenReturn(services);
