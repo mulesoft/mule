@@ -105,21 +105,22 @@ public class MuleServiceManager implements ServiceManager {
   public void stop() throws MuleException {
     for (int i = registeredServices.size() - 1; i >= 0; i--) {
       Service service = registeredServices.get(i).getSecond();
-      if (service instanceof Stoppable
-          && (!(service instanceof Startable) || (service instanceof Startable && startedServices.contains(service)))) {
+      if (service instanceof Stoppable && (!(service instanceof Startable) || startedServices.contains(service))) {
         try {
           ((Stoppable) service).stop();
         } catch (Exception e) {
           logger.warn("Service {s} was not stopped properly: {s}", service.getName(), e.getMessage());
         }
       }
-      startedServices.clear();
+
       try {
         registeredServices.get(i).getFirst().dispose();
       } catch (Exception e) {
         logger.warn("Service {s} class loader was not stopped properly: {s}", service.getName(), e.getMessage());
       }
     }
+
+    startedServices.clear();
   }
 
   @Override
