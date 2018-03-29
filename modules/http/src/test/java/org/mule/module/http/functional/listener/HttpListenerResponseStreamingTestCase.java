@@ -15,11 +15,14 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
-
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -27,6 +30,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Response;
+import org.junit.Before;
 import org.junit.Rule;
 
 public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
@@ -36,6 +40,8 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
 
     public static final String TEST_BODY = RandomStringUtils.randomAlphabetic(100 * 1024);
     public static final String TEST_BODY_MAP = "one=1&two=2";
+    private static InputStreamWrapper payloadStream;
+
     @Rule
     public DynamicPort listenPort = new DynamicPort("port");
 
@@ -45,6 +51,12 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
     protected String getConfigFile()
     {
         return "http-listener-response-streaming-config.xml";
+    }
+
+    @Before
+    public void setUp()
+    {
+        payloadStream = null;
     }
 
     protected String getUrl(String path)
@@ -112,4 +124,43 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(expectedBody));
     }
 
+    protected void streamIsClosed()
+    {
+        assertThat(payloadStream.isClosed(), is(true));
+    }
+
+    public static class InputStreamWrapper extends ByteArrayInputStream
+    {
+
+        private boolean closed;
+
+        private InputStreamWrapper(byte[] buf)
+        {
+            super(buf);
+        }
+
+        @Override
+        public void close() throws IOException
+        {
+            super.close();
+            closed = true;
+        }
+
+        public boolean isClosed()
+        {
+            return closed;
+        }
+    }
+
+    public static class SetStreamMessageProcessor implements MessageProcessor
+    {
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            payloadStream = new InputStreamWrapper(TEST_BODY.getBytes());
+            event.getMessage().setPayload(payloadStream);
+            return event;
+        }
+    }
 }
