@@ -6,57 +6,39 @@
  */
 package org.mule.module.http.internal.listener;
 
-import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static java.nio.charset.StandardCharsets.UTF_8;
-
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.junit.Before;
 import org.junit.Test;
 
-public class HttpResponseBuilderTestCase
+public class HttpResponseBuilderTestCase extends AbstractMuleContextTestCase
 {
 
-    public static final String EXAMPLE_STRING = "exampleString";
-    private MuleContext muleContext;
-    private MuleMessage mockMuleMessage;
-    private MuleEvent mockEvent;
-
-    @Before
-    public void setUp()
-    {
-        muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-        mockEvent = mock(MuleEvent.class);
-        mockMuleMessage = mock(MuleMessage.class);
-    }
+    private static final String EXAMPLE_STRING = "exampleString";
 
     @Test
     public void testContentLengthIsOverridden() throws Exception
     {
         HttpResponseBuilder httpResponseBuilder = new HttpResponseBuilder();
         int contentLengthDifferingPayloadSize = 12;
-        mockMuleMessage(new ByteArrayInputStream(EXAMPLE_STRING.getBytes(UTF_8)), contentLengthDifferingPayloadSize);
+        MuleEvent event = mockEvent(new ByteArrayInputStream(EXAMPLE_STRING.getBytes(UTF_8)), contentLengthDifferingPayloadSize);
 
-        HttpResponse httpResponse = httpResponseBuilder.build(new org.mule.module.http.internal.domain.response.HttpResponseBuilder(), mockEvent);
+        HttpResponse httpResponse = httpResponseBuilder.build(new org.mule.module.http.internal.domain.response.HttpResponseBuilder(), event);
         assertThat(httpResponse.getHeaderValue(CONTENT_LENGTH), is(String.valueOf(EXAMPLE_STRING.length())));
     }
 
-    private void mockMuleMessage(InputStream payload, int contentLength)
+    private MuleEvent mockEvent(InputStream payload, int contentLength) throws Exception
     {
-        mockMuleMessage = new DefaultMuleMessage(payload, muleContext);
-        mockMuleMessage.setOutboundProperty(CONTENT_LENGTH, contentLength);
-        when(mockEvent.getMessage()).thenReturn(mockMuleMessage);
+        MuleEvent event = getTestEvent(payload);
+        event.getMessage().setOutboundProperty(CONTENT_LENGTH, contentLength);
+        return event;
     }
 }

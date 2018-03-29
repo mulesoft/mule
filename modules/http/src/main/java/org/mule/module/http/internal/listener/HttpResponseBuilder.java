@@ -44,7 +44,6 @@ import org.mule.transformer.types.MimeTypes;
 import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
 import org.mule.util.DataTypeUtils;
-import org.mule.util.IOUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.UUID;
 
@@ -197,9 +196,16 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 }
                 else
                 {
-                    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(IOUtils.toByteArray(((InputStream) payload)));
-                    setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
-                    httpEntity = byteArrayHttpEntity;
+                    try
+                    {
+                        ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
+                        setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+                        httpEntity = byteArrayHttpEntity;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
             else
