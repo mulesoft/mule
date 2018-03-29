@@ -9,7 +9,6 @@
     <configuration>
         <expression-language>
             <import class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase"/>
-            <alias name="inputStreamPayload" expression="new ByteArrayInputStream(HttpListenerResponseStreamingTestCase.TEST_BODY.getBytes())"/>
             <alias name="stringPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY"/>
             <alias name="mapPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY_MAP"/>
         </expression-language>
@@ -93,7 +92,7 @@
 
     <flow name="inputStreamFlow">
         <http:listener config-ref="listenerConfig" path="/inputStream"/>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
     </flow>
 
     <flow name="inputStreamWithContentLengthHeaderFlow">
@@ -102,12 +101,12 @@
                 <http:header headerName="Content-Length" value="#[stringPayload.length()]"/>
             </http:response-builder>
         </http:listener>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
     </flow>
 
     <flow name="inputStreamWithContentLengthOutboundPropertyFlow">
         <http:listener config-ref="listenerConfig" path="/inputStreamWithContentLengthOutboundProperty"/>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
         <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
     </flow>
 
@@ -117,12 +116,12 @@
                 <http:header headerName="Transfer-Encoding" value="chunked"/>
             </http:response-builder>
         </http:listener>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
     </flow>
 
     <flow name="inputStreamWithTransferEncodingOutboundPropertyFlow">
         <http:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingOutboundProperty"/>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
         <set-property propertyName="Transfer-Encoding" value="chunked"/>
     </flow>
 
@@ -133,12 +132,12 @@
                 <http:header headerName="Content-Length" value="#[stringPayload.length()]"/>
             </http:response-builder>
         </http:listener>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
     </flow>
 
     <flow name="inputStreamWithTransferEncodingAndContentLengthOutboundPropertyFlow">
         <http:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingAndContentLengthOutboundProperty"/>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
         <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
         <set-property propertyName="Transfer-Encoding" value="chunked"/>
     </flow>
@@ -149,7 +148,7 @@
                 <http:header headerName="Transfer-Encoding" value="chunked"/>
             </http:response-builder>
         </http:listener>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
         <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
     </flow>
 
@@ -159,7 +158,7 @@
                 <http:header headerName="Content-Length" value="#[stringPayload.length()]"/>
             </http:response-builder>
         </http:listener>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
         <set-property propertyName="Transfer-Encoding" value="chunked"/>
     </flow>
 
@@ -185,7 +184,7 @@
 
     <flow name="neverInputStreamFlow">
         <http:listener config-ref="listenerConfig" path="/neverInputStream"  responseStreamingMode="NEVER"/>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
     </flow>
 
     <flow name="neverInputStreamTransferEncodingHeaderFlow">
@@ -194,13 +193,13 @@
                 <http:header headerName="Transfer-Encoding" value="chunked" />
             </http:response-builder>
         </http:listener>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
         <set-property propertyName="Transfer-Encoding" value="chunked"/>
     </flow>
 
     <flow name="neverInputStreamTransferEncodingOutboundPropertyFlow">
         <http:listener config-ref="listenerConfig" path="/neverInputStreamTransferEncodingOutboundProperty"  responseStreamingMode="NEVER"/>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
         <set-property propertyName="Transfer-Encoding" value="chunked"/>
     </flow>
 
@@ -227,7 +226,7 @@
 
     <flow name="alwaysInputStreamFlow">
         <http:listener config-ref="listenerConfig" path="/alwaysInputStream" responseStreamingMode="ALWAYS"/>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
     </flow>
 
     <flow name="alwaysInputStreamContentLengthHeaderFlow">
@@ -236,13 +235,13 @@
                 <http:header headerName="Content-Length" value="#[stringPayload.length()]"/>
             </http:response-builder>
         </http:listener>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
         <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
     </flow>
 
     <flow name="alwaysInputStreamContentLengthOutboundPropertyFlow">
         <http:listener config-ref="listenerConfig" path="/alwaysInputStreamContentLengthOutboundProperty" responseStreamingMode="ALWAYS"/>
-        <set-payload value="#[inputStreamPayload]"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase$SetStreamMessageProcessor"/>
         <set-property propertyName="Content-Length" value="#[stringPayload.length()]"/>
     </flow>
 
