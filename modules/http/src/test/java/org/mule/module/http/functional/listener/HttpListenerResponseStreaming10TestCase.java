@@ -92,6 +92,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("inputStream");
         testResponseIsNotChunkedEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     @Test
@@ -99,6 +100,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("inputStreamWithContentLengthHeader");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     @Test
@@ -106,6 +108,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("inputStreamWithContentLengthOutboundProperty");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     @Test
@@ -113,6 +116,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("inputStreamWithTransferEncodingHeader");
         testResponseIsNotChunkedEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     @Test
@@ -120,6 +124,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("inputStreamWithTransferEncodingOutboundProperty");
         testResponseIsNotChunkedEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     @Test
@@ -127,6 +132,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("inputStreamWithTransferEncodingAndContentLengthHeader");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     @Test
@@ -134,6 +140,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("inputStreamWithTransferEncodingAndContentLengthOutboundProperty");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     @Test
@@ -141,6 +148,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("inputStreamWithTransferEncodingHeaderAndContentLengthOutboundProperty");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     @Test
@@ -148,6 +156,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("inputStreamWithTransferEncodingOutboundPropertyAndContentLengthHeader");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     // NEVER - String
@@ -180,6 +189,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("neverInputStream");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     @Test
@@ -187,6 +197,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("neverInputStreamTransferEncodingHeader");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     @Test
@@ -194,6 +205,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("neverInputStreamTransferEncodingOutboundProperty");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     // ALWAYS - String
@@ -231,6 +243,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("alwaysInputStream");
         testResponseIsNotChunkedEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     @Test
@@ -238,6 +251,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("alwaysInputStreamContentLengthHeader");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     @Test
@@ -245,6 +259,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
     {
         final String url = getUrl("alwaysInputStreamContentLengthOutboundProperty");
         testResponseIsContentLengthEncoding(url, getHttpVersion());
+        streamIsClosed();
     }
 
     // Map
