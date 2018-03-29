@@ -9,7 +9,6 @@
     <configuration>
         <expression-language>
             <import class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase"/>
-            <import class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase.InputStreamWrapper"/>
             <alias name="stringPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY"/>
             <alias name="mapPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY_MAP"/>
         </expression-language>

@@ -30,6 +30,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Response;
+import org.junit.Before;
 import org.junit.Rule;
 
 public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTestCase
@@ -50,6 +51,12 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
     protected String getConfigFile()
     {
         return "http-listener-response-streaming-config.xml";
+    }
+
+    @Before
+    public void setUp()
+    {
+        payloadStream = null;
     }
 
     protected String getUrl(String path)
@@ -151,7 +158,7 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
         @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            payloadStream = new InputStreamWrapper(HttpListenerResponseStreamingTestCase.TEST_BODY.getBytes());
+            payloadStream = new InputStreamWrapper(TEST_BODY.getBytes());
             event.getMessage().setPayload(payloadStream);
             return event;
         }
