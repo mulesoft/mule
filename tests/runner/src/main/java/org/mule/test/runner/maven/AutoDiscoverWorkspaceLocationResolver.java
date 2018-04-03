@@ -100,7 +100,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
     messages.add(" ");
     messages.addAll(filePathByArtifactId.entrySet().stream().map(entry -> entry.getKey() + " -> (" + (entry.getValue()) + ")")
         .collect(toList()));
-    logger.info(getBoilerPlate(newArrayList(messages), '*', 150));
+    logger.debug(getBoilerPlate(newArrayList(messages), '*', 150));
   }
 
   /**

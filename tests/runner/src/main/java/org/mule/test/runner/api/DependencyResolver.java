@@ -71,8 +71,10 @@ public class DependencyResolver {
     this.repositoryState =
         new AetherRepositoryState(this.resolutionContext.getLocalRepositoryLocation(), workspaceReader, false,
                                   true, resolutionContext.getAuthenticatorSelector(), true);
-
-    logger.info(ReflectionToStringBuilder.toString(resolutionContext.getAuthenticatorSelector()));
+    if (logger.isDebugEnabled()) {
+      resolutionContext.getAuthenticatorSelector()
+          .ifPresent(selector -> logger.debug("Using authenticator selector: " + ReflectionToStringBuilder.toString(selector)));
+    }
   }
 
   /**
@@ -218,7 +220,7 @@ public class DependencyResolver {
 
     DependencyNode node;
     try {
-      logger.info("Collecting dependencies for '{}'", printCollectRequest(collectRequest));
+      logger.debug("Collecting dependencies for '{}'", printCollectRequest(collectRequest));
       node = repositoryState.getSystem().collectDependencies(repositoryState.getSession(), collectRequest).getRoot();
       logDependencyGraph(node, collectRequest);
       DependencyRequest dependencyRequest = new DependencyRequest();
