@@ -11,6 +11,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Sets.newLinkedHashSet;
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
@@ -26,6 +28,8 @@ import static org.eclipse.aether.util.artifact.JavaScopes.TEST;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.andFilter;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilter;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
+import static org.mule.maven.client.internal.util.VersionChecker.areCompatibleVersions;
+import static org.mule.maven.client.internal.util.VersionChecker.isHighestVersion;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
@@ -143,7 +147,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   public ArtifactsUrlClassification classify(final ClassPathClassifierContext context) {
     checkNotNull(context, "context cannot be null");
 
-    logger.debug("Building class loaders for rootArtifact: {}", context.getRootArtifact());
+    logger.info("Running dependencies classification on: '{}' in order to build Mule class loaders", context.getRootArtifact());
 
     List<Dependency> directDependencies;
     try {
@@ -175,9 +179,17 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     List<PluginUrlClassification> pluginUrlClassifications =
         buildPluginUrlClassifications(context, directDependencies, rootArtifactType, remoteRepositories);
+    if (logger.isInfoEnabled()) {
+      logger.info("Resolved plugins: {}", pluginUrlClassifications.stream()
+          .map(pluginUrlClassification -> pluginUrlClassification.getArtifactId()).collect(toList()));
+    }
 
     List<ArtifactUrlClassification> serviceUrlClassifications =
         buildServicesUrlClassification(context, directDependencies, remoteRepositories);
+    if (logger.isInfoEnabled()) {
+      logger.info("Resolved services: {}", serviceUrlClassifications.stream()
+          .map(serviceUrlClassification -> serviceUrlClassification.getArtifactId()).collect(toList()));
+    }
 
     List<URL> containerUrls =
         buildContainerUrlClassification(context, directDependencies, serviceUrlClassifications, pluginUrlClassifications,
@@ -206,7 +218,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private List<ArtifactUrlClassification> buildServicesUrlClassification(final ClassPathClassifierContext context,
                                                                          final List<Dependency> directDependencies,
                                                                          final List<RemoteRepository> rootArtifactRemoteRepositories) {
-    Map<String, ArtifactClassificationNode> servicesClassified = newLinkedHashMap();
+    Set<ArtifactClassificationNode> servicesClassified = newLinkedHashSet();
 
     final Predicate<Dependency> muleServiceClassifiedDependencyFilter =
         dependency -> dependency.getArtifact().getClassifier().equals(MULE_SERVICE_CLASSIFIER);
@@ -219,7 +231,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                                  muleServiceClassifiedDependencyFilter, servicesClassified,
                                                                  rootArtifactRemoteRepositories));
 
-    return toServiceUrlClassification(servicesClassified.values());
+    return toServiceUrlClassification(servicesClassified);
 
   }
 
@@ -499,7 +511,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                                       List<Dependency> directDependencies,
                                                                       ArtifactClassificationType rootArtifactType,
                                                                       List<RemoteRepository> rootArtifactRemoteRepositories) {
-    Map<String, ArtifactClassificationNode> pluginsClassified = newLinkedHashMap();
+    Set<ArtifactClassificationNode> pluginsClassified = newLinkedHashSet();
 
     Artifact rootArtifact = context.getRootArtifact();
 
@@ -533,13 +545,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           new ExtensionPluginMetadataGenerator(context.getPluginResourcesFolder());
 
 
-      for (ArtifactClassificationNode pluginClassifiedNode : pluginsClassified.values()) {
+      for (ArtifactClassificationNode pluginClassifiedNode : pluginsClassified) {
         List<URL> urls = generateExtensionMetadata(pluginClassifiedNode.getArtifact(), context, extensionPluginMetadataGenerator,
                                                    pluginClassifiedNode.getUrls(), rootArtifactRemoteRepositories);
         pluginClassifiedNode.setUrls(urls);
       }
     }
-    return toPluginUrlClassification(pluginsClassified.values());
+    return toPluginUrlClassification(pluginsClassified);
   }
 
   /**
@@ -607,7 +619,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   private void buildPluginUrlClassification(Artifact artifactToClassify, ClassPathClassifierContext context,
                                             Predicate<Dependency> directDependenciesFilter,
-                                            Map<String, ArtifactClassificationNode> artifactsClassified,
+                                            Set<ArtifactClassificationNode> artifactsClassified,
                                             List<RemoteRepository> rootArtifactRemoteRepositories) {
 
     List<URL> urls;
@@ -637,12 +649,32 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     logger.debug("Artifacts {} identified a plugin dependencies for plugin {}", pluginArtifactDependencies, artifactToClassify);
     pluginArtifactDependencies.stream()
         .map(artifact -> {
-          String artifactClassifierLessId = toId(artifact);
-          if (!artifactsClassified.containsKey(artifactClassifierLessId)) {
+          Optional<ArtifactClassificationNode> artifactClassificationNodeOptional =
+              findArtifactClassified(artifactsClassified, artifact);
+          if (!artifactClassificationNodeOptional.isPresent()) {
             buildPluginUrlClassification(artifact, context, directDependenciesFilter, artifactsClassified,
                                          rootArtifactRemoteRepositories);
+          } else {
+            if (!areCompatibleVersions(artifactClassificationNodeOptional.get().getArtifact().getVersion(),
+                                       artifact.getVersion())) {
+              throw new IllegalStateException(
+                                              format("Incompatible version of artifacts found: %s and %s",
+                                                     toId(artifactClassificationNodeOptional.get().getArtifact()),
+                                                     toId(artifact)));
+            }
+            logger.debug("Checking for highest version of artifact, already discovered: '{}' versus: '{}'",
+                         toId(artifactClassificationNodeOptional.get().getArtifact()), toId(artifact));
+            if (isHighestVersion(artifact.getVersion(), artifactClassificationNodeOptional.get().getArtifact().getVersion())) {
+              artifactsClassified.remove(artifactClassificationNodeOptional.get());
+              buildPluginUrlClassification(artifact, context, directDependenciesFilter, artifactsClassified,
+                                           rootArtifactRemoteRepositories);
+              logger.debug("Replacing artifact: '{}' for highest version: '{}'",
+                           toId(artifactClassificationNodeOptional.get().getArtifact()), toId(artifact));
+            }
           }
-          return artifactsClassified.get(artifactClassifierLessId);
+          return findArtifactClassified(artifactsClassified, artifact)
+              .orElseThrow(() -> new IllegalStateException(format("Should %s be already added to the list of artifacts classified",
+                                                                  toId(artifact))));
         })
         .forEach(artifactDependencies::add);
 
@@ -655,7 +687,18 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                                                           exportClasses,
                                                                                           artifactDependencies);
 
-    artifactsClassified.put(toId(artifactToClassify), artifactUrlClassification);
+    logger.debug("Artifact discovered: {}", toId(artifactUrlClassification.getArtifact()));
+    artifactsClassified.add(artifactUrlClassification);
+  }
+
+  private Optional<ArtifactClassificationNode> findArtifactClassified(Set<ArtifactClassificationNode> artifactsClassified,
+                                                                      Artifact artifact) {
+    return artifactsClassified.stream().filter(pluginClassified -> {
+      Artifact pluginClassifiedArtifact = pluginClassified.getArtifact();
+      return pluginClassifiedArtifact.getGroupId().equals(artifact.getGroupId())
+          && pluginClassifiedArtifact.getArtifactId()
+              .equals(artifact.getArtifactId());
+    }).findFirst();
   }
 
   /**
@@ -1034,8 +1077,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           logger.debug("Replacing resolved URL '{}' from class path URL '{}'", urlResolved, urlFromClassPath);
           listIterator.set(urlFromClassPath);
         } else {
-          logger.warn("'{}' resolved SNAPSHOT version couldn't be matched to a class path URL: '{}'", artifactResolvedFile,
-                      classpathURLs);
+          logger.warn(
+                      "'{}' resolved SNAPSHOT version couldn't be matched to a class path URL. Probably the artifact would be loaded from the installed file on your local Maven repository",
+                      artifactResolvedFile);
         }
       }
     }
