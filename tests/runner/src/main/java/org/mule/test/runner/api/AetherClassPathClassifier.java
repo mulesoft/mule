@@ -179,15 +179,15 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     List<PluginUrlClassification> pluginUrlClassifications =
         buildPluginUrlClassifications(context, directDependencies, rootArtifactType, remoteRepositories);
-    if (logger.isInfoEnabled()) {
-      logger.info("Resolved plugins: {}", pluginUrlClassifications.stream()
+    if (logger.isDebugEnabled()) {
+      logger.debug("Resolved plugins: {}", pluginUrlClassifications.stream()
           .map(pluginUrlClassification -> pluginUrlClassification.getArtifactId()).collect(toList()));
     }
 
     List<ArtifactUrlClassification> serviceUrlClassifications =
         buildServicesUrlClassification(context, directDependencies, remoteRepositories);
-    if (logger.isInfoEnabled()) {
-      logger.info("Resolved services: {}", serviceUrlClassifications.stream()
+    if (logger.isDebugEnabled()) {
+      logger.debug("Resolved services: {}", serviceUrlClassifications.stream()
           .map(serviceUrlClassification -> serviceUrlClassification.getArtifactId()).collect(toList()));
     }
 
@@ -668,8 +668,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
               artifactsClassified.remove(artifactClassificationNodeOptional.get());
               buildPluginUrlClassification(artifact, context, directDependenciesFilter, artifactsClassified,
                                            rootArtifactRemoteRepositories);
-              logger.debug("Replacing artifact: '{}' for highest version: '{}'",
-                           toId(artifactClassificationNodeOptional.get().getArtifact()), toId(artifact));
+              logger.warn("Replacing artifact: '{}' for highest version: '{}'",
+                          toId(artifactClassificationNodeOptional.get().getArtifact()), toId(artifact));
             }
           }
           return findArtifactClassified(artifactsClassified, artifact)
