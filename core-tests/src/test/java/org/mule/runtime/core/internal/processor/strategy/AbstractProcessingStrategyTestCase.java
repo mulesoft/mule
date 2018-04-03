@@ -15,6 +15,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
@@ -29,6 +30,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
@@ -123,6 +125,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected Supplier<Builder> flowBuilder;
   protected Flow flow;
   protected Set<String> threads = synchronizedSet(new HashSet<>());
+  protected Set<String> schedulers = synchronizedSet(new HashSet<>());
   private TriggerableMessageSource triggerableMessageSource = getTriggerableMessageSource();
   protected Processor cpuLightProcessor = new ThreadTrackingProcessor() {
 
@@ -249,6 +252,12 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.initialise();
     flow.start();
     processFlow(testEvent());
+
+    assertThat(schedulers, cpuLightSchedulerMatcher());
+  }
+
+  protected Matcher<Iterable<? extends String>> cpuLightSchedulerMatcher() {
+    return contains(CPU_LIGHT);
   }
 
   @Test
@@ -285,6 +294,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     // We need to assert the threads logged at this point. But good idea to ensure once unlocked the pending invocation completes.
     // To do this need to copy threads locally.
     Set<String> threadsBeforeUnlock = new HashSet<>(threads);
+    Set<String> schedulersBeforeUnlock = new HashSet<>(schedulers);
 
     latchedProcessor.release();
 
@@ -293,6 +303,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     }
 
     threads = threadsBeforeUnlock;
+    schedulers = schedulersBeforeUnlock;
   }
 
   @Test
@@ -311,6 +322,12 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.start();
 
     processFlow(testEvent());
+
+    assertThat(schedulers, ioSchedulerMatcher());
+  }
+
+  protected Matcher<Iterable<? extends String>> ioSchedulerMatcher() {
+    return contains(IO);
   }
 
   @Test
@@ -329,6 +346,12 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.start();
 
     processFlow(testEvent());
+
+    assertThat(schedulers, cpuIntensiveSchedulerMatcher());
+  }
+
+  protected Matcher<Iterable<? extends String>> cpuIntensiveSchedulerMatcher() {
+    return contains(CPU_INTENSIVE);
   }
 
   @Test
@@ -440,12 +463,14 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public abstract void tx() throws Exception;
 
-  protected void singleIORW(Callable<CoreEvent> eventSupplier) throws Exception {
+  protected void singleIORW(Callable<CoreEvent> eventSupplier, Matcher<Iterable<? extends String>> schedulerNameMatcher)
+      throws Exception {
     flow = flowBuilder.get().processors(ioRWProcessor).build();
 
     flow.initialise();
     flow.start();
     processFlow(eventSupplier.call());
+    assertThat(schedulers, schedulerNameMatcher);
   }
 
   protected CoreEvent processFlow(CoreEvent event) throws Exception {
@@ -610,10 +635,12 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   static class TestScheduler extends ScheduledThreadPoolExecutor implements Scheduler {
 
+    private String threadNamePrefix;
     private ExecutorService executor;
 
     public TestScheduler(int threads, String threadNamePrefix, boolean reject) {
       super(1, new NamedThreadFactory(threadNamePrefix + ".tasks"));
+      this.threadNamePrefix = threadNamePrefix;
       executor = new ThreadPoolExecutor(threads, threads, 0l, TimeUnit.MILLISECONDS,
                                         new LinkedBlockingQueue(reject ? threads : Integer.MAX_VALUE),
                                         new NamedThreadFactory(threadNamePrefix));
@@ -649,7 +676,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     @Override
     public String getName() {
-      return TestScheduler.class.getSimpleName();
+      return threadNamePrefix;
     }
 
   }
@@ -697,11 +724,15 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+      Flux<CoreEvent> schedulerTrackingPublisher = from(publisher)
+          .doOnEach(signal -> signal.getContext().getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
+              .ifPresent(sch -> schedulers.add(((Scheduler) sch).getName())));
+
       if (getProcessingType() == CPU_LITE_ASYNC) {
-        return from(publisher).transform(processorPublisher -> Processor.super.apply(publisher))
+        return from(schedulerTrackingPublisher).transform(processorPublisher -> Processor.super.apply(schedulerTrackingPublisher))
             .publishOn(fromExecutorService(custom)).errorStrategyStop();
       } else {
-        return Processor.super.apply(publisher);
+        return Processor.super.apply(schedulerTrackingPublisher);
       }
     }
 

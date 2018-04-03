@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.retry.policies;
 
 import static java.lang.System.currentTimeMillis;
+import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -19,17 +20,22 @@ import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.R
 import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromCallable;
+
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.reactivestreams.Publisher;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.junit.Test;
-import org.reactivestreams.Publisher;
 
 public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase {
 
@@ -40,6 +46,18 @@ public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase
   private final AtomicBoolean exhausted = new AtomicBoolean(false);
   private final AtomicLong previousExecutionMoment = new AtomicLong(0);
   private final List<Long> executionMomentDeltas = new LinkedList<>();
+
+  private Optional<Scheduler> retryScheduler;
+
+  @Before
+  public void before() {
+    retryScheduler = ofNullable(muleContext.getSchedulerService().cpuLightScheduler());
+  }
+
+  @After
+  public void after() {
+    retryScheduler.ifPresent(s -> s.stop());
+  }
 
   @Test
   public void successfulWithoutRetry() throws Exception {
@@ -53,7 +71,8 @@ public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase
     Integer value = from(retryPolicy.applyPolicy(publisher,
                                                  e -> e instanceof IllegalArgumentException,
                                                  e -> exhausted.set(true),
-                                                 identity()))
+                                                 identity(),
+                                                 retryScheduler))
                                                      .block();
 
     assertThat(value, is(1));
@@ -85,7 +104,8 @@ public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase
     Integer value = from(retryPolicy.applyPolicy(publisher,
                                                  e -> e instanceof IllegalArgumentException,
                                                  e -> exhausted.set(true),
-                                                 identity()))
+                                                 identity(),
+                                                 retryScheduler))
                                                      .block();
 
     assertThat(value, is(RETRIES + 1));
@@ -108,7 +128,8 @@ public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase
       from(retryPolicy.applyPolicy(publisher,
                                    e -> e instanceof IllegalArgumentException,
                                    e -> exhausted.set(true),
-                                   identity()))
+                                   identity(),
+                                   retryScheduler))
                                        .block();
     } catch (Exception e) {
       assertThat(e, instanceOf(IllegalArgumentException.class));
@@ -131,7 +152,8 @@ public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase
       from(retryPolicy.applyPolicy(publisher,
                                    e -> true,
                                    e -> exhausted.set(true),
-                                   ConnectionException::new))
+                                   ConnectionException::new,
+                                   retryScheduler))
                                        .block();
     } catch (Throwable e) {
       e = unwrap(e);
@@ -156,7 +178,8 @@ public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase
       from(retryPolicy.applyPolicy(publisher,
                                    e -> !(e instanceof IllegalArgumentException),
                                    e -> exhausted.set(true),
-                                   identity()))
+                                   identity(),
+                                   retryScheduler))
                                        .block();
     } catch (Exception e) {
       assertThat(e, instanceOf(IllegalArgumentException.class));

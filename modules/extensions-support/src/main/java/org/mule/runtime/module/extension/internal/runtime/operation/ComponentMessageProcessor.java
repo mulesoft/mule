@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
@@ -32,6 +33,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
+import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -42,6 +44,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -163,45 +166,53 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return from(publisher).flatMap(checkedFunction(event -> {
-      Optional<ConfigurationInstance> configuration;
-      OperationExecutionFunction operationExecutionFunction;
+    return from(publisher)
+        .zipWith(subscriberContext().map(ctx -> ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s)))
+        .flatMap(checkedFunction(t -> {
+          CoreEvent event = t.getT1();
+          Optional<Scheduler> currentScheduler = t.getT2();
 
-      if (getLocation() != null && ((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
-        // If the event already contains an execution context, use that one.
-        // Only for interceptable components!
-        ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
-        configuration = operationContext.getConfiguration();
+          Optional<ConfigurationInstance> configuration;
+          OperationExecutionFunction operationExecutionFunction;
 
-        operationExecutionFunction = (parameters, operationEvent) -> doProcessWithErrorMapping(operationEvent, operationContext);
-      } else {
-        // Otherwise, generate the context as usual.
-        configuration = getConfiguration(event);
+          if (getLocation() != null
+              && ((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+            // If the event already contains an execution context, use that one.
+            // Only for interceptable components!
+            ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event, currentScheduler);
+            configuration = operationContext.getConfiguration();
 
-        operationExecutionFunction = (parameters, operationEvent) -> {
-          ExecutionContextAdapter<T> operationContext;
-          try {
-            operationContext = createExecutionContext(configuration, parameters, operationEvent);
-          } catch (MuleException e) {
-            return error(e);
+            operationExecutionFunction =
+                (parameters, operationEvent) -> doProcessWithErrorMapping(operationEvent, operationContext);
+          } else {
+            // Otherwise, generate the context as usual.
+            configuration = getConfiguration(event);
+
+            operationExecutionFunction = (parameters, operationEvent) -> {
+              ExecutionContextAdapter<T> operationContext;
+              try {
+                operationContext = createExecutionContext(configuration, parameters, operationEvent,
+                                                          currentScheduler);
+              } catch (MuleException e) {
+                return error(e);
+              }
+              return doProcessWithErrorMapping(operationEvent, operationContext);
+            };
           }
-          return doProcessWithErrorMapping(operationEvent, operationContext);
-        };
-      }
-      if (getLocation() != null) {
-        String resolveProcessorRepresentation =
-            resolveProcessorRepresentation(muleContext.getConfiguration().getId(), getLocation().getLocation(), this);
+          if (getLocation() != null) {
+            String resolveProcessorRepresentation =
+                resolveProcessorRepresentation(muleContext.getConfiguration().getId(), getLocation().getLocation(), this);
 
-        ((DefaultFlowCallStack) event.getFlowCallStack()).setCurrentProcessorPath(resolveProcessorRepresentation);
-        return policyManager
-            .createOperationPolicy(this, event, getResolutionResult(event, configuration),
-                                   operationExecutionFunction)
-            .process(event);
-      } else {
-        // If this operation has no component location then it is internal. Don't apply policies on internal operations.
-        return operationExecutionFunction.execute(getResolutionResult(event, configuration), event);
-      }
-    }));
+            ((DefaultFlowCallStack) event.getFlowCallStack()).setCurrentProcessorPath(resolveProcessorRepresentation);
+            return policyManager
+                .createOperationPolicy(this, event, getResolutionResult(event, configuration),
+                                       operationExecutionFunction)
+                .process(event);
+          } else {
+            // If this operation has no component location then it is internal. Don't apply policies on internal operations.
+            return operationExecutionFunction.execute(getResolutionResult(event, configuration), event);
+          }
+        }));
   }
 
   /**
@@ -217,9 +228,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         .onErrorMap(e -> !(e instanceof MessagingException), e -> new MessagingException(operationEvent, e, this));
   }
 
-  private PrecalculatedExecutionContextAdapter<T> getPrecalculatedContext(CoreEvent event) {
-    return (PrecalculatedExecutionContextAdapter) (((InternalEvent) event).getInternalParameters()
-        .get(INTERCEPTION_RESOLVED_CONTEXT));
+  private PrecalculatedExecutionContextAdapter<T> getPrecalculatedContext(CoreEvent event, Optional<Scheduler> currentScheduler) {
+    PrecalculatedExecutionContextAdapter precalculatedExecutionContextAdapter =
+        (PrecalculatedExecutionContextAdapter) (((InternalEvent) event).getInternalParameters()
+            .get(INTERCEPTION_RESOLVED_CONTEXT));
+    precalculatedExecutionContextAdapter.setCurrentScheduler(currentScheduler);
+    return precalculatedExecutionContextAdapter;
   }
 
   protected Mono<CoreEvent> doProcess(CoreEvent event, ExecutionContextAdapter<T> operationContext) {
@@ -243,12 +257,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private ExecutionContextAdapter<T> createExecutionContext(Optional<ConfigurationInstance> configuration,
                                                             Map<String, Object> resolvedParameters,
-                                                            CoreEvent event)
+                                                            CoreEvent event, Optional<Scheduler> currentScheduler)
       throws MuleException {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, componentModel, event,
                                          getCursorProviderFactory(), streamingManager, this, retryPolicyTemplate,
-                                         muleContext);
+                                         currentScheduler, muleContext);
   }
 
   @Override
@@ -476,7 +490,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private ExecutionContextAdapter<T> createExecutionContext(CoreEvent event) throws MuleException {
     Optional<ConfigurationInstance> configuration = getConfiguration(event);
-    return createExecutionContext(configuration, getResolutionResult(event, configuration), event);
+    return createExecutionContext(configuration, getResolutionResult(event, configuration), event, empty());
   }
 
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)

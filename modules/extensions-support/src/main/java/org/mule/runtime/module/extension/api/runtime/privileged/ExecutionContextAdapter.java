@@ -10,15 +10,17 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.security.SecurityContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 
 import java.util.Optional;
 
@@ -116,4 +118,14 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
    * @return the context for this session or null if the request is not secure.
    */
   SecurityContext getSecurityContext();
+
+  /**
+   * @param currentScheduler the scheduler that was determined by the {@link ProcessingStrategy} to execute this component.
+   */
+  void setCurrentScheduler(Optional<Scheduler> currentScheduler);
+
+  /**
+   * @return the scheduler that was determined by the {@link ProcessingStrategy} to execute this component.
+   */
+  Optional<Scheduler> getCurrentScheduler();
 }

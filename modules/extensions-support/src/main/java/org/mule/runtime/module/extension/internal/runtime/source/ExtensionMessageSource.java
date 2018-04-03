@@ -229,7 +229,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                 exception);
 
     Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
-        .map(p -> from(retryPolicyTemplate.applyPolicy(p)))
+        .map(p -> from(retryPolicyTemplate.applyPolicy(p, of(retryScheduler))))
         .orElseGet(() -> create(sink -> {
           try {
             exception.getConnection().ifPresent(sourceConnectionManager::invalidate);

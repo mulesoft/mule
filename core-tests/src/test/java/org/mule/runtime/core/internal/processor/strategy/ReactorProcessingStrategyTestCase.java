@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -19,7 +20,6 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
 
@@ -31,12 +31,14 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory.ReactorProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import org.hamcrest.Matcher;
+import org.junit.Test;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(REACTOR)
@@ -102,6 +104,11 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   }
 
   @Override
+  protected Matcher<Iterable<? extends String>> ioSchedulerMatcher() {
+    return contains(CPU_LIGHT);
+  }
+
+  @Override
   @Description("Regardless of processor type, when the ReactorProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a single cpu light thread.")
   public void multipleBlocking() throws Exception {
@@ -115,6 +122,11 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   public void singleCpuIntensive() throws Exception {
     super.singleCpuIntensive();
     assertEverythingOnEventLoop();
+  }
+
+  @Override
+  protected Matcher<Iterable<? extends String>> cpuIntensiveSchedulerMatcher() {
+    return contains(CPU_LIGHT);
   }
 
   @Override
@@ -240,7 +252,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Description("Regardless of processor type, when the ReactorProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a single cpu light thread.")
   public void singleIORW() throws Exception {
-    super.singleIORW(() -> testEvent());
+    super.singleIORW(() -> testEvent(), contains(CPU_LIGHT));
     assertEverythingOnEventLoop();
   }
 

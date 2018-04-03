@@ -23,6 +23,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -49,17 +50,17 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -127,7 +128,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     operationContext = new DefaultExecutionContext(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
                                                    muleEvent, cursorProviderFactory, streamingManager, component,
-                                                   retryPolicyTemplate, muleContext);
+                                                   retryPolicyTemplate, empty(), muleContext);
     operationContext = spy(operationContext);
   }
 

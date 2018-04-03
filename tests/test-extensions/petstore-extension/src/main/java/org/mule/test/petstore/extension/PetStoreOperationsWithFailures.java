@@ -15,6 +15,7 @@ public class PetStoreOperationsWithFailures extends PetStoreOperations {
   public static final String CONNECTION_FAIL = "Connection fail";
 
   public Integer failConnection(@Connection PetStoreClient client) throws ConnectionException {
+    System.out.println(Thread.currentThread().getName());
     throw new ConnectionException(CONNECTION_FAIL);
   }
 

@@ -14,12 +14,14 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
@@ -63,6 +65,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final LazyValue<Optional<TransactionConfig>> transactionConfig;
   private final Component component;
   private final RetryPolicyTemplate retryPolicyTemplate;
+  private Optional<Scheduler> currentScheduler;
 
   /**
    * Creates a new instance with the given state
@@ -86,6 +89,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
                                  StreamingManager streamingManager,
                                  Component component,
                                  RetryPolicyTemplate retryPolicyTemplate,
+                                 Optional<Scheduler> currentScheduler,
                                  MuleContext muleContext) {
 
     this.extensionModel = extensionModel;
@@ -99,6 +103,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.muleContext = muleContext;
     this.component = component;
     this.retryPolicyTemplate = retryPolicyTemplate;
+    this.currentScheduler = currentScheduler;
 
     final boolean isTransactional = isTransactional(componentModel);
     this.transactionConfig = new LazyValue<>(() -> isTransactional ? of(buildTransactionConfig()) : empty());
@@ -192,6 +197,16 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   @Override
   public SecurityContext getSecurityContext() {
     return securityContext;
+  }
+
+  @Override
+  public void setCurrentScheduler(Optional<Scheduler> currentScheduler) {
+    this.currentScheduler = currentScheduler;
+  }
+
+  @Override
+  public Optional<Scheduler> getCurrentScheduler() {
+    return currentScheduler;
   }
 
   /**

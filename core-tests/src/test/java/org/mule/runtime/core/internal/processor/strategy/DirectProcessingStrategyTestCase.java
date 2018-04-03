@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.collection.IsEmptyIterable.emptyIterable;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
@@ -21,10 +22,12 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import org.hamcrest.Matcher;
+import org.junit.Test;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(DIRECT)
@@ -45,6 +48,11 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
   public void singleCpuLight() throws Exception {
     super.singleCpuLight();
     assertSynchronous(1);
+  }
+
+  @Override
+  protected Matcher<Iterable<? extends String>> cpuLightSchedulerMatcher() {
+    return emptyIterable();
   }
 
   @Override
@@ -72,6 +80,11 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
   }
 
   @Override
+  protected Matcher<Iterable<? extends String>> ioSchedulerMatcher() {
+    return emptyIterable();
+  }
+
+  @Override
   @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void multipleBlocking() throws Exception {
@@ -85,6 +98,11 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
   public void singleCpuIntensive() throws Exception {
     super.singleCpuIntensive();
     assertSynchronous(1);
+  }
+
+  @Override
+  protected Matcher<Iterable<? extends String>> cpuIntensiveSchedulerMatcher() {
+    return emptyIterable();
   }
 
   @Override
@@ -139,7 +157,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
   @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void singleIORW() throws Exception {
-    super.singleIORW(() -> testEvent());
+    super.singleIORW(() -> testEvent(), emptyIterable());
     assertSynchronous(1);
   }
 
