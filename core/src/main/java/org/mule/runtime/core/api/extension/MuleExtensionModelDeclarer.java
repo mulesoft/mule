@@ -200,7 +200,7 @@ class MuleExtensionModelDeclarer {
         .withOperation("idempotentMessageValidator")
         .describedAs("Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. "
             + "Note that the ID used can be generated from the message using an expression defined in the 'idExpression' "
-            + "attribute. Otherwise, an 'DUPLICATE_MESSAGE' error is generated.");
+            + "attribute. Otherwise, a 'DUPLICATE_MESSAGE' error is generated.");
 
     validator.withOutput().ofType(typeLoader.load(void.class));
     validator.withOutputAttributes().ofType(typeLoader.load(void.class));
