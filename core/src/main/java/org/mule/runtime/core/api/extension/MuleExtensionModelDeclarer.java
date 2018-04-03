@@ -200,7 +200,7 @@ class MuleExtensionModelDeclarer {
         .withOperation("idempotentMessageValidator")
         .describedAs("Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. "
             + "Note that the ID used can be generated from the message using an expression defined in the 'idExpression' "
-            + "attribute. Otherwise, a 'DUPLICATE_MESSAGE' error is generated.");
+            + "attribute. Otherwise, an 'DUPLICATE_MESSAGE' error is generated.");
 
     validator.withOutput().ofType(typeLoader.load(void.class));
     validator.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -232,7 +232,7 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(ObjectStore.class)).withExpressionSupport(NOT_SUPPORTED)
         .withAllowedStereotypes(singletonList(OBJECT_STORE))
         .describedAs("The object store where the IDs of the processed events are going to be stored. " +
-            "If defined as argument it should reference a globally created object store. Otherwise, " +
+            "If defined as an argument, it should reference a globally created object store. Otherwise, " +
             "it can be defined inline or not at all. In the last case, a default object store will be provided.");
 
     validator.withErrorModel(duplicateMessageError);
@@ -258,9 +258,9 @@ class MuleExtensionModelDeclarer {
   private void declareFlowRef(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
 
     OperationDeclarer flowRef = extensionDeclarer.withOperation("flowRef")
-        .describedAs("Allows a \u0027flow\u0027 to be referenced such that the message processing will continue in the referenced flow "
+        .describedAs("Allows a \u0027flow\u0027 to be referenced so that message processing will continue in the referenced flow "
             + "before returning. Message processing in the referenced \u0027flow\u0027 will occur within the context of the "
-            + "referenced flow and will therefore use its exception strategy etc.")
+            + "referenced flow and will therefore use its exception strategy, etc.")
         .withErrorModel(routingError);
 
     flowRef.withOutput().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
@@ -275,10 +275,10 @@ class MuleExtensionModelDeclarer {
 
   private void declareLogger(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer logger = extensionDeclarer.withOperation("logger")
-        .describedAs("Performs logging using an expression that determines what should be logged. By default the current messages is logged "
+        .describedAs("Performs logging using an expression to determine the message to be logged. By default, if a message is not specified, the current Mule Message is logged "
             + "using the " + DEFAULT_LOG_LEVEL
-            + " level to the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category but "
-            + "the level and category can both be configured to suit your needs. message is specified then the current message is used.");
+            + " level with the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category, but "
+            + "the level and category can both be configured to suit your needs.");
 
     logger.withOutput().ofType(typeLoader.load(void.class));
     logger.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -286,8 +286,8 @@ class MuleExtensionModelDeclarer {
     logger.onDefaultParameterGroup()
         .withOptionalParameter("message")
         .ofType(typeLoader.load(String.class))
-        .describedAs("Message that will be logged. Embedded expressions can be used to extract value from the current message. "
-            + "If no message is specified then the current message is used.");
+        .describedAs("The message that will be logged. Embedded expressions can be used to extract values from the current message. "
+            + "If no message is specified, then the current message is used.");
 
     logger.onDefaultParameterGroup()
         .withOptionalParameter("level")
@@ -295,13 +295,13 @@ class MuleExtensionModelDeclarer {
         .ofType(BaseTypeBuilder.create(JAVA).stringType()
             .enumOf("ERROR", "WARN", "INFO", "DEBUG", "TRACE").build())
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The logging level to be used. Default is " + DEFAULT_LOG_LEVEL + ".");
+        .describedAs("Sets the log level. Default is " + DEFAULT_LOG_LEVEL + ".");
 
     logger.onDefaultParameterGroup()
         .withOptionalParameter("category")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The log category to be used");
+        .describedAs("Sets the log category");
 
   }
 
@@ -366,7 +366,7 @@ class MuleExtensionModelDeclarer {
 
   private void declareParseTemplate(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer parseTemplate = extensionDeclarer.withOperation("parseTemplate")
-        .describedAs("A transformer that parses a template defined inline.");
+        .describedAs("Parses a template defined inline.");
 
     parseTemplate.withOutput().ofType(typeLoader.load(String.class));
     parseTemplate.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -382,13 +382,13 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("location")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL or from the classpath.");
+        .describedAs("The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL, then from the classpath.");
 
   }
 
   private void declareRemoveVariable(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer removeVariable = extensionDeclarer.withOperation("removeVariable")
-        .describedAs("A processor that remove variables by name or regular expression.");
+        .describedAs("A processor that removes variables by name or regular expression.");
 
     removeVariable.withOutput().ofType(typeLoader.load(void.class));
     removeVariable.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -486,8 +486,8 @@ class MuleExtensionModelDeclarer {
   private void declareChoice(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer choice = extensionDeclarer.withConstruct("choice")
         .describedAs("Sends the message to the first message processor whose condition has been satisfied. "
-            + "If no conditions were satisfied, sends to the configured default message processor if configured, "
-            + "or throws an exception if not configured.")
+            + "If no conditions were satisfied, sends to the configured default message processor (if configured), "
+            + "or throws an exception (if not configured).")
         .withErrorModel(routingError);
 
     NestedRouteDeclarer when = choice.withRoute("when").withMinOccurs(1);
@@ -820,9 +820,9 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(Integer.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo("500")
-        .describedAs("The approximated maximum space in megabytes used by the transaction log files for transactional persistent queues."
+        .describedAs("Sets the approximate maximum space in megabytes allowed for the transaction log files for transactional persistent queues."
             + " Take into account that this number applies both to the set of transaction log files for XA and for local transactions. "
-            + "If both type of transactions are used then the approximated maximum space used will be twice the configured value.");
+            + "If both types of transactions are used then the approximate maximum space used, will be twice the configured value.");
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("defaultObjectSerializer-ref")
@@ -846,7 +846,12 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configurationProperties")
         .allowingTopLevelDefinition()
         .withStereotype(APP_CONFIG)
-        .describedAs("References a file with configuration properties. Each property has a key and a value. \n"
+        .describedAs("Configuration properties are key/value pairs that can be stored in configuration files or set as system environment variables. "
+            + "\nEach property%2Cs value can be referenced inside the attributes of a mule configuration file by wrapping the property%2Cs key name in the syntax: \n${key_name}. "
+            + "\n At runtime, each property placeholder expression is substituted with the property's value. "
+            + "\nThis allows you to externalize configuration of properties outside"
+            + " the Mule application's deployable archive, and to allow others to change these properties based on the environment the application is being deployed to. "
+            + "Note that a system environment variable with a matching key name will override the same key%2Cs value from a properties file. Each property has a key and a value. \n"
             + "The key can be referenced from the mule configuration files using the following semantics: \n"
             + "${key_name}. This allows to externalize configuration and change it based\n"
             + "on the environment the application is being deployed to.");
@@ -857,7 +862,7 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, EMBEDDED, new String[] {"properties"})).build())
         .describedAs(" The location of the file with the configuration properties to use. "
-            + "It may be a location in the classpath or an absolute location. The file location\n"
+            + "It may be a location in the classpath or an absolute location. \nThe file location"
             + " value may also contains references to properties that will only be resolved based on "
             + "system properties or properties set at deployment time.");
   }
