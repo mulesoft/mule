@@ -261,7 +261,9 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     }
 
     final MavenConfiguration mavenConfiguration = mavenConfigurationBuilder.build();
-    LOGGER.info("Using MavenConfiguration: {}", mavenConfiguration);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Using MavenConfiguration: {}", mavenConfiguration);
+    }
 
     final DependencyResolver dependencyResolver =
         new DependencyResolver(mavenConfiguration, of(new DefaultWorkspaceReader(classPath, workspaceLocationResolver)));
