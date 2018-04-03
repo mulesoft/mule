@@ -155,8 +155,7 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
       throw new MuleRuntimeException(createStaticMessage("Found exception trying to create Object Store of name " + name), e);
     }
 
-    if (settings.getExpirationInterval() > 0 &&
-        (settings.getMaxEntries().isPresent() || settings.getEntryTTL().isPresent())) {
+    if (settings.getExpirationInterval() > 0 && (settings.getMaxEntries().isPresent() || settings.getEntryTTL().isPresent())) {
       store = getMonitorablePartition(name, baseStore, store, settings);
     }
 
