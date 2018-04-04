@@ -13,9 +13,9 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
-import org.mule.api.MuleEvent;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.api.MuleEventContext;
 import org.mule.api.routing.RoutingException;
+import org.mule.tck.functional.EventCallback;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.InputStream;
@@ -91,13 +91,13 @@ public class UntilSuccessfulStreamCloserTestCase extends FunctionalTestCase
         return routingExpectedException;
     }
 
-    public static class FailureProcessor implements MessageProcessor
+    public static class PayloadSetter implements EventCallback
     {
 
         @Override
-        public MuleEvent process(MuleEvent event)
+        public void eventReceived(MuleEventContext context, Object component) throws Exception
         {
-            event.getMessage().setPayload(streams[i++]);
+            context.getMessage().setPayload(streams[i++]);
             latch.countDown();
             throw new RuntimeException("Failure exception");
         }
