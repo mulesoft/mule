@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -105,7 +106,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
     ResolverSetResult.Builder builder = getResolverSetBuilder();
 
     for (Map.Entry<String, ValueResolver<?>> entry : resolvers.entrySet()) {
-      builder.add(entry.getKey(), resolveValue(entry.getValue(), context));
+      builder.add(entry.getKey(), resolveRecursively(entry.getValue(), context));
     }
 
     return builder.build();
