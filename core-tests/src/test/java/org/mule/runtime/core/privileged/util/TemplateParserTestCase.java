@@ -10,6 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.privileged.util.TemplateParser.createAntStyleParser;
+import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
+import static org.mule.runtime.core.privileged.util.TemplateParser.createSquareBracesStyleParser;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -26,7 +30,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void squareBracesParserDefaultConfiguration() {
-    TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
+    TemplateParser tp = createSquareBracesStyleParser();
     assertNotNull(tp.getStyle());
     assertEquals("[", tp.getStyle().getPrefix());
     assertEquals("]", tp.getStyle().getSuffix());
@@ -34,7 +38,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void squareBracesParserShouldReplaceKnownTokens() {
-    TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
+    TemplateParser tp = createSquareBracesStyleParser();
 
     Map<String, String> map = Collections.singletonMap("fromAddress", "ross.mason@symphonysoft.com");
     String template = "smtp://[fromAddress]";
@@ -45,7 +49,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void squareBracesParserShouldNotReplaceUnknownTokens() {
-    TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
+    TemplateParser tp = createSquareBracesStyleParser();
 
     Map<String, String> map = Collections.emptyMap();
     String template = "smtp://[toAddress]";
@@ -56,7 +60,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void squareBracesParserShouldValidateExpressionDelimiters() {
-    TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
+    TemplateParser tp = createSquareBracesStyleParser();
     assertTrue(tp.isValid("[1][2]"));
     assertFalse(tp.isValid("[[1]2]"));
     assertFalse(tp.isValid("[[1][2]"));
@@ -64,7 +68,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void antParserDefaultConfiguration() {
-    TemplateParser tp = TemplateParser.createAntStyleParser();
+    TemplateParser tp = createAntStyleParser();
     assertNotNull(tp.getStyle());
     assertEquals("${", tp.getStyle().getPrefix());
     assertEquals("}", tp.getStyle().getSuffix());
@@ -72,7 +76,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void antParserShouldValidateExpressionDelimiters() {
-    TemplateParser tp = TemplateParser.createAntStyleParser();
+    TemplateParser tp = createAntStyleParser();
     assertTrue(tp.isValid("${1}"));
     assertTrue(tp.isValid("${1}${2}"));
     assertTrue(tp.isValid("${1}&{}"));
@@ -84,7 +88,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void antParserShouldReplaceKnownTokens() {
-    TemplateParser tp = TemplateParser.createAntStyleParser();
+    TemplateParser tp = createAntStyleParser();
 
     Map<String, Object> map = buildMap();
     String template = "Some String with ${prop1} and ${prop2} in it";
@@ -96,7 +100,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void antParserShouldNotReplaceUnknownTokens() {
-    TemplateParser tp = TemplateParser.createAntStyleParser();
+    TemplateParser tp = createAntStyleParser();
 
     Map<String, String> map = Collections.emptyMap();
     String template = "Some String with ${prop1} in it";
@@ -107,7 +111,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void antParserShouldHandleWhitespaceAndBackslashesCorrectly() {
-    TemplateParser tp = TemplateParser.createAntStyleParser();
+    TemplateParser tp = createAntStyleParser();
 
     String dir = "C:\\Documents and Settings\\";
     Map<String, String> map = Collections.singletonMap("dir", dir);
@@ -119,7 +123,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void antParserWithListInputShouldReplaceKnownTokens() {
-    TemplateParser tp = TemplateParser.createAntStyleParser();
+    TemplateParser tp = createAntStyleParser();
 
     Map<String, Object> map = buildMap();
 
@@ -134,7 +138,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void antParserWithNullListInputShouldNotReplaceTokens() {
-    TemplateParser tp = TemplateParser.createAntStyleParser();
+    TemplateParser tp = createAntStyleParser();
 
     Map<String, Object> map = buildMap();
     List<?> result = tp.parse(map, (List<?>) null);
@@ -144,7 +148,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void antParserWithSimilarTokensShouldNotBeConfused() {
-    TemplateParser tp = TemplateParser.createAntStyleParser();
+    TemplateParser tp = createAntStyleParser();
 
     Map<String, Object> map = buildMap();
     map.put("prop1-2", "value2");
@@ -157,7 +161,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void antParserWithOptionalTokenShouldReplaceKnownTokens() {
-    TemplateParser tp = TemplateParser.createAntStyleParser();
+    TemplateParser tp = createAntStyleParser();
 
     Map<String, Object> props = new HashMap<String, Object>();
     props.put("prop1?", "value1");
@@ -171,7 +175,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserManagesPipeCharacter() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
 
     final String expectedResult = "mel:evaluator: 'Hello|Hi'";
 
@@ -182,7 +186,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserManagesNestedSquareBrackets() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     final String expectedResult = "zero[one[two[three[four[five]]]]]";
     String expression = "#[zero[one[two[three[four[five]]]]]]";
     assertTrue(tp.isValid(expression));
@@ -192,7 +196,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserManagesNestedExpressions() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     final String expectedResult = "mel:zero mel:one mel:two mel:three mel:four mel:five";
     String expression = "#[mel:zero #[mel:one #[mel:two #[mel:three #[mel:four #[mel:five]]]]]]";
     assertTrue(tp.isValid(expression));
@@ -202,7 +206,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserManagesConcatenation() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
 
     final String expectedResult = "'hi'+'world'";
 
@@ -213,7 +217,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserManagesNullExpressions() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
 
     final String expectedResult = "null";
 
@@ -224,7 +228,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserDefaultConfiguration() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     assertNotNull(tp.getStyle());
     assertEquals("#[", tp.getStyle().getPrefix());
     assertEquals("]", tp.getStyle().getSuffix());
@@ -232,7 +236,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserShouldValidateExpressionDelimiters() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
 
     assertTrue(tp.isValid("#[mel:]"));
     assertTrue(tp.isValid("#[mel:]   #[mel:]"));
@@ -256,7 +260,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testWithoutSharp() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     assertTrue(tp.isValid(""));
     assertTrue(tp.isValid("]]]]]"));
     assertTrue(tp.isValid("["));
@@ -282,7 +286,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testWithSharp() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     assertTrue(tp.isValid("#"));
     assertTrue(tp.isValid("##[]"));
     assertTrue(tp.isValid("#[]"));
@@ -307,7 +311,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithStringBracesInside() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     final String expectedResult = "'['";
     String expression = "#['[']";
     assertTrue(tp.isValid(expression));
@@ -317,7 +321,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithExpresionInside() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     final String expression = "#[hello #[mule]]";
     String expectedResult = "hello mule";
     assertTrue(tp.isValid(expression));
@@ -328,7 +332,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithExpresionInsideWithoutSharp() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     final String expression = "#[hello [mule]]";
     String expectedResult = "hello [mule]";
     assertTrue(tp.isValid(expression));
@@ -338,7 +342,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithExpresionInsideWithoutLiteralWithoutSharp() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     final String expression = "#[[mule]]";
     String expectedResult = "[mule]";
     assertTrue(tp.isValid(expression));
@@ -348,7 +352,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithExpresionInsideWithoutLiteral() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     final String expression = "#[#[mule]]";
     String expectedResult = "mule";
     assertTrue(tp.isValid(expression));
@@ -358,7 +362,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithLiteralBefore() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     final String expectedResult = "muleman 'value'";
     String expression = "muleman #['value']";
     assertTrue(tp.isValid(expression));
@@ -368,7 +372,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParseConsecutiveExpressions() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     final String expectedResult = "muleman value";
     String expression = "#[muleman] #[value]";
     assertTrue(tp.isValid(expression));
@@ -378,7 +382,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParseConsecutiveSharps() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     final String expectedResult = "#muleman # ##value";
     String expression = "##[muleman] # ###[value]";
     assertTrue(tp.isValid(expression));
@@ -388,7 +392,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParseMultiLine() {
-    TemplateParser tp = TemplateParser.createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser();
     final String expectedResult = "{\n" +
         "    \"text\" : \"#\n" +
         "    3\"\n" +
