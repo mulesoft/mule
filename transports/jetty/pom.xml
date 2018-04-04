@@ -32,7 +32,7 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-httpclient</groupId>
+            <groupId>org.mule.apache.commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
         </dependency>
 
