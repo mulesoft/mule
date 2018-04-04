@@ -114,7 +114,7 @@ public final class TemplateParser {
       return template;
     }
 
-    boolean lastSharp = false;
+    boolean lastStartedExpression = false;
     boolean openSingleQuotes = false;
     boolean openDoubleQuotes = false;
 
@@ -123,7 +123,7 @@ public final class TemplateParser {
     while (currentPosition < template.length()) {
       char c = template.charAt(currentPosition);
 
-      if (lastSharp && c != OPEN_EXPRESSION) {
+      if (lastStartedExpression && c != OPEN_EXPRESSION) {
         result.append(START_EXPRESSION);
       }
 
@@ -133,7 +133,7 @@ public final class TemplateParser {
       if (c == '"') {
         openDoubleQuotes = !openDoubleQuotes;
       }
-      if (c == OPEN_EXPRESSION && lastSharp && !(openDoubleQuotes || openSingleQuotes)) {
+      if (c == OPEN_EXPRESSION && lastStartedExpression && !(openDoubleQuotes || openSingleQuotes)) {
         int closing = closingBracesPosition(template, currentPosition);
         String enclosingTemplate = template.substring(currentPosition + 1, closing);
 
@@ -153,7 +153,7 @@ public final class TemplateParser {
         result.append(c);
       }
 
-      lastSharp = c == START_EXPRESSION;
+      lastStartedExpression = c == START_EXPRESSION;
       currentPosition++;
     }
 
@@ -232,7 +232,7 @@ public final class TemplateParser {
 
   private boolean validateBalanceMuleStyle(String template) {
     Stack<Character> stack = new Stack<>();
-    boolean lastSharp = false;
+    boolean lastStartedExpression = false;
     int openBraces = 0;
     int openSingleQuotes = 0;
     int openDoubleQuotes = 0;
@@ -248,7 +248,7 @@ public final class TemplateParser {
             stack.push(c);
             openSingleQuotes++;
           }
-          lastSharp = false;
+          lastStartedExpression = false;
           break;
         case '"':
           if (!stack.empty() && stack.peek().equals('"')) {
@@ -258,24 +258,24 @@ public final class TemplateParser {
             stack.push(c);
             openDoubleQuotes++;
           }
-          lastSharp = false;
+          lastStartedExpression = false;
           break;
         case CLOSE_EXPRESSION:
           if (!stack.empty() && stack.peek().equals(OPEN_EXPRESSION)) {
             stack.pop();
             openBraces--;
           }
-          lastSharp = false;
+          lastStartedExpression = false;
           break;
         case OPEN_EXPRESSION:
-          if ((lastSharp || openBraces > 0) && !(openDoubleQuotes > 0 || openSingleQuotes > 0)) {
+          if ((lastStartedExpression || openBraces > 0) && !(openDoubleQuotes > 0 || openSingleQuotes > 0)) {
             stack.push(c);
             openBraces++;
           }
-          lastSharp = false;
+          lastStartedExpression = false;
           break;
         case START_EXPRESSION:
-          lastSharp = true;
+          lastStartedExpression = true;
           break;
       }
     }
