@@ -154,9 +154,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
     }
 
     /**
-     * Any processor executed during the until-successful scope can put a closeable payload in the message,
-     * that won't be closed if an unexpected exception occurs.
-     * This method, that ensures these payloads are closed, must be called after each failure retry.
+     * This method must be called after each failure retry for ensuring the payload is closed if applicable.
      * As the until successful propagates the exception once the max retry count is reached,
      * closing the last payload is responsibility of the {@link AbstractExceptionListener}.
      *
