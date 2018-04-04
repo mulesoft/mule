@@ -114,6 +114,7 @@ public final class TemplateParser {
       return template;
     }
 
+    boolean lastIsBackSlash = false;
     boolean lastStartedExpression = false;
     boolean openSingleQuotes = false;
     boolean openDoubleQuotes = false;
@@ -127,10 +128,14 @@ public final class TemplateParser {
         result.append(START_EXPRESSION);
       }
 
-      if (c == '\'') {
+      if (lastIsBackSlash && c != '\'' && c != '"') {
+        result.append("\\");
+      }
+
+      if (!lastIsBackSlash && c == '\'') {
         openSingleQuotes = !openDoubleQuotes;
       }
-      if (c == '"') {
+      if (!lastIsBackSlash && c == '"') {
         openDoubleQuotes = !openDoubleQuotes;
       }
       if (c == OPEN_EXPRESSION && lastStartedExpression && !(openDoubleQuotes || openSingleQuotes)) {
@@ -149,11 +154,12 @@ public final class TemplateParser {
         result.append(value);
 
         currentPosition = closing;
-      } else if (c != START_EXPRESSION) {
+      } else if (c != START_EXPRESSION && c != '\\') {
         result.append(c);
       }
 
       lastStartedExpression = c == START_EXPRESSION;
+      lastIsBackSlash = c == '\\';
       currentPosition++;
     }
 
@@ -163,18 +169,21 @@ public final class TemplateParser {
   private int closingBracesPosition(String template, int startingPosition) {
     // This assumes that the template is balanced (simply validate first)
     int openingBraces = 1;
+    boolean lastIsBackSlash = false;
     boolean openSingleQuotes = false;
     boolean openDoubleQuotes = false;
     for (int i = startingPosition + 1; i < template.length(); i++) {
-      if (template.charAt(i) == CLOSE_EXPRESSION && !(openSingleQuotes || openDoubleQuotes)) {
+      char c = template.charAt(i);
+      if (c == CLOSE_EXPRESSION && !(openSingleQuotes || openDoubleQuotes)) {
         openingBraces--;
-      } else if (template.charAt(i) == OPEN_EXPRESSION && !(openSingleQuotes || openDoubleQuotes)) {
+      } else if (c == OPEN_EXPRESSION && !(openSingleQuotes || openDoubleQuotes)) {
         openingBraces++;
-      } else if (template.charAt(i) == '\'') {
+      } else if (!lastIsBackSlash && c == '\'') {
         openSingleQuotes = !openSingleQuotes;
-      } else if (template.charAt(i) == '"') {
+      } else if (!lastIsBackSlash && c == '"') {
         openDoubleQuotes = !openDoubleQuotes;
       }
+      lastIsBackSlash = c == '\\';
 
       if (openingBraces == 0) {
         return i;
@@ -233,6 +242,7 @@ public final class TemplateParser {
   private boolean validateBalanceMuleStyle(String template) {
     Stack<Character> stack = new Stack<>();
     boolean lastStartedExpression = false;
+    boolean lastIsBackSlash = false;
     int openBraces = 0;
     int openSingleQuotes = 0;
     int openDoubleQuotes = 0;
@@ -241,6 +251,9 @@ public final class TemplateParser {
       char c = template.charAt(i);
       switch (c) {
         case '\'':
+          if (lastIsBackSlash) {
+            break;
+          }
           if (!stack.empty() && stack.peek().equals('\'')) {
             stack.pop();
             openSingleQuotes--;
@@ -248,9 +261,11 @@ public final class TemplateParser {
             stack.push(c);
             openSingleQuotes++;
           }
-          lastStartedExpression = false;
           break;
         case '"':
+          if (lastIsBackSlash) {
+            break;
+          }
           if (!stack.empty() && stack.peek().equals('"')) {
             stack.pop();
             openDoubleQuotes--;
@@ -258,26 +273,22 @@ public final class TemplateParser {
             stack.push(c);
             openDoubleQuotes++;
           }
-          lastStartedExpression = false;
           break;
         case CLOSE_EXPRESSION:
           if (!stack.empty() && stack.peek().equals(OPEN_EXPRESSION)) {
             stack.pop();
             openBraces--;
           }
-          lastStartedExpression = false;
           break;
         case OPEN_EXPRESSION:
           if ((lastStartedExpression || openBraces > 0) && !(openDoubleQuotes > 0 || openSingleQuotes > 0)) {
             stack.push(c);
             openBraces++;
           }
-          lastStartedExpression = false;
-          break;
-        case START_EXPRESSION:
-          lastStartedExpression = true;
           break;
       }
+      lastStartedExpression = c == START_EXPRESSION;
+      lastIsBackSlash = c == '\\';
     }
 
     return stack.empty();

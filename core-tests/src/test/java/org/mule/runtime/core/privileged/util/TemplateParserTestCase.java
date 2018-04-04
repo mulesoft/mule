@@ -268,6 +268,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
     assertTrue(tp.isValid("[]]]]]"));
     assertTrue(tp.isValid("[][][][][[]]"));
     assertFalse(tp.isValid("\""));
+    assertTrue(tp.isValid("\\'"));
     assertFalse(tp.isValid("'"));
     assertTrue(tp.isValid("''"));
     assertTrue(tp.isValid("\"\""));
@@ -314,6 +315,26 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
     TemplateParser tp = createMuleStyleParser();
     final String expectedResult = "'['";
     String expression = "#['[']";
+    assertTrue(tp.isValid(expression));
+    String result = tp.parse(null, expression, token -> token);
+    assertEquals(expectedResult, result);
+  }
+
+  @Test
+  public void muleParserWithScapedQuote() {
+    TemplateParser tp = createMuleStyleParser();
+    final String expectedResult = "\"";
+    String expression = "#[\\\"]";
+    assertTrue(tp.isValid(expression));
+    String result = tp.parse(null, expression, token -> token);
+    assertEquals(expectedResult, result);
+  }
+
+  @Test
+  public void muleParserWithBackSlashWithoutQuote() {
+    TemplateParser tp = createMuleStyleParser();
+    final String expectedResult = "\\a";
+    String expression = "#[\\a]";
     assertTrue(tp.isValid(expression));
     String result = tp.parse(null, expression, token -> token);
     assertEquals(expectedResult, result);
