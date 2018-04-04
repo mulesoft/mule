@@ -81,7 +81,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>commons-httpclient</groupId>
+            <groupId>org.mule.apache.commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
         </dependency>
         <!-- Use the latest version of WSDL4J as it is compatible with CXF -->
