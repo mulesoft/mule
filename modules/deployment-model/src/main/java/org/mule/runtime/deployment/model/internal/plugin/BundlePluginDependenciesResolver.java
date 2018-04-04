@@ -19,11 +19,15 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +92,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     return filteredPluginDescriptors;
   }
 
-  private Optional<ArtifactPluginDescriptor> findPlugin(Set<ArtifactPluginDescriptor> appPlugins,
+  private Optional<ArtifactPluginDescriptor> findPlugin(Collection<ArtifactPluginDescriptor> appPlugins,
                                                         BundleDescriptor bundleDescriptor) {
     for (ArtifactPluginDescriptor appPlugin : appPlugins) {
       if (appPlugin.getBundleDescriptor().getArtifactId().equals(bundleDescriptor.getArtifactId())
@@ -190,11 +194,26 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                     throw new PluginResolutionError(format("Bundle URL should have been resolved for %s.",
                                                            dependency.getDescriptor()));
                   }
-                  ArtifactPluginDescriptor artifactPluginDescriptor =
-                      artifactDescriptorFactory.create(mulePluginLocation, empty());
-                  artifactPluginDescriptor.setBundleDescriptor(dependency.getDescriptor());
-                  foundDependencies.add(artifactPluginDescriptor);
-                  visited.add(dependency.getDescriptor());
+
+                  Optional<ArtifactPluginDescriptor> resolvedPluginApplicationLevelOptional =
+                      findPlugin(pluginDescriptorsWithDependences, dependency.getDescriptor());
+                  if (resolvedPluginApplicationLevelOptional.isPresent()) {
+                    ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
+                    ArtifactPluginDescriptor artifactPluginDescriptorResolved = resolvedPluginApplicationLevelOptional.get();
+                    pluginDescriptor.setClassLoaderModel(createBuilderWithoutDependency(originalClassLoaderModel, dependency)
+                        .dependingOn(ImmutableSet.of(
+                                                     new BundleDependency.Builder()
+                                                         .setDescriptor(artifactPluginDescriptorResolved.getBundleDescriptor())
+                                                         .setScope(dependency.getScope())
+                                                         .build()))
+                        .build());
+                  } else {
+                    ArtifactPluginDescriptor artifactPluginDescriptor =
+                        artifactDescriptorFactory.create(mulePluginLocation, empty());
+                    artifactPluginDescriptor.setBundleDescriptor(dependency.getDescriptor());
+                    foundDependencies.add(artifactPluginDescriptor);
+                    visited.add(dependency.getDescriptor());
+                  }
                 }
               }));
 
@@ -224,6 +243,23 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   private ClassLoaderModelBuilder createBuilderWithoutExportedPackages(ClassLoaderModel originalClassLoaderModel) {
     ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder()
         .dependingOn(originalClassLoaderModel.getDependencies())
+        .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
+                                     originalClassLoaderModel.getPrivilegedArtifacts())
+        .exportingResources(originalClassLoaderModel.getExportedResources());
+    for (URL url : originalClassLoaderModel.getUrls()) {
+      classLoaderModelBuilder.containing(url);
+    }
+    return classLoaderModelBuilder;
+  }
+
+  private ClassLoaderModelBuilder createBuilderWithoutDependency(ClassLoaderModel originalClassLoaderModel,
+                                                                 BundleDependency dependencyToBeExcluded) {
+    ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder()
+        .dependingOn(originalClassLoaderModel.getDependencies().stream()
+            .filter(dependency -> !dependency.equals(dependencyToBeExcluded)).collect(
+                                                                                      Collectors
+                                                                                          .toCollection(() -> new LinkedHashSet<>())))
+        .exportingPackages(originalClassLoaderModel.getExportedPackages())
         .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
                                      originalClassLoaderModel.getPrivilegedArtifacts())
         .exportingResources(originalClassLoaderModel.getExportedResources());

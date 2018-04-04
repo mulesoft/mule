@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Abstract implementation of {@link ClassLoaderModelLoader} that resolves the dependencies for all the mule artifacts and create
  * the {@link ClassLoaderModel}. It lets the implementations of this class to add artifact's specific class loader URLs
- * 
+ *
  * @since 4.0
  */
 public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoaderModelLoader {
