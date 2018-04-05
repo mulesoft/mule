@@ -60,9 +60,9 @@ public class PolicyPointcutParametersManager {
                                  factory -> factory.supportsSourceIdentifier(sourceIdentifier),
                                  factory -> factory.createPolicyPointcutParameters(source, event.getMessage().getAttributes()));
 
-    String correlationId = event.getContext().getCorrelationId();
-    sourceParameters.put(correlationId, sourcePointcutParameters);
-    ((BaseEventContext) event.getContext()).getRootContext().onTerminated((e, t) -> sourceParameters.remove(correlationId));
+    String id = event.getContext().getId();
+    sourceParameters.put(id, sourcePointcutParameters);
+    ((BaseEventContext) event.getContext()).getRootContext().onTerminated((e, t) -> sourceParameters.remove(id));
 
     return sourcePointcutParameters;
   }
@@ -88,7 +88,7 @@ public class PolicyPointcutParametersManager {
                                  factory -> factory.supportsOperationIdentifier(operationIdentifier),
                                  factory -> factory.createPolicyPointcutParameters(operation, operationParameters));
 
-    PolicyPointcutParameters originalParameters = sourceParameters.remove(event.getContext().getCorrelationId());
+    PolicyPointcutParameters originalParameters = sourceParameters.get(event.getContext().getId());
     operationPointcutParameters.addSourceParameters(originalParameters);
 
     return operationPointcutParameters;

@@ -15,6 +15,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
@@ -172,6 +173,24 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
   }
 
   @Test
+  public void createOperationParametersWhenOneFactorySupportsIdentifierMultipleTimes() {
+    Map<String, Object> operationParameters = new HashMap<>();
+    OperationPolicyPointcutParametersFactory factory = mockOperationFactory(true);
+    operationPointcutFactories.add(factory);
+    sourcePointcutFactories.add(mockSourceFactory(true));
+    PolicyPointcutParameters sourceParameters = parametersManager.createSourcePointcutParameters(component, event);
+    parametersManager.createOperationPointcutParameters(component, event, operationParameters);
+
+    PolicyPointcutParameters parameters =
+        parametersManager.createOperationPointcutParameters(component, event, operationParameters);
+
+    assertThat(parameters.getComponent(), is(component));
+    assertThat(parameters.getSourceParameters(), is(of(sourceParameters)));
+    verify(factory, times(2)).supportsOperationIdentifier(identifier);
+    verify(factory, times(2)).createPolicyPointcutParameters(component, operationParameters);
+  }
+
+  @Test
   public void createOperationParametersWhenOneFactoryDoesNotSupportsIdentifier() {
     Map<String, Object> operationParameters = new HashMap<>();
     OperationPolicyPointcutParametersFactory factory = mockOperationFactory(false);
@@ -223,7 +242,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     eventContext = mock(BaseEventContext.class, RETURNS_DEEP_STUBS);
     when(event.getContext()).thenReturn(eventContext);
     when(eventContext.getRootContext()).thenReturn(eventContext);
-    when(eventContext.getCorrelationId()).thenReturn("anId");
+    when(eventContext.getId()).thenReturn("anId");
   }
 
   private void mockComponent() {
