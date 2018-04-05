@@ -89,7 +89,7 @@ public class PolicyPointcutParametersManager {
                                  factory -> factory.createPolicyPointcutParameters(operation, operationParameters));
 
     PolicyPointcutParameters originalParameters = sourceParameters.remove(event.getContext().getCorrelationId());
-    operationPointcutParameters.addOriginalParameters(originalParameters);
+    operationPointcutParameters.addSourceParameters(originalParameters);
 
     return operationPointcutParameters;
   }
