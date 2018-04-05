@@ -76,7 +76,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     }
   }
 
-  @Parameters
+  @Parameters(name = "tx: {0}")
   public static Collection<Boolean> modeParameters() {
     return asList(new Boolean[] {Boolean.TRUE, Boolean.FALSE});
   }

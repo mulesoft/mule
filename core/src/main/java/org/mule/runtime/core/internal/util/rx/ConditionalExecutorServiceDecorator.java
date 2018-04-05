@@ -7,6 +7,9 @@
 package org.mule.runtime.core.internal.util.rx;
 
 import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorService;
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
+
 import org.mule.runtime.api.scheduler.Scheduler;
 
 import com.google.common.util.concurrent.MoreExecutors;
@@ -17,26 +20,29 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
 /**
- * Transaction aware {@link ExecutorService} decorator that does not scheduler tasks for async processing using the delagate
+ * Transaction aware {@link ExecutorService} decorator that does not scheduler tasks for async processing using the delegate
  * executor service if a transaction is active, instead a {@link MoreExecutors#newDirectExecutorService()} is used and the task is
  * run on the current thread.
  */
-public class ConditionalExecutorServiceDecorator implements ExecutorService {
+public class ConditionalExecutorServiceDecorator implements ScheduledExecutorService {
 
   private Scheduler delegate;
   private Predicate<Scheduler> scheduleOverridePredicate;
   private ExecutorService directExecutor = newDirectExecutorService();
 
   /**
-   * Create a new executor service decorator that delegats to the provided executor service if no transaction is active and runs
+   * Create a new executor service decorator that delegates to the provided executor service if no transaction is active and runs
    * tasks on the same thread otherwise.
-   * 
-   * @param executorService the delegate executor service to use when no transaction is actice.
+   *
+   * @param executorService the delegate executor service to use when no transaction is active.
    */
   public ConditionalExecutorServiceDecorator(Scheduler executorService, Predicate<Scheduler> scheduleOverridePredicate) {
     this.delegate = executorService;
@@ -141,6 +147,59 @@ public class ConditionalExecutorServiceDecorator implements ExecutorService {
       directExecutor.execute(command);
     } else {
       delegate.execute(command);
+    }
+  }
+
+  @Override
+  public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
+    if (scheduleOverridePredicate.test(delegate)) {
+      return synchronousSchedule(() -> {
+        command.run();
+        return null;
+      }, delay, unit);
+    } else {
+      return delegate.schedule(command, delay, unit);
+    }
+  }
+
+  @Override
+  public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
+    if (scheduleOverridePredicate.test(delegate)) {
+      return synchronousSchedule(callable, delay, unit);
+    } else {
+      return delegate.schedule(callable, delay, unit);
+    }
+  }
+
+  private <V> ScheduledFuture<V> synchronousSchedule(Callable<V> callable, long delay, TimeUnit unit) {
+    try {
+      sleep(unit.toMillis(delay));
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
+      return new SynchronousScheduledFuture<>(true);
+    }
+    try {
+      return new SynchronousScheduledFuture<>(callable.call());
+    } catch (Exception e) {
+      return new SynchronousScheduledFuture<>(e);
+    }
+  }
+
+  @Override
+  public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
+    if (scheduleOverridePredicate.test(delegate)) {
+      throw new RejectedExecutionException("Cannot schedule recurrent tasks in a transactional context.");
+    } else {
+      return delegate.scheduleAtFixedRate(command, initialDelay, period, unit);
+    }
+  }
+
+  @Override
+  public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
+    if (scheduleOverridePredicate.test(delegate)) {
+      throw new RejectedExecutionException("Cannot schedule recurrent tasks in a transactional context.");
+    } else {
+      return delegate.scheduleWithFixedDelay(command, initialDelay, delay, unit);
     }
   }
 

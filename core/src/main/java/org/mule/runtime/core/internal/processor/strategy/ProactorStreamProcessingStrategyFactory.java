@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-import static reactor.core.publisher.Mono.delay;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.retry.Retry.onlyIf;
 
@@ -36,12 +35,10 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
-import reactor.retry.BackoffDelay;
-import reactor.retry.Retry;
-
-import java.time.Duration;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Supplier;
+
+import reactor.retry.BackoffDelay;
 
 /**
  * Creates {@link ReactorProcessingStrategyFactory.ReactorProcessingStrategy} instance that implements the proactor pattern by
@@ -161,15 +158,16 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
     private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
       reactor.core.scheduler.Scheduler publishOnScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
-      reactor.core.scheduler.Scheduler subscribeOnScheduler = fromExecutorService(decorateScheduler(scheduler));
 
       return publisher -> from(publisher).flatMap(event -> {
         if (processor.getProcessingType() == IO_RW && !scheduleIoRwEvent(event)) {
           // If payload is not a stream o length is < STREAM_PAYLOAD_BLOCKING_IO_THRESHOLD (default 16KB) perform processing on
           // current thread in stead of scheduling using IO pool.
-          return just(event).transform(processor);
+          return just(event)
+              .transform(processor)
+              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
         } else {
-          return scheduleProcessor(processor, publishOnScheduler, subscribeOnScheduler, scheduler.getName(), event);
+          return scheduleProcessor(processor, publishOnScheduler, scheduler, event);
         }
       }, max(maxConcurrency / (getParallelism() * subscribers), 1));
     }
@@ -180,15 +178,17 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     }
 
     private Publisher<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
-                                                   reactor.core.scheduler.Scheduler publishOnScheduler,
-                                                   reactor.core.scheduler.Scheduler subscribeOnScheduler,
-                                                   String subscribeOnSchedulerName, CoreEvent event) {
+                                                   reactor.core.scheduler.Scheduler eventLoopScheduler,
+                                                   Scheduler processorScheduler, CoreEvent event) {
       return just(event)
           .transform(processor)
-          .subscribeOn(subscribeOnScheduler)
-          .publishOn(publishOnScheduler)
-          .doOnError(RejectedExecutionException.class, throwable -> LOGGER.trace("Shared scheduler " + subscribeOnSchedulerName
-              + " is busy.  Scheduling of the current event will be retried after " + SCHEDULER_BUSY_RETRY_INTERVAL_MS + "ms."))
+          .subscribeOn(fromExecutorService(decorateScheduler(processorScheduler)))
+          .publishOn(eventLoopScheduler)
+          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, processorScheduler))
+          .doOnError(RejectedExecutionException.class,
+                     throwable -> LOGGER.trace("Shared scheduler " + processorScheduler.getName()
+                         + " is busy.  Scheduling of the current event will be retried after " + SCHEDULER_BUSY_RETRY_INTERVAL_MS
+                         + "ms."))
           .retryWhen(onlyIf(ctx -> RejectedExecutionException.class.isAssignableFrom(unwrap(ctx.exception()).getClass()))
               .backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS), ZERO, ZERO))
               .withBackoffScheduler(fromExecutorService(getCpuLightScheduler())));

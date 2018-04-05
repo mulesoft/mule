@@ -11,15 +11,14 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
@@ -40,13 +39,15 @@ import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStra
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import org.hamcrest.Matcher;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(WORK_QUEUE)
@@ -56,6 +57,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     super(mode);
   }
 
+  @Override
   @Before
   public void before() throws RegistrationException {
     super.before();
@@ -75,6 +77,11 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   public void singleCpuLight() throws Exception {
     super.singleCpuLight();
     assertSynchronousIOScheduler(1);
+  }
+
+  @Override
+  protected Matcher<Iterable<? extends String>> cpuLightSchedulerMatcher() {
+    return contains(IO);
   }
 
   @Override
@@ -120,6 +127,11 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   public void singleCpuIntensive() throws Exception {
     super.singleCpuIntensive();
     assertSynchronousIOScheduler(1);
+  }
+
+  @Override
+  protected Matcher<Iterable<? extends String>> cpuIntensiveSchedulerMatcher() {
+    return contains(IO);
   }
 
   @Override
@@ -294,7 +306,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Description("Regardless of processor type, when the WorkQueueProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a single IO thead.")
   public void singleIORW() throws Exception {
-    super.singleIORW(() -> testEvent());
+    super.singleIORW(() -> testEvent(), contains(IO));
     assertSynchronousIOScheduler(1);
   }
 

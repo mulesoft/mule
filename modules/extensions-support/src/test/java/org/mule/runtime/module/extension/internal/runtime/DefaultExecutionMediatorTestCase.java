@@ -25,7 +25,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
+import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -72,7 +74,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 @SmallTest
@@ -149,6 +150,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     when(operationContext.getExtensionModel()).thenReturn(extensionModel);
     when(operationContext.getTransactionConfig()).thenReturn(empty());
     when(operationContext.getRetryPolicyTemplate()).thenReturn(empty());
+    when(operationContext.getCurrentScheduler()).thenReturn(IMMEDIATE_SCHEDULER);
 
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
     mediator = new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
@@ -279,7 +281,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
       execute().block();
       fail("was expecting a exception");
     } catch (Exception e) {
-      assertion.accept(Exceptions.unwrap(e));
+      assertion.accept(unwrap(e));
     }
   }
 

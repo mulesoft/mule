@@ -39,6 +39,18 @@
         <petstore:fail-connection config-ref="petstore-invalid"/>
     </flow>
 
+    <flow name="fail-operation-with-connection-exception-tx">
+        <try transactionalAction="ALWAYS_BEGIN">
+            <petstore:fail-connection config-ref="petstore-valid"/>
+        </try>
+    </flow>
+
+    <flow name="fail-connection-validation-tx">
+        <try transactionalAction="ALWAYS_BEGIN">
+            <petstore:fail-connection config-ref="petstore-invalid"/>
+        </try>
+    </flow>
+
     <flow name="fail-operation-with-not-handled-exception">
         <petstore:fail-operation-with-exception config-ref="petstore-valid"/>
     </flow>
