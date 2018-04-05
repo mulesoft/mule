@@ -42,7 +42,7 @@ public class ConditionalExecutorServiceDecorator implements ScheduledExecutorSer
   private ExecutorService directExecutor = newDirectExecutorService();
 
   /**
-   * Create a new executor service decorator that delegats to the provided executor service if no transaction is active and runs
+   * Create a new executor service decorator that delegates to the provided executor service if no transaction is active and runs
    * tasks on the same thread otherwise.
    *
    * @param executorService the delegate executor service to use when no transaction is active.

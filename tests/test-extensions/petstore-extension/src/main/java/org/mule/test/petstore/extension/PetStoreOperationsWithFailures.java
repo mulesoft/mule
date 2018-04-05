@@ -11,15 +11,12 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableList;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PetStoreOperationsWithFailures extends PetStoreOperations implements Initialisable, Disposable {
+public class PetStoreOperationsWithFailures extends PetStoreOperations {
 
   public static final String CONNECTION_FAIL = "Connection fail";
 
@@ -28,18 +25,12 @@ public class PetStoreOperationsWithFailures extends PetStoreOperations implement
    */
   private static List<Thread> connectionThreads = new ArrayList<>();
 
-  @Override
-  public void initialise() throws InitialisationException {
-    connectionThreads.clear();
-  }
-
-  @Override
-  public void dispose() {
-    connectionThreads.clear();
-  }
-
   public static List<Thread> getConnectionThreads() {
     return unmodifiableList(connectionThreads);
+  }
+
+  public static void resetConnectionThreads() {
+    connectionThreads.clear();
   }
 
   public Integer failConnection(@Connection PetStoreClient client) throws ConnectionException {

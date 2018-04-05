@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.retry.policies;
 
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
 import static java.time.Duration.ZERO;
 import static java.time.Duration.ofMillis;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY;
@@ -33,11 +35,13 @@ import org.slf4j.Logger;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.retry.BackoffDelay;
 import reactor.retry.Retry;
@@ -79,12 +83,17 @@ public class SimpleRetryPolicy implements RetryPolicy {
         reactor.core.scheduler.Scheduler reactorRetryScheduler = retryScheduler
             .map(sch -> fromExecutorService(new ConditionalExecutorServiceDecorator(sch, s -> isTransactionActive())))
             // If no Scheduler passed, let Reactor use its own...
-            .orElse(isTransactionActive() ? immediate() : parallel());
-
-        retry = retry.withBackoffScheduler(reactorRetryScheduler);
+            .orElseGet(() -> {
+              if (isTransactionActive()) {
+                return new TransactionalRetryScheduler();
+              } else {
+                LOGGER.warn("No Mule Scheduler passed to retry policy. Using Reactor's own 'parallel' Scheduler.");
+                return parallel();
+              }
+            });
 
         Mono<T> retryMono = from(publisher)
-            .retryWhen(retry)
+            .retryWhen(retry.withBackoffScheduler(reactorRetryScheduler))
             .doOnError(e2 -> onExhausted.accept(unwrap(e2)))
             .onErrorMap(RetryExhaustedException.class, e2 -> errorFunction.apply(unwrap(e2.getCause())));
         return delay(frequency, reactorRetryScheduler).then(isTransactionActive() ? just(retryMono.block()) : retryMono);
@@ -153,4 +162,54 @@ public class SimpleRetryPolicy implements RetryPolicy {
     }
   }
 
+  private static class TransactionalRetryScheduler implements reactor.core.scheduler.Scheduler {
+
+    private final reactor.core.scheduler.Scheduler delegate = immediate();
+
+    @Override
+    public Disposable schedule(Runnable task) {
+      return delegate.schedule(task);
+    }
+
+    @Override
+    public Disposable schedule(Runnable task, long delay, TimeUnit unit) {
+      try {
+        sleep(unit.toMillis(delay));
+      } catch (InterruptedException e) {
+        currentThread().interrupt();
+        throw new RuntimeException(e);
+      }
+      return schedule(task);
+    }
+
+    @Override
+    public Disposable schedulePeriodically(Runnable task, long initialDelay, long period, TimeUnit unit) {
+      return delegate.schedulePeriodically(task, initialDelay, period, unit);
+    }
+
+    @Override
+    public long now(TimeUnit unit) {
+      return delegate.now(unit);
+    }
+
+    @Override
+    public Worker createWorker() {
+      return delegate.createWorker();
+    }
+
+    @Override
+    public void dispose() {
+      delegate.dispose();
+    }
+
+    @Override
+    public void start() {
+      delegate.start();
+    }
+
+    @Override
+    public boolean isDisposed() {
+      return delegate.isDisposed();
+    }
+  }
 }
