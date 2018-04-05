@@ -53,6 +53,7 @@ import reactor.retry.RetryExhaustedException;
 public class SimpleRetryPolicy implements RetryPolicy {
 
   private static final Logger LOGGER = getLogger(SimpleRetryPolicy.class);
+  private static final reactor.core.scheduler.Scheduler TRANSACTIONAL_RETRY_SCHEDULER = new TransactionalRetryScheduler();
 
   protected RetryCounter retryCounter;
 
@@ -85,7 +86,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
             // If no Scheduler passed, let Reactor use its own...
             .orElseGet(() -> {
               if (isTransactionActive()) {
-                return new TransactionalRetryScheduler();
+                return TRANSACTIONAL_RETRY_SCHEDULER;
               } else {
                 LOGGER.warn("No Mule Scheduler passed to retry policy. Using Reactor's own 'parallel' Scheduler.");
                 return parallel();

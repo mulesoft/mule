@@ -62,10 +62,12 @@ public interface RetryPolicyTemplate {
    * @param <T> the generic type of the publisher's content
    * @return a {@link Publisher} configured with the retry policy.
    * @since 4.0
+   *
+   * @deprecated USe {@link #applyPolicy(Publisher, Optional)} instead
    */
+  @Deprecated
   default <T> Publisher<T> applyPolicy(Publisher<T> publisher) {
-    return createRetryInstance().applyPolicy(publisher, t -> true, t -> {
-    }, identity(), empty());
+    return applyPolicy(publisher, empty());
   }
 
   /**
@@ -76,7 +78,7 @@ public interface RetryPolicyTemplate {
    * @param retryScheduler the scheduler to use when retrying. If empty, an internal reactor Scheduler will be used.
    * @param <T> the generic type of the publisher's content
    * @return a {@link Publisher} configured with the retry policy.
-   * @since 4.1.2
+   * @since 4.2
    */
   default <T> Publisher<T> applyPolicy(Publisher<T> publisher, Optional<Scheduler> retryScheduler) {
     return createRetryInstance().applyPolicy(publisher, t -> true, t -> {
@@ -94,11 +96,14 @@ public interface RetryPolicyTemplate {
    * @param <T> the generic type of the publisher's content
    * @return a {@link Publisher} configured with the retry policy.
    * @since 4.0
+   *
+   * @deprecated Use {@link #applyPolicy(Publisher, Predicate, Consumer, Function, Optional)} instead
    */
+  @Deprecated
   default <T> Publisher<T> applyPolicy(Publisher<T> publisher,
                                        Predicate<Throwable> shouldRetry,
                                        Consumer<Throwable> onExhausted, Function<Throwable, Throwable> errorFunction) {
-    return createRetryInstance().applyPolicy(publisher, shouldRetry, onExhausted, errorFunction, empty());
+    return applyPolicy(publisher, shouldRetry, onExhausted, errorFunction, empty());
 
   }
 
@@ -113,7 +118,7 @@ public interface RetryPolicyTemplate {
    * @param retryScheduler the scheduler to use when retrying. If empty, an internal reactor Scheduler will be used.
    * @param <T> the generic type of the publisher's content
    * @return a {@link Publisher} configured with the retry policy.
-   * @since 4.1.2
+   * @since 4.2
    */
   default <T> Publisher<T> applyPolicy(Publisher<T> publisher,
                                        Predicate<Throwable> shouldRetry,

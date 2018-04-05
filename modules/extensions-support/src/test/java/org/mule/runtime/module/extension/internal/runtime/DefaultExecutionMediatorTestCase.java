@@ -280,7 +280,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
       execute().block();
       fail("was expecting a exception");
     } catch (Exception e) {
-      e.printStackTrace();
       assertion.accept(unwrap(e));
     }
   }
