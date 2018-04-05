@@ -58,12 +58,12 @@ public abstract class AbstractExecutionContextAdapterDecorator<M extends Compone
   }
 
   @Override
-  public Optional<Scheduler> getCurrentScheduler() {
+  public Scheduler getCurrentScheduler() {
     return decorated.getCurrentScheduler();
   }
 
   @Override
-  public void setCurrentScheduler(Optional<Scheduler> currentScheduler) {
+  public void setCurrentScheduler(Scheduler currentScheduler) {
     decorated.setCurrentScheduler(currentScheduler);
   }
 

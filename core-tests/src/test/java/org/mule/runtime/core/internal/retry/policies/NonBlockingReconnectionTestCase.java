@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.retry.policies;
 
 import static java.lang.System.currentTimeMillis;
-import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -32,7 +31,6 @@ import org.reactivestreams.Publisher;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -47,16 +45,16 @@ public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase
   private final AtomicLong previousExecutionMoment = new AtomicLong(0);
   private final List<Long> executionMomentDeltas = new LinkedList<>();
 
-  private Optional<Scheduler> retryScheduler;
+  private Scheduler retryScheduler;
 
   @Before
   public void before() {
-    retryScheduler = ofNullable(muleContext.getSchedulerService().cpuLightScheduler());
+    retryScheduler = muleContext.getSchedulerService().cpuLightScheduler();
   }
 
   @After
   public void after() {
-    retryScheduler.ifPresent(s -> s.stop());
+    retryScheduler.stop();
   }
 
   @Test

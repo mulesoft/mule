@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Collections.singletonList;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
@@ -106,7 +105,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
                                                             scheduleRoute(p -> Mono.from(p).transform(nestedChain)),
                                                             ofNullable(getLocation())))
             .transform(p -> policyTemplate.applyPolicy(p, getRetryPredicate(), e -> {
-            }, getThrowableFunction(event), of(timer))));
+            }, getThrowableFunction(event), timer)));
   }
 
   private Predicate<Throwable> getRetryPredicate() {

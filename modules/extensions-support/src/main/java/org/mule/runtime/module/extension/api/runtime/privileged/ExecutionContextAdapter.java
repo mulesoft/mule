@@ -122,10 +122,10 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
   /**
    * @param currentScheduler the scheduler that was determined by the {@link ProcessingStrategy} to execute this component.
    */
-  void setCurrentScheduler(Optional<Scheduler> currentScheduler);
+  void setCurrentScheduler(Scheduler currentScheduler);
 
   /**
    * @return the scheduler that was determined by the {@link ProcessingStrategy} to execute this component.
    */
-  Optional<Scheduler> getCurrentScheduler();
+  Scheduler getCurrentScheduler();
 }

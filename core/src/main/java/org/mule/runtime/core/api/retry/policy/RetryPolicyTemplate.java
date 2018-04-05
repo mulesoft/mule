@@ -7,8 +7,8 @@
 package org.mule.runtime.core.api.retry.policy;
 
 
-import static java.util.Optional.empty;
 import static java.util.function.Function.identity;
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -63,11 +63,11 @@ public interface RetryPolicyTemplate {
    * @return a {@link Publisher} configured with the retry policy.
    * @since 4.0
    *
-   * @deprecated USe {@link #applyPolicy(Publisher, Optional)} instead
+   * @deprecated Use {@link #applyPolicy(Publisher, Optional)} instead
    */
   @Deprecated
   default <T> Publisher<T> applyPolicy(Publisher<T> publisher) {
-    return applyPolicy(publisher, empty());
+    return applyPolicy(publisher, IMMEDIATE_SCHEDULER);
   }
 
   /**
@@ -80,7 +80,7 @@ public interface RetryPolicyTemplate {
    * @return a {@link Publisher} configured with the retry policy.
    * @since 4.2
    */
-  default <T> Publisher<T> applyPolicy(Publisher<T> publisher, Optional<Scheduler> retryScheduler) {
+  default <T> Publisher<T> applyPolicy(Publisher<T> publisher, Scheduler retryScheduler) {
     return createRetryInstance().applyPolicy(publisher, t -> true, t -> {
     }, identity(), retryScheduler);
   }
@@ -103,7 +103,7 @@ public interface RetryPolicyTemplate {
   default <T> Publisher<T> applyPolicy(Publisher<T> publisher,
                                        Predicate<Throwable> shouldRetry,
                                        Consumer<Throwable> onExhausted, Function<Throwable, Throwable> errorFunction) {
-    return applyPolicy(publisher, shouldRetry, onExhausted, errorFunction, empty());
+    return applyPolicy(publisher, shouldRetry, onExhausted, errorFunction, IMMEDIATE_SCHEDULER);
 
   }
 
@@ -123,7 +123,7 @@ public interface RetryPolicyTemplate {
   default <T> Publisher<T> applyPolicy(Publisher<T> publisher,
                                        Predicate<Throwable> shouldRetry,
                                        Consumer<Throwable> onExhausted, Function<Throwable, Throwable> errorFunction,
-                                       Optional<Scheduler> retryScheduler) {
+                                       Scheduler retryScheduler) {
     return createRetryInstance().applyPolicy(publisher, shouldRetry, onExhausted, errorFunction, retryScheduler);
 
   }

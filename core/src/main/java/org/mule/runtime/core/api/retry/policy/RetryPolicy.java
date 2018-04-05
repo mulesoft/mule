@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.retry.policy;
 
-import static java.util.Optional.empty;
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -53,7 +53,7 @@ public interface RetryPolicy {
                                        Predicate<Throwable> shouldRetry,
                                        Consumer<Throwable> onExhausted,
                                        Function<Throwable, Throwable> errorFunction) {
-    return applyPolicy(publisher, shouldRetry, onExhausted, errorFunction, empty());
+    return applyPolicy(publisher, shouldRetry, onExhausted, errorFunction, IMMEDIATE_SCHEDULER);
   }
 
   /**
@@ -73,7 +73,7 @@ public interface RetryPolicy {
                                        Predicate<Throwable> shouldRetry,
                                        Consumer<Throwable> onExhausted,
                                        Function<Throwable, Throwable> errorFunction,
-                                       Optional<Scheduler> retryScheduler) {
+                                       Scheduler retryScheduler) {
     return publisher;
   }
 

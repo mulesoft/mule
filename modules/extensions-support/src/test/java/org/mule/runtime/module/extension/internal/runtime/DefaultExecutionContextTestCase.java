@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -108,7 +109,7 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
     operationContext =
         new DefaultExecutionContext<>(extensionModel, of(configuration), resolverSetResult.asMap(), operationModel,
                                       event, cursorProviderFactory, streamingManager, component, retryPolicyTemplate,
-                                      empty(), muleContext);
+                                      IMMEDIATE_SCHEDULER, muleContext);
   }
 
   @Test

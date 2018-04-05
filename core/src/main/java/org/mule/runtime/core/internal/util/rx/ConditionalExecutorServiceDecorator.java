@@ -9,17 +9,14 @@ package org.mule.runtime.core.internal.util.rx;
 import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorService;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.internal.processor.interceptor.InterceptionException;
 
 import com.google.common.util.concurrent.MoreExecutors;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -203,66 +200,6 @@ public class ConditionalExecutorServiceDecorator implements ScheduledExecutorSer
       throw new RejectedExecutionException("Cannot schedule recurrent tasks in a transactional context.");
     } else {
       return delegate.scheduleWithFixedDelay(command, initialDelay, delay, unit);
-    }
-  }
-
-  private static final class SynchronousScheduledFuture<V> implements ScheduledFuture<V> {
-
-    private V result;
-    private Throwable thrown;
-    private boolean interrupted;
-
-    public SynchronousScheduledFuture(V result) {
-      this.result = result;
-    }
-
-    public SynchronousScheduledFuture(Throwable thrown) {
-      this.thrown = thrown;
-    }
-
-    public SynchronousScheduledFuture(boolean interrupted) {
-      this.interrupted = interrupted;
-    }
-
-    @Override
-    public long getDelay(TimeUnit unit) {
-      return 0;
-    }
-
-    @Override
-    public int compareTo(Delayed o) {
-      return o.getDelay(MILLISECONDS) == 0L ? 0 : -1;
-    }
-
-    @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-      return false;
-    }
-
-    @Override
-    public boolean isCancelled() {
-      return false;
-    }
-
-    @Override
-    public boolean isDone() {
-      return true;
-    }
-
-    @Override
-    public V get() throws InterruptedException, ExecutionException {
-      if (interrupted) {
-        throw new InterceptionException();
-      } else if (result != null) {
-        return result;
-      } else {
-        throw new ExecutionException(thrown);
-      }
-    }
-
-    @Override
-    public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-      return get();
     }
   }
 

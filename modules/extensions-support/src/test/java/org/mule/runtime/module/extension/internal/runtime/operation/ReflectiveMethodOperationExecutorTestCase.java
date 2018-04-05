@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static reactor.core.publisher.Mono.from;
@@ -128,7 +129,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     operationContext = new DefaultExecutionContext(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
                                                    muleEvent, cursorProviderFactory, streamingManager, component,
-                                                   retryPolicyTemplate, empty(), muleContext);
+                                                   retryPolicyTemplate, IMMEDIATE_SCHEDULER, muleContext);
     operationContext = spy(operationContext);
   }
 

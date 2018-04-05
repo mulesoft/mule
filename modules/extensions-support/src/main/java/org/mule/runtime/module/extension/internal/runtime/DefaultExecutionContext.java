@@ -65,7 +65,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final LazyValue<Optional<TransactionConfig>> transactionConfig;
   private final Component component;
   private final RetryPolicyTemplate retryPolicyTemplate;
-  private Optional<Scheduler> currentScheduler;
+  private Scheduler currentScheduler;
 
   /**
    * Creates a new instance with the given state
@@ -89,7 +89,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
                                  StreamingManager streamingManager,
                                  Component component,
                                  RetryPolicyTemplate retryPolicyTemplate,
-                                 Optional<Scheduler> currentScheduler,
+                                 Scheduler currentScheduler,
                                  MuleContext muleContext) {
 
     this.extensionModel = extensionModel;
@@ -200,12 +200,12 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   }
 
   @Override
-  public void setCurrentScheduler(Optional<Scheduler> currentScheduler) {
+  public void setCurrentScheduler(Scheduler currentScheduler) {
     this.currentScheduler = currentScheduler;
   }
 
   @Override
-  public Optional<Scheduler> getCurrentScheduler() {
+  public Scheduler getCurrentScheduler() {
     return currentScheduler;
   }
 

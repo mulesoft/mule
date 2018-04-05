@@ -39,8 +39,7 @@ public interface ProcessingStrategy {
    * @return enriched pipeline function/
    */
   default ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-    return publisher -> from(publisher)
-        .transform(pipeline);
+    return publisher -> from(publisher).transform(pipeline);
   }
 
   /**
@@ -50,8 +49,7 @@ public interface ProcessingStrategy {
    * @return enriched processor function
    */
   default ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-    return publisher -> from(publisher)
-        .transform(processor);
+    return publisher -> from(publisher).transform(processor);
   }
 
   /**

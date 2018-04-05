@@ -22,7 +22,6 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.core.scheduler.Schedulers.immediate;
-import static reactor.core.scheduler.Schedulers.parallel;
 import static reactor.retry.Retry.onlyIf;
 
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -34,7 +33,6 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import java.time.Duration;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -71,7 +69,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
                                       Predicate<Throwable> shouldRetry,
                                       Consumer<Throwable> onExhausted,
                                       Function<Throwable, Throwable> errorFunction,
-                                      Optional<Scheduler> retryScheduler) {
+                                      Scheduler retryScheduler) {
     return from(publisher).onErrorResume(e -> {
       if (shouldRetry.test(e)) {
         Retry<T> retry = (Retry<T>) onlyIf(ctx -> shouldRetry.test(unwrap(ctx.exception())))
@@ -81,17 +79,8 @@ public class SimpleRetryPolicy implements RetryPolicy {
           retry = retry.retryMax(count - 1);
         }
 
-        reactor.core.scheduler.Scheduler reactorRetryScheduler = retryScheduler
-            .map(sch -> fromExecutorService(new ConditionalExecutorServiceDecorator(sch, s -> isTransactionActive())))
-            // If no Scheduler passed, let Reactor use its own...
-            .orElseGet(() -> {
-              if (isTransactionActive()) {
-                return TRANSACTIONAL_RETRY_SCHEDULER;
-              } else {
-                LOGGER.warn("No Mule Scheduler passed to retry policy. Using Reactor's own 'parallel' Scheduler.");
-                return parallel();
-              }
-            });
+        reactor.core.scheduler.Scheduler reactorRetryScheduler =
+            fromExecutorService(new ConditionalExecutorServiceDecorator(retryScheduler, s -> isTransactionActive()));
 
         Mono<T> retryMono = from(publisher)
             .retryWhen(retry.withBackoffScheduler(reactorRetryScheduler))

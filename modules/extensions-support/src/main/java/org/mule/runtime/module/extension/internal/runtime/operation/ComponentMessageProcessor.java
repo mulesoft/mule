@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
@@ -185,7 +186,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
           return subscriberContext().flatMap(ctx -> {
             OperationExecutionFunction operationExecutionFunction;
-            final Optional<Scheduler> currentScheduler = ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s);
+            final Scheduler currentScheduler =
+                ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s).orElse(IMMEDIATE_SCHEDULER);
 
             if (getLocation() != null
                 && ((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
@@ -263,7 +265,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private ExecutionContextAdapter<T> createExecutionContext(Optional<ConfigurationInstance> configuration,
                                                             Map<String, Object> resolvedParameters,
-                                                            CoreEvent event, Optional<Scheduler> currentScheduler)
+                                                            CoreEvent event, Scheduler currentScheduler)
       throws MuleException {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, componentModel, event,
@@ -496,7 +498,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private ExecutionContextAdapter<T> createExecutionContext(CoreEvent event) throws MuleException {
     Optional<ConfigurationInstance> configuration = getConfiguration(event);
-    return createExecutionContext(configuration, getResolutionResult(event, configuration), event, empty());
+    return createExecutionContext(configuration, getResolutionResult(event, configuration), event, IMMEDIATE_SCHEDULER);
   }
 
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)

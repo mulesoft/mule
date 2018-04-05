@@ -18,6 +18,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 import static reactor.core.publisher.Mono.from;
 
@@ -79,7 +80,7 @@ public class OperationExecutorFactoryWrapperTestCase extends AbstractMuleTestCas
                                           mock(StreamingManager.class),
                                           mock(Component.class),
                                           mock(RetryPolicyTemplate.class),
-                                          empty(),
+                                          IMMEDIATE_SCHEDULER,
                                           mock(MuleContext.class)));
 
     wrapper = new OperationExecutorFactoryWrapper(executorFactory, emptyList());
