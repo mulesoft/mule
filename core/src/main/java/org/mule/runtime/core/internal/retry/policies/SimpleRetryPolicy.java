@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.core.internal.retry.policies;
 
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
 import static java.time.Duration.ZERO;
 import static java.time.Duration.ofMillis;
+import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY;
+import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
@@ -16,11 +20,17 @@ import static reactor.core.publisher.Mono.delay;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import static reactor.core.scheduler.Schedulers.immediate;
 import static reactor.retry.Retry.onlyIf;
 
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.retry.policy.PolicyStatus;
 import org.mule.runtime.core.api.retry.policy.RetryPolicy;
-import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
+import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -29,12 +39,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 import reactor.retry.BackoffDelay;
 import reactor.retry.Retry;
 import reactor.retry.RetryExhaustedException;
@@ -45,12 +51,12 @@ import reactor.retry.RetryExhaustedException;
 public class SimpleRetryPolicy implements RetryPolicy {
 
   private static final Logger LOGGER = getLogger(SimpleRetryPolicy.class);
-  private static final Scheduler TRANSACTIONAL_RETRY_SCHEDULER = new TransactionalRetryScheduler();
+  private static final reactor.core.scheduler.Scheduler TRANSACTIONAL_RETRY_SCHEDULER = new TransactionalRetryScheduler();
 
   protected RetryCounter retryCounter;
 
-  private volatile int count = SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
-  private volatile Duration frequency = ofMillis(SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY);
+  private volatile int count = DEFAULT_RETRY_COUNT;
+  private volatile Duration frequency = ofMillis(DEFAULT_FREQUENCY);
 
   public SimpleRetryPolicy(long frequency, int retryCount) {
     this.frequency = ofMillis(frequency);
@@ -62,39 +68,35 @@ public class SimpleRetryPolicy implements RetryPolicy {
   public <T> Publisher<T> applyPolicy(Publisher<T> publisher,
                                       Predicate<Throwable> shouldRetry,
                                       Consumer<Throwable> onExhausted,
-                                      Function<Throwable, Throwable> errorFunction) {
-    return from(publisher)
-        .onErrorResume(e -> {
-          if (shouldRetry.test(e)) {
-            Retry<T> retry = (Retry<T>) onlyIf(ctx -> shouldRetry.test(unwrap(ctx.exception())))
-                .backoff(ctx -> new BackoffDelay(frequency, ZERO, ZERO));
+                                      Function<Throwable, Throwable> errorFunction,
+                                      Scheduler retryScheduler) {
+    return from(publisher).onErrorResume(e -> {
+      if (shouldRetry.test(e)) {
+        Retry<T> retry = (Retry<T>) onlyIf(ctx -> shouldRetry.test(unwrap(ctx.exception())))
+            .backoff(ctx -> new BackoffDelay(frequency, ZERO, ZERO));
 
-            if (count != RETRY_COUNT_FOREVER) {
-              retry = retry.retryMax(count - 1);
-            }
+        if (count != RETRY_COUNT_FOREVER) {
+          retry = retry.retryMax(count - 1);
+        }
 
-            Mono<T> retryMono = from(publisher)
-                .retryWhen(retry)
-                .doOnError(e2 -> onExhausted.accept(unwrap(e2)))
-                .onErrorMap(RetryExhaustedException.class, e2 -> errorFunction.apply(unwrap(e2.getCause())));
+        reactor.core.scheduler.Scheduler reactorRetryScheduler =
+            fromExecutorService(new ConditionalExecutorServiceDecorator(retryScheduler, s -> isTransactionActive()));
 
-            if (isTransactionActive()) {
-              retry.withBackoffScheduler(TRANSACTIONAL_RETRY_SCHEDULER);
-              retryMono = delay(frequency, TRANSACTIONAL_RETRY_SCHEDULER).then(just(retryMono.block()));
-            } else {
-              retryMono = delay(frequency).then(retryMono);
-            }
+        Mono<T> retryMono = from(publisher)
+            .retryWhen(retry.withBackoffScheduler(reactorRetryScheduler))
+            .doOnError(e2 -> onExhausted.accept(unwrap(e2)))
+            .onErrorMap(RetryExhaustedException.class, e2 -> errorFunction.apply(unwrap(e2.getCause())));
+        return delay(frequency, reactorRetryScheduler).then(isTransactionActive() ? just(retryMono.block()) : retryMono);
 
-            return retryMono;
-
-          } else {
-            e = unwrap(e);
-            onExhausted.accept(e);
-            return error(errorFunction.apply(e));
-          }
-        });
+      } else {
+        e = unwrap(e);
+        onExhausted.accept(e);
+        return error(errorFunction.apply(e));
+      }
+    });
   }
 
+  @Override
   public PolicyStatus applyPolicy(Throwable cause) {
     if (isExhausted() || !isApplicableTo(cause)) {
       return PolicyStatus.policyExhausted(cause);
@@ -150,9 +152,9 @@ public class SimpleRetryPolicy implements RetryPolicy {
     }
   }
 
-  private static class TransactionalRetryScheduler implements Scheduler {
+  private static class TransactionalRetryScheduler implements reactor.core.scheduler.Scheduler {
 
-    private final Scheduler delegate = Schedulers.immediate();
+    private final reactor.core.scheduler.Scheduler delegate = immediate();
 
     @Override
     public Disposable schedule(Runnable task) {
@@ -162,8 +164,9 @@ public class SimpleRetryPolicy implements RetryPolicy {
     @Override
     public Disposable schedule(Runnable task, long delay, TimeUnit unit) {
       try {
-        Thread.sleep(unit.toMillis(delay));
+        sleep(unit.toMillis(delay));
       } catch (InterruptedException e) {
+        currentThread().interrupt();
         throw new RuntimeException(e);
       }
       return schedule(task);

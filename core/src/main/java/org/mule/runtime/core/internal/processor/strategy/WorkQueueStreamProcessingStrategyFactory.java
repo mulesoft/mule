@@ -18,13 +18,11 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +76,8 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
       if (maxConcurrency > subscribers) {
         return publisher -> from(publisher)
             .flatMap(event -> just(event).transform(pipeline)
-                .subscribeOn(fromExecutorService(decorateScheduler(blockingScheduler))),
+                .subscribeOn(fromExecutorService(decorateScheduler(blockingScheduler)))
+                .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, blockingScheduler)),
                      maxConcurrency);
       } else {
         return super.onPipeline(pipeline);

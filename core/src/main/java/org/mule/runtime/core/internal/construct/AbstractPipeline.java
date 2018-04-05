@@ -312,9 +312,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   @Override
+  protected void doStartProcessingStrategy() throws MuleException {
+    super.doStartProcessingStrategy();
+    startIfStartable(processingStrategy);
+  }
+
+  @Override
   protected void doStart() throws MuleException {
     super.doStart();
-    startIfStartable(processingStrategy);
     sink = processingStrategy.createSink(this, processFlowFunction());
     // TODO MULE-13360: PhaseErrorLifecycleInterceptor is not being applied when AbstractPipeline doStart fails
     try {
@@ -337,6 +342,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         // If the source couldn't be started we would need to stop the pipeline (if possible) in order to leave
         // its LifecycleManager also as initialise phase so the flow can be disposed later
         doStop();
+        doStopProcessingStrategy();
         throw e;
       }
     }
@@ -362,8 +368,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     disposeIfDisposable(sink);
     sink = null;
     stopIfStoppable(pipeline);
-    stopIfStoppable(processingStrategy);
     super.doStop();
+  }
+
+  @Override
+  protected void doStopProcessingStrategy() throws MuleException {
+    stopIfStoppable(processingStrategy);
+    super.doStopProcessingStrategy();
   }
 
   @Override

@@ -1,4 +1,46 @@
 {
+  "4.1.2": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method <T> org.reactivestreams.Publisher<T> org.mule.runtime.core.api.retry.policy.RetryPolicy::applyPolicy(org.reactivestreams.Publisher<T>, java.util.function.Predicate<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Function<java.lang.Throwable, java.lang.Throwable>, org.mule.runtime.api.scheduler.Scheduler)",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "RetryPolicy",
+          "methodName": "applyPolicy",
+          "elementKind": "method",
+          "justification": "Fixes threading issue"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method <T> org.reactivestreams.Publisher<T> org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate::applyPolicy(org.reactivestreams.Publisher<T>, java.util.function.Predicate<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Function<java.lang.Throwable, java.lang.Throwable>, org.mule.runtime.api.scheduler.Scheduler)",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "RetryPolicyTemplate",
+          "methodName": "applyPolicy",
+          "elementKind": "method",
+          "justification": "Fixes threading issue"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method <T> org.reactivestreams.Publisher<T> org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate::applyPolicy(org.reactivestreams.Publisher<T>, org.mule.runtime.api.scheduler.Scheduler)",
+          "package": "org.mule.runtime.core.api.retry.policy",
+          "classSimpleName": "RetryPolicyTemplate",
+          "methodName": "applyPolicy",
+          "elementKind": "method",
+          "justification": "Fixes threading issue"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.util.concurrent.NamedThreadFactory::<init>(java.lang.String, java.lang.ClassLoader, java.lang.ThreadGroup)",
+          "package": "org.mule.runtime.core.api.util.concurrent",
+          "classSimpleName": "NamedThreadFactory",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "Fixes threading issue"
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [

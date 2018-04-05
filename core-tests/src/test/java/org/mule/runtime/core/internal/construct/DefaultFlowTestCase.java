@@ -82,11 +82,11 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   @Rule
   public ExpectedException expectedException = none();
 
-  public DefaultFlowTestCase(BiFunction<Processor, CoreEvent, CoreEvent> triggerFunction) {
+  public DefaultFlowTestCase(String strategyName, BiFunction<Processor, CoreEvent, CoreEvent> triggerFunction) {
     this.triggerFunction = triggerFunction;
   }
 
-  @Parameters
+  @Parameters(name = "{0}")
   public static Collection<Object[]> parameters() {
     BiFunction<Processor, CoreEvent, CoreEvent> blocking = (listener, event) -> just(event).transform(listener).block();
     BiFunction<Processor, CoreEvent, CoreEvent> async = (listener, event) -> {
@@ -96,7 +96,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         throw new RuntimeException(e);
       }
     };
-    return asList(new Object[][] {{blocking}, {async}});
+    return asList(new Object[][] {{"Blocking", blocking}, {"Async", async}});
   }
 
   @Override

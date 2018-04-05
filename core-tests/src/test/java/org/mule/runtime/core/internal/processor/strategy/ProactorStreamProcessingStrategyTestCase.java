@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThan;
@@ -426,7 +427,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Test
   @Description("If the processing type is IO_RW and the payload is not a stream processing occurs in CPU_LIGHT thread.")
   public void singleIOWRWString() throws Exception {
-    super.singleIORW(() -> testEvent());
+    super.singleIORW(() -> testEvent(), contains(CPU_LIGHT));
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(IO))));
@@ -437,7 +438,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Test
   @Description("If the processing type is IO_RW and the payload is a stream with unknown length then processing occurs in BLOCKING thread.")
   public void singleIOWRWUnkownLengthStream() throws Exception {
-    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.empty()));
+    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.empty()), contains(IO));
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
@@ -448,7 +449,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Test
   @Description("If the processing type is IO_RW and the payload is a stream shorter that 16KB in length then processing occurs in CPU_LIGHT thread.")
   public void singleIOWRWSmallStream() throws Exception {
-    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.of(KB.toBytes(10))));
+    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.of(KB.toBytes(10))), contains(CPU_LIGHT));
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(IO))));
@@ -459,7 +460,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Test
   @Description("If the processing type is IO_RW and the payload is a longer than 16KB in length then processing occurs in BLOCKING thread.")
   public void singleIOWRWLargeStream() throws Exception {
-    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.of(KB.toBytes(20))));
+    super.singleIORW(() -> createStreamPayloadEventWithLength(OptionalLong.of(KB.toBytes(20))), contains(IO));
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));

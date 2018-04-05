@@ -35,8 +35,13 @@ import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
  */
 public class SimpleUnitTestSupportSchedulerService implements SchedulerService, Stoppable {
 
+  public static final ThreadGroup UNIT_TEST_THREAD_GROUP = new ThreadGroup(SimpleUnitTestSupportScheduler.class.getSimpleName());
+
   private SimpleUnitTestSupportScheduler scheduler =
-      new SimpleUnitTestSupportScheduler(8, new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName()),
+      new SimpleUnitTestSupportScheduler(8,
+                                         new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName(),
+                                                                SimpleUnitTestSupportSchedulerService.class.getClassLoader(),
+                                                                UNIT_TEST_THREAD_GROUP),
                                          new AbortPolicy());
 
   private List<Scheduler> customSchedulers = synchronizedList(new ArrayList<>());
