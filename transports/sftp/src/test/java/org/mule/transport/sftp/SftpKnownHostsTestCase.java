@@ -22,7 +22,7 @@ import org.junit.Test;
 public class SftpKnownHostsTestCase extends AbstractSftpFunctionalTestCase
 {
 
-    private static final String TEST_ERROR_MESSAGE = "Error during login to muletest1@localhost: UnknownHostKey: localhost. RSA key fingerprint is ";
+    private static final String TEST_ERROR_MESSAGE = "Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is ";
 
     @Override
     protected String getConfigFile()
