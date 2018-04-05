@@ -24,14 +24,15 @@ public class ConstrainedConnectorExceptionStrategyMule2126TestCase extends Abstr
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/constrained-connector-exception-strategy-mule-2126-test.xml"}           
+            {ConfigVariant.SERVICE, "org/mule/config/spring/parsers/constrained-connector-exception-strategy-mule-2126-test.xml"}
         });
-    }      
-    
+    }
+
     @Test
     public void testError() throws Exception
     {
-        assertErrorContains("Invalid content was found starting with element 'default-connector-exception-strategy'");
+        assertErrorContains("Invalid content was found starting with element '{\"http://www.springframework.org/schema/beans\":" +
+                            "default-connector-exception-strategy}");
     }
 
 }
