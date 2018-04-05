@@ -10,13 +10,15 @@ import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
-
+import org.mule.exception.AbstractExceptionListener;
+import org.mule.api.util.StreamCloserService;
 import java.io.NotSerializableException;
 
 import org.apache.commons.logging.Log;
@@ -70,6 +72,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
                     lastExecutionException = e;
                     if (i < getUntilSuccessfulConfiguration().getMaxRetries())
                     {
+                        closeRetryPayload(retryEvent.getMessage().getPayload(), event.getMuleContext());
                         Thread.sleep(getUntilSuccessfulConfiguration().getMillisBetweenRetries());
                         retryEvent = copyEventForRetry(event);
                     }
