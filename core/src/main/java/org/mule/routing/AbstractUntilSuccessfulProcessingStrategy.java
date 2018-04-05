@@ -10,11 +10,14 @@ import static org.mule.util.ClassUtils.isConsumable;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.util.StreamCloserService;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.exception.AbstractExceptionListener;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
@@ -148,6 +151,19 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
         {
             throw new NotSerializableException(message.getPayload().getClass().getCanonicalName());
         }
+    }
+
+    /**
+     * This method must be called after each failure retry for ensuring the payload is closed if applicable.
+     * As the until successful propagates the exception once the max retry count is reached,
+     * closing the last payload is responsibility of the {@link AbstractExceptionListener}.
+     *
+     * @param retryPayload: the payload that must be closed.
+     * @param muleContext: the muleContext to have access to the {@link StreamCloserService}.
+     */
+    protected void closeRetryPayload(Object retryPayload, MuleContext muleContext)
+    {
+        muleContext.getStreamCloserService().closeStream(retryPayload);
     }
 
 }

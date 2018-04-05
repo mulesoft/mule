@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <spring:beans>
+        <spring:bean id="objectStore" class="org.mule.util.store.SimpleMemoryObjectStore"/>
+    </spring:beans>
+
+    <flow name="synchronousUntilSuccessfulStreamCloser">
+        <until-successful maxRetries="2" millisBetweenRetries="1" synchronous="true">
+            <test:component>
+                <test:callback
+                        class="org.mule.test.integration.routing.UntilSuccessfulStreamCloserTestCase$PayloadSetter"/>
+            </test:component>
+        </until-successful>
+    </flow>
+
+
+    <flow name="asynchronousUntilSuccessfulStreamCloser">
+        <until-successful maxRetries="2" millisBetweenRetries="1" objectStore-ref="objectStore">
+            <test:component>
+                <test:callback
+                        class="org.mule.test.integration.routing.UntilSuccessfulStreamCloserTestCase$PayloadSetter"/>
+            </test:component>
+        </until-successful>
+    </flow>
+
+
+</mule>

@@ -361,7 +361,15 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     {
         final MuleEvent persistedEvent = getUntilSuccessfulConfiguration().getObjectStore().retrieve(eventStoreKey);
         final MuleEvent mutableEvent = threadSafeCopy(persistedEvent);
-        processEvent(mutableEvent);
+        try
+        {
+            processEvent(mutableEvent);
+        }
+        catch (Throwable e)
+        {
+            closeRetryPayload(mutableEvent.getMessage().getPayload(), mutableEvent.getMuleContext());
+            throw e;
+        }
         removeFromStore(eventStoreKey);
     }
 
