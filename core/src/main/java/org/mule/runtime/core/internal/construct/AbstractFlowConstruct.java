@@ -118,6 +118,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     }
 
     lifecycleManager.fireStartPhase((phaseName, object) -> {
+      doStartProcessingStrategy();
       startIfStartable(exceptionListener);
       doStart();
     });
@@ -128,6 +129,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     lifecycleManager.fireStopPhase((phaseName, object) -> {
       doStop();
       stopIfStoppable(exceptionListener);
+      doStopProcessingStrategy();
     });
   }
 
@@ -201,7 +203,15 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     return statistics;
   }
 
+  protected void doStartProcessingStrategy() throws MuleException {
+    // Empty template method
+  }
+
   protected void doStart() throws MuleException {
+    // Empty template method
+  }
+
+  protected void doStopProcessingStrategy() throws MuleException {
     // Empty template method
   }
 

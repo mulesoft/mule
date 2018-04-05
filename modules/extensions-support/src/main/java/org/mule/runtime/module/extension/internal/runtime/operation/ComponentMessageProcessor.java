@@ -167,51 +167,60 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
-        .zipWith(subscriberContext().map(ctx -> ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s)))
-        .flatMap(checkedFunction(t -> {
-          CoreEvent event = t.getT1();
-          Optional<Scheduler> currentScheduler = t.getT2();
-
+        .flatMap(checkedFunction(event -> {
           Optional<ConfigurationInstance> configuration;
-          OperationExecutionFunction operationExecutionFunction;
 
           if (getLocation() != null
               && ((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
             // If the event already contains an execution context, use that one.
             // Only for interceptable components!
-            ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event, currentScheduler);
+            ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
             configuration = operationContext.getConfiguration();
-
-            operationExecutionFunction =
-                (parameters, operationEvent) -> doProcessWithErrorMapping(operationEvent, operationContext);
           } else {
             // Otherwise, generate the context as usual.
             configuration = getConfiguration(event);
-
-            operationExecutionFunction = (parameters, operationEvent) -> {
-              ExecutionContextAdapter<T> operationContext;
-              try {
-                operationContext = createExecutionContext(configuration, parameters, operationEvent,
-                                                          currentScheduler);
-              } catch (MuleException e) {
-                return error(e);
-              }
-              return doProcessWithErrorMapping(operationEvent, operationContext);
-            };
           }
-          if (getLocation() != null) {
-            String resolveProcessorRepresentation =
-                resolveProcessorRepresentation(muleContext.getConfiguration().getId(), getLocation().getLocation(), this);
 
-            ((DefaultFlowCallStack) event.getFlowCallStack()).setCurrentProcessorPath(resolveProcessorRepresentation);
-            return policyManager
-                .createOperationPolicy(this, event, getResolutionResult(event, configuration),
-                                       operationExecutionFunction)
-                .process(event);
-          } else {
-            // If this operation has no component location then it is internal. Don't apply policies on internal operations.
-            return operationExecutionFunction.execute(getResolutionResult(event, configuration), event);
-          }
+          final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
+
+          return subscriberContext().flatMap(ctx -> {
+            OperationExecutionFunction operationExecutionFunction;
+            final Optional<Scheduler> currentScheduler = ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY).map(s -> (Scheduler) s);
+
+            if (getLocation() != null
+                && ((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+              ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
+
+              operationExecutionFunction = (parameters, operationEvent) -> {
+                operationContext.setCurrentScheduler(currentScheduler);
+                return doProcessWithErrorMapping(operationEvent, operationContext);
+              };
+            } else {
+              operationExecutionFunction = (parameters, operationEvent) -> {
+                ExecutionContextAdapter<T> operationContext;
+                try {
+                  operationContext = createExecutionContext(configuration, parameters, operationEvent, currentScheduler);
+                } catch (MuleException e) {
+                  return error(e);
+                }
+                return doProcessWithErrorMapping(operationEvent, operationContext);
+              };
+            }
+
+            if (getLocation() != null) {
+              String resolveProcessorRepresentation =
+                  resolveProcessorRepresentation(muleContext.getConfiguration().getId(), getLocation().getLocation(), this);
+
+              ((DefaultFlowCallStack) event.getFlowCallStack()).setCurrentProcessorPath(resolveProcessorRepresentation);
+              return Mono.from(policyManager
+                  .createOperationPolicy(this, event, resolutionResult,
+                                         operationExecutionFunction)
+                  .process(event));
+            } else {
+              // If this operation has no component location then it is internal. Don't apply policies on internal operations.
+              return Mono.from(operationExecutionFunction.execute(resolutionResult, event));
+            }
+          });
         }));
   }
 
@@ -228,12 +237,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         .onErrorMap(e -> !(e instanceof MessagingException), e -> new MessagingException(operationEvent, e, this));
   }
 
-  private PrecalculatedExecutionContextAdapter<T> getPrecalculatedContext(CoreEvent event, Optional<Scheduler> currentScheduler) {
-    PrecalculatedExecutionContextAdapter precalculatedExecutionContextAdapter =
-        (PrecalculatedExecutionContextAdapter) (((InternalEvent) event).getInternalParameters()
-            .get(INTERCEPTION_RESOLVED_CONTEXT));
-    precalculatedExecutionContextAdapter.setCurrentScheduler(currentScheduler);
-    return precalculatedExecutionContextAdapter;
+  private PrecalculatedExecutionContextAdapter<T> getPrecalculatedContext(CoreEvent event) {
+    return (PrecalculatedExecutionContextAdapter) (((InternalEvent) event).getInternalParameters()
+        .get(INTERCEPTION_RESOLVED_CONTEXT));
   }
 
   protected Mono<CoreEvent> doProcess(CoreEvent event, ExecutionContextAdapter<T> operationContext) {
