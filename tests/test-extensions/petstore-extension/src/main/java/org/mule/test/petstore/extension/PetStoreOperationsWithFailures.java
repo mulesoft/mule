@@ -7,23 +7,53 @@
 
 package org.mule.test.petstore.extension;
 
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.unmodifiableList;
+
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 
-public class PetStoreOperationsWithFailures extends PetStoreOperations {
+import java.util.ArrayList;
+import java.util.List;
+
+public class PetStoreOperationsWithFailures extends PetStoreOperations implements Initialisable, Disposable {
 
   public static final String CONNECTION_FAIL = "Connection fail";
 
+  /**
+   * The threads on which a connection was executed.
+   */
+  private static List<Thread> connectionThreads = new ArrayList<>();
+
+  @Override
+  public void initialise() throws InitialisationException {
+    connectionThreads.clear();
+  }
+
+  @Override
+  public void dispose() {
+    connectionThreads.clear();
+  }
+
+  public static List<Thread> getConnectionThreads() {
+    return unmodifiableList(connectionThreads);
+  }
+
   public Integer failConnection(@Connection PetStoreClient client) throws ConnectionException {
-    System.out.println(Thread.currentThread().getName());
+    connectionThreads.add(currentThread());
     throw new ConnectionException(CONNECTION_FAIL);
   }
 
   public Integer failOperationWithException(@Connection PetStoreClient client) throws Exception {
+    connectionThreads.add(currentThread());
     throw new Exception(CONNECTION_FAIL);
   }
 
   public Integer failOperationWithThrowable(@Connection PetStoreClient client) throws Throwable {
+    connectionThreads.add(currentThread());
     throw new Throwable(CONNECTION_FAIL);
   }
 }

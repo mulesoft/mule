@@ -116,7 +116,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  @Parameterized.Parameters
+  @Parameterized.Parameters(name = "{0}, {1}")
   public static Collection<Object[]> parameters() {
     return asList(new Object[][] {
         {new TransactionAwareWorkQueueProcessingStrategyFactory(), BLOCKING},
