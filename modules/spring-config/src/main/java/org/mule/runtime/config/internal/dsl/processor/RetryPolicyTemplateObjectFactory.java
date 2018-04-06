@@ -67,7 +67,6 @@ public class RetryPolicyTemplateObjectFactory extends AbstractComponentFactory<R
 
   @Override
   public RetryPolicyTemplate doGetObject() throws Exception {
-    // MULE-13092 ExecutionMediator should use scheduler for retry policy
     SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, count);
     retryPolicyTemplate.setNotificationFirer(notificationFirer);
     if (retryNotifier != null) {
