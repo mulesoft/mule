@@ -33,7 +33,7 @@ public class BundleDescriptorUtils {
     checkArgument(!isEmpty(availableVersion), "availableVersion cannot be empty");
     checkArgument(!isEmpty(expectedVersion), "expectedVersion cannot be empty");
 
-    if (availableVersion.equals(expectedVersion)) {
+    if (areEqualVersion(availableVersion, expectedVersion)) {
       return true;
     }
 
@@ -45,6 +45,20 @@ public class BundleDescriptorUtils {
     }
 
     return false;
+  }
+
+  /**
+   * Determines if a version is equals with another one
+   *
+   * @param availableVersion version that is available to use. Non empty
+   * @param expectedVersion version that is expected. Non empty
+   * @return true if versions are equals, false otherwise
+   */
+  public static boolean areEqualVersion(String availableVersion, String expectedVersion) {
+    checkArgument(!isEmpty(availableVersion), "availableVersion cannot be empty");
+    checkArgument(!isEmpty(expectedVersion), "expectedVersion cannot be empty");
+
+    return availableVersion.equals(expectedVersion);
   }
 
   private static Semver getBundleVersion(String version) {
