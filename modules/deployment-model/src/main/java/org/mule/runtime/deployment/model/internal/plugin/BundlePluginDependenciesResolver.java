@@ -12,7 +12,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.areEqualVersion;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
@@ -227,11 +226,14 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                   if (resolvedPluginApplicationLevelOptional.isPresent()) {
                     BundleDescriptor availablePluginBundleDescriptor =
                         resolvedPluginApplicationLevelOptional.get().getBundleDescriptor();
-                    if (!areEqualVersion(availablePluginBundleDescriptor.getVersion(), dependency.getDescriptor().getVersion())) {
-                      logger.debug(format(
-                                          "Transitive plugin dependency '[%s -> %s]' is minor than the one resolved for the application '%s', it will be ignored.",
-                                          pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
-                                          availablePluginBundleDescriptor));
+                    if (org.apache.commons.lang3.ObjectUtils.notEqual(availablePluginBundleDescriptor.getVersion(),
+                                                                      dependency.getDescriptor().getVersion())) {
+                      if (logger.isDebugEnabled()) {
+                        logger.debug(format(
+                                            "Transitive plugin dependency '[%s -> %s]' is minor than the one resolved for the application '%s', it will be ignored.",
+                                            pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
+                                            availablePluginBundleDescriptor));
+                      }
                     }
                   }
                 }
