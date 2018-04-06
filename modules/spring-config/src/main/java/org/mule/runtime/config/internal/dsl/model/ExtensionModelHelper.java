@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
@@ -25,6 +26,7 @@ import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.construct.HasConstructModels;
+import org.mule.runtime.api.meta.model.nested.HasNestableElementModels;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModelVisitor;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
@@ -55,18 +57,19 @@ import java.util.concurrent.ExecutionException;
  * <p/>
  * It's recommended that the application only has one instance of this class to avoid processing the extension models several
  * times.
- *
+ * <p>
  * since 4.0
  */
 public class ExtensionModelHelper {
 
   private final Set<ExtensionModel> extensionsModels;
   private Cache<ComponentIdentifier, Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>> extensionComponentModelByComponentIdentifier =
-      CacheBuilder.newBuilder().build();
+          CacheBuilder.newBuilder().build();
+  private Cache<ComponentIdentifier, Optional<? extends NestableElementModel>> extensionNestableElementModelByComponentIdentifier = CacheBuilder.newBuilder().build();
 
   /**
    * @param extensionModels the set of {@link ExtensionModel}s to work with. Usually this is the set of models configured within a
-   *        mule artifact.
+   *                        mule artifact.
    */
   public ExtensionModelHelper(Set<ExtensionModel> extensionModels) {
     this.extensionsModels = extensionModels;
@@ -79,10 +82,11 @@ public class ExtensionModelHelper {
    * @return the {@link DslElementModel} associated with the configuration or an {@link Optional#empty()} if there isn't one.
    */
   public TypedComponentIdentifier.ComponentType findComponentType(ComponentModel componentModel) {
-    Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> extensionComponentModelOptional =
-        findComponentModel(componentModel.getCustomAttributes().containsKey(ORIGINAL_IDENTIFIER)
-            ? (ComponentIdentifier) componentModel.getCustomAttributes().get(ORIGINAL_IDENTIFIER)
-            : componentModel.getIdentifier());
+    ComponentIdentifier componentId = componentModel.getCustomAttributes().containsKey(ORIGINAL_IDENTIFIER)
+                                      ? (ComponentIdentifier) componentModel.getCustomAttributes().get(ORIGINAL_IDENTIFIER)
+                                      : componentModel.getIdentifier();
+    Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> extensionComponentModelOptional = findComponentModel(componentId);
+
     return extensionComponentModelOptional.map(extensionComponentModel -> {
       Reference<TypedComponentIdentifier.ComponentType> componentTypeReference = new Reference<>();
       extensionComponentModel.accept(new ComponentModelVisitor() {
@@ -117,7 +121,16 @@ public class ExtensionModelHelper {
         }
       });
       return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
-    }).orElse(UNKNOWN);
+    }).orElseGet(() -> {
+                   //If there was no ComponentModel found, search for nestable elements, we might be talking about a ROUTE and we need to return it's ComponentType as well
+                   Optional<? extends NestableElementModel> nestableElementModelOptional = findNestableElementModel(componentId);
+                   return nestableElementModelOptional.map(nestableElementModel -> {
+                     Reference<TypedComponentIdentifier.ComponentType> componentTypeReference = new Reference<>();
+                     nestableElementModel.accept(new IsRouteVisitor(componentTypeReference));
+                     return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
+                   }).orElse(UNKNOWN);
+                 }
+    );
   }
 
   /**
@@ -134,13 +147,13 @@ public class ExtensionModelHelper {
         for (ExtensionModel extensionModel : extensionsModels) {
           if (extensionModel.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace())) {
             List<HasOperationModels> operationModelsProviders = ImmutableList.<HasOperationModels>builder()
-                .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
+                    .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
             List<HasSourceModels> sourceModelsProviders = ImmutableList.<HasSourceModels>builder()
-                .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
+                    .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
             List<HasConstructModels> constructModelsProviders = singletonList(extensionModel);
 
             Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> componentModel =
-                resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName);
+                    resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName);
             //TODO MULE-13894 remove this once unified extensionModel names to use camelCase (see smart connectors and crafted declared extesion models)
             if (!componentModel.isPresent()) {
               componentModel = resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
@@ -151,9 +164,45 @@ public class ExtensionModelHelper {
         }
         return empty();
       });
-    } catch (ExecutionException e) {
+    }
+    catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  private Optional<? extends NestableElementModel> findNestableElementModel(ComponentIdentifier componentIdentifier) {
+    try {
+      return extensionNestableElementModelByComponentIdentifier.get(componentIdentifier, () -> {
+        String componentName = toCamelCase(componentIdentifier.getName(), COMPONENT_NAME_SEPARATOR);
+        for (ExtensionModel extensionModel : extensionsModels) {
+          if (extensionModel.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace())) {
+            List<HasNestableElementModels> nestableElementModelsProviders = singletonList(extensionModel);
+
+            Optional<? extends NestableElementModel> componentModel = resolveModel(nestableElementModelsProviders, componentName);
+            if (!componentModel.isPresent()) {
+              componentModel = resolveModel(nestableElementModelsProviders, componentIdentifier.getName());
+            }
+            return componentModel;
+          }
+        }
+        return empty();
+      });
+    }
+    catch (ExecutionException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
+  private Optional<? extends NestableElementModel> resolveModel(List<HasNestableElementModels> nestableElementModelsProviders, String componentName) {
+
+    for (HasNestableElementModels nestableElementModelsProvider : nestableElementModelsProviders) {
+      Optional<NestableElementModel> nestableElementModel = nestableElementModelsProvider.getNestableElementModel(componentName);
+      if (nestableElementModel.isPresent()) {
+        return nestableElementModel;
+      }
+    }
+    return empty();
+
   }
 
   private Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> resolveModel(List<HasOperationModels> operationModelsProviders,
@@ -181,6 +230,29 @@ public class ExtensionModelHelper {
     return empty();
   }
 
+  static class IsRouteVisitor implements NestableElementModelVisitor {
+
+    private Reference<TypedComponentIdentifier.ComponentType> reference;
+
+    public IsRouteVisitor(Reference<TypedComponentIdentifier.ComponentType> reference) {
+      this.reference = reference;
+    }
+
+    @Override
+    public void visit(NestedComponentModel component) {
+    }
+
+    @Override
+    public void visit(NestedChainModel component) {
+    }
+
+    @Override
+    public void visit(NestedRouteModel component) {
+      reference.set(ROUTE);
+
+    }
+  }
+
   /**
    * Visitor of {@link ConstructModel} that determines it
    * {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType}
@@ -194,7 +266,8 @@ public class ExtensionModelHelper {
     }
 
     @Override
-    public void visit(NestedComponentModel component) {}
+    public void visit(NestedComponentModel component) {
+    }
 
     @Override
     public void visit(NestedChainModel component) {
