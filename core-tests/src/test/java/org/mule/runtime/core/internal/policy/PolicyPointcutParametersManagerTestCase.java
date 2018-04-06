@@ -38,6 +38,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 
 public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCase {
 
@@ -236,12 +237,31 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     parametersManager.createOperationPointcutParameters(component, event, new HashMap<>());
   }
 
+  @Test
+  public void createOperationParametersFallbacksToDeprecatedMethod() {
+    Map<String, Object> operationParameters = new HashMap<>();
+    PolicyPointcutParameters sourceParameters = parametersManager.createSourcePointcutParameters(component, event);
+    OperationPolicyPointcutParametersFactory factory = mockOperationFactory(true, sourceParameters);
+    PolicyPointcutParameters parameters = mock(PolicyPointcutParameters.class);
+    when(factory.createPolicyPointcutParameters(any())).thenThrow(new AbstractMethodError());
+    when(factory.createPolicyPointcutParameters(component, operationParameters)).thenReturn(parameters);
+    operationPointcutFactories.add(factory);
+
+    PolicyPointcutParameters returnedParameters =
+        parametersManager.createOperationPointcutParameters(component, event, operationParameters);
+
+    assertThat(returnedParameters, is(parameters));
+    verify(factory).supportsOperationIdentifier(identifier);
+    verify(factory).createPolicyPointcutParameters(any());
+    verify(factory).createPolicyPointcutParameters(component, operationParameters);
+  }
+
   private void mockEvent() {
     event = mock(CoreEvent.class, RETURNS_DEEP_STUBS);
     eventContext = mock(BaseEventContext.class, RETURNS_DEEP_STUBS);
     when(event.getContext()).thenReturn(eventContext);
     when(eventContext.getRootContext()).thenReturn(eventContext);
-    when(eventContext.getId()).thenReturn("anId");
+    when(eventContext.getCorrelationId()).thenReturn("anId");
   }
 
   private void mockComponent() {
