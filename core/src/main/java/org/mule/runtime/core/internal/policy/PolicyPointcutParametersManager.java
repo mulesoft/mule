@@ -65,9 +65,9 @@ public class PolicyPointcutParametersManager {
                                  factory -> factory.createPolicyPointcutParameters(source, event.getMessage().getAttributes()))
                                      .orElse(new PolicyPointcutParameters(source));
 
-    String id = event.getContext().getId();
-    sourceParametersMap.put(id, sourcePointcutParameters);
-    ((BaseEventContext) event.getContext()).getRootContext().onTerminated((e, t) -> sourceParametersMap.remove(id));
+    String correlationId = event.getContext().getCorrelationId();
+    sourceParametersMap.put(correlationId, sourcePointcutParameters);
+    ((BaseEventContext) event.getContext()).getRootContext().onTerminated((e, t) -> sourceParametersMap.remove(correlationId));
 
     return sourcePointcutParameters;
   }
@@ -86,16 +86,25 @@ public class PolicyPointcutParametersManager {
                                                                     Map<String, Object> operationParameters) {
     ComponentIdentifier operationIdentifier = operation.getLocation().getComponentIdentifier().getIdentifier();
 
-    PolicyPointcutParameters sourceParameters = sourceParametersMap.get(event.getContext().getId());
+    PolicyPointcutParameters sourceParameters = sourceParametersMap.get(event.getContext().getCorrelationId());
 
     OperationPolicyPointcutParametersParameters parameters =
         new OperationPolicyPointcutParametersParameters(operation, operationParameters, sourceParameters);
+
+    Function<OperationPolicyPointcutParametersFactory, PolicyPointcutParameters> creationFunction =
+        factory -> {
+          try {
+            return factory.createPolicyPointcutParameters(parameters);
+          } catch (AbstractMethodError error) {
+            return factory.createPolicyPointcutParameters(parameters.getOperation(), parameters.getOperationParameters());
+          }
+        };
 
     return createPointcutParameters(operation,
                                     OperationPolicyPointcutParametersFactory.class,
                                     operationPointcutFactories,
                                     factory -> factory.supportsOperationIdentifier(operationIdentifier),
-                                    factory -> factory.createPolicyPointcutParameters(parameters))
+                                    creationFunction)
                                         .orElse(new PolicyPointcutParameters(operation, sourceParameters));
   }
 

@@ -93,10 +93,10 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
                                                    coreEvent.getMessage(), this.muleContext.getConfiguration().getId()))
         .flatMap(event -> {
-          Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getId());
+          Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getCorrelationId());
           if (nextOperation == null) {
             return error(new MuleRuntimeException(createStaticMessage("There's no next operation configured for event context id "
-                + event.getContext().getId())));
+                + event.getContext().getCorrelationId())));
           }
 
           popBeforeNextFlowFlowStackElement().accept(event);
@@ -108,7 +108,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
               .onErrorResume(MessagingException.class, t -> {
 
                 PolicyStateId policyStateId =
-                    new PolicyStateId(event.getContext().getId(), muleContext.getConfiguration().getId());
+                    new PolicyStateId(event.getContext().getCorrelationId(), muleContext.getConfiguration().getId());
                 policyStateHandler.getLatestState(policyStateId)
                     .ifPresent(latestStateEvent -> t.setProcessedEvent(policyEventConverter
                         .createEvent((PrivilegedEvent) t.getEvent(), (PrivilegedEvent) latestStateEvent)));
@@ -144,7 +144,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   private void logExecuteNextEvent(String startingMessage, EventContext eventContext, Message message, String policyName) {
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("\nEvent Id: " + eventContext.getId() + "\n" + startingMessage + ".\nPolicy: " + policyName
+      LOGGER.trace("\nEvent Id: " + eventContext.getCorrelationId() + "\n" + startingMessage + ".\nPolicy: " + policyName
           + "\n" + message.getAttributes().getValue().toString());
     }
   }

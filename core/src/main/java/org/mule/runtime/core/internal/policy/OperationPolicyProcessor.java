@@ -78,7 +78,7 @@ public class OperationPolicyProcessor implements Processor {
     return from(publisher)
         .cast(PrivilegedEvent.class)
         .flatMap(operationEvent -> {
-          PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getId(), policy.getPolicyId());
+          PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getCorrelationId(), policy.getPolicyId());
           Optional<CoreEvent> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
           PrivilegedEvent variablesProviderEvent =
               (PrivilegedEvent) latestPolicyState
@@ -104,14 +104,14 @@ public class OperationPolicyProcessor implements Processor {
     policyChain.onChainError(t -> manageError(policyStateId, operationEvent, (MessagingException) t));
 
     return just(policyEvent)
-        .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
+        .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policyStateId.getPolicyId(),
                                      getMessageAttributesAsString(event), "Before operation"))
         .cast(CoreEvent.class)
         .transform(policyChain)
         .cast(PrivilegedEvent.class)
         .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
         .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent))
-        .doOnNext(event -> logPolicy(event.getContext().getId(), policyStateId.getPolicyId(),
+        .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policyStateId.getPolicyId(),
                                      getMessageAttributesAsString(event), "After operation"));
   }
 
