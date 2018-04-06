@@ -7,16 +7,16 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
-
-import com.google.common.collect.Sets;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +24,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -36,11 +35,11 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
   private static final String PLUGIN_NAME = "simplePlugin";
   private static final String APP_LIB_PATH = String.format("%s/lib", APP_NAME);
   private static final String MY_JAR = "myLib.jar";
+  public static final String PLUGIN_GROUP_ID = "org.mule.tests";
+  public static final String PLUGIN_ARTIFACT_ID = "simple-plugin";
+  public static final String PLUGIN_VERSION = "1.0.0";
 
   private ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
-  private ClassLoaderModel classLoaderModel;
-  private ArtifactPluginDescriptor pluginDescriptor = new ArtifactPluginDescriptor(PLUGIN_NAME);
-  private Set<ArtifactPluginDescriptor> plugins = Sets.newHashSet(pluginDescriptor);
   private static List<URL> runtimeLibs = newArrayList();
 
   @BeforeClass
@@ -62,11 +61,18 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
     splashScreen = new ApplicationStartedSplashScreen();
     ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
     runtimeLibs.stream().forEach(classLoaderModelBuilder::containing);
-    classLoaderModel = classLoaderModelBuilder.build();
+    ClassLoaderModel classLoaderModel = classLoaderModelBuilder.build();
+
+    ArtifactPluginDescriptor pluginDescriptor = new ArtifactPluginDescriptor(PLUGIN_NAME);
+    pluginDescriptor.setBundleDescriptor(new BundleDescriptor.Builder()
+        .setGroupId(PLUGIN_GROUP_ID)
+        .setArtifactId(PLUGIN_ARTIFACT_ID)
+        .setVersion(PLUGIN_VERSION)
+        .build());
 
     when(descriptor.getName()).thenReturn(APP_NAME);
     when(descriptor.getAppProperties()).thenReturn(new HashMap<>());
-    when(descriptor.getPlugins()).thenReturn(plugins);
+    when(descriptor.getPlugins()).thenReturn(newHashSet(pluginDescriptor));
     when(descriptor.getClassLoaderModel()).thenReturn(classLoaderModel);
   }
 
@@ -86,8 +92,9 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
   protected Matcher<String> getComplexLogMatcher() {
     return is("\n**********************************************************************\n" + "* Started app '" + APP_NAME
         + "'                                            *\n"
-        + "* Application plugins:                                               *\n" + "*  - " + PLUGIN_NAME
-        + "                                                    *\n"
+        + "* Application plugins:                                               *\n" + "*  - " + PLUGIN_NAME + " ("
+        + PLUGIN_ARTIFACT_ID + "-" + PLUGIN_VERSION + ")"
+        + "                              *\n"
         + "* Application libraries:                                             *\n" + "*  - " + MY_JAR
         + "                                                       *\n"
         + "**********************************************************************");

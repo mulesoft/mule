@@ -24,6 +24,8 @@ import java.util.Set;
  */
 public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen<ApplicationDescriptor> {
 
+  private static final String PLUGIN_VALUE_FORMAT = " - %s (%s)";
+
   @Override
   public void createMessage(ApplicationDescriptor descriptor) {
     doBody(format("Started app '%s'", descriptor.getName()));
@@ -38,7 +40,7 @@ public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen<
     if (!plugins.isEmpty()) {
       doBody("Application plugins:");
       for (ArtifactPluginDescriptor plugin : plugins) {
-        doBody(format(VALUE_FORMAT, plugin.getName()));
+        doBody(format(PLUGIN_VALUE_FORMAT, plugin.getName(), plugin.getBundleDescriptor().getArtifactFileName()));
       }
     }
   }
