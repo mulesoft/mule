@@ -64,8 +64,9 @@ public class ExtensionModelHelper {
 
   private final Set<ExtensionModel> extensionsModels;
   private Cache<ComponentIdentifier, Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>> extensionComponentModelByComponentIdentifier =
-          CacheBuilder.newBuilder().build();
-  private Cache<ComponentIdentifier, Optional<? extends NestableElementModel>> extensionNestableElementModelByComponentIdentifier = CacheBuilder.newBuilder().build();
+      CacheBuilder.newBuilder().build();
+  private Cache<ComponentIdentifier, Optional<? extends NestableElementModel>> extensionNestableElementModelByComponentIdentifier =
+      CacheBuilder.newBuilder().build();
 
   /**
    * @param extensionModels the set of {@link ExtensionModel}s to work with. Usually this is the set of models configured within a
@@ -83,9 +84,10 @@ public class ExtensionModelHelper {
    */
   public TypedComponentIdentifier.ComponentType findComponentType(ComponentModel componentModel) {
     ComponentIdentifier componentId = componentModel.getCustomAttributes().containsKey(ORIGINAL_IDENTIFIER)
-                                      ? (ComponentIdentifier) componentModel.getCustomAttributes().get(ORIGINAL_IDENTIFIER)
-                                      : componentModel.getIdentifier();
-    Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> extensionComponentModelOptional = findComponentModel(componentId);
+        ? (ComponentIdentifier) componentModel.getCustomAttributes().get(ORIGINAL_IDENTIFIER)
+        : componentModel.getIdentifier();
+    Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> extensionComponentModelOptional =
+        findComponentModel(componentId);
 
     return extensionComponentModelOptional.map(extensionComponentModel -> {
       Reference<TypedComponentIdentifier.ComponentType> componentTypeReference = new Reference<>();
@@ -122,15 +124,14 @@ public class ExtensionModelHelper {
       });
       return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
     }).orElseGet(() -> {
-                   //If there was no ComponentModel found, search for nestable elements, we might be talking about a ROUTE and we need to return it's ComponentType as well
-                   Optional<? extends NestableElementModel> nestableElementModelOptional = findNestableElementModel(componentId);
-                   return nestableElementModelOptional.map(nestableElementModel -> {
-                     Reference<TypedComponentIdentifier.ComponentType> componentTypeReference = new Reference<>();
-                     nestableElementModel.accept(new IsRouteVisitor(componentTypeReference));
-                     return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
-                   }).orElse(UNKNOWN);
-                 }
-    );
+      //If there was no ComponentModel found, search for nestable elements, we might be talking about a ROUTE and we need to return it's ComponentType as well
+      Optional<? extends NestableElementModel> nestableElementModelOptional = findNestableElementModel(componentId);
+      return nestableElementModelOptional.map(nestableElementModel -> {
+        Reference<TypedComponentIdentifier.ComponentType> componentTypeReference = new Reference<>();
+        nestableElementModel.accept(new IsRouteVisitor(componentTypeReference));
+        return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
+      }).orElse(UNKNOWN);
+    });
   }
 
   /**
@@ -147,13 +148,13 @@ public class ExtensionModelHelper {
         for (ExtensionModel extensionModel : extensionsModels) {
           if (extensionModel.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace())) {
             List<HasOperationModels> operationModelsProviders = ImmutableList.<HasOperationModels>builder()
-                    .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
+                .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
             List<HasSourceModels> sourceModelsProviders = ImmutableList.<HasSourceModels>builder()
-                    .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
+                .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
             List<HasConstructModels> constructModelsProviders = singletonList(extensionModel);
 
             Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> componentModel =
-                    resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName);
+                resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName);
             //TODO MULE-13894 remove this once unified extensionModel names to use camelCase (see smart connectors and crafted declared extesion models)
             if (!componentModel.isPresent()) {
               componentModel = resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
@@ -164,8 +165,7 @@ public class ExtensionModelHelper {
         }
         return empty();
       });
-    }
-    catch (ExecutionException e) {
+    } catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
     }
   }
@@ -187,13 +187,13 @@ public class ExtensionModelHelper {
         }
         return empty();
       });
-    }
-    catch (ExecutionException e) {
+    } catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
     }
   }
 
-  private Optional<? extends NestableElementModel> resolveModel(List<HasNestableElementModels> nestableElementModelsProviders, String componentName) {
+  private Optional<? extends NestableElementModel> resolveModel(List<HasNestableElementModels> nestableElementModelsProviders,
+                                                                String componentName) {
 
     for (HasNestableElementModels nestableElementModelsProvider : nestableElementModelsProviders) {
       Optional<NestableElementModel> nestableElementModel = nestableElementModelsProvider.getNestableElementModel(componentName);
@@ -239,12 +239,10 @@ public class ExtensionModelHelper {
     }
 
     @Override
-    public void visit(NestedComponentModel component) {
-    }
+    public void visit(NestedComponentModel component) {}
 
     @Override
-    public void visit(NestedChainModel component) {
-    }
+    public void visit(NestedChainModel component) {}
 
     @Override
     public void visit(NestedRouteModel component) {
@@ -266,8 +264,7 @@ public class ExtensionModelHelper {
     }
 
     @Override
-    public void visit(NestedComponentModel component) {
-    }
+    public void visit(NestedComponentModel component) {}
 
     @Override
     public void visit(NestedChainModel component) {
