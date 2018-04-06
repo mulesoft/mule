@@ -133,11 +133,9 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase
                 else
                 {
                     httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    httpResponse.getOutputStream().flush();
                     httpResponse.getOutputStream().close();
                     result = false;
                 }
-                httpResponse.getOutputStream().flush();
                 httpResponse.getOutputStream().close();
                 request.setHandled(true);
             }
@@ -166,7 +164,6 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase
             {
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 httpResponse.setHeader("www-authenticate", "Basic realm=\"Fake Realm\"");
-                httpResponse.getOutputStream().flush();
                 httpResponse.getOutputStream().close();
                 request.setHandled(true);
             }
