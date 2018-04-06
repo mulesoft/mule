@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -125,6 +126,11 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(domain.getDescriptor().getPlugins(),
                                            new ArrayList<>(getArtifactPluginDescriptors(descriptor)));
+
+    // Refreshes the list of plugins on the descriptor with the resolved from domain and transitive plugin dependencies
+    Set resolvedArtifactPlugins = new LinkedHashSet<>();
+    resolvedArtifactPlugins.addAll(resolvedArtifactPluginDescriptors);
+    descriptor.setPlugins(resolvedArtifactPlugins);
 
     ApplicationClassLoaderBuilder artifactClassLoaderBuilder =
         applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder();

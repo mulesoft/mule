@@ -10,6 +10,7 @@ package org.mule.runtime.deployment.model.internal.plugin;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -19,9 +20,12 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -29,12 +33,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resolves plugin dependencies considering the plugin name only.
  */
 public class BundlePluginDependenciesResolver implements PluginDependenciesResolver {
+
+  private static final Logger logger = LoggerFactory.getLogger(BundlePluginDependenciesResolver.class);
 
   private final ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory;
 
@@ -88,7 +96,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     return filteredPluginDescriptors;
   }
 
-  private Optional<ArtifactPluginDescriptor> findPlugin(Set<ArtifactPluginDescriptor> appPlugins,
+  private Optional<ArtifactPluginDescriptor> findPlugin(Collection<ArtifactPluginDescriptor> appPlugins,
                                                         BundleDescriptor bundleDescriptor) {
     for (ArtifactPluginDescriptor appPlugin : appPlugins) {
       if (appPlugin.getBundleDescriptor().getArtifactId().equals(bundleDescriptor.getArtifactId())
@@ -102,7 +110,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
 
   private List<ArtifactPluginDescriptor> resolvePluginsDependencies(List<ArtifactPluginDescriptor> descriptors) {
     Set<BundleDescriptor> knownPlugins =
-        descriptors.stream().map(ArtifactPluginDescriptor::getBundleDescriptor).collect(Collectors.toSet());
+        descriptors.stream().map(ArtifactPluginDescriptor::getBundleDescriptor).collect(toSet());
     descriptors = getArtifactsWithDependencies(descriptors, knownPlugins);
 
     List<ArtifactPluginDescriptor> sortedDescriptors = new ArrayList<>(descriptors);
@@ -182,6 +190,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
           .filter(pluginDescriptor -> pluginDescriptor.getBundleDescriptor().isPlugin())
           .forEach(pluginDescriptor -> pluginDescriptor.getClassLoaderModel().getDependencies()
               .forEach(dependency -> {
+                Optional<ArtifactPluginDescriptor> resolvedPluginApplicationLevelOptional =
+                    findPlugin(pluginDescriptorsWithDependences, dependency.getDescriptor());
                 if (isPlugin(dependency) && !isResolvedDependency(visited, dependency.getDescriptor())) {
                   File mulePluginLocation;
                   if (dependency.getBundleUri() != null) {
@@ -190,11 +200,42 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                     throw new PluginResolutionError(format("Bundle URL should have been resolved for %s.",
                                                            dependency.getDescriptor()));
                   }
-                  ArtifactPluginDescriptor artifactPluginDescriptor =
-                      artifactDescriptorFactory.create(mulePluginLocation, empty());
-                  artifactPluginDescriptor.setBundleDescriptor(dependency.getDescriptor());
-                  foundDependencies.add(artifactPluginDescriptor);
-                  visited.add(dependency.getDescriptor());
+
+                  if (resolvedPluginApplicationLevelOptional.isPresent()) {
+                    ArtifactPluginDescriptor artifactPluginDescriptorResolved = resolvedPluginApplicationLevelOptional.get();
+                    logger
+                        .warn(format("Transitive plugin dependency '[%s -> %s]' is greater than the one resolved for the application '%s', it will be ignored.",
+                                     pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
+                                     artifactPluginDescriptorResolved.getBundleDescriptor()));
+                    ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
+                    pluginDescriptor.setClassLoaderModel(createBuilderWithoutDependency(originalClassLoaderModel, dependency)
+                        .dependingOn(ImmutableSet.of(
+                                                     new BundleDependency.Builder()
+                                                         .setDescriptor(artifactPluginDescriptorResolved.getBundleDescriptor())
+                                                         .setScope(dependency.getScope())
+                                                         .build()))
+                        .build());
+                  } else {
+                    ArtifactPluginDescriptor artifactPluginDescriptor =
+                        artifactDescriptorFactory.create(mulePluginLocation, empty());
+                    artifactPluginDescriptor.setBundleDescriptor(dependency.getDescriptor());
+                    foundDependencies.add(artifactPluginDescriptor);
+                    visited.add(dependency.getDescriptor());
+                  }
+                } else {
+                  if (resolvedPluginApplicationLevelOptional.isPresent()) {
+                    BundleDescriptor availablePluginBundleDescriptor =
+                        resolvedPluginApplicationLevelOptional.get().getBundleDescriptor();
+                    if (org.apache.commons.lang3.ObjectUtils.notEqual(availablePluginBundleDescriptor.getVersion(),
+                                                                      dependency.getDescriptor().getVersion())) {
+                      if (logger.isDebugEnabled()) {
+                        logger.debug(format(
+                                            "Transitive plugin dependency '[%s -> %s]' is minor than the one resolved for the application '%s', it will be ignored.",
+                                            pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
+                                            availablePluginBundleDescriptor));
+                      }
+                    }
+                  }
                 }
               }));
 
@@ -224,6 +265,22 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   private ClassLoaderModelBuilder createBuilderWithoutExportedPackages(ClassLoaderModel originalClassLoaderModel) {
     ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder()
         .dependingOn(originalClassLoaderModel.getDependencies())
+        .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
+                                     originalClassLoaderModel.getPrivilegedArtifacts())
+        .exportingResources(originalClassLoaderModel.getExportedResources());
+    for (URL url : originalClassLoaderModel.getUrls()) {
+      classLoaderModelBuilder.containing(url);
+    }
+    return classLoaderModelBuilder;
+  }
+
+  private ClassLoaderModelBuilder createBuilderWithoutDependency(ClassLoaderModel originalClassLoaderModel,
+                                                                 BundleDependency dependencyToBeExcluded) {
+    ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder()
+        .dependingOn(originalClassLoaderModel.getDependencies().stream()
+            .filter(dependency -> !dependency.equals(dependencyToBeExcluded))
+            .collect(toSet()))
+        .exportingPackages(originalClassLoaderModel.getExportedPackages())
         .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
                                      originalClassLoaderModel.getPrivilegedArtifacts())
         .exportingResources(originalClassLoaderModel.getExportedResources());
