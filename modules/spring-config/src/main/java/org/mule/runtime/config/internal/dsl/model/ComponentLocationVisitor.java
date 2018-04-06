@@ -35,7 +35,6 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_BEFO
 import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_BEFORE_TEST_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_TEST_IDENTIFIER;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -57,7 +56,7 @@ import java.util.stream.Collectors;
  *
  * @since 4.0
  */
-// TODO MULE-13618 - Migrate ComponentLocationVisitor to use ExtensionModel
+// TODO MULE-13618 - Migrate ComponentLocationVisitor to use ExtensionModels
 public class ComponentLocationVisitor implements Consumer<ComponentModel> {
 
   public static final ComponentIdentifier BATCH_JOB_COMPONENT_IDENTIFIER = buildFromStringRepresentation("batch:job");
@@ -141,7 +140,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                   componentModel.getLineNumber());
         } else {
           componentLocation =
-              parentComponentLocation.appendLocationPart(findRoutePath(componentModel), typedComponentIdentifier,
+              parentComponentLocation.appendLocationPart(findNonProcessorPath(componentModel), typedComponentIdentifier,
                                                          componentModel.getConfigFileName(), componentModel.getLineNumber());
         }
       } else if (isProcessor(componentModel)) {
@@ -312,8 +311,8 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
    * It rewrites the history for those macro expanded operations that are not direct children from a flow, which means the
    * returned {@link ComponentLocation} are mapped to the new operation rather the original flow.
    *
-   * @param componentModel           source to generate the new {@link ComponentLocation}, it also relies in its parent
-   *                                 {@link ComponentModel#getParent()}
+   * @param componentModel source to generate the new {@link ComponentLocation}, it also relies in its parent
+   *        {@link ComponentModel#getParent()}
    * @param operationTypedIdentifier identifier of the current operation
    * @return a fictitious {@link ComponentLocation}
    */

@@ -57,7 +57,7 @@ import java.util.concurrent.ExecutionException;
  * <p/>
  * It's recommended that the application only has one instance of this class to avoid processing the extension models several
  * times.
- * <p>
+ *
  * since 4.0
  */
 public class ExtensionModelHelper {
