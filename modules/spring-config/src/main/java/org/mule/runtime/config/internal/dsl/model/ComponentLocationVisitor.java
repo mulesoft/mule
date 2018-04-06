@@ -149,7 +149,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         }
         else {
           componentLocation =
-                  parentComponentLocation.appendLocationPart(findNonProcessorPath(componentModel), typedComponentIdentifier,
+                  parentComponentLocation.appendLocationPart(findRoutePath(componentModel), typedComponentIdentifier,
                                                              componentModel.getConfigFileName(), componentModel.getLineNumber());
         }
       }
