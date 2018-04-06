@@ -78,7 +78,7 @@ public class OperationPolicyProcessor implements Processor {
     return from(publisher)
         .cast(PrivilegedEvent.class)
         .flatMap(operationEvent -> {
-          PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getCorrelationId(), policy.getPolicyId());
+          PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getId(), policy.getPolicyId());
           Optional<CoreEvent> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
           PrivilegedEvent variablesProviderEvent =
               (PrivilegedEvent) latestPolicyState

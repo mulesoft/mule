@@ -93,7 +93,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         .doOnNext(coreEvent -> logExecuteNextEvent("Before execute-next", coreEvent.getContext(),
                                                    coreEvent.getMessage(), this.muleContext.getConfiguration().getId()))
         .flatMap(event -> {
-          Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getCorrelationId());
+          Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getId());
           if (nextOperation == null) {
             return error(new MuleRuntimeException(createStaticMessage("There's no next operation configured for event context id "
                 + event.getContext().getId())));
@@ -108,7 +108,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
               .onErrorResume(MessagingException.class, t -> {
 
                 PolicyStateId policyStateId =
-                    new PolicyStateId(event.getContext().getCorrelationId(), muleContext.getConfiguration().getId());
+                    new PolicyStateId(event.getContext().getId(), muleContext.getConfiguration().getId());
                 policyStateHandler.getLatestState(policyStateId)
                     .ifPresent(latestStateEvent -> t.setProcessedEvent(policyEventConverter
                         .createEvent((PrivilegedEvent) t.getEvent(), (PrivilegedEvent) latestStateEvent)));

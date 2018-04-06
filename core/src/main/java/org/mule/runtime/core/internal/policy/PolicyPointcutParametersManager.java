@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.component.Component;
@@ -15,11 +17,13 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
+import org.mule.runtime.policy.api.OperationPolicyPointcutParametersParameters;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -32,13 +36,13 @@ public class PolicyPointcutParametersManager {
   private final Collection<SourcePolicyPointcutParametersFactory> sourcePointcutFactories;
   private final Collection<OperationPolicyPointcutParametersFactory> operationPointcutFactories;
 
-  private final Map<String, PolicyPointcutParameters> sourceParameters;
+  private final Map<String, PolicyPointcutParameters> sourceParametersMap;
 
   public PolicyPointcutParametersManager(Collection<SourcePolicyPointcutParametersFactory> sourcePointcutFactories,
                                          Collection<OperationPolicyPointcutParametersFactory> operationPointcutFactories) {
     this.sourcePointcutFactories = sourcePointcutFactories;
     this.operationPointcutFactories = operationPointcutFactories;
-    this.sourceParameters = new ConcurrentHashMap<>();
+    this.sourceParametersMap = new ConcurrentHashMap<>();
   }
 
   /**
@@ -58,11 +62,12 @@ public class PolicyPointcutParametersManager {
                                  SourcePolicyPointcutParametersFactory.class,
                                  sourcePointcutFactories,
                                  factory -> factory.supportsSourceIdentifier(sourceIdentifier),
-                                 factory -> factory.createPolicyPointcutParameters(source, event.getMessage().getAttributes()));
+                                 factory -> factory.createPolicyPointcutParameters(source, event.getMessage().getAttributes()))
+                                     .orElse(new PolicyPointcutParameters(source));
 
     String id = event.getContext().getId();
-    sourceParameters.put(id, sourcePointcutParameters);
-    ((BaseEventContext) event.getContext()).getRootContext().onTerminated((e, t) -> sourceParameters.remove(id));
+    sourceParametersMap.put(id, sourcePointcutParameters);
+    ((BaseEventContext) event.getContext()).getRootContext().onTerminated((e, t) -> sourceParametersMap.remove(id));
 
     return sourcePointcutParameters;
   }
@@ -81,22 +86,22 @@ public class PolicyPointcutParametersManager {
                                                                     Map<String, Object> operationParameters) {
     ComponentIdentifier operationIdentifier = operation.getLocation().getComponentIdentifier().getIdentifier();
 
-    PolicyPointcutParameters operationPointcutParameters =
-        createPointcutParameters(operation,
-                                 OperationPolicyPointcutParametersFactory.class,
-                                 operationPointcutFactories,
-                                 factory -> factory.supportsOperationIdentifier(operationIdentifier),
-                                 factory -> factory.createPolicyPointcutParameters(operation, operationParameters));
+    PolicyPointcutParameters sourceParameters = sourceParametersMap.get(event.getContext().getId());
 
-    PolicyPointcutParameters originalParameters = sourceParameters.get(event.getContext().getId());
-    operationPointcutParameters.addSourceParameters(originalParameters);
+    OperationPolicyPointcutParametersParameters parameters =
+        new OperationPolicyPointcutParametersParameters(operation, operationParameters, sourceParameters);
 
-    return operationPointcutParameters;
+    return createPointcutParameters(operation,
+                                    OperationPolicyPointcutParametersFactory.class,
+                                    operationPointcutFactories,
+                                    factory -> factory.supportsOperationIdentifier(operationIdentifier),
+                                    factory -> factory.createPolicyPointcutParameters(parameters))
+                                        .orElse(new PolicyPointcutParameters(operation, sourceParameters));
   }
 
-  private <T> PolicyPointcutParameters createPointcutParameters(Component component, Class<T> factoryType,
-                                                                Collection<T> factories, Predicate<T> factoryFilter,
-                                                                Function<T, PolicyPointcutParameters> policyPointcutParametersCreationFunction) {
+  private <T> Optional<PolicyPointcutParameters> createPointcutParameters(Component component, Class<T> factoryType,
+                                                                          Collection<T> factories, Predicate<T> factoryFilter,
+                                                                          Function<T, PolicyPointcutParameters> policyPointcutParametersCreationFunction) {
 
     T found = null;
 
@@ -109,11 +114,7 @@ public class PolicyPointcutParametersManager {
       }
     }
 
-    if (found == null) {
-      return new PolicyPointcutParameters(component);
-    } else {
-      return policyPointcutParametersCreationFunction.apply(found);
-    }
+    return found != null ? of(policyPointcutParametersCreationFunction.apply(found)) : empty();
   }
 
   private void throwMoreThanOneFactoryFoundException(ComponentIdentifier sourceIdentifier, Class factoryClass) {

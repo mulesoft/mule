@@ -84,7 +84,7 @@ public class SourcePolicyProcessor implements Processor {
     return from(publisher)
         .cast(PrivilegedEvent.class)
         .flatMap(sourceEvent -> {
-          String executionIdentifier = sourceEvent.getContext().getCorrelationId();
+          String executionIdentifier = sourceEvent.getContext().getId();
           policyStateHandler.updateNextOperation(executionIdentifier,
                                                  buildSourceExecutionWithPolicyFunction(executionIdentifier, sourceEvent));
           return just(sourceEvent)

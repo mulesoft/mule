@@ -11,7 +11,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -158,10 +157,10 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
   @Test
   public void createOperationParametersWhenOneFactorySupportsIdentifier() {
     Map<String, Object> operationParameters = new HashMap<>();
-    OperationPolicyPointcutParametersFactory factory = mockOperationFactory(true);
+    PolicyPointcutParameters sourceParameters = parametersManager.createSourcePointcutParameters(component, event);
+    OperationPolicyPointcutParametersFactory factory = mockOperationFactory(true, sourceParameters);
     operationPointcutFactories.add(factory);
     sourcePointcutFactories.add(mockSourceFactory(true));
-    PolicyPointcutParameters sourceParameters = parametersManager.createSourcePointcutParameters(component, event);
 
     PolicyPointcutParameters parameters =
         parametersManager.createOperationPointcutParameters(component, event, operationParameters);
@@ -169,16 +168,16 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     assertThat(parameters.getComponent(), is(component));
     assertThat(parameters.getSourceParameters(), is(of(sourceParameters)));
     verify(factory).supportsOperationIdentifier(identifier);
-    verify(factory).createPolicyPointcutParameters(component, operationParameters);
+    verify(factory).createPolicyPointcutParameters(any());
   }
 
   @Test
   public void createOperationParametersWhenOneFactorySupportsIdentifierMultipleTimes() {
     Map<String, Object> operationParameters = new HashMap<>();
-    OperationPolicyPointcutParametersFactory factory = mockOperationFactory(true);
+    PolicyPointcutParameters sourceParameters = parametersManager.createSourcePointcutParameters(component, event);
+    OperationPolicyPointcutParametersFactory factory = mockOperationFactory(true, sourceParameters);
     operationPointcutFactories.add(factory);
     sourcePointcutFactories.add(mockSourceFactory(true));
-    PolicyPointcutParameters sourceParameters = parametersManager.createSourcePointcutParameters(component, event);
     parametersManager.createOperationPointcutParameters(component, event, operationParameters);
 
     PolicyPointcutParameters parameters =
@@ -187,16 +186,16 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     assertThat(parameters.getComponent(), is(component));
     assertThat(parameters.getSourceParameters(), is(of(sourceParameters)));
     verify(factory, times(2)).supportsOperationIdentifier(identifier);
-    verify(factory, times(2)).createPolicyPointcutParameters(component, operationParameters);
+    verify(factory, times(2)).createPolicyPointcutParameters(any());
   }
 
   @Test
   public void createOperationParametersWhenOneFactoryDoesNotSupportsIdentifier() {
     Map<String, Object> operationParameters = new HashMap<>();
-    OperationPolicyPointcutParametersFactory factory = mockOperationFactory(false);
+    PolicyPointcutParameters sourceParameters = parametersManager.createSourcePointcutParameters(component, event);
+    OperationPolicyPointcutParametersFactory factory = mockOperationFactory(false, sourceParameters);
     operationPointcutFactories.add(factory);
     sourcePointcutFactories.add(mockSourceFactory(true));
-    PolicyPointcutParameters sourceParameters = parametersManager.createSourcePointcutParameters(component, event);
 
     PolicyPointcutParameters parameters =
         parametersManager.createOperationPointcutParameters(component, event, operationParameters);
@@ -204,18 +203,18 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     assertThat(parameters.getComponent(), is(component));
     assertThat(parameters.getSourceParameters(), is(of(sourceParameters)));
     verify(factory).supportsOperationIdentifier(identifier);
-    verify(factory, never()).createPolicyPointcutParameters(component, operationParameters);
+    verify(factory, never()).createPolicyPointcutParameters(any());
   }
 
   @Test
   public void createOperationParametersWhenOneFactorySupportsIdentifierAndOneNot() {
     Map<String, Object> operationParameters = new HashMap<>();
-    OperationPolicyPointcutParametersFactory factory1 = mockOperationFactory(true);
-    OperationPolicyPointcutParametersFactory factory2 = mockOperationFactory(false);
+    PolicyPointcutParameters sourceParameters = parametersManager.createSourcePointcutParameters(component, event);
+    OperationPolicyPointcutParametersFactory factory1 = mockOperationFactory(true, sourceParameters);
+    OperationPolicyPointcutParametersFactory factory2 = mockOperationFactory(false, sourceParameters);
     operationPointcutFactories.add(factory1);
     operationPointcutFactories.add(factory2);
     sourcePointcutFactories.add(mockSourceFactory(true));
-    PolicyPointcutParameters sourceParameters = parametersManager.createSourcePointcutParameters(component, event);
 
     PolicyPointcutParameters parameters =
         parametersManager.createOperationPointcutParameters(component, event, operationParameters);
@@ -223,15 +222,15 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     assertThat(parameters.getComponent(), is(component));
     assertThat(parameters.getSourceParameters(), is(of(sourceParameters)));
     verify(factory1).supportsOperationIdentifier(identifier);
-    verify(factory1).createPolicyPointcutParameters(component, operationParameters);
+    verify(factory1).createPolicyPointcutParameters(any());
     verify(factory2).supportsOperationIdentifier(identifier);
-    verify(factory2, never()).createPolicyPointcutParameters(component, operationParameters);
+    verify(factory2, never()).createPolicyPointcutParameters(any());
   }
 
   @Test
   public void throwExceptionWhenMoreThanOneOperationFactorySupportsIdentifier() {
-    operationPointcutFactories.add(mockOperationFactory(true));
-    operationPointcutFactories.add(mockOperationFactory(true));
+    operationPointcutFactories.add(mockOperationFactory(true, null));
+    operationPointcutFactories.add(mockOperationFactory(true, null));
     expectedException.expect(MuleRuntimeException.class);
 
     parametersManager.createOperationPointcutParameters(component, event, new HashMap<>());
@@ -259,11 +258,12 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     return factory;
   }
 
-  private OperationPolicyPointcutParametersFactory mockOperationFactory(boolean supportsIdentifier) {
+  private OperationPolicyPointcutParametersFactory mockOperationFactory(boolean supportsIdentifier,
+                                                                        PolicyPointcutParameters sourceParameters) {
     OperationPolicyPointcutParametersFactory factory = mock(OperationPolicyPointcutParametersFactory.class);
     when(factory.supportsOperationIdentifier(identifier)).thenReturn(supportsIdentifier);
-    PolicyPointcutParameters parameters = new PolicyPointcutParameters(component);
-    when(factory.createPolicyPointcutParameters(eq(component), any())).thenReturn(parameters);
+    PolicyPointcutParameters parameters = new PolicyPointcutParameters(component, sourceParameters);
+    when(factory.createPolicyPointcutParameters(any())).thenReturn(parameters);
     return factory;
   }
 
