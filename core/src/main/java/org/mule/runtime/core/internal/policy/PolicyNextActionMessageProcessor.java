@@ -96,7 +96,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
           Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getCorrelationId());
           if (nextOperation == null) {
             return error(new MuleRuntimeException(createStaticMessage("There's no next operation configured for event context id "
-                + event.getContext().getId())));
+                + event.getContext().getCorrelationId())));
           }
 
           popBeforeNextFlowFlowStackElement().accept(event);
@@ -144,7 +144,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   private void logExecuteNextEvent(String startingMessage, EventContext eventContext, Message message, String policyName) {
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("\nEvent Id: " + eventContext.getId() + "\n" + startingMessage + ".\nPolicy: " + policyName
+      LOGGER.trace("\nEvent Id: " + eventContext.getCorrelationId() + "\n" + startingMessage + ".\nPolicy: " + policyName
           + "\n" + message.getAttributes().getValue().toString());
     }
   }
