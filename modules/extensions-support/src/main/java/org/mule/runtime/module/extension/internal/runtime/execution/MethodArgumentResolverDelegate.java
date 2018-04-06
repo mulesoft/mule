@@ -10,6 +10,7 @@ import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 
 import org.mule.metadata.java.api.JavaTypeLoader;
@@ -234,20 +235,20 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     LazyValue<Object>[] parameterValues = new LazyValue[argumentResolvers.length];
     int i = 0;
     for (ArgumentResolver<?> argumentResolver : argumentResolvers) {
-      parameterValues[i] = wrapWithResolvePrimitiveType(parameterTypes[i], argumentResolver.resolve(executionContext));
+      parameterValues[i] = wrapParameterResolution(parameterTypes[i], argumentResolver.resolve(executionContext));
       i++;
     }
 
     return parameterValues;
   }
 
-  private LazyValue<Object> wrapWithResolvePrimitiveType(Class<?> parameterType, Supplier<?> valueSupplier) {
+  private LazyValue<Object> wrapParameterResolution(Class<?> parameterType, Supplier<?> valueSupplier) {
     return new LazyValue<>(() -> {
       Object parameterValue = valueSupplier.get();
       if (parameterValue == null) {
         return resolvePrimitiveTypeDefaultValue(parameterType);
       } else {
-        return parameterValue;
+        return resolveCursor(parameterValue);
       }
     });
   }

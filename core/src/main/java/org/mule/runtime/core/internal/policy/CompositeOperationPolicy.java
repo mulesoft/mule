@@ -138,21 +138,8 @@ public class CompositeOperationPolicy extends
   @Override
   public Publisher<CoreEvent> process(CoreEvent operationEvent) {
     try {
-      Map<String, Object> operationParameters = new HashMap<>(getParametersProcessor().getOperationParameters());
-      Map<String, Object> providers = new HashMap<>();
-
-      // TODO MULE-14735 Avoid iterating this map every time
-      for (Entry<String, Object> e : operationParameters.entrySet()) {
-        if (e.getValue() instanceof TypedValue) {
-          providers.put(e.getKey(),
-                        updateTypedValueWithCursorProvider((TypedValue) e.getValue(), operationEvent, streamingManager));
-        }
-      }
-
-      operationParameters.putAll(providers);
-
       Message message = getParametersTransformer().isPresent()
-          ? getParametersTransformer().get().fromParametersToMessage(operationParameters)
+          ? getParametersTransformer().get().fromParametersToMessage(getParametersProcessor().getOperationParameters())
           : operationEvent.getMessage();
       return processWithChildContext(CoreEvent.builder(operationEvent).message(message).build(), getPolicyProcessor(),
                                      empty());

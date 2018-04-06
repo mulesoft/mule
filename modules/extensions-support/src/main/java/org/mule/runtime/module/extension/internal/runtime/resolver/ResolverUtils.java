@@ -84,7 +84,7 @@ public class ResolverUtils {
     return null;
   }
 
-  static <T> T resolveRecursively(ValueResolver<T> valueResolver, ValueResolvingContext resolvingContext)
+  public static <T> T resolveRecursively(ValueResolver<T> valueResolver, ValueResolvingContext resolvingContext)
       throws MuleException {
     T resolve = valueResolver.resolve(resolvingContext);
     if (resolve instanceof ValueResolver) {
