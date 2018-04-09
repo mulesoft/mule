@@ -10,6 +10,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -26,7 +27,7 @@ import javax.inject.Inject;
 
 public class FlowTraceUtils {
 
-  public static class FlowStackAsserter implements Processor {
+  public static class FlowStackAsserter implements Processor, Disposable {
 
     @Inject
     private EventContextService eventContextService;
@@ -40,6 +41,11 @@ public class FlowTraceUtils {
           .ifPresent(dumpEntry -> stackToAssert = dumpEntry.getFlowCallStack());
 
       return event;
+    }
+
+    @Override
+    public void dispose() {
+      stackToAssert = null;
     }
   }
 
