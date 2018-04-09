@@ -208,16 +208,16 @@ class MuleExtensionModelDeclarer {
     validator.onDefaultParameterGroup()
         .withOptionalParameter("idExpression")
         .ofType(typeLoader.load(String.class))
-        .defaultingTo("#[id]")
+        .defaultingTo("#[correlationId]")
         .withDsl(ParameterDslConfiguration.builder().allowsReferences(false).build())
-        .describedAs("Defines one or more expressions to use when extracting the ID from the message. "
-            + "If this property is not set, '#[id]' will be used by default.");
+        .describedAs("The expression to use when extracting the ID from the message. "
+            + "If this property is not set, '#[correlationId]' will be used by default.");
 
     validator.onDefaultParameterGroup()
         .withOptionalParameter("valueExpression")
         .ofType(typeLoader.load(String.class))
-        .defaultingTo("#[id]")
-        .describedAs("Defines one or more expressions to use when extracting the value from the message.");
+        .defaultingTo("#[correlationId]")
+        .describedAs("The expression to use when extracting the value from the message.");
 
     validator.onDefaultParameterGroup()
         .withOptionalParameter("storePrefix")
@@ -240,18 +240,18 @@ class MuleExtensionModelDeclarer {
 
   private void declareAsync(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer async = extensionDeclarer.withConstruct("async")
-        .describedAs("Processes the nested list of message processors asynchronously using a thread pool");
+        .describedAs("Processes the nested list of message processors asynchronously.");
 
     async.withChain();
     async.onDefaultParameterGroup()
         .withOptionalParameter("name")
         .withExpressionSupport(NOT_SUPPORTED)
         .ofType(typeLoader.load(String.class))
-        .describedAs("Name that will be used to name the async scheduler");
+        .describedAs("Name that will be used to identify the async threads.");
 
     async.onDefaultParameterGroup()
         .withOptionalParameter("maxConcurrency")
-        .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that this async router can use to optimize for performance when processing messages.")
+        .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that this async router can use to optimize its performance when processing messages.")
         .ofType(typeLoader.load(Integer.class));
   }
 
@@ -260,7 +260,7 @@ class MuleExtensionModelDeclarer {
     OperationDeclarer flowRef = extensionDeclarer.withOperation("flowRef")
         .describedAs("Allows a \u0027flow\u0027 to be referenced so that message processing will continue in the referenced flow "
             + "before returning. Message processing in the referenced \u0027flow\u0027 will occur within the context of the "
-            + "referenced flow and will therefore use its exception strategy, etc.")
+            + "referenced flow and will therefore use its error handler etc.")
         .withErrorModel(routingError);
 
     flowRef.withOutput().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
@@ -277,7 +277,7 @@ class MuleExtensionModelDeclarer {
     OperationDeclarer logger = extensionDeclarer.withOperation("logger")
         .describedAs("Performs logging using an expression to determine the message to be logged. By default, if a message is not specified, the current Mule Message is logged "
             + "using the " + DEFAULT_LOG_LEVEL
-            + " level with the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category, but "
+            + " level to the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category but "
             + "the level and category can both be configured to suit your needs.");
 
     logger.withOutput().ofType(typeLoader.load(void.class));
@@ -301,13 +301,13 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("category")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("Sets the log category");
+        .describedAs("Sets the log category.");
 
   }
 
   private void declareSetPayload(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer setPayload = extensionDeclarer.withOperation("setPayload")
-        .describedAs("A transformer that sets the payload with the provided value.");
+        .describedAs("A processor that sets the payload with the provided value.");
 
     setPayload.withOutput().ofType(typeLoader.load(void.class));
     setPayload.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -382,13 +382,12 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("location")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL, then from the classpath.");
-
+        .describedAs("The location of the template. The order in which the processor will attempt to load the file is: from the file system, from a URL, then from the classpath.");
   }
 
   private void declareRemoveVariable(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer removeVariable = extensionDeclarer.withOperation("removeVariable")
-        .describedAs("A processor that removes variables by name or regular expression.");
+        .describedAs("A processor that removes variables by name or a wildcard expression.");
 
     removeVariable.withOutput().ofType(typeLoader.load(void.class));
     removeVariable.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -435,34 +434,34 @@ class MuleExtensionModelDeclarer {
         }.getType()))
         .defaultingTo("#[payload]")
         .withExpressionSupport(REQUIRED)
-        .describedAs("An expression to that returns a java collection, object array, map or DOM nodes.");
+        .describedAs("Expression that defines the collection to iterate over.");
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("batchSize")
         .ofType(typeLoader.load(Integer.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("An expression to that returns a java collection, object array, map or DOM nodes.");
+        .describedAs("Partitions the collection in sub-collections of the specified size.");
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("rootMessageVariableName")
         .ofType(typeLoader.load(String.class))
         .defaultingTo("rootMessage")
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("Property name where the parent message is stored.");
+        .describedAs("Variable name for the original message.");
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("counterVariableName")
         .ofType(typeLoader.load(String.class))
         .defaultingTo("counter")
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("Property name used to store the number of message being iterated.");
+        .describedAs("Variable name for the item number being processed.");
 
   }
 
   private void declareUntilSuccessful(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer untilSuccessful = extensionDeclarer.withConstruct("untilSuccessful")
         .describedAs("Attempts to route a message to the message processor it contains in an asynchronous manner. " +
-            "Routing is considered successful if no exception has been raised and, optionally, if the response matches an expression");
+            "Routing is considered successful if no error has been raised and, optionally, if the response matches an expression.");
 
     untilSuccessful.withChain();
 
@@ -485,9 +484,9 @@ class MuleExtensionModelDeclarer {
 
   private void declareChoice(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer choice = extensionDeclarer.withConstruct("choice")
-        .describedAs("Sends the message to the first message processor whose condition has been satisfied. "
-            + "If no conditions were satisfied, sends to the configured default message processor (if configured), "
-            + "or throws an exception (if not configured).")
+        .describedAs("Sends the message to the first message processor whose condition is satisfied. "
+            + "If none of the conditions are satisfied, it sends the message to the configured default message processor "
+            + "or fails if there is none.")
         .withErrorModel(routingError);
 
     NestedRouteDeclarer when = choice.withRoute("when").withMinOccurs(1);
@@ -508,7 +507,7 @@ class MuleExtensionModelDeclarer {
     flow.onDefaultParameterGroup().withOptionalParameter("initialState").defaultingTo("started")
         .ofType(BaseTypeBuilder.create(JAVA).stringType().enumOf("started", "stopped").build());
     flow.onDefaultParameterGroup().withOptionalParameter("maxConcurrency")
-        .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that the Flow can use to optimize for performance when processing messages.")
+        .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that the Flow can use to optimize its performance when processing messages.")
         .ofType(typeLoader.load(Integer.class));
 
     flow.withComponent("source")
@@ -535,7 +534,7 @@ class MuleExtensionModelDeclarer {
 
   private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer roundRobin = extensionDeclarer.withConstruct("roundRobin")
-        .describedAs("Send each message received to the next message processor in the circular list of targets.");
+        .describedAs("Send each message received to the next message processor in a circular list of targets.");
 
     roundRobin.withRoute("route").withChain();
   }
@@ -594,7 +593,7 @@ class MuleExtensionModelDeclarer {
         // TODO MULE-14734 Review collection parameter in splitAggregate
         .withRole(ParameterRole.BEHAVIOUR)
         .withExpressionSupport(REQUIRED)
-        .describedAs("Expression that defines the collection of parts to be processed in parallel");
+        .describedAs("Expression that defines the collection of parts to be processed in parallel.");
     splitAggregate.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
         .ofType(typeLoader.load(Long.class))
@@ -669,7 +668,7 @@ class MuleExtensionModelDeclarer {
 
     NestedRouteDeclarer onErrorContinue = errorHandler.withRoute("onErrorContinue")
         .describedAs(
-                     "Error handler used to handle exceptions. It will commit any transaction as if the message was consumed successfully.");
+                     "Error handler used to handle errors. It will commit any transaction as if the message was consumed successfully.");
     declareOnErrorRoute(typeLoader, onErrorContinue);
 
     NestedRouteDeclarer onErrorPropagate = errorHandler.withRoute("onErrorPropagate")
@@ -678,11 +677,11 @@ class MuleExtensionModelDeclarer {
 
     errorHandler.withOptionalComponent("onError")
         .withAllowedStereotypes(ON_ERROR)
-        .describedAs("Error handler used to reference other ones.");
+        .describedAs("Error handler used to reference others.");
 
     ConstructDeclarer onError = extensionDeclarer.withConstruct("onError")
         .withStereotype(ON_ERROR)
-        .describedAs("Error handler used to reference other ones.");
+        .describedAs("Error handler used to reference others.");
 
     onError.onDefaultParameterGroup()
         .withRequiredParameter("ref")
