@@ -34,6 +34,7 @@ import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
@@ -56,6 +57,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     private RequestLine requestLine;
     private boolean failureResponseSentToClient;
     private HttpThrottlingHeadersMapBuilder httpThrottlingHeadersMapBuilder;
+    private Map<String, String> extraHeaders = new HashMap<String, String>();
 
     public HttpMessageProcessTemplate(final HttpMessageReceiver messageReceiver, final HttpServerConnection httpServerConnection)
     {
@@ -504,7 +506,14 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
     private Map<String,String> getThrottlingHeaders()
     {
-        return httpThrottlingHeadersMapBuilder.build();
+        Map<String, String> throttlingHeaders = httpThrottlingHeadersMapBuilder.build();
+
+        for (String headerName : extraHeaders.keySet())
+        {
+            throttlingHeaders.put(headerName, extraHeaders.get(headerName));
+        }
+
+        return throttlingHeaders;
     }
 
     @Override
@@ -517,5 +526,10 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     public void awaitTermination() throws InterruptedException
     {
         this.messageProcessedLatch.await();
+    }
+
+    @Override
+    public void addExtraHeader(String headerName, String value) {
+        extraHeaders.put(headerName, value);
     }
 }

@@ -44,4 +44,5 @@ public interface ThrottlingPhaseTemplate extends MessageProcessTemplate
     */
     void setThrottlingPolicyStatistics(long remainingRequestInCurrentPeriod, long maximumRequestAllowedPerPeriod, long timeUntilNextPeriodInMillis);
 
+    void addExtraHeader(String headerName, String value);
 }
