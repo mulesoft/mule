@@ -7,6 +7,7 @@
 
 package org.mule.test.infrastructure.maven;
 
+import static java.io.File.separator;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Collections.singletonList;
@@ -81,12 +82,14 @@ public class MavenTestUtils {
    */
   public static File findMavenArtifact(BundleDescriptor descriptor) {
     File artifact = new File(getMavenLocalRepository(), Paths
-        .get(descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion(),
+        .get(descriptor.getGroupId().replaceAll("\\.", separator), descriptor.getArtifactId(), descriptor.getVersion(),
              descriptor.getArtifactFileName() + "." + descriptor.getType())
         .toString());
 
     if (!artifact.exists()) {
-      throw new IllegalArgumentException(format("Maven artifact %s does not exists in the local Maven repository", descriptor));
+      LOGGER.error(format("Artifact file: %s", artifact.getAbsolutePath()));
+      throw new IllegalArgumentException(format("Maven artifact '%s' does not exists in the local Maven repository @ '%s'",
+                                                descriptor, getMavenLocalRepository()));
     }
 
     return artifact;
@@ -114,7 +117,14 @@ public class MavenTestUtils {
     request.setGoals(goals);
     request.setBatchMode(true);
 
-    File mavenArtifactsAndBaseDirectory = new File(new File(MAVEN_ARTIFACTS_DIRECTORY), baseDirectory);
+    File mavenArtifactsAndBaseDirectory;
+    File baseDirFile = new File(baseDirectory);
+    if (baseDirFile.isAbsolute()) {
+      mavenArtifactsAndBaseDirectory = baseDirFile;
+    } else {
+      mavenArtifactsAndBaseDirectory = new File(new File(MAVEN_ARTIFACTS_DIRECTORY), baseDirectory);
+    }
+
     LOGGER.info("Using Maven artifacts base directory: '" + mavenArtifactsAndBaseDirectory.getAbsolutePath() + "'...");
 
     request.setBaseDirectory(mavenArtifactsAndBaseDirectory);
