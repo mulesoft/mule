@@ -6,6 +6,7 @@
  */
 package org.mule.context.notification;
 
+import org.mule.api.context.notification.AbstractBlockingServerEvent;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.model.Model;
@@ -17,7 +18,7 @@ import org.mule.api.model.Model;
  * @see org.mule.api.model.Model
  */
 @Deprecated
-public class ModelNotification extends ServerNotification implements BlockingServerEvent
+public class ModelNotification extends AbstractBlockingServerEvent
 {
     /**
      * Serial version
