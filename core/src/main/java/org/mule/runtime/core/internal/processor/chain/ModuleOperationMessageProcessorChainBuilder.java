@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
+import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
@@ -159,6 +160,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
 
     /**
      * Plains the complete list of configurations and connections for the parameterized {@link ExtensionModel}
+     *
      * @param extensionModel looks for all the the parameters of the configuration and connection.
      * @return a list of {@link ParameterModel} that will not repeat their {@link ParameterModel#getName()}s.
      */
@@ -174,8 +176,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     }
 
     /**
-     * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, CoreEvent)} we need to store
-     * the {@link MetadataType} per parameter, so that the {@link DataType} can be generated.
+     * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, CoreEvent)} we need to store the
+     * {@link MetadataType} per parameter, so that the {@link DataType} can be generated.
      *
      * @param parameters list of parameters taken from the XML
      * @param parameterModels collection of elements taken from the matching {@link ExtensionModel}
@@ -201,24 +203,27 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
      */
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+      Map<String, String> annotation = (Map<String, String>) getAnnotation(ANNOTATION_PARAMETERS);
+      String moduleOperationName = annotation.get("moduleName") + ":" + annotation.get("moduleOperation");
+
       return from(publisher)
           .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack())
-              .push(new FlowStackElement(getLocation().getRootContainerName(), getLocation().getLocation())))
-          .concatMap(request -> from(processWithChildContext(createEventWithParameters(request), super::apply,
-                                                             ofNullable(getLocation())))
-                                                                 .onErrorResume(MessagingException.class,
-                                                                                createErrorResumeMapper(request))
-                                                                 .map(eventResult -> processResult(request, eventResult)))
-          .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop())
-          .doOnError(MessagingException.class, me -> ((DefaultFlowCallStack) me.getEvent().getFlowCallStack()).pop());
+              .push(new FlowStackElement(moduleOperationName, null)))
+          .concatMap(request -> {
+            Publisher<CoreEvent> child = processWithChildContext(createEventWithParameters(request), super::apply,
+                                                                 ofNullable(getLocation()));
+            return from(child).doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop())
+                .doOnError(MessagingException.class, me -> ((DefaultFlowCallStack) me.getEvent().getFlowCallStack()).pop())
+                .onErrorResume(MessagingException.class, createErrorResumeMapper(request))
+                .map(eventResult -> processResult(request, eventResult));
+          });
     }
 
     /**
      * If an exception within the <module/> is thrown, we will cut the current exception bubbling by returning the control to the
      * caller/publisher of the current <module/>'s invocation.
      */
-    private Function<MessagingException, Publisher<? extends CoreEvent>> createErrorResumeMapper(
-                                                                                                 CoreEvent originalRequest) {
+    private Function<MessagingException, Publisher<? extends CoreEvent>> createErrorResumeMapper(CoreEvent originalRequest) {
       return throwable -> {
         throwable = handleSubChainException(throwable, originalRequest);
         return Mono.from(((BaseEventContext) originalRequest.getContext()).error(throwable)).then(Mono.error(throwable));
