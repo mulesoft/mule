@@ -26,7 +26,9 @@ import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.CONFIG_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import com.google.common.collect.ImmutableSet;
+import io.qameta.allure.Description;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -39,18 +41,25 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.marvel.MarvelExtension;
+import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
 import java.io.IOException;
@@ -421,6 +430,70 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getOperationModels().size(), is(11));
   }
 
+  @Test
+  @Description("UX test to ensure parameterized stereotypes properly tells which config can be fed from the tools/UI")
+  public void testModuleStereotypes() {
+    String modulePath = "modules/module-stereotypes.xml";
+    ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+
+    assertThat(extensionModel.getName(), is("module-stereotypes"));
+    assertThat(extensionModel.getConfigurationModels().size(), is(1));
+    ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
+    assertThat(configurationModel.getName(), is(CONFIG_NAME));
+    assertThat(configurationModel.getAllParameterModels().size(), is(4));
+
+    final StereotypeModel ironManStereotype =
+        StereotypeModelBuilder.newStereotype(IronMan.CONFIG_NAME, MARVEL_EXTENSION).withParent(MuleStereotypes.CONFIG).build();
+    final StereotypeModel heisenbergStereotype = StereotypeModelBuilder.newStereotype(CONFIG_NAME, HeisenbergExtension.HEISENBERG)
+        .withParent(MuleStereotypes.CONFIG).build();
+
+    assertParameterWithStereotypes(configurationModel.getAllParameterModels().get(0), "stereotypableIronManConfig",
+                                   ironManStereotype);
+    assertParameterWithStereotypes(configurationModel.getAllParameterModels().get(1), "stereotypableMultipleConfig",
+                                   heisenbergStereotype, ironManStereotype);
+    assertParameterWithStereotypes(configurationModel.getAllParameterModels().get(2), "stereotypableWeirdConfig",
+                                   ironManStereotype);
+
+    assertThat(configurationModel.getConnectionProviders().size(), is(1));
+    final ConnectionProviderModel connectionProviderModel = configurationModel.getConnectionProviders().get(0);
+    assertThat(connectionProviderModel.getAllParameterModels().size(), is(1));
+    final ParameterModel stereotypableIronManConfigInConnectionParameterModel =
+        connectionProviderModel.getAllParameterModels().get(0);
+    assertParameterWithStereotypes(stereotypableIronManConfigInConnectionParameterModel, "stereotypableIronManConfigInConnection",
+                                   ironManStereotype);
+
+    Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
+        configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
+    assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
+    assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(3));
+
+    assertThat(configurationModel.getOperationModels().size(), is(1));
+    Optional<OperationModel> operationModel = configurationModel.getOperationModel("do-something");
+    assertThat(operationModel.isPresent(), is(true));
+    assertThat(operationModel.get().getAllParameterModels().size(), is(3));
+    assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("aData"));
+    assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(operationModel.get().getAllParameterModels().get(2).getName(), is(TARGET_VALUE_PARAMETER_NAME));
+
+    Optional<OperationComponentModelModelProperty> modelProperty =
+        operationModel.get().getModelProperty(OperationComponentModelModelProperty.class);
+    assertThat(modelProperty.isPresent(), is(true));
+    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(2));
+  }
+
+  private void assertParameterWithStereotypes(ParameterModel parameterModel, String propertyName,
+                                              StereotypeModel... stereotypeModel) {
+    assertThat(parameterModel.getName(), is(propertyName));
+    assertThat(parameterModel.getAllowedStereotypes(), containsInAnyOrder(stereotypeModel));
+  }
+
+
+  //TODO add test with two stereotypes usages for the same property that belong to different types, and then fail during compile time
+  //TODO add a test with something that has stereotype and also a usage for simple strings, making it work
+  //TODO add a test with something that has stereotype in two different properties and choose the more restrictive one
+
+
+
   /**
    * If {@link #validateXml} is true, the XML of the smart connector must be validated when reading it. False otherwise. Useful to
    * simulate the {@link ExtensionModel} generation of a connector that has malformed message processors in the <body/> element.
@@ -456,7 +529,8 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
   private Set<ExtensionModel> getDependencyExtensions() {
     ExtensionModel petstore = loadExtension(PetStoreConnector.class, emptySet());
-    return ImmutableSet.<ExtensionModel>builder().add(petstore).build();
+    ExtensionModel marvel = loadExtension(MarvelExtension.class, emptySet());
+    return ImmutableSet.<ExtensionModel>builder().add(petstore).add(marvel).build();
   }
 
   private ExtensionModel loadExtension(Class extension, Set<ExtensionModel> deps) {

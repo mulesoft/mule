@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+
+      xmlns:module-stereotypes="http://www.mulesoft.org/schema/mule/module-stereotypes"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core     http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd
+       http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+       http://www.mulesoft.org/schema/mule/module-stereotypes http://www.mulesoft.org/schema/mule/module-stereotypes/current/mule-module-stereotypes.xsd">
+
+    <marvel:iron-man-config name="daIronMan">
+        <marvel:odd-missile-connection />
+    </marvel:iron-man-config>
+
+    <heisenberg:config name="daHeisenberg" cancer="true" dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00" money="0" finalHealth="CANCER" enemies="#[mel:[]]">
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
+    </heisenberg:config>
+
+    <module-stereotypes:config name="stereotype-module"
+                               stereotypableIronManConfig="daIronMan"
+                               stereotypableMultipleConfig="daHeisenberg"
+                               stereotypableWeirdConfig="daIronMan" >
+        <module-stereotypes:connection stereotypableIronManConfigInConnection="daIronMan"/>
+    </module-stereotypes:config>
+
+    <flow name="testParameterizedStereotypeDoesCorrectBindingAndConnectorWorks">
+        <module-stereotypes:do-something config-ref="stereotype-module" aData="#[vars.aData]"/>
+    </flow>
+</mule>
