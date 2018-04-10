@@ -7,7 +7,10 @@
 
 package org.mule.api.context.notification;
 
-public class AbstractBlockingServerEvent extends ServerNotification implements BlockingServerEvent
+/**
+ * @since 3.10
+ */
+public abstract class AbstractBlockingServerEvent extends ServerNotification implements BlockingServerEvent
 {
 
 

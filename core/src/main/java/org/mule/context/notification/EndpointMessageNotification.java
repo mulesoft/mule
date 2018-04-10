@@ -46,7 +46,7 @@ public class EndpointMessageNotification extends BaseConnectorMessageNotificatio
                                FlowConstruct flowConstruct,
                                int action)
     {
-        super(resource, endpoint.getEndpointURI().toString(), flowConstruct, action, false);
+        super(resource, endpoint.getEndpointURI().toString(), flowConstruct, action);
         this.immutableEndpoint = endpoint;
     }
 

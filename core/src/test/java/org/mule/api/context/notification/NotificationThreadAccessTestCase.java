@@ -7,6 +7,7 @@
 
 package org.mule.api.context.notification;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -38,7 +39,7 @@ public class NotificationThreadAccessTestCase extends AbstractMuleContextTestCas
             @Override
             public void onNotification(ServerNotification notification)
             {
-                while (true)
+                while (!currentThread().isInterrupted())
                 {
                     try
                     {
@@ -64,7 +65,7 @@ public class NotificationThreadAccessTestCase extends AbstractMuleContextTestCas
                     @Override
                     public void run()
                     {
-                        while (true)
+                        while (!currentThread().isInterrupted())
                         {
                             try
                             {
