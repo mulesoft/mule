@@ -10,8 +10,8 @@ package org.mule.api.context.notification;
 import org.mule.api.MuleMessage;
 
 /**
- * Default implementation of {@link @BlockingServerEvent} that guarantees all the notifications that extends this class
- * sends a copy of the {@link MuleMessage} instead of the original one for avoiding race conditions for getting the message ownership.
+ * Default implementation of {@link BlockingServerEvent} that guarantees all the notifications that extend this class
+ * send a copy of the {@link MuleMessage} instead of the original one. This avoids race conditions for getting the message ownership.
  *
  * @since 3.10
  */
