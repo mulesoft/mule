@@ -7,7 +7,12 @@
 
 package org.mule.api.context.notification;
 
+import org.mule.api.MuleMessage;
+
 /**
+ * Default implementation of {@link @BlockingServerEvent} that guarantees all the notifications that extends this class
+ * sends a copy of the {@link MuleMessage} instead of the original one for avoiding race conditions for the message ownership.
+ *
  * @since 3.10
  */
 public abstract class AbstractBlockingServerEvent extends ServerNotification implements BlockingServerEvent
