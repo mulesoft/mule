@@ -18,6 +18,6 @@ public class ConnectorMessageNotification extends BaseConnectorMessageNotificati
 
     public ConnectorMessageNotification(MuleMessage resource, String endpoint, FlowConstruct flowConstruct, int action)
     {
-        super(resource, endpoint, flowConstruct, action);
+        super(resource, endpoint, flowConstruct, action, true);
     }
 }

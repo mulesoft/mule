@@ -9,13 +9,14 @@ package org.mule.context.notification;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.construct.Pipeline;
+import org.mule.api.context.notification.AbstractBlockingServerEvent;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 
 /**
  * <code>PipelineMessageNotification</code> is fired at key steps in the processing of {@link Pipeline}
  */
-public class PipelineMessageNotification extends ServerNotification implements BlockingServerEvent
+public class PipelineMessageNotification extends AbstractBlockingServerEvent
 {
 
     private static final long serialVersionUID = 6065691696506216248L;
@@ -38,7 +39,7 @@ public class PipelineMessageNotification extends ServerNotification implements B
 
     public PipelineMessageNotification(Pipeline pipeline, MuleEvent event, int action)
     {
-        super(event, action, pipeline.getName(), true);
+        super(event, action, pipeline.getName());
     }
 
     public PipelineMessageNotification(Pipeline pipeline,

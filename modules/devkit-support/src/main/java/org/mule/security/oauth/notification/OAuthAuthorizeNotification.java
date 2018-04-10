@@ -30,7 +30,7 @@ public class OAuthAuthorizeNotification extends CustomNotification implements Bl
 
     public OAuthAuthorizeNotification(MuleEvent event, int action)
     {
-        super(event, action);
+        super(event, action, null,true);
         this.muleEvent = event;
     }
 
