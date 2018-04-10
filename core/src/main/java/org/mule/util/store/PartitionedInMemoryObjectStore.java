@@ -175,6 +175,20 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
             return;
         }
 
+        if (!(store instanceof ExpirationDelegatableObjectStore))
+        {
+            expiredEntries = expireDueToTTL(entryTTL, now, expiredEntries, store, partition);
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Expired " + expiredEntries + " old entries");
+        }
+    }
+
+    private int expireDueToTTL(int entryTTL, final long now, int expiredEntries, ConcurrentLinkedQueue<ExpiryEntry> store, ConcurrentMap<Serializable, T> partition)
+    {
+        ExpiryEntry oldestEntry;
         while ((oldestEntry = store.peek()) != null)
         {
             if (TimeUnit.NANOSECONDS.toMillis(now - oldestEntry.getTime()) >= entryTTL)
@@ -188,11 +202,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
                 break;
             }
         }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Expired " + expiredEntries + " old entries");
-        }
+        return expiredEntries;
     }
 
     private void trimToMaxSize(ConcurrentLinkedQueue<ExpiryEntry> store,
