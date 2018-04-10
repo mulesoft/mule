@@ -6,6 +6,7 @@
  */
 package org.mule.context.notification;
 
+import org.mule.api.context.notification.AbstractBlockingServerEvent;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.service.Service;
@@ -16,7 +17,7 @@ import org.mule.api.service.Service;
  * service.
  */
 @Deprecated
-public class ServiceNotification extends ServerNotification implements BlockingServerEvent
+public class ServiceNotification extends AbstractBlockingServerEvent
 {
     /**
      * Serial version

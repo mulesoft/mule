@@ -32,7 +32,7 @@ public class ServletContextNotification extends CustomNotification implements Bl
 
     public ServletContextNotification(ServletContext context, int action)
     {
-        super(context, action, context.getServletContextName());
+        super(context, action, context.getServletContextName(), true);
     }
 
     public String toString()

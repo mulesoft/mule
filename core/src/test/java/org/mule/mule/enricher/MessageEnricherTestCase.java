@@ -31,8 +31,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
-import org.mule.api.context.notification.MessageProcessorNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
@@ -40,7 +38,6 @@ import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.Flow;
-import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.processor.chain.DefaultMessageProcessorChain;
@@ -575,43 +572,6 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase
         assertThat(RequestContext.getEvent().getReplyToHandler(), instanceOf(ReplyToHandler.class));
     }
 
-    @Test
-    public void testRaceConditionBetweenEnricherAndNotificationListener() throws Exception
-    {
-        muleContext.getNotificationManager().addInterfaceToType(MessageProcessorNotificationListener.class, MessageProcessorNotification.class);
-        muleContext.getNotificationManager().addListener(new MessageProcessorNotificationListener()
-        {
-            @Override
-            public void onNotification(ServerNotification notification)
-            {
-                if(MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE == notification.getAction())
-                {
-                    final ThreadSafeAccess event = (ThreadSafeAccess) notification.getSource();
-                    new Thread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            while(true)
-                            {
-                                event.resetAccessControl();
-                            }
-                        }
-                    }).start();
-                }
-            }
-        });
-        MessageEnricher enricher = createEnricher(new SensingNullMessageProcessor());
-        final MuleEvent in  = createBlockingEvent();
-        try
-        {
-            processEnricherInChain(enricher, in);
-        }
-        catch(Exception e)
-        {
-            fail("Enricher has lost the ownership of the thread");
-        }
-    }
 
     private MuleEvent createNonBlockingEvent(SensingNullReplyToHandler nullReplyToHandler)
     {

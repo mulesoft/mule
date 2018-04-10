@@ -56,7 +56,15 @@ public abstract class BaseConnectorMessageNotification extends ServerNotificatio
                                             FlowConstruct flowConstruct,
                                             int action)
     {
-        super(resource, action, flowConstruct != null ? flowConstruct.getName() : null);
+        this(resource, endpoint, flowConstruct, action, false);
+    }
+
+    public BaseConnectorMessageNotification(MuleMessage resource,
+                                            String endpoint,
+                                            FlowConstruct flowConstruct,
+                                            int action, boolean referenceOriginalResource)
+    {
+        super(resource, action, flowConstruct != null ? flowConstruct.getName() : null, referenceOriginalResource);
         this.endpoint = endpoint;
         this.flowConstruct = flowConstruct;
     }
