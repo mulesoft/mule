@@ -15,13 +15,14 @@ import org.mule.api.MuleEvent;
 import org.mule.api.NameableObject;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.MessageProcessorPathResolver;
+import org.mule.api.context.notification.AbstractBlockingServerEvent;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.transport.NullPayload;
 import org.mule.util.ObjectUtils;
 
-public class MessageProcessorNotification extends ServerNotification implements BlockingServerEvent
+public class MessageProcessorNotification extends AbstractBlockingServerEvent
 {
 
     private static final long serialVersionUID = 1L;
@@ -54,7 +55,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
                                         MessageProcessor processor,
                                         MessagingException exceptionThrown, int action)
     {
-        super(produceEvent(event, flowConstruct), action, flowConstruct != null ? flowConstruct.getName() : null, action == MESSAGE_PROCESSOR_PRE_INVOKE_ORIGINAL_EVENT);
+        super(produceEvent(event, flowConstruct), action, flowConstruct != null ? flowConstruct.getName() : null);
         this.exceptionThrown = exceptionThrown;
         this.processor = processor;
     }

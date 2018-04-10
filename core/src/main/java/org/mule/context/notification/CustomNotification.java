@@ -56,6 +56,11 @@ public class CustomNotification extends ServerNotification
         }
     }
 
+    public CustomNotification(Object resource, int action, String resourceIdentifier, boolean referenceOriginalResource)
+    {
+        super(resource, action, resourceIdentifier, referenceOriginalResource);
+    }
+
     protected String[] getActionNames()
     {
         return new String[]{};

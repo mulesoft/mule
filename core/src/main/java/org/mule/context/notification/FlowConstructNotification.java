@@ -7,6 +7,7 @@
 package org.mule.context.notification;
 
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.notification.AbstractBlockingServerEvent;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 
@@ -15,7 +16,7 @@ import org.mule.api.context.notification.ServerNotification;
  * construct starting occurs. The payload of this event will always be a reference to
  * the flow construct.
  */
-public class FlowConstructNotification extends ServerNotification implements BlockingServerEvent
+public class FlowConstructNotification extends AbstractBlockingServerEvent
 {
     private static final long serialVersionUID = 6658641434183647952L;
     public static final int FLOW_CONSTRUCT_INITIALISED = FLOW_CONSTRUCT_EVENT_ACTION_START_RANGE + 1;

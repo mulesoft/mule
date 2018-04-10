@@ -6,11 +6,12 @@
  */
 package org.mule.context.notification;
 
+import org.mule.api.context.notification.AbstractBlockingServerEvent;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.transaction.Transaction;
 
-public class TransactionNotification extends ServerNotification implements BlockingServerEvent
+public class TransactionNotification extends AbstractBlockingServerEvent
 {
     /**
      * Serial version
