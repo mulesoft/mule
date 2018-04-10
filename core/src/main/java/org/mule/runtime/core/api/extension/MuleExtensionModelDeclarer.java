@@ -247,7 +247,7 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("name")
         .withExpressionSupport(NOT_SUPPORTED)
         .ofType(typeLoader.load(String.class))
-        .describedAs("Name that will be used to identify the async threads.");
+        .describedAs("Name that will be used to identify the async scheduling tasks.");
 
     async.onDefaultParameterGroup()
         .withOptionalParameter("maxConcurrency")

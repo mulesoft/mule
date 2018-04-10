@@ -496,7 +496,7 @@
                 <xsd:attribute name="name" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Name that will be used to identify the async threads.
+                            Name that will be used to identify the async scheduling tasks.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
