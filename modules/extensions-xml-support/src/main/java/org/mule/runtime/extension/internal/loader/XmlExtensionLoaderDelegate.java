@@ -11,7 +11,6 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.lang.Thread.currentThread;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -30,15 +29,6 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpa
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang3.StringUtils;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.CycleDetector;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -87,19 +77,18 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
+import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
-import org.w3c.dom.Document;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -109,6 +98,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang3.StringUtils;
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.w3c.dom.Document;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -343,9 +347,8 @@ public final class XmlExtensionLoaderDelegate {
     return Optional.ofNullable(result);
   }
 
-  private ComponentModel getModuleComponentModel(URL resource, Document moduleDocument) {
-    XmlApplicationParser xmlApplicationParser =
-        new XmlApplicationParser(new SpiServiceRegistry(), singletonList(currentThread().getContextClassLoader()));
+  private ComponentModel getModuleComponentModel(URL resource, Document moduleDocument, Set<ExtensionModel> extensions) {
+    XmlApplicationParser xmlApplicationParser = XmlApplicationParser.createFromExtensionModels(extensions);
     Optional<ConfigLine> parseModule = xmlApplicationParser.parse(moduleDocument.getDocumentElement());
     if (!parseModule.isPresent()) {
       // This happens in org.mule.runtime.config.dsl.processor.xml.XmlApplicationParser.configLineFromElement()
@@ -359,7 +362,7 @@ public final class XmlExtensionLoaderDelegate {
 
   private void loadModuleExtension(ExtensionDeclarer declarer, URL resource, Document moduleDocument,
                                    Set<ExtensionModel> extensions, boolean comesFromTNS) {
-    final ComponentModel moduleModel = getModuleComponentModel(resource, moduleDocument);
+    final ComponentModel moduleModel = getModuleComponentModel(resource, moduleDocument, extensions);
     if (!moduleModel.getIdentifier().equals(MODULE_IDENTIFIER)) {
       throw new MuleRuntimeException(createStaticMessage(format("The root element of a module must be '%s', but found '%s'",
                                                                 MODULE_IDENTIFIER.toString(),
@@ -581,7 +584,7 @@ public final class XmlExtensionLoaderDelegate {
    * Goes over all {@code globalElementsComponentModel} looking for the configuration and connection elements (parent and child),
    * where if present looks for the {@link ExtensionModel}s validating if the element is in fact a {@link ConnectionProvider}.
    * It heavily relies on the {@link DslSyntaxResolver}, as many elements in the XML do not match to the names of the model.
-   * 
+   *
    * @param globalElementsComponentModel global elements of the smart connector
    * @param extensions set of extensions used to generate the current {@link ExtensionModel}
    * @return a {@link ComponentModel} of the global element to do test connection, empty otherwise.

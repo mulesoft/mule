@@ -244,6 +244,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         List<ConfigurationBuilder> builders = new ArrayList<>();
         builders.add(new SimpleConfigurationBuilder(getStartUpRegistryObjects()));
         addBuilders(builders);
+        builders.add(new MockExtensionManagerConfigurationBuilder());
         builders.add(getBuilder());
         MuleContextBuilder contextBuilder = MuleContextBuilder.builder(APP);
         DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();

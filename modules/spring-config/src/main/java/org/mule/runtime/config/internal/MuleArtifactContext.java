@@ -45,7 +45,6 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
@@ -60,7 +59,6 @@ import org.mule.runtime.config.api.dsl.processor.ConfigFile;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute;
 import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
-import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -218,7 +216,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                .getComponentBuildingDefinitions()));
     }
 
-    xmlApplicationParser = createApplicationParser(pluginsClassLoaders);
+    xmlApplicationParser = createApplicationParser();
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(componentBuildingDefinitionRegistry, muleContext.getErrorTypeRepository());
 
@@ -233,14 +231,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         : extensionManager.getExtensions());
   }
 
-  private XmlApplicationParser createApplicationParser(List<ClassLoader> pluginsClassLoaders) {
+  private XmlApplicationParser createApplicationParser() {
     ExtensionManager extensionManager = muleContext.getExtensionManager();
-
-    ServiceRegistry customRegistry = extensionManager != null
-        ? new XmlApplicationServiceRegistry(serviceRegistry, DslResolvingContext.getDefault(extensionManager.getExtensions()))
-        : serviceRegistry;
-
-    return new XmlApplicationParser(customRegistry, pluginsClassLoaders);
+    return XmlApplicationParser.createFromExtensionModels(extensionManager.getExtensions());
   }
 
   private void validateAllConfigElementHaveParsers() {

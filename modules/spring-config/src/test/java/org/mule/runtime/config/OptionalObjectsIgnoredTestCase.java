@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
 
 import org.junit.After;
 import org.junit.Before;
@@ -41,6 +42,7 @@ public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase {
   public void before() throws Exception {
     muleContext =
         (MuleContextWithRegistries) new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
+                                                                                      new MockExtensionManagerConfigurationBuilder(),
                                                                                       new SpringXmlConfigurationBuilder(new String[0],
                                                                                                                         emptyMap()));
     muleContext.start();
