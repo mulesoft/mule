@@ -117,7 +117,6 @@ public final class TemplateParser {
     boolean lastIsBackSlash = false;
     boolean lastStartedExpression = false;
     boolean openSingleQuotes = false;
-    boolean openDoubleQuotes = false;
 
     StringBuilder result = new StringBuilder();
     int currentPosition = 0;
@@ -133,12 +132,9 @@ public final class TemplateParser {
       }
 
       if (!lastIsBackSlash && c == '\'') {
-        openSingleQuotes = !openDoubleQuotes;
+        openSingleQuotes = !openSingleQuotes;
       }
-      if (!lastIsBackSlash && c == '"') {
-        openDoubleQuotes = !openDoubleQuotes;
-      }
-      if (c == OPEN_EXPRESSION && lastStartedExpression && !(openDoubleQuotes || openSingleQuotes)) {
+      if (c == OPEN_EXPRESSION && lastStartedExpression && !openSingleQuotes) {
         int closing = closingBracesPosition(template, currentPosition);
         String enclosingTemplate = template.substring(currentPosition + 1, closing);
 
@@ -171,17 +167,15 @@ public final class TemplateParser {
     int openingBraces = 1;
     boolean lastIsBackSlash = false;
     boolean openSingleQuotes = false;
-    boolean openDoubleQuotes = false;
     for (int i = startingPosition + 1; i < template.length(); i++) {
       char c = template.charAt(i);
-      if (c == CLOSE_EXPRESSION && !(openSingleQuotes || openDoubleQuotes)) {
+      if (c == CLOSE_EXPRESSION && !openSingleQuotes) {
         openingBraces--;
-      } else if (c == OPEN_EXPRESSION && !(openSingleQuotes || openDoubleQuotes)) {
+      } else if (c == OPEN_EXPRESSION && !openSingleQuotes) {
         openingBraces++;
       } else if (!lastIsBackSlash && c == '\'') {
         openSingleQuotes = !openSingleQuotes;
       } else if (!lastIsBackSlash && c == '"') {
-        openDoubleQuotes = !openDoubleQuotes;
       }
       lastIsBackSlash = c == '\\';
 
