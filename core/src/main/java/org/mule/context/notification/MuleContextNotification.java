@@ -7,6 +7,7 @@
 package org.mule.context.notification;
 
 import org.mule.api.MuleContext;
+import org.mule.api.context.notification.AbstractBlockingServerEvent;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 
@@ -15,7 +16,7 @@ import org.mule.api.context.notification.ServerNotification;
  * context starting occurs. The payload of this event will always be a reference to
  * the muleContext.
  */
-public class MuleContextNotification extends ServerNotification implements BlockingServerEvent
+public class MuleContextNotification extends AbstractBlockingServerEvent
 {
     /**
      * Serial version
