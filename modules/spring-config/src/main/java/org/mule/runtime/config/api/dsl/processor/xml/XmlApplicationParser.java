@@ -7,6 +7,7 @@
 
 package org.mule.runtime.config.api.dsl.processor.xml;
 
+import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
 import static org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -15,10 +16,14 @@ import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.api.dsl.processor.ConfigLineProvider;
+import org.mule.runtime.config.api.dsl.xml.StaticXmlNamespaceInfo;
+import org.mule.runtime.config.api.dsl.xml.StaticXmlNamespaceInfoProvider;
 import org.mule.runtime.config.internal.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
@@ -31,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -73,6 +79,39 @@ public final class XmlApplicationParser {
       namespaceInfoProvidersBuilder.addAll(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, pluginClassLoader));
     }
     return namespaceInfoProvidersBuilder.build();
+  }
+
+  /**
+   * Creates an {@link XmlApplicationParser} based on the list of {@link ExtensionModel}s used by the artifact.
+   * <p/>
+   * The {@link XmlNamespaceInfoProvider} will be discovered based on those extensions and the one discovered using by SPI.
+   *
+   * @param extensionModels the {@link ExtensionModel}s of the artifact that contains the configuration.
+   * @return a new {@link XmlApplicationParser}.
+   */
+  public static XmlApplicationParser createFromExtensionModels(Set<ExtensionModel> extensionModels) {
+    List<XmlNamespaceInfoProvider> xmlNamespaceInfoProviders =
+        ImmutableList.<XmlNamespaceInfoProvider>builder()
+            .add(createStaticNamespaceInfoProviders(extensionModels))
+            .addAll(discoverRuntimeXmlNamespaceInfoProvider())
+            .build();
+    return new XmlApplicationParser(xmlNamespaceInfoProviders);
+  }
+
+  private static List<XmlNamespaceInfoProvider> discoverRuntimeXmlNamespaceInfoProvider() {
+    ImmutableList.Builder namespaceInfoProvidersBuilder = ImmutableList.builder();
+    namespaceInfoProvidersBuilder
+        .addAll(new SpiServiceRegistry().lookupProviders(XmlNamespaceInfoProvider.class,
+                                                         XmlNamespaceInfoProvider.class.getClassLoader()));
+    return namespaceInfoProvidersBuilder.build();
+  }
+
+  private static XmlNamespaceInfoProvider createStaticNamespaceInfoProviders(Set<ExtensionModel> extensionModels) {
+    List<XmlNamespaceInfo> extensionNamespaces = extensionModels.stream()
+        .map(ext -> new StaticXmlNamespaceInfo(ext.getXmlDslModel().getNamespace(), ext.getXmlDslModel().getPrefix()))
+        .collect(toImmutableList());
+
+    return new StaticXmlNamespaceInfoProvider(extensionNamespaces);
   }
 
   public XmlApplicationParser(List<XmlNamespaceInfoProvider> namespaceInfoProviders) {

@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
+import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,7 @@ public class ApplicationContextBuilder {
     MuleContext context;
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     List<ConfigurationBuilder> builders = new ArrayList<>();
+    builders.add(new MockExtensionManagerConfigurationBuilder());
     builders.add(getAppBuilder(this.applicationResources));
     addBuilders(builders);
     configureMuleContext(muleContextBuilder);
