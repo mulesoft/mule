@@ -185,11 +185,26 @@
             <artifactId>jgrapht-jdk1.5</artifactId>
             <version>0.7.3</version>
         </dependency>
+
+        <!-- MULE-14795: This change is only needed in 3.9.1 because mule-common was released before
+             mule-core with an older version of Jackson 2 -->
         <dependency>
             <groupId>org.mule.common</groupId>
             <artifactId>mule-common</artifactId>
             <version>3.9.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson2Version}</version>
+        </dependency>
+        
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
