@@ -483,7 +483,7 @@
     <xsd:element name="async" type="asyncType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Processes the nested list of message processors asynchronously using a scheduler
+                Processes the nested list of message processors asynchronously.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -496,14 +496,14 @@
                 <xsd:attribute name="name" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Optional name that will be used to name the async scheduler.
+                            Name that will be used to identify the async scheduling tasks.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="maxConcurrency">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The maximum concurrency. This value determines the maximum level of parallelism that this async router can use to optimize for performance when processing messages.
+                            The maximum concurrency. This value determines the maximum level of parallelism that this async router can use to optimize its performance when processing messages.
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
@@ -518,7 +518,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 Performs logging using an expression that determines what should be logged. By default the current messages is
-                logged using the DEBUG level to the 'org.mule.runtime.core.api.processor.LoggerMessageProcessor' category but the level and
+                logged using the INFO level to the 'org.mule.runtime.core.api.processor.LoggerMessageProcessor' category but the level and
                 category can both be configured to suit your needs.
             </xsd:documentation>
         </xsd:annotation>
@@ -537,7 +537,7 @@
                 <xsd:attribute name="level" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The logging level to be used. Default is DEBUG.
+                            The logging level to be used. Default is INFO.
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
@@ -553,7 +553,7 @@
                 <xsd:attribute name="category" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The log category to be used
+                            Sets the logger category.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1314,7 +1314,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 Allows a 'flow' to be referenced such that the message processing will continue in the referenced flow before returning.
-                Message processing in the referenced 'flow' will occur within the context of the referenced flow and will therefore use its exception strategy etc.
+                Message processing in the referenced 'flow' will occur within the context of the referenced flow and will therefore use its error handler etc.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -1719,7 +1719,7 @@
     <xsd:element name="remove-variable" type="removeVariableType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A processor that remove variables by name or regular expression.
+                A processor that removes variables by name or a wildcard expression.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1734,7 +1734,7 @@
     <xsd:element name="parse-template" type="parseTemplateProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that parses a template defined inline
+                A processor that parses a template defined inline as output.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1754,7 +1754,7 @@
                 <xsd:attribute name="location" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL or from the classpath.
+                            The location of the template. The order in which the processor will attempt to load the file is: from the file system, from a URL or from the classpath.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1779,7 +1779,7 @@
     <xsd:element name="set-payload" type="setPayloadTransformerType" substitutionGroup="top-level-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that sets the payload with the provided value
+                A processor that sets the payload with the provided value.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2061,7 +2061,7 @@
                  substitutionGroup="abstract-on-error">
         <xsd:annotation>
             <xsd:documentation>
-                Error handler used to reference other ones.
+                Error handler used to reference others.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2070,7 +2070,7 @@
                  substitutionGroup="abstract-on-error">
         <xsd:annotation>
             <xsd:documentation>
-                Error handler used to handle exceptions. It will commit any transaction as if the message was consumed successfully.
+                Error handler used to handle errors. It will commit any transaction as if the message was consumed successfully.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2219,14 +2219,14 @@
                 <xsd:attribute name="idExpression" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Defines one or more expressions to use when extracting the ID from the message. If this property is not set, '#[id]' will be used by default.
+                            The expression to use when extracting the ID from the message. If this property is not set, '#[correlationId]' will be used by default.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="valueExpression" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Defines one or more expressions to use when extracting the value from the message.
+                            The expression to use when extracting the value from the message.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2366,28 +2366,28 @@
                 <xsd:attribute name="collection" use="optional" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            An expression to that returns a java collection, object array, map or DOM nodes.
+                            Expression that defines the collection to iterate over.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="batchSize" use="optional" type="substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Partitions the collection in subcollections of the specified size.
+                            Partitions the collection in sub-collections of the specified size.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="rootMessageVariableName" use="optional" default="rootMessage" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Property name where the parent message is stored.
+                            Variable name for the original message.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="counterVariableName" use="optional" default="counter" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Property name used to store the number of message being iterated.
+                            Variable name for the item number being processed.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2457,7 +2457,7 @@
                  substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Sends the message to the first message processor whose condition has been satisfied. If no conditions were satisfied, sends to the configured default message processor if configured, or throws an exception if not configured.
+                Sends the message to the first message processor whose condition is satisfied. If none of the conditions are satisfied, it sends the message to the configured default message processor or fails if there is none.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2501,7 +2501,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 Attempts to route a message to the message processor it contains in an asynchronous manner.
-                Routing is considered successful if no exception has been raised and, optionally, if the response matches an expression
+                Routing is considered successful if no error has been raised and, optionally, if the response matches an expression
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -2584,7 +2584,7 @@
     <xsd:element name="split-aggregate" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Splits the incoming message using the collection DataWeave script processing each part in parallel.
+                Splits the same message and processes each part in parallel.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -2594,7 +2594,7 @@
                         <xsd:element name="collection" type="xsd:string" minOccurs="0">
                             <xsd:annotation>
                                 <xsd:documentation>
-                                    DataWeave script used to evaluate the collection of parts to be processed.
+                                    Expression that defines the collection of parts to be processed in parallel.
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
@@ -2653,7 +2653,7 @@
                  type="processorWithAtLeastOneTargetType">
         <xsd:annotation>
             <xsd:documentation>
-                Send each message received to the next message processor in the circular list of targets
+                Send each message received to the next message processor in a circular list of targets.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
