@@ -17,6 +17,8 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.XMLConstants;
 import java.util.ArrayList;
@@ -38,6 +40,8 @@ import java.util.stream.Collectors;
  * @since 4.0
  */
 public class MacroExpansionModulesModel {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MacroExpansionModulesModel.class);
 
   private final ApplicationModel applicationModel;
   private final List<ExtensionModel> sortedExtensions;
@@ -61,6 +65,12 @@ public class MacroExpansionModulesModel {
    */
   public void expand() {
     for (ExtensionModel sortedExtension : sortedExtensions) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(String.format("macro expanding '%s' connector, xmlns:%s=\"%s\"",
+                                   sortedExtension.getName(),
+                                   sortedExtension.getXmlDslModel().getPrefix(),
+                                   sortedExtension.getXmlDslModel().getNamespace()));
+      }
       new MacroExpansionModuleModel(applicationModel, sortedExtension).expand();
     }
   }
@@ -86,7 +96,7 @@ public class MacroExpansionModulesModel {
         .filter(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())
         .collect(Collectors.toMap(extModel -> extModel.getXmlDslModel().getNamespace(), Function.identity()));
 
-    // we firt check there are at least one extension to macro expand
+    // we first check there are at least one extension to macro expand
     if (!allExtensionsByNamespace.isEmpty()) {
       Set<String> extensionsUsedInApp = new HashSet<>();
       applicationModel.executeOnEveryMuleComponentTree(rootComponentModel -> extensionsUsedInApp
@@ -96,7 +106,7 @@ public class MacroExpansionModulesModel {
         // generation of the DAG and then the topological iterator.
         // it's important to be 100% sure the DAG is not empty, or the TopologicalOrderIterator will fail at start up.
         DirectedGraph<String, DefaultEdge> namespaceDAG = new DirectedMultigraph<>(DefaultEdge.class);
-        extensionsUsedInApp.stream().forEach(namespace -> fillDependencyGraph(namespaceDAG, namespace, allExtensionsByNamespace));
+        extensionsUsedInApp.forEach(namespace -> fillDependencyGraph(namespaceDAG, namespace, allExtensionsByNamespace));
         GraphIterator<String, DefaultEdge> graphIterator = new TopologicalOrderIterator<>(namespaceDAG);
         while (graphIterator.hasNext()) {
           final String namespace = graphIterator.next();
