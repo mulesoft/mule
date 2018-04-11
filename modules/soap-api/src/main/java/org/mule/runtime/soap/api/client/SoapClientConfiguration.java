@@ -90,7 +90,7 @@ public final class SoapClientConfiguration {
   }
 
   public String getEncoding() {
-    return encoding;
+    return encoding == null ? "UTF-8" : encoding;
   }
 
   public TransportResourceLocator getLocator() {
