@@ -45,8 +45,6 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.collections.map.LazyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +109,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
               .onErrorMap(MessagingException.class,
                           error -> createMessagingException(doAfter(interceptor, component, of(error.getCause()))
                               .apply((InternalEvent) error.getEvent()),
-                                                            error.getCause(), (Component) component))
+                                                            error.getCause(), (Component) component, of(error)))
               .cast(InternalEvent.class)
               .map(doAfter(interceptor, component, empty()))
               .errorStrategyStop());
@@ -175,7 +173,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
                                () -> interceptor.after(((Component) component).getLocation(), interceptionEvent, thrown));
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), (Component) component));
+        throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), (Component) component, empty()));
       }
     };
   }
@@ -267,9 +265,11 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     return builder.build();
   }
 
-  protected MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor) {
+  protected MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor,
+                                                        Optional<MessagingException> original) {
     MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
     MessagingException me = new MessagingException(event, cause, processor);
+    original.ifPresent(error -> error.getInfo().forEach((name, info) -> me.addInfo(name, info)));
 
     return exceptionResolver.resolve(me, muleContext);
   }
