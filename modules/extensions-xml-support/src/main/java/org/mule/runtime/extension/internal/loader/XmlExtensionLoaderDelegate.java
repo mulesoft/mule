@@ -29,6 +29,15 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpa
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang3.StringUtils;
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -60,8 +69,8 @@ import org.mule.runtime.config.api.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
@@ -70,25 +79,26 @@ import org.mule.runtime.config.internal.dsl.model.extension.xml.property.Private
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.util.NoOpXmlErrorHandler;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
-import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurationPropertiesValidator;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
+import org.w3c.dom.Document;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
-
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -98,21 +108,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang3.StringUtils;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.CycleDetector;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-import org.w3c.dom.Document;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -354,9 +349,9 @@ public final class XmlExtensionLoaderDelegate {
       // This happens in org.mule.runtime.config.dsl.processor.xml.XmlApplicationParser.configLineFromElement()
       throw new IllegalArgumentException(format("There was an issue trying to read the stream of '%s'", resource.getFile()));
     }
+    final ConfigurationPropertiesResolver configurationPropertiesResolver = new XmlExtensionConfigurationPropertiesResolver();
     ComponentModelReader componentModelReader =
-        new ComponentModelReader(new DefaultConfigurationPropertiesResolver(empty(),
-                                                                            new EnvironmentPropertiesConfigurationProvider()));
+        new ComponentModelReader(configurationPropertiesResolver);
     return componentModelReader.extractComponentDefinitionModel(parseModule.get(), modulePath);
   }
 
@@ -468,7 +463,11 @@ public final class XmlExtensionLoaderDelegate {
     List<ComponentModel> configurationProperties = extractProperties(moduleModel);
     List<ComponentModel> connectionProperties = extractConnectionProperties(moduleModel);
     validateProperties(configurationProperties, connectionProperties);
-
+    //TODO lautaro aca
+    //TODO lautaro aca
+    //TODO lautaro aca
+    //TODO lautaro aca
+    //TODO lautaro aca
     if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty() || !globalElementsComponentModel.isEmpty()) {
       declarer.withModelProperty(new NoReconnectionStrategyModelProperty());
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
@@ -872,5 +871,24 @@ public final class XmlExtensionLoaderDelegate {
               .withParent(ErrorModelBuilder.newError(ANY).build())
               .build());
         }));
+  }
+
+  /**
+   * Utility class to read the XML module entirely so that if there's any usage of configurations properties, such as
+   * "${someProperty}", the {@link ForbiddenConfigurationPropertiesValidator} can show the errors consistently,
+   * Without this dull implementation, the {@link ComponentModelReader#extractComponentDefinitionModel(ConfigLine, String)} method
+   * fails while reading ANY parametrization throwing a {@link PropertyNotFoundException} eagerly. 
+   */
+  private class XmlExtensionConfigurationPropertiesResolver implements ConfigurationPropertiesResolver {
+
+    @Override
+    public Object resolveValue(String value) {
+      return value;
+    }
+
+    @Override
+    public Object resolvePlaceholderKeyValue(String placeholderKey) {
+      return placeholderKey;
+    }
   }
 }
