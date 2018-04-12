@@ -26,6 +26,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
+import org.mule.api.transport.OutputHandler;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.HttpMessageBuilder;
@@ -38,6 +39,7 @@ import org.mule.module.http.internal.domain.HttpEntity;
 import org.mule.module.http.internal.domain.HttpProtocol;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
+import org.mule.module.http.internal.domain.OutputHandlerHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.multipart.HttpMultipartEncoder;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
@@ -185,7 +187,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                     }
                 }
             }
-            else if (payload instanceof InputStream)
+            else if (payload instanceof InputStream || payload instanceof OutputHandler)
             {
                 if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null))
                 {
@@ -193,7 +195,13 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                     {
                         setupChunkedEncoding(httpResponseHeaderBuilder);
                     }
-                    httpEntity = new InputStreamHttpEntity((InputStream) payload);
+                    if (payload instanceof InputStream) {
+                        httpEntity = new InputStreamHttpEntity((InputStream) payload);
+                    }
+                    else
+                    {
+                        httpEntity = new OutputHandlerHttpEntity((OutputHandler) payload);
+                    }
                 }
                 else
                 {
