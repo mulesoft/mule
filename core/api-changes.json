@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.added",
+          "new": "method java.lang.String org.mule.runtime.api.util.ComponentLocationProvider::getSourceCode(org.mule.runtime.api.component.Component) @ org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider",
+          "package": "org.mule.runtime.core.privileged.execution",
+          "classSimpleName": "LocationExecutionContextProvider",
+          "methodName": "getSourceCode",
+          "elementKind": "method",
+          "justification": "Not implemented by users"
+        },
+        {
           "code": "java.method.defaultMethodAddedToInterface",
           "new": "method <T> org.reactivestreams.Publisher<T> org.mule.runtime.core.api.retry.policy.RetryPolicy::applyPolicy(org.reactivestreams.Publisher<T>, java.util.function.Predicate<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Function<java.lang.Throwable, java.lang.Throwable>, org.mule.runtime.api.scheduler.Scheduler)",
           "package": "org.mule.runtime.core.api.retry.policy",
