@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShu
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
+import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -23,6 +24,8 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.logging.LogUtil;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
@@ -237,7 +240,7 @@ public class MuleContainer {
   protected void showSplashScreen() {
     final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen();
     splashScreen.doBody();
-    logger.info(splashScreen.toString());
+    log(splashScreen.toString());
   }
 
   /**

@@ -21,9 +21,19 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
@@ -40,6 +50,8 @@ import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.internal.logging.LogUtil;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.DeploymentStopException;
@@ -58,14 +70,6 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,9 +127,7 @@ public class DefaultMuleApplication implements Application {
   @Override
   public void install() {
     withContextClassLoader(null, () -> {
-      if (logger.isInfoEnabled()) {
-        logger.info(miniSplash(format("New app '%s'", descriptor.getName())));
-      }
+      log(miniSplash(format("New app '%s'", descriptor.getName())));
     });
     // set even though it might be redundant, just in case the app is been redeployed
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
@@ -157,9 +159,7 @@ public class DefaultMuleApplication implements Application {
   @Override
   public void start() {
     withContextClassLoader(null, () -> {
-      if (logger.isInfoEnabled()) {
-        logger.info(miniSplash(format("Starting app '%s'", descriptor.getName())));
-      }
+      log(miniSplash(format("Starting app '%s'", descriptor.getName())));
     });
     try {
       this.artifactContext.getMuleContext().start();
@@ -167,11 +167,9 @@ public class DefaultMuleApplication implements Application {
       // null CCL ensures we log at 'system' level
       // TODO getDomainClassLoader a more usable wrapper for any logger to be logged at sys level
       withContextClassLoader(null, () -> {
-        if (logger.isInfoEnabled()) {
-          ApplicationStartedSplashScreen splashScreen = new ApplicationStartedSplashScreen();
-          splashScreen.createMessage(descriptor);
-          logger.info(splashScreen.toString());
-        }
+        ApplicationStartedSplashScreen splashScreen = new ApplicationStartedSplashScreen();
+        splashScreen.createMessage(descriptor);
+        LogUtil.log(splashScreen.toString());
       });
     } catch (Exception e) {
       setStatusToFailed();
@@ -194,9 +192,7 @@ public class DefaultMuleApplication implements Application {
 
   private void doInit(boolean lazy, boolean disableXmlValidations) {
     withContextClassLoader(null, () -> {
-      if (logger.isInfoEnabled()) {
-        logger.info(miniSplash(format("Initializing app '%s'", descriptor.getName())));
-      }
+      log(miniSplash(format("Initializing app '%s'", descriptor.getName())));
     });
     try {
       ArtifactContextBuilder artifactBuilder =
@@ -407,9 +403,7 @@ public class DefaultMuleApplication implements Application {
 
     try {
       withContextClassLoader(null, () -> {
-        if (logger.isInfoEnabled()) {
-          logger.info(miniSplash(format("Stopping app '%s'", descriptor.getName())));
-        }
+        log(miniSplash(format("Stopping app '%s'", descriptor.getName())));
       });
       this.artifactContext.getMuleContext().stop();
     } catch (MuleException e) {
@@ -464,9 +458,7 @@ public class DefaultMuleApplication implements Application {
     }
 
     withContextClassLoader(null, () -> {
-      if (logger.isInfoEnabled()) {
-        logger.info(miniSplash(format("Disposing app '%s'", descriptor.getName())));
-      }
+      log(miniSplash(format("Disposing app '%s'", descriptor.getName())));
     });
     artifactContext.getMuleContext().dispose();
     artifactContext = null;

@@ -18,12 +18,15 @@ import static org.apache.commons.collections.CollectionUtils.subtract;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
+import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.config.StartupContext;
+import org.mule.runtime.core.internal.logging.LogUtil;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -172,9 +175,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
             // Ignore and continue
           }
         }
-        if (logger.isInfoEnabled()) {
-          logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
-        }
+        log(miniSplash("Mule is up and running in a fixed app set mode"));
       }
     } finally {
       if (deploymentLock.isHeldByCurrentThread()) {
@@ -227,9 +228,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
     artifactDirMonitorTimer.scheduleWithFixedDelay(this, reloadIntervalMs, reloadIntervalMs, MILLISECONDS);
 
-    if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
-    }
+    log(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
   }
 
   protected void deployPackedApps(String[] zips) {

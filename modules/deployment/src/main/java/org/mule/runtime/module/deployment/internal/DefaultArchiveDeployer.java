@@ -18,16 +18,9 @@ import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
+import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.deployment.model.api.DeploymentStartException;
-import org.mule.runtime.module.deployment.api.DeploymentListener;
-import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
-import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +35,18 @@ import java.util.Properties;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
+
+import org.mule.runtime.core.internal.logging.LogUtil;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.DeploymentStartException;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
+import org.mule.runtime.module.deployment.internal.util.ObservableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,10 +148,11 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   private void logDeploymentFailure(Throwable t, String artifactName) {
     if (containsType(t, DeploymentStartException.class)) {
-      logger.error(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", artifactName)));
+      log(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", artifactName)));
       logger.error(t.getMessage());
     } else {
-      logger.error(miniSplash(format("Failed to deploy artifact '%s', see below", artifactName)), t);
+      log(miniSplash(format("Failed to deploy artifact '%s', see below", artifactName)));
+      logger.error(t.getMessage(), t);
     }
   }
 
@@ -227,8 +233,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private T deployExplodedApp(String addedApp, Optional<Properties> deploymentProperties) throws DeploymentException {
-    if (logger.isInfoEnabled()) {
-      logger.info("================== New Exploded Artifact: " + addedApp);
+    if (logger.isDebugEnabled()) {
+      logger.debug("================== New Exploded Artifact: " + addedApp);
     }
 
     T artifact;
@@ -245,10 +251,11 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       addZombieFile(addedApp, artifactDir);
 
       if (containsType(t, DeploymentStartException.class)) {
-        logger.error(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", addedApp)));
+        log(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", addedApp)));
         logger.error(t.getMessage());
       } else {
-        logger.error(miniSplash(format("Failed to deploy artifact '%s', see below", addedApp)), t);
+        log(miniSplash(format("Failed to deploy artifact '%s', see below", addedApp)));
+        logger.error(t.getMessage(), t);
       }
 
       deploymentListener.onDeploymentFailure(addedApp, t);
@@ -354,9 +361,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private void logArtifactUndeployed(T artifact) {
-    if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(format("Undeployed artifact '%s'", artifact.getArtifactName())));
-    }
+    log(miniSplash(format("Undeployed artifact '%s'", artifact.getArtifactName())));
   }
 
   private File installFrom(URI uri) throws IOException {
@@ -418,9 +423,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public void redeploy(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException {
-    if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(format("Redeploying artifact '%s'", artifact.getArtifactName())));
-    }
+    log(miniSplash(format("Redeploying artifact '%s'", artifact.getArtifactName())));
 
     deploymentListener.onRedeploymentStart(artifact.getArtifactName());
 
@@ -482,11 +485,12 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     } catch (Throwable t) {
       // error text has been created by the deployer already
       if (containsType(t, DeploymentStartException.class)) {
-        logger.error(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details",
-                                       artifact.getArtifactName())));
+        log(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details",
+                              artifact.getArtifactName())));
         logger.error(t.getMessage());
       } else {
-        logger.error(miniSplash(format("Failed to deploy artifact '%s', see below", artifact.getArtifactName())), t);
+        log(miniSplash(format("Failed to deploy artifact '%s', see below", artifact.getArtifactName())));
+        logger.info(t.getMessage(), t);
       }
 
       addZombieApp(artifact);
