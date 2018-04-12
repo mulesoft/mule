@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -100,14 +101,14 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
                           throw new CompletionException(createMessagingException(eventWithResolvedParams,
                                                                                  t instanceof CompletionException ? t.getCause()
                                                                                      : t,
-                                                                                 ((Component) component)));
+                                                                                 (Component) component, empty()));
                         }
                       })
                       .thenApply(interceptedEvent -> interceptedEvent != null
                           ? ((DefaultInterceptionEvent) interceptedEvent).resolve()
                           : null);
     } catch (Exception e) {
-      throw propagate(createMessagingException(interceptionEvent.resolve(), e, (Component) component));
+      throw propagate(createMessagingException(interceptionEvent.resolve(), e, (Component) component, empty()));
     }
   }
 
