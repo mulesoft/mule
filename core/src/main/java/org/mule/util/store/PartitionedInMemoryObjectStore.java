@@ -7,10 +7,6 @@
 package org.mule.util.store;
 
 import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
-import org.mule.api.store.ObjectAlreadyExistsException;
-import org.mule.api.store.ObjectDoesNotExistException;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.PartitionableExpirableObjectStore;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,6 +17,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+
+import org.mule.api.store.ObjectAlreadyExistsException;
+import org.mule.api.store.ObjectDoesNotExistException;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.PartitionableExpirableObjectStore;
 
 public class PartitionedInMemoryObjectStore<T extends Serializable> extends AbstractPartitionedObjectStore<T>
     implements PartitionableExpirableObjectStore<T>
@@ -97,7 +98,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
     {
         return new ArrayList<Serializable>(getPartition(partitionName).keySet());
     }
-    
+
     @Override
     public void clear(String partitionName) throws ObjectStoreException
     {
@@ -132,7 +133,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
         {
             partition = new ConcurrentLinkedQueue<ExpiryEntry>();
             ConcurrentLinkedQueue<ExpiryEntry> previous = expiryInfoPartition.putIfAbsent(
-                partitionName, partition);
+                    partitionName, partition);
             if (previous != null)
             {
                 partition = previous;
@@ -175,7 +176,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
             return;
         }
 
-        if (!(store instanceof ExpirationDelegatableObjectStore))
+        if (!(store instanceof ExpirationDelegatableObjectStore) || ((ExpirationDelegatableObjectStore) store).mustPerformMuleExpiration())
         {
             expiredEntries = expireDueToTTL(entryTTL, now, expiredEntries, store, partition);
         }
