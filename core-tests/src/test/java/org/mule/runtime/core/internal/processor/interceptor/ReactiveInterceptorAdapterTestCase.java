@@ -36,6 +36,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
@@ -1218,6 +1219,44 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         inOrder.verify(processor).process(any());
         inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
         inOrder.verify(interceptor1).after(any(), any(), eq(empty()));
+
+        verifyParametersResolvedAndDisposed(times(1));
+      }
+    }
+  }
+
+  @Test
+  public void processorFailsAndfirstInterceptorThrowsExceptionAfter() throws Exception {
+    when(processor.process(any())).thenThrow(new RuntimeException("Processor Error"));
+    RuntimeException expectedException = new RuntimeException("Some Error");
+    ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
+
+      @Override
+      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
+        throw expectedException;
+      }
+    });
+    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
+    startFlowWithInterceptors(interceptor1, interceptor2);
+
+    expected.expect(MessagingException.class);
+    expected.expectCause(sameInstance(expectedException));
+    try {
+      process(flow, eventBuilder(muleContext).message(Message.of("")).build());
+    } catch (MessagingException e) {
+      assertThat(e.getInfo().getOrDefault(INFO_ALREADY_LOGGED_KEY, false), is(true));
+      throw e;
+    } finally {
+      if (useMockInterceptor) {
+        InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
+
+        inOrder.verify(interceptor1).before(any(), any(), any());
+        inOrder.verify(interceptor2).before(any(), any(), any());
+        inOrder.verify(interceptor1).around(any(), any(), any(), any());
+        inOrder.verify(interceptor2).around(any(), any(), any(), any());
+        inOrder.verify(processor).process(any());
+        inOrder.verify(interceptor2, never()).after(any(), any(), eq(empty()));
+        inOrder.verify(interceptor1, never()).after(any(), any(), eq(empty()));
 
         verifyParametersResolvedAndDisposed(times(1));
       }
