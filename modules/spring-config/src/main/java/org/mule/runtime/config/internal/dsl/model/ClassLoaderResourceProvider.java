@@ -6,15 +6,13 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static org.apache.commons.io.FileUtils.toFile;
-
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.URL;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 
 /**
  * Resource provider implementation that delegates to an actual class loader.
@@ -29,20 +27,17 @@ public class ClassLoaderResourceProvider implements ResourceProvider {
 
   @Override
   public InputStream getResourceAsStream(String uri) {
-    URL resourceUrl = classLoader.getResource(uri);
-    if (resourceUrl == null) {
-      return null;
+    InputStream resourceAsStream = classLoader.getResourceAsStream(uri);
+    if (resourceAsStream == null) {
+      File file = new File(uri);
+      if (file.exists()) {
+        try {
+          return new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+          throw new MuleRuntimeException(e);
+        }
+      }
     }
-
-    File resourceFile = toFile(resourceUrl);
-    if (!resourceFile.exists()) {
-      return null;
-    }
-
-    try {
-      return new FileInputStream(resourceFile);
-    } catch (FileNotFoundException e) {
-      return null;
-    }
+    return resourceAsStream;
   }
 }
