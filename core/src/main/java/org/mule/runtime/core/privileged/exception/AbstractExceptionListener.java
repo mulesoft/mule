@@ -142,18 +142,17 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   protected void resolveAndLogException(Throwable t) {
     Pair<MuleException, String> resolvedException = resolveExceptionAndMessageToLog(t);
-    if (resolvedException.getSecond() != null) {
-      //First check if exception was not logged already
-      if (!(boolean) resolvedException.getFirst().getInfo().getOrDefault(INFO_ALREADY_LOGGED_KEY, false)) {
-        doLogException(resolvedException.getSecond(), null);
-      } else {
-        //Don't log anything, error while getting root or exception already logged.
-        return;
-      }
-      resolvedException.getFirst().addInfo(INFO_ALREADY_LOGGED_KEY, true);
-    } else {
+    if (resolvedException.getSecond() == null) {
       doLogException("Caught exception in Exception Strategy: " + t.getMessage(), t);
+      return;
     }
+    //First check if exception was not logged already
+    if ((boolean) resolvedException.getFirst().getInfo().getOrDefault(INFO_ALREADY_LOGGED_KEY, false)) {
+      //Don't log anything, error while getting root or exception already logged.
+      return;
+    }
+    doLogException(resolvedException.getSecond(), null);
+    resolvedException.getFirst().addInfo(INFO_ALREADY_LOGGED_KEY, true);
   }
 
   protected void doLogException(String message, Throwable t) {
