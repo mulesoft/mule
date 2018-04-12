@@ -7,7 +7,9 @@
 package org.mule.runtime.config.internal.dsl.model;
 
 import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
@@ -26,7 +28,6 @@ import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.construct.HasConstructModels;
-import org.mule.runtime.api.meta.model.nested.HasNestableElementModels;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModelVisitor;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
@@ -36,6 +37,7 @@ import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -45,7 +47,9 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -57,16 +61,16 @@ import java.util.concurrent.ExecutionException;
  * <p/>
  * It's recommended that the application only has one instance of this class to avoid processing the extension models several
  * times.
- *
+ * <p>
  * since 4.0
  */
 public class ExtensionModelHelper {
 
   private final Set<ExtensionModel> extensionsModels;
   private Cache<ComponentIdentifier, Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>> extensionComponentModelByComponentIdentifier =
-      CacheBuilder.newBuilder().build();
-  private Cache<ComponentIdentifier, Optional<? extends NestableElementModel>> extensionNestableElementModelByComponentIdentifier =
-      CacheBuilder.newBuilder().build();
+          CacheBuilder.newBuilder().build();
+  private Cache<ComponentIdentifier, Optional<NestableElementModel>> extensionNestableElementModelByComponentIdentifier =
+          CacheBuilder.newBuilder().build();
 
   /**
    * @param extensionModels the set of {@link ExtensionModel}s to work with. Usually this is the set of models configured within a
@@ -84,10 +88,10 @@ public class ExtensionModelHelper {
    */
   public TypedComponentIdentifier.ComponentType findComponentType(ComponentModel componentModel) {
     ComponentIdentifier componentId = componentModel.getCustomAttributes().containsKey(ORIGINAL_IDENTIFIER)
-        ? (ComponentIdentifier) componentModel.getCustomAttributes().get(ORIGINAL_IDENTIFIER)
-        : componentModel.getIdentifier();
+                                      ? (ComponentIdentifier) componentModel.getCustomAttributes().get(ORIGINAL_IDENTIFIER)
+                                      : componentModel.getIdentifier();
     Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> extensionComponentModelOptional =
-        findComponentModel(componentId);
+            findComponentModel(componentId);
 
     return extensionComponentModelOptional.map(extensionComponentModel -> {
       Reference<TypedComponentIdentifier.ComponentType> componentTypeReference = new Reference<>();
@@ -148,13 +152,13 @@ public class ExtensionModelHelper {
         for (ExtensionModel extensionModel : extensionsModels) {
           if (extensionModel.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace())) {
             List<HasOperationModels> operationModelsProviders = ImmutableList.<HasOperationModels>builder()
-                .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
+                    .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
             List<HasSourceModels> sourceModelsProviders = ImmutableList.<HasSourceModels>builder()
-                .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
+                    .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
             List<HasConstructModels> constructModelsProviders = singletonList(extensionModel);
 
             Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> componentModel =
-                resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName);
+                    resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName);
             //TODO MULE-13894 remove this once unified extensionModel names to use camelCase (see smart connectors and crafted declared extesion models)
             if (!componentModel.isPresent()) {
               componentModel = resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
@@ -165,50 +169,57 @@ public class ExtensionModelHelper {
         }
         return empty();
       });
-    } catch (ExecutionException e) {
+    }
+    catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
     }
   }
 
-  private Optional<? extends NestableElementModel> findNestableElementModel(ComponentIdentifier componentIdentifier) {
+  private Optional<NestableElementModel> findNestableElementModel(ComponentIdentifier componentIdentifier) {
     try {
       return extensionNestableElementModelByComponentIdentifier.get(componentIdentifier, () -> {
         String componentName = toCamelCase(componentIdentifier.getName(), COMPONENT_NAME_SEPARATOR);
         for (ExtensionModel extensionModel : extensionsModels) {
           if (extensionModel.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace())) {
-            List<HasNestableElementModels> nestableElementModelsProviders = singletonList(extensionModel);
-
-            Optional<? extends NestableElementModel> componentModel = resolveModel(nestableElementModelsProviders, componentName);
-            if (!componentModel.isPresent()) {
-              componentModel = resolveModel(nestableElementModelsProviders, componentIdentifier.getName());
+            Optional<NestableElementModel> elementModelOptional = searchNestableElementModel(extensionModel, componentName);
+            if(elementModelOptional.isPresent()) {
+              return elementModelOptional;
             }
-            return componentModel;
+            return searchNestableElementModel(extensionModel, componentIdentifier.getName());
           }
         }
         return empty();
       });
-    } catch (ExecutionException e) {
+    }
+    catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
     }
   }
 
-  private Optional<? extends NestableElementModel> resolveModel(List<HasNestableElementModels> nestableElementModelsProviders,
-                                                                String componentName) {
-
-    for (HasNestableElementModels nestableElementModelsProvider : nestableElementModelsProviders) {
-      Optional<NestableElementModel> nestableElementModel = nestableElementModelsProvider.getNestableElementModel(componentName);
-      if (nestableElementModel.isPresent()) {
-        return nestableElementModel;
+  private Optional<NestableElementModel> searchNestableElementModel(ExtensionModel extensionModel, String componentName) {
+    Reference<NestableElementModel> reference = new Reference<>();
+    IdempotentExtensionWalker walker = new IdempotentExtensionWalker() {
+      @Override
+      protected void onConstruct(ConstructModel model) {
+        model.getNestedComponents().stream()
+                .filter(nestedComponent -> nestedComponent.getName().equals(componentName))
+                .findFirst()
+                .ifPresent((foundComponent) -> {
+          reference.set(foundComponent);
+          stop();
+        });
       }
-    }
-    return empty();
-
+    };
+    walker.walk(extensionModel);
+    return ofNullable(reference.get());
   }
 
-  private Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> resolveModel(List<HasOperationModels> operationModelsProviders,
-                                                                                          List<HasSourceModels> sourceModelsProviders,
-                                                                                          List<HasConstructModels> constructModelsProviders,
-                                                                                          String componentName) {
+
+  private Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> resolveModel
+          (List<HasOperationModels> operationModelsProviders,
+           List<HasSourceModels> sourceModelsProviders,
+           List<HasConstructModels> constructModelsProviders,
+           String componentName) {
     for (HasOperationModels operationModelsProvider : operationModelsProviders) {
       Optional<OperationModel> operationModel = operationModelsProvider.getOperationModel(componentName);
       if (operationModel.isPresent()) {
@@ -239,10 +250,12 @@ public class ExtensionModelHelper {
     }
 
     @Override
-    public void visit(NestedComponentModel component) {}
+    public void visit(NestedComponentModel component) {
+    }
 
     @Override
-    public void visit(NestedChainModel component) {}
+    public void visit(NestedChainModel component) {
+    }
 
     @Override
     public void visit(NestedRouteModel component) {
@@ -264,7 +277,8 @@ public class ExtensionModelHelper {
     }
 
     @Override
-    public void visit(NestedComponentModel component) {}
+    public void visit(NestedComponentModel component) {
+    }
 
     @Override
     public void visit(NestedChainModel component) {
