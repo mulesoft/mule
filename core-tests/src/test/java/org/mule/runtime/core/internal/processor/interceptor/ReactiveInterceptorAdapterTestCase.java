@@ -1236,8 +1236,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
         throw expectedException;
       }
     });
-    ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
-    startFlowWithInterceptors(interceptor1, interceptor2);
+    startFlowWithInterceptors(interceptor1);
 
     expected.expect(MessagingException.class);
     expected.expectCause(sameInstance(expectedException));
@@ -1246,20 +1245,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     } catch (MessagingException e) {
       assertThat(e.getInfo().getOrDefault(INFO_ALREADY_LOGGED_KEY, false), is(true));
       throw e;
-    } finally {
-      if (useMockInterceptor) {
-        InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
-
-        inOrder.verify(interceptor1).before(any(), any(), any());
-        inOrder.verify(interceptor2).before(any(), any(), any());
-        inOrder.verify(interceptor1).around(any(), any(), any(), any());
-        inOrder.verify(interceptor2).around(any(), any(), any(), any());
-        inOrder.verify(processor).process(any());
-        inOrder.verify(interceptor2, never()).after(any(), any(), eq(empty()));
-        inOrder.verify(interceptor1, never()).after(any(), any(), eq(empty()));
-
-        verifyParametersResolvedAndDisposed(times(1));
-      }
     }
   }
 
