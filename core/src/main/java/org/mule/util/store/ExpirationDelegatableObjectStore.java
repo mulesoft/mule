@@ -19,4 +19,11 @@ public interface ExpirationDelegatableObjectStore
      * @param entryTTL the entryTTL of the object store record.
      */
     void setExpirationPolicyProperties(int entryTTL);
+
+    /**
+     * Verifies if the actual configuration of the object store allows delegation of expiration
+     * 
+     * @return whether mule must perform the record expiration in the object store.
+     */
+    boolean mustPerformMuleExpiration();
 }
