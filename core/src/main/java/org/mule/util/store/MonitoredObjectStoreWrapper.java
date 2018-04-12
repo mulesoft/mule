@@ -201,7 +201,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
             }
 
             ListableObjectStore<StoredObject<T>> store = getStore();
-            if (!(store instanceof ExpirationDelegatableObjectStore))
+            if (!(store instanceof ExpirationDelegatableObjectStore) || ((ExpirationDelegatableObjectStore) store).mustPerformMuleExpiration())
             {
                 excess = expireDueToTTL(now, keys, excess, sortedMaxEntries, store);
             }
