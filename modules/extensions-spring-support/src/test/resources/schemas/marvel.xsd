@@ -31,6 +31,19 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="pooling-mystic-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="mule:expressionString" use="optional" name="multipleConfig"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="Bytes-casterType" substitutionGroup="mule:abstract-message-source" name="bytes-caster"></xs:element>
   <xs:complexType name="Bytes-casterType">
     <xs:complexContent>
@@ -72,7 +85,9 @@
   <xs:complexType name="ReadStreamType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -124,7 +139,9 @@
   <xs:complexType name="SeekStreamType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
@@ -151,6 +168,7 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
           <xs:annotation>

@@ -35,7 +35,7 @@ public class MysticConnectionProvider implements ConnectionProvider<MysticConnec
 
   @Override
   public void disconnect(MysticConnection connection) {
-
+    connection.close();
   }
 
   @Override

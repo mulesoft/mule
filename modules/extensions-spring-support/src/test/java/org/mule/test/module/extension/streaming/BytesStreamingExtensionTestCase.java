@@ -25,9 +25,11 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -42,10 +44,14 @@ import javax.inject.Named;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
+@RunnerDelegateTo(Parameterized.class)
 public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";
@@ -58,6 +64,14 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
     synchronized (CASTED_SPELLS) {
       CASTED_SPELLS.add(spell);
     }
+  }
+
+  @Parameters(name = "{0}")
+  public static Object[][] parameters() {
+    return new Object[][] {
+        {"Direct connection", "drStrange"},
+        {"Pooled connection", "pollingDrStrange"}
+    };
   }
 
   @Inject
@@ -80,11 +94,26 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   @Named("toNonRepeatableStream")
   private Flow toNonRepeatableStream;
 
+  @Rule
+  public SystemProperty configName;
+
+  private final String name;
+
+  public BytesStreamingExtensionTestCase(String name, String configName) {
+    this.name = name;
+    this.configName = new SystemProperty("configName", configName);
+  }
+
   private String data = randomAlphabetic(2048);
 
   @Override
   protected String getConfigFile() {
     return "bytes-streaming-extension-config.xml";
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    setDisposeContextPerClass(true);
   }
 
   @Override
@@ -289,7 +318,10 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   }
 
   private void startSourceAndListenSpell(Flow flow, Predicate<String> predicate) throws Exception {
-    flow.start();
+    if (!flow.getLifecycleState().isStarted()) {
+      flow.start();
+    }
+
     new PollingProber(4000, 100).check(new JUnitLambdaProbe(() -> {
       synchronized (CASTED_SPELLS) {
         return CASTED_SPELLS.stream().anyMatch(predicate);
