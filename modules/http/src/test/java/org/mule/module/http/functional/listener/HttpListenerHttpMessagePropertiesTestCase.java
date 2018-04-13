@@ -12,8 +12,9 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_REMOTE_ADDRESS;
-
+import static org.mule.module.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import org.mule.api.MuleMessage;
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.HttpHeaders;
@@ -207,6 +208,52 @@ public class HttpListenerHttpMessagePropertiesTestCase extends FunctionalTestCas
         assertThat(uriParams, notNullValue());
         assertThat(uriParams.size(), is(1));
         assertThat(uriParams.get(FIRST_URI_PARAM_NAME), is(uriParamValue));
+    }
+
+    @Test
+    public void muleCorrelationIdHeader() throws Exception
+    {
+        final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
+
+        final String myCorrelationId = "myCorrelationId";
+        Post(url).addHeader(MULE_CORRELATION_ID_PROPERTY, myCorrelationId).connectTimeout(RECEIVE_TIMEOUT).execute();
+        final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
+        assertThat(message.getCorrelationId(), is(myCorrelationId));
+        String header = message.getInboundProperty(MULE_CORRELATION_ID_PROPERTY);
+        assertThat(header, is(myCorrelationId));
+    }
+
+    @Test
+    public void xCorrelationIdHeader() throws Exception
+    {
+        final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
+
+        final String myCorrelationId = "myCorrelationId";
+        Post(url).addHeader(X_CORRELATION_ID, myCorrelationId).connectTimeout(RECEIVE_TIMEOUT).execute();
+        final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
+        assertThat(message.getCorrelationId(), is(myCorrelationId));
+        String header = message.getInboundProperty(X_CORRELATION_ID);
+        assertThat(header, is(myCorrelationId));
+    }
+
+    @Test
+    public void muleOverridesXCorrelationIdHeader() throws Exception
+    {
+        final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
+
+        final String myCorrelationId = "myCorrelationId";
+        final String myOtherCorrelationId = "myOtherCorrelationId";
+        Post(url)
+          .addHeader(X_CORRELATION_ID, myCorrelationId)
+          .addHeader(MULE_CORRELATION_ID_PROPERTY, myOtherCorrelationId)
+          .connectTimeout(RECEIVE_TIMEOUT)
+          .execute();
+        final MuleMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT);
+        assertThat(message.getCorrelationId(), is(myOtherCorrelationId));
+        String header = message.getInboundProperty(X_CORRELATION_ID);
+        assertThat(header, is(myCorrelationId));
+        String muleHeader = message.getInboundProperty(MULE_CORRELATION_ID_PROPERTY);
+        assertThat(muleHeader, is(myOtherCorrelationId));
     }
 
     @Test

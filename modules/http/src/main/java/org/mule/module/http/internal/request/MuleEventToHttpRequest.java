@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.request;
 
 import static org.mule.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
@@ -95,17 +96,32 @@ public class MuleEventToHttpRequest
             if (isNotIgnoredProperty(outboundProperty))
             {
                 Object outboundPropertyValue = event.getMessage().getOutboundProperty(outboundProperty);
-                if (outboundPropertyValue instanceof Iterable)
+                if (outboundProperty.equalsIgnoreCase(MULE_CORRELATION_ID_PROPERTY))
                 {
-                    Iterable outboundIterable = (Iterable)outboundPropertyValue;
-                    for (Object value : outboundIterable)
+                    if (!builder.getHeaders().containsKey(MULE_CORRELATION_ID_PROPERTY))
                     {
-                        builder.addHeader(outboundProperty, value.toString());
+                        builder.addHeader(outboundProperty, outboundPropertyValue.toString());
+                    }
+                    else
+                    {
+                        logger.warn("MULE_CORRELATION_ID is present as an explicit header and as an outbound property."
+                                      + " The explicit header will prevail.");
                     }
                 }
                 else
                 {
-                    builder.addHeader(outboundProperty, outboundPropertyValue.toString());
+                    if (outboundPropertyValue instanceof Iterable)
+                    {
+                        Iterable outboundIterable = (Iterable) outboundPropertyValue;
+                        for (Object value : outboundIterable)
+                        {
+                            builder.addHeader(outboundProperty, value.toString());
+                        }
+                    }
+                    else
+                    {
+                        builder.addHeader(outboundProperty, outboundPropertyValue.toString());
+                    }
                 }
             }
         }
