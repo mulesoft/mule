@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <configuration>
+        <expression-language>
+            <import class="org.mule.module.http.functional.listener.HttpListenerResponseStreamingTestCase"/>
+            <alias name="mapPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY_MAP"/>
+        </expression-language>
+    </configuration>
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+
+    <flow name="mapFlow">
+        <http:listener config-ref="listenerConfig" path="/map">
+            <http:response-builder>
+                <http:header headerName="Content-Type" value="application/x-www-form-urlencoded"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[mapPayload]"/>
+    </flow>
+
+    <flow name="alwaysMapFlow">
+        <http:listener config-ref="listenerConfig" path="/alwaysMap" responseStreamingMode="ALWAYS">
+            <http:response-builder>
+                <http:header headerName="Content-Type" value="application/x-www-form-urlencoded"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[mapPayload]"/>
+    </flow>
+
+    <flow name="neverMapFlow">
+        <http:listener config-ref="listenerConfig" path="/neverMap" responseStreamingMode="NEVER">
+            <http:response-builder>
+                <http:header headerName="Content-Type" value="application/x-www-form-urlencoded"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="#[mapPayload]"/>
+    </flow>
+</mule>

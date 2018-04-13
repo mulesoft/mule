@@ -18,12 +18,14 @@ import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transport.OutputHandler;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.Header;
@@ -40,6 +42,16 @@ public abstract class HttpListenerResponseStreamingTestCase extends FunctionalTe
 
     public static final String TEST_BODY = RandomStringUtils.randomAlphabetic(100 * 1024);
     public static final String TEST_BODY_MAP = "one=1&two=2";
+    public static final OutputHandler TEST_OUTPUT_HANDLER = new OutputHandler() {
+
+        @Override
+        public void write(MuleEvent event, OutputStream out) throws IOException {
+            out.write(TEST_BODY.getBytes());
+            out.flush();
+            out.close();
+        }
+
+    };
     private static InputStreamWrapper payloadStream;
 
     @Rule
