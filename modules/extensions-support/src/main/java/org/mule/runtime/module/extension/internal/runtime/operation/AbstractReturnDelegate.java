@@ -9,19 +9,20 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
-import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
+import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageIterator;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isJavaCollection;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler.nullHandler;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
-
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
@@ -31,6 +32,7 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.util.StreamingUtils;
 import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -39,6 +41,8 @@ import org.mule.runtime.module.extension.internal.runtime.operation.resulthandle
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.MapReturnHandler;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Iterator;
@@ -124,7 +128,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
         value = toMessageIterator((Iterator<Result>) value, cursorProviderFactory, event);
       }
 
-      value = streamingContent(value, cursorProviderFactory, event);
+      value = streamingContent(value, operationContext, cursorProviderFactory, event);
 
       Message.Builder messageBuilder;
 
@@ -140,6 +144,20 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
       return messageBuilder.mediaType(mediaType).build();
     }
+  }
+
+  private Object streamingContent(Object value,
+                                  ExecutionContextAdapter operationContext,
+                                  CursorProviderFactory cursorProviderFactory,
+                                  CoreEvent event) {
+    if (value instanceof InputStream) {
+      ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
+      if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
+        value = new ConnectedInputStreamWrapper((InputStream) value, connectionHandler);
+      }
+    }
+
+    return StreamingUtils.streamingContent(value, cursorProviderFactory, event);
   }
 
   /**
@@ -178,5 +196,65 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     }
 
     return mediaType;
+  }
+
+  private class ConnectedInputStreamWrapper extends InputStream {
+
+    private final InputStream delegate;
+    private final ConnectionHandler<?> connectionHandler;
+
+    private ConnectedInputStreamWrapper(InputStream delegate, ConnectionHandler<?> connectionHandler) {
+      this.delegate = delegate;
+      this.connectionHandler = connectionHandler;
+    }
+
+    @Override
+    public int read() throws IOException {
+      return delegate.read();
+    }
+
+    @Override
+    public int read(byte[] b) throws IOException {
+      return delegate.read(b);
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+      return delegate.read(b, off, len);
+    }
+
+    @Override
+    public long skip(long n) throws IOException {
+      return delegate.skip(n);
+    }
+
+    @Override
+    public int available() throws IOException {
+      return delegate.available();
+    }
+
+    @Override
+    public void close() throws IOException {
+      try {
+        delegate.close();
+      } finally {
+        connectionHandler.release();
+      }
+    }
+
+    @Override
+    public void mark(int readlimit) {
+      delegate.mark(readlimit);
+    }
+
+    @Override
+    public void reset() throws IOException {
+      delegate.reset();
+    }
+
+    @Override
+    public boolean markSupported() {
+      return delegate.markSupported();
+    }
   }
 }
