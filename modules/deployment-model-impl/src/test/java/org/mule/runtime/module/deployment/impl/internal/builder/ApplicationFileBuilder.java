@@ -44,6 +44,7 @@ import java.util.Properties;
 public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFileBuilder> {
 
   private Properties properties = new Properties();
+  private String minMuleVersion = "4.0.0";
 
   /**
    * Creates a new builder
@@ -57,7 +58,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
   /**
    * Creates a new builder
    *
-   * @param artifactId artifact identifier. Non empty.
+   * @param artifactId           artifact identifier. Non empty.
    * @param upperCaseInExtension whether the extension is in uppercase
    */
   public ApplicationFileBuilder(String artifactId, boolean upperCaseInExtension) {
@@ -77,7 +78,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
   /**
    * Create a new builder from another instance and different ID.
    *
-   * @param id artifact identifier. Non empty.
+   * @param id     artifact identifier. Non empty.
    * @param source instance used as template to build the new one. Non null.
    */
   public ApplicationFileBuilder(String id, ApplicationFileBuilder source) {
@@ -108,7 +109,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
   /**
    * Adds a property into the application properties file.
    *
-   * @param propertyName name fo the property to add. Non empty
+   * @param propertyName  name fo the property to add. Non empty
    * @param propertyValue value of the property to add. Non null.
    * @return the same builder instance
    */
@@ -124,7 +125,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
    * Adds a resource file to the artifact folder.
    *
    * @param resourceFile class file from a external file or test resource. Non empty.
-   * @param targetFile name to use on the added resource. Non empty.
+   * @param targetFile   name to use on the added resource. Non empty.
    * @return the same builder instance
    */
   public ApplicationFileBuilder usingResource(String resourceFile, String targetFile) {
@@ -133,6 +134,17 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
     resources.add(new ZipResource(resourceFile, targetFile));
 
     return getThis();
+  }
+
+  /**
+   * Add the minMuleVersion to the mule-artifact.json file.
+   *
+   * @param minMuleVersion of the artifact to be constructed
+   * @return the same builder instance
+   */
+  public ApplicationFileBuilder withMinMuleVersion(String minMuleVersion) {
+    this.minMuleVersion = minMuleVersion;
+    return this;
   }
 
   @Override
@@ -146,10 +158,11 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
 
     Object redeploymentEnabled = deployProperties.get(PROPERTY_REDEPLOYMENT_ENABLED);
     Object configResources = deployProperties.get(PROPERTY_CONFIG_RESOURCES);
-    File applicationDescriptor = createApplicationJsonDescriptorFile(redeploymentEnabled == null
-        ? empty()
-        : ofNullable(Boolean
-            .valueOf((String) redeploymentEnabled)),
+    File applicationDescriptor = createApplicationJsonDescriptorFile(minMuleVersion,
+                                                                     redeploymentEnabled == null
+                                                                         ? empty()
+                                                                         : ofNullable(Boolean
+                                                                             .valueOf((String) redeploymentEnabled)),
                                                                      Optional.ofNullable((String) configResources),
                                                                      ofNullable((String) properties.get(EXPORTED_PACKAGES)),
                                                                      ofNullable((String) properties.get(EXPORTED_RESOURCES)));
@@ -157,7 +170,8 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
     return customResources;
   }
 
-  private File createApplicationJsonDescriptorFile(Optional<Boolean> redeploymentEnabled, Optional<String> configResources,
+  private File createApplicationJsonDescriptorFile(String minMuleVersion,
+                                                   Optional<Boolean> redeploymentEnabled, Optional<String> configResources,
                                                    Optional<String> exportedPackages, Optional<String> exportedResources) {
     File applicationDescriptor = new File(getTempFolder(), getArtifactId() + "application.json");
     applicationDescriptor.deleteOnExit();
@@ -165,7 +179,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
         new MuleApplicationModel.MuleApplicationModelBuilder();
     muleApplicationModelBuilder
         .setName(getArtifactId())
-        .setMinMuleVersion("4.0.0")
+        .setMinMuleVersion(minMuleVersion)
         .setRequiredProduct(MULE);
     redeploymentEnabled.ifPresent(muleApplicationModelBuilder::setRedeploymentEnabled);
     configResources.ifPresent(configs -> {
