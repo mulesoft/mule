@@ -12,7 +12,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.test.marvel.model.Missile;
 
-@Alias(("odd-missile"))
+@Alias("odd-missile")
 public class OddMissileProvider extends MissileProvider implements Initialisable {
 
   private int count;

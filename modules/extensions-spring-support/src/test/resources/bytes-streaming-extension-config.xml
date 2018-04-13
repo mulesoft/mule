@@ -9,15 +9,19 @@
 
     <marvel:dr-strange-config name="drStrange" />
 
+    <marvel:dr-strange-config name="pollingDrStrange">
+        <marvel:pooling-mystic-connection />
+    </marvel:dr-strange-config>
+
     <flow name="readStream">
-        <marvel:read-stream config-ref="drStrange"/>
+        <marvel:read-stream config-ref="${configName}"/>
     </flow>
 
     <flow name="rewind">
         <flow-ref name="toStream" />
-        <marvel:read-stream config-ref="drStrange" target="firstRead" targetValue="#[message]"/>
-        <marvel:seek-stream config-ref="drStrange" position="0" />
-        <marvel:read-stream config-ref="drStrange" target="secondRead" targetValue="#[message]"/>
+        <marvel:read-stream target="firstRead" targetValue="#[message]" config-ref="${configName}"/>
+        <marvel:seek-stream position="0" config-ref="${configName}"/>
+        <marvel:read-stream target="secondRead" targetValue="#[message]" config-ref="${configName}"/>
     </flow>
 
     <flow name="consumeGeneratedStream">
@@ -32,29 +36,29 @@
     
     <flow name="seekStream">
         <flow-ref name="toStream" />
-        <marvel:seek-stream config-ref="drStrange" position="#[vars.position]" />
+        <marvel:seek-stream position="#[vars.position]" config-ref="${configName}"/>
     </flow>
     
     <flow name="seekStreamTx">
         <try transactionalAction="BEGIN_OR_JOIN">
             <flow-ref name="toStream" />
-            <marvel:seek-stream config-ref="drStrange" position="#[vars.position]" />
+            <marvel:seek-stream position="#[vars.position]" config-ref="${configName}"/>
         </try>
     </flow>
 
     <flow name="toStream">
-        <marvel:to-stream />
+        <marvel:to-stream config-ref="${configName}"/>
     </flow>
 
     <flow name="toNonRepeatableStream">
-        <marvel:to-stream>
+        <marvel:to-stream config-ref="${configName}">
             <non-repeatable-stream />
         </marvel:to-stream>
     </flow>
 
     <flow name="bufferExceeded">
         <try>
-            <marvel:to-stream config-ref="drStrange" >
+            <marvel:to-stream config-ref="${configName}">
                 <repeatable-in-memory-stream initialBufferSize="10" bufferSizeIncrement="5" maxBufferSize="50" bufferUnit="KB" />
             </marvel:to-stream>
             <flow-ref name="readStream" />
@@ -68,22 +72,22 @@
     </flow>
 
     <flow name="toSimpleStream">
-        <marvel:to-stream config-ref="drStrange" >
+        <marvel:to-stream config-ref="${configName}">
             <non-repeatable-stream />
         </marvel:to-stream>
     </flow>
 
     <flow name="bytesCaster" initialState="stopped">
-        <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain" />
+        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" config-ref="${configName}"/>
         <flow-ref name="assertPayloadIsStreamProvider" />
         <object-to-string-transformer />
         <flow-ref name="castSpell" />
     </flow>
 
     <flow name="sourceWithExceededBuffer" initialState="stopped">
-        <marvel:bytes-caster config-ref="drStrange"
-                             castFrequencyInMillis="5000"
-                             spell="dormammu i've come to bargain" spellSize="65536">
+        <marvel:bytes-caster castFrequencyInMillis="5000"
+                             spell="dormammu i've come to bargain" spellSize="65536"
+                             config-ref="${configName}">
             <repeatable-in-memory-stream initialBufferSize="10" bufferSizeIncrement="5" maxBufferSize="50" bufferUnit="KB" />
         </marvel:bytes-caster>
         <logger message="#[payload]" level="ERROR"/>
@@ -97,7 +101,7 @@
     </flow>
 
     <flow name="bytesCasterInTx" initialState="stopped">
-        <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain" />
+        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" config-ref="${configName}" />
         <try transactionalAction="BEGIN_OR_JOIN">
             <flow-ref name="assertPayloadIsStreamProvider" />
             <object-to-string-transformer />
@@ -106,7 +110,7 @@
     </flow>
 
     <flow name="bytesCasterWithoutStreaming" initialState="stopped">
-        <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain">
+        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" config-ref="${configName}">
             <non-repeatable-stream />
         </marvel:bytes-caster>
         <flow-ref name="assertPayloadIsNotStreamProvider" />
@@ -115,13 +119,13 @@
     </flow>
 
     <flow name="crashCar">
-        <marvel:to-stream />
+        <marvel:to-stream config-ref="${configName}"/>
         <flow-ref name="doCrash" />
     </flow>
 
     <flow name="handledCrashCar">
         <try>
-            <marvel:to-stream />
+            <marvel:to-stream config-ref="${configName}"/>
             <flow-ref name="doCrash" />
             <error-handler>
                 <on-error-continue>
@@ -133,7 +137,7 @@
 
     <flow name="nonRepeatableHandledCrashCar">
         <try>
-            <marvel:to-stream>
+            <marvel:to-stream config-ref="${configName}">
                 <non-repeatable-stream />
             </marvel:to-stream>
             <flow-ref name="doCrash" />
@@ -146,7 +150,7 @@
     </flow>
 
     <flow name="nonRepeatableCrashCar">
-        <marvel:to-stream>
+        <marvel:to-stream config-ref="${configName}">
             <non-repeatable-stream />
         </marvel:to-stream>
         <flow-ref name="doCrash" />
@@ -159,7 +163,7 @@
     </flow>
 
     <flow name="doCrash">
-        <marvel:crash-car />
+        <marvel:crash-car config-ref="${configName}"/>
     </flow>
 
     <sub-flow name="castSpell">

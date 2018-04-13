@@ -26,7 +26,7 @@ import org.mule.test.marvel.ironman.IronMan;
 @Configuration(name = CONFIG_NAME)
 @Operations(DrStrangeOperations.class)
 @Sources(DrStrangeBytesSource.class)
-@ConnectionProviders(MysticConnectionProvider.class)
+@ConnectionProviders({MysticConnectionProvider.class, PoolingMysticConnectionProvider.class})
 public class DrStrange {
 
   public static final String CONFIG_NAME = "dr-strange";

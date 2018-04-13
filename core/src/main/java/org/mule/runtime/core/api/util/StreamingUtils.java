@@ -10,8 +10,11 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -313,5 +316,14 @@ public final class StreamingUtils {
         return value;
       }
     }
+  }
+
+  /**
+   * @param componentModel a {@link Component}
+   * @return Whether the {@code componentModel} supports streaming or not
+   */
+  public static boolean supportsStreaming(ComponentModel componentModel) {
+    return componentModel instanceof ConnectableComponentModel
+        && ((ConnectableComponentModel) componentModel).supportsStreaming();
   }
 }

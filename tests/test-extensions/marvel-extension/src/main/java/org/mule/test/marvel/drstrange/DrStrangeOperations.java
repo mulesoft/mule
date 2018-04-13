@@ -17,6 +17,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -34,19 +35,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DrStrangeOperations {
 
   @MediaType(TEXT_PLAIN)
-  public String seekStream(@Config DrStrange dr, @Optional(defaultValue = PAYLOAD) InputStream stream, int position)
+  public String seekStream(@Connection MysticConnection connection, @Optional(defaultValue = PAYLOAD) InputStream stream,
+                           int position)
       throws IOException {
     checkArgument(stream instanceof CursorStream, "Stream was not cursored");
 
     CursorStream cursor = (CursorStream) stream;
     cursor.seek(position);
 
-    return readStream(dr, cursor);
+    return readStream(connection, cursor);
   }
 
   @Throws(CustomErrorProvider.class)
   @MediaType(TEXT_PLAIN)
-  public String readStream(@Config DrStrange dr, @Optional(defaultValue = PAYLOAD) InputStream stream) throws IOException {
+  public String readStream(@Connection MysticConnection connection, @Optional(defaultValue = PAYLOAD) InputStream stream)
+      throws IOException {
     try {
       return IOUtils.toString(stream);
     } catch (Exception e) {
@@ -55,8 +58,8 @@ public class DrStrangeOperations {
   }
 
   @MediaType(TEXT_PLAIN)
-  public InputStream toStream(@Config DrStrange dr, @Optional(defaultValue = PAYLOAD) String data) {
-    return new InputStreamWrapper(new ByteArrayInputStream(data.getBytes()));
+  public InputStream toStream(@Connection MysticConnection connection, @Optional(defaultValue = PAYLOAD) String data) {
+    return connection.manage(new ByteArrayInputStream(data.getBytes()));
   }
 
   public void crashCar(@Config DrStrange dr) {
@@ -103,70 +106,5 @@ public class DrStrangeOperations {
 
       }
     };
-  }
-
-  private class InputStreamWrapper extends InputStream {
-
-    private final InputStream delegate;
-    private boolean closed = false;
-
-    public InputStreamWrapper(InputStream delegate) {
-      this.delegate = delegate;
-    }
-
-    @Override
-    public int read() throws IOException {
-      if (closed) {
-        return -1;
-      }
-      return delegate.read();
-    }
-
-    @Override
-    public int read(byte[] b) throws IOException {
-      if (closed) {
-        return -1;
-      }
-      return delegate.read(b);
-    }
-
-    @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-      if (closed) {
-        return -1;
-      }
-      return delegate.read(b, off, len);
-    }
-
-    @Override
-    public long skip(long n) throws IOException {
-      return delegate.skip(n);
-    }
-
-    @Override
-    public int available() throws IOException {
-      return delegate.available();
-    }
-
-    @Override
-    public void close() throws IOException {
-      closed = true;
-      delegate.close();
-    }
-
-    @Override
-    public void mark(int readlimit) {
-      delegate.mark(readlimit);
-    }
-
-    @Override
-    public void reset() throws IOException {
-      delegate.reset();
-    }
-
-    @Override
-    public boolean markSupported() {
-      return delegate.markSupported();
-    }
   }
 }
