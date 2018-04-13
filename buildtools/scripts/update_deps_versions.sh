@@ -72,12 +72,3 @@ propertiesDeps=("muleHttpConnectorTestVersion"
 # deps. So there is a circular dependency.
 updatePropertiesVersion "$VERSION_CONNECTORS_MODULES_AUX" pom.xml propertiesDeps[@]
 
-
-propertiesDeps=("muleMetadataExtensionTestVersion"
-                "muleVeganExtensionTestVersion"
-                "muleHeisenbergExtensionTestVersion"
-                "muleSubtypesExtensionTestVersion"
-                "muleMarvelExtensionTestVersion"
-                "mulePetstoreExtensionTestVersion")
-
-updatePropertiesVersion "$VERSION_TO_MULE" pom.xml propertiesDeps[@]
