@@ -24,6 +24,7 @@ import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
 import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 
 import java.io.ByteArrayInputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -47,6 +48,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
     private HttpResponseBuilder responseBuilder;
     private HttpResponseBuilder errorResponseBuilder;
     private HttpThrottlingHeadersMapBuilder httpThrottlingHeadersMapBuilder = new HttpThrottlingHeadersMapBuilder();
+    private Map<String, String> extraHeaders = new HashMap<String, String>();
 
     public HttpMessageProcessorTemplate(MuleEvent sourceMuleEvent,
                                         MessageProcessor messageProcessor,
@@ -190,6 +192,11 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
         {
             throttledResponseBuilder.addHeader(throttlingHeaderName, throttlingHeaders.get(throttlingHeaderName));
         }
+
+        for (String header : extraHeaders.keySet() )
+        {
+            throttledResponseBuilder.addHeader(header, extraHeaders.get(header));
+        }
     }
 
     private ResponseStatusCallback getLogCompletionCallback()
@@ -226,5 +233,10 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
     private Map<String,String> getThrottlingHeaders()
     {
         return httpThrottlingHeadersMapBuilder.build();
+    }
+
+    @Override
+    public void addExtraHeader(String headerName, String value) {
+        extraHeaders.put(headerName, value);
     }
 }
