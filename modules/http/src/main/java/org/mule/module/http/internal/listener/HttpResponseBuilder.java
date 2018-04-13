@@ -26,6 +26,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
+import org.mule.api.transport.OutputHandler;
 import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.HttpMessageBuilder;
@@ -38,6 +39,7 @@ import org.mule.module.http.internal.domain.HttpEntity;
 import org.mule.module.http.internal.domain.HttpProtocol;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
+import org.mule.module.http.internal.domain.OutputHandlerHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.multipart.HttpMultipartEncoder;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
@@ -185,41 +187,50 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                     }
                 }
             }
-            else if (payload instanceof InputStream)
-            {
-                if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null))
+            else {
+                boolean isStream = payload instanceof InputStream;
+                if (isStream || payload instanceof OutputHandler)
                 {
-                    if (supportsTransferEncoding(event))
+                    if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null))
                     {
-                        setupChunkedEncoding(httpResponseHeaderBuilder);
+                        if (supportsTransferEncoding(event))
+                        {
+                            setupChunkedEncoding(httpResponseHeaderBuilder);
+                        }
+                        if (isStream) {
+                            httpEntity = new InputStreamHttpEntity((InputStream) payload);
+                        }
+                        else
+                        {
+                            httpEntity = new OutputHandlerHttpEntity((OutputHandler) payload);
+                        }
                     }
-                    httpEntity = new InputStreamHttpEntity((InputStream) payload);
+                    else
+                    {
+                        try
+                        {
+                            ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
+                            setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+                            httpEntity = byteArrayHttpEntity;
+                        }
+                        catch (Exception e)
+                        {
+                            throw new RuntimeException(e);
+                        }
+                    }
                 }
                 else
                 {
                     try
                     {
                         ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
-                        setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+                        resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding(event), byteArrayHttpEntity);
                         httpEntity = byteArrayHttpEntity;
                     }
                     catch (Exception e)
                     {
                         throw new RuntimeException(e);
                     }
-                }
-            }
-            else
-            {
-                try
-                {
-                    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
-                    resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding(event), byteArrayHttpEntity);
-                    httpEntity = byteArrayHttpEntity;
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(e);
                 }
             }
         }

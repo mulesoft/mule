@@ -60,7 +60,7 @@ public class ResponseStreamingCompletionHandler
 
     public void sendInputStreamChunk() throws IOException
     {
-        final Buffer buffer = memoryManager.allocate(8 * 1024);
+        final Buffer buffer = memoryManager.allocate(DEFAULT_BUFFER_SIZE);
 
         final byte[] bufferByteArray = buffer.array();
         final int offset = buffer.arrayOffset();

@@ -22,7 +22,9 @@ import org.slf4j.LoggerFactory;
 
 public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandler<WriteResult>
 {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
+
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected HttpResponsePacket buildHttpResponsePacket(HttpRequestPacket sourceRequest, HttpResponse httpResponse)
     {
