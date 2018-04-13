@@ -19,6 +19,18 @@ import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
 import static org.mule.module.http.internal.listener.grizzly.ExecutorPerServerAddressIOStrategy.EXECUTOR_DISCARDED_ATTRIBUTE;
 import static org.mule.module.http.internal.listener.grizzly.ExecutorPerServerAddressIOStrategy.EXECUTOR_REJECTED_ATTRIBUTE;
 import static org.mule.module.http.internal.listener.grizzly.MuleSslFilter.SSL_SESSION_ATTRIBUTE_KEY;
+import org.mule.module.http.api.HttpConstants.HttpStatus;
+import org.mule.module.http.internal.domain.EmptyHttpEntity;
+import org.mule.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.module.http.internal.domain.OutputHandlerHttpEntity;
+import org.mule.module.http.internal.domain.request.ClientConnection;
+import org.mule.module.http.internal.domain.request.HttpRequestContext;
+import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.module.http.internal.domain.response.HttpResponseBuilder;
+import org.mule.module.http.internal.listener.RequestHandlerProvider;
+import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
+import org.mule.module.http.internal.listener.async.RequestHandler;
+import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -31,17 +43,6 @@ import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
-import org.mule.module.http.api.HttpConstants.HttpStatus;
-import org.mule.module.http.internal.domain.EmptyHttpEntity;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.request.ClientConnection;
-import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.domain.response.HttpResponse;
-import org.mule.module.http.internal.domain.response.HttpResponseBuilder;
-import org.mule.module.http.internal.listener.RequestHandlerProvider;
-import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
 
 /**
  * Grizzly filter that dispatches the request to the right request handler
@@ -121,6 +122,10 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
                     if (httpResponse.getEntity() instanceof InputStreamHttpEntity)
                     {
                         new ResponseStreamingCompletionHandler(ctx, request, httpResponse, responseStatusCallback).start();
+                    }
+                    else if (httpResponse.getEntity() instanceof OutputHandlerHttpEntity)
+                    {
+                        new ResponseDeferringCompletionHandler(ctx, request, httpResponse, responseStatusCallback).start();
                     }
                     else
                     {
