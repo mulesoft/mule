@@ -137,9 +137,9 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
         configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
     assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
-    assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(0));
+    assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(1));
 
-    assertThat(configurationModel.getOperationModels().size(), is(7));
+    assertThat(configurationModel.getOperationModels().size(), is(10));
 
     Optional<OperationModel> operationModel = configurationModel.getOperationModel("set-payload-add-param-and-property-values");
     assertThat(operationModel.isPresent(), is(true));

@@ -32,7 +32,7 @@ import java.util.stream.StreamSupport;
 public class ForbiddenConfigurationPropertiesValidator implements ExtensionModelValidator {
 
   public static final String CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE =
-      "Configuration properties is not supported, used <mule:global-property ../> or <module:property/> instead. Offending global element '%s'";
+      "Configuration properties is not supported, either use <mule:global-property ../>, ${file::file.txt} or <module:property/> instead. Offending global element '%s'";
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
@@ -42,7 +42,6 @@ public class ForbiddenConfigurationPropertiesValidator implements ExtensionModel
       protected void onConfiguration(ConfigurationModel model) {
         model.getModelProperty(GlobalElementComponentModelModelProperty.class).ifPresent(modelProperty -> {
           final Set<ComponentIdentifier> configurationPropertiesCollection = getConfigurationPropertiesIdentifiers();
-
           modelProperty.getGlobalElements().forEach(globalElementComponentModel -> {
             if (configurationPropertiesCollection.contains(globalElementComponentModel.getIdentifier())) {
               problemsReporter.addError(new Problem(model, format(
@@ -51,7 +50,6 @@ public class ForbiddenConfigurationPropertiesValidator implements ExtensionModel
             }
           });
         });
-
       }
 
       private Set<ComponentIdentifier> getConfigurationPropertiesIdentifiers() {
