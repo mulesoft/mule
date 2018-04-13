@@ -128,7 +128,6 @@ public class HttpListenerOutputHandlerTestCase extends FunctionalTestCase
       public void write(MuleEvent event, OutputStream out) throws IOException
       {
         throw new IOException("Error");
-
       }
     };
 
