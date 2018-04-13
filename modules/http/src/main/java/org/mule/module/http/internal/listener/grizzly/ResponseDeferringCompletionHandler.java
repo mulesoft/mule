@@ -180,6 +180,10 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
       if (!isDone)
       {
         HttpContent content = httpResponsePacket.httpTrailerBuilder().build();
+        if (hasPendingData())
+        {
+          content = getBufferAsContent().append(content);
+        }
         waitAndWrite(content);
         isDone = true;
         if (!httpResponsePacket.isChunked())
@@ -217,13 +221,9 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
      */
     public void flush(int bufferSize)
     {
-      // Check whether there's actually data to send
-      if (buffer.capacity() != buffer.remaining())
+      if (hasPendingData())
       {
-        // Prepare buffer for reading
-        buffer.flip();
-        HttpContent content = httpResponsePacket.httpContentBuilder().content(buffer).build();
-        waitAndWrite(content);
+        waitAndWrite(getBufferAsContent());
       }
       else
       {
@@ -231,6 +231,16 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
         buffer.release();
       }
       buffer = getBuffer(bufferSize);
+    }
+
+    private boolean hasPendingData() {
+      return buffer.capacity() != buffer.remaining();
+    }
+
+    private HttpContent getBufferAsContent() {
+      // Prepare buffer for reading
+      buffer.flip();
+      return httpResponsePacket.httpContentBuilder().content(buffer).build();
     }
 
     /**
