@@ -6,13 +6,13 @@
  */
 package org.mule.test.functional;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.core.api.event.CoreEvent;
-
 import org.junit.Test;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.util.IOUtils;
 
 public class ModuleWithPropertiesTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
@@ -66,5 +66,28 @@ public class ModuleWithPropertiesTestCase extends AbstractXmlExtensionMuleArtifa
   public void testSetPayloadConfigOptionalProperty() throws Exception {
     CoreEvent muleEvent = flowRunner("testSetPayloadConfigOptionalProperty").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(nullValue()));
+  }
+
+  @Test
+  public void testSetPayloadHardcodedGlobalProperty() throws Exception {
+    CoreEvent muleEvent = flowRunner("testSetPayloadHardcodedGlobalProperty").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("a-constant-global-value"));
+  }
+
+  @Test
+  public void testSetPayloadHardcodedSystemProperty() throws Exception {
+    final String expected_value = System.getProperty("user.home");
+    CoreEvent muleEvent = flowRunner("testSetPayloadHardcodedSystemProperty").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is(expected_value));
+  }
+
+  @Test
+  public void testSetPayloadHardcodedFileProperty() throws Exception {
+    CoreEvent muleEvent = flowRunner("testSetPayloadHardcodedFileProperty").run();
+    final String expectedContent =
+        IOUtils.toString(currentThread().getContextClassLoader().getResourceAsStream("modules/module-properties-file.txt"))
+            .trim();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is(
+                                                                  expectedContent));
   }
 }

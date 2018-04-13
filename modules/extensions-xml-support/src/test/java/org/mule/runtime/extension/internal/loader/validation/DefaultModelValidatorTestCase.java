@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory.CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
@@ -20,6 +21,7 @@ import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.EMPTY_TYPE_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.TYPE_RAISE_ERROR_ATTRIBUTE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.WRONG_VALUE_FORMAT_MESSAGE;
+import static org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurationPropertiesValidator.CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator.ILLEGAL_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator.REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
@@ -194,6 +196,12 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
                                                         "ilegal-petstore-config-name_lal[\\{#a",
                                                         ""))));
     getExtensionModelFrom("validation/module-repeated-global-elements.xml", getDependencyExtensions());
+  }
+
+  @Test
+  public void forbiddenConfigurationPropertiesThrowsException() {
+    exception.expectMessage(format(CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE, CONFIGURATION_PROPERTIES.toString()));
+    getExtensionModelFrom("validation/module-configuration-property-file.xml");
   }
 
   private ExtensionModel getExtensionModelFrom(String modulePath) {
