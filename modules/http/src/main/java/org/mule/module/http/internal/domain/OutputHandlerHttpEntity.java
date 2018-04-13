@@ -8,6 +8,11 @@ package org.mule.module.http.internal.domain;
 
 import org.mule.api.transport.OutputHandler;
 
+/**
+ * Entity to wrap {@link OutputHandler OutputHandles}.
+ *
+ * @since 3.10
+ */
 public class OutputHandlerHttpEntity implements HttpEntity {
 
   private OutputHandler outputHandler;

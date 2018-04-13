@@ -187,20 +187,36 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                     }
                 }
             }
-            else if (payload instanceof InputStream || payload instanceof OutputHandler)
-            {
-                if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null))
+            else {
+                boolean isStream = payload instanceof InputStream;
+                if (isStream || payload instanceof OutputHandler)
                 {
-                    if (supportsTransferEncoding(event))
+                    if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null))
                     {
-                        setupChunkedEncoding(httpResponseHeaderBuilder);
-                    }
-                    if (payload instanceof InputStream) {
-                        httpEntity = new InputStreamHttpEntity((InputStream) payload);
+                        if (supportsTransferEncoding(event))
+                        {
+                            setupChunkedEncoding(httpResponseHeaderBuilder);
+                        }
+                        if (isStream) {
+                            httpEntity = new InputStreamHttpEntity((InputStream) payload);
+                        }
+                        else
+                        {
+                            httpEntity = new OutputHandlerHttpEntity((OutputHandler) payload);
+                        }
                     }
                     else
                     {
-                        httpEntity = new OutputHandlerHttpEntity((OutputHandler) payload);
+                        try
+                        {
+                            ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
+                            setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+                            httpEntity = byteArrayHttpEntity;
+                        }
+                        catch (Exception e)
+                        {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
                 else
@@ -208,26 +224,13 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                     try
                     {
                         ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
-                        setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+                        resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding(event), byteArrayHttpEntity);
                         httpEntity = byteArrayHttpEntity;
                     }
                     catch (Exception e)
                     {
                         throw new RuntimeException(e);
                     }
-                }
-            }
-            else
-            {
-                try
-                {
-                    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
-                    resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding(event), byteArrayHttpEntity);
-                    httpEntity = byteArrayHttpEntity;
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(e);
                 }
             }
         }

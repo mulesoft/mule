@@ -24,7 +24,7 @@ public abstract class BaseResponseCompletionHandler extends EmptyCompletionHandl
 {
     public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected HttpResponsePacket buildHttpResponsePacket(HttpRequestPacket sourceRequest, HttpResponse httpResponse)
     {

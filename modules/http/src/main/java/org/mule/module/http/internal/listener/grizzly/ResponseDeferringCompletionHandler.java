@@ -32,6 +32,8 @@ import org.glassfish.grizzly.memory.MemoryManager;
 /**
  * {@link org.glassfish.grizzly.CompletionHandler}, responsible for asynchronous http response transferring
  * when the response body is an {@link OutputHandler}.
+ *
+ * @since 3.10
  */
 public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHandler {
 
@@ -59,7 +61,23 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
 
   public void start() throws IOException
   {
-    outputHandler.write(null, outputStream);
+    try
+    {
+      outputHandler.write(null, outputStream);
+    }
+    catch (IOException e)
+    {
+      // Check whether a 200 has already gone through
+      if (outputStream.isWritten())
+      {
+        logger.warn("Failure while processing HTTP response body. Cancelling.", e);
+        outputStream.close();
+      }
+      else
+      {
+        throw e;
+      }
+    }
   }
 
   /**
@@ -120,6 +138,7 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
   {
 
     private Buffer buffer = getBuffer(BaseResponseCompletionHandler.DEFAULT_BUFFER_SIZE);
+    private boolean written = false;
     private CompletionHandler completionHandler;
 
     CompletionOutputStream(CompletionHandler completionHandler)
@@ -158,17 +177,24 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
     @Override
     public void close() throws IOException
     {
-      HttpContent content = httpResponsePacket.httpTrailerBuilder().build();
-      waitAndWrite(content);
-      isDone = true;
-      if (!httpResponsePacket.isChunked())
+      if (!isDone)
       {
-        // In HTTP 1.0 (no chunk supported) there is no more data sent to the client after the input stream is completed.
-        // As there is no more data to be sent (in HTTP 1.1 a last chunk with '0' is sent) the #completed method is not called
-        // So, we have to call it manually here
-        sent.release();
-        doComplete();
+        HttpContent content = httpResponsePacket.httpTrailerBuilder().build();
+        waitAndWrite(content);
+        isDone = true;
+        if (!httpResponsePacket.isChunked())
+        {
+          // In HTTP 1.0 (no chunk supported) there is no more data sent to the client after the input stream is completed.
+          // As there is no more data to be sent (in HTTP 1.1 a last chunk with '0' is sent) the #completed method is not called
+          // So, we have to call it manually here
+          sent.release();
+          doComplete();
+        }
       }
+    }
+
+    public boolean isWritten() {
+      return written;
     }
 
     /**
@@ -216,6 +242,7 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
       try {
         sent.acquire();
         ctx.write(content, completionHandler);
+        written = true;
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }

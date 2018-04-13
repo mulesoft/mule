@@ -120,6 +120,50 @@ public class HttpListenerOutputHandlerTestCase extends FunctionalTestCase
     });
   }
 
+  @Test
+  public void failing() throws Exception
+  {
+    outputHandler = new OutputHandler() {
+      @Override
+      public void write(MuleEvent event, OutputStream out) throws IOException
+      {
+        throw new IOException("Error");
+
+      }
+    };
+
+    assertThat(Request.Get(getUrl()).execute().returnResponse().getStatusLine().getStatusCode(), is(500));
+  }
+
+  @Test
+  public void flushAndFail() throws Exception
+  {
+    validateResponseFor(new OutputHandler() {
+      @Override
+      public void write(MuleEvent event, OutputStream out) throws IOException
+      {
+        saveAndWrite(out, DEFAULT_BUFFER_SIZE / 4);
+        out.flush();
+        throw new IOException("Error");
+      }
+    });
+  }
+
+  @Test
+  public void flushCloseAndFail() throws Exception
+  {
+    validateResponseFor(new OutputHandler() {
+      @Override
+      public void write(MuleEvent event, OutputStream out) throws IOException
+      {
+        saveAndWrite(out, DEFAULT_BUFFER_SIZE / 4);
+        out.flush();
+        out.close();
+        throw new IOException("Error");
+      }
+    });
+  }
+
   private void saveAndWrite(OutputStream out, int size) throws IOException
   {
     String chunk = RandomStringUtils.randomAlphabetic(size);
