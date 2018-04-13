@@ -506,16 +506,12 @@ public final class XmlExtensionLoaderDelegate {
     List<ComponentModel> configurationProperties = extractProperties(moduleModel);
     List<ComponentModel> connectionProperties = extractConnectionProperties(moduleModel);
     validateProperties(configurationProperties, connectionProperties);
-    //TODO lautaro aca
-    //TODO lautaro aca
-    //TODO lautaro aca
-    //TODO lautaro aca
-    //TODO lautaro aca
+
     if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty() || !globalElementsComponentModel.isEmpty()) {
       declarer.withModelProperty(new NoReconnectionStrategyModelProperty());
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
       configurationDeclarer.withModelProperty(new GlobalElementComponentModelModelProperty(globalElementsComponentModel));
-      configurationProperties.stream().forEach(param -> extractProperty(configurationDeclarer, param));
+      configurationProperties.forEach(param -> extractProperty(configurationDeclarer, param));
 
       addConnectionProvider(configurationDeclarer, connectionProperties, globalElementsComponentModel, extensions);
       return of(configurationDeclarer);
