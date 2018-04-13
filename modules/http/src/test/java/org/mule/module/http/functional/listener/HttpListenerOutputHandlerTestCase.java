@@ -103,6 +103,18 @@ public class HttpListenerOutputHandlerTestCase extends FunctionalTestCase
   }
 
   @Test
+  public void noFlush() throws Exception
+  {
+    validateResponseFor(new OutputHandler() {
+      @Override
+      public void write(MuleEvent event, OutputStream out) throws IOException {
+        saveAndWrite(out, DEFAULT_BUFFER_SIZE / 4);
+        out.close();
+      }
+    });
+  }
+
+  @Test
   public void multipleFlushes() throws Exception
   {
     validateResponseFor(new OutputHandler() {
