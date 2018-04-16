@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.api.dsl.model;
 
-import org.mule.api.annotation.NoImplement;
-
 import java.io.InputStream;
+
+import org.mule.api.annotation.NoImplement;
 
 /**
  * Represents a generic resource provider, to be used instead of the artifact class loader.
@@ -16,5 +16,9 @@ import java.io.InputStream;
 @NoImplement
 public interface ResourceProvider {
 
+  /**
+   * @param uri location of the resource. It may be a classpath location or an absolute path.
+   * @return the input stream of the resource or null if the resource was not found.
+   */
   InputStream getResourceAsStream(String uri);
 }
