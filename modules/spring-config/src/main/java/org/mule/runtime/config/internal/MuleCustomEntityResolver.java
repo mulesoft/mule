@@ -6,15 +6,6 @@
  */
 package org.mule.runtime.config.internal;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -23,6 +14,15 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ResourceUtils;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Custom entity resolver based on Spring's schema resolver.
@@ -47,6 +47,7 @@ public class MuleCustomEntityResolver implements EntityResolver {
     if (systemId != null) {
       String resourceLocation = this.schemaMappings.get(systemId);
       if (resourceLocation != null) {
+        // The caller expects the stream in the InputSource to be open, so this cannot be closed before returning.
         InputStream is = this.classLoader.getResourceAsStream(resourceLocation);
         if (is == null) {
           LOGGER.debug("Couldn't find XML schema [" + systemId + "]: " + resourceLocation);
@@ -77,7 +78,7 @@ public class MuleCustomEntityResolver implements EntityResolver {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Loaded schema mappings: " + mappings);
       }
-      Map<String, String> schemaMappings = new HashMap<String, String>(mappings.size());
+      Map<String, String> schemaMappings = new HashMap<>(mappings.size());
       CollectionUtils.mergePropertiesIntoMap(mappings, schemaMappings);
       return schemaMappings;
     } catch (IOException ex) {

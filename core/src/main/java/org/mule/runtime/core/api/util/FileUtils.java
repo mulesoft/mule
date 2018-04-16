@@ -418,7 +418,7 @@ public class FileUtils {
    * Extract resources contain in file
    *
    * @param path - path to file
-   * @param outputDir Directory for unpack recources
+   * @param outputDir Directory for unpack resources
    * @param resourceName
    * @param keepParentDirectory true - full structure of directories is kept; false - file - removed all directories, directory -
    *        started from resource point
@@ -462,59 +462,61 @@ public class FileUtils {
    */
   private static void extractJarResources(JarURLConnection connection, File outputDir, boolean keepParentDirectory)
       throws IOException {
-    JarFile jarFile = connection.getJarFile();
-    JarEntry jarResource = connection.getJarEntry();
-    Enumeration entries = jarFile.entries();
-    InputStream inputStream = null;
-    OutputStream outputStream = null;
-    int jarResourceNameLenght = jarResource.getName().length();
-    for (; entries.hasMoreElements();) {
-      JarEntry entry = (JarEntry) entries.nextElement();
-      if (entry.getName().startsWith(jarResource.getName())) {
+    try (JarFile jarFile = connection.getJarFile()) {
+      JarEntry jarResource = connection.getJarEntry();
+      Enumeration entries = jarFile.entries();
+      InputStream inputStream = null;
+      OutputStream outputStream = null;
+      int jarResourceNameLenght = jarResource.getName().length();
+      for (; entries.hasMoreElements();) {
+        JarEntry entry = (JarEntry) entries.nextElement();
+        if (entry.getName().startsWith(jarResource.getName())) {
 
-        String path = outputDir.getPath() + File.separator + entry.getName();
+          String path = outputDir.getPath() + File.separator + entry.getName();
 
-        // remove directory struct for file and first dir for directory
-        if (!keepParentDirectory) {
-          if (entry.isDirectory()) {
-            if (entry.getName().equals(jarResource.getName())) {
-              continue;
-            }
-            path =
-                outputDir.getPath() + File.separator + entry.getName().substring(jarResourceNameLenght, entry.getName().length());
-          } else {
-            if (entry.getName().length() > jarResourceNameLenght) {
-              path = outputDir.getPath() + File.separator
-                  + entry.getName().substring(jarResourceNameLenght, entry.getName().length());
+          // remove directory struct for file and first dir for directory
+          if (!keepParentDirectory) {
+            if (entry.isDirectory()) {
+              if (entry.getName().equals(jarResource.getName())) {
+                continue;
+              }
+              path =
+                  outputDir.getPath() + File.separator
+                      + entry.getName().substring(jarResourceNameLenght, entry.getName().length());
             } else {
-              path = outputDir.getPath() + File.separator
-                  + entry.getName().substring(entry.getName().lastIndexOf("/"), entry.getName().length());
+              if (entry.getName().length() > jarResourceNameLenght) {
+                path = outputDir.getPath() + File.separator
+                    + entry.getName().substring(jarResourceNameLenght, entry.getName().length());
+              } else {
+                path = outputDir.getPath() + File.separator
+                    + entry.getName().substring(entry.getName().lastIndexOf("/"), entry.getName().length());
+              }
             }
           }
-        }
 
-        File file = FileUtils.newFile(path);
-        if (!file.getParentFile().exists()) {
-          if (!file.getParentFile().mkdirs()) {
-            throw new IOException("Could not create directory: " + file.getParentFile());
+          File file = FileUtils.newFile(path);
+          if (!file.getParentFile().exists()) {
+            if (!file.getParentFile().mkdirs()) {
+              throw new IOException("Could not create directory: " + file.getParentFile());
+            }
           }
-        }
-        if (entry.isDirectory()) {
-          if (!file.exists() && !file.mkdirs()) {
-            throw new IOException("Could not create directory: " + file);
+          if (entry.isDirectory()) {
+            if (!file.exists() && !file.mkdirs()) {
+              throw new IOException("Could not create directory: " + file);
+            }
+
+          } else {
+            try {
+              inputStream = jarFile.getInputStream(entry);
+              outputStream = new BufferedOutputStream(new FileOutputStream(file));
+              copy(inputStream, outputStream);
+            } finally {
+              IOUtils.closeQuietly(inputStream);
+              IOUtils.closeQuietly(outputStream);
+            }
           }
 
-        } else {
-          try {
-            inputStream = jarFile.getInputStream(entry);
-            outputStream = new BufferedOutputStream(new FileOutputStream(file));
-            copy(inputStream, outputStream);
-          } finally {
-            IOUtils.closeQuietly(inputStream);
-            IOUtils.closeQuietly(outputStream);
-          }
         }
-
       }
     }
   }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -20,6 +21,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.json.api.JsonTypeLoader;
 import org.mule.metadata.xml.api.XmlTypeLoader;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
@@ -41,14 +43,15 @@ import org.mule.runtime.extension.api.annotation.metadata.fixed.InputXmlType;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputXmlType;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
-import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.AnnotatedElement;
 import java.util.HashSet;
@@ -180,7 +183,12 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
   }
 
   private Optional<MetadataType> getJsonType(String schema) {
-    String schemaContent = IOUtils.toString(getSchemaContent(schema));
+    String schemaContent;
+    try (InputStream is = getSchemaContent(schema)) {
+      schemaContent = IOUtils.toString(is);
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
     Optional<MetadataType> type = new JsonTypeLoader(schemaContent).load(null);
     if (!type.isPresent()) {
       throw new IllegalArgumentException("Could not load type from Json schema [" + schema + "]");
@@ -193,7 +201,12 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
       if (isBlank(qname)) {
         throw new IllegalStateException("[" + schema + "] was specified but no associated QName to find in schema");
       }
-      Optional<MetadataType> type = new XmlTypeLoader(getInstance().addSchema(schema, getSchemaContent(schema))).load(qname);
+      Optional<MetadataType> type;
+      try (InputStream is = getSchemaContent(schema)) {
+        type = new XmlTypeLoader(getInstance().addSchema(schema, is)).load(qname);
+      } catch (IOException e) {
+        throw new MuleRuntimeException(e);
+      }
       if (!type.isPresent()) {
         throw new IllegalArgumentException("Type [" + qname + "] wasn't found in XML schema [" + schema + "]");
       }
@@ -203,7 +216,7 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
   }
 
   private InputStream getSchemaContent(String schemaName) {
-    InputStream schema = Thread.currentThread().getContextClassLoader().getResourceAsStream(schemaName);
+    InputStream schema = currentThread().getContextClassLoader().getResourceAsStream(schemaName);
     if (schema == null) {
       throw new IllegalArgumentException("Can't load schema [" + schemaName + "]. It was not found in the resources.");
     }
