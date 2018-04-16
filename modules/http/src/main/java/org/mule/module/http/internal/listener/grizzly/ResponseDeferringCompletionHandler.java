@@ -35,15 +35,15 @@ import org.glassfish.grizzly.memory.MemoryManager;
  *
  * @since 3.10
  */
-public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHandler {
-
+public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHandler
+{
   private final MemoryManager memoryManager;
   private final FilterChainContext ctx;
   private final HttpResponsePacket httpResponsePacket;
   private final OutputHandler outputHandler;
   private final ResponseStatusCallback responseStatusCallback;
   private final CompletionOutputStream outputStream;
-  private final Semaphore sent = new Semaphore(1);
+  private final Semaphore sending = new Semaphore(1);
 
   private volatile boolean isDone;
 
@@ -89,8 +89,9 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
   public void completed(WriteResult result)
   {
     // Allow more data to be sent
-    sent.release();
-    if (isDone) {
+    sending.release();
+    if (isDone)
+    {
       doComplete();
     }
   }
@@ -125,7 +126,6 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
     resume();
   }
 
-
   /**
    * Resume the HttpRequestPacket processing
    */
@@ -153,7 +153,6 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
       buffer.put((byte) b);
       buffer.limit(buffer.position() + 1);
     }
-
 
     @Override
     public void write(byte[] b) throws IOException
@@ -184,20 +183,30 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
         {
           content = getBufferAsContent().append(content);
         }
-        waitAndWrite(content);
-        isDone = true;
-        if (!httpResponsePacket.isChunked())
+        try
         {
-          // In HTTP 1.0 (no chunk supported) there is no more data sent to the client after the input stream is completed.
-          // As there is no more data to be sent (in HTTP 1.1 a last chunk with '0' is sent) the #completed method is not called
-          // So, we have to call it manually here
-          sent.release();
-          doComplete();
+          sending.acquire();
+          isDone = true;
+          ctx.write(content, completionHandler);
+          written = true;
+          if (!httpResponsePacket.isChunked())
+          {
+            // In HTTP 1.0 (no chunk supported) there is no more data sending to the client after the input stream is completed.
+            // As there is no more data to be sending (in HTTP 1.1 a last chunk with '0' is sending) the #completed method is not called
+            // So, we have to call it manually here
+            sending.release();
+            doComplete();
+          }
+        }
+        catch (InterruptedException e)
+        {
+          Thread.currentThread().interrupt();
         }
       }
     }
 
-    public boolean isWritten() {
+    public boolean isWritten()
+    {
       return written;
     }
 
@@ -208,7 +217,8 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
      */
     private void flushIfNecessary(int writeLength)
     {
-      if (buffer.remaining() < writeLength) {
+      if (buffer.remaining() < writeLength)
+      {
         // The data is already in-memory, so send it all
         flush(Math.max(writeLength, DEFAULT_BUFFER_SIZE));
       }
@@ -223,7 +233,16 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
     {
       if (hasPendingData())
       {
-        waitAndWrite(getBufferAsContent());
+        try
+        {
+          sending.acquire();
+          ctx.write(getBufferAsContent(), completionHandler);
+          written = true;
+        }
+        catch (InterruptedException e)
+        {
+          Thread.currentThread().interrupt();
+        }
       }
       else
       {
@@ -233,29 +252,16 @@ public class ResponseDeferringCompletionHandler extends BaseResponseCompletionHa
       buffer = getBuffer(bufferSize);
     }
 
-    private boolean hasPendingData() {
+    private boolean hasPendingData()
+    {
       return buffer.capacity() != buffer.remaining();
     }
 
-    private HttpContent getBufferAsContent() {
+    private HttpContent getBufferAsContent()
+    {
       // Prepare buffer for reading
       buffer.flip();
       return httpResponsePacket.httpContentBuilder().content(buffer).build();
-    }
-
-    /**
-     * Waits until the previous write has completed before sending more data.
-     *
-     * @param content data to be written.
-     */
-    private void waitAndWrite(HttpContent content) {
-      try {
-        sent.acquire();
-        ctx.write(content, completionHandler);
-        written = true;
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-      }
     }
 
     /**
