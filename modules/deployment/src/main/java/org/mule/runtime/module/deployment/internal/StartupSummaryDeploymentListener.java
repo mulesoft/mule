@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.core.internal.logging.LogUtil.log;
+import org.mule.runtime.core.internal.logging.LogUtil;
 import org.mule.runtime.core.internal.util.splash.SimpleLoggingTable;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.StartupListener;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -45,10 +48,6 @@ public class StartupSummaryDeploymentListener implements StartupListener {
   }
 
   public void onAfterStartup() {
-    if (!logger.isInfoEnabled()) {
-      return;
-    }
-
     Multimap<String, String> applicationsPerDomain = LinkedListMultimap.create();
 
     Map<String, ArtifactDeploymentStatusTracker.DeploymentState> domainDeploymentState =
@@ -95,6 +94,6 @@ public class StartupSummaryDeploymentListener implements StartupListener {
       message = String.format("%n%s", domainTable);
     }
 
-    logger.info(message);
+    log(message);
   }
 }

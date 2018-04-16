@@ -6,14 +6,18 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Base splash screen to log messages when an {@link Artifact} is started based on it's {@link ArtifactDescriptor}.
@@ -30,5 +34,15 @@ public abstract class ArtifactStartedSplashScreen<D extends ArtifactDescriptor> 
       return asList(libraries);
     }
     return new ArrayList<>();
+  }
+
+  protected void listPlugins(String artifactType, DeployableArtifactDescriptor descriptor) {
+    Set<ArtifactPluginDescriptor> plugins = descriptor.getPlugins();
+    if (!plugins.isEmpty()) {
+      doBody(artifactType + " plugins:");
+      for (ArtifactPluginDescriptor plugin : plugins) {
+        doBody(format(VALUE_FORMAT, format("%s : %s", plugin.getName(), plugin.getBundleDescriptor().getVersion())));
+      }
+    }
   }
 }

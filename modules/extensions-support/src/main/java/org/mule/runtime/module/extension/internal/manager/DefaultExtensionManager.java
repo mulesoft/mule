@@ -122,7 +122,9 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     final String extensionVersion = extensionModel.getVersion();
     final String extensionVendor = extensionModel.getVendor();
 
-    LOGGER.info("Registering extension {} (version: {} vendor: {} )", extensionName, extensionVersion, extensionVendor);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Registering extension {} (version: {} vendor: {} )", extensionName, extensionVersion, extensionVendor);
+    }
 
     if (extensionRegistry.containsExtension(extensionName)) {
       if (LOGGER.isDebugEnabled()) {

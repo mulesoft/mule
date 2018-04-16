@@ -16,6 +16,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Implements singleton pattern to allow different splash-screen implementations following the concept of header, body, and
  * footer. Header and footer are reserved internally to Mule but body can be used to customize splash-screen output. External code
@@ -29,6 +32,8 @@ import java.util.Map;
  * </pre>
  */
 public abstract class SplashScreen {
+
+  public static Logger LOGGER = LoggerFactory.getLogger(SplashScreen.class);
 
   public static final String RUNTIME_VERBOSE = SYSTEM_PROPERTY_PREFIX + "runtime.verbose";
   /**

@@ -14,14 +14,16 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getPatchesLibFolder
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServerPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.internal.util.SecurityUtils;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -30,9 +32,21 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class MuleContainerStartupSplashScreen extends SplashScreen {
 
+  private Logger LOGGER = LoggerFactory.getLogger(MuleContainerStartupSplashScreen.class);
+
   public void doBody() {
+
+    try (InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("banner.txt")) {
+      doBody(IOUtils.toString(resourceAsStream));
+    } catch (IOException e) {
+      LOGGER.warn("Could not create banner");
+    }
+
     String notset = CoreMessages.notSet().getMessage();
 
     // Mule Version, Timestamp, and Server ID

@@ -43,9 +43,20 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
+import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+import javax.transaction.TransactionManager;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -126,16 +137,6 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 
 import org.slf4j.Logger;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
-import javax.transaction.TransactionManager;
 
 import reactor.core.publisher.Hooks;
 
@@ -342,7 +343,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
       if (logger.isInfoEnabled()) {
         SplashScreen startupScreen = buildStartupSplash();
-        logger.info(startupScreen.toString());
+        log(startupScreen.toString());
       }
     }
   }
@@ -430,7 +431,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
       if ((getStartDate() > 0) && logger.isInfoEnabled()) {
         SplashScreen shutdownScreen = buildShutdownSplash();
-        logger.info(shutdownScreen.toString());
+        log(shutdownScreen.toString());
       }
 
       // registryBroker.dispose();

@@ -62,13 +62,17 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
 
   @Override
   public void dispose() {
-    LOGGER.info("Disposing core extensions");
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Disposing core extensions");
+    }
     for (MuleCoreExtension extension : coreExtensions) {
 
       if (initializedCoreExtensions.contains(extension)) {
         try {
           extension.dispose();
-          LOGGER.info("Core extension '{}' disposed", extension.toString());
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Core extension '{}' disposed", extension.toString());
+          }
         } catch (Exception ex) {
           LOGGER.error("Error disposing core extension " + extension.getName(), ex);
         }
@@ -93,11 +97,15 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
 
   @Override
   public void start() throws MuleException {
-    LOGGER.info("Starting core extensions");
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Starting core extensions");
+    }
     for (MuleCoreExtension extension : orderedCoreExtensions) {
       extension.start();
       startedCoreExtensions.add(extension);
-      LOGGER.info("Core extension '{}' started", extension.toString());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Core extension '{}' started", extension.toString());
+      }
     }
   }
 
@@ -107,14 +115,18 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
       return;
     }
 
-    LOGGER.info("Stopping core extensions");
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Stopping core extensions");
+    }
     for (int i = orderedCoreExtensions.size() - 1; i >= 0; i--) {
       MuleCoreExtension extension = orderedCoreExtensions.get(i);
 
       if (startedCoreExtensions.contains(extension)) {
         try {
           extension.stop();
-          LOGGER.info("Core extension '{}' stopped", extension.toString());
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Core extension '{}' stopped", extension.toString());
+          }
         } catch (Throwable e) {
           LOGGER.warn("Error stopping core extension: " + extension.getName(), e);
         }
@@ -124,7 +136,9 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   }
 
   private void initializeCoreExtensions() throws MuleException {
-    LOGGER.info("Initializing core extensions");
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Initializing core extensions");
+    }
 
     Injector simpleRegistry = createContainerInjector();
 
@@ -163,7 +177,9 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
 
       extension.initialise();
       initializedCoreExtensions.add(extension);
-      LOGGER.info("Core extension '{}' initialized", extension.toString());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Core extension '{}' initialized", extension.toString());
+      }
     }
   }
 

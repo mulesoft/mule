@@ -12,6 +12,7 @@ import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
+import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.service.internal.manager.LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -21,6 +22,8 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.lifecycle.StartException;
+import org.mule.runtime.core.internal.logging.LogUtil;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
@@ -92,7 +95,7 @@ public class MuleServiceManager implements ServiceManager {
           startedServices.add(service);
 
           if (isNotEmpty(service.getSplashMessage())) {
-            logger.info(new ServiceSplashScreen(service).toString());
+            log(new ServiceSplashScreen(service).toString());
           }
         } finally {
           currentThread().setContextClassLoader(originalContextClassLoader);

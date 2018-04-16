@@ -47,8 +47,8 @@ public class RegistryBrokerLifecycleManager extends RegistryLifecycleManager {
   public void fireInitialisePhase(LifecycleCallback<AbstractRegistryBroker> callback) throws InitialisationException {
     checkPhase(Initialisable.PHASE_NAME);
 
-    if (logger.isInfoEnabled()) {
-      logger.info("Initialising RegistryBroker");
+    if (logger.isDebugEnabled()) {
+      logger.debug("Initialising RegistryBroker");
     }
 
     // No pre notification
@@ -65,8 +65,8 @@ public class RegistryBrokerLifecycleManager extends RegistryLifecycleManager {
   public void fireDisposePhase(LifecycleCallback<AbstractRegistryBroker> callback) {
     checkPhase(Disposable.PHASE_NAME);
 
-    if (logger.isInfoEnabled()) {
-      logger.info("Disposing RegistryBroker");
+    if (logger.isDebugEnabled()) {
+      logger.debug("Disposing RegistryBroker");
     }
 
     // No pre notification

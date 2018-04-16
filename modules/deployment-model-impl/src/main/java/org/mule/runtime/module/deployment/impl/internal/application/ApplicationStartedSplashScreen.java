@@ -30,7 +30,7 @@ public class ApplicationStartedSplashScreen extends ArtifactStartedSplashScreen<
   public void createMessage(ApplicationDescriptor descriptor) {
     doBody(format("Started app '%s'", descriptor.getName()));
     if (RUNTIME_VERBOSE_PROPERTY.isEnabled()) {
-      listPlugins(descriptor);
+      listPlugins("Application", descriptor);
       listLibraries(descriptor);
     }
   }

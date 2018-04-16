@@ -17,6 +17,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
@@ -29,6 +30,8 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
+import org.mule.runtime.core.internal.logging.LogUtil;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.DeploymentStopException;
@@ -121,7 +124,7 @@ public class DefaultMuleDomain implements Domain {
   public void install() {
     withContextClassLoader(null, () -> {
       if (logger.isInfoEnabled()) {
-        logger.info(miniSplash(format("New domain '%s'", getArtifactName())));
+        log(miniSplash(format("New domain '%s'", getArtifactName())));
       }
     });
   }
@@ -144,7 +147,7 @@ public class DefaultMuleDomain implements Domain {
   public void doInit(boolean lazy, boolean disableXmlValidations) throws DeploymentInitException {
     withContextClassLoader(null, () -> {
       if (logger.isInfoEnabled()) {
-        logger.info(miniSplash(format("Initializing domain '%s'", getArtifactName())));
+        log(miniSplash(format("Initializing domain '%s'", getArtifactName())));
       }
     });
     try {
@@ -208,7 +211,7 @@ public class DefaultMuleDomain implements Domain {
       withContextClassLoader(null, () -> {
         DomainStartedSplashScreen splashScreen = new DomainStartedSplashScreen();
         splashScreen.createMessage(descriptor);
-        logger.info(splashScreen.toString());
+        log(splashScreen.toString());
       });
     } catch (Exception e) {
       throw new DeploymentStartException(createStaticMessage("Failure trying to start domain " + getArtifactName()), e);
@@ -220,7 +223,7 @@ public class DefaultMuleDomain implements Domain {
     try {
       withContextClassLoader(null, () -> {
         if (logger.isInfoEnabled()) {
-          logger.info(miniSplash(format("Stopping domain '%s'", getArtifactName())));
+          log(miniSplash(format("Stopping domain '%s'", getArtifactName())));
         }
       });
       if (this.artifactContext != null) {
@@ -237,9 +240,7 @@ public class DefaultMuleDomain implements Domain {
   @Override
   public void dispose() {
     withContextClassLoader(null, () -> {
-      if (logger.isInfoEnabled()) {
-        logger.info(miniSplash(format("Disposing domain '%s'", getArtifactName())));
-      }
+      log(miniSplash(format("Disposing domain '%s'", getArtifactName())));
     });
     if (this.artifactContext != null) {
       withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> this.artifactContext.getMuleContext().dispose());
