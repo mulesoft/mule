@@ -59,16 +59,3 @@ propertiesDeps=("muleHttpServiceTestVersion"
 # deps. So there is a circular dependency.
 updatePropertiesVersion "$VERSION_TO_DEPS_AUX" pom.xml propertiesDeps[@]
 
-
-# Properties with 0.8.x in the root pom.xml
-propertiesDeps=("muleHttpConnectorTestVersion"
-                "muleSocketsConnectorTestVersion"
-                "muleFileConnectorTestVersion"
-                "muleJmsConnectorTestVersion"
-                "muleFileCommonsTestVersion"
-                "muleSpringModuleTestVersion")
-
-# Using Snapshot as a workaround because the extensions have the mule artifacts as
-# deps. So there is a circular dependency.
-updatePropertiesVersion "$VERSION_CONNECTORS_MODULES_AUX" pom.xml propertiesDeps[@]
-
