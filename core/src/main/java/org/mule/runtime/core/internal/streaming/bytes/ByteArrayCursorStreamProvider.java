@@ -20,7 +20,8 @@ import java.io.Serializable;
  * mainly deserialization and testing. <b>Think twice</b> before using this method. Most likely you're
  * doing something wrong.
  * <p>
- * Also consider that because the data is already in memory, the cursors will never buffer into disk.
+ * Also consider that because the data is already in memory, the cursors will never buffer into disk and will
+ * never be closed or released. Resources are freed when this instance is garbage collected.
  *
  * @since 4.0
  */
@@ -28,7 +29,6 @@ public class ByteArrayCursorStreamProvider implements CursorStreamProvider, Seri
 
   private static final long serialVersionUID = -7152264489981618670L;
 
-  private boolean closed = false;
   private byte[] content;
 
   public ByteArrayCursorStreamProvider(byte[] content) {
@@ -41,17 +41,13 @@ public class ByteArrayCursorStreamProvider implements CursorStreamProvider, Seri
   }
 
   @Override
-  public void close() {
-    closed = true;
-  }
+  public void close() {}
 
   @Override
-  public void releaseResources() {
-    content = null;
-  }
+  public void releaseResources() {}
 
   @Override
   public boolean isClosed() {
-    return closed;
+    return false;
   }
 }
