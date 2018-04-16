@@ -17,10 +17,10 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptio
 import static org.mule.runtime.core.api.util.ExceptionUtils.isUnknownMuleError;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
@@ -33,6 +33,7 @@ import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.policy.FlowExecutionException;
+import org.mule.runtime.core.internal.processor.chain.ModuleOperationMuleException;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
@@ -101,6 +102,31 @@ public class MessagingExceptionResolver {
       result.addInfo(INFO_ALREADY_LOGGED_KEY, me.getInfo().get(INFO_ALREADY_LOGGED_KEY));
     }
     return enrich(result, failingComponent, event, context);
+  }
+
+
+  public ModuleOperationMuleException resolveSmartConnector(final MessagingException me, MuleContext context) {
+    ErrorTypeLocator locator = ((PrivilegedMuleContext) context).getErrorTypeLocator();
+    Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(component, me, locator);
+
+    Throwable root = rootCause.get().getFirst();
+    ErrorType rootErrorType = rootCause.get().getSecond();
+
+    ErrorType errorType = getErrorMappings(component)
+        .stream()
+        .filter(m -> m.match(rootErrorType))
+        .findFirst()
+        .map(ErrorMapping::getTarget)
+        .orElse(rootErrorType);
+
+    Error error = ErrorBuilder.builder(getMessagingExceptionCause(root)).errorType(errorType).build();
+    CoreEvent event = CoreEvent.builder(me.getEvent()).error(error).build();
+
+    ModuleOperationMuleException result = new ModuleOperationMuleException(root);
+    if (me.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
+      result.addInfo(INFO_ALREADY_LOGGED_KEY, me.getInfo().get(INFO_ALREADY_LOGGED_KEY));
+    }
+    return enrich(result, component, event, context);
   }
 
   private Optional<Pair<Throwable, ErrorType>> findRoot(Component obj, MessagingException me, ErrorTypeLocator locator) {
@@ -172,13 +198,22 @@ public class MessagingExceptionResolver {
     return cause instanceof MessagingException && ((MessagingException) cause).getEvent().getError().isPresent();
   }
 
-  private MessagingException enrich(MessagingException me, Component failing, CoreEvent event, MuleContext context) {
+  private <T extends MuleException> T enrich(T me, Component failing, CoreEvent event, MuleContext context) {
     EnrichedNotificationInfo notificationInfo = createInfo(event, me, null);
     context.getExceptionContextProviders().forEach(cp -> {
       cp.getContextInfo(notificationInfo, failing).forEach((k, v) -> me.getInfo().putIfAbsent(k, v));
     });
     return me;
   }
+
+  //  private ModuleOperationMuleException enrich2(ModuleOperationMuleException me, Component failing, CoreEvent event,
+  //                                               MuleContext context) {
+  //    EnrichedNotificationInfo notificationInfo = createInfo(event, me, null);
+  //    context.getExceptionContextProviders().forEach(cp -> {
+  //      cp.getContextInfo(notificationInfo, failing).forEach((k, v) -> me.getInfo().putIfAbsent(k, v));
+  //    });
+  //    return me;
+  //  }
 
   private boolean isCriticalMuleError(ErrorType type) {
     return type.getNamespace().equals(CORE_NAMESPACE_NAME) && type.getIdentifier().equals(CRITICAL_IDENTIFIER);
