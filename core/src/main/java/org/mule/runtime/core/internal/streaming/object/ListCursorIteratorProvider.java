@@ -20,14 +20,14 @@ import java.util.List;
  * mainly deserialization and testing. <b>Think twice</b> before using this method. Most likely you're
  * doing something wrong.
  * <p>
- * Also consider that because the data is already in memory, the cursors will never buffer into disk.
+ * Also consider that because the data is already in memory, the cursors will never buffer into disk and will
+ * never be closed or released. Resources are freed when this instance is garbage collected.
  *
  * @since 4.0
  */
 public class ListCursorIteratorProvider implements CursorIteratorProvider {
 
   private List<?> list;
-  private boolean closed = false;
 
   public ListCursorIteratorProvider(List<?> list) {
     this.list = list;
@@ -39,17 +39,13 @@ public class ListCursorIteratorProvider implements CursorIteratorProvider {
   }
 
   @Override
-  public void close() {
-    closed = true;
-  }
+  public void close() {}
 
   @Override
-  public void releaseResources() {
-    list = null;
-  }
+  public void releaseResources() {}
 
   @Override
   public boolean isClosed() {
-    return closed;
+    return false;
   }
 }
