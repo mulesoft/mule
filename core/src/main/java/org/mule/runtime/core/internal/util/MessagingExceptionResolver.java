@@ -206,15 +206,6 @@ public class MessagingExceptionResolver {
     return me;
   }
 
-  //  private ModuleOperationMuleException enrich2(ModuleOperationMuleException me, Component failing, CoreEvent event,
-  //                                               MuleContext context) {
-  //    EnrichedNotificationInfo notificationInfo = createInfo(event, me, null);
-  //    context.getExceptionContextProviders().forEach(cp -> {
-  //      cp.getContextInfo(notificationInfo, failing).forEach((k, v) -> me.getInfo().putIfAbsent(k, v));
-  //    });
-  //    return me;
-  //  }
-
   private boolean isCriticalMuleError(ErrorType type) {
     return type.getNamespace().equals(CORE_NAMESPACE_NAME) && type.getIdentifier().equals(CRITICAL_IDENTIFIER);
   }
