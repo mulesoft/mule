@@ -46,6 +46,15 @@
           "methodName": "<init>",
           "elementKind": "constructor",
           "justification": "Fixes threading issue"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.api.util.StreamingUtils::supportsStreaming(org.mule.runtime.api.meta.model.ComponentModel)",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "StreamingUtils",
+          "methodName": "supportsStreaming",
+          "elementKind": "method",
+          "justification": "New utility method"
         }
       ]
     }
