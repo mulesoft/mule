@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
@@ -126,7 +127,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
       } else if (parentComponentIsRouter(componentModel)) {
         if (isRoute(componentModel)) {
           componentLocation = parentComponentLocation.appendRoutePart()
-              .appendLocationPart(findNonProcessorPath(componentModel), of(TypedComponentIdentifier.builder().type(SCOPE)
+              .appendLocationPart(findRoutePath(componentModel), of(TypedComponentIdentifier.builder().type(SCOPE)
                   .identifier(ROUTE_COMPONENT_IDENTIFIER).build()), componentModel.getConfigFileName(),
                                   componentModel.getLineNumber());
         } else if (isProcessor(componentModel)) {
@@ -138,10 +139,9 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
               .appendLocationPart("0", typedComponentIdentifier, componentModel.getConfigFileName(),
                                   componentModel.getLineNumber());
         } else {
-          // this is the case of the when element inside the choice
-          componentLocation = parentComponentLocation.appendRoutePart()
-              .appendLocationPart(findNonProcessorPath(componentModel), of(TypedComponentIdentifier.builder().type(UNKNOWN)
-                  .identifier(ROUTE_COMPONENT_IDENTIFIER).build()), empty(), empty());
+          componentLocation =
+              parentComponentLocation.appendLocationPart(findNonProcessorPath(componentModel), typedComponentIdentifier,
+                                                         componentModel.getConfigFileName(), componentModel.getLineNumber());
         }
       } else if (isProcessor(componentModel)) {
         if (isModuleOperation(componentModel.getParent())) {
@@ -189,7 +189,8 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         || componentModel.getIdentifier().equals(CHOICE_OTHERWISE_COMPONENT_IDENTIFIER)
         || componentModel.getIdentifier().equals(BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER)
         || componentModel.getIdentifier().equals(BATCH_ON_COMPLETE_IDENTIFIER)
-        || componentModel.getIdentifier().equals(BATCH_STEP_COMPONENT_IDENTIFIER);
+        || componentModel.getIdentifier().equals(BATCH_STEP_COMPONENT_IDENTIFIER)
+        || componentModel.getComponentType().map(componentType -> componentType == ROUTE).orElse(false);
   }
 
   private boolean isHttpProxyPart(ComponentModel componentModel) {
@@ -234,6 +235,19 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         break;
       }
       i++;
+    }
+    return String.valueOf(i);
+  }
+
+  private String findRoutePath(ComponentModel componentModel) {
+    int i = 0;
+    for (ComponentModel child : componentModel.getParent().getInnerComponents()) {
+      if (child == componentModel) {
+        break;
+      }
+      if (isRoute(child)) {
+        i++;
+      }
     }
     return String.valueOf(i);
   }
