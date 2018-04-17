@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.processor.chain;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 /**
  * Similar to a {@link MuleException}, this class is intended to be created only when an exception from within a
  * {@link ModuleOperationMessageProcessorChainBuilder} is used, so that later on it can be treated differently.
@@ -21,6 +23,6 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 public class ModuleOperationMuleException extends MuleException {
 
   public ModuleOperationMuleException(Throwable root) {
-    super(I18nMessageFactory.createStaticMessage(root.getMessage()));
+    super(createStaticMessage(root.getMessage()));
   }
 }

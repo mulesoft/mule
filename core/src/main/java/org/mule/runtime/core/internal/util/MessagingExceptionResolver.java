@@ -7,8 +7,10 @@
 
 package org.mule.runtime.core.internal.util;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
 import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
@@ -21,6 +23,8 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
@@ -69,8 +73,7 @@ public class MessagingExceptionResolver {
    * @return a {@link MessagingException} with the proper {@link Error} associated to it's {@link CoreEvent}
    */
   public MessagingException resolve(final MessagingException me, MuleContext context) {
-    ErrorTypeLocator locator = ((PrivilegedMuleContext) context).getErrorTypeLocator();
-    Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(component, me, locator);
+    Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(component, me, context);
 
     if (!rootCause.isPresent()) {
       return updateCurrent(me, component, context);
@@ -98,38 +101,36 @@ public class MessagingExceptionResolver {
       result = me instanceof FlowExecutionException ? new FlowExecutionException(event, root, failingComponent)
           : new MessagingException(event, root, failingComponent);
     }
-    if (me.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
-      result.addInfo(INFO_ALREADY_LOGGED_KEY, me.getInfo().get(INFO_ALREADY_LOGGED_KEY));
-    }
+    checkIfAlreadyLogged(me, result);
     return enrich(result, failingComponent, event, context);
   }
 
+  private void checkIfAlreadyLogged(MessagingException origin, MuleException result) {
+    if (origin.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
+      result.addInfo(INFO_ALREADY_LOGGED_KEY, origin.getInfo().get(INFO_ALREADY_LOGGED_KEY));
+    }
+  }
 
-  public ModuleOperationMuleException resolveSmartConnector(final MessagingException me, MuleContext context) {
-    ErrorTypeLocator locator = ((PrivilegedMuleContext) context).getErrorTypeLocator();
-    Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(component, me, locator);
-
+  public ModuleOperationMuleException resolveSmartConnector(final MessagingException innerCause, MuleContext context) {
+    Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(component, innerCause, context);
+    if (!rootCause.isPresent()) {
+      throw new MuleRuntimeException(createStaticMessage(format("Should have not reached here, there must be an exception within macro expansion's '%s' that contains the root cause of this handling",
+                                                                component.toString())),
+                                     innerCause);
+    }
     Throwable root = rootCause.get().getFirst();
     ErrorType rootErrorType = rootCause.get().getSecond();
 
-    ErrorType errorType = getErrorMappings(component)
-        .stream()
-        .filter(m -> m.match(rootErrorType))
-        .findFirst()
-        .map(ErrorMapping::getTarget)
-        .orElse(rootErrorType);
-
-    Error error = ErrorBuilder.builder(getMessagingExceptionCause(root)).errorType(errorType).build();
-    CoreEvent event = CoreEvent.builder(me.getEvent()).error(error).build();
+    Error error = ErrorBuilder.builder(getMessagingExceptionCause(root)).errorType(rootErrorType).build();
+    CoreEvent event = CoreEvent.builder(innerCause.getEvent()).error(error).build();
 
     ModuleOperationMuleException result = new ModuleOperationMuleException(root);
-    if (me.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
-      result.addInfo(INFO_ALREADY_LOGGED_KEY, me.getInfo().get(INFO_ALREADY_LOGGED_KEY));
-    }
+    checkIfAlreadyLogged(innerCause, result);
     return enrich(result, component, event, context);
   }
 
-  private Optional<Pair<Throwable, ErrorType>> findRoot(Component obj, MessagingException me, ErrorTypeLocator locator) {
+  private Optional<Pair<Throwable, ErrorType>> findRoot(Component obj, MessagingException me, MuleContext context) {
+    ErrorTypeLocator locator = ((PrivilegedMuleContext) context).getErrorTypeLocator();
     List<Pair<Throwable, ErrorType>> errors = collectErrors(obj, me, locator);
     if (errors.isEmpty()) {
       return collectCritical(obj, me, locator).stream().findFirst();

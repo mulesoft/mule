@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
@@ -234,7 +235,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
       return me -> {
         MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(this);
         final ModuleOperationMuleException resolved = exceptionResolver.resolveSmartConnector(me, muleContext);
-        return new MessagingException(I18nMessageFactory.createStaticMessage(resolved.getMessage()),
+        return new MessagingException(createStaticMessage(resolved.getMessage()),
                                       me.getEvent(), resolved);
       };
     }
