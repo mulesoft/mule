@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static org.springframework.cglib.proxy.Enhancer.registerStaticCallbacks;
+import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
 
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -14,9 +14,9 @@ import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
 
 import org.springframework.beans.factory.SmartFactoryBean;
-import org.springframework.cglib.proxy.Callback;
-import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
 
 import java.util.Optional;
 import java.util.function.Consumer;
