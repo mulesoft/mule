@@ -27,7 +27,6 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -234,7 +233,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     private Function<MessagingException, Throwable> remapMessagingException() {
       return me -> {
         MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(this);
-        final ModuleOperationMuleException resolved = exceptionResolver.resolveSmartConnector(me, muleContext);
+        final ModuleOperationMuleException resolved = exceptionResolver.resolveForSmartConnectorError(me, muleContext);
         return new MessagingException(createStaticMessage(resolved.getMessage()),
                                       me.getEvent(), resolved);
       };

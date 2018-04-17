@@ -24,7 +24,6 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
@@ -101,17 +100,17 @@ public class MessagingExceptionResolver {
       result = me instanceof FlowExecutionException ? new FlowExecutionException(event, root, failingComponent)
           : new MessagingException(event, root, failingComponent);
     }
-    checkIfAlreadyLogged(me, result);
+    propagateAlreadyLogged(me, result);
     return enrich(result, failingComponent, event, context);
   }
 
-  private void checkIfAlreadyLogged(MessagingException origin, MuleException result) {
+  private void propagateAlreadyLogged(MessagingException origin, MuleException result) {
     if (origin.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
       result.addInfo(INFO_ALREADY_LOGGED_KEY, origin.getInfo().get(INFO_ALREADY_LOGGED_KEY));
     }
   }
 
-  public ModuleOperationMuleException resolveSmartConnector(final MessagingException innerCause, MuleContext context) {
+  public ModuleOperationMuleException resolveForSmartConnectorError(final MessagingException innerCause, MuleContext context) {
     Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(component, innerCause, context);
     if (!rootCause.isPresent()) {
       throw new MuleRuntimeException(createStaticMessage(format("Should have not reached here, there must be an exception within macro expansion's '%s' that contains the root cause of this handling",
@@ -125,7 +124,7 @@ public class MessagingExceptionResolver {
     CoreEvent event = CoreEvent.builder(innerCause.getEvent()).error(error).build();
 
     ModuleOperationMuleException result = new ModuleOperationMuleException(root);
-    checkIfAlreadyLogged(innerCause, result);
+    propagateAlreadyLogged(innerCause, result);
     return enrich(result, component, event, context);
   }
 
