@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
@@ -15,7 +14,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
@@ -41,7 +39,8 @@ import java.util.List;
 
 import net.sf.cglib.proxy.CallbackHelper;
 import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.FixedValue;
+import net.sf.cglib.proxy.InvocationHandler;
 
 
 /**
@@ -114,9 +113,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     Class[] proxyInterfaces = getProxyInterfaces(provider);
     enhancer.setInterfaces(proxyInterfaces);
 
-    MethodInterceptor returnProviderInterceptor = (obj, method, args, proxy) -> provider;
-
-    MethodInterceptor invokerInterceptor = (obj, method, args, proxy) -> {
+    InvocationHandler invokerInterceptor = (proxy, method, args) -> {
       Reference<Object> resultReference = new Reference<>();
       Reference<Throwable> errorReference = new Reference<>();
 
@@ -142,7 +139,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
       @Override
       protected Object getCallback(Method method) {
         if (method.getDeclaringClass().equals(HasDelegate.class) && method.getName().equals("getDelegate")) {
-          return returnProviderInterceptor;
+          return (FixedValue) () -> provider;
         } else {
           return invokerInterceptor;
         }
@@ -151,6 +148,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
 
     enhancer.setCallbackTypes(callbackHelper.getCallbackTypes());
     enhancer.setCallbackFilter(callbackHelper);
+    enhancer.setCallbacks(callbackHelper.getCallbacks());
 
     if (Enhancer.class.getClassLoader() != classLoader) {
       enhancer.setClassLoader(new CompositeClassLoader(DefaultConnectionProviderObjectBuilder.class.getClassLoader(),
@@ -158,14 +156,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
       enhancer.setUseCache(false);
     }
 
-    Class<ConnectionProvider<C>> proxyClass = enhancer.createClass();
-    registerStaticCallbacks(proxyClass, callbackHelper.getCallbacks());
-
-    try {
-      return proxyClass.newInstance();
-    } catch (InstantiationException | IllegalAccessException e) {
-      throw new MuleRuntimeException(e);
-    }
+    return (ConnectionProvider<C>) enhancer.create();
   }
 
   /**
