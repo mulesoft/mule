@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/metadata http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd">
+
+    <flow name="receiveJsonInputStream">
+        <set-payload value="#[output application/java --- write({}, 'application/json')]"/>
+        <metadata:receive-json-input-stream >
+            <metadata:json-value>
+                #[payload]
+            </metadata:json-value>
+        </metadata:receive-json-input-stream>
+    </flow>
+
+</mule>
