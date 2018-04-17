@@ -8,8 +8,10 @@ package org.mule.test.metadata.extension;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -35,6 +37,7 @@ import org.mule.test.metadata.extension.model.shops.Order;
 import org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver;
 import org.mule.test.metadata.extension.query.MetadataExtensionQueryTranslator;
 import org.mule.test.metadata.extension.query.NativeQueryOutputResolver;
+import org.mule.test.metadata.extension.resolver.AnyJsonTypeStaticResolver;
 import org.mule.test.metadata.extension.resolver.TestAttributesResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestBooleanMetadataResolver;
 import org.mule.test.metadata.extension.resolver.TestEnumMetadataResolver;
@@ -51,6 +54,7 @@ import org.mule.test.metadata.extension.resolver.TestPartialMultiLevelKeyResolve
 import org.mule.test.metadata.extension.resolver.TestResolverWithCache;
 import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -263,6 +267,11 @@ public class MetadataOperations {
   public List<Object> objectListAsInput(@MetadataKeyId String type,
                                         @Optional @TypeResolver(TestInputResolverWithKeyResolver.class) List<Object> objects) {
     return null;
+  }
+
+  @MediaType(APPLICATION_JSON)
+  public InputStream receiveJsonInputStream(@TypeResolver(AnyJsonTypeStaticResolver.class) @Content InputStream jsonValue) {
+    return jsonValue;
   }
 
   public PagingProvider<MetadataConnection, Animal> pagedOperationMetadata(Animal animal) {
