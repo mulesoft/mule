@@ -38,8 +38,10 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -59,12 +61,6 @@ import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
-import org.hamcrest.Matchers;
-import org.hamcrest.collection.IsMapContaining;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,6 +68,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.hamcrest.Matchers;
+import org.hamcrest.collection.IsMapContaining;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -88,7 +90,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
 
   @Override
   protected String[] getConfigFiles() {
-    return new String[] {"heisenberg-operation-config.xml", "vegan-config.xml"};
+    return new String[] {"heisenberg-operation-config.xml", "vegan-config.xml", "static-metadata-execution.xml"};
   }
 
   @Override
@@ -511,6 +513,13 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
     ParameterResolver<String> result =
         (ParameterResolver<String>) flowRunner("aliasedOperation").run().getMessage().getPayload().getValue();
     assertThat(result.resolve(), is("an expression"));
+  }
+
+  @Test
+  public void anyTypeAsParameterType() throws Exception {
+    TypedValue<Object> payload = flowRunner("receiveJsonInputStream").keepStreamsOpen().run().getMessage().getPayload();
+    String jsonValue = IOUtils.toString((CursorStreamProvider) payload.getValue());
+    assertThat(jsonValue, is("{\n  \n}"));
   }
 
   private void assertDynamicDoor(String flowName) throws Exception {
