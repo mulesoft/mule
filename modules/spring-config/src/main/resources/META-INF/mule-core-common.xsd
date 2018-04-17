@@ -3341,58 +3341,13 @@
         </xsd:sequence>
     </xsd:group>
 
-    <xsd:complexType name="referenceType">
-        <xsd:attribute name="ref" type="xsd:string"/>
-    </xsd:complexType>
-
     <xsd:complexType name="keyType">
         <xsd:attribute name="key" type="xsd:string"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="nameType">
-        <xsd:attribute name="name" type="xsd:string"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="valueType">
-        <xsd:attribute name="value" type="xsd:string"/>
-        <xsd:attribute name="value-ref" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="keyValueType">
         <xsd:complexContent>
             <xsd:extension base="keyType">
-                <xsd:attribute name="value" type="xsd:string"/>
-                <xsd:attribute name="value-ref" type="xsd:string"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="propertyWithDataType">
-        <xsd:complexContent>
-            <xsd:extension base="keyType">
-                <xsd:attribute name="value" type="xsd:string"/>
-                <xsd:attribute name="value-ref" type="xsd:string"/>
-                <xsd:attributeGroup ref="mimeTypeAttributes">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The mime type for the property
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attributeGroup>
-                <xsd:attribute name="encoding" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            String encoding for the property.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="nameValueType">
-        <xsd:complexContent>
-            <xsd:extension base="nameType">
                 <xsd:attribute name="value" type="xsd:string"/>
                 <xsd:attribute name="value-ref" type="xsd:string"/>
             </xsd:extension>
