@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
@@ -19,13 +20,13 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -43,11 +44,12 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,8 +57,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-
-import reactor.core.publisher.Mono;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -205,7 +205,6 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       Map<String, String> annotation = (Map<String, String>) getAnnotation(ANNOTATION_PARAMETERS);
       String moduleOperationName = annotation.get("moduleName") + ":" + annotation.get("moduleOperation");
-
       return from(publisher)
           .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack())
               .push(new FlowStackElement(moduleOperationName, null)))
@@ -213,10 +212,31 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
             Publisher<CoreEvent> child = processWithChildContext(createEventWithParameters(request), super::apply,
                                                                  ofNullable(getLocation()));
             return from(child).doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop())
+                .onErrorMap(MessagingException.class, remapMessagingException())
                 .doOnError(MessagingException.class, me -> ((DefaultFlowCallStack) me.getEvent().getFlowCallStack()).pop())
                 .onErrorResume(MessagingException.class, createErrorResumeMapper(request))
                 .map(eventResult -> processResult(request, eventResult));
           });
+    }
+
+    /**
+     * If any of the internals of an <operation/> throws an {@link MuleException}, this method will be responsible of remapping
+     * that exception into a {@link ModuleOperationMuleException}.
+     * <br/>
+     * By doing so, later processing (such as {@link MuleException#getDetailedMessage()}) will not keep digging for the prime
+     * cause of the exception, which means the Mule application will <b>only see</b> the logs of the application's call to the
+     * smart connector's <operation/>, rather than the internals of the smart connector's internals.
+     *<br/>
+     * Finally, after remapping it, it will encapsulate the {@link ModuleOperationMuleException} into a {@link MessagingException}
+     * to keep the normal exception flow.
+     */
+    private Function<MessagingException, Throwable> remapMessagingException() {
+      return me -> {
+        MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(this);
+        final ModuleOperationMuleException resolved = exceptionResolver.resolveForSmartConnectorError(me, muleContext);
+        return new MessagingException(createStaticMessage(resolved.getMessage()),
+                                      me.getEvent(), resolved);
+      };
     }
 
     /**

@@ -81,4 +81,8 @@
         </error-handler>
     </flow>
 
+    <flow name="simpleWithNoHandling">
+        <module-using-raise-error:fail-raise-error/>
+    </flow>
+
 </mule>
