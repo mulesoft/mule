@@ -8,8 +8,8 @@ import org.mule.runtime.api.metadata.resolving.InputStaticTypeResolver;
 
 public class AnyJsonTypeStaticResolver extends InputStaticTypeResolver {
 
-    @Override
-    public MetadataType getStaticMetadata() {
-        return BaseTypeBuilder.create(JSON).anyType().build();
-    }
+  @Override
+  public MetadataType getStaticMetadata() {
+    return BaseTypeBuilder.create(JSON).anyType().build();
+  }
 }
