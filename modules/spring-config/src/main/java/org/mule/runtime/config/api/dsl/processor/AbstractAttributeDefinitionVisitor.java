@@ -32,6 +32,11 @@ public class AbstractAttributeDefinitionVisitor implements AttributeDefinitionVi
   }
 
   @Override
+  public void onSoftReferenceSimpleParameter(String softReference) {
+    doOnOperation("onSoftReferenceSimpleParameter");
+  }
+
+  @Override
   public void onReferenceFixedParameter(String reference) {
     doOnOperation("onReferenceFixedParameter");
   }
