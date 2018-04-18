@@ -9,9 +9,8 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
-
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.AttributeDefinitionVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -29,6 +28,7 @@ import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -154,12 +154,14 @@ class ComponentConfigurationBuilder<T> {
     public void onReferenceSimpleParameter(final String configAttributeName) {
       ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
       valueExtractor.onReferenceSimpleParameter(configAttributeName);
-      Object value = valueExtractor.getValue();
-      if (value != null) {
-        valueConsumer.accept(value);
-      } else {
-        valueConsumer.accept(null);
-      }
+      valueConsumer.accept(valueExtractor.getValue());
+    }
+
+    @Override
+    public void onSoftReferenceSimpleParameter(String softReference) {
+      ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
+      valueExtractor.onSoftReferenceSimpleParameter(softReference);
+      valueConsumer.accept(valueExtractor.getValue());
     }
 
     @Override
@@ -265,6 +267,15 @@ class ComponentConfigurationBuilder<T> {
         this.value = new RuntimeBeanReference(reference);
       }
       simpleParameters.remove(configAttributeName);
+    }
+
+    @Override
+    public void onSoftReferenceSimpleParameter(String softReference) {
+      String reference = (String) simpleParameters.get(softReference);
+      if (reference != null) {
+        this.value = new RuntimeBeanNameReference(reference);
+      }
+      simpleParameters.remove(softReference);
     }
 
     @Override

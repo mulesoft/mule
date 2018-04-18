@@ -82,6 +82,11 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
                 public void onReferenceSimpleParameter(String reference) {
                   parametersReferencingDependencies.add(reference);
                 }
+
+                @Override
+                public void onSoftReferenceSimpleParameter(String softReference) {
+                  parametersReferencingDependencies.add(softReference);
+                }
               });
             }));
 

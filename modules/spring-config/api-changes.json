@@ -1,4 +1,24 @@
 {
+  "4.1.2": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser::createFromExtensionModels(java.util.Set<org.mule.runtime.api.meta.model.ExtensionModel>)",
+          "package": "org.mule.runtime.config.api.dsl.processor.xml",
+          "classSimpleName": "XmlApplicationParser",
+          "methodName": "createFromExtensionModels",
+          "elementKind": "method",
+          "justification": "This interface is not extend."
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor::onSoftReferenceSimpleParameter(java.lang.String)",
+          "justification": "Implementing interface"
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [
