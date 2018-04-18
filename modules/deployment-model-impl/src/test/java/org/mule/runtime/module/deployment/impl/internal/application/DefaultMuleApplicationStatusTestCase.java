@@ -13,11 +13,20 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
+
+import java.io.File;
+import java.net.URL;
+
+import javax.inject.Inject;
+
+import org.junit.Test;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -28,16 +37,11 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
-
-import java.io.File;
-
-import javax.inject.Inject;
-
-import org.junit.Test;
 
 /**
  * This tests verifies that the {@link DefaultMuleApplication} status is set correctly depending on its
@@ -62,7 +66,10 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     mockArtifactContext = mock(ArtifactContext.class);
     when(mockArtifactContext.getMuleContext()).thenReturn(muleContext);
     when(mockArtifactContext.getRegistry()).thenReturn(new DefaultRegistry(muleContext));
-    application = new DefaultMuleApplication(null, parentArtifactClassLoader, emptyList(),
+    ApplicationDescriptor applicationDescriptorMock = mock(ApplicationDescriptor.class, RETURNS_DEEP_STUBS.get());
+    when(applicationDescriptorMock.getClassLoaderModel())
+        .thenReturn(new ClassLoaderModel.ClassLoaderModelBuilder().containing(new URL("file:/target/classes")).build());
+    application = new DefaultMuleApplication(applicationDescriptorMock, parentArtifactClassLoader, emptyList(),
                                              null, mock(ServiceRepository.class),
                                              mock(ExtensionModelLoaderRepository.class),
                                              appLocation, null, null);
@@ -131,8 +138,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
   public void deploymentFailedOnStart() throws Exception {
     MuleContext mockedMuleContext = mock(MuleContext.class);
     when(mockArtifactContext.getMuleContext()).thenReturn(mockedMuleContext);
-    mockedMuleContext.start();
-    doThrow(new MuleRuntimeException(createStaticMessage("error")));
+    doThrow(new MuleRuntimeException(createStaticMessage("error"))).when(mockedMuleContext).start();
 
     try {
       application.start();
