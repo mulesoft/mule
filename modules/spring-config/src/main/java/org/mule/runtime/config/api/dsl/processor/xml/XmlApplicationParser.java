@@ -74,7 +74,7 @@ public final class XmlApplicationParser {
                                                                                List<ClassLoader> pluginsClassLoaders) {
     final Builder<XmlNamespaceInfoProvider> namespaceInfoProvidersBuilder = ImmutableList.builder();
     namespaceInfoProvidersBuilder
-        .addAll(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, XmlNamespaceInfoProvider.class.getClassLoader()));
+        .addAll(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, Thread.currentThread().getContextClassLoader()));
     for (ClassLoader pluginClassLoader : pluginsClassLoaders) {
       namespaceInfoProvidersBuilder.addAll(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, pluginClassLoader));
     }
@@ -94,15 +94,23 @@ public final class XmlApplicationParser {
         ImmutableList.<XmlNamespaceInfoProvider>builder()
             .add(createStaticNamespaceInfoProviders(extensionModels))
             .addAll(discoverRuntimeXmlNamespaceInfoProvider())
+            .addAll(discoverArtifactNamespaceInfoProvider())
             .build();
     return new XmlApplicationParser(xmlNamespaceInfoProviders);
   }
 
+  private static List<XmlNamespaceInfoProvider> discoverArtifactNamespaceInfoProvider() {
+    return discoverNamespaceInfoProviderFromClassLoader(Thread.currentThread().getContextClassLoader());
+  }
+
   private static List<XmlNamespaceInfoProvider> discoverRuntimeXmlNamespaceInfoProvider() {
-    ImmutableList.Builder namespaceInfoProvidersBuilder = ImmutableList.builder();
+    return discoverNamespaceInfoProviderFromClassLoader(XmlNamespaceInfoProvider.class.getClassLoader());
+  }
+
+  private static List<XmlNamespaceInfoProvider> discoverNamespaceInfoProviderFromClassLoader(ClassLoader classLoader) {
+    Builder namespaceInfoProvidersBuilder = ImmutableList.builder();
     namespaceInfoProvidersBuilder
-        .addAll(new SpiServiceRegistry().lookupProviders(XmlNamespaceInfoProvider.class,
-                                                         XmlNamespaceInfoProvider.class.getClassLoader()));
+        .addAll(new SpiServiceRegistry().lookupProviders(XmlNamespaceInfoProvider.class, classLoader));
     return namespaceInfoProvidersBuilder.build();
   }
 
