@@ -92,9 +92,9 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
   protected Matcher<String> getComplexLogMatcher() {
     return is("\n**********************************************************************\n" + "* Started app '" + APP_NAME
         + "'                                            *\n"
-        + "* Application plugins:                                               *\n" + "*  - " + PLUGIN_NAME + " ("
-        + PLUGIN_ARTIFACT_ID + "-" + PLUGIN_VERSION + ")"
-        + "                              *\n"
+        + "* Application plugins:                                               *\n" + "*  - " + PLUGIN_NAME + " : "
+        + PLUGIN_VERSION
+        + "                                            *\n"
         + "* Application libraries:                                             *\n" + "*  - " + MY_JAR
         + "                                                       *\n"
         + "**********************************************************************");
