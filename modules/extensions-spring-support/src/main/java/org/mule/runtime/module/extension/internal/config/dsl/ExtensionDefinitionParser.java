@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static java.lang.String.format;
 import static java.time.Instant.ofEpochMilli;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
@@ -24,6 +25,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSoftReferenceSimpleParameter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
@@ -43,7 +45,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTargetParameter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -68,6 +69,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -80,6 +82,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
@@ -118,6 +121,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValue
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
+import com.google.common.collect.ImmutableList;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -138,7 +143,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
-import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.core.convert.ConversionService;
@@ -314,7 +318,7 @@ public abstract class ExtensionDefinitionParser {
           } else {
             parseObject(getKey(parameter), parameter.getName(), objectType, parameter.getDefaultValue(),
                         parameter.getExpressionSupport(), parameter.isRequired(), acceptsReferences(parameter),
-                        paramDsl, parameter.getModelProperties());
+                        paramDsl, parameter.getModelProperties(), parameter.getAllowedStereotypes());
           }
 
         }
@@ -367,7 +371,7 @@ public abstract class ExtensionDefinitionParser {
   protected void parseMapParameters(String key, String name, ObjectType dictionaryType, Object defaultValue,
                                     ExpressionSupport expressionSupport, boolean required, DslElementSyntax paramDsl,
                                     Set<ModelProperty> modelProperties) {
-    parseAttributeParameter(key, name, dictionaryType, defaultValue, expressionSupport, required, modelProperties);
+    parseAttributeParameter(key, name, dictionaryType, defaultValue, expressionSupport, required, modelProperties, emptyList());
 
     Class<? extends Map> mapType = getType(dictionaryType);
     if (ConcurrentMap.class.equals(mapType)) {
@@ -488,7 +492,7 @@ public abstract class ExtensionDefinitionParser {
     Optional<String> keyName = getInfrastructureParameterName(fieldType);
     if (keyName.isPresent()) {
       parseObject(fieldName, keyName.get(), (ObjectType) fieldType, defaultValue, expressionSupport, false, acceptsReferences,
-                  fieldDsl.get(), emptySet());
+                  fieldDsl.get(), emptySet(), emptyList());
       return;
     }
 
@@ -498,7 +502,10 @@ public abstract class ExtensionDefinitionParser {
       @Override
       protected void defaultVisit(MetadataType metadataType) {
         if (!parseAsContent(isContent, metadataType)) {
-          parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false, emptySet());
+          parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false, emptySet(),
+                                  objectField.getAnnotation(StereotypeTypeAnnotation.class)
+                                      .map(StereotypeTypeAnnotation::getAllowedStereotypes)
+                                      .orElse(emptyList()));
         }
       }
 
@@ -544,10 +551,10 @@ public abstract class ExtensionDefinitionParser {
         if (!parsingContext.isRegistered(dsl.getElementName(), dsl.getPrefix())) {
           parsingContext.registerObjectType(dsl.getElementName(), dsl.getPrefix(), type);
           parseObjectParameter(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
-                               dsl, emptySet());
+                               dsl, emptySet(), emptyList());
         } else {
           parseObject(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
-                      dsl, emptySet());
+                      dsl, emptySet(), emptyList());
         }
       }
 
@@ -599,7 +606,7 @@ public abstract class ExtensionDefinitionParser {
                                           ExpressionSupport expressionSupport, boolean required, DslElementSyntax parameterDsl,
                                           Set<ModelProperty> modelProperties) {
 
-    parseAttributeParameter(key, name, arrayType, defaultValue, expressionSupport, required, modelProperties);
+    parseAttributeParameter(key, name, arrayType, defaultValue, expressionSupport, required, modelProperties, emptyList());
 
     Class<?> collectionType = ExtensionMetadataTypeUtils.getType(arrayType).orElse(null);
 
@@ -868,7 +875,8 @@ public abstract class ExtensionDefinitionParser {
   protected AttributeDefinition.Builder parseAttributeParameter(ParameterModel parameterModel) {
     return parseAttributeParameter(getKey(parameterModel), parameterModel.getName(), parameterModel.getType(),
                                    parameterModel.getDefaultValue(), parameterModel.getExpressionSupport(),
-                                   parameterModel.isRequired(), parameterModel.getModelProperties());
+                                   parameterModel.isRequired(), parameterModel.getModelProperties(),
+                                   parameterModel.getAllowedStereotypes());
   }
 
   /**
@@ -884,20 +892,24 @@ public abstract class ExtensionDefinitionParser {
    */
   protected AttributeDefinition.Builder parseAttributeParameter(String key, String name, MetadataType type, Object defaultValue,
                                                                 ExpressionSupport expressionSupport, boolean required,
-                                                                Set<ModelProperty> modelProperties) {
-    return parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, true, modelProperties);
+                                                                Set<ModelProperty> modelProperties,
+                                                                List<StereotypeModel> allowedStereotypes) {
+    return parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, true,
+                                   modelProperties, allowedStereotypes);
   }
 
   private AttributeDefinition.Builder parseAttributeParameter(String key, String name, MetadataType type, Object defaultValue,
                                                               ExpressionSupport expressionSupport, boolean required,
-                                                              boolean acceptsReferences, Set<ModelProperty> modelProperties) {
+                                                              boolean acceptsReferences, Set<ModelProperty> modelProperties,
+                                                              List<StereotypeModel> allowedStereotypes) {
     AttributeDefinition.Builder definitionBuilder;
 
-    if (acceptsReferences &&
-        expressionSupport == NOT_SUPPORTED &&
-        type instanceof ObjectType) {
+    if (acceptsReferences && type instanceof StringType && !allowedStereotypes.isEmpty()) {
+      definitionBuilder = fromSoftReferenceSimpleParameter(name);
 
+    } else if (acceptsReferences && expressionSupport == NOT_SUPPORTED && type instanceof ObjectType) {
       definitionBuilder = fromSimpleReferenceParameter(name);
+
     } else {
       definitionBuilder =
           fromSimpleParameter(name, value -> resolverOf(name, type, value, defaultValue, expressionSupport, required,
@@ -929,7 +941,8 @@ public abstract class ExtensionDefinitionParser {
     } else {
       parseObjectParameter(getKey(parameterModel), parameterModel.getName(), (ObjectType) parameterModel.getType(),
                            parameterModel.getDefaultValue(), parameterModel.getExpressionSupport(), parameterModel.isRequired(),
-                           acceptsReferences(parameterModel), paramDsl, parameterModel.getModelProperties());
+                           acceptsReferences(parameterModel), paramDsl, parameterModel.getModelProperties(),
+                           parameterModel.getAllowedStereotypes());
     }
   }
 
@@ -947,9 +960,11 @@ public abstract class ExtensionDefinitionParser {
   protected void parseObjectParameter(String key, String name, ObjectType type, Object defaultValue,
                                       ExpressionSupport expressionSupport, boolean required,
                                       boolean acceptsReferences, DslElementSyntax elementDsl,
-                                      Set<ModelProperty> modelProperties) {
+                                      Set<ModelProperty> modelProperties,
+                                      List<StereotypeModel> allowedStereotypes) {
 
-    parseObject(key, name, type, defaultValue, expressionSupport, required, acceptsReferences, elementDsl, modelProperties);
+    parseObject(key, name, type, defaultValue, expressionSupport, required, acceptsReferences, elementDsl,
+                modelProperties, allowedStereotypes);
 
     final String elementNamespace = elementDsl.getPrefix();
     final String elementName = elementDsl.getElementName();
@@ -968,8 +983,9 @@ public abstract class ExtensionDefinitionParser {
 
   protected void parseObject(String key, String name, ObjectType type, Object defaultValue, ExpressionSupport expressionSupport,
                              boolean required, boolean acceptsReferences, DslElementSyntax elementDsl,
-                             Set<ModelProperty> modelProperties) {
-    parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, acceptsReferences, modelProperties);
+                             Set<ModelProperty> modelProperties, List<StereotypeModel> allowedStereotypes) {
+    parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, acceptsReferences,
+                            modelProperties, allowedStereotypes);
 
     ObjectParsingDelegate delegate = (ObjectParsingDelegate) locateParsingDelegate(objectParsingDelegates, type)
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find a parsing delegate for type "

@@ -10,6 +10,11 @@
           "methodName": "createFromExtensionModels",
           "elementKind": "method",
           "justification": "This interface is not extend."
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor::onSoftReferenceSimpleParameter(java.lang.String)",
+          "justification": "Implementing interface"
         }
       ]
     }
