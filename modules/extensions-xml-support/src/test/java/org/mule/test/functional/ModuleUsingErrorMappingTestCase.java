@@ -19,6 +19,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 @Feature(ERROR_HANDLING)
 @Story(ERROR_MAPPINGS)
@@ -139,10 +140,11 @@ public class ModuleUsingErrorMappingTestCase extends AbstractXmlExtensionMuleArt
   }
 
   private void verify(String flowName, String expectedPayload, boolean failExpression) throws Exception {
-    assertThat(flowRunner(flowName)
+    CoreEvent coreEvent = flowRunner(flowName)
         .withVariable("names", emptyMap())
         .withVariable("failExpression", failExpression)
-        .run().getMessage(), hasPayload(that(is(expectedPayload))));
+        .run();
+    assertThat(coreEvent.getMessage(), hasPayload(that(is(expectedPayload))));
   }
 
 }
