@@ -8,16 +8,21 @@ package org.mule.test.marvel.drstrange;
 
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import static org.mule.test.marvel.drstrange.DrStrange.CONFIG_NAME;
-
-import org.mule.runtime.extension.api.annotation.param.reference.ConfigReference;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.reference.ConfigReference;
 import org.mule.runtime.extension.api.annotation.param.reference.ObjectStoreReference;
 import org.mule.test.marvel.ironman.IronMan;
+
+import javax.inject.Inject;
 
 /**
  * Default extension to test cursor streams and lists. Given Dr. Strange's ability to use the eye of Agamotto
@@ -27,9 +32,12 @@ import org.mule.test.marvel.ironman.IronMan;
 @Operations(DrStrangeOperations.class)
 @Sources(DrStrangeBytesSource.class)
 @ConnectionProviders({MysticConnectionProvider.class, PoolingMysticConnectionProvider.class})
-public class DrStrange {
+public class DrStrange implements Initialisable {
 
   public static final String CONFIG_NAME = "dr-strange";
+
+  @Inject
+  private ConfigurationComponentLocator locator;
 
   @ConfigReference(namespace = MARVEL_EXTENSION, name = IronMan.CONFIG_NAME)
   @Parameter
@@ -40,4 +48,13 @@ public class DrStrange {
   @Optional
   @ObjectStoreReference
   private String spellStore;
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (ironManConfig != null) {
+      locator.find(Location.builder().globalName(ironManConfig).build())
+          .orElseThrow(() -> new IllegalArgumentException("No bean with name " + ironManConfig));
+    }
+  }
+
 }
