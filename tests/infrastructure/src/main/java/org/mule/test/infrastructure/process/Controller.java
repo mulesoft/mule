@@ -16,9 +16,8 @@ import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.listFiles;
+import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
-
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +33,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 public class Controller {
 
@@ -296,4 +297,12 @@ public class Controller {
         .max(Integer::compare).get();
   }
 
+  public void useLog4jConfigFile(File log4jFile) {
+    File currentRuntimeLog4jConfigFile = Paths.get(osSpecificController.getMuleHome(), "conf", "log4j2.xml").toFile();
+    try {
+      copyFile(log4jFile, currentRuntimeLog4jConfigFile, false);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }
