@@ -130,6 +130,10 @@ public class MuleProcessController {
     getController().addConfProperty(value);
   }
 
+  public void useLog4jConfigFile(File log4jFile) {
+    getController().useLog4jConfigFile(log4jFile);
+  }
+
   protected Controller getController() {
     return controller;
   }
