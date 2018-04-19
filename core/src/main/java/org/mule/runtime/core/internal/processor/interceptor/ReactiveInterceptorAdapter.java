@@ -10,6 +10,7 @@ import static java.lang.String.valueOf;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
@@ -17,6 +18,7 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -33,9 +35,14 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
+import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,9 +51,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -230,7 +234,12 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
         // handling exceptions here in the interceptor adapter code. Any exception is to be handling by the interceptor
         // implementation
         if (expressionManager.isExpression(providedValue)) {
-          return expressionManager.evaluate(providedValue, event, ((Component) processor).getLocation()).getValue();
+          if (processor instanceof LoggerMessageProcessor || processor instanceof ParseTemplateProcessor) {
+            return expressionManager.parseLogTemplate(providedValue, event, ((Component) processor).getLocation(),
+                                                      NULL_BINDING_CONTEXT);
+          } else {
+            return expressionManager.evaluate(providedValue, event, ((Component) processor).getLocation()).getValue();
+          }
         } else {
           return valueOf(providedValue);
         }
