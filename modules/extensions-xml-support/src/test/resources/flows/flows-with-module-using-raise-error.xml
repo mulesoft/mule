@@ -81,8 +81,12 @@
         </error-handler>
     </flow>
 
-    <flow name="simpleWithNoHandling">
+    <flow name="simpleWithNoHandlingFlow">
         <module-using-raise-error:fail-raise-error/>
+    </flow>
+
+    <flow name="simpleWithCustomJavaExceptionFlow">
+        <module-using-raise-error:fail-custom-exception content="#[vars.food]"/>
     </flow>
 
 </mule>

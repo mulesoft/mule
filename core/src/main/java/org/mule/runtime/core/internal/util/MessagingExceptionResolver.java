@@ -23,7 +23,6 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
@@ -36,7 +35,6 @@ import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.policy.FlowExecutionException;
-import org.mule.runtime.core.internal.processor.chain.ModuleOperationMuleException;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
@@ -108,24 +106,6 @@ public class MessagingExceptionResolver {
     if (origin.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
       result.addInfo(INFO_ALREADY_LOGGED_KEY, origin.getInfo().get(INFO_ALREADY_LOGGED_KEY));
     }
-  }
-
-  public ModuleOperationMuleException resolveForSmartConnectorError(final MessagingException innerCause, MuleContext context) {
-    Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(component, innerCause, context);
-    if (!rootCause.isPresent()) {
-      throw new MuleRuntimeException(createStaticMessage(format("Should have not reached here, there must be an exception within macro expansion's '%s' that contains the root cause of this handling",
-                                                                component.toString())),
-                                     innerCause);
-    }
-    Throwable root = rootCause.get().getFirst();
-    ErrorType rootErrorType = rootCause.get().getSecond();
-
-    Error error = ErrorBuilder.builder(getMessagingExceptionCause(root)).errorType(rootErrorType).build();
-    CoreEvent event = CoreEvent.builder(innerCause.getEvent()).error(error).build();
-
-    ModuleOperationMuleException result = new ModuleOperationMuleException(root);
-    propagateAlreadyLogged(innerCause, result);
-    return enrich(result, component, event, context);
   }
 
   private Optional<Pair<Throwable, ErrorType>> findRoot(Component obj, MessagingException me, MuleContext context) {
