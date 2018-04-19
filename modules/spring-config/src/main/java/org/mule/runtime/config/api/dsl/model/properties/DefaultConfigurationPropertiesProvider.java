@@ -71,7 +71,7 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
     return new File(file).isAbsolute();
   }
 
-  private InputStream getResourceInputStream(String file) throws IOException {
+  protected InputStream getResourceInputStream(String file) throws IOException {
     return isAbsolutePath(fileLocation) ? new FileInputStream(file) : resourceProvider.getResourceAsStream(file);
   }
 
