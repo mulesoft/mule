@@ -441,5 +441,4 @@
         </wire-tap>
         <logger level="INFO"/>
     </flow>
-
 </mule>
