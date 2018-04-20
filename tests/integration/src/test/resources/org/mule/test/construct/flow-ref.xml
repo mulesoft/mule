@@ -173,5 +173,29 @@
         <processor ref="ProcessorPathAssertingProcessor"/>
     </sub-flow>
 
+    <sub-flow name="middleSubX">
+        <logger/>
+        <logger/>
+        <flow-ref name="#[flowVars.subflow3]"/>
+    </sub-flow>
+
+    <sub-flow name="middleSubY">
+        <logger/>
+        <logger/>
+        <flow-ref name="#[flowVars.subflow3]"/>
+    </sub-flow>
+
+    <sub-flow name="middleSubO">
+        <logger/>
+        <logger/>
+        <processor ref="ProcessorPathAssertingProcessor"/>
+    </sub-flow>
+
+    <sub-flow name="middleSubP">
+        <logger/>
+        <logger/>
+        <processor ref="ProcessorPathAssertingProcessor"/>
+    </sub-flow>
+
 
 </mule>

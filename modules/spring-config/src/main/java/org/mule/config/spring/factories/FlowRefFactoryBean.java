@@ -94,7 +94,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
         private FlowMap buildInnerPaths(MessageProcessorContainer messageProcessorContainer) {
             if(!processedDynamicMessageProcessors.contains(messageProcessorContainer)) {
-                ((MessageProcessorContainer) dynamicMessageProcessor).addMessageProcessorPathElements(getPathElement());
+                messageProcessorContainer.addMessageProcessorPathElements(getPathElement());
                 processedDynamicMessageProcessors.add(messageProcessorContainer);
             }
             return buildPathResolver(getPathElement());

@@ -7,6 +7,7 @@
 package org.mule.test.construct;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -251,9 +252,26 @@ public class FlowRefTestCase extends FunctionalTestCase
         String[] level1 = {"subA","subB"};
         String[] level2 = {"subX","subY"};
         String[] level3 = {"subO","subP"};
+        String pathTemplate = "/%s/processors/0/%s/subprocessors/0/%s/subprocessors/0/%s/subprocessors/0";
+        assertSubFlowCombinations(asList(level1,level2,level3), pathTemplate);
+    }
+
+    @Test
+    public void pathsOnMultipleNestedSubFlowsWithMixedMessageProcessors() throws Exception {
+
+        String[] level1 = {"subA","subB"};
+        String[] level2 = {"middleSubX","middleSubY"};
+        String[] level3 = {"middleSubO","middleSubP"};
+        String pathTemplate = "/%s/processors/0/%s/subprocessors/0/%s/subprocessors/2/%s/subprocessors/2";
+        assertSubFlowCombinations(asList(level1,level2,level3), pathTemplate);
+    }
+
+    private void assertSubFlowCombinations(List<String[]> levels, String templatePath) throws Exception {
+        String[] level1 = levels.get(0);
+        String[] level2 = levels.get(1);
+        String[] level3 = levels.get(2);
         String mainFlowName = "mainFlowForDynamicSubflowTesting";
         Flow mainFlow = ((Flow) getFlowConstruct(mainFlowName));
-        String pathTemplate = "/%s/processors/0/%s/subprocessors/0/%s/subprocessors/0/%s/subprocessors/0";
 
         for(String level1_subflow : level1) {
             for(String level2_subflow : level2) {
@@ -263,7 +281,7 @@ public class FlowRefTestCase extends FunctionalTestCase
                     event.setFlowVariable("subflow2",level2_subflow);
                     event.setFlowVariable("subflow3",level3_subflow);
                     mainFlow.process(event);
-                    String expected_processor_path = format(pathTemplate,
+                    String expected_processor_path = format(templatePath,
                                                             mainFlowName,
                                                             level1_subflow,
                                                             level2_subflow,
@@ -273,7 +291,6 @@ public class FlowRefTestCase extends FunctionalTestCase
                 }
             }
         }
-
     }
 
 
