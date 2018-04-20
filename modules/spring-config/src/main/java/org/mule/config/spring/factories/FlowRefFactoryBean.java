@@ -30,7 +30,9 @@ import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.util.NotificationUtils.FlowMap;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -72,6 +74,9 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         private MessageProcessorPathElement pathElement;
         private MessageProcessor dynamicMessageProcessor;
 
+        //Store the processed messageProcessors to avoid creating the paths more than one time.
+        private Set<MessageProcessorContainer> processedDynamicMessageProcessors = new HashSet<>();
+
         @Override
         public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
             this.pathElement = pathElement;
@@ -80,16 +85,21 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         @Override
         public FlowMap buildInnerPaths()
         {
-            if (dynamicMessageProcessor instanceof MessageProcessorContainer)
-            {
-                ((MessageProcessorContainer) dynamicMessageProcessor).addMessageProcessorPathElements(getPathElement());
-                return buildPathResolver(getPathElement());
-            }
-            else
-            {
+            if(dynamicMessageProcessor instanceof MessageProcessorContainer) {
+                return buildInnerPaths((MessageProcessorContainer) dynamicMessageProcessor);
+            }else {
                 return null;
             }
         }
+
+        private FlowMap buildInnerPaths(MessageProcessorContainer messageProcessorContainer) {
+            if(!processedDynamicMessageProcessors.contains(messageProcessorContainer)) {
+                ((MessageProcessorContainer) dynamicMessageProcessor).addMessageProcessorPathElements(getPathElement());
+                processedDynamicMessageProcessors.add(messageProcessorContainer);
+            }
+            return buildPathResolver(getPathElement());
+        }
+
 
         public MessageProcessorPathElement getPathElement()
         {

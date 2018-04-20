@@ -6,13 +6,13 @@
  */
 package org.mule.test.construct;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mule.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -201,7 +201,7 @@ public class FlowRefTestCase extends FunctionalTestCase
                 .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), containsString(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Unable to process a synchronous event asynchronously."));
     }
 
     @Test
@@ -211,7 +211,7 @@ public class FlowRefTestCase extends FunctionalTestCase
                 .connectTimeout(RECEIVE_TIMEOUT).bodyString(TEST_MESSAGE, ContentType.TEXT_PLAIN).execute();
         HttpResponse httpResponse = response.returnResponse();
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(500));
-        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), containsString(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Unable to process a synchronous event asynchronously."));
     }
 
     @Test
@@ -242,5 +242,37 @@ public class FlowRefTestCase extends FunctionalTestCase
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
         assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(ERROR_MESSAGE));
     }
+
+    @Test
+    public void pathsOnMultipleNestedSubFlows() throws Exception {
+
+        String[] level1 = {"subA","subB"};
+        String[] level2 = {"subX","subY"};
+        String[] level3 = {"subO","subP"};
+        String mainFlowName = "mainFlowForDynamicSubflowTesting";
+        Flow mainFlow = ((Flow) getFlowConstruct(mainFlowName));
+        String pathTemplate = "/%s/processors/0/%s/subprocessors/0/%s/subprocessors/0/%s/subprocessors/0";
+
+        for(String level1_subflow : level1) {
+            for(String level2_subflow : level2) {
+                for(String level3_subflow : level3) {
+                    MuleEvent event = getTestEvent("0");
+                    event.setFlowVariable("subflow1",level1_subflow);
+                    event.setFlowVariable("subflow2",level2_subflow);
+                    event.setFlowVariable("subflow3",level3_subflow);
+                    mainFlow.process(event);
+                    String expected_processor_path = format(pathTemplate,
+                                                            mainFlowName,
+                                                            level1_subflow,
+                                                            level2_subflow,
+                                                            level3_subflow);
+                    assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is(expected_processor_path));
+                    ProcessorPathAssertingProcessor.traversedProcessorPaths.clear();
+                }
+            }
+        }
+
+    }
+
 
 }
