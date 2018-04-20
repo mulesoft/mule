@@ -17,21 +17,13 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_CONSOLE
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.CORRELATION_ID_MDC_KEY;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleBase;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-
-import java.io.File;
-import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
-import java.util.Properties;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -52,6 +44,15 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.config.Reconfigurable;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.util.FileWatcher;
+
+import java.io.File;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.List;
+import java.util.Properties;
+import java.util.function.Function;
 
 /**
  * This component grabs a {link MuleLoggerContext} which has just been created reading a configuration file and applies
@@ -75,7 +76,7 @@ final class LoggerContextConfigurer {
 
   private static final String MULE_APP_LOG_FILE_TEMPLATE = "mule-app-%s.log";
   private static final String MULE_DOMAIN_LOG_FILE_TEMPLATE = "mule-domain-%s.log";
-  private static final String PATTERN_LAYOUT = "%-5p %d [%t] %X{" + CORRELATION_ID_MDC_KEY + "}%c: %m%n";
+  private static final String PATTERN_LAYOUT = "%-5p %d [%t] [event: %X{" + CORRELATION_ID_MDC_KEY + "}]%c: %m%n";
   private static final int DEFAULT_MONITOR_INTERVAL_SECS = 60;
   private static final Function<Appender, Boolean> containerConsoleAppenderMatcher =
       (appender) -> appender instanceof ConsoleAppender && appender.getName().equals("Console");
