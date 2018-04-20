@@ -38,15 +38,15 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements SourceElement, ParameterizableTypeElement {
+public final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements SourceElement, ParameterizableTypeElement {
 
   private final Class<T> aClass;
   private LazyValue<List<Type>> sourceGenerics;
 
-  SourceTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
+  public SourceTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
     super(aClass, typeLoader);
     this.aClass = aClass;
-    this.sourceGenerics = new LazyValue<>(() -> IntrospectionUtils.getSuperClassGenerics(aClass, Source.class)
+    this.sourceGenerics = new LazyValue<>(() -> IntrospectionUtils.getSuperClassGenericsAsResolvableTypes(aClass, Source.class)
         .stream()
         .map(e -> new TypeWrapper(e, typeLoader))
         .collect(toList()));

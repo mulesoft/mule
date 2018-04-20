@@ -52,6 +52,8 @@ import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
@@ -70,15 +72,7 @@ import org.mule.test.petstore.extension.PhoneNumber;
 import org.mule.test.petstore.extension.TransactionalPetStoreClient;
 import org.mule.test.petstore.extension.TransactionalPetStoreConnectionProvider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.springframework.core.ResolvableType;
-
-import com.google.testing.compile.CompilationRule;
-
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,6 +88,14 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javax.annotation.processing.ProcessingEnvironment;
+
+import com.google.testing.compile.CompilationRule;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.springframework.core.ResolvableType;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -194,7 +196,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void getInterfaceGenerics() {
     Type connectionProvider = typeSupplier.apply(TransactionalPetStoreConnectionProvider.class);
-    List<Type> interfaceGenerics = connectionProvider.getInterfaceGenerics(ConnectionProvider.class);
+    List<Type> interfaceGenerics = connectionProvider.getSuperTypeGenerics(ConnectionProvider.class);
 
     assertThat(interfaceGenerics.size(), is(1));
     Type type = interfaceGenerics.get(0);
@@ -372,6 +374,18 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertThat(((ObjectType) returnType).getOpenRestriction().get(), instanceOf(AnyType.class));
   }
 
+  @Test
+  public void getSourceGenerics() {
+    Type type = typeSupplier.apply(ThirdLevelSource.class);
+    List<Type> superTypeGenerics = type.getSuperTypeGenerics(Source.class);
+
+    assertThat(superTypeGenerics.size(), is(2));
+    Type stringListType = superTypeGenerics.get(0);
+    assertThat(stringListType.isSameType(List.class), is(true));
+    assertThat(stringListType.getGenerics().get(0).getConcreteType().isSameType(String.class), is(true));
+    assertThat(superTypeGenerics.get(1).isSameType(Integer.class), is(true));
+  }
+
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {
     Field field = findField(name, fields);
     assertThat(field, is(notNullValue()));
@@ -488,6 +502,25 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertMessageType(((ArrayType) returnType).getType(), is(instanceOf(StringType.class)), is(instanceOf(ObjectType.class)));
   }
 
+  public static class ThirdLevelSource extends SecondLevelSource<Integer> {
+  }
+
+  public static class SecondLevelSource<T extends Serializable> extends FirstLevelSource<List<String>, T> {
+  }
+
+  public static class FirstLevelSource<P, A> extends Source<P, A> {
+
+    @Override
+    public void onStart(SourceCallback<P, A> sourceCallback) throws MuleException {
+
+    }
+
+    @Override
+    public void onStop() {
+
+    }
+  }
+
   public static class SomePojo {
 
     private String aString;
@@ -510,6 +543,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
       this.someNumber = someNumber;
     }
   }
+
 
   private class TestPagingProvider implements PagingProvider<Object, Result<Banana, Apple>> {
 
