@@ -110,21 +110,11 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
   List<TypeGeneric> getGenerics();
 
   /**
-   * @param superType The {@link Class} with generics, this can be a Interface or a normal Class
-   * @return The list of generics types from the given super type class.
-   * @since 4.1.2
-   */
-  List<Type> getSuperTypeGenerics(Class superType);
-
-  /**
-   * @param interfaceType The {@link Class} with generics
+   * @param interfaceClass The {@link Class} with generics
    * @return The list of generics types from the given interface class.
    * @since 4.1
    */
-  @Deprecated
-  default List<Type> getInterfaceGenerics(Class interfaceType) {
-    return getSuperTypeGenerics(interfaceType);
-  }
+  List<Type> getInterfaceGenerics(Class interfaceClass);
 
   /**
    * @return The current type described as a {@link MetadataType}
