@@ -11,6 +11,7 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.api.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
@@ -19,7 +20,6 @@ import org.mule.runtime.config.internal.dsl.model.config.ConfigurationProperties
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.w3c.dom.Document;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +30,7 @@ import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.custommonkey.xmlunit.XMLUnit.*;
 import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.ComponentModelReaderHelper.PASSWORD_MASK;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ORIGINAL_IDENTIFIER;
 
 
 public class ComponentModelReaderHelperTestCase {
@@ -127,13 +128,67 @@ public class ComponentModelReaderHelperTestCase {
     compareXML(applicationXml, expectedXml);
   }
 
-  private void compareXML(String inputXml, String expectedXml) throws Exception {
-    ComponentModel componentModel = getComponentModel(inputXml);
+
+  @Test
+  public void testSimpleAppWithSmartConnectorLeavingBreadcrumbs() throws Exception {
+    String format = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+        "      xmlns:echo=\"http://www.mulesoft.org/schema/mule/module-echo\"\n" +
+        "      xsi:schemaLocation=\"\n" +
+        "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\n" +
+        "       http://www.mulesoft.org/schema/mule/module-echo http://www.mulesoft.org/schema/mule/module-echo/current/mule-module-echo.xsd\">\n"
+        +
+        "\n" +
+        "    <flow name=\"test\">\n" +
+        "        <echo:data-type value=\"#[payload]\" password=\"%s\" />%s\n" +
+        "    </flow>\n" +
+        "\n" +
+        "    <flow name=\"test2\">\n" +
+        "        <echo:data-type2 value=\"#[payload]\" password=\"%s\" >\n%s" +
+        "            <echo:sub-data-type/>\n" +
+        "        </echo:data-type2>\n" +
+        "    </flow>\n" +
+        "</mule>";
+
+    ComponentIdentifier echoIdentifier = ComponentIdentifier.builder().namespace("echo").name("data-type").build();
+    ComponentIdentifier echoIdentifier2 = ComponentIdentifier.builder().namespace("echo").name("data-type2").build();
+
+    String applicationXml = String.format(format, "THIS IS THE PASSWORD ATTRIBUTE", "", "THIS IS OTHER PASSWORD ATTRIBUTE", "");
+    String expectedXml = String.format(format, PASSWORD_MASK, "<!-- macro expanded from [" + echoIdentifier + "] -->",
+                                       PASSWORD_MASK, "<!-- macro expanded from [" + echoIdentifier2 + "] -->");
+
+    ComponentModel componentModel = getComponentModel(applicationXml);
+
+    injectBreadcrumb(componentModel, echoIdentifier, 0);
+    injectBreadcrumb(componentModel, echoIdentifier2, 1);
+    compareXML(componentModel, expectedXml);
+  }
+
+  private void injectBreadcrumb(ComponentModel componentModel, ComponentIdentifier originalBreadcrumb, int flowIndex) {
+    ComponentModel flowComponentModel = componentModel.getInnerComponents().get(flowIndex);
+
+    ComponentModel echoComponentModel = flowComponentModel.getInnerComponents().get(0);
+    ComponentModel.Builder builder = new ComponentModel.Builder();
+    builder.addCustomAttribute(ORIGINAL_IDENTIFIER, originalBreadcrumb);
+    echoComponentModel.getParameters().forEach((name, value) -> builder.addParameter(name, value, false));
+    echoComponentModel.getCustomAttributes().forEach(builder::addCustomAttribute);
+    echoComponentModel.getInnerComponents().forEach(builder::addChildComponentModel);
+    builder.setIdentifier(originalBreadcrumb);
+
+    ComponentModel resultComponentModel = builder.build();
+    resultComponentModel.setParent(flowComponentModel);
+
+    flowComponentModel.getInnerComponents().remove(0);
+    flowComponentModel.getInnerComponents().add(resultComponentModel);
+  }
+
+  private void compareXML(ComponentModel componentModel, String expectedXml) throws Exception {
     String actualXml = ComponentModelReaderHelper.toXml(componentModel);
 
     setNormalizeWhitespace(true);
     setIgnoreWhitespace(true);
-    setIgnoreComments(true);
+    setIgnoreComments(false);
     setIgnoreAttributeOrder(false);
 
     Diff diff = XMLUnit.compareXML(expectedXml, actualXml);
@@ -151,7 +206,12 @@ public class ComponentModelReaderHelperTestCase {
     }
   }
 
-  private ComponentModel getComponentModel(String applicationXml) throws IOException {
+  private void compareXML(String inputXml, String expectedXml) throws Exception {
+    ComponentModel componentModel = getComponentModel(inputXml);
+    this.compareXML(componentModel, expectedXml);
+  }
+
+  private ComponentModel getComponentModel(String applicationXml) {
     String filename = "file-app-config-name.xml";
     InputStream inputStream = toInputStream(applicationXml, UTF_8);
     XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader = noValidationDocumentLoader();
