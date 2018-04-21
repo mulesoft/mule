@@ -107,6 +107,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
+import org.reflections.ReflectionUtils;
+import org.springframework.core.ResolvableType;
+
+import com.google.common.collect.ImmutableList;
+
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -132,16 +137,15 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-
-import com.google.common.collect.ImmutableList;
-import org.reflections.ReflectionUtils;
-import org.springframework.core.ResolvableType;
+import javax.lang.model.type.TypeVariable;
+import javax.lang.model.util.Types;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -526,48 +530,53 @@ public final class IntrospectionUtils {
         .orElse(defaultName);
   }
 
-  public static List<? extends TypeMirror> getInterfaceGenerics(TypeMirror type, TypeElement superTypeElement,
-                                                                ProcessingEnvironment processingEnvironment) {
-    TypeElement objectType = processingEnvironment.getElementUtils().getTypeElement(Object.class.getName());
-    TypeMirror superClassTypeMirror = processingEnvironment.getTypeUtils().erasure(superTypeElement.asType());
+  public static List<TypeMirror> getInterfaceGenerics(TypeMirror type, TypeElement implementedInterface,
+                                                      ProcessingEnvironment processingEnvironment) {
+    Types types = processingEnvironment.getTypeUtils();
+    TypeMirror erasure = types.erasure(implementedInterface.asType());
+    TypeMirror searchType = types.erasure(type);
 
-    if (!processingEnvironment.getTypeUtils().isAssignable(type, superClassTypeMirror)) {
-      throw new IllegalArgumentException(
-                                         format("Class '%s' does not extend the '%s' class", type.toString(),
-                                                superTypeElement.getSimpleName()));
+    if (types.isSameType(erasure, searchType)) {
+      if (type instanceof DeclaredType) {
+        return (List<TypeMirror>) ((DeclaredType) type).getTypeArguments();
+      }
     }
 
-    if (processingEnvironment.getTypeUtils().isSameType(superClassTypeMirror,
-                                                        processingEnvironment.getTypeUtils().erasure(type))) {
-      return ((DeclaredType) type).getTypeArguments();
+    for (TypeMirror interfaceType : ((TypeElement) types.asElement(type)).getInterfaces()) {
+      if (types.isAssignable(types.erasure(interfaceType),
+                             erasure)) {
+        List<TypeMirror> generics = new ArrayList<>();
+        List<? extends TypeMirror> typeArguments = ((DeclaredType) interfaceType).getTypeArguments();
+
+        for (TypeMirror typeArgument : typeArguments) {
+          if (typeArgument instanceof DeclaredType) {
+            generics.add(typeArgument);
+          } else if (typeArgument instanceof TypeVariable) {
+            DeclaredType declaredType = (DeclaredType) ((DeclaredType) type).asElement().asType();
+            List<? extends TypeMirror> typeTypeArguments = declaredType.getTypeArguments();
+            int i = typeTypeArguments.indexOf(typeArgument);
+            generics.add(((DeclaredType) type).getTypeArguments().get(i));
+          }
+        }
+        return generics;
+      }
     }
 
-    DeclaredType searchClass = (DeclaredType) type;
-    while (!processingEnvironment.getTypeUtils().isAssignable(objectType.asType(), searchClass)) {
-      for (TypeMirror typeMirror : processingEnvironment.getTypeUtils().directSupertypes(searchClass)) {
-        if (processingEnvironment.getTypeUtils().isSameType(superClassTypeMirror,
-                                                            processingEnvironment.getTypeUtils().erasure(typeMirror))) {
-          if (typeMirror instanceof DeclaredType) {
-            return ((DeclaredType) typeMirror).getTypeArguments();
-          } else {
-            return emptyList();
-          }
-        } else {
-          if (typeMirror instanceof DeclaredType
-              && processingEnvironment.getTypeUtils().isAssignable(typeMirror, superClassTypeMirror)) {
-            searchClass = (DeclaredType) typeMirror;
-          } else if (processingEnvironment.getTypeUtils().isAssignable(objectType.asType(), typeMirror)) {
-            searchClass = (DeclaredType) typeMirror;
-          }
+    if (type instanceof DeclaredType) {
+      Element element = ((DeclaredType) type).asElement();
+      if (element instanceof TypeElement) {
+        TypeMirror superclass = ((TypeElement) element).getSuperclass();
+        if (types.isAssignable(types.erasure(superclass), erasure)) {
+          return getInterfaceGenerics(superclass, implementedInterface, processingEnvironment);
         }
       }
     }
+
     return emptyList();
   }
 
   public static List<ResolvableType> getInterfaceGenerics(final java.lang.reflect.Type type,
                                                           final Class<?> implementedInterface) {
-
     ResolvableType interfaceType = null;
     ResolvableType searchClass = ResolvableType.forType(type);
 
@@ -652,10 +661,6 @@ public final class IntrospectionUtils {
   }
 
   public static List<java.lang.reflect.Type> getSuperClassGenerics(Class<?> type, Class<?> superClass) {
-    return getSuperClassGenericsAsResolvableTypes(type, superClass).stream().map(ResolvableType::getType).collect(toList());
-  }
-
-  public static List<ResolvableType> getSuperClassGenericsAsResolvableTypes(Class<?> type, Class<?> superClass) {
     if (!superClass.isAssignableFrom(type)) {
       throw new IllegalArgumentException(
                                          format("Class '%s' does not extend the '%s' class", type.getName(),
@@ -664,11 +669,15 @@ public final class IntrospectionUtils {
 
     ResolvableType searchType = ResolvableType.forType(type);
     while (!Object.class.equals(searchType.getType())) {
-      if (superClass.equals(searchType.getRawClass())) {
-        return stream(searchType.getGenerics()).collect(toList());
-      } else {
-        searchType = searchType.getSuperType();
+      ResolvableType[] generics = searchType.getGenerics();
+      if (generics.length > 0) {
+        return stream(generics).map(g -> g.getType()).collect(toList());
       }
+
+      if (superClass.equals(searchType.getType())) {
+        break;
+      }
+      searchType = searchType.getSuperType();
     }
     return new LinkedList<>();
   }
@@ -1468,7 +1477,7 @@ public final class IntrospectionUtils {
       throw new IllegalArgumentException("The given OutputType is not a PagingProvider");
     }
 
-    List<Type> interfaceGenerics = type.getSuperTypeGenerics(PagingProvider.class);
+    List<Type> interfaceGenerics = type.getInterfaceGenerics(PagingProvider.class);
     if (interfaceGenerics.size() == 2) {
       return new Pair<>(interfaceGenerics.get(0), interfaceGenerics.get(1));
     } else {

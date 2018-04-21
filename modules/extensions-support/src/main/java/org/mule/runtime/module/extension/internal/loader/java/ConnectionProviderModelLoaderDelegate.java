@@ -70,7 +70,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
       name = DEFAULT_CONNECTION_PROVIDER_NAME;
     }
 
-    List<Type> providerGenerics = providerType.getSuperTypeGenerics(ConnectionProvider.class);
+    List<Type> providerGenerics = providerType.getInterfaceGenerics(ConnectionProvider.class);
 
     if (providerGenerics.size() != 1) {
       // TODO: MULE-9220: Add a syntax validator for this

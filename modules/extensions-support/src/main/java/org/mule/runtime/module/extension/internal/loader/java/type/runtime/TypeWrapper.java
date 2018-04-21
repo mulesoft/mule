@@ -63,7 +63,7 @@ public class TypeWrapper implements Type {
   }
 
   public TypeWrapper(ResolvableType resolvableType, ClassTypeLoader typeLoader) {
-    this.aClass = resolvableType.resolve();
+    this.aClass = resolvableType.getRawClass();
     instantiable = new LazyValue<>(() -> IntrospectionUtils.isInstantiable(aClass, new ReflectionCache()));
     this.type = resolvableType.getType();
     this.generics = new ArrayList<>();
@@ -236,18 +236,11 @@ public class TypeWrapper implements Type {
    * {@inheritDoc}
    */
   @Override
-  public List<Type> getSuperTypeGenerics(Class superType) {
-    if (superType.isInterface()) {
-      return IntrospectionUtils.getInterfaceGenerics(type, superType)
-          .stream()
-          .map(e -> new TypeWrapper(e, typeLoader))
-          .collect(toList());
-    } else {
-      return IntrospectionUtils.getSuperClassGenericsAsResolvableTypes(aClass, superType)
-          .stream()
-          .map(e -> new TypeWrapper(e, typeLoader))
-          .collect(toList());
-    }
+  public List<Type> getInterfaceGenerics(Class interfaceClass) {
+    return IntrospectionUtils.getInterfaceGenerics(type, interfaceClass)
+        .stream()
+        .map(e -> new TypeWrapper(e, typeLoader))
+        .collect(toList());
   }
 
   @Override
