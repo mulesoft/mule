@@ -8,13 +8,13 @@ package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
+import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 
 import java.util.Optional;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.repeat;
@@ -25,7 +25,7 @@ import static org.mule.runtime.core.privileged.execution.LocationExecutionContex
  * Internal object responsible to traverse the entire XMl of a given application to read the {@link ComponentModel} to
  * recreate the macro expanded XML of the application.
  *
- * By default it will print every attribute or content if it's not marked as {@link LayoutModel#isPassword()} to true.
+ * It will obfuscate attributes that matches with {@link LocationExecutionContextProvider#maskPasswords(String, String)}.
  * @since 4.2.0
  */
 class ComponentModelReaderHelper {

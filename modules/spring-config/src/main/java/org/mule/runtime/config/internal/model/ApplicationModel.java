@@ -1058,8 +1058,6 @@ public class ApplicationModel {
    */
   private void expandModules(Set<ExtensionModel> extensionModels) {
     new MacroExpansionModulesModel(this, extensionModels).expand();
-    //TODO lautaro remove this before merging
-    //    System.out.println("App before starting things up \n" + getRootComponentModel().toXml());
   }
 
   /**
