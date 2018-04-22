@@ -46,7 +46,7 @@ public final class SourceTypeWrapper<T extends Source> extends TypeWrapper imple
   public SourceTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
     super(aClass, typeLoader);
     this.aClass = aClass;
-    this.sourceGenerics = new LazyValue<>(() -> IntrospectionUtils.getSuperClassGenericsAsResolvableTypes(aClass, Source.class)
+    this.sourceGenerics = new LazyValue<>(() -> IntrospectionUtils.getSuperClassGenerics(aClass, Source.class)
         .stream()
         .map(e -> new TypeWrapper(e, typeLoader))
         .collect(toList()));

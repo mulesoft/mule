@@ -44,7 +44,7 @@ public interface SourceElement extends ParameterizableTypeElement, WithReturnTyp
 
   @Override
   default MetadataType getReturnMetadataType() {
-    return getSourceReturnType(getSuperClassGenerics().get(0));
+    return getSourceReturnType(getReturnType());
   }
 
   @Override

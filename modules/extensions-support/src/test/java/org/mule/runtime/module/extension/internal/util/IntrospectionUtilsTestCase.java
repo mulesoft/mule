@@ -57,8 +57,10 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
+import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -123,6 +125,9 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   @Parameterized.Parameter(2)
   public Function<Class, Type> typeSupplier;
 
+  @Parameterized.Parameter(3)
+  public Function<Class, SourceElement> sourceSupplier;
+
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     List<Object[]> objects = new ArrayList<>();
@@ -130,7 +135,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     Function<Class, Type> javaTypeSupplier =
         aClass -> new TypeWrapper(aClass, new DefaultExtensionsTypeLoaderFactory().createTypeLoader());
 
-    objects.add(new Object[] {CLASS, new ClassOperationSupplier(), javaTypeSupplier});
+    objects.add(new Object[] {CLASS, new ClassOperationSupplier(), javaTypeSupplier, new ClassSourceSupplier()});
     return objects;
   }
 
@@ -386,6 +391,18 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertThat(superTypeGenerics.get(1).isSameType(Integer.class), is(true));
   }
 
+  @Test
+  public void getSourceMetadataType() {
+    SourceElement source = sourceSupplier.apply(ThirdLevelSource.class);
+    MetadataType returnType = source.getReturnMetadataType();
+
+    assertThat(returnType, is(instanceOf(ArrayType.class)));
+    ArrayType arrayType = (ArrayType) returnType;
+
+    MetadataType itemType = arrayType.getType();
+    assertThat(itemType, is(instanceOf(StringType.class)));
+  }
+
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {
     Field field = findField(name, fields);
     assertThat(field, is(notNullValue()));
@@ -521,6 +538,19 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     }
   }
 
+  public static class SimpleSource extends Source<List<String>, Integer> {
+
+    @Override
+    public void onStart(SourceCallback<List<String>, Integer> sourceCallback) throws MuleException {
+
+    }
+
+    @Override
+    public void onStop() {
+
+    }
+  }
+
   public static class SomePojo {
 
     private String aString;
@@ -559,6 +589,14 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
     @Override
     public void close(Object connection) throws MuleException {}
+  }
+
+  private static class ClassSourceSupplier implements Function<Class<?>, SourceElement> {
+
+    @Override
+    public SourceElement apply(Class className) {
+      return new SourceTypeWrapper(className, TYPE_LOADER);
+    }
   }
 
   private static class ClassOperationSupplier implements BiFunction<String, Class[], OperationElement> {

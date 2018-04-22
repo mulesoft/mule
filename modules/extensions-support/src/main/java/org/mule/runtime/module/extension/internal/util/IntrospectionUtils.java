@@ -118,8 +118,10 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -651,21 +653,36 @@ public final class IntrospectionUtils {
     return emptyList();
   }
 
-  public static List<java.lang.reflect.Type> getSuperClassGenerics(Class<?> type, Class<?> superClass) {
-    return getSuperClassGenericsAsResolvableTypes(type, superClass).stream().map(ResolvableType::getType).collect(toList());
-  }
-
-  public static List<ResolvableType> getSuperClassGenericsAsResolvableTypes(Class<?> type, Class<?> superClass) {
-    if (!superClass.isAssignableFrom(type)) {
+  public static List<java.lang.reflect.Type> getSuperClassGenerics(Class<?> currentType, Class<?> superClass) {
+    if (!superClass.isAssignableFrom(currentType)) {
       throw new IllegalArgumentException(
-                                         format("Class '%s' does not extend the '%s' class", type.getName(),
+                                         format("Class '%s' does not extend the '%s' class", currentType.getName(),
                                                 superClass.getName()));
     }
 
-    ResolvableType searchType = ResolvableType.forType(type);
+    Map<String, java.lang.reflect.Type> genericTypes = new HashMap<>();
+
+    ResolvableType searchType = ResolvableType.forType(currentType);
     while (!Object.class.equals(searchType.getType())) {
+
+      ResolvableType[] generics = searchType.getGenerics();
+
+      for (ResolvableType resolvableType : generics) {
+        java.lang.reflect.Type foundType = resolvableType.getType();
+
+        if (!(foundType instanceof TypeVariable)) {
+          genericTypes.put(resolvableType.toString(), foundType);
+        }
+      }
+
       if (superClass.equals(searchType.getRawClass())) {
-        return stream(searchType.getGenerics()).collect(toList());
+        return stream(generics).map(resolvableType -> {
+          java.lang.reflect.Type genericType = resolvableType.getType();
+          if (genericType instanceof TypeVariable) {
+            genericType = genericTypes.get(resolvableType.toString());
+          }
+          return genericType;
+        }).collect(toList());
       } else {
         searchType = searchType.getSuperType();
       }
