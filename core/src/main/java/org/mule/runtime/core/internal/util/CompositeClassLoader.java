@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import org.mule.runtime.core.api.util.CompoundEnumeration;
+
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
@@ -15,8 +17,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-
-import sun.misc.CompoundEnumeration;
 
 /**
  * Classloader implementation that, given a set of classloaders, will first search for a resource/class in the first one. If it is

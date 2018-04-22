@@ -7,17 +7,17 @@
 package org.mule.runtime.http.api.domain.entity;
 
 import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.util.IOUtils;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Optional;
-
-import sun.misc.IOUtils;
 
 /**
  * Representation of a stream HTTP body.
@@ -31,7 +31,7 @@ public class InputStreamHttpEntity implements HttpEntity {
   private InputStream inputStream;
 
   public InputStreamHttpEntity(InputStream inputStream) {
-    checkNotNull(inputStream, "HTTP entity stream cannot be null.");
+    requireNonNull(inputStream, "HTTP entity stream cannot be null.");
     this.inputStream = inputStream;
   }
 
@@ -57,7 +57,7 @@ public class InputStreamHttpEntity implements HttpEntity {
 
   @Override
   public byte[] getBytes() throws IOException {
-    return IOUtils.readFully(this.inputStream, -1, true);
+    return IOUtils.toByteArray(this.inputStream);
   }
 
   @Override
