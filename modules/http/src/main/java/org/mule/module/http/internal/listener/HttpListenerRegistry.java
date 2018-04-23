@@ -281,7 +281,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 {
                     auxPathMap = pathMap;
                 }
-                if (i == pathParts.length - 1)
+                if (i == pathParts.length - 1 || pathMap == null)
                 {
                     if (auxPathMap != null)
                     {
