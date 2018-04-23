@@ -145,4 +145,57 @@
         <echo-component/>
     </flow>
 
+    <flow name="mainFlowForDynamicSubflowTesting">
+        <flow-ref name="#[flowVars.subflows[0]]"/>
+    </flow>
+
+    <sub-flow name="subA">
+        <flow-ref name="#[flowVars.subflows[1]]"/>
+    </sub-flow>
+
+    <sub-flow name="subB">
+        <flow-ref name="#[flowVars.subflows[1]]"/>
+    </sub-flow>
+
+    <sub-flow name="subX">
+        <flow-ref name="#[flowVars.subflows[2]]"/>
+    </sub-flow>
+
+    <sub-flow name="subY">
+        <flow-ref name="#[flowVars.subflows[2]]"/>
+    </sub-flow>
+
+    <sub-flow name="subO">
+        <processor ref="ProcessorPathAssertingProcessor"/>
+    </sub-flow>
+
+    <sub-flow name="subP">
+        <processor ref="ProcessorPathAssertingProcessor"/>
+    </sub-flow>
+
+    <sub-flow name="middleSubX">
+        <logger/>
+        <logger/>
+        <flow-ref name="#[flowVars.subflows[2]]"/>
+    </sub-flow>
+
+    <sub-flow name="middleSubY">
+        <logger/>
+        <logger/>
+        <flow-ref name="#[flowVars.subflows[2]]"/>
+    </sub-flow>
+
+    <sub-flow name="middleSubO">
+        <logger/>
+        <logger/>
+        <processor ref="ProcessorPathAssertingProcessor"/>
+    </sub-flow>
+
+    <sub-flow name="middleSubP">
+        <logger/>
+        <logger/>
+        <processor ref="ProcessorPathAssertingProcessor"/>
+    </sub-flow>
+
+
 </mule>
