@@ -146,23 +146,23 @@
     </flow>
 
     <flow name="mainFlowForDynamicSubflowTesting">
-        <flow-ref name="#[flowVars.subflow1]"/>
+        <flow-ref name="#[flowVars.subflows[0]]"/>
     </flow>
 
     <sub-flow name="subA">
-        <flow-ref name="#[flowVars.subflow2]"/>
+        <flow-ref name="#[flowVars.subflows[1]]"/>
     </sub-flow>
 
     <sub-flow name="subB">
-        <flow-ref name="#[flowVars.subflow2]"/>
+        <flow-ref name="#[flowVars.subflows[1]]"/>
     </sub-flow>
 
     <sub-flow name="subX">
-        <flow-ref name="#[flowVars.subflow3]"/>
+        <flow-ref name="#[flowVars.subflows[2]]"/>
     </sub-flow>
 
     <sub-flow name="subY">
-        <flow-ref name="#[flowVars.subflow3]"/>
+        <flow-ref name="#[flowVars.subflows[2]]"/>
     </sub-flow>
 
     <sub-flow name="subO">
@@ -176,13 +176,13 @@
     <sub-flow name="middleSubX">
         <logger/>
         <logger/>
-        <flow-ref name="#[flowVars.subflow3]"/>
+        <flow-ref name="#[flowVars.subflows[2]]"/>
     </sub-flow>
 
     <sub-flow name="middleSubY">
         <logger/>
         <logger/>
-        <flow-ref name="#[flowVars.subflow3]"/>
+        <flow-ref name="#[flowVars.subflows[2]]"/>
     </sub-flow>
 
     <sub-flow name="middleSubO">

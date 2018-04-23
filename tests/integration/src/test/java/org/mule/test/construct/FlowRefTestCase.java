@@ -30,6 +30,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -247,51 +248,75 @@ public class FlowRefTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void pathsOnMultipleNestedSubFlows() throws Exception {
-
-        String[] level1 = {"subA","subB"};
-        String[] level2 = {"subX","subY"};
-        String[] level3 = {"subO","subP"};
-        String pathTemplate = "/%s/processors/0/%s/subprocessors/0/%s/subprocessors/0/%s/subprocessors/0";
-        assertSubFlowCombinations(asList(level1,level2,level3), pathTemplate);
+    public void pathsOnMultipleNestedSubFlows() throws Exception
+    {
+        List<String> level1 = asList("subA","subB");
+        List<String> level2 = asList("subX","subY");
+        List<String> level3 = asList("subO","subP");
+        String mainFlowName = "mainFlowForDynamicSubflowTesting";
+        String pathTemplate = "/mainFlowForDynamicSubflowTesting/processors/0/%s/subprocessors/0/%s/subprocessors/0/%s/subprocessors/0";
+        assertSubFlowCombinations(asList(level1,level2,level3),mainFlowName, pathTemplate);
     }
 
     @Test
-    public void pathsOnMultipleNestedSubFlowsWithMixedMessageProcessors() throws Exception {
+    public void pathsOnMultipleNestedSubFlowsWithMixedMessageProcessors() throws Exception
+    {
 
-        String[] level1 = {"subA","subB"};
-        String[] level2 = {"middleSubX","middleSubY"};
-        String[] level3 = {"middleSubO","middleSubP"};
-        String pathTemplate = "/%s/processors/0/%s/subprocessors/0/%s/subprocessors/2/%s/subprocessors/2";
-        assertSubFlowCombinations(asList(level1,level2,level3), pathTemplate);
+        List<String> level1 = asList("subA","subB");
+        List<String> level2 = asList("middleSubX","middleSubY");
+        List<String> level3 = asList("middleSubO","middleSubP");
+        String mainFlowName = "mainFlowForDynamicSubflowTesting";
+        String pathTemplate = "/mainFlowForDynamicSubflowTesting/processors/0/%s/subprocessors/0/%s/subprocessors/2/%s/subprocessors/2";
+        assertSubFlowCombinations(asList(level1,level2,level3),mainFlowName,pathTemplate);
     }
 
-    private void assertSubFlowCombinations(List<String[]> levels, String templatePath) throws Exception {
-        String[] level1 = levels.get(0);
-        String[] level2 = levels.get(1);
-        String[] level3 = levels.get(2);
-        String mainFlowName = "mainFlowForDynamicSubflowTesting";
+    private void assertSubFlowCombinations(List<List<String>> levels,String mainFlowName, String pathTemplate) throws Exception
+    {
+
         Flow mainFlow = ((Flow) getFlowConstruct(mainFlowName));
 
-        for(String level1_subflow : level1) {
-            for(String level2_subflow : level2) {
-                for(String level3_subflow : level3) {
-                    MuleEvent event = getTestEvent("0");
-                    event.setFlowVariable("subflow1",level1_subflow);
-                    event.setFlowVariable("subflow2",level2_subflow);
-                    event.setFlowVariable("subflow3",level3_subflow);
-                    mainFlow.process(event);
-                    String expected_processor_path = format(templatePath,
-                                                            mainFlowName,
-                                                            level1_subflow,
-                                                            level2_subflow,
-                                                            level3_subflow);
-                    assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is(expected_processor_path));
-                    ProcessorPathAssertingProcessor.traversedProcessorPaths.clear();
-                }
-            }
+        List<List<String>> combinations = getPathCombinations(levels);
+
+        for(List<String> subFlowCombination : combinations)
+        {
+          MuleEvent event = getTestEvent("0");
+          event.setFlowVariable("subflows", subFlowCombination);
+          String expectedPath = format(pathTemplate, subFlowCombination.toArray());
+          mainFlow.process(event);
+          assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is(expectedPath));
+          ProcessorPathAssertingProcessor.traversedProcessorPaths.clear();
+
         }
     }
 
+  private List<List<String>> getPathCombinations(List<List<String>> levels)
+  {
+      List<List<String>> combinations = new LinkedList<>();
+      populatePathCombinations(levels, combinations, new LinkedList<String>(), 0);
+      return combinations;
+  }
+
+  private void populatePathCombinations(List<List<String>> levels, List<List<String>> combinations, List<String> previousLevels, int currentLevelIndex)
+  {
+
+      if(currentLevelIndex == levels.size())
+      {
+        combinations.add(previousLevels);
+        return;
+      }
+
+      for( String levelRelativePath : levels.get(currentLevelIndex))
+      {
+        List<String> tmpCombination = new LinkedList<>(previousLevels);
+        tmpCombination.add(levelRelativePath);
+        populatePathCombinations(levels, combinations,  tmpCombination, currentLevelIndex + 1);
+      }
+
+  }
+
+
 
 }
+
+
+

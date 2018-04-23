@@ -47,16 +47,19 @@ public class SubflowInterceptingChainLifecycleWrapper extends InterceptingChainL
                 filteredMessageProcessorList.add(messageProcessor);
                 break;
             }
-            else {
+            else
+            {
                 filteredMessageProcessorList.add(messageProcessor);
             }
-            if(messageProcessor instanceof DynamicMessageProcessorContainer) {
+            if(messageProcessor instanceof DynamicMessageProcessorContainer)
+            {
                 dynamicMessageProcessorContainers.add((DynamicMessageProcessorContainer) messageProcessor);
             }
 
         }
         NotificationUtils.addMessageProcessorPathElements(filteredMessageProcessorList, subprocessors);
-        for(DynamicMessageProcessorContainer dynamicMessageProcessorContainer : dynamicMessageProcessorContainers) {
+        for(DynamicMessageProcessorContainer dynamicMessageProcessorContainer : dynamicMessageProcessorContainers)
+        {
             dynamicMessageProcessorContainer.buildInnerPaths();
         }
     }
