@@ -285,7 +285,6 @@ public class FlowRefTestCase extends FunctionalTestCase
           mainFlow.process(event);
           assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0), is(expectedPath));
           ProcessorPathAssertingProcessor.traversedProcessorPaths.clear();
-
         }
     }
 
@@ -313,9 +312,7 @@ public class FlowRefTestCase extends FunctionalTestCase
       }
 
   }
-
-
-
+  
 }
 
 
