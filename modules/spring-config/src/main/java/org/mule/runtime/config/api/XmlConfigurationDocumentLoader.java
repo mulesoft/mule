@@ -11,6 +11,7 @@ import static java.lang.System.lineSeparator;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -19,16 +20,16 @@ import org.mule.runtime.config.internal.DefaultXmlLoggerErrorHandler;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.MuleDocumentLoader;
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.w3c.dom.Document;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Loads a mule configuration file into a {@link Document} object.
@@ -136,6 +137,8 @@ public final class XmlConfigurationDocumentLoader {
                         validationMode, true);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Error loading: %s, %s", filename, e.getMessage())), e);
+    } finally {
+      closeQuietly(inputStream);
     }
     if (validationMode == VALIDATION_XSD) {
       throwExceptionIfErrorsWereFound(errorHandler, filename);

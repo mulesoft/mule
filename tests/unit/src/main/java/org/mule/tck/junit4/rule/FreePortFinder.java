@@ -61,9 +61,7 @@ public class FreePortFinder {
       int port = minPortNumber + random.nextInt(portRange);
       logger.debug("Trying port " + port + "...");
       String portFile = port + LOCK_FILE_EXTENSION;
-      try {
-
-        FileChannel channel = open(get(basePath + separator + portFile), CREATE, WRITE, DELETE_ON_CLOSE);
+      try (FileChannel channel = open(get(basePath + separator + portFile), CREATE, WRITE, DELETE_ON_CLOSE)) {
         FileLock lock = channel.tryLock();
         if (lock == null) {
           // If the lock couldn't be acquired and tryLock didn't throw the exception, we throw it here

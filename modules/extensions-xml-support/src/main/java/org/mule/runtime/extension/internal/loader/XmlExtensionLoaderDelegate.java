@@ -107,6 +107,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -329,8 +330,8 @@ public final class XmlExtensionLoaderDelegate {
   private Optional<ExtensionModel> createTnsExtensionModel(URL resource, Set<ExtensionModel> extensions) throws IOException {
     ExtensionModel result = null;
     final ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
-    try {
-      final Source xslt = new StreamSource(getClass().getClassLoader().getResourceAsStream(TRANSFORMATION_FOR_TNS_RESOURCE));
+    try (InputStream in = getClass().getClassLoader().getResourceAsStream(TRANSFORMATION_FOR_TNS_RESOURCE)) {
+      final Source xslt = new StreamSource(in);
       final Source moduleToTransform = new StreamSource(resource.openStream());
       TransformerFactory.newInstance()
           .newTransformer(xslt)

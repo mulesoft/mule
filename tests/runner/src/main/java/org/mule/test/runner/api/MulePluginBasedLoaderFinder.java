@@ -6,6 +6,7 @@
  */
 package org.mule.test.runner.api;
 
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.test.runner.utils.ExtensionLoaderUtils.getLoaderById;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -28,7 +29,11 @@ public class MulePluginBasedLoaderFinder {
   private final MulePluginModel mulePlugin;
 
   MulePluginBasedLoaderFinder(InputStream json) {
-    this.mulePlugin = mulePluginSerializer.deserialize(IOUtils.toString(json));
+    try {
+      this.mulePlugin = mulePluginSerializer.deserialize(IOUtils.toString(json));
+    } finally {
+      closeQuietly(json);
+    }
   }
 
   MulePluginBasedLoaderFinder(File json) throws FileNotFoundException {
