@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.el.datetime;
 
+import static java.util.Calendar.MILLISECOND;
 import static java.util.Objects.hash;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -76,8 +77,13 @@ public abstract class AbstractInstant implements Instant {
 
   @Override
   public Instant withTimeZone(String newTimezone) {
+    int currentOffset = calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
     TimeZone timeZone = TimeZone.getTimeZone(newTimezone);
-    calendar.add(Calendar.MILLISECOND, -timeZone.getOffset(calendar.getTimeInMillis()));
+    int newOffset = timeZone.getOffset(calendar.getTimeInMillis());
+
+    int diffOffset = currentOffset - newOffset;
+
+    calendar.add(MILLISECOND, diffOffset);
     calendar.setTimeZone(timeZone);
     return this;
   }
