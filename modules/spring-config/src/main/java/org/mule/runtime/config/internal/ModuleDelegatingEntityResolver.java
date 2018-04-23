@@ -53,13 +53,14 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
       "http://www.mulesoft.org/schema/mule/compatibility/current/mule-compatibility.xsd";
   private static final String TEST_XSD = "http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd";
 
+  private static Boolean internalIsRunningTests;
+
   private final Set<ExtensionModel> extensions;
   private final EntityResolver muleEntityResolver;
   // TODO(fernandezlautaro): MULE-11024 once implemented, extensionSchemaFactory must not be Optional
   private Optional<ExtensionSchemaGenerator> extensionSchemaFactory;
   private Map<String, Boolean> checkedEntities; // It saves already checked entities so that if the resolution already failed
   // once, it will raise and exception and not loop failing over and over again.
-  private static Boolean internalIsRunningTests = false;
 
   /**
    * Returns an instance of {@link ModuleDelegatingEntityResolver}
@@ -121,9 +122,9 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
 
   private String overrideSystemIdForCompatibility(String publicId, String systemId) throws SAXException, IOException {
     if (systemId.equals(CORE_XSD)) {
-      Boolean useDeprecated = muleEntityResolver.resolveEntity(publicId, CORE_DEPRECATED_XSD) != null;
-      Boolean usingCompatibility = muleEntityResolver.resolveEntity(publicId, COMPATIBILITY_XSD) != null;
-      Boolean runningTests = isRunningTests(new Throwable().getStackTrace());
+      Boolean useDeprecated = canResolveEntity(publicId, CORE_DEPRECATED_XSD);
+      Boolean usingCompatibility = canResolveEntity(publicId, COMPATIBILITY_XSD);
+      boolean runningTests = isRunningTests();
 
       if (useDeprecated && (usingCompatibility || runningTests)) {
         return CORE_DEPRECATED_XSD;
@@ -131,7 +132,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
         return CORE_CURRENT_XSD;
       }
     } else if (systemId.equals(TEST_XSD)) {
-      Boolean runningTests = isRunningTests(new Throwable().getStackTrace());
+      boolean runningTests = isRunningTests();
       if (!runningTests && generateFromExtensions(publicId, systemId) == null) {
         String message = "Internal runtime mule-test.xsd can't be used in real applications";
         throw new MuleRuntimeException(createStaticMessage(message));
@@ -141,15 +142,33 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     return systemId;
   }
 
-  private Boolean isRunningTests(StackTraceElement[] stackTrace) {
-    if (internalIsRunningTests) {
-      return true;
+  protected boolean canResolveEntity(String publicId, String systemId) throws SAXException, IOException {
+    final InputSource resolvedEntity = muleEntityResolver.resolveEntity(publicId, systemId);
+    try {
+      return resolvedEntity != null;
+    } finally {
+      if (resolvedEntity != null) {
+        if (resolvedEntity.getByteStream() != null) {
+          resolvedEntity.getByteStream().close();
+        }
+        if (resolvedEntity.getCharacterStream() != null) {
+          resolvedEntity.getCharacterStream().close();
+        }
+      }
     }
-    for (StackTraceElement element : stackTrace) {
+  }
+
+  private boolean isRunningTests() {
+    if (internalIsRunningTests != null) {
+      return internalIsRunningTests;
+    }
+    for (StackTraceElement element : new Throwable().getStackTrace()) {
       if (element.getClassName().startsWith("org.junit.runners.")) {
+        internalIsRunningTests = true;
         return true;
       }
     }
+    internalIsRunningTests = false;
     return false;
   }
 
