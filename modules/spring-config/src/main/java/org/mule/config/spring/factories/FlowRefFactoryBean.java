@@ -78,14 +78,16 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         private Set<MessageProcessorContainer> processedDynamicMessageProcessors = new HashSet<>();
 
         @Override
-        public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+        public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
+        {
             this.pathElement = pathElement;
         }
         
         @Override
         public FlowMap buildInnerPaths()
         {
-            if(dynamicMessageProcessor instanceof MessageProcessorContainer) {
+            if(dynamicMessageProcessor instanceof MessageProcessorContainer)
+            {
                 return buildInnerPaths((MessageProcessorContainer) dynamicMessageProcessor);
             }
             else
