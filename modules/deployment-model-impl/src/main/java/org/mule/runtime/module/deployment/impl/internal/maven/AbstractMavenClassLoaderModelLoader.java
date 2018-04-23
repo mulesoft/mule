@@ -43,6 +43,8 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.tools.api.classloader.model.Artifact;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
@@ -262,12 +264,28 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
       loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
       Set<BundleDependency> allBundleDependencies =
           dependencies.stream().map(mavenClientDependency -> convertBundleDependency(mavenClientDependency)).collect(toSet());
+
+      allBundleDependencies = addMTFArtifactIfNecesary(attributes, allBundleDependencies);
+
       classLoaderModelBuilder.dependingOn(allBundleDependencies);
       return classLoaderModelBuilder.build();
     } finally {
       deleteQuietly(temporaryDirectory);
     }
   }
+
+  private Set<BundleDependency> addMTFArtifactIfNecesary(Map<String, Object> attributes,
+                                                         Set<BundleDependency> allBundleDependencies) {
+    Optional<BundleDependency> mtfTestArtifact = new MTFArtifactUnderTestFinder().find(attributes);
+    if (mtfTestArtifact.isPresent()) {
+      allBundleDependencies = ImmutableSet.<BundleDependency>builder()
+          .addAll(allBundleDependencies)
+          .add(mtfTestArtifact.get()).build();
+    }
+    return allBundleDependencies;
+  }
+
+
 
   protected abstract boolean includeProvidedDependencies(ArtifactType artifactType);
 
@@ -304,7 +322,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
    * <p>
    * It let's implementations to add artifact specific URLs by letting them override
    * {@link #addArtifactSpecificClassloaderConfiguration(File, ClassLoaderModel.ClassLoaderModelBuilder, Set)}
-   * 
+   *
    * @param artifactFile the artifact file for which the {@link ClassLoaderModel} is being generated.
    * @param classLoaderModelBuilder the builder of the {@link ClassLoaderModel}
    * @param dependencies the dependencies resolved for this artifact.
