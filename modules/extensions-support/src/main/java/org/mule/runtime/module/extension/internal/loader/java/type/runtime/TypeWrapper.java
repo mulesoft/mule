@@ -15,6 +15,7 @@ import static org.mule.runtime.module.extension.api.loader.java.type.PropertyEle
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.WRITE_ONLY;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPropertyDescriptors;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -243,7 +244,7 @@ public class TypeWrapper implements Type {
           .map(e -> new TypeWrapper(e, typeLoader))
           .collect(toList());
     } else {
-      return IntrospectionUtils.getSuperClassGenericsAsResolvableTypes(aClass, superType)
+      return IntrospectionUtils.getSuperClassGenerics(aClass, superType)
           .stream()
           .map(e -> new TypeWrapper(e, typeLoader))
           .collect(toList());
