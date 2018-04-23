@@ -32,6 +32,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeType
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Collection;
@@ -58,6 +59,13 @@ public final class InputParametersTypeModelValidator implements ExtensionModelVa
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problems) {
     final Set<Class<?>> validatedTypes = new HashSet<>();
+
+    Optional<ImplementingTypeModelProperty> implementingType =
+        extensionModel.getModelProperty(ImplementingTypeModelProperty.class);
+    if (!implementingType.isPresent()) {
+      return;
+    }
+
     new IdempotentExtensionWalker() {
 
       @Override
