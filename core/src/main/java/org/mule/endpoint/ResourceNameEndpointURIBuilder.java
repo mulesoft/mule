@@ -76,7 +76,8 @@ public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
         }
         
         int x = address.indexOf(":", y);
-        if (x > -1)
+        int repeatedColon = address.indexOf("::", y);
+        if (x > -1 && x != repeatedColon)
         {
             String resourceInfo = address.substring(y, x);
             props.setProperty(RESOURCE_INFO_PROPERTY, resourceInfo);
