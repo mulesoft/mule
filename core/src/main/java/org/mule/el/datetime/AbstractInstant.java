@@ -89,8 +89,13 @@ public abstract class AbstractInstant implements Instant
     @Override
     public Instant withTimeZone(String newTimezone)
     {
+    	int currentOffset = calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
         TimeZone timeZone = TimeZone.getTimeZone(newTimezone);
-        calendar.add(Calendar.MILLISECOND, -timeZone.getOffset(calendar.getTimeInMillis()));
+        int newOffset = timeZone.getOffset(calendar.getTimeInMillis());
+
+        int diffOffset = currentOffset - newOffset;
+        
+        calendar.add(Calendar.MILLISECOND, diffOffset);
         calendar.setTimeZone(timeZone);
         return this;
     }
