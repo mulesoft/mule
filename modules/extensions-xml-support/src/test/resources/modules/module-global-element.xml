@@ -1,27 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module name="module-global-element"
         xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:tns="http://www.mulesoft.org/schema/mule/module-global-element"
         xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/module-global-element http://www.mulesoft.org/schema/mule/module-global-element/current/mule-module-global-element.xsd
            http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
-    <property name="username" type="string" defaultValue="some-username"/>
+    <property name="username" type="string"/>
+    <property name="password" type="string"/>
 
-    <petstore:config name="config" cashierName="cashierName">
-        <petstore:connection username="#[vars.username]" password="doe"/>
+    <petstore:config name="petstore" cashierName="jim">
+        <petstore:pooled-connection username="#[vars.username]" password="#[vars.password]" />
         <petstore:pets>
-            <petstore:pet value="Dog"/>
+            <petstore:pet value="la tota" />
+            <petstore:pet value="la porota" />
         </petstore:pets>
     </petstore:config>
 
-    <operation name="do-something">
+    <operation name="do-get-client">
+        <body>
+            <petstore:get-client config-ref="petstore" />
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="do-get-pets">
         <parameters>
-            <parameter name="somePetName" type="string" defaultValue="bruma"/>
+            <parameter name="owner" type="string" />
         </parameters>
         <body>
-            <petstore:fail petNames="#[vars.somePetName]"/>
+            <petstore:get-pets config-ref="petstore" ownerName="#[vars.owner]" />
+        </body>
+        <output type="string"/>
+    </operation>
+
+
+    <operation name="do-get-client-with-private-operation">
+        <body>
+            <tns:private-do-get-client />
+        </body>
+        <output type="string"/>
+    </operation>
+
+
+    <operation name="private-do-get-client" visibility="PRIVATE">
+        <body>
+            <petstore:get-client config-ref="petstore" />
         </body>
         <output type="string"/>
     </operation>

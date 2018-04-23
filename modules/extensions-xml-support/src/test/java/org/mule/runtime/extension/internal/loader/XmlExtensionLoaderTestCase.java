@@ -27,11 +27,6 @@ import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDeleg
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
-import com.google.common.collect.ImmutableSet;
-import io.qameta.allure.Description;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.ObjectType;
@@ -62,12 +57,19 @@ import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import io.qameta.allure.Description;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
@@ -164,22 +166,22 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
-    assertThat(configurationModel.getAllParameterModels().size(), is(2));
+    assertThat(configurationModel.getAllParameterModels().size(), is(3));
     assertThat(configurationModel.getAllParameterModels().get(0).getName(), is("username"));
+    assertThat(configurationModel.getAllParameterModels().get(1).getName(), is("password"));
 
     Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
         configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
     assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
     assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(1));
 
-    assertThat(configurationModel.getOperationModels().size(), is(1));
+    assertThat(configurationModel.getOperationModels().size(), is(3));
 
-    Optional<OperationModel> operationModel = configurationModel.getOperationModel("do-something");
+    Optional<OperationModel> operationModel = configurationModel.getOperationModel("do-get-client");
     assertThat(operationModel.isPresent(), is(true));
-    assertThat(operationModel.get().getAllParameterModels().size(), is(3));
-    assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("somePetName"));
-    assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(operationModel.get().getAllParameterModels().get(2).getName(), is(TARGET_VALUE_PARAMETER_NAME));
+    assertThat(operationModel.get().getAllParameterModels().size(), is(2));
+    assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is(TARGET_VALUE_PARAMETER_NAME));
 
 
     Optional<OperationComponentModelModelProperty> modelProperty =
