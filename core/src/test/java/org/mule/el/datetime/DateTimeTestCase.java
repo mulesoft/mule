@@ -40,8 +40,13 @@ public class DateTimeTestCase extends AbstractMuleContextTestCase
 {
 
     private Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-
     private DateTime now = new DateTime(currentCalendar).withTimeZone("UTC");
+    
+    private Calendar currentCalendarPST = Calendar.getInstance(TimeZone.getTimeZone("PST"));
+    private DateTime nowPST = new DateTime(currentCalendarPST).changeTimeZone("PST");
+    
+    private Calendar currentCalendarGmtMinus3 = Calendar.getInstance(TimeZone.getTimeZone("GMT-03:00"));
+    private DateTime nowGmtMinus3 = new DateTime(currentCalendarGmtMinus3).changeTimeZone("GMT-03:00");
 
     @Test
     public void milliSeconds()
@@ -123,10 +128,45 @@ public class DateTimeTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void withTimeZone()
+    public void withTimeZoneToGmtMinus3()
     {
         int hour = now.getHours();
         assertEquals(hour, now.withTimeZone("GMT-03:00").getHours());
+    }
+    
+    @Test
+    public void withTimeZoneToPst()
+    {
+        int hour = now.getHours();
+        assertEquals(hour, now.withTimeZone("PST").getHours());
+    }
+    
+    @Test
+    public void withTimeZonePstToGmtMinus3()
+    {
+        int hour = nowPST.getHours();
+        assertEquals(hour, nowPST.withTimeZone("GMT-03:00").getHours());
+    }
+    
+    @Test
+    public void withTimeZonePstToUTC()
+    {
+        int hour = nowPST.getHours();
+        assertEquals(hour, nowPST.withTimeZone("UTC").getHours());
+    }
+    
+    @Test
+    public void withTimeZoneGmtMinus3ToPst()
+    {
+        int hour = nowGmtMinus3.getHours();
+        assertEquals(hour, nowGmtMinus3.withTimeZone("PST").getHours());
+    }
+    
+    @Test
+    public void withTimeZoneGmtMinus3ToUTC()
+    {
+        int hour = nowGmtMinus3.getHours();
+        assertEquals(hour, nowGmtMinus3.withTimeZone("UTC").getHours());
     }
 
     @Test
