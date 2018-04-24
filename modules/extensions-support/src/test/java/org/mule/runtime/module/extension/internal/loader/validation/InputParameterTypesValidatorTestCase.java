@@ -16,6 +16,7 @@ import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -26,13 +27,14 @@ import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.List;
+import java.util.Optional;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,6 +71,8 @@ public class InputParameterTypesValidatorTestCase extends AbstractMuleTestCase {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     when(extensionModel.getSubTypes()).thenReturn(emptySet());
+    when(extensionModel.getModelProperty(ImplementingTypeModelProperty.class))
+        .thenReturn(Optional.of(new ImplementingTypeModelProperty(Object.class)));
     when(operationModel.getName()).thenReturn("dummyOperation");
     when(operationModel.getOutput()).thenReturn(outputModel);
     when(sourceModel.getOutput()).thenReturn(outputModel);
