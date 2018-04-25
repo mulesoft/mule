@@ -7,10 +7,12 @@
 package org.mule.module.http.internal.listener;
 
 import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ALL_INTERFACES_IP;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.HOST;
+import static org.mule.module.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.module.http.internal.domain.HttpProtocol.HTTP_1_0;
@@ -42,8 +44,14 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class HttpRequestToMuleEvent
 {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(HttpMessagePropertiesResolver.class);
+
 
     public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext, final FlowConstruct flowConstruct, Boolean parseRequest, ListenerPath listenerPath) throws HttpRequestParsingException
     {
@@ -126,12 +134,33 @@ public class HttpRequestToMuleEvent
         }
 
         final DefaultMuleMessage defaultMuleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext);
+
+        resolveCorrelationId(defaultMuleMessage);
+
         return new DefaultMuleEvent(
                 defaultMuleMessage,
                 resolveUri(requestContext),
                 REQUEST_RESPONSE,
                 flowConstruct,
                 new DefaultMuleSession());
+    }
+
+    private static void resolveCorrelationId(DefaultMuleMessage defaultMuleMessage) {
+        String xCorrelationId = defaultMuleMessage.getInboundProperty(X_CORRELATION_ID);
+        String muleCorrelationId = defaultMuleMessage.getInboundProperty(MULE_CORRELATION_ID_PROPERTY);
+        if (muleCorrelationId != null)
+        {
+            if (xCorrelationId != null)
+            {
+                LOGGER.warn("'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'MULE_CORRELATION_ID' will be used.",
+                            xCorrelationId, muleCorrelationId);
+            }
+            defaultMuleMessage.setCorrelationId(muleCorrelationId);
+        }
+        else if (xCorrelationId != null)
+        {
+            defaultMuleMessage.setCorrelationId(xCorrelationId);
+        }
     }
 
     private static URI resolveUri(final HttpRequestContext requestContext)
