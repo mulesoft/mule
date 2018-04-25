@@ -33,6 +33,7 @@ public class EndpointTransactionalInterceptingMessageProcessor extends AbstractI
         this.transactionConfig = transactionConfig;
     }
 
+    @Override
     public MuleEvent process(final MuleEvent event) throws MuleException
     {
         if (next == null)
@@ -40,7 +41,8 @@ public class EndpointTransactionalInterceptingMessageProcessor extends AbstractI
             return event;
         }
         // This optimization is not valid with Services because of how outbound routers work
-        else if (TransactionCoordination.getInstance().getTransaction() != null || event.getFlowConstruct() instanceof Service)
+        else if (TransactionCoordination.getInstance().getTransaction() != null || transactionConfig.isConfigured() ||
+                event.getFlowConstruct() instanceof Service)
         {
             ExecutionTemplate<MuleEvent> executionTemplate = TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, transactionConfig);
             ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>()
