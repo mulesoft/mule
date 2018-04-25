@@ -8,10 +8,12 @@ package org.mule.test.module.extension.values;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+
 import org.mule.runtime.api.value.Value;
-import org.junit.Test;
 
 import java.util.Set;
+
+import org.junit.Test;
 
 public class ConnectionProviderValuesTestCase extends AbstractValuesTestCase {
 
@@ -47,5 +49,28 @@ public class ConnectionProviderValuesTestCase extends AbstractValuesTestCase {
         getValuesFromConnection("values-with-required-params-from-show-in-dsl-group-connection", "valueParam");
     assertThat(channels, hasSize(1));
     assertThat(channels, hasValues("anyParameter:someValue"));
+  }
+
+  @Test
+  public void dynamicConnectionWithValuesWithParamsFromShowInDslGroup() throws Exception {
+    Set<Value> channels =
+        getValuesFromConnection("values-with-required-params-from-show-in-dsl-group-dynamic-connection", "valueParam");
+    assertThat(channels, hasSize(1));
+    assertThat(channels, hasValues("anyParameter:someValue"));
+  }
+
+  @Test
+  public void dynamicConnectionWithValuesWithParamsFromShowInDslStaticGroup() throws Exception {
+    Set<Value> channels =
+        getValuesFromConnection("values-with-required-params-from-show-in-dsl-static-group-dynamic-connection", "valueParam");
+    assertThat(channels, hasSize(1));
+    assertThat(channels, hasValues("anyParameter:someValue"));
+  }
+
+  @Test
+  public void dynamicConnectionWithValues() throws Exception {
+    Set<Value> channels = getValuesFromConnection("dynamic-connection", "channel");
+    assertThat(channels, hasSize(3));
+    assertThat(channels, hasValues("channel1", "channel2", "channel3"));
   }
 }

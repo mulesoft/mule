@@ -13,7 +13,6 @@ import static org.mule.runtime.extension.api.values.ValueResolvingException.INVA
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.cloneAndEnrichValue;
 
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -106,9 +105,11 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
 
     try {
       return resolveValues(parameters, factoryModelProperty, parameterValueResolver, connectionSupplier, configurationSupplier);
+    } catch (ValueResolvingException e) {
+      throw e;
     } catch (Exception e) {
-      throw new ValueResolvingException(format("An error occurred trying to resolve the Values for parameter '%s' of component '%s'",
-                                               parameterName, containerModel.getName()),
+      throw new ValueResolvingException(format("An error occurred trying to resolve the Values for parameter '%s' of component '%s'. Cause: %s",
+                                               parameterName, containerModel.getName(), e.getMessage()),
                                         UNKNOWN, e);
     }
   }
@@ -116,9 +117,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
   private Set<Value> resolveValues(List<ParameterModel> parameters, ValueProviderFactoryModelProperty factoryModelProperty,
                                    ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                                    Supplier<Object> configurationSupplier)
-      throws NoSuchMethodException, InstantiationException, IllegalAccessException, java.lang.reflect.InvocationTargetException,
-      InitialisationException, org.mule.runtime.module.extension.internal.runtime.ValueResolvingException,
-      ValueResolvingException {
+      throws ValueResolvingException {
 
     ValueProvider valueProvider =
         factoryModelProperty
