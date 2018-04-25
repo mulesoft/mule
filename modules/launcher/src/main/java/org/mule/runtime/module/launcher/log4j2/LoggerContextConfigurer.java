@@ -76,7 +76,7 @@ final class LoggerContextConfigurer {
 
   private static final String MULE_APP_LOG_FILE_TEMPLATE = "mule-app-%s.log";
   private static final String MULE_DOMAIN_LOG_FILE_TEMPLATE = "mule-domain-%s.log";
-  private static final String PATTERN_LAYOUT = "%-5p %d [%t] [event: %X{" + CORRELATION_ID_MDC_KEY + "}]%c: %m%n";
+  private static final String PATTERN_LAYOUT = "%-5p %d [%t] [event: %X{" + CORRELATION_ID_MDC_KEY + "}] %c: %m%n";
   private static final int DEFAULT_MONITOR_INTERVAL_SECS = 60;
   private static final Function<Appender, Boolean> containerConsoleAppenderMatcher =
       (appender) -> appender instanceof ConsoleAppender && appender.getName().equals("Console");
