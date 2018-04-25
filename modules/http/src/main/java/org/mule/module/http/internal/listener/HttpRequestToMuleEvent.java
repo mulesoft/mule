@@ -152,11 +152,8 @@ public class HttpRequestToMuleEvent
         {
             if (xCorrelationId != null)
             {
-                LOGGER.warn("'X-Correlation-ID' and 'MULE_CORRELATION_ID' headers found.");
-                if (!xCorrelationId.equals(muleCorrelationId))
-                {
-                    LOGGER.warn("Correlation values do not match. 'MULE_CORRELATION_ID' will be used.");
-                }
+                LOGGER.warn("'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'MULE_CORRELATION_ID' will be used.",
+                            xCorrelationId, muleCorrelationId);
             }
             defaultMuleMessage.setCorrelationId(muleCorrelationId);
         }

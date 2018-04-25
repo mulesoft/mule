@@ -321,7 +321,7 @@ public abstract class HttpHeaders
         /**
          * {@value "X-Correlation-Id"}
          */
-        public static final String X_CORRELATION_ID = "X-Correlation-Id";
+        public static final String X_CORRELATION_ID = "X-Correlation-ID";
         /**
          * {@value "X-Forwarded-For"}
          */
