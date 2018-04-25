@@ -66,7 +66,7 @@ public class ComponentMessageNotification extends ServerNotification
     public String toString()
     {
         return EVENT_NAME + "{action=" + getActionName(action) + ", message: " + source + ", resourceId="
-               + resourceIdentifier + ", timestamp=" + timestamp + ", serverId=" + serverId + ", component: "
+               + resourceIdentifier + ", timestamp=" + timestamp + ", serverId=" + getServerId() + ", component: "
                + "}";
     }
 

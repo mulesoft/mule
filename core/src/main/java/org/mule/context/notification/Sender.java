@@ -33,14 +33,7 @@ class Sender
                 (null != notification.getResourceIdentifier() &&
                         subscriptionFilter.accept(notification.getResourceIdentifier())))
         {
-            try
-            {
-                pair.getListener().onNotification(notification);
-            }
-            catch (Exception e)
-            {
-                // Exceptions from listeners do not affect the notification processing
-            }
+            pair.getListener().onNotification(notification);
         }
     }
 

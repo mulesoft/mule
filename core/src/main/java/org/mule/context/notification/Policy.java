@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -31,7 +32,7 @@ class Policy
 
     // these are cumulative - set values should never change, they are just a cache of known info
     // they are co and contra-variant wrt to exact event type (see code below).
-    private ConcurrentMap knownEventsExact = new ConcurrentHashMap();
+    private ConcurrentMap<Class, Boolean> knownEventsExact = new ConcurrentHashMap<>();
     private ConcurrentMap knownEventsSuper = new ConcurrentHashMap();
 
     /**
@@ -103,13 +104,14 @@ class Policy
         if (null != notification)
         {
             Class notfnClass = notification.getClass();
+            Boolean eventKnown = knownEventsExact.get(notfnClass);
             // search if we don't know about this event, or if we do know it is used
-            if (!knownEventsExact.containsKey(notfnClass))
+            if (eventKnown == null)
             {
                 boolean found = doDispatch(notification, notfnClass);
                 knownEventsExact.put(notfnClass, Boolean.valueOf(found));
             }
-            else if (((Boolean) knownEventsExact.get(notfnClass)).booleanValue())
+            else if (eventKnown.booleanValue())
             {
                 boolean found = doDispatch(notification, notfnClass);
                 // reduce contention on the map by not writing the same value over and over again.
@@ -124,14 +126,21 @@ class Policy
     protected boolean doDispatch(ServerNotification notification, Class<? extends ServerNotification> notfnClass)
     {
         boolean found = false;
-        for (Class<? extends ServerNotification> event : eventToSenders.keySet())
+        for (Entry<Class<? extends ServerNotification>, Collection<Sender>> event : eventToSenders.entrySet())
         {
-            if (event.isAssignableFrom(notfnClass))
+            if (event.getKey().isAssignableFrom(notfnClass))
             {
                 found = true;
-                for (Sender sender : eventToSenders.get(event))
+                for (Sender sender : event.getValue())
                 {
-                    sender.dispatch(notification);
+                    try
+                    {
+                        sender.dispatch(notification);
+                    }
+                    catch (Exception e)
+                    {
+                        // Exceptions from listeners do not affect the notification processing
+                    }
                 }
             }
         }
