@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-abstract class StereotypeResolver<T extends WithAnnotations> {
+public abstract class StereotypeResolver<T extends WithAnnotations> {
 
   protected final T annotatedElement;
   protected final WithStereotypesDeclaration declaration;
@@ -43,9 +43,9 @@ abstract class StereotypeResolver<T extends WithAnnotations> {
   protected Stereotype stereotypeAnnotation;
   protected Map<StereotypeDefinition, StereotypeModel> stereotypesCache;
 
-  protected static StereotypeModel createCustomStereotype(Class<? extends StereotypeDefinition> definitionClass,
-                                                          String namespace,
-                                                          Map<StereotypeDefinition, StereotypeModel> stereotypesCache) {
+  public static StereotypeModel createCustomStereotype(Class<? extends StereotypeDefinition> definitionClass,
+                                                       String namespace,
+                                                       Map<StereotypeDefinition, StereotypeModel> stereotypesCache) {
     try {
       return getStereotype(instantiateClass(definitionClass), namespace, stereotypesCache);
     } catch (Exception e) {
