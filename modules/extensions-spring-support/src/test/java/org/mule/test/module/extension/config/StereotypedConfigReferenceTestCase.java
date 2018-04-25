@@ -22,9 +22,6 @@ import javax.inject.Named;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-/**
- * //TODO
- */
 @RunnerDelegateTo(Parameterized.class)
 public class StereotypedConfigReferenceTestCase extends AbstractExtensionFunctionalTestCase {
 

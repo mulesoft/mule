@@ -2101,8 +2101,12 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
+            "type": "REFERABLE_OPERATION",
+            "namespace": "MARVEL",
+            "parent": {
             "type": "PROCESSOR",
             "namespace": "MULE"
+            }
           },
           "parameterGroupModels": [
             {
@@ -2113,7 +2117,7 @@
                     "type": "String"
                   },
                   "hasDynamicType": false,
-                  "required": true,
+                  "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -2135,6 +2139,32 @@
                     }
                   ],
                   "name": "flowRef",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "name",
                   "description": "",
                   "modelProperties": {}
                 }
@@ -3064,6 +3094,41 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 4
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "REFERABLE_OPERATION",
+                      "namespace": "MARVEL",
+                      "parent": {
+                        "type": "PROCESSOR",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "name": "nextOperationReference",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Boolean"
                   },
                   "hasDynamicType": false,
@@ -3081,7 +3146,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 6,
+                    "order": 7,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3257,7 +3322,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -3380,7 +3445,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 5,
+                    "order": 6,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],

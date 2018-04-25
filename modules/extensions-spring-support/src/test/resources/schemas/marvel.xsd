@@ -60,6 +60,7 @@
         <xs:attribute type="mule:substitutableLong" use="required" name="castFrequencyInMillis"></xs:attribute>
         <xs:attribute type="xs:string" use="required" name="spell"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="spellSize"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="nextOperationReference"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
@@ -189,7 +190,8 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithFlowReferenceType" substitutionGroup="mule:abstract-operator" name="with-flow-reference"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-operator" abstract="true" name="referable_operation"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" type="WithFlowReferenceType" substitutionGroup="referable_operation" name="with-flow-reference"></xs:element>
   <xs:complexType name="WithFlowReferenceType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
@@ -199,7 +201,8 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="required" name="flowRef"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="flowRef"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="name"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
