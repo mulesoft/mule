@@ -12,7 +12,7 @@ package org.mule.module.http.api;
 public abstract class HttpHeaders
 {
 
-    /**
+  /**
      * Standard HTTP header names.
      */
     public static final class Names
@@ -318,6 +318,10 @@ public abstract class HttpHeaders
          * {@value "WWW-Authenticate"}
          */
         public static final String WWW_AUTHENTICATE = "WWW-Authenticate";
+        /**
+         * {@value "X-Correlation-Id"}
+         */
+        public static final String X_CORRELATION_ID = "X-Correlation-ID";
         /**
          * {@value "X-Forwarded-For"}
          */
