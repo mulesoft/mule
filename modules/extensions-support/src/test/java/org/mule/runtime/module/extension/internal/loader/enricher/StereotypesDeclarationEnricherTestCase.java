@@ -73,11 +73,11 @@ public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase
   }
 
   @Test
-  public void operationParameterWithFlowReferenceParameter() {
+  public void sourceParameterWithCustomReference() {
     SourceModel source = configuration.getSourceModel("bytes-caster").get();
 
     ParameterModel param = source.getAllParameterModels().stream()
-      .filter(p -> p.getName().equals("nextOperationReference")).findFirst().get();
+        .filter(p -> p.getName().equals("nextOperationReference")).findFirst().get();
 
     List<StereotypeModel> stereotypes = param.getAllowedStereotypes();
     assertThat(stereotypes, hasSize(1));
@@ -86,7 +86,7 @@ public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase
   }
 
   @Test
-  public void sourceParameterWithCustomReference() {
+  public void operationParameterWithFlowReferenceParameter() {
     OperationModel operation = configuration.getOperationModel("withFlowReference").get();
     assertThat(operation.getAllParameterModels(), hasSize(2));
     ParameterModel param = operation.getAllParameterModels().get(0);
@@ -94,7 +94,7 @@ public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase
     assertThat(stereotypes, hasSize(1));
     assertThat(stereotypes.get(0), is(FLOW));
   }
-  
+
   public void configurationWithConfigReferenceParameter() {
     List<ParameterModel> params = configuration.getAllParameterModels();
     assertThat(params, hasSize(3));
