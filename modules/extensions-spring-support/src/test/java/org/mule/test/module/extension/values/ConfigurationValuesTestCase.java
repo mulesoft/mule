@@ -49,4 +49,27 @@ public class ConfigurationValuesTestCase extends AbstractValuesTestCase {
     assertThat(channels, hasSize(1));
     assertThat(channels, hasValues("anyParameter:someValue"));
   }
+
+  @Test
+  public void dynamicConfigWithValuesWithRequiredParamsFromShowInDslStaticGroup() throws Exception {
+    Set<Value> channels =
+        getValuesFromConfig("dynamic-config-values-with-required-params-from-show-in-dsl-static-group", "valueParam");
+    assertThat(channels, hasSize(1));
+    assertThat(channels, hasValues("anyParameter:someValue"));
+  }
+
+  @Test
+  public void dynamicConfigWithValuesWithRequiredParamsFromShowInDslDynamicGroup() throws Exception {
+    Set<Value> channels =
+        getValuesFromConfig("dynamic-config-values-with-required-params-from-show-in-dsl-dynamic-group", "valueParam");
+    assertThat(channels, hasSize(1));
+    assertThat(channels, hasValues("anyParameter:someValue"));
+  }
+
+  @Test
+  public void dynamicConfigWithValues() throws Exception {
+    Set<Value> channels = getValuesFromConfig("dynamic-config", "channel");
+    assertThat(channels, hasSize(3));
+    assertThat(channels, hasValues("channel1", "channel2", "channel3"));
+  }
 }

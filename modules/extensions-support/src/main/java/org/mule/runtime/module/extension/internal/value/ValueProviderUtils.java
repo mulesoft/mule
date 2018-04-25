@@ -8,16 +8,24 @@ package org.mule.runtime.module.extension.internal.value;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.extension.api.values.ValueProvider;
+import org.mule.runtime.extension.api.values.ValueResolvingException;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.Callable;
 
 /**
  * Utility class for {@link ValueProvider} related objects
@@ -25,6 +33,10 @@ import java.util.Objects;
  * @since 4.0
  */
 public class ValueProviderUtils {
+
+  private ValueProviderUtils() {
+
+  }
 
   /**
    * Given a {@link Value}, this is navigated recursively cloning each {@link Value} of the tree structure creating a
@@ -74,5 +86,29 @@ public class ValueProviderUtils {
         .map(parameterModel -> parameterModel.getValueProviderModel().orElse(null))
         .filter(Objects::nonNull)
         .collect(toList());
+  }
+
+  /**
+   * Executes the {@link ValueProvider} logic with the required extension related classloader
+   *
+   * @param valueResolver {@link Callable} that wraps the logic of resolve the {@link Value values}
+   * @return The {@link Set} of resolved {@link Value values}
+   * @throws ValueResolvingException if an error occurs trying to resolve the values
+   * @since 4.1.1
+   */
+  public static Set<Value> valuesWithClassLoader(Callable<Set<Value>> valueResolver, ExtensionModel extensionModel)
+      throws ValueResolvingException {
+    Reference<ValueResolvingException> exceptionReference = new Reference<>();
+    Set<Value> values =
+        withContextClassLoader(getClassLoader(extensionModel), valueResolver, ValueResolvingException.class, (e) -> {
+          exceptionReference.set((ValueResolvingException) e);
+          return null;
+        });
+
+    if (exceptionReference.get() != null) {
+      throw exceptionReference.get();
+    }
+
+    return values;
   }
 }

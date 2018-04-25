@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -15,7 +16,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -27,7 +31,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -35,26 +42,31 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ExpirableConfigurationProvider;
+import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
+import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-
-import org.slf4j.Logger;
+import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.slf4j.Logger;
+
 /**
  * A {@link ConfigurationProvider} which continuously evaluates the same {@link ResolverSet} and then uses the resulting
  * {@link ResolverSetResult} to build an instance of type {@code T}
  * <p>
- * Although each invocation to {@link #get(Object)} is guaranteed to end up in an invocation to
+ * Although each invocation to {@link #get(Event)} is guaranteed to end up in an invocation to
  * {@link #resolverSet#resolve(Object)}, the resulting {@link ResolverSetResult} might not end up generating a new instance. This
  * is so because {@link ResolverSetResult} instances are put in a cache to guarantee that equivalent evaluations of the
  * {@code resolverSet} return the same instance.
@@ -62,7 +74,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @since 4.0.0
  */
 public final class DynamicConfigurationProvider extends LifecycleAwareConfigurationProvider
-    implements ExpirableConfigurationProvider {
+    implements ExpirableConfigurationProvider, ConfigurationParameterValueProvider {
 
   private static final Logger LOGGER = getLogger(DynamicConfigurationProvider.class);
 
@@ -75,6 +87,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   private final ReadWriteLock cacheLock = new ReentrantReadWriteLock();
   private final Lock cacheReadLock = cacheLock.readLock();
   private final Lock cacheWriteLock = cacheLock.writeLock();
+  private final ReflectionCache reflectionCache;
 
   /**
    * Creates a new instance
@@ -97,6 +110,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     super(name, extensionModel, configurationModel, muleContext);
     configurationInstanceFactory =
         new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, reflectionCache, muleContext);
+    this.reflectionCache = reflectionCache;
     this.resolverSet = resolverSet;
     this.connectionProviderResolver = connectionProviderResolver;
     this.expirationPolicy = expirationPolicy;
@@ -261,4 +275,66 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   public boolean isDynamic() {
     return true;
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Set<Value> getConfigValues(String parameterName) throws ValueResolvingException {
+    return valuesWithClassLoader(() -> new ValueProviderMediator<>(getConfigurationModel(), () -> muleContext,
+                                                                   () -> reflectionCache)
+                                                                       .getValues(parameterName,
+                                                                                  new ResolverSetBasedParameterResolver(resolverSet,
+                                                                                                                        getConfigurationModel(),
+                                                                                                                        reflectionCache)),
+                                 getExtensionModel());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<ValueProviderModel> getConfigModels(String parameterName) {
+    return getValueProviderModels(getConfigurationModel().getAllParameterModels());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Set<Value> getConnectionValues(String parameterName) throws ValueResolvingException {
+    return valuesWithClassLoader(() -> {
+      ConnectionProviderModel connectionProviderModel = getConnectionProviderModel()
+          .orElseThrow(() -> new ValueResolvingException("Internal Error. Unable to resolve values because the service is unable to get the connection model",
+                                                         UNKNOWN));
+      ResolverSet resolverSet = ((Optional<ResolverSet>) connectionProviderResolver.getResolverSet())
+          .orElseThrow(() -> new ValueResolvingException("Internal Error. Unable to resolve values because of the service is unable to retrieve connection parameters",
+                                                         UNKNOWN));
+
+      return new ValueProviderMediator<>(connectionProviderModel,
+                                         () -> muleContext,
+                                         () -> reflectionCache)
+                                             .getValues(parameterName,
+                                                        new ResolverSetBasedParameterResolver(resolverSet,
+                                                                                              connectionProviderModel,
+                                                                                              reflectionCache));
+    }, getExtensionModel());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<ValueProviderModel> getConnectionModels(String providerName) {
+    return getConnectionProviderModel()
+        .map(model -> getValueProviderModels(model.getAllParameterModels()))
+        .orElse(emptyList());
+  }
+
+  private Optional<ConnectionProviderModel> getConnectionProviderModel() {
+    return this.connectionProviderResolver.getObjectBuilder()
+        .filter(ob -> ob instanceof ConnectionProviderObjectBuilder)
+        .map(ob -> ((ConnectionProviderObjectBuilder) ob).providerModel);
+  }
+
 }

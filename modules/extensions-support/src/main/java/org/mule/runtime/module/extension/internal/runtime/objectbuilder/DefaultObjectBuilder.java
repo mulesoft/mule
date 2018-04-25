@@ -23,6 +23,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -38,10 +40,11 @@ import javax.inject.Inject;
  *
  * @since 3.7.0
  */
-public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable {
+public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable, ParameterValueResolver {
 
   protected final Class<T> prototypeClass;
   protected final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
+  protected final Map<String, ValueResolver<? extends Object>> resolverByFieldName = new HashMap<>();
   private String name = null;
   private String encoding = null;
 
@@ -76,6 +79,8 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable 
     Field field = getField(prototypeClass, propertyName, getReflectionCache())
         .orElseThrow(() -> new IllegalArgumentException(format("Class '%s' does not contain property '%s'",
                                                                prototypeClass.getName(), propertyName)));
+
+    resolverByFieldName.put(propertyName, resolver);
 
     field.setAccessible(true);
     resolvers.put(field, (ValueResolver<Object>) resolver);
@@ -122,5 +127,18 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable 
       reflectionCache = new ReflectionCache();
     }
     return reflectionCache;
+  }
+
+  @Override
+  public Object getParameterValue(String parameterName) throws ValueResolvingException {
+    ValueResolver<?> valueResolver = resolverByFieldName.get(parameterName);
+    if (valueResolver == null) {
+      return null;
+    }
+    try {
+      return valueResolver.resolve(ValueResolvingContext.from(null));
+    } catch (MuleException e) {
+      throw new ValueResolvingException(format("An error occurred trying to resolve value for parameter [%s]", parameterName), e);
+    }
   }
 }

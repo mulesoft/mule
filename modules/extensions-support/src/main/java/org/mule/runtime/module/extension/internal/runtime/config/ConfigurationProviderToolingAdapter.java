@@ -12,7 +12,6 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -21,6 +20,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -38,7 +38,6 @@ import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
@@ -49,7 +48,6 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
-import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
@@ -59,7 +57,6 @@ import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 /**
  * Adds the capability to expose tooling focused capabilities associated with the {@link StaticConfigurationProvider}'s
@@ -150,7 +147,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
       ConfigurationModel configurationModel = getConfigurationModel();
       return new ValueProviderMediator<>(configurationModel, () -> muleContext, () -> reflectionCache)
           .getValues(parameterName, getParameterValueResolver(configuration.getValue(), configurationModel));
-    });
+    }, getExtensionModel());
   }
 
   /**
@@ -170,34 +167,12 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
       ValueProviderMediator<ConnectionProviderModel> valueProviderMediator =
           new ValueProviderMediator<>(model, () -> muleContext, () -> reflectionCache);
       return valueProviderMediator.getValues(parameterName, getParameterValueResolver(connection, model));
-    }));
+    }), getExtensionModel());
   }
 
   @Override
   public List<ValueProviderModel> getConnectionModels(String providerName) throws ValueResolvingException {
     return withConnectionProviderInfo((connection, model) -> getValueProviderModels(model.getAllParameterModels()));
-  }
-
-  /**
-   * Executes the {@link ValueProvider} logic with the required extension related classloader
-   *
-   * @param valueResolver {@link Callable} that wraps the logic of resolve the {@link Value values}
-   * @return The {@link Set} of resolved {@link Value values}
-   * @throws ValueResolvingException if an error occurs trying to resolve the values
-   */
-  private Set<Value> valuesWithClassLoader(Callable<Set<Value>> valueResolver) throws ValueResolvingException {
-    Reference<ValueResolvingException> exceptionReference = new Reference<>();
-    Set<Value> values =
-        withContextClassLoader(getClassLoader(this.getExtensionModel()), valueResolver, ValueResolvingException.class, (e) -> {
-          exceptionReference.set((ValueResolvingException) e);
-          return null;
-        });
-
-    if (exceptionReference.get() != null) {
-      throw exceptionReference.get();
-    }
-
-    return values;
   }
 
   private <T> T withConnectionProviderInfo(WithConnectionProviderCallable<T> withConnectionProviderCallable)

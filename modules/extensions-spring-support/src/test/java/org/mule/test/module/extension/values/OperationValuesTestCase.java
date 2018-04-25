@@ -126,4 +126,11 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     assertThat(values, hasSize(1));
     assertThat(values, hasValues("anyParameter:someValue"));
   }
+
+  @Test
+  public void optionsInsideShowInDslDynamicGroup() throws Exception {
+    Set<Value> values = getValues("valuesInsideShowInDslDynamicGroup", "values");
+    assertThat(values, hasSize(1));
+    assertThat(values, hasValues("anyParameter:someValue"));
+  }
 }

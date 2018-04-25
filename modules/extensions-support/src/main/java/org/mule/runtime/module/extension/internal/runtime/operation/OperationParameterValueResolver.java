@@ -8,20 +8,19 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGroupModelContainerName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getShowInDslParameters;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
+import org.mule.runtime.module.extension.internal.runtime.config.ResolverSetBasedParameterResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -33,14 +32,17 @@ import java.util.Optional;
 public final class OperationParameterValueResolver<T extends ComponentModel> implements ParameterValueResolver {
 
   private final T operationModel;
+  private final ResolverSet resolverSet;
   private final ExecutionContext<T> executionContext;
   private final Map<String, String> showInDslParameters;
   private final ReflectionCache reflectionCache;
 
-  OperationParameterValueResolver(ExecutionContext<T> executionContext, ReflectionCache reflectionCache) {
+  OperationParameterValueResolver(ExecutionContext<T> executionContext, ResolverSet resolverSet,
+                                  ReflectionCache reflectionCache) {
     this.executionContext = executionContext;
     this.operationModel = executionContext.getComponentModel();
-    this.showInDslParameters = getShowInDslParameters();
+    this.resolverSet = resolverSet;
+    this.showInDslParameters = getShowInDslParameters(operationModel);
     this.reflectionCache = reflectionCache;
   }
 
@@ -54,8 +56,18 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
           .map(group -> new ParameterGroupArgumentResolver<>(group, reflectionCache).resolve(executionContext).get())
           .orElseGet(() -> {
             String showInDslGroupName = showInDslParameters.get(parameterName);
+
             if (showInDslGroupName != null) {
-              return getShowInDslParameterValue(parameterName, showInDslGroupName);
+              if (resolverSet.getResolvers().get(showInDslGroupName).isDynamic()) {
+                try {
+                  return new ResolverSetBasedParameterResolver(resolverSet, operationModel, reflectionCache)
+                      .getParameterValue(parameterName);
+                } catch (ValueResolvingException e) {
+                  return null;
+                }
+              } else {
+                return getShowInDslParameterValue(parameterName, showInDslGroupName);
+              }
             }
 
             if (executionContext.hasParameter(parameterName)) {
@@ -90,17 +102,5 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
                                       format("An error occurred trying to obtain the field '%s' from the group '%s' of the Operation '%s'",
                                              parameterName, showInDslGroupName, operationModel.getName()));
     }
-  }
-
-  private Map<String, String> getShowInDslParameters() {
-    HashMap<String, String> showInDslMap = new HashMap<>();
-
-    operationModel.getParameterGroupModels().stream()
-        .filter(ParameterGroupModel::isShowInDsl)
-        .forEach(groupModel -> groupModel.getParameterModels()
-            .forEach(param -> showInDslMap.put(IntrospectionUtils.getImplementingName(param),
-                                               getGroupModelContainerName(groupModel))));
-
-    return showInDslMap;
   }
 }
