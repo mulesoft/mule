@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.request;
 
 import static org.mule.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
+import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
@@ -14,6 +15,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.COOKIE;
 import static org.mule.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.module.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
@@ -49,6 +51,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.activation.DataHandler;
 
@@ -90,27 +93,53 @@ public class MuleEventToHttpRequest
         builder.setHeaders(requestBuilder.getHeaders(event));
         builder.setQueryParams(requestBuilder.getQueryParams(event));
 
-        for (String outboundProperty : event.getMessage().getOutboundPropertyNames())
+        Set<String> outboundPropertyNames = event.getMessage().getOutboundPropertyNames();
+        for (String outboundProperty : outboundPropertyNames)
         {
             if (isNotIgnoredProperty(outboundProperty))
             {
                 Object outboundPropertyValue = event.getMessage().getOutboundProperty(outboundProperty);
-                if (outboundPropertyValue instanceof Iterable)
+                if (outboundProperty.equalsIgnoreCase(MULE_CORRELATION_ID_PROPERTY))
                 {
-                    Iterable outboundIterable = (Iterable)outboundPropertyValue;
-                    for (Object value : outboundIterable)
+                    String muleCorrelationId;
+                    if (!builder.getHeaders().containsKey(MULE_CORRELATION_ID_PROPERTY))
                     {
-                        builder.addHeader(outboundProperty, value.toString());
+                        muleCorrelationId = outboundPropertyValue.toString();
+                        builder.addHeader(outboundProperty, muleCorrelationId);
+                    }
+                    else
+                    {
+                        muleCorrelationId = builder.getHeaders().get(MULE_CORRELATION_ID_PROPERTY);
+                        logger.warn("MULE_CORRELATION_ID is present as an explicit header and as an outbound property."
+                                      + " The explicit header will prevail.");
+                    }
+                    String xCorrelationId = outboundPropertyNames.contains(X_CORRELATION_ID) ?
+                      (String) event.getMessage().getOutboundProperty(X_CORRELATION_ID) : builder.getHeaders().get(X_CORRELATION_ID);
+                    if (xCorrelationId != null)
+                    {
+                        logger.warn("Explicitly configured 'X-Correlation-ID: {}' header could interfere with 'MULE_CORRELATION_ID: {}' header.",
+                                    muleCorrelationId, xCorrelationId);
                     }
                 }
                 else
                 {
-                    builder.addHeader(outboundProperty, outboundPropertyValue.toString());
+                    if (outboundPropertyValue instanceof Iterable)
+                    {
+                        Iterable outboundIterable = (Iterable) outboundPropertyValue;
+                        for (Object value : outboundIterable)
+                        {
+                            builder.addHeader(outboundProperty, value.toString());
+                        }
+                    }
+                    else
+                    {
+                        builder.addHeader(outboundProperty, outboundPropertyValue.toString());
+                    }
                 }
             }
         }
 
-        if (!event.getMessage().getOutboundPropertyNames().contains(CONTENT_TYPE_PROPERTY)
+        if (!outboundPropertyNames.contains(CONTENT_TYPE_PROPERTY)
             && !builder.getHeaders().containsKey(CONTENT_TYPE_PROPERTY))
         {
             DataType<?> dataType = event.getMessage().getDataType();
