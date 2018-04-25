@@ -13,6 +13,7 @@ import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtili
 import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.isConnection;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.NOT_VALUE_PROVIDER_ENABLED;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.value.ResolvingFailure;
@@ -25,8 +26,9 @@ import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 
-import javax.inject.Inject;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 /**
  * Default implementation of the {@link ValueProviderService}, which provides the capability to resolve {@link Value values}
@@ -81,11 +83,11 @@ public class MuleValueProviderService implements ValueProviderService {
   private ValueProvider findValueProvider(Location location, String providerName) throws ValueResolvingException {
     boolean isConnection = isConnection(location);
 
-    if (isConnection) {
-      location = deleteLastPartFromLocation(location);
-    }
+    Location realLocation = isConnection
+        ? deleteLastPartFromLocation(location)
+        : location;
 
-    Object component = findComponent(location);
+    Object component = findComponent(realLocation);
 
     if (component instanceof ComponentValueProvider) {
       return () -> ((ComponentValueProvider) component).getValues(providerName);

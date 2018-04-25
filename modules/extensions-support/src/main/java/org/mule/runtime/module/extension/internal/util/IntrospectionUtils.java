@@ -147,6 +147,10 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Types;
 
+import com.google.common.collect.ImmutableList;
+import org.reflections.ReflectionUtils;
+import org.springframework.core.ResolvableType;
+
 /**
  * Set of utility operations to get insights about objects and their components
  *
@@ -1483,5 +1487,25 @@ public final class IntrospectionUtils {
     } else {
       throw new IllegalStateException("PagingProvider must provide their generics");
     }
+  }
+
+  /**
+   * Given a {@link ParameterizedModel} iterates over all the parameter groups show in dsl and returns a mapping of
+   * parameter name and parameter group name.
+   *
+   * @param parameterizedModel Model to introspect.
+   * @return A map with parameters from Show in DSL parameters
+   * @since 4.1.1
+   */
+  public static Map<String, String> getShowInDslParameters(ParameterizedModel parameterizedModel) {
+    HashMap<String, String> showInDslMap = new HashMap<>();
+
+    parameterizedModel.getParameterGroupModels().stream()
+        .filter(ParameterGroupModel::isShowInDsl)
+        .forEach(groupModel -> groupModel.getParameterModels()
+            .forEach(param -> showInDslMap.put(IntrospectionUtils.getImplementingName(param),
+                                               getGroupModelContainerName(groupModel))));
+
+    return showInDslMap;
   }
 }

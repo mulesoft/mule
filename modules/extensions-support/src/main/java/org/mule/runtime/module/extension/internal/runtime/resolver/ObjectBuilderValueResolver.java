@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
@@ -15,6 +16,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
 /**
@@ -26,7 +28,8 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBu
  * @param <T> the generic type for the instances built.
  * @since 3.7.0
  */
-public class ObjectBuilderValueResolver<T> extends AbstractComponent implements ValueResolver<T>, Initialisable {
+public class ObjectBuilderValueResolver<T> extends AbstractComponent
+    implements ValueResolver<T>, Initialisable, ParameterValueResolver {
 
   private final ObjectBuilder<T> builder;
   private final MuleContext muleContext;
@@ -62,4 +65,16 @@ public class ObjectBuilderValueResolver<T> extends AbstractComponent implements 
     initialiseIfNeeded(builder, true, muleContext);
   }
 
+  /**
+   * {@inheritDoc}
+   * @since 4.1.1
+   */
+  @Override
+  public Object getParameterValue(String parameterName) throws ValueResolvingException {
+    if (builder instanceof ParameterValueResolver) {
+      return ((ParameterValueResolver) builder).getParameterValue(parameterName);
+    } else {
+      throw new ValueResolvingException(format("Unable to resolve value for parameter '%s'", parameterName));
+    }
+  }
 }

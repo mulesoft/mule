@@ -15,4 +15,13 @@
 
     <values:values-with-required-params-from-param-group-config name="values-with-required-params-from-param-group-config" anyParameter="someValue"/>
 
+    <values:config-with-value-config name="dynamic-config" channel="#['dynamic vaue']"/>
+
+    <values:values-with-required-params-from-show-in-dsl-group-config valueParam="#['dynamic value']" name="dynamic-config-values-with-required-params-from-show-in-dsl-static-group">
+        <values:some-group anyParameter="someValue"/>
+    </values:values-with-required-params-from-show-in-dsl-group-config>
+
+    <values:values-with-required-params-from-show-in-dsl-group-config valueParam="value" name="dynamic-config-values-with-required-params-from-show-in-dsl-dynamic-group">
+        <values:some-group anyParameter="#['someValue']"/>
+    </values:values-with-required-params-from-show-in-dsl-group-config>
 </mule>

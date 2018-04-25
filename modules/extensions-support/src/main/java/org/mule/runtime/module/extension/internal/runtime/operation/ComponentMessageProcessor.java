@@ -84,9 +84,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -94,6 +91,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -439,6 +438,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       event = getInitialiserEvent(muleContext);
       return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, componentModel, extensionModel,
                                                                             from(event)),
+                                                 resolverSet,
                                                  reflectionCache);
     } finally {
       if (event != null) {

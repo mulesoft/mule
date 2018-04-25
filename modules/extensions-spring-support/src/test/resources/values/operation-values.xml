@@ -81,4 +81,10 @@
             <values:values-group channels="dummyValue" anyParameter="someValue"/>
         </values:values-inside-show-in-dsl-group>
     </flow>
+
+    <flow name="valuesInsideShowInDslDynamicGroup">
+        <values:values-inside-show-in-dsl-group values="dummyValue">
+            <values:values-group channels="#[payload ++ payload]" anyParameter="someValue"/>
+        </values:values-inside-show-in-dsl-group>
+    </flow>
 </mule>
