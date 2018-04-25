@@ -28,7 +28,6 @@ import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -273,7 +272,7 @@ class ComponentConfigurationBuilder<T> {
     public void onSoftReferenceSimpleParameter(String softReference) {
       String reference = (String) simpleParameters.get(softReference);
       if (reference != null) {
-        this.value = new RuntimeBeanNameReference(reference);
+        this.value = reference;
       }
       simpleParameters.remove(softReference);
     }
