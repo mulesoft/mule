@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -18,7 +17,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
-import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -32,7 +30,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
@@ -294,14 +291,6 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
    * {@inheritDoc}
    */
   @Override
-  public List<ValueProviderModel> getConfigModels(String parameterName) {
-    return getValueProviderModels(getConfigurationModel().getAllParameterModels());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public Set<Value> getConnectionValues(String parameterName) throws ValueResolvingException {
     return valuesWithClassLoader(() -> {
       ConnectionProviderModel connectionProviderModel = getConnectionProviderModel()
@@ -319,16 +308,6 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
                                                                                               connectionProviderModel,
                                                                                               reflectionCache));
     }, getExtensionModel());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public List<ValueProviderModel> getConnectionModels(String providerName) {
-    return getConnectionProviderModel()
-        .map(model -> getValueProviderModels(model.getAllParameterModels()))
-        .orElse(emptyList());
   }
 
   private Optional<ConnectionProviderModel> getConnectionProviderModel() {
