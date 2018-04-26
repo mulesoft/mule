@@ -75,6 +75,13 @@ public class HttpListenerContentTypeTestCase extends FunctionalTestCase
         testRejectContentType(request, "Could not parse");
     }
 
+    @Test
+    public void rejectsAndEscapesInvalidContentTypeWithScript() throws Exception
+    {
+        Request request = Request.Post(getUrl()).body(new StringEntity(TEST_MESSAGE, "<script>alert('hello');</script>", null));
+        testRejectContentType(request, "Could not parse '&lt;script&gt;alert('hello');&lt;/script&gt;; charset=ISO-8859-1'");
+    }
+
     private void testRejectContentType(Request request, String expectedMessage) throws IOException
     {
         HttpResponse response = request.execute().returnResponse();
