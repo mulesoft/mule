@@ -201,7 +201,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void orbiddenConfigurationPropertiesThrowsException() {
+  public void forbiddenConfigurationPropertiesThrowsException() {
     exception.expectMessage(format(CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE, CONFIGURATION_PROPERTIES.toString()));
     getExtensionModelFrom("validation/module-configuration-property-file.xml");
   }
