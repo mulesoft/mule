@@ -13,6 +13,7 @@ import org.mule.test.values.extension.resolver.MultiLevelValueProvider;
 import org.mule.test.values.extension.resolver.SimpleValueProvider;
 import org.mule.test.values.extension.resolver.WithConfigValueProvider;
 import org.mule.test.values.extension.resolver.WithConnectionValueProvider;
+import org.mule.test.values.extension.resolver.WithErrorValueProvider;
 import org.mule.test.values.extension.resolver.WithMuleContextValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider;
 import org.mule.test.values.extension.resolver.WithRequiredParametersValueProvider;
@@ -59,6 +60,10 @@ public class ValuesOperations {
   public void valuesInsideShowInDslGroup(@OfValues(WithRequiredParameterFromGroupValueProvider.class) String values,
                                          @ParameterGroup(name = "ValuesGroup",
                                              showInDsl = true) GroupWithValuesParameter optionsParameter) {
+
+  }
+
+  public void withErrorValueProvider(@OfValues(WithErrorValueProvider.class) String values, String errorCode) {
 
   }
 }
