@@ -84,4 +84,8 @@ public class ArtifactClassificationNode {
     return artifact.hashCode();
   }
 
+  @Override
+  public String toString() {
+    return artifact.toString();
+  }
 }
