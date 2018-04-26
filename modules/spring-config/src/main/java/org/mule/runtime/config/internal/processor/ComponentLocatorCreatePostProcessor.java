@@ -8,8 +8,7 @@ package org.mule.runtime.config.internal.processor;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
-
-import java.util.function.Function;
+import org.mule.runtime.dsl.api.component.ComponentFactory;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
@@ -44,7 +43,8 @@ public class ComponentLocatorCreatePostProcessor implements BeanPostProcessor {
   @Override
   public Object postProcessAfterInitialization(Object o, String s) throws BeansException {
     // We check for instanceof Component because this method may be called for spring objects
-    if (!(o instanceof FactoryBean) && o instanceof Component && ((Component) o).getLocation() != null) {
+    if ((!(o instanceof FactoryBean) || o instanceof ComponentFactory) && o instanceof Component
+        && ((Component) o).getLocation() != null) {
       componentLocator.addComponent((Component) o);
     }
     return o;
