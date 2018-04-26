@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -201,6 +202,6 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
         .orElseThrow(
                      () -> new IllegalStateException("There were no schema generators available when trying to work with the extension '"
                          + extensionModel.getName() + "'"));
-    return new ByteArrayInputStream(generatedResource.getBytes());
+    return new ByteArrayInputStream(generatedResource.getBytes(UTF_8));
   }
 }
