@@ -26,12 +26,6 @@ import static org.mule.runtime.extension.internal.loader.validator.GlobalElement
 import static org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator.REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
-import com.google.common.collect.ImmutableSet;
-import org.apache.maven.model.validation.ModelValidator;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -43,9 +37,17 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.maven.model.validation.ModelValidator;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Tests the defaults {@link ModelValidator}s provided by the {@link ExtensionModelFactory}
@@ -199,7 +201,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void forbiddenConfigurationPropertiesThrowsException() {
+  public void orbiddenConfigurationPropertiesThrowsException() {
     exception.expectMessage(format(CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE, CONFIGURATION_PROPERTIES.toString()));
     getExtensionModelFrom("validation/module-configuration-property-file.xml");
   }

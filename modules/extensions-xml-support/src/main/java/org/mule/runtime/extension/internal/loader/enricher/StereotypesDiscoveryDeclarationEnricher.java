@@ -18,6 +18,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -70,32 +71,32 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
     }
 
     public void apply(ExtensionLoadingContext extensionLoadingContext) {
+      ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
+      Optional<GlobalElementComponentModelModelProperty> modelProperty =
+          extensionDeclaration.getModelProperty(GlobalElementComponentModelModelProperty.class);
       new IdempotentDeclarationWalker() {
 
         @Override
         protected void onConfiguration(ConfigurationDeclaration declaration) {
-          walkDeclaration(declaration.getModelProperty(GlobalElementComponentModelModelProperty.class),
-                          declaration.getAllParameters());
+          walkDeclaration(modelProperty, declaration.getAllParameters());
         }
 
         @Override
         protected void onConnectionProvider(ConnectedDeclaration owner,
                                             ConnectionProviderDeclaration declaration) {
           if (owner instanceof ConfigurationDeclaration) {
-            walkDeclaration(((ConfigurationDeclaration) owner)
-                .getModelProperty(GlobalElementComponentModelModelProperty.class),
-                            declaration.getAllParameters());
+            walkDeclaration(modelProperty, declaration.getAllParameters());
           }
         }
+      }.walk(extensionDeclaration);
+    }
 
-        private void walkDeclaration(Optional<GlobalElementComponentModelModelProperty> globalElementModelProperty,
-                                     List<ParameterDeclaration> allParameters) {
-          globalElementModelProperty.ifPresent(modelProperty -> allParameters.stream()
-              .filter(parameterDeclaration -> parameterDeclaration.getType() instanceof StringType)
-              .forEach(parameterDeclaration -> traverseProperty(globalElementModelProperty.get().getGlobalElements(),
-                                                                parameterDeclaration)));
-        }
-      }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
+    private void walkDeclaration(Optional<GlobalElementComponentModelModelProperty> globalElementModelProperty,
+                                 List<ParameterDeclaration> allParameters) {
+      globalElementModelProperty.ifPresent(modelProperty -> allParameters.stream()
+          .filter(parameterDeclaration -> parameterDeclaration.getType() instanceof StringType)
+          .forEach(parameterDeclaration -> traverseProperty(globalElementModelProperty.get().getGlobalElements(),
+                                                            parameterDeclaration)));
     }
 
     /**
