@@ -185,7 +185,7 @@ public class HttpListenerTestCase extends AbstractMuleTestCase
 
         HttpResponseReadyCallback responseCallback = mock(HttpResponseReadyCallback.class);
         requestHandlerRef.get().handleRequest(requestContext, responseCallback);
-        assertResponse(responseCallback, BAD_REQUEST.getStatusCode(), BAD_REQUEST.getReasonPhrase(), "Missing 'host' header");
+        assertResponse(responseCallback, BAD_REQUEST.getStatusCode(), BAD_REQUEST.getReasonPhrase(), "HTTP request parsing failed with error: \"Missing 'host' header\"");
     }
 
     protected HttpRequest buildGetRootRequest(HttpProtocol protocol)
