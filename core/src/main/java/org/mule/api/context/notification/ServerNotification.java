@@ -64,7 +64,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
 
     public final String EVENT_NAME = ClassUtils.getClassName(getClass());
 
-    protected String serverId;
+    private volatile String serverId;
 
     protected long timestamp;
 
@@ -111,7 +111,6 @@ public abstract class ServerNotification extends EventObject implements MuleCont
     public void setMuleContext(MuleContext context)
     {
         muleContext = context;
-        serverId = generateId(context);
     }
 
     protected static String generateId(MuleContext context)
@@ -139,6 +138,16 @@ public abstract class ServerNotification extends EventObject implements MuleCont
 
     public String getServerId()
     {
+        if(serverId == null)
+        {
+            synchronized (this)
+            {
+                if(serverId == null)
+                {
+                    serverId = generateId(muleContext);
+                }                
+            }
+        }
         return serverId;
     }
 
@@ -161,7 +170,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
     public String toString()
     {
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier
-               + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
+               + ", serverId=" + getServerId() + ", timestamp=" + timestamp + "}";
     }
 
     protected String getPayloadToString()

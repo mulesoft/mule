@@ -89,7 +89,7 @@ public class SftpTransportNotification extends CustomNotification
         return EVENT_NAME + "{action = " + getActionName(action) + ", endpoint = "
                + endpoint.getEndpointURI() + ", info = " + info + ", size = " + size
                + ", resourceIdentifier = " + resourceIdentifier + ", timestamp = " + timestamp
-               + ", serverId = " + serverId + ", message = " + source + "}";
+               + ", serverId = " + getServerId() + ", message = " + source + "}";
     }
 
     public ImmutableEndpoint getEndpoint()
