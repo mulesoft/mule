@@ -87,4 +87,7 @@
             <values:values-group channels="#[payload ++ payload]" anyParameter="someValue"/>
         </values:values-inside-show-in-dsl-group>
     </flow>
+    <flow name="withErrorValueProvider">
+        <values:with-error-value-provider errorCode="CUSTOM_ERROR"/>
+    </flow>
 </mule>

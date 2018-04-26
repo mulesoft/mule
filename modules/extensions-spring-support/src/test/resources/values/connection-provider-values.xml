@@ -40,4 +40,12 @@
         <values:with-value-parameter-connection channel="#['dynamic value']"/>
     </values:config>
 
+    <values:config name="failure-config">
+        <values:failure-connection errorCode="CUSTOM_ERROR" />
+    </values:config>
+
+    <values:config name="dynamic-failure-config">
+        <values:failure-connection errorCode="#['CUSTOM_ERROR']" />
+    </values:config>
+
 </mule>

@@ -24,4 +24,8 @@
     <values:values-with-required-params-from-show-in-dsl-group-config valueParam="value" name="dynamic-config-values-with-required-params-from-show-in-dsl-dynamic-group">
         <values:some-group anyParameter="#['someValue']"/>
     </values:values-with-required-params-from-show-in-dsl-group-config>
+
+    <values:failure-config errorCode="CUSTOM_ERROR" name="failure-config"/>
+
+    <values:failure-config errorCode="#['CUSTOM_ERROR']" name="dynamic-failure-config"/>
 </mule>

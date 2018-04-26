@@ -21,10 +21,10 @@ import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.tck.junit4.matcher.ValueMatcher;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import java.util.Set;
 
 import org.hamcrest.Matcher;
 
@@ -82,13 +82,21 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
   }
 
   Set<Value> getValuesFromConfig(String configName, String parameterName) throws Exception {
-    return checkResultAndRetrieveValues(valueProviderService.getValues(Location.builder().globalName(configName).build(),
-                                                                       parameterName));
+    return checkResultAndRetrieveValues(getValueResultFromConfig(configName, parameterName));
+  }
+
+  public ValueResult getValueResultFromConfig(String configName, String parameterName) {
+    return valueProviderService.getValues(Location.builder().globalName(configName).build(),
+                                          parameterName);
   }
 
   Set<Value> getValuesFromConnection(String configName, String parameterName) throws Exception {
-    return checkResultAndRetrieveValues(valueProviderService
-        .getValues(Location.builder().globalName(configName).addConnectionPart().build(), parameterName));
+    return checkResultAndRetrieveValues(getValueResultFromConnection(configName, parameterName));
+  }
+
+  public ValueResult getValueResultFromConnection(String configName, String parameterName) {
+    return valueProviderService
+        .getValues(Location.builder().globalName(configName).addConnectionPart().build(), parameterName);
   }
 
   private Set<Value> checkResultAndRetrieveValues(ValueResult values) throws ValueResolvingException {

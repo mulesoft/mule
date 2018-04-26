@@ -23,6 +23,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.extension.api.util.MuleExtensionUtils;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -42,6 +43,8 @@ import javax.inject.Inject;
  */
 public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable, ParameterValueResolver {
 
+  private static final ValueResolvingContext RESOLVING_CONTEXT =
+      ValueResolvingContext.from(MuleExtensionUtils.getInitialiserEvent());
   protected final Class<T> prototypeClass;
   protected final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
   protected final Map<String, ValueResolver<? extends Object>> resolverByFieldName = new HashMap<>();
@@ -136,8 +139,8 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
       return null;
     }
     try {
-      return valueResolver.resolve(ValueResolvingContext.from(null));
-    } catch (MuleException e) {
+      return valueResolver.resolve(RESOLVING_CONTEXT);
+    } catch (Exception e) {
       throw new ValueResolvingException(format("An error occurred trying to resolve value for parameter [%s]", parameterName), e);
     }
   }
