@@ -79,7 +79,7 @@ public class MessageProcessorNotification extends AbstractBlockingServerEvent
     public String toString()
     {
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", processor=" + processorToString() + ", resourceId=" + resourceIdentifier
-               + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
+               + ", serverId=" + getServerId() + ", timestamp=" + timestamp + "}";
     }
 
     protected String processorToString()
