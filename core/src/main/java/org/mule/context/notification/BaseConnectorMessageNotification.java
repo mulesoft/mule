@@ -91,7 +91,7 @@ public abstract class BaseConnectorMessageNotification extends ServerNotificatio
                + ", endpoint: " + endpoint
                + ", resourceId=" + resourceIdentifier
                + ", timestamp=" + timestamp
-               + ", serverId=" + serverId
+               + ", serverId=" + getServerId()
                + ", message: " + source + "}";
     }
 
