@@ -13,6 +13,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProvider
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.test.values.extension.ValuesOperations;
+import org.mule.test.values.extension.connection.ConnectionWithFailureErrorProvider;
 import org.mule.test.values.extension.connection.ConnectionWithValueParameter;
 import org.mule.test.values.extension.connection.ConnectionWithValueWithRequiredParam;
 import org.mule.test.values.extension.connection.ConnectionWithValuesWithRequiredParamsFromParamGroup;
@@ -32,7 +33,8 @@ import java.util.List;
 @Configuration
 @ConnectionProviders({ValuesConnectionProvider.class, ConnectionWithValueParameter.class,
     ConnectionWithValueWithRequiredParam.class, ConnectionWithValuesWithRequiredParamsFromParamGroup.class,
-    ConnectionWithValuesWithRequiredParamsFromShowInDslGroup.class})
+    ConnectionWithValuesWithRequiredParamsFromShowInDslGroup.class, ConnectionWithFailureErrorProvider.class
+})
 @Operations({ValuesOperations.class})
 @Sources({SourceWithConfiguration.class, SourceWithConnection.class, SourceWithValuesWithRequiredParameters.class,
     SourceWithValuesWithRequiredParameterInsideParamGroup.class,

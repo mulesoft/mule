@@ -11,7 +11,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.tck.junit4.matcher.ValueMatcher.valueWithId;
+import static org.mule.test.values.extension.resolver.WithErrorValueProvider.ERROR_MESSAGE;
 
+import org.mule.runtime.api.value.ResolvingFailure;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.tck.junit4.matcher.ValueMatcher;
@@ -132,5 +134,14 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     Set<Value> values = getValues("valuesInsideShowInDslDynamicGroup", "values");
     assertThat(values, hasSize(1));
     assertThat(values, hasValues("anyParameter:someValue"));
+  }
+
+  @Test
+  public void userErrorWhenResolvingValues() throws Exception {
+    ValueResult result = getValueResult("withErrorValueProvider", "values");
+    assertThat(result.getFailure().isPresent(), is(true));
+    ResolvingFailure resolvingFailure = result.getFailure().get();
+    assertThat(resolvingFailure.getFailureCode(), is("CUSTOM_ERROR"));
+    assertThat(resolvingFailure.getMessage(), is(ERROR_MESSAGE));
   }
 }

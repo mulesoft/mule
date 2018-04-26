@@ -6,10 +6,14 @@
  */
 package org.mule.test.module.extension.values;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mule.test.values.extension.resolver.WithErrorValueProvider.ERROR_MESSAGE;
 
+import org.mule.runtime.api.value.ResolvingFailure;
 import org.mule.runtime.api.value.Value;
+import org.mule.runtime.api.value.ValueResult;
 
 import java.util.Set;
 
@@ -72,5 +76,23 @@ public class ConnectionProviderValuesTestCase extends AbstractValuesTestCase {
     Set<Value> channels = getValuesFromConnection("dynamic-connection", "channel");
     assertThat(channels, hasSize(3));
     assertThat(channels, hasValues("channel1", "channel2", "channel3"));
+  }
+
+  @Test
+  public void userErrorWhenResolvingValues() throws Exception {
+    ValueResult result = getValueResultFromConnection("failure-config", "values");
+    assertThat(result.getFailure().isPresent(), is(true));
+    ResolvingFailure resolvingFailure = result.getFailure().get();
+    assertThat(resolvingFailure.getFailureCode(), is("CUSTOM_ERROR"));
+    assertThat(resolvingFailure.getMessage(), is(ERROR_MESSAGE));
+  }
+
+  @Test
+  public void userErrorWhenResolvingValuesDynamic() throws Exception {
+    ValueResult result = getValueResultFromConnection("dynamic-failure-config", "values");
+    assertThat(result.getFailure().isPresent(), is(true));
+    ResolvingFailure resolvingFailure = result.getFailure().get();
+    assertThat(resolvingFailure.getFailureCode(), is("CUSTOM_ERROR"));
+    assertThat(resolvingFailure.getMessage(), is(ERROR_MESSAGE));
   }
 }

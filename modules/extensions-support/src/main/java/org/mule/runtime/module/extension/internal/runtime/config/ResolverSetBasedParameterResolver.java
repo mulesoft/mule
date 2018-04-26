@@ -10,6 +10,7 @@ import static java.lang.String.format;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.module.extension.api.util.MuleExtensionUtils;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
@@ -25,14 +26,14 @@ import java.util.Optional;
 /**
  * {@link ParameterValueResolver} based on {@link ResolverSet resolver sets}
  *
- * @since 4.1.1
+ * @since 4.1.2
  */
 public class ResolverSetBasedParameterResolver implements ParameterValueResolver {
 
   private ResolverSet resolverSet;
   private ParameterizedModel parameterizedModel;
   private ReflectionCache reflectionCache;
-  private ValueResolvingContext resolvingContext = ValueResolvingContext.from(null);
+  private ValueResolvingContext resolvingContext = ValueResolvingContext.from(MuleExtensionUtils.getInitialiserEvent());
 
   public ResolverSetBasedParameterResolver(ResolverSet resolverSet, ParameterizedModel parameterizedModel,
                                            ReflectionCache reflectionCache) {
@@ -51,9 +52,12 @@ public class ResolverSetBasedParameterResolver implements ParameterValueResolver
       } else {
         return resolveFromParameterGroup(parameterName);
       }
-    } catch (MuleException e) {
+    } catch (ValueResolvingException e) {
+      throw e;
+    } catch (Exception e) {
       throw new ValueResolvingException(format("Error occurred trying to resolve value for the parameter [%s]",
-                                               parameterName));
+                                               parameterName),
+                                        e);
     }
   }
 
@@ -83,7 +87,7 @@ public class ResolverSetBasedParameterResolver implements ParameterValueResolver
 
   private Object resolveStaticGroup(String parameterName, ValueResolver<?> paramGroup)
       throws MuleException, ValueResolvingException {
-    Object resolve = paramGroup.resolve(ValueResolvingContext.from(null));
+    Object resolve = paramGroup.resolve(resolvingContext);
     return new ObjectBasedParameterValueResolver(resolve, parameterizedModel, reflectionCache)
         .getParameterValue(parameterName);
   }

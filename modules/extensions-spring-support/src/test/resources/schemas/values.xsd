@@ -150,6 +150,19 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="failure-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="mule:expressionString" use="required" name="values"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="errorCode"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="with-value-parameter-connection">
     <xs:complexType>
       <xs:complexContent>
@@ -247,6 +260,20 @@
           </xs:sequence>
           <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="required" name="channel"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="failure-config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractExtensionType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="values"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="errorCode"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -498,6 +525,16 @@
           </xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="values"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/values" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="WithErrorValueProviderType" substitutionGroup="mule:abstract-operator" name="with-error-value-provider"></xs:element>
+  <xs:complexType name="WithErrorValueProviderType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="values"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="errorCode"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
