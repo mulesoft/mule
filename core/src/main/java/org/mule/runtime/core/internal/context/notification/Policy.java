@@ -6,16 +6,21 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
-import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.context.notification.NotifierCallback;
+
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -26,13 +31,15 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class Policy {
 
+  private static final Logger LOGGER = getLogger(Policy.class);
+
   // map from event to set of senders
   private Map<Class<? extends Notification>, Collection<Sender>> eventToSenders =
       new HashMap<>();
 
   // these are cumulative - set values should never change, they are just a cache of known info
   // they are co and contra-variant wrt to exact event type (see code below).
-  private ConcurrentMap knownEventsExact = new ConcurrentHashMap();
+  private ConcurrentMap<Class, Boolean> knownEventsExact = new ConcurrentHashMap<>();
   private ConcurrentMap knownEventsSuper = new ConcurrentHashMap();
 
   /**
@@ -88,11 +95,12 @@ public class Policy {
   public void dispatch(Notification notification, NotifierCallback notifier) {
     if (null != notification) {
       Class notfnClass = notification.getClass();
+      Boolean eventKnown = knownEventsExact.get(notfnClass);
       // search if we don't know about this event, or if we do know it is used
-      if (!knownEventsExact.containsKey(notfnClass)) {
+      if (eventKnown == null) {
         boolean found = doDispatch(notification, notfnClass, notifier);
         knownEventsExact.put(notfnClass, Boolean.valueOf(found));
-      } else if (((Boolean) knownEventsExact.get(notfnClass)).booleanValue()) {
+      } else if (eventKnown.booleanValue()) {
         boolean found = doDispatch(notification, notfnClass, notifier);
         // reduce contention on the map by not writing the same value over and over again.
         if (!found) {
@@ -105,11 +113,17 @@ public class Policy {
   protected boolean doDispatch(Notification notification, Class<? extends Notification> notfnClass,
                                NotifierCallback notifier) {
     boolean found = false;
-    for (Class<? extends Notification> event : eventToSenders.keySet()) {
-      if (event.isAssignableFrom(notfnClass)) {
+    for (Entry<Class<? extends Notification>, Collection<Sender>> event : eventToSenders.entrySet()) {
+      if (event.getKey().isAssignableFrom(notfnClass)) {
         found = true;
-        for (Sender sender : eventToSenders.get(event)) {
-          sender.dispatch(notification, notifier);
+        for (Sender sender : event.getValue()) {
+          try {
+            sender.dispatch(notification, notifier);
+          } catch (Throwable e) {
+            // Exceptions or errors from listeners do not affect the notification processing
+            LOGGER.info("NotificationListener {} was unable to fire notification {} due to an exception: {}.",
+                        sender.getListener(), notification, e);
+          }
         }
       }
     }
@@ -144,7 +158,7 @@ public class Policy {
 
     }
     return ((Boolean) knownEventsSuper.get(notfnClass)).booleanValue()
-        || ((Boolean) knownEventsExact.get(notfnClass)).booleanValue();
+        || knownEventsExact.get(notfnClass).booleanValue();
   }
 
 }
