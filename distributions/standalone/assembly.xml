@@ -13,15 +13,21 @@
             <excludes>
                 <exclude>**/IGNORE</exclude>
                 <exclude>bin/**</exclude>
+                <exclude>conf/**</exclude>
                 <exclude>lib/boot/exec/**</exclude>
             </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/resources/conf</directory>
+            <outputDirectory>conf</outputDirectory>
+            <fileMode>600</fileMode>
         </fileSet>
 
         <!-- Make binary files executable. -->
         <fileSet>
             <directory>src/main/resources/bin</directory>
             <outputDirectory>bin</outputDirectory>
-            <fileMode>755</fileMode>
+            <fileMode>700</fileMode>
             <includes>
                 <include>launcher</include>
                 <include>mule</include>
@@ -31,7 +37,7 @@
         <fileSet>
             <directory>src/main/resources/bin</directory>
             <outputDirectory>bin</outputDirectory>
-            <fileMode>644</fileMode>
+            <fileMode>600</fileMode>
             <includes>
                 <include>*.groovy</include>
                 <include>*.bat</include>
@@ -42,7 +48,7 @@
         <fileSet>
             <directory>src/main/resources/lib/boot/exec</directory>
             <outputDirectory>lib/boot/exec</outputDirectory>
-            <fileMode>755</fileMode>
+            <fileMode>700</fileMode>
             <excludes>
                 <exclude>*.txt</exclude>
             </excludes>
@@ -53,7 +59,7 @@
         <fileSet>
             <directory>src/main/resources/lib/boot/exec</directory>
             <outputDirectory>lib/boot/exec</outputDirectory>
-            <fileMode>644</fileMode>
+            <fileMode>600</fileMode>
             <includes>
                 <include>*.txt</include>
             </includes>
@@ -91,6 +97,7 @@
         <dependencySet>
             <outputDirectory>lib/boot</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0640</fileMode>
             <includes>
                 <include>org.mule.modules:mule-module-boot</include>
                 <include>org.mule.modules:mule-module-reboot</include>
@@ -303,6 +310,7 @@
         <dependencySet>
             <outputDirectory>lib/user</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0640</fileMode>
             <scope>test</scope>
             <includes>
                 <include>junit:junit</include>
