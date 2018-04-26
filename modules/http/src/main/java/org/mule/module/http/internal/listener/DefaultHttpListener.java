@@ -6,6 +6,8 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
@@ -137,7 +139,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
                 catch (HttpRequestParsingException | IllegalArgumentException e)
                 {
                     logger.warn("Exception occurred parsing request:", e);
-                    sendErrorResponse(BAD_REQUEST, e.getMessage(), responseCallback);
+                    sendErrorResponse(BAD_REQUEST, getEscapedErrorBody(e), responseCallback);
                 }
                 catch (RuntimeException e)
                 {
@@ -178,6 +180,10 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
                     {
                     }
                 });
+            }
+
+            private String getEscapedErrorBody(Exception e) {
+                return format("HTTP request parsing failed with error: \"%s\"", escapeHtml(e.getMessage()));
             }
         };
     }
@@ -240,7 +246,8 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
                 String uriParamName = pathPart.substring(1, pathPart.length() - 1);
                 if (uriParamNames.contains(uriParamName))
                 {
-                    throw new InitialisationException(CoreMessages.createStaticMessage(String.format("Http Listener with path %s contains duplicated uri param names", this.path)), this);
+                    throw new InitialisationException(CoreMessages.createStaticMessage(
+                      format("Http Listener with path %s contains duplicated uri param names", this.path)), this);
                 }
                 uriParamNames.add(uriParamName);
             }
@@ -248,7 +255,8 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
             {
                 if (pathPart.contains("*") && pathPart.length() > 1)
                 {
-                    throw new InitialisationException(CoreMessages.createStaticMessage(String.format("Http Listener with path %s contains an invalid use of a wildcard. Wildcards can only be used at the end of the path (i.e.: /path/*) or between / characters (.i.e.: /path/*/anotherPath))", this.path)), this);
+                    throw new InitialisationException(CoreMessages.createStaticMessage(
+                      format("Http Listener with path %s contains an invalid use of a wildcard. Wildcards can only be used at the end of the path (i.e.: /path/*) or between / characters (.i.e.: /path/*/anotherPath))", this.path)), this);
                 }
             }
         }
