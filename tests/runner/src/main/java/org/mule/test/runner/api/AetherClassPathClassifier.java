@@ -368,7 +368,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
               .filter(artifactUrlClassification -> artifactUrlClassification.getArtifactId().equals(toId(artifact))).findAny()
               .isPresent()
               && !pluginUrlClassifications.stream()
-                  .filter(artifactUrlClassification -> artifactUrlClassification.getArtifactId().equals(toId(artifact))).findAny()
+                  // Plugins may have ended up with a highest version due to transitive dependencies... therefore comparing without version 
+                  .filter(artifactUrlClassification -> artifactUrlClassification.getArtifactId()
+                      .equals(toVersionlessId(artifact)))
+                  .findAny()
                   .isPresent());
         })
         .map(depToTransform -> depToTransform.setScope(COMPILE))
