@@ -9,6 +9,7 @@
 
     <tx:config name="localTx1">
         <tx:connection>
+            <reconnection failsDeployment="true"/>
             <pooling-profile maxActive="1" exhaustedAction="WHEN_EXHAUSTED_WAIT"/>
         </tx:connection>
     </tx:config>
