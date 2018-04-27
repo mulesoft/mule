@@ -94,6 +94,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
           extendArtifactProperties(artifactProperties), artifactType, pluginsClassLoaders, parentConfigurationProperties,
           disableXmlValidations);
+    // Changes the component locator in order to allow accessing any component by location even when they are prototype
+    this.componentLocator = new SpringConfigurationComponentLocator();
+
     this.applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
