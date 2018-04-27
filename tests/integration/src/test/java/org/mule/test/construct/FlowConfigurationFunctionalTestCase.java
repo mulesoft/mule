@@ -487,6 +487,27 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertNull(asyncResult);
     }
 
+    @Test
+    public void testAsyncAfterTransaction() throws Exception
+    {
+        muleContext.getClient().send("vm://async-after-tx-in",
+            new DefaultMuleMessage("0", muleContext));
+        final MuleMessage txResult = muleContext.getClient().request("vm://async-inside-tx-out",
+                RECEIVE_TIMEOUT);
+        final MuleMessage result = muleContext.getClient().request("vm://async-after-tx-out",
+            RECEIVE_TIMEOUT);
+        final MuleMessage asyncResult = muleContext.getClient().request(
+            "vm://async-async-after-tx-out", RECEIVE_TIMEOUT);
+
+        assertNotNull(txResult);
+        assertNotNull(result);
+        assertNotNull(asyncResult);
+        assertEquals("0a", txResult.getPayloadAsString());
+        assertEquals("0ac", result.getPayloadAsString());
+        assertEquals("0ab", asyncResult.getPayloadAsString());
+    }
+
+    
     @Ignore
     @Test
     public void testTransactional() throws Exception

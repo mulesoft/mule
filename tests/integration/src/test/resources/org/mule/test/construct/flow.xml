@@ -275,6 +275,21 @@
         <vm:outbound-endpoint path="async-tx-out" exchange-pattern="request-response" />
     </flow>
     
+    <flow name="async-after-tx">
+        <vm:inbound-endpoint path="async-after-tx-in" exchange-pattern="request-response"/>
+        <transactional>
+            <append-string-transformer message="a" />
+            <!--  Actually using a tx aware component inside the tx manifests the issue -->
+            <vm:outbound-endpoint path="async-inside-tx-out" exchange-pattern="one-way" />
+        </transactional>
+        <async>
+            <append-string-transformer message="b" />
+            <vm:outbound-endpoint path="async-async-after-tx-out" exchange-pattern="one-way" />
+        </async>
+        <append-string-transformer message="c" />    
+        <vm:outbound-endpoint path="async-after-tx-out" exchange-pattern="one-way" />
+    </flow>
+
     <!-- 
     <flow name="transactional">
         <vm:inbound-endpoint path="transactional-in" exchange-pattern="one-way">
