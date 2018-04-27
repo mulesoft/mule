@@ -39,6 +39,10 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
   private final Map<String, Component> componentsMap = new HashMap<>();
   private final Set<ComponentLocation> componentLocations = new HashSet<>();
 
+  public SpringConfigurationComponentLocator() {
+    this.isTemplateLocationFunction = memoize(location -> false, new ConcurrentHashMap<>());
+  }
+
   public SpringConfigurationComponentLocator(Function<String, Boolean> isTemplateComponentFunction) {
     this.isTemplateLocationFunction = memoize(isTemplateComponentFunction, new ConcurrentHashMap<>());
   }
