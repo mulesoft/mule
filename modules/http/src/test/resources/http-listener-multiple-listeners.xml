@@ -7,11 +7,11 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
     
     <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="${port}" />
     
-    <flow name="00187067-supportFlow">
+    <flow name="wildcardFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/api/*" />
         <set-payload value="#['Response via /api/*']" />
     </flow>
-    <flow name="00187067-supportFlow1">
+    <flow name="subPathFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/api/sys/ref/upsPoint/" />
         <set-payload value="#['Response via /api/sys/ref/upsPoint/']" />
     </flow>

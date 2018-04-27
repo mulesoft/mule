@@ -30,7 +30,9 @@ public class MultipleListenerTestCase extends FunctionalTestCase
 
     private static final String PATH_1 = "api/sys/ref/batterytype";
     private static final String PATH_2 = "api/sys/ref/batterytype/1";
-    private static final String RESPONSE_1 = "Response via /api/*";
+    private static final String PATH_3 = "api/sys/ref/upsPoint";
+    private static final String WILDCARD_RESPONSE = "Response via /api/*";
+    private static final String SUB_PATH_RESPONSE = "Response via /api/sys/ref/upsPoint/";
     private static final String URL = "http://localhost:%s/%s";
     private final String path;
     private final String response;
@@ -54,7 +56,7 @@ public class MultipleListenerTestCase extends FunctionalTestCase
     @Parameters
     public static Collection<Object[]> data()
     {
-        return asList(new Object[][] {{PATH_1, RESPONSE_1}, {PATH_2, RESPONSE_1}});
+        return asList(new Object[][] {{PATH_1, WILDCARD_RESPONSE}, {PATH_2, WILDCARD_RESPONSE}, {PATH_3, SUB_PATH_RESPONSE}});
     }
 
     @Test
