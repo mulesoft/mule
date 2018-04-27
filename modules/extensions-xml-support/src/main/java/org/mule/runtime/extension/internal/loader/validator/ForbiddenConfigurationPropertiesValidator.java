@@ -25,7 +25,7 @@ import java.util.stream.StreamSupport;
  * configuration properties. If the developer wants to use constants, then it must rely on <mule:global-property/>'s than in the
  * properties file.
  *
- * @since 4.2
+ * @since 4.1.2
  */
 public class ForbiddenConfigurationPropertiesValidator implements ExtensionModelValidator {
 
