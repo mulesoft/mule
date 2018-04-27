@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-configuration-property-file"
+        
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <mule:configuration-properties file="config.properties" />
+
+    <operation name="op">
+        <body>
+            <!-- smart connectors do not support configuration properties, it will fail during validation phase-->
+            <mule:set-payload value="${aProperty}"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>
