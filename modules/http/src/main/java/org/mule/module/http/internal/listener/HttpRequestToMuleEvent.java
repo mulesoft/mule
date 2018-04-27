@@ -10,6 +10,7 @@ import static org.mule.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.api.config.MuleProperties.MULE_ENCODING_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ALL_INTERFACES_IP;
+import static org.mule.module.http.api.HttpConstants.HttpProperties.COMPATIBILITY_IGNORE_CORRELATION_ID;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.module.http.api.HttpHeaders.Names.X_CORRELATION_ID;
@@ -32,6 +33,7 @@ import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestContext;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.NullPayload;
+import org.mule.util.BackwardsCompatibilityPropertyChecker;
 import org.mule.util.IOUtils;
 
 import com.google.common.net.MediaType;
@@ -51,6 +53,8 @@ public class HttpRequestToMuleEvent
 {
 
     private static Logger LOGGER = LoggerFactory.getLogger(HttpMessagePropertiesResolver.class);
+    public static final BackwardsCompatibilityPropertyChecker
+      IGNORE_CORRELATION_ID = new BackwardsCompatibilityPropertyChecker(COMPATIBILITY_IGNORE_CORRELATION_ID);
 
 
     public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext, final FlowConstruct flowConstruct, Boolean parseRequest, ListenerPath listenerPath) throws HttpRequestParsingException
@@ -135,7 +139,10 @@ public class HttpRequestToMuleEvent
 
         final DefaultMuleMessage defaultMuleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext);
 
-        resolveCorrelationId(defaultMuleMessage);
+        if (!IGNORE_CORRELATION_ID.isEnabled())
+        {
+            resolveCorrelationId(defaultMuleMessage);
+        }
 
         return new DefaultMuleEvent(
                 defaultMuleMessage,
