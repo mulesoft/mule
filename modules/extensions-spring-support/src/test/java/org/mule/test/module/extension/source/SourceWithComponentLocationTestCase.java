@@ -11,6 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.SentientSource;
 
@@ -37,9 +39,13 @@ public class SourceWithComponentLocationTestCase extends AbstractExtensionFuncti
 
   @Test
   public void injectedComponentLocation() throws Exception {
-    ComponentLocation location = SentientSource.capturedLocation;
-    assertThat(location, is(notNullValue()));
-    assertThat(location.getRootContainerName(), equalTo("sentient"));
+    new PollingProber(5000, 50)
+        .check(new JUnitLambdaProbe(() -> {
+          ComponentLocation location = SentientSource.capturedLocation;
+          assertThat(location, is(notNullValue()));
+          assertThat(location.getRootContainerName(), equalTo("sentient"));
+          return true;
+        }));
   }
 
   private void reset() {

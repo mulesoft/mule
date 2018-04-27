@@ -55,6 +55,78 @@
           "methodName": "supportsStreaming",
           "elementKind": "method",
           "justification": "New utility method"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate::dispose()",
+          "package": "org.mule.runtime.core.api.retry.async",
+          "classSimpleName": "AsynchronousRetryTemplate",
+          "methodName": "dispose",
+          "justification": "Support lifecycle"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate::initialise() throws org.mule.runtime.api.lifecycle.InitialisationException",
+          "package": "org.mule.runtime.core.api.retry.async",
+          "classSimpleName": "AsynchronousRetryTemplate",
+          "methodName": "initialise",
+          "justification": "Support lifecycle"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate::start() throws org.mule.runtime.api.exception.MuleException",
+          "package": "org.mule.runtime.core.api.retry.async",
+          "classSimpleName": "AsynchronousRetryTemplate",
+          "methodName": "start",
+          "justification": "Support lifecycle"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate::stop() throws org.mule.runtime.api.exception.MuleException",
+          "package": "org.mule.runtime.core.api.retry.async",
+          "classSimpleName": "AsynchronousRetryTemplate",
+          "methodName": "stop",
+          "justification": "Support lifecycle"
+        },
+        {
+          "code": "java.class.nowImplementsInterface",
+          "old": "class org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate",
+          "new": "class org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate",
+          "interface": "org.mule.runtime.api.lifecycle.Initialisable",
+          "package": "org.mule.runtime.core.api.retry.async",
+          "classSimpleName": "AsynchronousRetryTemplate",
+          "elementKind": "class",
+          "justification": "Support lifecycle"
+        },
+        {
+          "code": "java.class.nowImplementsInterface",
+          "old": "class org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate",
+          "new": "class org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate",
+          "interface": "org.mule.runtime.api.lifecycle.Startable",
+          "package": "org.mule.runtime.core.api.retry.async",
+          "classSimpleName": "AsynchronousRetryTemplate",
+          "elementKind": "class",
+          "justification": "Support lifecycle"
+        },
+        {
+          "code": "java.class.nowImplementsInterface",
+          "old": "class org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate",
+          "new": "class org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate",
+          "interface": "org.mule.runtime.api.lifecycle.Stoppable",
+          "package": "org.mule.runtime.core.api.retry.async",
+          "classSimpleName": "AsynchronousRetryTemplate",
+          "elementKind": "class",
+          "justification": "Support lifecycle"
+        },
+        {
+          "code": "java.class.nowImplementsInterface",
+          "old": "class org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate",
+          "new": "class org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate",
+          "interface": "org.mule.runtime.api.lifecycle.Disposable",
+          "package": "org.mule.runtime.core.api.retry.async",
+          "classSimpleName": "AsynchronousRetryTemplate",
+          "elementKind": "class",
+          "justification": "Support lifecycle"
         }
       ]
     }

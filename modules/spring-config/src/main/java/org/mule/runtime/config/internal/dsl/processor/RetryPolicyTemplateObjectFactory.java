@@ -29,7 +29,7 @@ import javax.inject.Inject;
  */
 public class RetryPolicyTemplateObjectFactory extends AbstractComponentFactory<RetryPolicyTemplate> {
 
-  private boolean blocking;
+  private boolean blocking = true;
   private Integer count = DEFAULT_RETRY_COUNT;
   private Integer frequency = DEFAULT_FREQUENCY;
   private RetryNotifier retryNotifier;
