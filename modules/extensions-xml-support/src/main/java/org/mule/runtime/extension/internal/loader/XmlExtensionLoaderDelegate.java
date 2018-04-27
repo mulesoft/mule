@@ -26,6 +26,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel.getUsedNamespaces;
+import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
@@ -57,27 +58,34 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.api.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.internal.model.ComponentModel;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
+import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
+import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
 import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.util.NoOpXmlErrorHandler;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
-import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurationPropertiesValidator;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
@@ -88,7 +96,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -348,10 +355,44 @@ public final class XmlExtensionLoaderDelegate {
       // This happens in org.mule.runtime.config.dsl.processor.xml.XmlApplicationParser.configLineFromElement()
       throw new IllegalArgumentException(format("There was an issue trying to read the stream of '%s'", resource.getFile()));
     }
-    ComponentModelReader componentModelReader =
-        new ComponentModelReader(new DefaultConfigurationPropertiesResolver(empty(),
-                                                                            new EnvironmentPropertiesConfigurationProvider()));
-    return componentModelReader.extractComponentDefinitionModel(parseModule.get(), modulePath);
+    final ConfigLine configLine = parseModule.get();
+    final ConfigurationPropertiesResolver externalPropertiesResolver = getConfigurationPropertiesResolver(configLine);
+    final ComponentModelReader componentModelReader = new ComponentModelReader(externalPropertiesResolver);
+    return componentModelReader.extractComponentDefinitionModel(configLine, modulePath);
+  }
+
+  private ConfigurationPropertiesResolver getConfigurationPropertiesResolver(ConfigLine configLine) {
+    // <mule:global-property ... /> properties reader
+    final ConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(of(new XmlExtensionConfigurationPropertiesResolver()),
+                                                   createProviderFromGlobalProperties(configLine, modulePath));
+    // system properties, such as "file.separator" properties reader
+    final ConfigurationPropertiesResolver systemPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
+                                                   new EnvironmentPropertiesConfigurationProvider());
+    // "file::" properties reader
+    final String description = format("External files for smart connector '%s'", modulePath);
+    final FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
+        new FileConfigurationPropertiesProvider(new ClassLoaderResourceProvider(currentThread().getContextClassLoader()),
+                                                description);
+    return new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
+                                                      externalPropertiesConfigurationProvider);
+  }
+
+  private ConfigurationPropertiesProvider createProviderFromGlobalProperties(ConfigLine moduleLine, String modulePath) {
+    final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
+    moduleLine.getChildren().stream()
+        .filter(configLine -> GLOBAL_PROPERTY.equals(configLine.getIdentifier()))
+        .forEach(configLine -> {
+          final String key = configLine.getConfigAttributes().get("name").getValue();
+          final String rawValue = configLine.getConfigAttributes().get("value").getValue();
+          globalProperties.put(key,
+                               new DefaultConfigurationProperty(format("global-property - file: %s - lineNumber %s",
+                                                                       modulePath, configLine.getLineNumber()),
+                                                                key, rawValue));
+
+        });
+    return new GlobalPropertyConfigurationPropertiesProvider(globalProperties);
   }
 
   private void loadModuleExtension(ExtensionDeclarer declarer, URL resource, Document moduleDocument,
@@ -842,5 +883,24 @@ public final class XmlExtensionLoaderDelegate {
               .withParent(ErrorModelBuilder.newError(ANY).build())
               .build());
         }));
+  }
+
+  /**
+   * Utility class to read the XML module entirely so that if there's any usage of configurations properties, such as
+   * "${someProperty}", the {@link ForbiddenConfigurationPropertiesValidator} can show the errors consistently,
+   * Without this dull implementation, the {@link ComponentModelReader#extractComponentDefinitionModel(ConfigLine, String)} method
+   * fails while reading ANY parametrization throwing a {@link PropertyNotFoundException} eagerly.
+   */
+  private class XmlExtensionConfigurationPropertiesResolver implements ConfigurationPropertiesResolver {
+
+    @Override
+    public Object resolveValue(String value) {
+      return value;
+    }
+
+    @Override
+    public Object resolvePlaceholderKeyValue(String placeholderKey) {
+      return placeholderKey;
+    }
   }
 }

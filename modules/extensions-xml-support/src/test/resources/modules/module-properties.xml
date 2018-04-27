@@ -7,6 +7,8 @@
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
+    <mule:global-property name="mule-global-property" value="a-constant-global-value" />
+
     <property name="configParam" type="string"/>
     <property name="defaultConfigParam" defaultValue="some default-config-value-parameter" type="string"/>
     <property name="optionalProperty" use="OPTIONAL" type="string"/>
@@ -65,6 +67,28 @@
             <mule:set-payload value="a value"/>
             <!-- will override payload with the null 'optionalProperty' parameter-->
             <mule:set-payload value="#[vars.optionalProperty]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-hardcoded-global-property">
+        <body>
+            <mule:set-payload value="${mule-global-property}"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-hardcoded-system-property">
+        <body>
+            <mule:set-payload value="${user.home}"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-hardcoded-file-property">
+        <body>
+            <!-- notice we need to add the folder modules to be sure it will be loaded in the context of the running test -->
+            <mule:set-payload value="${file::modules/module-properties-file.txt}"/>
         </body>
         <output type="string"/>
     </operation>

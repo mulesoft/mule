@@ -35,4 +35,16 @@
     <flow name="testSetPayloadConfigOptionalProperty">
         <module-properties:set-payload-config-optional-property config-ref="instantiatedConfig"/>
     </flow>
+
+    <flow name="testSetPayloadHardcodedGlobalProperty">
+        <module-properties:set-payload-hardcoded-global-property config-ref="instantiatedConfig"/>
+    </flow>
+
+    <flow name="testSetPayloadHardcodedSystemProperty">
+        <module-properties:set-payload-hardcoded-system-property config-ref="instantiatedConfig"/>
+    </flow>
+
+    <flow name="testSetPayloadHardcodedFileProperty">
+        <module-properties:set-payload-hardcoded-file-property config-ref="instantiatedConfig"/>
+    </flow>
 </mule>
