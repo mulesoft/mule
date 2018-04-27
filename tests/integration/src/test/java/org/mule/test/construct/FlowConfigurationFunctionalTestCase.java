@@ -502,9 +502,9 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         final MuleMessage asyncResult = muleContext.getClient().request(
             "vm://async-async-after-tx-out", RECEIVE_TIMEOUT);
 
-        assertThat(txResult, not(notNullValue()));
-        assertThat(result, not(notNullValue()));
-        assertThat(asyncResult, not(notNullValue()));
+        assertThat(txResult, notNullValue());
+        assertThat(result, notNullValue());
+        assertThat(asyncResult, notNullValue());
         assertThat(txResult.getPayloadAsString(), is("0a"));
         assertThat(result.getPayloadAsString(), is("0ac"));
         assertThat(asyncResult.getPayloadAsString(), is("0ab"));
