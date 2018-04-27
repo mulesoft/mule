@@ -336,6 +336,46 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this(rewriteEvent, rewriteEvent.getFlowConstruct(), replyToHandler, null);
     }
 
+    /**
+     * Copy constructor used when transacted flag needs to be reset
+     *
+     * @param rewriteEvent
+     * @param transacted
+     */
+    public DefaultMuleEvent(MuleEvent rewriteEvent, boolean transacted)
+    {
+        this.id = rewriteEvent.getId();
+        this.flowConstruct = rewriteEvent.getFlowConstruct();
+        this.session = rewriteEvent.getSession();
+        
+        this.credentials = rewriteEvent.getCredentials();
+        this.encoding = rewriteEvent.getEncoding();
+        this.exchangePattern = rewriteEvent.getExchangePattern();
+        this.messageSourceName = rewriteEvent.getMessageSourceName();
+        this.messageSourceURI = rewriteEvent.getMessageSourceURI();
+        this.outputStream = rewriteEvent.getOutputStream();
+        if (rewriteEvent instanceof DefaultMuleEvent)
+        {
+            this.processingTime = ((DefaultMuleEvent) rewriteEvent).processingTime;
+            this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
+        }
+        else
+        {
+            this.processingTime = ProcessingTime.newInstance(this);
+        }
+        setMessage(rewriteEvent.getMessage());
+        this.replyToHandler = rewriteEvent.getReplyToHandler();
+        this.replyToDestination = rewriteEvent.getReplyToDestination();
+        this.timeout = rewriteEvent.getTimeout();
+        this.transacted = transacted;
+        this.notificationsEnabled = rewriteEvent.isNotificationsEnabled();
+        this.synchronous = rewriteEvent.isSynchronous();
+        this.nonBlocking = rewriteEvent.isAllowNonBlocking() || isFlowConstructNonBlockingProcessingStrategy();
+        this.flowCallStack = rewriteEvent.getFlowCallStack() == null ? new DefaultFlowCallStack() : rewriteEvent.getFlowCallStack().clone();
+        // We want parallel paths of the same flows (i.e.: async events) to contribute to this list and be available at the end, so we copy only the reference.
+        this.processorsTrace = rewriteEvent.getProcessorsTrace();
+    }
+    
     public DefaultMuleEvent(MuleEvent rewriteEvent, FlowConstruct flowConstruct, ReplyToHandler replyToHandler, Object replyToDestination)
     {
         this(rewriteEvent.getMessage(), rewriteEvent, flowConstruct, rewriteEvent.getSession(),

@@ -6,6 +6,11 @@
  */
 package org.mule.processor;
 
+import static org.mule.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
+import static org.mule.execution.TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate;
+
+import org.mule.DefaultMuleEvent;
+import org.mule.VoidMuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -23,9 +28,8 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorPathElement;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.transaction.MuleTransactionConfig;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.util.NotificationUtils;
 
 /**
@@ -46,7 +50,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
         }
         else
         {
-            ExecutionTemplate<MuleEvent> executionTemplate = TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate(muleContext, transactionConfig, exceptionListener);
+            ExecutionTemplate<MuleEvent> executionTemplate = createScopeExecutionTemplate(muleContext, transactionConfig, exceptionListener);
             ExecutionCallback<MuleEvent> processingCallback = new ExecutionCallback<MuleEvent>()
             {
                 public MuleEvent process() throws Exception
@@ -57,7 +61,16 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
 
             try
             {
-                return executionTemplate.execute(processingCallback);
+                MuleEvent result = executionTemplate.execute(processingCallback);
+                if(VoidMuleEvent.getInstance() == result)
+                {
+                    return result;
+                }
+                else
+                {
+                    // Reset the `transacted` flag of the event when exiting the `transactional` block
+                    return new DefaultMuleEvent(result, TransactionCoordination.getInstance().getTransaction() != null);
+                }
             }
             catch (MuleException e)
             {
@@ -65,8 +78,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
             }
             catch (Exception e)
             {
-                throw new DefaultMuleException(CoreMessages.errorInvokingMessageProcessorWithinTransaction(
-                    next, transactionConfig), e);
+                throw new DefaultMuleException(errorInvokingMessageProcessorWithinTransaction(next, transactionConfig), e);
             }
         }
     }

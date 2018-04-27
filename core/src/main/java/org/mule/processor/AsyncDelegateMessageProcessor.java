@@ -6,6 +6,7 @@
  */
 package org.mule.processor;
 
+import static org.mule.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.util.ClassUtils.isConsumable;
 
 import org.mule.DefaultMuleEvent;
@@ -128,7 +129,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     {
         if (event.isTransacted())
         {
-            throw new MessagingException(CoreMessages.asyncDoesNotSupportTransactions(), event, this);
+            throw new MessagingException(asyncDoesNotSupportTransactions(), event, this);
         }
 
         final MuleMessage message = event.getMessage();
