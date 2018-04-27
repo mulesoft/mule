@@ -227,6 +227,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     when(configurationProvider.get(any())).thenReturn(configurationInstance);
     when(configurationProvider.getConfigurationModel()).thenReturn(configurationModel);
     when(configurationProvider.getName()).thenReturn(CONFIG_NAME);
+    when(configurationInstance.getConnectionProvider()).thenReturn(empty());
 
     mockMetadataResolverFactory(sourceModel, metadataResolverFactory);
     when(metadataResolverFactory.getKeyResolver()).thenReturn(new TestNoConfigMetadataResolver());
