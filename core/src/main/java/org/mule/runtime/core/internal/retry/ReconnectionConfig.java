@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.retry;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -42,7 +43,7 @@ public class ReconnectionConfig extends AbstractComponent {
 
   public ReconnectionConfig(boolean failsDeployment, RetryPolicyTemplate retryPolicyTemplate) {
     this.failsDeployment = failsDeployment;
-    this.retryPolicyTemplate = retryPolicyTemplate;
+    this.retryPolicyTemplate = getRetryPolicyTemplate(retryPolicyTemplate);
   }
 
   public boolean isFailsDeployment() {
@@ -51,5 +52,50 @@ public class ReconnectionConfig extends AbstractComponent {
 
   public RetryPolicyTemplate getRetryPolicyTemplate() {
     return retryPolicyTemplate;
+  }
+
+  /**
+   * Generates a {@link RetryPolicyTemplate} that behaves as expected regarding the deployment model defined by {@code this}
+   * {@link ReconnectionConfig}, while maintaining the behaviour expected for the delegating policy.
+   *
+   * @param delegate the {@link RetryPolicyTemplate} with the policy and configuration that should be finally applied
+   * @return a {@link RetryPolicyTemplate} that is configured with the current deployment configuration, while using the
+   * delegate's RetryPolicy.
+   */
+  public RetryPolicyTemplate getRetryPolicyTemplate(RetryPolicyTemplate delegate) {
+    if (delegate == null) {
+      return this.retryPolicyTemplate;
+    }
+
+    if (failsDeployment) {
+      return getBlockingTemplate(delegate);
+    }
+
+    return getAsyncTemplate(delegate);
+  }
+
+  /**
+   * @return an {@link AsynchronousRetryTemplate} configured with the given {@code delegate}.
+   * This {@link RetryPolicyTemplate} will not block the execution while performing the retries.
+   */
+  private RetryPolicyTemplate getAsyncTemplate(RetryPolicyTemplate delegate) {
+    if (delegate instanceof AsynchronousRetryTemplate) {
+      return delegate;
+    }
+    return new AsynchronousRetryTemplate(delegate);
+  }
+
+  /**
+   * @return a {@link RetryPolicyTemplate} configured with the given {@code delegate} policy, but
+   * blocking the execution while performing the retries.
+   */
+  private RetryPolicyTemplate getBlockingTemplate(RetryPolicyTemplate delegate) {
+    if (delegate == null) {
+      return this.retryPolicyTemplate;
+    }
+    if (delegate instanceof AsynchronousRetryTemplate) {
+      return getBlockingTemplate(((AsynchronousRetryTemplate) delegate).getDelegate());
+    }
+    return delegate;
   }
 }

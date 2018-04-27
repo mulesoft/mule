@@ -23,7 +23,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -72,14 +71,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedPa
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import org.slf4j.Logger;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -108,7 +106,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private final SourceModel sourceModel;
   private final SourceAdapterFactory sourceAdapterFactory;
   private final boolean primaryNodeOnly;
-  private final RetryPolicyTemplate retryPolicyTemplate;
+  private final RetryPolicyTemplate customRetryPolicyTemplate;
   private final BackPressureStrategy backPressureStrategy;
   private final ExceptionHandlerManager exceptionEnricherManager;
   private final AtomicBoolean reconnecting = new AtomicBoolean(false);
@@ -119,6 +117,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private LazyValue<TransactionConfig> transactionConfig = new LazyValue<>(this::buildTransactionConfig);
 
   private SourceAdapter sourceAdapter;
+  private RetryPolicyTemplate retryPolicyTemplate;
   private Scheduler retryScheduler;
   private Scheduler flowTriggerScheduler;
 
@@ -136,11 +135,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     super(extensionModel, sourceModel, configurationProvider, cursorProviderFactory, managerAdapter);
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
-    this.retryPolicyTemplate = retryPolicyTemplate;
+    this.customRetryPolicyTemplate = retryPolicyTemplate;
     this.primaryNodeOnly = primaryNodeOnly;
     this.backPressureStrategy = backPressureStrategy;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, sourceModel);
-    lifecycleManager = new DefaultLifecycleManager<>(sourceModel.getName(), this);
+    this.lifecycleManager = new DefaultLifecycleManager<>(sourceModel.getName(), this);
   }
 
   private synchronized void createSource() throws Exception {
@@ -155,6 +154,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                                sourceConnectionManager,
                                                new MessagingExceptionResolver(this));
         muleContext.getInjector().inject(sourceAdapter);
+        retryPolicyTemplate = createRetryPolicyTemplate(customRetryPolicyTemplate);
+        initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
       } finally {
         if (initialiserEvent != null) {
           ((BaseEventContext) initialiserEvent.getContext()).success();
@@ -173,6 +174,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         throw new MuleRuntimeException(e);
       }
     }
+  }
+
+  private RetryPolicyTemplate createRetryPolicyTemplate(RetryPolicyTemplate customTemplate) {
+    return this.getConfigurationInstance()
+        .map(config -> config.getConnectionProvider().orElse(null))
+        .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(customTemplate))
+        .orElse(customTemplate);
   }
 
   private void stopSource() throws MuleException {
@@ -521,7 +529,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private void reallyDoInitialise() throws InitialisationException {
     try {
       lifecycle(() -> lifecycleManager.fireInitialisePhase((phase, o) -> {
-        initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
         sourceConnectionManager = new SourceConnectionManager(connectionManager);
 
         try {

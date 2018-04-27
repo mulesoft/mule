@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionExc
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -30,7 +29,6 @@ import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
@@ -42,10 +40,6 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +47,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 /**
@@ -251,15 +248,18 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
   }
 
   private RetryPolicyTemplate getRetryPolicyTemplate(ExecutionContextAdapter<T> context) {
-    return context.getRetryPolicyTemplate().orElseGet(() -> context.getConfiguration()
-        .flatMap(ConfigurationInstance::getConnectionProvider)
-        .map(provider -> {
-          if (provider instanceof ConnectionProviderWrapper) {
-            return ((ConnectionProviderWrapper) provider).getRetryPolicyTemplate();
-          }
+    // If there is a template, try to wrap it using the ReconnectionConfig
+    Optional<RetryPolicyTemplate> customTemplate = context.getRetryPolicyTemplate()
+        .map(delegate -> context.getConfiguration()
+            .map(config -> config.getConnectionProvider().orElse(null))
+            .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(delegate))
+            .orElse(delegate));
 
-          return connectionManager.getRetryTemplateFor((ConnectionProvider<? extends Object>) provider);
-        }).orElse(fallbackRetryPolicyTemplate));
+    // In case of no template available in the context, use the one defined by the ConnectionProvider
+    return customTemplate.orElseGet(() -> context.getConfiguration()
+        .map(config -> config.getConnectionProvider().orElse(null))
+        .map(provider -> connectionManager.getRetryTemplateFor((ConnectionProvider<? extends Object>) provider))
+        .orElse(fallbackRetryPolicyTemplate));
   }
 
   private Optional<MutableConfigurationStats> getMutableConfigurationStats(ExecutionContext<T> context) {

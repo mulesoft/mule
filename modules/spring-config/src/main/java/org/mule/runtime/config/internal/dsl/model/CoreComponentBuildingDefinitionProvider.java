@@ -1162,6 +1162,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     ComponentBuildingDefinition.Builder baseReconnectDefinition = baseDefinition
         .withTypeDefinition(fromType(RetryPolicyTemplate.class)).withObjectFactoryType(RetryPolicyTemplateObjectFactory.class)
+        // 'blocking' configuration remains available only for compatibility use cases
         .withSetterParameterDefinition("blocking", fromSimpleParameter("blocking").build())
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build());
 
