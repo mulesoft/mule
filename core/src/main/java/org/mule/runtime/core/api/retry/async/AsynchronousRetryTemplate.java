@@ -6,27 +6,49 @@
  */
 package org.mule.runtime.core.api.retry.async;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.retry.async.FutureRetryContext;
 import org.mule.runtime.core.internal.retry.async.RetryWorker;
 
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+
 /**
  * This class is a wrapper for a {@link RetryPolicyTemplate} and will execute any retry work within a separate thread. An optional
  * {@link Latch} can be passed into this template, in which case execution will only occur once the latch is released.
  */
-public final class AsynchronousRetryTemplate extends AbstractComponent implements RetryPolicyTemplate {
+public final class AsynchronousRetryTemplate extends AbstractComponent
+    implements RetryPolicyTemplate, Initialisable, Startable, Stoppable, Disposable {
 
   private final RetryPolicyTemplate delegate;
   private Latch startLatch;
+
+  @Inject
+  private MuleContext muleContext;
+
+  private static final Logger LOGGER = getLogger(AsynchronousRetryTemplate.class);
 
   public AsynchronousRetryTemplate(RetryPolicyTemplate delegate) {
     this.delegate = delegate;
@@ -76,5 +98,25 @@ public final class AsynchronousRetryTemplate extends AbstractComponent implement
 
   public void setStartLatch(Latch latch) {
     this.startLatch = latch;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(delegate, muleContext);
+  }
+
+  @Override
+  public void start() throws MuleException {
+    startIfNeeded(delegate);
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    stopIfNeeded(delegate);
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(delegate, LOGGER);
   }
 }

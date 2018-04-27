@@ -16,6 +16,9 @@
                        initialHealth="CANCER"
                        finalHealth="CANCER"
                        enemies="#[mel:[]]">
+        <heisenberg:connection>
+            <reconnection failsDeployment="true"/>
+        </heisenberg:connection>
         <heisenberg:monthly-incomes>
             <heisenberg:monthly-income value="12000"/>
             <heisenberg:monthly-income value="500"/>
