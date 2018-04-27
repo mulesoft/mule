@@ -55,13 +55,13 @@ public class HttpRequestCorrelationIdTestCase extends AbstractHttpRequestTestCas
   }
 
   @Test
-  public void usesListenerMuleCorrelationId() throws Exception
+  public void listenerMuleCorrelationId() throws Exception
   {
     propagatesMuleCorrelationIdFromListenerHeader(MULE_CORRELATION_ID_PROPERTY);
   }
 
   @Test
-  public void usesListenerXCorrelationId() throws Exception
+  public void listenerXCorrelationId() throws Exception
   {
     propagatesMuleCorrelationIdFromListenerHeader(X_CORRELATION_ID);
   }
@@ -82,7 +82,15 @@ public class HttpRequestCorrelationIdTestCase extends AbstractHttpRequestTestCas
     Request.Get(format("http://localhost:%s/", serverPort.getValue()))
       .addHeader(listenerCorrelationIdHeader, listenerCorrelationId)
       .execute();
-    assertThat(getFirstReceivedHeader(MULE_CORRELATION_ID_PROPERTY), is(listenerCorrelationId));
+    validateCorrelationId(listenerCorrelationId);
+  }
+
+  /**
+   * By default, the correlation ID should be set from the received header and therefore sent by the HTTP requester.
+   */
+  protected void validateCorrelationId(String receivedCorrelationId)
+  {
+    assertThat(getFirstReceivedHeader(MULE_CORRELATION_ID_PROPERTY), is(receivedCorrelationId));
   }
 
 }

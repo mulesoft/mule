@@ -76,6 +76,7 @@ public abstract class HttpConstants
     public static final class HttpProperties
     {
         public static String GRIZZLY_MEMORY_MANAGER_SYSTEM_PROPERTY = "org.glassfish.grizzly.DEFAULT_MEMORY_MANAGER";
+        public static String COMPATIBILITY_IGNORE_CORRELATION_ID = "mule.http.server.ignoreCorrelationId";
     }
 
     public static final String ALL_INTERFACES_IP = "0.0.0.0";
