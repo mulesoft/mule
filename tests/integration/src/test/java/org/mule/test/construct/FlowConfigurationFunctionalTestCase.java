@@ -6,15 +6,25 @@
  */
 package org.mule.test.construct;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.equalTo;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.hamcrest.Matchers;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -37,13 +47,6 @@ import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.simple.StringAppendTransformer;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 {
@@ -488,7 +491,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void testAsyncAfterTransaction() throws Exception
+    public void asyncAfterTransaction() throws Exception
     {
         muleContext.getClient().send("vm://async-after-tx-in",
             new DefaultMuleMessage("0", muleContext));
@@ -499,12 +502,12 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         final MuleMessage asyncResult = muleContext.getClient().request(
             "vm://async-async-after-tx-out", RECEIVE_TIMEOUT);
 
-        assertNotNull(txResult);
-        assertNotNull(result);
-        assertNotNull(asyncResult);
-        assertEquals("0a", txResult.getPayloadAsString());
-        assertEquals("0ac", result.getPayloadAsString());
-        assertEquals("0ab", asyncResult.getPayloadAsString());
+        assertThat(txResult, not(notNullValue()));
+        assertThat(result, not(notNullValue()));
+        assertThat(asyncResult, not(notNullValue()));
+        assertThat(txResult.getPayloadAsString(), is("0a"));
+        assertThat(result.getPayloadAsString(), is("0ac"));
+        assertThat(asyncResult.getPayloadAsString(), is("0ab"));
     }
 
     

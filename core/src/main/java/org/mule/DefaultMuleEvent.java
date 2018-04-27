@@ -357,14 +357,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
             this.processingTime = ((DefaultMuleEvent) rewriteEvent).processingTime;
-            if (true)
-            {
-                this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
-            }
-            else
-            {
-                this.flowVariables.putAll(((DefaultMuleEvent) rewriteEvent).flowVariables);
-            }
+            this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
         }
         else
         {
