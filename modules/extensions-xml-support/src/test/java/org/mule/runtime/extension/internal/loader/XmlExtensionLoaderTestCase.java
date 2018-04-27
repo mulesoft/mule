@@ -137,7 +137,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(configurationModel.getAllParameterModels().get(1).getName(), is("defaultConfigParam"));
 
     Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
-        configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
+        extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
     assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
     assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(1));
 
@@ -171,7 +171,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(configurationModel.getAllParameterModels().get(1).getName(), is("password"));
 
     Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
-        configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
+        extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
     assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
     assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(1));
 
@@ -302,9 +302,8 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(configurationParameterModels.get(3).getLayoutModel().get().getOrder().get(), is(42));
 
     Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
-        configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
-    assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
-    assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(0));
+        extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
+    assertThat(globalElementComponentModelModelProperty.isPresent(), is(false));
 
     assertThat(configurationModel.getOperationModels().size(), is(1));
 
@@ -399,7 +398,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
       assertThat(configurationModel.getAllParameterModels().size(), is(2));
 
       Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
-          configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
+          extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
       assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
       assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(1));
 
@@ -465,7 +464,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
                                    ironManStereotype);
 
     Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
-        configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
+        extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
     assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
     assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(3));
 

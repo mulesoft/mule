@@ -9,8 +9,6 @@ package org.mule.runtime.extension.internal.loader.validator;
 import static java.lang.String.format;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -37,48 +35,41 @@ public class GlobalElementNamesValidator implements ExtensionModelValidator {
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
-    new ExtensionWalker() {
-
-      Map<String, ComponentModel> existingObjectsWithName = new HashMap<>();
-
-      @Override
-      protected void onConfiguration(ConfigurationModel configurationModel) {
-        configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class)
-            .ifPresent(globalElementComponentModelModelProperty -> {
-              globalElementComponentModelModelProperty.getGlobalElements().stream()
-                  .filter(componentModel -> componentModel.getNameAttribute() != null)
-                  .forEach(componentModel -> {
-                    String nameAttributeValue = componentModel.getNameAttribute();
-                    validateDuplicatedGlobalElements(configurationModel, componentModel, nameAttributeValue,
-                                                     existingObjectsWithName, problemsReporter);
-                    validateNotReservedCharacterInName(configurationModel, nameAttributeValue, problemsReporter);
-                  });
-            });
-      }
-    }.walk(extensionModel);
+    Map<String, ComponentModel> existingObjectsWithName = new HashMap<>();
+    extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class)
+        .ifPresent(globalElementComponentModelModelProperty -> {
+          globalElementComponentModelModelProperty.getGlobalElements().stream()
+              .filter(componentModel -> componentModel.getNameAttribute() != null)
+              .forEach(componentModel -> {
+                String nameAttributeValue = componentModel.getNameAttribute();
+                validateDuplicatedGlobalElements(extensionModel, componentModel, nameAttributeValue,
+                                                 existingObjectsWithName, problemsReporter);
+                validateNotReservedCharacterInName(extensionModel, nameAttributeValue, problemsReporter);
+              });
+        });
   }
 
-  private void validateNotReservedCharacterInName(ConfigurationModel configurationModel, String nameAttributeValue,
+  private void validateNotReservedCharacterInName(ExtensionModel extensionModel, String nameAttributeValue,
                                                   ProblemsReporter problemsReporter) {
     try {
       verifyStringDoesNotContainsReservedCharacters(nameAttributeValue);
     } catch (IllegalArgumentException e) {
       problemsReporter
-          .addError(new Problem(configurationModel, format(ILLEGAL_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE, nameAttributeValue,
-                                                           StringUtils.isBlank(e.getMessage()) ? "" : e.getMessage())));
+          .addError(new Problem(extensionModel, format(ILLEGAL_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE, nameAttributeValue,
+                                                       StringUtils.isBlank(e.getMessage()) ? "" : e.getMessage())));
     }
   }
 
-  private void validateDuplicatedGlobalElements(ConfigurationModel configurationModel, ComponentModel componentModel,
+  private void validateDuplicatedGlobalElements(ExtensionModel extensionModel, ComponentModel componentModel,
                                                 String nameAttributeValue, Map<String, ComponentModel> existingObjectsWithName,
                                                 ProblemsReporter problemsReporter) {
     if (existingObjectsWithName.containsKey(nameAttributeValue)) {
-      problemsReporter.addError(new Problem(configurationModel, format(
-                                                                       REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE,
-                                                                       nameAttributeValue,
-                                                                       existingObjectsWithName.get(nameAttributeValue)
-                                                                           .getIdentifier(),
-                                                                       componentModel.getIdentifier())));
+      problemsReporter.addError(new Problem(extensionModel, format(
+                                                                   REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE,
+                                                                   nameAttributeValue,
+                                                                   existingObjectsWithName.get(nameAttributeValue)
+                                                                       .getIdentifier(),
+                                                                   componentModel.getIdentifier())));
     } else {
       existingObjectsWithName.put(nameAttributeValue, componentModel);
     }

@@ -30,15 +30,6 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PRO
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang3.StringUtils;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.CycleDetector;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -98,13 +89,10 @@ import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurationPropertiesValidator;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
-import org.w3c.dom.Document;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -118,6 +106,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang3.StringUtils;
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.w3c.dom.Document;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -426,8 +429,12 @@ public final class XmlExtensionLoaderDelegate {
 
     DirectedGraph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     //loading public operations
-    final Optional<ConfigurationDeclarer> configurationDeclarer = loadPropertiesFrom(declarer, moduleModel, extensions);
+    final List<ComponentModel> globalElementsComponentModel = extractGlobalElementsFrom(moduleModel);
+    addGlobalElementModelProperty(declarer, globalElementsComponentModel);
+    final Optional<ConfigurationDeclarer> configurationDeclarer =
+        loadPropertiesFrom(declarer, moduleModel, globalElementsComponentModel, extensions);
     final HasOperationDeclarer hasOperationDeclarer = configurationDeclarer.isPresent() ? configurationDeclarer.get() : declarer;
+
     loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel, OperationVisibility.PUBLIC);
     //loading private operations
     if (comesFromTNS) {
@@ -502,22 +509,26 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private Optional<ConfigurationDeclarer> loadPropertiesFrom(ExtensionDeclarer declarer, ComponentModel moduleModel,
+                                                             List<ComponentModel> globalElementsComponentModel,
                                                              Set<ExtensionModel> extensions) {
-    List<ComponentModel> globalElementsComponentModel = extractGlobalElementsFrom(moduleModel);
     List<ComponentModel> configurationProperties = extractProperties(moduleModel);
     List<ComponentModel> connectionProperties = extractConnectionProperties(moduleModel);
     validateProperties(configurationProperties, connectionProperties);
 
-    if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty() || !globalElementsComponentModel.isEmpty()) {
+    if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty()) {
       declarer.withModelProperty(new NoReconnectionStrategyModelProperty());
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
-      configurationDeclarer.withModelProperty(new GlobalElementComponentModelModelProperty(globalElementsComponentModel));
       configurationProperties.forEach(param -> extractProperty(configurationDeclarer, param));
-
       addConnectionProvider(configurationDeclarer, connectionProperties, globalElementsComponentModel, extensions);
       return of(configurationDeclarer);
     }
     return empty();
+  }
+
+  private void addGlobalElementModelProperty(ExtensionDeclarer declarer, List<ComponentModel> globalElementsComponentModel) {
+    if (!globalElementsComponentModel.isEmpty()) {
+      declarer.withModelProperty(new GlobalElementComponentModelModelProperty(globalElementsComponentModel));
+    }
   }
 
   private List<ComponentModel> extractProperties(ComponentModel moduleModel) {
