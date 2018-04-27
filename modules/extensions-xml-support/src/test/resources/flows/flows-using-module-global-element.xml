@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-global-element="http://www.mulesoft.org/schema/mule/module-global-element"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/module-global-element http://www.mulesoft.org/schema/mule/module-global-element/current/mule-module-global-element.xsd">
+
+    <module-global-element:config name="globalElementName" username="john" password="notDoe"/>
+
+    <flow name="testDoGetClient">
+        <module-global-element:do-get-client config-ref="globalElementName"/>
+    </flow>
+
+    <flow name="testDoGetClientWithPrivateOperation">
+        <module-global-element:do-get-client-with-private-operation config-ref="globalElementName"/>
+    </flow>
+
+    <flow name="testDoGetPets">
+        <module-global-element:do-get-pets config-ref="globalElementName" owner="#[vars.ownerTest]" />
+    </flow>
+</mule>

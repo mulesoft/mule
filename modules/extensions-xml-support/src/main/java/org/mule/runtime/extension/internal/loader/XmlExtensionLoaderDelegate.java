@@ -427,7 +427,10 @@ public final class XmlExtensionLoaderDelegate {
         .withCategory(Category.valueOf(category.toUpperCase()))
         .withXmlDsl(xmlDslModel);
     declarer.withModelProperty(getXmlExtensionModelProperty(moduleModel, xmlDslModel));
-    final Optional<ConfigurationDeclarer> configurationDeclarer = loadPropertiesFrom(declarer, moduleModel, extensions);
+    final List<ComponentModel> globalElementsComponentModel = extractGlobalElementsFrom(moduleModel);
+    addGlobalElementModelProperty(declarer, globalElementsComponentModel);
+    final Optional<ConfigurationDeclarer> configurationDeclarer =
+        loadPropertiesFrom(declarer, moduleModel, globalElementsComponentModel, extensions);
     if (configurationDeclarer.isPresent()) {
       loadOperationsFrom(configurationDeclarer.get(), moduleModel, directedGraph, xmlDslModel);
     } else {
@@ -478,13 +481,13 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private Optional<ConfigurationDeclarer> loadPropertiesFrom(ExtensionDeclarer declarer, ComponentModel moduleModel,
+                                                             List<ComponentModel> globalElementsComponentModel,
                                                              Set<ExtensionModel> extensions) {
-    List<ComponentModel> globalElementsComponentModel = extractGlobalElementsFrom(moduleModel);
     List<ComponentModel> configurationProperties = extractProperties(moduleModel);
     List<ComponentModel> connectionProperties = extractConnectionProperties(moduleModel);
     validateProperties(configurationProperties, connectionProperties);
 
-    if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty() || !globalElementsComponentModel.isEmpty()) {
+    if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty()) {
       declarer.withModelProperty(new NoReconnectionStrategyModelProperty());
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
       configurationDeclarer.withModelProperty(new GlobalElementComponentModelModelProperty(globalElementsComponentModel));
@@ -494,6 +497,12 @@ public final class XmlExtensionLoaderDelegate {
       return of(configurationDeclarer);
     }
     return empty();
+  }
+
+  private void addGlobalElementModelProperty(ExtensionDeclarer declarer, List<ComponentModel> globalElementsComponentModel) {
+    if (!globalElementsComponentModel.isEmpty()) {
+      declarer.withModelProperty(new GlobalElementComponentModelModelProperty(globalElementsComponentModel));
+    }
   }
 
   private List<ComponentModel> extractProperties(ComponentModel moduleModel) {
