@@ -6,9 +6,13 @@
                http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd">
 
 
-    <marvel:dr-strange-config name="drStrange" ironManConfig="ironCat"/>
+    <marvel:dr-strange-config name="drStrange" ironManConfig="ironCat">
+        <marvel:missile-connection>
+            <reconnection failsDeployment="true"/>
+        </marvel:missile-connection>
+    </marvel:dr-strange-config>
 
-    <marvel:iron-man-config name="ironCat" />
+    <marvel:iron-man-config name="ironCat"/>
 
     <flow name="matchingOperationFlow" initialState="stopped">
         <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain"
