@@ -188,6 +188,8 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
                      t);
         }
         return null;
+      } finally {
+        clearAllThreadLocals();
       }
     };
   }

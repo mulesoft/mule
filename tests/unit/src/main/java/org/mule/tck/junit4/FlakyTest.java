@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 public @interface FlakyTest {
 
   /**
-   * Indicate th number of times a flaky test must be executed.
+   * Indicate the number of times a flaky test must be executed.
    */
   int times() default 50;
 }

@@ -10,6 +10,7 @@ import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.c
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
@@ -20,17 +21,23 @@ import java.util.List;
 
 public class ApplicationContextBuilder {
 
+  private String contextId;
   private MuleContext domainContext;
   private String[] applicationResources = new String[0];
 
   private MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(APP);
+
+  public ApplicationContextBuilder setContextId(String contextId) {
+    this.contextId = contextId;
+    return this;
+  }
 
   public ApplicationContextBuilder setDomainContext(MuleContext domainContext) {
     this.domainContext = domainContext;
     return this;
   }
 
-  public ApplicationContextBuilder setApplicationResources(String[] applicationResources) {
+  public ApplicationContextBuilder setApplicationResources(String... applicationResources) {
     this.applicationResources = applicationResources;
     return this;
   }
@@ -49,6 +56,11 @@ public class ApplicationContextBuilder {
     builders.add(new MockExtensionManagerConfigurationBuilder());
     builders.add(getAppBuilder(this.applicationResources));
     addBuilders(builders);
+    final DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+    if (contextId != null) {
+      muleConfiguration.setId(contextId);
+    }
+    muleContextBuilder.setMuleConfiguration(muleConfiguration);
     configureMuleContext(muleContextBuilder);
     context = muleContextFactory.createMuleContext(builders, muleContextBuilder);
     return context;

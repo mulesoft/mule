@@ -110,7 +110,9 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
           builders.add(getBuilder());
         }
       }
-    }.setDomainConfig(getDomainConfigs());
+    }
+        .setContextId(this.getClass().getSimpleName())
+        .setDomainConfig(getDomainConfigs());
 
     domainContext = domainContextBuilder.build();
     domainInfrastructure = new ArtifactInstanceInfrastructure();
@@ -146,8 +148,12 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     domainInfrastructure = null;
   }
 
-  protected MuleContext createAppMuleContext(String[] configResource) throws Exception {
-    return new ApplicationContextBuilder().setDomainContext(domainContext).setApplicationResources(configResource).build();
+  protected MuleContext createAppMuleContext(String... configResource) throws Exception {
+    return new ApplicationContextBuilder()
+        .setContextId(this.getClass().getSimpleName())
+        .setDomainContext(domainContext)
+        .setApplicationResources(configResource)
+        .build();
   }
 
   public abstract ApplicationConfig[] getConfigResources();
