@@ -17,7 +17,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
-import org.mule.runtime.policy.api.OperationPolicyPointcutParametersParameters;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 
@@ -88,15 +87,12 @@ public class PolicyPointcutParametersManager {
 
     PolicyPointcutParameters sourceParameters = sourceParametersMap.get(event.getContext().getCorrelationId());
 
-    OperationPolicyPointcutParametersParameters parameters =
-        new OperationPolicyPointcutParametersParameters(operation, operationParameters, sourceParameters);
-
     Function<OperationPolicyPointcutParametersFactory, PolicyPointcutParameters> creationFunction =
         factory -> {
           try {
-            return factory.createPolicyPointcutParameters(parameters);
+            return factory.createPolicyPointcutParameters(operation, operationParameters, sourceParameters);
           } catch (AbstractMethodError error) {
-            return factory.createPolicyPointcutParameters(parameters.getOperation(), parameters.getOperationParameters());
+            return factory.createPolicyPointcutParameters(operation, operationParameters);
           }
         };
 
