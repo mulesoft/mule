@@ -17,12 +17,12 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.load
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import static org.mule.test.marvel.drstrange.DrStrangeStereotypeDefinition.DR_STRANGE_STEREOTYPE_NAME;
 import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
-
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -32,7 +32,6 @@ import org.mule.test.marvel.drstrange.DrStrange;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.junit.Test;
 
@@ -74,16 +73,28 @@ public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase
   }
 
   @Test
+  public void sourceParameterWithCustomReference() {
+    SourceModel source = configuration.getSourceModel("bytes-caster").get();
+
+    ParameterModel param = source.getAllParameterModels().stream()
+        .filter(p -> p.getName().equals("nextOperationReference")).findFirst().get();
+
+    List<StereotypeModel> stereotypes = param.getAllowedStereotypes();
+    assertThat(stereotypes, hasSize(1));
+    assertThat(stereotypes.get(0).getType(), is("REFERABLE_OPERATION"));
+    assertThat(stereotypes.get(0).getNamespace(), is("MARVEL"));
+  }
+
+  @Test
   public void operationParameterWithFlowReferenceParameter() {
     OperationModel operation = configuration.getOperationModel("withFlowReference").get();
-    assertThat(operation.getAllParameterModels(), hasSize(1));
+    assertThat(operation.getAllParameterModels(), hasSize(2));
     ParameterModel param = operation.getAllParameterModels().get(0);
     List<StereotypeModel> stereotypes = param.getAllowedStereotypes();
     assertThat(stereotypes, hasSize(1));
     assertThat(stereotypes.get(0), is(FLOW));
   }
 
-  @Test
   public void configurationWithConfigReferenceParameter() {
     List<ParameterModel> params = configuration.getAllParameterModels();
     assertThat(params, hasSize(3));

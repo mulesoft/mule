@@ -27,7 +27,7 @@ import org.junit.rules.ExpectedException;
 
 public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtensionFunctionalTestCase {
 
-  public static final int TIMEOUT_MILLIS = 1000;
+  public static final int TIMEOUT_MILLIS = 10000;
   public static final int POLL_DELAY_MILLIS = 50;
 
   @Rule
