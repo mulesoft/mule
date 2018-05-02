@@ -401,6 +401,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     final SchedulerService serviceImpl = muleContext.getSchedulerService();
 
     Set<String> schedulersOnInitNames = schedulersOnInit.stream().map(s -> s.getName()).collect(toSet());
+    schedulersOnInit = emptyList();
     try {
       assertThat(muleContext.getSchedulerService().getSchedulers().stream()
           .filter(s -> !schedulersOnInitNames.contains(s.getName())).collect(toList()), empty());

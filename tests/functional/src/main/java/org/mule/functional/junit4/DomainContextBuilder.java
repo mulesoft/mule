@@ -11,6 +11,7 @@ import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.c
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
@@ -21,9 +22,15 @@ import java.util.List;
 
 public class DomainContextBuilder {
 
+  private String contextId;
   private String[] domainConfig = new String[0];
 
   private MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(DOMAIN);
+
+  public DomainContextBuilder setContextId(String contextId) {
+    this.contextId = contextId;
+    return this;
+  }
 
   public DomainContextBuilder setDomainConfig(String... domainConfig) {
     this.domainConfig = domainConfig;
@@ -36,6 +43,11 @@ public class DomainContextBuilder {
     builders.add(new MockExtensionManagerConfigurationBuilder());
     builders.add(cfgBuilder);
     addBuilders(builders);
+    final DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+    if (contextId != null) {
+      muleConfiguration.setId(contextId);
+    }
+    muleContextBuilder.setMuleConfiguration(muleConfiguration);
     DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     MuleContext domainContext = muleContextFactory.createMuleContext(builders, muleContextBuilder);
     domainContext.start();

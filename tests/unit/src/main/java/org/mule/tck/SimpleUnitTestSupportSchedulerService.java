@@ -146,7 +146,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
       @Override
       public Thread newThread(Runnable runnable) {
-        Thread t = new Thread(new ThreadGroup(config.getSchedulerName()), runnable);
+        Thread t = new Thread(new ThreadGroup(getName()), runnable);
         configureThread(t);
         return t;
       }
