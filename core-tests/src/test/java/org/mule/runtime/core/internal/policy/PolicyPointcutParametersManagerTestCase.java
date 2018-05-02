@@ -38,7 +38,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mockito;
 
 public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCase {
 
@@ -169,7 +168,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     assertThat(parameters.getComponent(), is(component));
     assertThat(parameters.getSourceParameters(), is(of(sourceParameters)));
     verify(factory).supportsOperationIdentifier(identifier);
-    verify(factory).createPolicyPointcutParameters(any());
+    verify(factory).createPolicyPointcutParameters(any(), any(), any());
   }
 
   @Test
@@ -187,7 +186,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     assertThat(parameters.getComponent(), is(component));
     assertThat(parameters.getSourceParameters(), is(of(sourceParameters)));
     verify(factory, times(2)).supportsOperationIdentifier(identifier);
-    verify(factory, times(2)).createPolicyPointcutParameters(any());
+    verify(factory, times(2)).createPolicyPointcutParameters(any(), any(), any());
   }
 
   @Test
@@ -204,7 +203,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     assertThat(parameters.getComponent(), is(component));
     assertThat(parameters.getSourceParameters(), is(of(sourceParameters)));
     verify(factory).supportsOperationIdentifier(identifier);
-    verify(factory, never()).createPolicyPointcutParameters(any());
+    verify(factory, never()).createPolicyPointcutParameters(any(), any(), any());
   }
 
   @Test
@@ -223,9 +222,9 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     assertThat(parameters.getComponent(), is(component));
     assertThat(parameters.getSourceParameters(), is(of(sourceParameters)));
     verify(factory1).supportsOperationIdentifier(identifier);
-    verify(factory1).createPolicyPointcutParameters(any());
+    verify(factory1).createPolicyPointcutParameters(any(), any(), any());
     verify(factory2).supportsOperationIdentifier(identifier);
-    verify(factory2, never()).createPolicyPointcutParameters(any());
+    verify(factory2, never()).createPolicyPointcutParameters(any(), any(), any());
   }
 
   @Test
@@ -243,7 +242,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     PolicyPointcutParameters sourceParameters = parametersManager.createSourcePointcutParameters(component, event);
     OperationPolicyPointcutParametersFactory factory = mockOperationFactory(true, sourceParameters);
     PolicyPointcutParameters parameters = mock(PolicyPointcutParameters.class);
-    when(factory.createPolicyPointcutParameters(any())).thenThrow(new AbstractMethodError());
+    when(factory.createPolicyPointcutParameters(any(), any(), any())).thenThrow(new AbstractMethodError());
     when(factory.createPolicyPointcutParameters(component, operationParameters)).thenReturn(parameters);
     operationPointcutFactories.add(factory);
 
@@ -252,7 +251,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
 
     assertThat(returnedParameters, is(parameters));
     verify(factory).supportsOperationIdentifier(identifier);
-    verify(factory).createPolicyPointcutParameters(any());
+    verify(factory).createPolicyPointcutParameters(any(), any(), any());
     verify(factory).createPolicyPointcutParameters(component, operationParameters);
   }
 
@@ -283,7 +282,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     OperationPolicyPointcutParametersFactory factory = mock(OperationPolicyPointcutParametersFactory.class);
     when(factory.supportsOperationIdentifier(identifier)).thenReturn(supportsIdentifier);
     PolicyPointcutParameters parameters = new PolicyPointcutParameters(component, sourceParameters);
-    when(factory.createPolicyPointcutParameters(any())).thenReturn(parameters);
+    when(factory.createPolicyPointcutParameters(any(), any(), any())).thenReturn(parameters);
     return factory;
   }
 
