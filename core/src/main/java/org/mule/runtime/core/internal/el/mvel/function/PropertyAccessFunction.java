@@ -35,11 +35,7 @@ public class PropertyAccessFunction implements ExpressionFunction {
   @Override
   public Object call(Object[] parameters, BindingContext context) {
     String name = (String) parameters[0];
-    String value = configurationProperties.resolveStringProperty(name).orElse(System.getProperty(name));
-    if (value == null) {
-      value = System.getenv(name);
-    }
-    return value;
+    return configurationProperties.resolveStringProperty(name).orElse(null);
   }
 
   @Override
