@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.retry;
 
+import static java.lang.Boolean.valueOf;
+import static java.lang.System.getProperty;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
@@ -22,6 +25,8 @@ import org.mule.runtime.extension.api.runtime.source.Source;
  * @since 4.0
  */
 public class ReconnectionConfig extends AbstractComponent {
+
+  public static final String DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES = SYSTEM_PROPERTY_PREFIX + "disableAsyncRetryPolicyOnSources";
 
   /**
    * When the application is deployed, a connectivity test is performed on all connectors. If set to {@code true}, deployment will
@@ -71,7 +76,16 @@ public class ReconnectionConfig extends AbstractComponent {
       return getBlockingTemplate(delegate);
     }
 
+    // Just for testing mode, if disable async use blocking reconnection
+    if (isDisableAsyncReconnection()) {
+      return getBlockingTemplate(delegate);
+    }
+
     return getAsyncTemplate(delegate);
+  }
+
+  private boolean isDisableAsyncReconnection() {
+    return valueOf(getProperty(DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES, "false"));
   }
 
   /**

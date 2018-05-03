@@ -9,7 +9,7 @@ package org.mule.functional.junit4;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-
+import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
@@ -20,16 +20,18 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.processor.FlowAssert;
-
-import javax.inject.Inject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.junit.After;
+import org.junit.Rule;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The default configuration builder used is
@@ -56,6 +58,10 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     // A functional test case that starts up the management context by default.
     setStartContext(true);
   }
+
+  @Rule
+  public SystemProperty muleDisableAsyncRetryPolicyOnSourcesProperty =
+      new SystemProperty(DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES, "true");
 
   /**
    * @return
