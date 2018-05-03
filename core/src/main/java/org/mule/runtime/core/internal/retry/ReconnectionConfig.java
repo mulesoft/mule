@@ -26,7 +26,7 @@ import org.mule.runtime.extension.api.runtime.source.Source;
  */
 public class ReconnectionConfig extends AbstractComponent {
 
-  public static final String ENABLE_BLOCKING_RETRY_POLICY = SYSTEM_PROPERTY_PREFIX + "sources.enableBlockingRetryPolicy";
+  public static final String DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES = SYSTEM_PROPERTY_PREFIX + "disableAsyncRetryPolicyOnSources";
 
   /**
    * When the application is deployed, a connectivity test is performed on all connectors. If set to {@code true}, deployment will
@@ -76,7 +76,7 @@ public class ReconnectionConfig extends AbstractComponent {
       return getBlockingTemplate(delegate);
     }
 
-    // Just for testing mode, retry policy should be blocking...
+    // Just for testing mode, if disable async use blocking reconnection
     if (isDisableAsyncReconnection()) {
       return getBlockingTemplate(delegate);
     }
@@ -85,7 +85,7 @@ public class ReconnectionConfig extends AbstractComponent {
   }
 
   private boolean isDisableAsyncReconnection() {
-    return valueOf(getProperty(ENABLE_BLOCKING_RETRY_POLICY, "false"));
+    return valueOf(getProperty(DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES, "false"));
   }
 
   /**

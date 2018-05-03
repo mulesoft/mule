@@ -9,7 +9,7 @@ package org.mule.functional.junit4;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.internal.retry.ReconnectionConfig.ENABLE_BLOCKING_RETRY_POLICY;
+import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
@@ -60,7 +60,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   }
 
   @Rule
-  public SystemProperty muleEnableBlockingRetryPolicyProperty = new SystemProperty(ENABLE_BLOCKING_RETRY_POLICY, "true");
+  public SystemProperty muleDisableAsyncRetryPolicyOnSourcesProperty =
+      new SystemProperty(DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES, "true");
 
   /**
    * @return
