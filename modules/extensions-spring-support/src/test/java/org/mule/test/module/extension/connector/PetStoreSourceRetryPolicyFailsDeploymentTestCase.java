@@ -10,9 +10,11 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.connectionException;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.executor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -64,6 +66,10 @@ public class PetStoreSourceRetryPolicyFailsDeploymentTestCase extends AbstractEx
                          new Object[] {true, "petstore-connection-fail-deployment.xml",
                              "petstore-source-retry-policy-connection-exception.xml", 3});
   }
+
+  @Rule
+  public SystemProperty muleDisableAsyncRetryPolicyOnSourcesProperty =
+      new SystemProperty(DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES, "false");
 
   @Override
   protected String[] getConfigFiles() {
