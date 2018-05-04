@@ -16,7 +16,7 @@ import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 public class SchedulingMessageSourceFactoryBean extends AbstractComponentFactory<DefaultSchedulerMessageSource>
     implements MuleContextAware {
 
-  private static final long DEFAULT_FREQUENCY = 1000l;
+  private static final long DEFAULT_FREQUENCY = 60000l;
   protected PeriodicScheduler scheduler;
   private boolean disallowConcurrentExecution;
   private MuleContext muleContext;
