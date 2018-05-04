@@ -9,7 +9,11 @@ package org.mule.runtime.core.internal.util.store;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.internal.store.PartitionedInMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -88,5 +92,27 @@ public class PartitionedInMemoryObjectStoreTestCase extends AbstractMuleTestCase
     assertThat(store.retrieve(TEST_KEY3, TEST_PARTITION), equalTo(TEST_VALUE));
   }
 
+  @Test
+  public void removesDataOnClear() throws ObjectStoreException {
+    PartitionedInMemoryObjectStore os = spy(store);
+
+    os.store(TEST_KEY1, TEST_VALUE, TEST_PARTITION);
+    assertThat(os.contains(TEST_KEY1, TEST_PARTITION), is(true));
+
+    os.clear(TEST_PARTITION);
+    assertThat(os.retrieveAll(TEST_PARTITION).size(), is(0));
+  }
+
+  @Test
+  public void removesDataOnClose() throws ObjectStoreException {
+    PartitionedInMemoryObjectStore os = spy(store);
+
+    os.store(TEST_KEY1, TEST_VALUE, TEST_PARTITION);
+    assertThat(os.contains(TEST_KEY1, TEST_PARTITION), is(true));
+
+    os.close(TEST_PARTITION);
+    assertThat(store.allPartitions(), is(empty()));
+    verify(os, times(1)).disposePartition(TEST_PARTITION);
+  }
 
 }
