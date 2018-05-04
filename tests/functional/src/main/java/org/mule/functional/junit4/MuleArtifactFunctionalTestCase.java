@@ -9,7 +9,6 @@ package org.mule.functional.junit4;
 
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -18,9 +17,12 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import javax.inject.Inject;
+
+import org.junit.Rule;
 
 /**
  * Base class for mule functional test cases that run tests using class loading isolation. This class will set the default values
@@ -59,6 +61,12 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
 
   @Inject
   private EventContextService eventContextService;
+
+  /**
+   * Sets to disable initial state manager from MUnit as the plugin will be discovered and register to the ExtensionManager if declared in the pom.xml.
+   */
+  @Rule
+  public SystemProperty mUnitDisableInitialStateManagerProperty = new SystemProperty("munit.disable.initial.state.manager", "true");
 
   private CoreEvent _testEvent;
 
