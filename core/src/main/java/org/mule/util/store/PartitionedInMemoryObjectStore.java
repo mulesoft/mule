@@ -7,6 +7,10 @@
 package org.mule.util.store;
 
 import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
+import org.mule.api.store.ObjectAlreadyExistsException;
+import org.mule.api.store.ObjectDoesNotExistException;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.api.store.PartitionableExpirableObjectStore;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,11 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-
-import org.mule.api.store.ObjectAlreadyExistsException;
-import org.mule.api.store.ObjectDoesNotExistException;
-import org.mule.api.store.ObjectStoreException;
-import org.mule.api.store.PartitionableExpirableObjectStore;
 
 public class PartitionedInMemoryObjectStore<T extends Serializable> extends AbstractPartitionedObjectStore<T>
     implements PartitionableExpirableObjectStore<T>
@@ -103,6 +102,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
     public void clear(String partitionName) throws ObjectStoreException
     {
         this.getPartition(partitionName).clear();
+        this.getExpiryInfoPartition(partitionName).clear();
     }
 
     @Override
@@ -151,7 +151,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
     @Override
     public void close(String partitionName) throws ObjectStoreException
     {
-        // Nothing to do
+        disposePartition(partitionName);
     }
 
     @Override
