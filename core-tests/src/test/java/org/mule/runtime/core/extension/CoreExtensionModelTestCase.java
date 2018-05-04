@@ -36,6 +36,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSO
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
+import org.mule.metadata.api.annotation.DefaultValueAnnotation;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -108,10 +109,16 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(ffSchedulerType.getFields(), hasSize(3));
     assertThat(ffSchedulerType.getFieldByName("frequency").get().isRequired(), is(false));
     assertThat(ffSchedulerType.getFieldByName("frequency").get().getValue(), instanceOf(DefaultNumberType.class));
+    assertThat(ffSchedulerType.getFieldByName("frequency").get().getAnnotation(DefaultValueAnnotation.class).get().getValue(),
+               is("60000"));
     assertThat(ffSchedulerType.getFieldByName("startDelay").get().isRequired(), is(false));
     assertThat(ffSchedulerType.getFieldByName("startDelay").get().getValue(), instanceOf(DefaultNumberType.class));
+    assertThat(ffSchedulerType.getFieldByName("startDelay").get().getAnnotation(DefaultValueAnnotation.class).get().getValue(),
+               is("0"));
     assertThat(ffSchedulerType.getFieldByName("timeUnit").get().isRequired(), is(false));
     assertThat(ffSchedulerType.getFieldByName("timeUnit").get().getValue(), instanceOf(DefaultStringType.class));
+    assertThat(ffSchedulerType.getFieldByName("timeUnit").get().getAnnotation(DefaultValueAnnotation.class).get().getValue(),
+               is("MILLISECONDS"));
 
     final DefaultObjectType cronSchedulerType = (DefaultObjectType) iterator.next();
     assertThat(cronSchedulerType.getFields(), hasSize(2));
