@@ -29,8 +29,8 @@ public final class FixedFrequencyScheduler extends PeriodicScheduler implements 
   private TimeUnit timeUnit = MILLISECONDS;
 
   @Parameter
-  @Optional(defaultValue = "1000")
-  private long frequency = 1000l;
+  @Optional(defaultValue = "60000")
+  private long frequency = 60000l;
 
   @Parameter
   @Optional(defaultValue = "0")
