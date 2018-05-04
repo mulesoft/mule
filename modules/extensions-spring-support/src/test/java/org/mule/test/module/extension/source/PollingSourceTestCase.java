@@ -107,7 +107,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   private void assertAllPetsAdopted() {
-    check(5000, 100, () -> {
+    check(5000, 200, () -> {
       synchronized (ADOPTION_EVENTS) {
         return ADOPTION_EVENTS.size() >= ALL_PETS.size() &&
             ALL_PETS.containsAll(ADOPTION_EVENTS.stream()
