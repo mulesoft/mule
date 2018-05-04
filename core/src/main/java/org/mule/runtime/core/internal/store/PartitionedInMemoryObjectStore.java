@@ -99,6 +99,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
   @Override
   public void clear(String partitionName) throws ObjectStoreException {
     getPartition(partitionName).clear();
+    getExpiryInfoPartition(partitionName).clear();
   }
 
   @Override
@@ -137,7 +138,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
 
   @Override
   public void close(String partitionName) throws ObjectStoreException {
-    // Nothing to do
+    disposePartition(partitionName);
   }
 
   @Override
