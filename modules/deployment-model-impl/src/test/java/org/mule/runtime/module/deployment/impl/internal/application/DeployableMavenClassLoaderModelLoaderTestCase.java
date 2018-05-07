@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.util.Collections.emptyMap;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -18,6 +19,8 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
@@ -33,6 +36,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
 
   private static final String APPS_FOLDER = "apps";
   private static final String PATCHED_PLUGIN_APP = "patched-plugin-app";
+  private static final String PATCHED_JAR_APP_WHITESPACES = "patched jar app";
   private static final String PATCHED_JAR_APP = "patched-jar-app";
   private static final String PATCHED_JAR_AND_PLUGIN_APP = "patched-jar-and-plugin-app";
 
@@ -58,15 +62,24 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     testPatchedDependency(PATCHED_JAR_AND_PLUGIN_APP, 3, "mule-sockets-connector", "1.5.8");
   }
 
+  @Test
+  public void patchedApplicationWithWhitespaces() throws InvalidDescriptorLoaderException, MalformedURLException {
+    ClassLoaderModel classLoaderModel = buildClassLoaderModel(
+                                                              new File(FileUtils.toFile(getClass().getClassLoader()
+                                                                  .getResource(Paths.get(APPS_FOLDER).toString())),
+                                                                       PATCHED_JAR_APP_WHITESPACES));
+    assertThat(classLoaderModel.getUrls().length, is(2));
+    // It was not escaping the URL for rootArtifact
+    assertThat(classLoaderModel.getUrls()[0], equalTo(FileUtils
+        .toFile(getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER, PATCHED_JAR_APP_WHITESPACES).toString())).toURI()
+        .toURL()));
+  }
+
   private void testPatchedDependency(String application, int totalExpectedDependencies, String patchedArtifactId,
                                      String patchedArtifactVersion)
       throws InvalidDescriptorLoaderException {
-    DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader =
-        new DeployableMavenClassLoaderModelLoader(mockMavenClient, mockLocalRepository);
-
     URL patchedAppUrl = getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER, application).toString());
-    ClassLoaderModel classLoaderModel =
-        deployableMavenClassLoaderModelLoader.load(FileUtils.toFile(patchedAppUrl), emptyMap(), APP);
+    ClassLoaderModel classLoaderModel = buildClassLoaderModel(FileUtils.toFile(patchedAppUrl));
     Set<BundleDependency> dependencies = classLoaderModel.getDependencies();
     assertThat(dependencies, hasSize(totalExpectedDependencies));
     List<BundleDependency> connectorsFound = dependencies.stream()
@@ -74,6 +87,14 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
         .collect(Collectors.toList());
     assertThat(connectorsFound, hasSize(1));
     assertThat(connectorsFound.get(0).getDescriptor().getVersion(), is(patchedArtifactVersion));
+  }
+
+  private ClassLoaderModel buildClassLoaderModel(File rootApplication)
+      throws InvalidDescriptorLoaderException {
+    DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader =
+        new DeployableMavenClassLoaderModelLoader(mockMavenClient, mockLocalRepository);
+
+    return deployableMavenClassLoaderModelLoader.load(rootApplication, emptyMap(), APP);
   }
 
 }
