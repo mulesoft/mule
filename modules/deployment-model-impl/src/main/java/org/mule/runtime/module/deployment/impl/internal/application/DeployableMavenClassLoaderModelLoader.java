@@ -68,7 +68,7 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
   protected void addArtifactSpecificClassloaderConfiguration(File artifactFile, ClassLoaderModelBuilder classLoaderModelBuilder,
                                                              Set<BundleDependency> dependencies) {
     try {
-      classLoaderModelBuilder.containing(artifactFile.toURL());
+      classLoaderModelBuilder.containing(artifactFile.toURI().toURL());
       exportSharedLibrariesResourcesAndPackages(artifactFile, classLoaderModelBuilder, dependencies);
     } catch (MalformedURLException e) {
       throw new MuleRuntimeException(e);
