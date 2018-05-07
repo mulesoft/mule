@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -371,6 +372,23 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     regionClassLoader.addClassLoader(pluginClassLoader, NULL_CLASSLOADER_FILTER);
 
     assertThat(regionClassLoader.getArtifactPluginClassLoaders(), contains(pluginClassLoader));
+  }
+
+  @Test
+  public void getResourceUsingNotNormalizedPath() {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    createClassLoaders(parentClassLoader);
+    pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
+
+    when(lookupPolicy.getPackageLookupStrategy(PACKAGE_NAME)).thenReturn(CHILD_FIRST);
+
+    regionClassLoader.addClassLoader(pluginClassLoader,
+                                     new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), singleton(RESOURCE_NAME)));
+
+    URL resource = regionClassLoader.findResource("root/../dummy.txt");
+
+    assertThat(resource, notNullValue());
   }
 
   public static class TestApplicationClassLoader extends TestArtifactClassLoader {
