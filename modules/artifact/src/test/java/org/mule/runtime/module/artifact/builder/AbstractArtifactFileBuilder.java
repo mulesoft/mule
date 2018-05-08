@@ -191,7 +191,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
         buildBrokenJarFile(tempFile);
       } else {
         final List<ZipResource> zipResources = new LinkedList<>(resources);
-        zipResources.add(new ZipResource(getArtifactPomFile().getAbsolutePath(), getArtifactFileBundledPomPath()));
+        zipResources.add(new ZipResource(getArtifactPomFile().getAbsolutePath(), getArtifactFileBundledPomPartialUrl()));
         zipResources.addAll(getCustomResources());
         compress(tempFile, zipResources.toArray(new ZipResource[0]));
       }
