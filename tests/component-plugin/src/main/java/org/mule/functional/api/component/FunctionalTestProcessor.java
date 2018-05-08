@@ -259,7 +259,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
     CoreEvent replyMessage = CoreEvent.builder(event).message(replyBuilder.build()).build();
 
     if (isEnableNotifications()) {
-      notificationFirer.dispatch(builtEventReceivedNotification(message, replyMessage));
+      notificationFirer.dispatch(buildEventReceivedNotification(message, replyMessage));
     }
 
     // Time to wait before returning
@@ -274,7 +274,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
     return replyMessage;
   }
 
-  protected FunctionalTestNotification builtEventReceivedNotification(final Message message, CoreEvent replyMessage)
+  protected FunctionalTestNotification buildEventReceivedNotification(final Message message, CoreEvent replyMessage)
       throws TransformerException {
     return new FunctionalTestNotification(message, getLocation().getRootContainerName(), replyMessage, EVENT_RECEIVED);
   }
