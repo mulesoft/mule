@@ -70,7 +70,7 @@ public class DependencyResolver {
     this.resolutionContext = new AetherResolutionContext(mavenConfiguration);
     this.repositoryState =
         new AetherRepositoryState(this.resolutionContext.getLocalRepositoryLocation(), workspaceReader, false,
-                                  true, resolutionContext.getAuthenticatorSelector(), true);
+                                  false, resolutionContext.getAuthenticatorSelector(), true);
     if (logger.isDebugEnabled()) {
       resolutionContext.getAuthenticatorSelector()
           .ifPresent(selector -> logger.debug("Using authenticator selector: " + ReflectionToStringBuilder.toString(selector)));
