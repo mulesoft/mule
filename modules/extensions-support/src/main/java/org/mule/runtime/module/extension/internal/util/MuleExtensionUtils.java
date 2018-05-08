@@ -127,7 +127,10 @@ public class MuleExtensionUtils {
   }
 
   public static Map<String, Object> toMap(ResolverSet resolverSet, CoreEvent event) throws MuleException {
-    final ValueResolvingContext ctx = from(event);
+    return toMap(resolverSet, from(event));
+  }
+
+  public static Map<String, Object> toMap(ResolverSet resolverSet, ValueResolvingContext ctx) throws MuleException {
     ImmutableMap.Builder<String, Object> map = ImmutableMap.builder();
     for (Entry<String, ValueResolver<?>> entry : resolverSet.getResolvers().entrySet()) {
       Object value = entry.getValue().resolve(ctx);

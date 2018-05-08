@@ -10,10 +10,15 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MediaType;
@@ -30,9 +35,13 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
 
+import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -189,8 +198,10 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     validateNotifications(contextAdapter);
     MessageProcessContext messageProcessContext = processContextSupplier.get();
 
+    MediaType mediaType = resolveMediaType(result, messageSource.getInitialisationParameters());
+
     SourceResultAdapter resultAdapter =
-        new SourceResultAdapter(result, cursorProviderFactory, defaultMediaType, returnsListOfMessages,
+        new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
                                 context.getCorrelationId());
     Message message = of(resultAdapter);
 
@@ -214,6 +225,36 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
                                                                              completionHandlerFactory
                                                                                  .createCompletionHandler(contextAdapter)),
                                             messageProcessContext);
+  }
+
+  protected MediaType resolveMediaType(Object value, Map<String, Object> initialisationParameters) {
+    Charset existingEncoding = getDefaultEncoding(muleContext);
+    MediaType mediaType = defaultMediaType;
+    if (value instanceof Result) {
+      final Optional<MediaType> optionalMediaType = ((Result) value).getMediaType();
+      if (optionalMediaType.isPresent()) {
+        mediaType = optionalMediaType.get();
+        if (mediaType.getCharset().isPresent()) {
+          existingEncoding = mediaType.getCharset().get();
+        }
+      }
+    }
+
+    if (mediaType == null) {
+      mediaType = ANY;
+    }
+
+    if (initialisationParameters.get(MIME_TYPE_PARAMETER_NAME) != null) {
+      mediaType = MediaType.parse((String) initialisationParameters.get(MIME_TYPE_PARAMETER_NAME));
+    }
+
+    if (initialisationParameters.get(ENCODING_PARAMETER_NAME) != null) {
+      mediaType = mediaType.withCharset(parseCharset((String) initialisationParameters.get(ENCODING_PARAMETER_NAME)));
+    } else {
+      mediaType = mediaType.withCharset(existingEncoding);
+    }
+
+    return mediaType;
   }
 
   /**
