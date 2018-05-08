@@ -40,6 +40,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.transformer.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -258,9 +259,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
     CoreEvent replyMessage = CoreEvent.builder(event).message(replyBuilder.build()).build();
 
     if (isEnableNotifications()) {
-      notificationFirer
-          .dispatch(new FunctionalTestNotification(message, getLocation().getRootContainerName(), replyMessage,
-                                                   EVENT_RECEIVED));
+      notificationFirer.dispatch(builtEventReceivedNotification(message, replyMessage));
     }
 
     // Time to wait before returning
@@ -273,6 +272,11 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
       }
     }
     return replyMessage;
+  }
+
+  protected FunctionalTestNotification builtEventReceivedNotification(final Message message, CoreEvent replyMessage)
+      throws TransformerException {
+    return new FunctionalTestNotification(message, getLocation().getRootContainerName(), replyMessage, EVENT_RECEIVED);
   }
 
   /**
