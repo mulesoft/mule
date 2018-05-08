@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
     <name>Spring Config</name>
     <description>
-        Mule Builder for use with Spring 2.X Namespace based XML configuration.
+        Mule Builder for use with Spring 4.3.x Namespace based XML configuration.
     </description>
     
     <properties>

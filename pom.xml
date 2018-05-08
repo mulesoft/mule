@@ -214,7 +214,7 @@
         <saxonVersion>9.7.0-15</saxonVersion>
         <slf4jVersion>1.7.25</slf4jVersion>
         <snakeYamlVersion>1.18</snakeYamlVersion>
-        <springVersion>4.1.9.RELEASE</springVersion>
+        <springVersion>4.3.17.RELEASE</springVersion>
         <sshCoreVersion>1.4.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <testFtpServerVersion>1.0.6</testFtpServerVersion>
@@ -268,7 +268,7 @@
         <mavenCompilerVersion>3.7.0</mavenCompilerVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
-        <maven.surefire.plugin.version>2.20.1</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>2.21.0</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
         <mule.module.maven.plugin.version>1.2.0-SNAPSHOT</mule.module.maven.plugin.version>
