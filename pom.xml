@@ -168,7 +168,7 @@
         <commonsLangVersion>2.6</commonsLangVersion>
         <commonsLang3Version>3.6</commonsLang3Version>
         <commonsNetVersion>3.5</commonsNetVersion>
-        <cxfVersion>2.7.19-MULE-SPRING-3-002</cxfVersion>
+        <cxfVersion>2.7.19-MULE-007</cxfVersion>
         <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>2.1.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
@@ -200,13 +200,13 @@
         <jodaTimeVersion>2.9.7</jodaTimeVersion>
         <jschVersion>0.1.54</jschVersion>
         <jsonSchemaValidatorVersion>2.2.8</jsonSchemaValidatorVersion>
-        <junitVersion>4.12</junitVersion>
+        <junitVersion>4.13-SNAPSHOT</junitVersion>
         <jythonVersion>2.7.1</jythonVersion>
         <jrubyVersion>9.2.7.0</jrubyVersion>
         <log4jVersion>2.8.2</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <maven.buildnumber.plugin.version>1.1</maven.buildnumber.plugin.version>
-        <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>2.21.0</maven.surefire.plugin.version>
         <mockitoVersion>1.10.19</mockitoVersion>
         <muleExtensionsApiVersion>1.0.0-alpha-1</muleExtensionsApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
@@ -226,11 +226,8 @@
         <saxonVersion>9.6.0-10</saxonVersion>
         <slf4jVersion>1.7.24</slf4jVersion>
         <smackVersion>3.4.1</smackVersion>
-        <springOsgiVersion>1.0.2</springOsgiVersion>
-        <springVersion>4.1.9.RELEASE</springVersion>
-        <springForkVersion>4.1.9.RELEASE-MULE-001</springForkVersion>
-        <springMessagingVersion>4.3.17.RELEASE</springMessagingVersion>
-        <springSecurityVersion>4.2.12.RELEASE</springSecurityVersion>
+        <springVersion>4.3.25.RELEASE</springVersion>
+        <springSecurityVersion>4.2.13.RELEASE</springSecurityVersion>
         <springLdapVersion>2.3.2.RELEASE</springLdapVersion>
         <sshCoreVersion>1.4.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
@@ -337,9 +334,9 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.mule.springframework</groupId>
+                <groupId>org.springframework</groupId>
                 <artifactId>spring-jms</artifactId>
-                <version>${springForkVersion}</version>
+                <version>${springVersion}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>aopalliance</groupId>
@@ -366,7 +363,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-messaging</artifactId>
-                <version>${springMessagingVersion}</version>
+                <version>${springVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>

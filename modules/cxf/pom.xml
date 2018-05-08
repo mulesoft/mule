@@ -696,14 +696,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!--  We should reenable this as it makes CXF faster
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm.osgi</artifactId>
-            <version>${asmVersion}</version>
-        </dependency>
-         -->
-
         <dependency>
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>

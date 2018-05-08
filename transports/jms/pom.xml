@@ -49,7 +49,7 @@
             <artifactId>geronimo-jms_1.1_spec</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mule.springframework</groupId>
+            <groupId>org.springframework</groupId>
             <artifactId>spring-jms</artifactId>
         </dependency>
 
