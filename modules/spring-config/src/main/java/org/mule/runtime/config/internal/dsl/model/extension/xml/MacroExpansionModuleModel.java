@@ -211,6 +211,8 @@ public class MacroExpansionModuleModel {
           Map<String, String> propertiesMap = extractParameters(configRefModel,
                                                                 configurationModel
                                                                     .getAllParameterModels());
+          Map<String, String> connectionPropertiesMap = extractConnectionProperties(configRefModel, configurationModel);
+          propertiesMap.putAll(connectionPropertiesMap);
           final Map<String, String> literalsParameters = getLiteralParameters(propertiesMap, emptyMap());
           List<ComponentModel> replacementGlobalElements =
               createGlobalElementsInstance(configRefModel, moduleComponentModels, moduleGlobalElementsNames, literalsParameters);
