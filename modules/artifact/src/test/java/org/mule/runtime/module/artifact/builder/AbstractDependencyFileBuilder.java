@@ -253,8 +253,8 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
   /**
    * @return the path within the artifact file where the pom file is bundled
    */
-  public String getArtifactFileBundledPomPath() {
-    return Paths.get("META-INF", "maven", getGroupId(), getArtifactId(), "pom.xml").toString();
+  public String getArtifactFileBundledPomPartialUrl() {
+    return "META-INF/maven/" + getGroupId() + "/" + getArtifactId() + "/pom.xml";
   }
 
   /**
