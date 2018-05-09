@@ -78,7 +78,7 @@ public abstract class AbstractOSController {
       throws MuleControllerException {
     CommandLine commandLine = new CommandLine(muleBin);
     commandLine.addArgument(command);
-    commandLine.addArguments(args);
+    commandLine.addArguments(args, false);
     DefaultExecutor executor = new DefaultExecutor();
     ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
     executor.setWatchdog(watchdog);
