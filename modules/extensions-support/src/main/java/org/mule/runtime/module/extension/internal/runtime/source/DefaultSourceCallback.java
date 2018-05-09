@@ -244,12 +244,14 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       mediaType = ANY;
     }
 
-    if (initialisationParameters.get(MIME_TYPE_PARAMETER_NAME) != null) {
-      mediaType = MediaType.parse((String) initialisationParameters.get(MIME_TYPE_PARAMETER_NAME));
+    Object mimeType = initialisationParameters.get(MIME_TYPE_PARAMETER_NAME);
+    if (mimeType != null) {
+      mediaType = MediaType.parse((String) mimeType);
     }
 
-    if (initialisationParameters.get(ENCODING_PARAMETER_NAME) != null) {
-      mediaType = mediaType.withCharset(parseCharset((String) initialisationParameters.get(ENCODING_PARAMETER_NAME)));
+    Object encoding = initialisationParameters.get(ENCODING_PARAMETER_NAME);
+    if (encoding != null) {
+      mediaType = mediaType.withCharset(parseCharset((String) encoding));
     } else {
       mediaType = mediaType.withCharset(existingEncoding);
     }
