@@ -66,7 +66,8 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
    * Sets to disable initial state manager from MUnit as the plugin will be discovered and register to the ExtensionManager if declared in the pom.xml.
    */
   @Rule
-  public SystemProperty mUnitDisableInitialStateManagerProperty = new SystemProperty("munit.disable.initial.state.manager", "true");
+  public SystemProperty mUnitDisableInitialStateManagerProperty =
+      new SystemProperty("munit.disable.initial.state.manager", "true");
 
   private CoreEvent _testEvent;
 
