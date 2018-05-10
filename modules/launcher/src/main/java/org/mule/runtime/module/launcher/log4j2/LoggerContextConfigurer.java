@@ -7,13 +7,16 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.util.zip.Deflater.NO_COMPRESSION;
-import static org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy.createStrategy;
-import static org.apache.logging.log4j.core.appender.rolling.TimeBasedTriggeringPolicy.createPolicy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_CONSOLE_LOG;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_DEFAULT_POLICY_INTERVAL;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_DEFAULT_STRATEGY_MAX;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_DEFAULT_STRATEGY_MIN;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.CORRELATION_ID_MDC_KEY;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleBase;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
@@ -34,8 +37,8 @@ import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.appender.RandomAccessFileAppender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
-import org.apache.logging.log4j.core.appender.rolling.RolloverStrategy;
-import org.apache.logging.log4j.core.appender.rolling.TriggeringPolicy;
+import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
+import org.apache.logging.log4j.core.appender.rolling.TimeBasedTriggeringPolicy;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.ConfigurationListener;
@@ -166,9 +169,10 @@ final class LoggerContextConfigurer {
   }
 
   private void forceConsoleAppender(MuleLoggerContext context) {
-    Appender appender = ConsoleAppender.createAppender(createLayout(context.getConfiguration()), null, null,
-                                                       FORCED_CONSOLE_APPENDER_NAME, null, null);
-    doAddAppender(context, appender);
+    doAddAppender(context, ConsoleAppender.newBuilder()
+        .withLayout(createLayout(context.getConfiguration()))
+        .withName(FORCED_CONSOLE_APPENDER_NAME)
+        .build());
   }
 
   private void doAddAppender(LoggerContext context, Appender appender) {
@@ -179,17 +183,34 @@ final class LoggerContextConfigurer {
 
   private RollingFileAppender createRollingFileAppender(String logFilePath, String filePattern, String appenderName,
                                                         Configuration configuration) {
-    TriggeringPolicy triggeringPolicy = createPolicy("1", "true");
-    RolloverStrategy rolloverStrategy =
-        createStrategy("30", "1", null, String.valueOf(NO_COMPRESSION), null, true, configuration);
-
-    return RollingFileAppender.createAppender(logFilePath, logFilePath + filePattern, "true", appenderName, "true", null, null,
-                                              triggeringPolicy, rolloverStrategy, createLayout(configuration), null, null, null,
-                                              null, configuration);
+    return RollingFileAppender.newBuilder()
+        .withFileName(logFilePath)
+        .withFilePattern(logFilePath + filePattern)
+        .withAppend(true)
+        .withName(appenderName).withBufferedIo(true)
+        .withPolicy(TimeBasedTriggeringPolicy.newBuilder()
+            .withInterval(getInteger(MULE_LOG_DEFAULT_POLICY_INTERVAL, 1))
+            .withModulate(true)
+            .build())
+        .withStrategy(DefaultRolloverStrategy.newBuilder()
+            .withMax(getProperty(MULE_LOG_DEFAULT_STRATEGY_MAX, "30"))
+            .withMin(getProperty(MULE_LOG_DEFAULT_STRATEGY_MIN, "1"))
+            .withCompressionLevelStr(String.valueOf(NO_COMPRESSION))
+            .withStopCustomActionsOnError(true)
+            .withConfig(configuration)
+            .build())
+        .withLayout(createLayout(configuration))
+        .setConfiguration(configuration)
+        .build();
   }
 
   private Layout<? extends Serializable> createLayout(Configuration configuration) {
-    return PatternLayout.createLayout(PATTERN_LAYOUT, null, configuration, null, null, true, false, null, null);
+    return PatternLayout.newBuilder()
+        .withPattern(PATTERN_LAYOUT)
+        .withConfiguration(configuration)
+        .withAlwaysWriteExceptions(true)
+        .withNoConsoleNoAnsi(false)
+        .build();
   }
 
 

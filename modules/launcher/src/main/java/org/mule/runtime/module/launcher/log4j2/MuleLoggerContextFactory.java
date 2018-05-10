@@ -6,34 +6,35 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.lang.System.getProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.LOGGER;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleBase;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DirectoryResourceLocator;
 import org.mule.runtime.module.artifact.api.classloader.LocalResourceLocator;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 
+import org.apache.logging.log4j.core.LoggerContext;
+
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.apache.logging.log4j.core.LoggerContext;
-
 /**
  * Encapsulates the logic to get the proper log configuration.
- * 
+ *
  * @since 3.8.0
  */
 public class MuleLoggerContextFactory {
 
   /**
    * Builds a new {@link LoggerContext} for the given {@code classLoader} and {@code selector}
-   * 
+   *
    * @param classLoader the classloader of the artifact this logger context is for.
    * @param selector the selector to bew used when building the loggers for the new context.
    * @return
@@ -110,33 +111,46 @@ public class MuleLoggerContextFactory {
   /**
    * Checks if there's an app-specific logging configuration available, scope the lookup to this classloader only, as
    * getResource() will delegate to parents locate xml config first, fallback to properties format if not found
-   * 
+   *
    * @param localResourceLocator
    * @return
    */
   private URI getLogConfig(LocalResourceLocator localResourceLocator) {
-    URL appLogConfig = localResourceLocator.findLocalResource("log4j2-test.xml");
+    URI appLogConfig = null;
 
     if (appLogConfig == null) {
-      appLogConfig = localResourceLocator.findLocalResource("log4j2.xml");
-    }
-
-    if (appLogConfig == null) {
-      File defaultConfigFile = new File(getMuleBase(), "conf");
-      defaultConfigFile = new File(defaultConfigFile, "log4j2.xml");
-
-      try {
-        appLogConfig = defaultConfigFile.toURI().toURL();
-      } catch (MalformedURLException e) {
-        throw new MuleRuntimeException(createStaticMessage("Could not locate log config in MULE_HOME"), e);
+      URL localResource = localResourceLocator.findLocalResource("log4j2-test.xml");
+      if (localResource != null) {
+        try {
+          appLogConfig = localResource.toURI();
+        } catch (URISyntaxException e) {
+          throw new MuleRuntimeException(createStaticMessage("Could not read log file " + appLogConfig), e);
+        }
       }
     }
 
-    try {
-      return appLogConfig.toURI();
-    } catch (URISyntaxException e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not read log file " + appLogConfig), e);
+    URI fallbackLogConfig = new File(getMuleBase(), "conf/log4j2.xml").toURI();
+
+    if (appLogConfig == null) {
+      URL localResource = localResourceLocator.findLocalResource("log4j2.xml");
+      try {
+        if (localResource != null && !fallbackLogConfig.equals(localResource.toURI())) {
+          appLogConfig = localResource.toURI();
+        }
+      } catch (URISyntaxException e) {
+        throw new MuleRuntimeException(createStaticMessage("Could not read log file " + appLogConfig), e);
+      }
     }
+
+    if (appLogConfig == null) {
+      if (getProperty("log4j.configurationFile") != null) {
+        appLogConfig = new File(getProperty("log4j.configurationFile")).toURI();
+      } else {
+        appLogConfig = fallbackLogConfig;
+      }
+    }
+
+    return appLogConfig;
   }
 
   private class NewContextParameters {

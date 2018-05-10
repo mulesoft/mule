@@ -88,15 +88,7 @@ final class LoggerContextCache implements Disposable {
   }
 
   private void acquireContextDisposeDelay() {
-    try {
-      disposeDelayInMillis = Long.valueOf(System.getProperty(MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS));
-    } catch (Exception e) {
-      // value not set... ignore and use default
-    }
-
-    if (disposeDelayInMillis == null) {
-      disposeDelayInMillis = DEFAULT_DISPOSE_DELAY_IN_MILLIS;
-    }
+    disposeDelayInMillis = Long.getLong(MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS, DEFAULT_DISPOSE_DELAY_IN_MILLIS);
   }
 
   LoggerContext getLoggerContext(final ClassLoader classLoader) {

@@ -39,8 +39,8 @@ import java.util.concurrent.ExecutionException;
  * This component also overrides log4j2's default algorithm for locating configuration files, although it does it in a way
  * consistent with the replaced behavior:
  * <ul>
- * <li>A file called log4j2-test.xml is fetched from the corresponding search path</li>
- * <li>If log4j2-test.xml is not found, then log4j2.xml is attempted</li>
+ * <li>A file called {@code log4j2-test.xml} is fetched from the corresponding search path</li>
+ * <li>If {@code log4j2-test.xml} is not found, then {@code log4j2.xml} is attempted</li>
  * <li>If not found, a default configuration consisting of a single rolling file appender is used</li>
  * <li>The search path is derived from the artifact for which a logging context is being requested, following a child first
  * strategy (artifact - domain - container). Each artifact starts looking in the phase that makes sense for it</li>
@@ -50,7 +50,7 @@ import java.util.concurrent.ExecutionException;
  * undeployed, preventing memory leaks.
  * <p/>
  * If mule is running in embedded mode, then all of this logic described above is discarded and it simply logs to a file called
- * mule-main.log
+ * {@code mule-main.log}.
  *
  * @since 3.6.0
  */
