@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextReaperThreadFactory.THREAD_NAME;
+import static org.mule.runtime.module.launcher.log4j2.MuleLoggerContextFactory.LOG4J_CONFIGURATION_FILE_PROPERTY;
 import static org.mule.tck.MuleTestUtils.getRunningThreadByName;
 
 import org.mule.runtime.api.util.Reference;
@@ -42,11 +43,6 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.size.SmallTest;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-
 import org.apache.logging.log4j.core.LifeCycle;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.junit.Before;
@@ -57,6 +53,11 @@ import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -71,6 +72,9 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
 
   @Rule
   public SystemProperty disposeDelay = new SystemProperty(MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS, "200");
+
+  @Rule
+  public SystemProperty log4jConfigurationFile = new SystemProperty("log4j.configurationFile", null);
 
   private ArtifactAwareContextSelector selector;
 
@@ -129,6 +133,15 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
     LoggerContext ctx = selector.getContext("", regionClassLoader, true);
     assertThat(ctx, instanceOf(MuleLoggerContext.class));
     assertConfigurationLocation(ctx);
+  }
+
+  @Test
+  public void defaultToLog4jSysPropWhenNoConfigFound() {
+    System.setProperty(LOG4J_CONFIGURATION_FILE_PROPERTY, "/customLocation/myLogConfig.xml");
+    when(regionClassLoader.findLocalResource(anyString())).thenReturn(null);
+    File expected = new File("/customLocation/myLogConfig.xml");
+    LoggerContext ctx = selector.getContext("", regionClassLoader, true);
+    assertThat(ctx.getConfigLocation(), equalTo(expected.toURI()));
   }
 
   @Test
