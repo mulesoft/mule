@@ -14,15 +14,22 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.tck.probe.PollingProber.check;
 
+import org.junit.Before;
 import org.mule.functional.api.flow.FlowRunner;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -31,6 +38,8 @@ import org.junit.Test;
 public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static Charset customEncoding;
+  private static final long PROBER_TIMEOUT = 15000;
+  private static final long PROBER_FREQUENCY = 1000;
 
   @Rule
   public SystemProperty customEncodingProperty = new SystemProperty("customEncoding", customEncoding.name());
@@ -48,6 +57,11 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
   @BeforeClass
   public static void before() throws Exception {
     customEncoding = defaultCharset().name().equals(UTF_8) ? ISO_8859_1 : UTF_8;
+  }
+
+  @Before
+  public void clearMediaTypes() {
+    MediaTypeCollectorProcessor.clearMediaTypes();
   }
 
   @Test
@@ -102,6 +116,23 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
   }
 
   @Test
+  public void sourceOverridesContentType() throws Exception {
+    ((Startable) getFlowConstruct("sourceMimeType")).start();
+    check(PROBER_TIMEOUT, PROBER_FREQUENCY, () -> {
+      if (MediaTypeCollectorProcessor.getMediaTypes().size() == 2) {
+        return true;
+      }
+      return false;
+    });
+    assertThat(MediaTypeCollectorProcessor.getMediaTypes().get(0).getCharset().get().displayName(), is("UTF-16"));
+    assertThat(MediaTypeCollectorProcessor.getMediaTypes().get(0).getPrimaryType(), is("pet"));
+    assertThat(MediaTypeCollectorProcessor.getMediaTypes().get(0).getSubType(), is("plain"));
+    assertThat(MediaTypeCollectorProcessor.getMediaTypes().get(0).getParameter("header"), is("false"));
+    assertThat(MediaTypeCollectorProcessor.getMediaTypes().get(1).getPrimaryType(), is("dead"));
+    assertThat(MediaTypeCollectorProcessor.getMediaTypes().get(1).getSubType(), is("json"));
+  }
+
+  @Test
   public void strictMimeType() throws Exception {
     CoreEvent response = runFlow("strictMimeType");
     assertThat(response.getMessage().getPayload().getDataType().getMediaType().matches(TEXT), is(true));
@@ -128,5 +159,24 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
   private DataType getDefaultDataType() {
     FlowRunner runner = flowRunner("defaultContentType").withPayload("");
     return runner.buildEvent().getMessage().getPayload().getDataType();
+  }
+
+  private static class MediaTypeCollectorProcessor implements Processor {
+
+    private static List<MediaType> MEDIA_TYPES = new LinkedList<>();
+
+    public static List<MediaType> getMediaTypes() {
+      return MEDIA_TYPES;
+    }
+
+    public static void clearMediaTypes() {
+      MEDIA_TYPES = new LinkedList<>();
+    }
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      MEDIA_TYPES.add(event.getMessage().getPayload().getDataType().getMediaType());
+      return event;
+    }
   }
 }

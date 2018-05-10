@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd
                http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
     <heisenberg:config name="heisenberg"
@@ -32,11 +34,11 @@
     </flow>
 
     <flow name="setsContentTypeOnXml">
-        <heisenberg:say-my-name config-ref="heisenberg"  outputMimeType="text/plain"/>
+        <heisenberg:say-my-name config-ref="heisenberg" outputMimeType="text/plain"/>
     </flow>
 
     <flow name="onlySetEncodingOnXml">
-        <heisenberg:name-as-stream config-ref="heisenberg" outputEncoding="${customEncoding}" />
+        <heisenberg:name-as-stream config-ref="heisenberg" outputEncoding="${customEncoding}"/>
     </flow>
 
     <flow name="onlySetMimeTypeOnXml">
@@ -48,11 +50,19 @@
     </flow>
 
     <flow name="setEncodingInMimeTypeAndParam">
-        <heisenberg:name-as-stream config-ref="heisenberg" outputMimeType="application/json; charset=UTF-8" outputEncoding="UTF-16"/>
+        <heisenberg:name-as-stream config-ref="heisenberg" outputMimeType="application/json; charset=UTF-8"
+                                   outputEncoding="UTF-16"/>
     </flow>
 
     <flow name="strictMimeType">
-        <heisenberg:kill victim="Gus" goodbyeMessage="ding ding" />
+        <heisenberg:kill victim="Gus" goodbyeMessage="ding ding"/>
+    </flow>
+
+    <flow name="sourceMimeType" initialState="stopped">
+        <petstore:pet-source-stream birds="Primate" outputMimeType="pet/plain; header=false" outputEncoding="UTF-16"/>
+        <custom-processor class="org.mule.test.module.extension.ContentTypeHandlingTestCase$MediaTypeCollectorProcessor"/>
+        <heisenberg:say-my-name config-ref="heisenberg" outputMimeType="dead/json"/>
+        <custom-processor class="org.mule.test.module.extension.ContentTypeHandlingTestCase$MediaTypeCollectorProcessor"/>
     </flow>
 
 </mule>

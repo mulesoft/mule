@@ -25,7 +25,8 @@ import java.util.List;
     TransactionalPetStoreConnectionProvider.class, PooledPetStoreConnectionProviderWithFailureInvalidConnection.class,
     PooledPetStoreConnectionProviderWithValidConnection.class})
 @ErrorTypes(PetstoreErrorTypeDefinition.class)
-@Sources({PetStoreSource.class, FailingPetStoreSource.class, SentientSource.class, PetAdoptionSource.class})
+@Sources({PetStoreSource.class, FailingPetStoreSource.class, SentientSource.class, PetAdoptionSource.class,
+    PetStoreStreamSource.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/petstore", prefix = "petstore")
 public class PetStoreConnector {
 

@@ -24,7 +24,7 @@ public class SourceResultAdapter {
   private final Result<?, ?> result;
   private final CursorProviderFactory cursorProviderFactory;
   private final boolean isCollection;
-  private final MediaType defaultMediaType;
+  private final MediaType mediaType;
   private final Optional<String> correlationId;
 
   /**
@@ -32,18 +32,18 @@ public class SourceResultAdapter {
    *
    * @param result                the source result
    * @param cursorProviderFactory the {@link CursorStreamProviderFactory} used by the source
-   * @param defaultMediaType      the {@link MediaType} to set in the message if the {@code result} doesn't specify any
+   * @param mediaType             the {@link MediaType} to set in the message
    * @param isCollection          whether the {@code result} represents a {@link List} of messages.
    * @param correlationId         the correlationId of the message to be set
    */
   public SourceResultAdapter(Result<?, ?> result,
                              CursorProviderFactory cursorProviderFactory,
-                             MediaType defaultMediaType,
+                             MediaType mediaType,
                              boolean isCollection,
                              Optional<String> correlationId) {
     this.result = result;
     this.cursorProviderFactory = cursorProviderFactory;
-    this.defaultMediaType = defaultMediaType;
+    this.mediaType = mediaType;
     this.isCollection = isCollection;
     this.correlationId = correlationId;
   }
@@ -78,6 +78,6 @@ public class SourceResultAdapter {
   }
 
   public MediaType getMediaType() {
-    return result.getMediaType().orElse(defaultMediaType);
+    return mediaType;
   }
 }

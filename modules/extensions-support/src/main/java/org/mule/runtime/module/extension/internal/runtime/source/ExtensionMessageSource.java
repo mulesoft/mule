@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -69,6 +70,7 @@ import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHan
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
@@ -551,7 +553,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getInitialiserEvent();
-      return copyOf(toMap(sourceAdapterFactory.getSourceParameters(), initialiserEvent));
+
+      return copyOf(toMap(sourceAdapterFactory.getSourceParameters(), from(initialiserEvent, this.getConfigurationInstance())));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not resolve parameters message source at location '%s'",
                                                                 getLocation().toString()),
