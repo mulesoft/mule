@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextReaperThreadFactory.THREAD_NAME;
+import static org.mule.runtime.module.launcher.log4j2.MuleLoggerContextFactory.LOG4J_CONFIGURATION_FILE_PROPERTY;
 import static org.mule.tck.MuleTestUtils.getRunningThreadByName;
 
 import org.mule.runtime.api.util.Reference;
@@ -136,7 +137,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void defaultToLog4jSysPropWhenNoConfigFound() {
-    System.setProperty("log4j.configurationFile", "/customLocation/myLogConfig.xml");
+    System.setProperty(LOG4J_CONFIGURATION_FILE_PROPERTY, "/customLocation/myLogConfig.xml");
     when(regionClassLoader.findLocalResource(anyString())).thenReturn(null);
     File expected = new File("/customLocation/myLogConfig.xml");
     LoggerContext ctx = selector.getContext("", regionClassLoader, true);

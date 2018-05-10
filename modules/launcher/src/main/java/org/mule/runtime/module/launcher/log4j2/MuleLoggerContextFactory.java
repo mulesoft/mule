@@ -32,6 +32,8 @@ import java.net.URL;
  */
 public class MuleLoggerContextFactory {
 
+  static final String LOG4J_CONFIGURATION_FILE_PROPERTY = "log4j.configurationFile";
+
   /**
    * Builds a new {@link LoggerContext} for the given {@code classLoader} and {@code selector}
    *
@@ -143,8 +145,8 @@ public class MuleLoggerContextFactory {
     }
 
     if (appLogConfig == null) {
-      if (getProperty("log4j.configurationFile") != null) {
-        appLogConfig = new File(getProperty("log4j.configurationFile")).toURI();
+      if (getProperty(LOG4J_CONFIGURATION_FILE_PROPERTY) != null) {
+        appLogConfig = new File(getProperty(LOG4J_CONFIGURATION_FILE_PROPERTY)).toURI();
       } else {
         appLogConfig = fallbackLogConfig;
       }
