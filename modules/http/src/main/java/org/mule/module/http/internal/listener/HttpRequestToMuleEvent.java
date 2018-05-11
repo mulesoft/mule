@@ -56,8 +56,12 @@ public class HttpRequestToMuleEvent
     public static final BackwardsCompatibilityPropertyChecker
       IGNORE_CORRELATION_ID = new BackwardsCompatibilityPropertyChecker(COMPATIBILITY_IGNORE_CORRELATION_ID);
 
-    private static final boolean ignoreCorrelationId = IGNORE_CORRELATION_ID.isEnabled();
+    private static boolean ignoreCorrelationId = IGNORE_CORRELATION_ID.isEnabled();
 
+    public static void resetIgnoreCorrelationId() {
+        ignoreCorrelationId = IGNORE_CORRELATION_ID.isEnabled();
+    }
+    
     public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext, final FlowConstruct flowConstruct, Boolean parseRequest, ListenerPath listenerPath) throws HttpRequestParsingException
     {
         final HttpRequest request = requestContext.getRequest();
