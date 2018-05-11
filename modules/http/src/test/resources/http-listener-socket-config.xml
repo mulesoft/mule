@@ -10,14 +10,19 @@
 
     <tcp:server-socket-properties name="globalTcpProperties" keepAlive="true" receiveBacklog="1024"
                                   receiveBufferSize="1024" reuseAddress="true" sendBufferSize="1024"
-                                  sendTcpNoDelay="true" serverTimeout="1000" linger="1000" />
+                                  sendTcpNoDelay="true" serverTimeout="${serverTimeout}" linger="1000" />
 
-    <http:listener-config name="globalConfig" host="localhost" port="${port1}" />
+    <http:listener-config name="globalConfig" host="localhost" port="${port1}" usePersistentConnections="false"/>
+    <http:listener-config name="timeoutConfig" host="localhost" port="${port2}" connectionIdleTimeout="${connectionTimeout}"/>
 
     <flow name="globalConfigFlow">
         <http:listener config-ref="globalConfig" path="/global"/>
         <echo-component />
     </flow>
 
+    <flow name="timeoutConfigFlow">
+        <http:listener config-ref="timeoutConfig" path="/timeout"/>
+        <echo-component />
+    </flow>
 
 </mule>
