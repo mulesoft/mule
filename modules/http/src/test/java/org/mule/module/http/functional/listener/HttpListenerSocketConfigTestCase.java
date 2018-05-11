@@ -7,23 +7,40 @@
 package org.mule.module.http.functional.listener;
 
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static java.lang.String.valueOf;
+import static java.lang.Thread.sleep;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
-import org.apache.http.entity.StringEntity;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.Socket;
+
 import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpListenerSocketConfigTestCase extends FunctionalTestCase
 {
+    private static int SERVER_TIMEOUT_MILLIS = 500;
+    private static int CONNECTION_TIMEOUT_MILLIS = 2000;
 
     @Rule
     public DynamicPort listenPort1 = new DynamicPort("port1");
-
+    @Rule
+    public DynamicPort listenPort2 = new DynamicPort("port2");
+    @Rule
+    public SystemProperty serverTimeout = new SystemProperty("serverTimeout", valueOf(SERVER_TIMEOUT_MILLIS));
+    @Rule
+    public SystemProperty connectionTimeout = new SystemProperty("connectionTimeout", valueOf(CONNECTION_TIMEOUT_MILLIS));
 
     @Override
     protected String getConfigFile()
@@ -32,18 +49,58 @@ public class HttpListenerSocketConfigTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void globalServerSocketProperties() throws Exception
+    public void serverTimeoutsTcpConnection() throws Exception
     {
-        // For now, just test that the context is parsed correctly.
-        assertResponse(listenPort1.getNumber(), "global");
+        Socket socket = new Socket("localhost", listenPort1.getNumber());
+        sleep(SERVER_TIMEOUT_MILLIS * 2);
+        sendRequest(socket, "global");
+        assertThat(getResponse(socket), is(nullValue()));
     }
 
-    private void assertResponse(int port, String path) throws Exception
+    @Test
+    public void keepAlivePreventsServerTimeout() throws Exception
     {
-        final String url = String.format("http://localhost:%s/%s", port, path);
-        final Response response = Request.Post(url).body(new StringEntity(TEST_MESSAGE)).connectTimeout(1000).execute();
-        assertThat(response.returnContent().asString(), equalTo(TEST_MESSAGE));
+        Socket socket = new Socket("localhost", listenPort2.getNumber());
+        sendRequest(socket, "timeout");
+        assertThat(getResponse(socket), is(notNullValue()));
+        sleep(SERVER_TIMEOUT_MILLIS * 2);
+        sendRequest(socket, "timeout");
+        assertThat(getResponse(socket), is(notNullValue()));
+        sleep(CONNECTION_TIMEOUT_MILLIS + SERVER_TIMEOUT_MILLIS * 2);
+        sendRequest(socket, "timeout");
+        assertThat(getResponse(socket), is(nullValue()));
+    }
 
+    private void sendRequest(Socket socket, final String path) throws IOException
+    {
+        PrintWriter writer = new PrintWriter(socket.getOutputStream());
+        writer.println("GET /" + path + " HTTP/1.1");
+        writer.println("Host: www.example.com");
+        writer.println("");
+        writer.flush();
+    }
+
+    private String getResponse(Socket socket)
+    {
+        try
+        {
+            StringWriter writer = new StringWriter();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            if (reader != null)
+            {
+                String line;
+                while (!isEmpty(line = reader.readLine()))
+                {
+                    writer.append(line).append("\r\n");
+                }
+            }
+            String response = writer.toString();
+            return response.length() == 0 ? null : response;
+        }
+        catch (IOException e)
+        {
+            return null;
+        }
     }
 
 }
