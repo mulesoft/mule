@@ -50,17 +50,24 @@ public class NotificationUtils
                 return path;
             }
 
-            for (DynamicMessageProcessorContainer flowMapEntry : flowDynamicsMap.keySet())
+            if(flowDynamicsMap.isEmpty())
             {
-                FlowMap resolvedInnerPaths = ((DynamicMessageProcessorContainer) flowMapEntry).buildInnerPaths();
-                if (resolvedInnerPaths != null)
-                {
-                    Map<MessageProcessor, String> paths = resolvedInnerPaths.getFlowMap();
-                    flowMap.putAll(paths);
-                    populateDynamicsMap(paths);
-                }
+                return null;
             }
-            return flowMap.get(processor);
+            else
+            {
+                for (DynamicMessageProcessorContainer flowMapEntry : flowDynamicsMap.keySet())
+                {
+                    FlowMap resolvedInnerPaths = ((DynamicMessageProcessorContainer) flowMapEntry).buildInnerPaths();
+                    if (resolvedInnerPaths != null)
+                    {
+                        Map<MessageProcessor, String> paths = resolvedInnerPaths.getFlowMap();
+                        flowMap.putAll(paths);
+                        populateDynamicsMap(paths);
+                    }
+                }
+                return flowMap.get(processor);
+            }
         }
 
         private void populateDynamicsMap(Map<MessageProcessor, String> paths)
