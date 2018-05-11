@@ -12,6 +12,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 
+import org.mule.runtime.api.util.IOUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +21,6 @@ import java.io.InputStream;
 import org.junit.Test;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import sun.misc.IOUtils;
 
 @Feature(HTTP_SERVICE)
 @Story("Entities")
@@ -30,7 +31,7 @@ public class InputStreamHttpEntityTestCase {
     private boolean once = false;
 
     @Override
-    public int read() throws IOException {
+    public int read() {
       if (once) {
         return -1;
       } else {
@@ -59,12 +60,12 @@ public class InputStreamHttpEntityTestCase {
   }
 
   @Test
-  public void providesStreamOnce() throws IOException {
+  public void providesStreamOnce() {
     InputStream content = entity.getContent();
     assertThat(content, equalTo(stream));
 
-    assertThat(IOUtils.readFully(content, -1, true), equalTo("+".getBytes()));
-    assertThat(IOUtils.readFully(entity.getContent(), -1, true).length, is(0));
+    assertThat(IOUtils.toByteArray(content), equalTo("+".getBytes()));
+    assertThat(IOUtils.toByteArray(entity.getContent()).length, is(0));
   }
 
   @Test

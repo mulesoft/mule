@@ -16,6 +16,7 @@ import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.core.api.util.CompoundEnumeration;
 import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -31,8 +32,6 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import sun.misc.CompoundEnumeration;
 
 /**
  * Defines a classloader for a Mule artifact composed of other artifacts.
