@@ -36,11 +36,13 @@ public class Policy {
   // map from event to set of senders
   private Map<Class<? extends Notification>, Collection<Sender>> eventToSenders =
       new HashMap<>();
+  private Map<Class<? extends Notification>, Collection<Sender>> concreteEventToSenders =
+      new HashMap<>();
 
   // these are cumulative - set values should never change, they are just a cache of known info
   // they are co and contra-variant wrt to exact event type (see code below).
   private ConcurrentMap<Class, Boolean> knownEventsExact = new ConcurrentHashMap<>();
-  private ConcurrentMap knownEventsSuper = new ConcurrentHashMap();
+  private ConcurrentMap<Class, Boolean> knownEventsSuper = new ConcurrentHashMap<>();
 
   /**
    * For each listener, we check each interface and see what events can be delivered.
@@ -113,21 +115,41 @@ public class Policy {
   protected boolean doDispatch(Notification notification, Class<? extends Notification> notfnClass,
                                NotifierCallback notifier) {
     boolean found = false;
-    for (Entry<Class<? extends Notification>, Collection<Sender>> event : eventToSenders.entrySet()) {
-      if (event.getKey().isAssignableFrom(notfnClass)) {
-        found = true;
-        for (Sender sender : event.getValue()) {
-          try {
-            sender.dispatch(notification, notifier);
-          } catch (Throwable e) {
-            // Exceptions or errors from listeners do not affect the notification processing
-            LOGGER.info("NotificationListener {} was unable to fire notification {} due to an exception: {}.",
-                        sender.getListener(), notification, e);
+
+    Collection<Sender> senders = concreteEventToSenders.get(notfnClass);
+    if (senders != null) {
+      found = true;
+      dispatchToSenders(notification, senders, notifier);
+    } else {
+      synchronized (concreteEventToSenders) {
+        senders = concreteEventToSenders.get(notfnClass);
+        if (senders != null) {
+          dispatchToSenders(notification, senders, notifier);
+        } else {
+          senders = new ArrayList<>();
+          for (Entry<Class<? extends Notification>, Collection<Sender>> event : eventToSenders.entrySet()) {
+            if (event.getKey().isAssignableFrom(notfnClass)) {
+              found = true;
+              senders.addAll(event.getValue());
+              dispatchToSenders(notification, senders, notifier);
+            }
           }
+          concreteEventToSenders.putIfAbsent(notfnClass, senders);
         }
       }
     }
     return found;
+  }
+
+  private void dispatchToSenders(Notification notification, Collection<Sender> senders, NotifierCallback notifier) {
+    for (Sender sender : senders) {
+      try {
+        sender.dispatch(notification, notifier);
+      } catch (Exception e) {
+        LOGGER.info("NotificationListener {} was unable to fire notification {} due to an exception: {}.", sender.getListener(),
+                    notification, e);
+      }
+    }
   }
 
   /**
@@ -139,26 +161,39 @@ public class Policy {
    * @return false if there is no need to dispatch the notification
    */
   public boolean isNotificationEnabled(Class notfnClass) {
-    if (!knownEventsSuper.containsKey(notfnClass)) {
+    // if (!knownEventsSuper.containsKey(notfnClass)) {
+    Boolean knownSuper = knownEventsSuper.get(notfnClass);
+    if (knownSuper == null) {
       boolean found = false;
       // this is exhaustive because we initialise to include all events handled.
-      for (Iterator events = knownEventsSuper.keySet().iterator(); events.hasNext() && !found;) {
-        Class event = (Class) events.next();
-        found = ((Boolean) knownEventsSuper.get(event)).booleanValue() && notfnClass.isAssignableFrom(event);
+      for (Iterator<Class> events = knownEventsSuper.keySet().iterator(); events.hasNext() && !found;) {
+        Class event = events.next();
+        found = knownEventsSuper.get(event).booleanValue() && notfnClass.isAssignableFrom(event);
       }
+      knownSuper = Boolean.valueOf(found);
       knownEventsSuper.put(notfnClass, Boolean.valueOf(found));
+    } else {
+      if (knownSuper.booleanValue()) {
+        return true;
+      }
     }
-    if (!knownEventsExact.containsKey(notfnClass)) {
+
+    Boolean knownExact = knownEventsExact.get(notfnClass);
+    if (knownExact == null) {
       boolean found = false;
       for (Iterator events = eventToSenders.keySet().iterator(); events.hasNext() && !found;) {
         Class event = (Class) events.next();
         found = event.isAssignableFrom(notfnClass);
       }
-      knownEventsExact.put(notfnClass, Boolean.valueOf(found));
-
+      knownExact = Boolean.valueOf(found);
+      knownEventsExact.put(notfnClass, knownExact);
+    } else {
+      if (knownExact.booleanValue()) {
+        return true;
+      }
     }
-    return ((Boolean) knownEventsSuper.get(notfnClass)).booleanValue()
-        || knownEventsExact.get(notfnClass).booleanValue();
+
+    return false;
   }
 
 }
