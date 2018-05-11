@@ -60,9 +60,7 @@ public final class JreExplorer {
     checkArgument(jdkPaths != null && !jdkPaths.isEmpty(), "jdkPaths cannot be empty");
 
     for (String jdkPath : jdkPaths) {
-      if (jdkPath != null) {
-        explorePath(packages, resources, services, jdkPath);
-      }
+      explorePath(packages, resources, services, jdkPath);
     }
   }
 
