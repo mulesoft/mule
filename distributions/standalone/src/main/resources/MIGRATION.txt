@@ -11,6 +11,7 @@ MULE-14878: The HTTP Listener now sets the message correlation ID as an outbound
 MULE-8817: Spring Framework was upgraded from 4.1.9 to 4.3.16 and Spring Security from 4.2.3 to 4.2.5. Minor incompatibilities might be found in the following components:
    * The getConnectionFactory() method in JmsConnector will now return a DefaultXAConnectionFactoryWrapper, regardless of the specific ConnectionFactory. If you are depending on this, you should use the ConnectionFactory interface to avoid problems.
    * The CxfInboundMessageProcessor will no longer include a newline character in the response stream by default. This may be troublesome only if you are writing the raw response to an OutputStream in a custom implementation.
+MULE-15004: The HTTP listener's socket server timeout default was changed from 0 to 60 seconds, while respecting the connectionIdleTimeout settings.
 
 Migration changes from 3.8.x to 3.9.x
 MULE-12245: Old Xalan and Xerces implementations were removed in favor of the newer versions included in Java. Only minor incompatibilities could result such as ordering changes of some XML attributes.
