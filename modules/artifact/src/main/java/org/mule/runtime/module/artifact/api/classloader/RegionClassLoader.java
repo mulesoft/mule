@@ -12,6 +12,7 @@ import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -122,12 +123,8 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
       });
 
       for (String exportedResource : filter.getExportedResources()) {
-        List<ArtifactClassLoader> classLoaders = resourceMapping.get(exportedResource);
-
-        if (classLoaders == null) {
-          classLoaders = new ArrayList<>();
-          resourceMapping.put(exportedResource, classLoaders);
-        }
+        List<ArtifactClassLoader> classLoaders =
+            resourceMapping.computeIfAbsent(normalize(exportedResource), k -> new ArrayList<>());
 
         classLoaders.add(artifactClassLoader);
       }
@@ -220,10 +217,11 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   @Override
   public final URL findResource(final String name) {
     URL resource = null;
-    final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(name);
+    String normalizedName = normalize(name);
+    final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(normalizedName);
     if (artifactClassLoaders != null) {
       for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
-        resource = artifactClassLoader.findResource(name);
+        resource = artifactClassLoader.findResource(normalizedName);
         if (resource != null) {
           break;
         }
@@ -235,13 +233,14 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   @Override
   public final Enumeration<URL> findResources(final String name) throws IOException {
-    final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(name);
+    String normalizedName = normalize(name);
+    final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(normalizedName);
     List<Enumeration<URL>> enumerations = new ArrayList<>(registeredClassLoaders.size());
 
     if (artifactClassLoaders != null) {
       for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
 
-        final Enumeration<URL> partialResources = artifactClassLoader.findResources(name);
+        final Enumeration<URL> partialResources = artifactClassLoader.findResources(normalizedName);
         if (partialResources.hasMoreElements()) {
           enumerations.add(partialResources);
         }

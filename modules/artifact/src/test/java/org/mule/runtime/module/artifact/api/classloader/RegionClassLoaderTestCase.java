@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -34,6 +35,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.util.EnumerationMatcher;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
@@ -371,6 +373,61 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     regionClassLoader.addClassLoader(pluginClassLoader, NULL_CLASSLOADER_FILTER);
 
     assertThat(regionClassLoader.getArtifactPluginClassLoaders(), contains(pluginClassLoader));
+  }
+
+  @Test
+  public void getResourceUsingNotNormalizedPath() {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    createClassLoaders(parentClassLoader);
+    pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
+
+    when(lookupPolicy.getPackageLookupStrategy(PACKAGE_NAME)).thenReturn(CHILD_FIRST);
+
+    regionClassLoader.addClassLoader(pluginClassLoader,
+                                     new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), singleton(RESOURCE_NAME)));
+
+    URL resource = regionClassLoader.findResource("root/../dummy.txt");
+
+    assertThat(resource, is(PLUGIN_LOADED_RESOURCE));
+  }
+
+  @Test
+  public void getResourcesUsingNotNormalizedPath() throws IOException {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    createClassLoaders(parentClassLoader);
+    pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
+
+    when(lookupPolicy.getPackageLookupStrategy(PACKAGE_NAME)).thenReturn(CHILD_FIRST);
+
+    regionClassLoader.addClassLoader(pluginClassLoader,
+                                     new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), singleton(RESOURCE_NAME)));
+
+    Enumeration<URL> resources = regionClassLoader.findResources("root/../dummy.txt");
+
+    List<URL> expectedResources = new LinkedList<>();
+    expectedResources.add(PLUGIN_LOADED_RESOURCE);
+
+    assertThat(resources, EnumerationMatcher.equalTo(expectedResources));
+  }
+
+  @Test
+  public void addClassloaderWithResourcesUsingNotNormalizedPath() throws IOException {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    createClassLoaders(parentClassLoader);
+    pluginClassLoader.addResource(RESOURCE_NAME, PLUGIN_LOADED_RESOURCE);
+
+    when(lookupPolicy.getPackageLookupStrategy(PACKAGE_NAME)).thenReturn(CHILD_FIRST);
+
+    regionClassLoader.addClassLoader(pluginClassLoader,
+                                     new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME),
+                                                                          singleton("root/../dummy.txt")));
+
+    URL resource = regionClassLoader.findResource(RESOURCE_NAME);
+
+    assertThat(resource, is(PLUGIN_LOADED_RESOURCE));
   }
 
   public static class TestApplicationClassLoader extends TestArtifactClassLoader {
