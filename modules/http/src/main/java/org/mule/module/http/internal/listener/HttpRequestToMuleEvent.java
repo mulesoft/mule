@@ -56,6 +56,7 @@ public class HttpRequestToMuleEvent
     public static final BackwardsCompatibilityPropertyChecker
       IGNORE_CORRELATION_ID = new BackwardsCompatibilityPropertyChecker(COMPATIBILITY_IGNORE_CORRELATION_ID);
 
+    private static final boolean ignoreCorrelationId = IGNORE_CORRELATION_ID.isEnabled();
 
     public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext, final FlowConstruct flowConstruct, Boolean parseRequest, ListenerPath listenerPath) throws HttpRequestParsingException
     {
@@ -139,7 +140,7 @@ public class HttpRequestToMuleEvent
 
         final DefaultMuleMessage defaultMuleMessage = new DefaultMuleMessage(payload, inboundProperties, outboundProperties, inboundAttachments, muleContext);
 
-        if (!IGNORE_CORRELATION_ID.isEnabled())
+        if (!ignoreCorrelationId)
         {
             resolveCorrelationId(defaultMuleMessage);
         }
