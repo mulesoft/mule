@@ -4,6 +4,9 @@ MIGRATION GUIDE
 The following is a list of changes you have to execute to migrate from Mule Runtime Community edition version 3.4.x to version 3.7.x
 Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for more details.
 
+Migration changes from 3.8.6 to 3.8.x
+MULE-8817: spring-messaging was upgraded from 4.1.9 to 4.3.17
+
 Migration changes from 3.8.0 to 3.8.x
 MULE-9931: Transaction log files size are now restricted by size, using a default size of 500 mb. The configured size is just an approximated value which may be exceeded based on the size of the record store by the transaction. This is configurable using the attribute queueTransactionFilesSize of the <configuration> element.
     The size restriction applies to the set of transaction log files for local transactions and XA transactions independently meaning that if both types of transactions are used for queue the set of tx files will use up to 1 gb.
