@@ -11,15 +11,11 @@ import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.eclipse.jetty.http.HttpMethod.GET;
 import static org.eclipse.jetty.http.HttpMethod.POST;
-import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleException;
 import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.HttpEntity;
@@ -27,8 +23,10 @@ import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.request.HttpClientConfiguration;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextFactoryBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,13 +37,12 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-public class InputStreamSendHttpClientTestCase extends AbstractMuleTestCase
+public class InputStreamSendHttpClientTestCase extends AbstractMuleContextTestCase
 {
 
     @Rule
@@ -106,7 +103,9 @@ public class InputStreamSendHttpClientTestCase extends AbstractMuleTestCase
 
     private void createClient() throws MuleException
     {
+        TlsContextFactory defaultTlsContextFactory = new TlsContextFactoryBuilder(muleContext).buildDefault();
         HttpClientConfiguration configuration = new HttpClientConfiguration.Builder().setUsePersistentConnections(true)
+                                                                                     .setDefaultTlsContextFactory(defaultTlsContextFactory)
                                                                                      .setMaxConnections(1)
                                                                                      .setStreaming(false)
                                                                                      .setConnectionIdleTimeout(-1)

@@ -20,6 +20,7 @@ import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.module.http.internal.request.HttpClientConfiguration;
 import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClient;
 import org.mule.transport.ssl.api.TlsContextFactory;
+import org.mule.transport.ssl.api.TlsContextFactoryBuilder;
 import org.mule.transport.tcp.DefaultTcpClientSocketProperties;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 
@@ -54,6 +55,7 @@ public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
     private TcpClientSocketProperties socketProperties = new DefaultTcpClientSocketProperties();
     private final HttpRequestAuthentication basicAuthentication = new HttpRequestAuthentication(BASIC);
     private TlsContextFactory tlsContextFactory = null;
+    private TlsContextFactory defaultTlsContextFactory = null;
     private ProxyConfig proxyConfig = null;
     private MuleContext context = null;
 
@@ -62,6 +64,7 @@ public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
         this.tlsContextFactory = tlsContextFactory;
         this.proxyConfig = proxyConfig;
         this.context = context;
+        this.defaultTlsContextFactory = new TlsContextFactoryBuilder(context).buildDefault();
     }
 
 
@@ -105,6 +108,7 @@ public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
 
         HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
                                                                                      .setTlsContextFactory(tlsContextFactory)
+                                                                                     .setDefaultTlsContextFactory(defaultTlsContextFactory)
                                                                                      .setProxyConfig(proxyConfig)
                                                                                      .setClientSocketProperties(socketProperties)
                                                                                      .setMaxConnections(DEFAULT_CONNECTIONS)

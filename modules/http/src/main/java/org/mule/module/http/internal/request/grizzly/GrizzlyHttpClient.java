@@ -104,6 +104,7 @@ public class GrizzlyHttpClient implements HttpClient
     );
 
     private final TlsContextFactory tlsContextFactory;
+    private final TlsContextFactory defaultTlsContextFactory;
     private final ProxyConfig proxyConfig;
     private final TcpClientSocketProperties clientSocketProperties;
 
@@ -127,6 +128,7 @@ public class GrizzlyHttpClient implements HttpClient
     public GrizzlyHttpClient(HttpClientConfiguration config)
     {
         this.tlsContextFactory = config.getTlsContextFactory();
+        this.defaultTlsContextFactory = config.getDefaultTlsContextFactory();
         this.proxyConfig = config.getProxyConfig();
         this.clientSocketProperties = config.getClientSocketProperties();
         this.maxConnections = config.getMaxConnections();
@@ -164,8 +166,10 @@ public class GrizzlyHttpClient implements HttpClient
 
     private void configureTlsContext(AsyncHttpClientConfig.Builder builder) throws MuleException
     {
+        TlsContextFactory resolvedTlsContext = defaultTlsContextFactory;
         if (tlsContextFactory != null)
         {
+            resolvedTlsContext = tlsContextFactory;
             LifecycleUtils.initialiseIfNeeded(tlsContextFactory);
             try
             {
@@ -178,15 +182,6 @@ public class GrizzlyHttpClient implements HttpClient
 
             // This sets all the TLS configuration needed, except for the enabled protocols and cipher suites.
             builder.setSSLContext(sslContext);
-            //These complete the set up
-            if (tlsContextFactory.getEnabledCipherSuites() != null)
-            {
-                builder.setEnabledCipherSuites(tlsContextFactory.getEnabledCipherSuites());
-            }
-            if (tlsContextFactory.getEnabledProtocols() != null)
-            {
-                builder.setEnabledProtocols(tlsContextFactory.getEnabledProtocols());
-            }
             TlsContextTrustStoreConfiguration trustStoreConfiguration = tlsContextFactory.getTrustStoreConfiguration();
             if(trustStoreConfiguration != null && trustStoreConfiguration.isInsecure())
             {
@@ -194,6 +189,15 @@ public class GrizzlyHttpClient implements HttpClient
                 //This disables hostname verification
                 builder.setAcceptAnyCertificate(true);
             }
+        }
+        //These complete the set up, they must always be set in case an implicit SSL connection is used
+        if (resolvedTlsContext.getEnabledCipherSuites() != null)
+        {
+            builder.setEnabledCipherSuites(resolvedTlsContext.getEnabledCipherSuites());
+        }
+        if (resolvedTlsContext.getEnabledProtocols() != null)
+        {
+            builder.setEnabledProtocols(resolvedTlsContext.getEnabledProtocols());
         }
     }
 
