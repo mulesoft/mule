@@ -14,6 +14,7 @@ import org.mule.transport.tcp.TcpClientSocketProperties;
 public class HttpClientConfiguration
 {
     private final TlsContextFactory tlsContextFactory;
+    private final TlsContextFactory defaultTlsContextFactory;
     private final ProxyConfig proxyConfig;
     private final TcpClientSocketProperties clientSocketProperties;
     private final int maxConnections;
@@ -29,7 +30,8 @@ public class HttpClientConfiguration
     private final Integer kernelCoreSize;
     private final Integer selectorRunnersCount;
 
-    private HttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig,
+    private HttpClientConfiguration(TlsContextFactory tlsContextFactory, TlsContextFactory defaultTlsContextFactory,
+                                    ProxyConfig proxyConfig,
                                     TcpClientSocketProperties clientSocketProperties,
                                     int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout,
                                     boolean streaming, int responseBufferSize, String threadNamePrefix, String ownerName,
@@ -37,6 +39,7 @@ public class HttpClientConfiguration
                                     Integer kernelCoreSize, Integer selectorRunnersCount)
     {
         this.tlsContextFactory = tlsContextFactory;
+        this.defaultTlsContextFactory = defaultTlsContextFactory;
         this.proxyConfig = proxyConfig;
         this.clientSocketProperties = clientSocketProperties;
         this.maxConnections = maxConnections;
@@ -56,6 +59,11 @@ public class HttpClientConfiguration
     public TlsContextFactory getTlsContextFactory()
     {
         return tlsContextFactory;
+    }
+
+    public TlsContextFactory getDefaultTlsContextFactory()
+    {
+        return defaultTlsContextFactory;
     }
 
     public ProxyConfig getProxyConfig()
@@ -130,6 +138,7 @@ public class HttpClientConfiguration
     public static class Builder
     {
         private TlsContextFactory tlsContextFactory;
+        private TlsContextFactory defaultTlsContextFactory;
         private ProxyConfig proxyConfig;
         private TcpClientSocketProperties clientSocketProperties;
         private int maxConnections;
@@ -148,6 +157,12 @@ public class HttpClientConfiguration
         public Builder setTlsContextFactory(TlsContextFactory tlsContextFactory)
         {
             this.tlsContextFactory = tlsContextFactory;
+            return this;
+        }
+
+        public Builder setDefaultTlsContextFactory(TlsContextFactory defaultTlsContextFactory)
+        {
+            this.defaultTlsContextFactory = defaultTlsContextFactory;
             return this;
         }
 
@@ -236,7 +251,7 @@ public class HttpClientConfiguration
 
         public HttpClientConfiguration build()
         {
-            return new HttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
+            return new HttpClientConfiguration(tlsContextFactory, defaultTlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
                     usePersistentConnections, connectionIdleTimeout, streaming, responseBufferSize, threadNamePrefix, ownerName,
                     maxWorkerPoolSize, workerCoreSize, maxKernelPoolSize, kernelCoreSize, selectorRunnersCount);
         }

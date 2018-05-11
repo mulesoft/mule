@@ -9,7 +9,6 @@ package org.mule.module.http.internal.request;
 import static java.lang.String.format;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -76,6 +75,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
 
     private boolean initialised = false;
     private boolean started = false;
+    private TlsContextFactory defaultTlsContextFactory;
 
     @Override
     public void initialise() throws InitialisationException
@@ -98,9 +98,10 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
                    "when using tls:context you must set attribute protocol=\"HTTPS\""), this);
         }
 
+        defaultTlsContextFactory = new TlsContextFactoryBuilder(muleContext).buildDefault();
         if (protocol.equals(HTTPS) && tlsContext == null)
         {
-            tlsContext = new TlsContextFactoryBuilder(muleContext).buildDefault();
+            tlsContext = defaultTlsContextFactory;
         }
 
         if (enableCookies)
@@ -112,6 +113,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
 
         HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
                 .setTlsContextFactory(tlsContext)
+                .setDefaultTlsContextFactory(defaultTlsContextFactory)
                 .setProxyConfig(proxyConfig)
                 .setClientSocketProperties(clientSocketProperties)
                 .setMaxConnections(maxConnections)
