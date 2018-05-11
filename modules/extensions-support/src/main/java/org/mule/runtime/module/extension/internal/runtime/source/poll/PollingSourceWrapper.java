@@ -12,6 +12,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedPersistent;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItemStatus.ACCEPTED;
 import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItemStatus.ALREADY_IN_PROCESS;
 import static org.mule.runtime.extension.api.runtime.source.PollContext.PollItemStatus.FILTERED_BY_WATERMARK;
@@ -50,6 +51,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -77,6 +79,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   private LockFactory lockFactory;
 
   @Inject
+  @Named(OBJECT_STORE_MANAGER)
   private ObjectStoreManager objectStoreManager;
 
   @Inject
