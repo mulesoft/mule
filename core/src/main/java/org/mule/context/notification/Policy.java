@@ -156,7 +156,9 @@ class Policy
                             dispatchToSenders(notification, senders);
                         }
                     }
-                    concreteEventToSenders.putIfAbsent(notfnClass, senders);
+                    if(!concreteEventToSenders.containsKey(notfnClass)) {
+                        concreteEventToSenders.put(notfnClass, senders);
+                    }
                 }
             }
         }
