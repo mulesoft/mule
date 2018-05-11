@@ -6,6 +6,7 @@ Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for mo
 
 Migration changes from 3.8.6 to 3.8.x
 MULE-8817: spring-messaging was upgraded from 4.1.9 to 4.3.17
+MULE-15004: The HTTP listener's socket server timeout default was changed from 0 to 60 seconds, while respecting the connectionIdleTimeout settings.
 
 Migration changes from 3.8.0 to 3.8.x
 MULE-9931: Transaction log files size are now restricted by size, using a default size of 500 mb. The configured size is just an approximated value which may be exceeded based on the size of the record store by the transaction. This is configurable using the attribute queueTransactionFilesSize of the <configuration> element.
