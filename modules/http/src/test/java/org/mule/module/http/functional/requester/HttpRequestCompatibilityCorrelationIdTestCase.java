@@ -11,9 +11,12 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.HttpProperties.COMPATIBILITY_IGNORE_CORRELATION_ID;
-import org.mule.tck.junit4.rule.SystemProperty;
+import static org.mule.module.http.internal.listener.HttpRequestToMuleEvent.resetIgnoreCorrelationId;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 public class HttpRequestCompatibilityCorrelationIdTestCase extends HttpRequestCorrelationIdTestCase
 {
@@ -21,6 +24,16 @@ public class HttpRequestCompatibilityCorrelationIdTestCase extends HttpRequestCo
   @Rule
   public SystemProperty ignoreCorrelationId = new SystemProperty(COMPATIBILITY_IGNORE_CORRELATION_ID, "true");
 
+  @Before
+  public void before() {
+      resetIgnoreCorrelationId();
+  }
+  
+  @After
+  public void after() {
+      resetIgnoreCorrelationId();
+  }
+  
   /**
    * To guarantee compatibility, the correlation ID should not be set from the received header and therefore not sent by the HTTP requester.
    */
