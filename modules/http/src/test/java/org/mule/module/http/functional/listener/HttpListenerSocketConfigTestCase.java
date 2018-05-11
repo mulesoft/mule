@@ -7,13 +7,16 @@
 package org.mule.module.http.functional.listener;
 
 
+import static java.lang.String.valueOf;
+import static java.lang.Thread.sleep;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.StringUtils;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,11 +30,17 @@ import org.junit.Test;
 
 public class HttpListenerSocketConfigTestCase extends FunctionalTestCase
 {
+    private static int SERVER_TIMEOUT_MILLIS = 500;
+    private static int CONNECTION_TIMEOUT_MILLIS = 2000;
 
     @Rule
     public DynamicPort listenPort1 = new DynamicPort("port1");
     @Rule
     public DynamicPort listenPort2 = new DynamicPort("port2");
+    @Rule
+    public SystemProperty serverTimeout = new SystemProperty("serverTimeout", valueOf(SERVER_TIMEOUT_MILLIS));
+    @Rule
+    public SystemProperty connectionTimeout = new SystemProperty("connectionTimeout", valueOf(CONNECTION_TIMEOUT_MILLIS));
 
     @Override
     protected String getConfigFile()
@@ -43,7 +52,7 @@ public class HttpListenerSocketConfigTestCase extends FunctionalTestCase
     public void serverTimeoutsTcpConnection() throws Exception
     {
         Socket socket = new Socket("localhost", listenPort1.getNumber());
-        Thread.sleep(1000);
+        sleep(SERVER_TIMEOUT_MILLIS * 2);
         sendRequest(socket, "global");
         assertThat(getResponse(socket), is(nullValue()));
     }
@@ -54,10 +63,10 @@ public class HttpListenerSocketConfigTestCase extends FunctionalTestCase
         Socket socket = new Socket("localhost", listenPort2.getNumber());
         sendRequest(socket, "timeout");
         assertThat(getResponse(socket), is(notNullValue()));
-        Thread.sleep(1000);
+        sleep(SERVER_TIMEOUT_MILLIS * 2);
         sendRequest(socket, "timeout");
         assertThat(getResponse(socket), is(notNullValue()));
-        Thread.sleep(3000);
+        sleep(CONNECTION_TIMEOUT_MILLIS + SERVER_TIMEOUT_MILLIS * 2);
         sendRequest(socket, "timeout");
         assertThat(getResponse(socket), is(nullValue()));
     }
@@ -80,7 +89,7 @@ public class HttpListenerSocketConfigTestCase extends FunctionalTestCase
             if (reader != null)
             {
                 String line;
-                while (!StringUtils.isEmpty(line = reader.readLine()))
+                while (!isEmpty(line = reader.readLine()))
                 {
                     writer.append(line).append("\r\n");
                 }

@@ -8,6 +8,7 @@ package org.mule.module.http.internal.listener.grizzly;
 
 import static java.lang.Integer.valueOf;
 import static java.lang.System.getProperty;
+import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
@@ -29,7 +30,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
@@ -56,7 +56,9 @@ public class GrizzlyServerManager implements HttpServerManager
     private static final String IDLE_TIMEOUT_THREADS_PREFIX_NAME = ".HttpIdleConnectionCloser";
     private static final String LISTENER_WORKER_THREAD_NAME_SUFFIX = ".worker";
     // We use this default for all connections but each server can define it's idle timeout to override this
-    private static final int DEFAULT_SERVER_TIMEOUT = 60000;
+    private static final int DEFAULT_SERVER_TIMEOUT_MILLIS = 60000;
+    // Defines the delay between the server timeout and the connection timeout when the latter forces it
+    private static final int SERVER_TIMEOUT_DELAY_MILLIS = 500;
     private final GrizzlyAddressDelegateFilter<IdleTimeoutFilter> timeoutFilterDelegate;
     private final GrizzlyAddressDelegateFilter<SSLFilter> sslFilterDelegate;
     private final GrizzlyAddressDelegateFilter<HttpServerFilter> httpServerFilterDelegate;
@@ -78,9 +80,9 @@ public class GrizzlyServerManager implements HttpServerManager
         timeoutFilterDelegate = new GrizzlyAddressDelegateFilter<>();
         sslFilterDelegate = new GrizzlyAddressDelegateFilter<>();
         httpServerFilterDelegate = new GrizzlyAddressDelegateFilter<>();
-        idleTimeoutExecutorService = Executors.newCachedThreadPool(new NamedThreadFactory(threadNamePrefix + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
+        idleTimeoutExecutorService = newCachedThreadPool(new NamedThreadFactory(threadNamePrefix + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
         idleTimeoutDelayedExecutor = new DelayedExecutor(idleTimeoutExecutorService);
-        serverTimeout = serverSocketProperties.getServerTimeout() == null ? DEFAULT_SERVER_TIMEOUT : serverSocketProperties.getServerTimeout();
+        serverTimeout = serverSocketProperties.getServerTimeout() == null ? DEFAULT_SERVER_TIMEOUT_MILLIS : serverSocketProperties.getServerTimeout();
 
         FilterChainBuilder serverFilterChainBuilder = FilterChainBuilder.stateless();
         serverFilterChainBuilder.add(new TransportFilter());
@@ -248,7 +250,7 @@ public class GrizzlyServerManager implements HttpServerManager
         if (usePersistentConnections && serverTimeout < connectionIdleTimeout)
         {
             // Avoid interfering with the keep alive timeout but secure plain TCP connections
-            timeout = connectionIdleTimeout * 2;
+            timeout = connectionIdleTimeout + SERVER_TIMEOUT_DELAY_MILLIS;
         }
         else
         {
