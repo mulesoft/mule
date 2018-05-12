@@ -128,7 +128,7 @@ class Policy
     {
         boolean found = false;
         
-        // Otimization to avoid iterating the eventToSenders map each time a notification is fired
+        // Optimization to avoid iterating the eventToSenders map each time a notification is fired
         Collection<Sender> senders = concreteEventToSenders.get(notfnClass);
         if(senders != null)
         {
@@ -137,28 +137,25 @@ class Policy
         }
         else
         {
-            synchronized (concreteEventToSenders)
+            senders = concreteEventToSenders.get(notfnClass);
+            if(senders != null)
             {
-                senders = concreteEventToSenders.get(notfnClass);
-                if(senders != null)
+                dispatchToSenders(notification, senders);
+            }
+            else
+            {
+                senders = new ArrayList<Sender>();
+                for (Entry<Class<? extends ServerNotification>, Collection<Sender>> event : eventToSenders.entrySet())
                 {
-                    dispatchToSenders(notification, senders);
-                }
-                else
-                {
-                    senders = new ArrayList<Sender>();
-                    for (Entry<Class<? extends ServerNotification>, Collection<Sender>> event : eventToSenders.entrySet())
+                    if (event.getKey().isAssignableFrom(notfnClass))
                     {
-                        if (event.getKey().isAssignableFrom(notfnClass))
-                        {
-                            found = true;
-                            senders.addAll(event.getValue());
-                            dispatchToSenders(notification, senders);
-                        }
+                        found = true;
+                        senders.addAll(event.getValue());
+                        dispatchToSenders(notification, senders);
                     }
-                    if(!concreteEventToSenders.containsKey(notfnClass)) {
-                        concreteEventToSenders.put(notfnClass, senders);
-                    }
+                }
+                if(!concreteEventToSenders.containsKey(notfnClass)) {
+                    concreteEventToSenders.put(notfnClass, senders);
                 }
             }
         }
@@ -203,10 +200,6 @@ class Policy
             }
             knownSuper = Boolean.valueOf(found);
             knownEventsSuper.put(notfnClass, knownSuper);
-        } else {
-            if(knownSuper.booleanValue()) {
-                return true;
-            }
         }
         
         Boolean knownExact = knownEventsExact.get(notfnClass);
@@ -220,13 +213,9 @@ class Policy
             }
             knownExact = Boolean.valueOf(found);
             knownEventsExact.put(notfnClass, knownExact);
-        } else {
-            if(knownExact.booleanValue()) {
-                return true;
-            }
         }
         
-        return false;
+        return knownSuper || knownExact;
     }
 
 }
