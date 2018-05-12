@@ -116,26 +116,25 @@ public class Policy {
                                NotifierCallback notifier) {
     boolean found = false;
 
+    // Optimization to avoid iterating the eventToSenders map each time a notification is fired
     Collection<Sender> senders = concreteEventToSenders.get(notfnClass);
     if (senders != null) {
       found = true;
       dispatchToSenders(notification, senders, notifier);
     } else {
-      synchronized (concreteEventToSenders) {
-        senders = concreteEventToSenders.get(notfnClass);
-        if (senders != null) {
-          dispatchToSenders(notification, senders, notifier);
-        } else {
-          senders = new ArrayList<>();
-          for (Entry<Class<? extends Notification>, Collection<Sender>> event : eventToSenders.entrySet()) {
-            if (event.getKey().isAssignableFrom(notfnClass)) {
-              found = true;
-              senders.addAll(event.getValue());
-              dispatchToSenders(notification, senders, notifier);
-            }
+      senders = concreteEventToSenders.get(notfnClass);
+      if (senders != null) {
+        dispatchToSenders(notification, senders, notifier);
+      } else {
+        senders = new ArrayList<>();
+        for (Entry<Class<? extends Notification>, Collection<Sender>> event : eventToSenders.entrySet()) {
+          if (event.getKey().isAssignableFrom(notfnClass)) {
+            found = true;
+            senders.addAll(event.getValue());
+            dispatchToSenders(notification, senders, notifier);
           }
-          concreteEventToSenders.putIfAbsent(notfnClass, senders);
         }
+        concreteEventToSenders.putIfAbsent(notfnClass, senders);
       }
     }
     return found;
@@ -145,7 +144,7 @@ public class Policy {
     for (Sender sender : senders) {
       try {
         sender.dispatch(notification, notifier);
-      } catch (Exception e) {
+      } catch (Throwable e) {
         LOGGER.info("NotificationListener {} was unable to fire notification {} due to an exception: {}.", sender.getListener(),
                     notification, e);
       }
@@ -172,10 +171,6 @@ public class Policy {
       }
       knownSuper = Boolean.valueOf(found);
       knownEventsSuper.put(notfnClass, Boolean.valueOf(found));
-    } else {
-      if (knownSuper.booleanValue()) {
-        return true;
-      }
     }
 
     Boolean knownExact = knownEventsExact.get(notfnClass);
@@ -187,13 +182,9 @@ public class Policy {
       }
       knownExact = Boolean.valueOf(found);
       knownEventsExact.put(notfnClass, knownExact);
-    } else {
-      if (knownExact.booleanValue()) {
-        return true;
-      }
     }
 
-    return false;
+    return knownSuper.booleanValue() || knownExact.booleanValue();
   }
 
 }
