@@ -129,6 +129,7 @@
         <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <mavenCompilerVersion>3.7.0</mavenCompilerVersion>
+        <maven.enforcer.plugin.version>3.0.0-M1</maven.enforcer.plugin.version>
 
         <!--
             The above project.url will not be picked up in the manifest,
@@ -1580,6 +1581,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>3.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-rar-plugin</artifactId>
                     <version>2.2</version>
                 </plugin>
@@ -2281,6 +2287,36 @@
                         <configuration>
                             <skip>${skipGpg}</skip>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>${maven.enforcer.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots-in-deps</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps>
+                                            <message>No Snapshots Allowed in Deps!</message>
+                                        </requireReleaseDeps>
+                                        <requireReleaseVersion>
+                                            <message>No Snapshots Allowed in Project Version!</message>
+                                        </requireReleaseVersion>
+                                        <requirePluginVersions>
+                                            <message>Best Practice is to always define plugin versions!</message>
+                                            <unCheckedPluginList>
+                                                org.apache.maven.plugins:maven-clean-plugin
+                                            </unCheckedPluginList>
+                                        </requirePluginVersions>
+                                    </rules>
+                                    <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
