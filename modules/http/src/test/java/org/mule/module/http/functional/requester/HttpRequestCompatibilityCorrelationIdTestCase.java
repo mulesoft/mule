@@ -13,7 +13,7 @@ import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.HttpProperties.COMPATIBILITY_IGNORE_CORRELATION_ID;
 import static org.mule.module.http.internal.listener.HttpRequestToMuleEvent.resetIgnoreCorrelationId;
 
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -29,8 +29,8 @@ public class HttpRequestCompatibilityCorrelationIdTestCase extends HttpRequestCo
       resetIgnoreCorrelationId();
   }
   
-  @After
-  public void after() {
+  @AfterClass
+  public static void afterClass() {
       resetIgnoreCorrelationId();
   }
   
