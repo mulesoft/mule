@@ -19,8 +19,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -33,8 +33,8 @@ public class FileJarExplorer implements JarExplorer {
 
   @Override
   public JarInfo explore(URI library) {
-    Set<String> packages = new HashSet<>();
-    Set<String> resources = new HashSet<>();
+    Set<String> packages = new TreeSet<>();
+    Set<String> resources = new TreeSet<>();
 
     try {
       final File libraryFile = new File(library);

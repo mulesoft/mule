@@ -23,6 +23,7 @@ import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClas
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.test.runner.RunnerConfiguration.TEST_RUNNER_ARTIFACT_ID;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
@@ -54,6 +55,8 @@ import org.mule.test.runner.api.ArtifactUrlClassification;
 import org.mule.test.runner.api.ArtifactsUrlClassification;
 import org.mule.test.runner.api.PluginUrlClassification;
 
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -66,8 +69,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.slf4j.Logger;
+import java.util.TreeSet;
 
 /**
  * Factory that creates a class loader hierarchy to emulate the one used in a mule standalone container.
@@ -143,9 +145,7 @@ public class IsolatedClassLoaderFactory {
       serviceArtifactClassLoaders = createServiceClassLoaders(containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy,
                                                               artifactsUrlClassification);
 
-      regionClassLoader =
-          new RegionClassLoader("Region", new ArtifactDescriptor("Region"), containerClassLoader.getClassLoader(),
-                                childClassLoaderLookupPolicy);
+      regionClassLoader = new TestRegionClassLoader(containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy);
 
       if (!artifactsUrlClassification.getPluginUrlClassifications().isEmpty()) {
         for (PluginUrlClassification pluginUrlClassification : artifactsUrlClassification.getPluginUrlClassifications()) {
@@ -210,8 +210,8 @@ public class IsolatedClassLoaderFactory {
   }
 
   private JarInfo getLibraryPackages(List<URL> libraries) {
-    Set<String> packages = new HashSet<>();
-    Set<String> resources = new HashSet<>();
+    Set<String> packages = new TreeSet<>();
+    Set<String> resources = new TreeSet<>();
     final JarExplorer jarExplorer = new FileJarExplorer();
 
     for (URL library : libraries) {
@@ -385,7 +385,7 @@ public class IsolatedClassLoaderFactory {
    * @return sanitized packages to export on the test class loader.
    */
   private Set<String> sanitizeTestExportedPackages(Set<String> productionPackages, Set<String> testPackages) {
-    Set<String> sanitizedTestPackages = new HashSet<>(testPackages);
+    Set<String> sanitizedTestPackages = new TreeSet<>(testPackages);
     removePackagesFromTestClassLoader(sanitizedTestPackages, SYSTEM_PACKAGES);
     removePackagesFromTestClassLoader(sanitizedTestPackages, productionPackages);
 
