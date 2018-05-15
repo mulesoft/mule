@@ -13,9 +13,12 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_NAME_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.DOMAIN_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.DOMAIN_NAME_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
@@ -486,9 +489,18 @@ public class ArtifactContextBuilder {
 
   protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties() {
     if (artifactInstallationDirectory != null) {
-      artifactProperties.put(APP_HOME_DIRECTORY_PROPERTY, artifactInstallationDirectory.getAbsolutePath());
+      String absolutePath = artifactInstallationDirectory.getAbsolutePath();
+      if (artifactType.equals(DOMAIN)) {
+        artifactProperties.put(DOMAIN_HOME_DIRECTORY_PROPERTY, absolutePath);
+      } else {
+        artifactProperties.put(APP_HOME_DIRECTORY_PROPERTY, absolutePath);
+      }
     }
-    artifactProperties.put(APP_NAME_PROPERTY, artifactName);
+    if (artifactType.equals(DOMAIN)) {
+      artifactProperties.put(DOMAIN_NAME_PROPERTY, artifactName);
+    } else {
+      artifactProperties.put(APP_NAME_PROPERTY, artifactName);
+    }
     return new SimpleConfigurationBuilder(artifactProperties);
   }
 

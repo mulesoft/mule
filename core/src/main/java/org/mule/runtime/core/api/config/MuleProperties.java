@@ -111,7 +111,9 @@ public class MuleProperties {
   public static final String MULE_HOME_DIRECTORY_PROPERTY = "mule.home";
   public static final String MULE_BASE_DIRECTORY_PROPERTY = "mule.base";
   public static final String APP_HOME_DIRECTORY_PROPERTY = "app.home";
+  public static final String DOMAIN_HOME_DIRECTORY_PROPERTY = "domain.home";
   public static final String APP_NAME_PROPERTY = "app.name";
+  public static final String DOMAIN_NAME_PROPERTY = "domain.name";
 
   // Object Name Keys
   public static final String OBJECT_MULE_CONTEXT = "_muleContext";
