@@ -10,7 +10,6 @@ package org.mule.runtime.deployment.model.api.application;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -30,6 +29,7 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
   public static final String REPOSITORY_FOLDER = "repository";
   public static final String MULE_APPLICATION_CLASSIFIER = "mule-application";
+  public static final String MULE_DOMAIN_CLASSIFIER = "mule-domain";
 
   private String encoding;
   private Map<String, String> appProperties = new HashMap<>();
