@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.io.FileUtils.copyFile;
@@ -27,6 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
+import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -88,6 +90,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
+import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -1485,6 +1488,56 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
   }
+
+  @Test
+  public void deploysWithExtensionXmlPluginWithResourcesOnly() throws Exception {
+    final String dwlResourceTestFile = "module-resources-dwlSource.dwl";
+    final String prefixModuleName = "module-resources";
+    final String extensionName = "resources-extension";
+    final String resources = "org/mule/module/";
+    final String dwExportedFile = resources + "module-resources-dwl.dwl";
+    final String moduleDestination = resources + prefixModuleName + ".xml";
+    final MulePluginModel.MulePluginModelBuilder builder =
+        new MulePluginModel.MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
+    builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
+                                                                                                  moduleDestination);
+    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
+        .setId(MULE_LOADER_ID)
+        .addProperty(EXPORTED_RESOURCES, asList(dwExportedFile))
+        .build());
+    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
+    builder.setRequiredProduct(MULE).setMinMuleVersion(MIN_MULE_VERSION);
+
+    final ArtifactPluginFileBuilder resourcesXmlPluginFileBuilder = new ArtifactPluginFileBuilder(extensionName)
+        .containingResource("module-resourcesSource.xml", moduleDestination)
+        .containingResource(dwlResourceTestFile, dwExportedFile)
+        .describedBy(builder.build());
+
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionResourcesXmlPlugin")
+        .definedBy("app-with-extension-xml-plugin-module-resources.xml").dependingOn(resourcesXmlPluginFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    final DefaultDomainManager domainManager = new DefaultDomainManager();
+    domainManager.addDomain(createDefaultDomain());
+
+    TestApplicationFactory appFactory =
+        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+                                     createDescriptorLoaderRepository());
+
+    deploymentService.setAppFactory(appFactory);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    //final assertion is to guarantee the DWL file can be accessed in the app classloader (cannot evaluate the expression as the
+    //test uses a mocked expression evaluator
+    final ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
+    final URL appDwlResource = appClassLoader.getResource(dwExportedFile);
+    assertThat(appDwlResource, is(isNotNull()));
+    final String expectedResource = IOUtils.toString(currentThread().getContextClassLoader().getResource(dwlResourceTestFile));
+    assertThat(IOUtils.toString(appDwlResource), is(expectedResource));
+  }
+
 
   @Test
   public void failsToDeployWithExtensionThatHasNonExistingIdForExtensionModel() throws Exception {
