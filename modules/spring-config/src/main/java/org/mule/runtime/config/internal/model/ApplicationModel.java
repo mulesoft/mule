@@ -419,14 +419,15 @@ public class ApplicationModel {
     }
 
     if (!configConfigurationPropertiesProviders.isEmpty()) {
-      // deployment properties provider has to go as parent here so we can reference them from configuration properties files
-      DefaultConfigurationPropertiesResolver deploymentPropertiesResolver =
-          new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
-                                                     deploymentPropertiesConfigurationProperties);
-
       CompositeConfigurationPropertiesProvider configurationAttributesProvider =
           new CompositeConfigurationPropertiesProvider(configConfigurationPropertiesProviders);
-      parentConfigurationPropertiesResolver = of(new DefaultConfigurationPropertiesResolver(of(deploymentPropertiesResolver),
+      parentConfigurationPropertiesResolver = of(new DefaultConfigurationPropertiesResolver(
+                                                                                            deploymentPropertiesConfigurationProperties != null
+                                                                                                ?
+                                                                                                // deployment properties provider has to go as parent here so we can reference them from configuration properties files
+                                                                                                of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
+                                                                                                                                              deploymentPropertiesConfigurationProperties))
+                                                                                                : parentConfigurationPropertiesResolver,
                                                                                             configurationAttributesProvider));
     }
     DefaultConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
@@ -436,17 +437,18 @@ public class ApplicationModel {
         new DefaultConfigurationPropertiesResolver(of(globalPropertiesConfigurationPropertiesResolver),
                                                    environmentPropertiesConfigurationProvider);
 
-    // deployment properties provider has to go as parent here so we can reference them from external files
-    DefaultConfigurationPropertiesResolver deploymentPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver), deploymentPropertiesConfigurationProperties);
-
     DefaultConfigurationPropertiesResolver externalPropertiesResolver =
-        new DefaultConfigurationPropertiesResolver(of(deploymentPropertiesResolver),
+        new DefaultConfigurationPropertiesResolver(
+                                                   deploymentPropertiesConfigurationProperties != null ?
+                                                   // deployment properties provider has to go as parent here so we can reference them from external files
+                                                       of(new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
+                                                                                                     deploymentPropertiesConfigurationProperties))
+                                                       : of(systemPropertiesResolver),
                                                    externalPropertiesConfigurationProvider);
-    if (deploymentProperties.isEmpty()) {
+    if (deploymentPropertiesConfigurationProperties == null) {
       this.configurationProperties = new PropertiesResolverConfigurationProperties(externalPropertiesResolver);
     } else {
-      // Finally the first configuration properties resolver should be deployment properties as they have precedence over the rest
+      // finally the first configuration properties resolver should be deployment properties as they have precedence over the rest
       this.configurationProperties =
           new PropertiesResolverConfigurationProperties(new DefaultConfigurationPropertiesResolver(of(externalPropertiesResolver),
                                                                                                    deploymentPropertiesConfigurationProperties));
