@@ -7,17 +7,18 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
-import java.util.Collections;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Filters classes and resources using a {@link ArtifactDescriptor} describing exported/blocked names.
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 public final class DefaultArtifactClassLoaderFilter implements ArtifactClassLoaderFilter {
 
   public static final ArtifactClassLoaderFilter NULL_CLASSLOADER_FILTER =
-      new DefaultArtifactClassLoaderFilter(Collections.EMPTY_SET, Collections.EMPTY_SET);
+      new DefaultArtifactClassLoaderFilter(emptySet(), emptySet());
 
   private static final char PACKAGE_SEPARATOR = '.';
   private static final String EMPTY_PACKAGE = "";
@@ -54,11 +55,11 @@ public final class DefaultArtifactClassLoaderFilter implements ArtifactClassLoad
   }
 
   private Set<String> sanitizeExportedResources(Set<String> exportedResources) {
-    return exportedResources.stream().map(this::sanitizeResourceName).collect(Collectors.toSet());
+    return exportedResources.stream().map(this::sanitizeResourceName).collect(toSet());
   }
 
   private Set<String> sanitizeClassPackageS(Set<String> exportedClassPackages) {
-    return exportedClassPackages.stream().map(this::sanitizePackageName).collect(Collectors.toSet());
+    return exportedClassPackages.stream().map(this::sanitizePackageName).collect(toSet());
   }
 
   private String sanitizePackageName(String exportedClassPackage) {
