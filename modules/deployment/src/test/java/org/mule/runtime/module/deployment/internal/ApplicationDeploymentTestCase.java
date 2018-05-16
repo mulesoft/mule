@@ -190,9 +190,10 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
         app.getRegistry().lookupByType(ConfigurationProperties.class);
     assertThat(configurationProperties.isPresent(), is(true));
 
-    String appHome = configurationProperties.get().resolveStringProperty("appHome")
-        .orElseThrow(() -> new RuntimeException("Could not find property appHome"));
-    assertThat(new File(appHome).exists(), is(true));
+    File appHome = new File(configurationProperties.get().resolveStringProperty("appHome")
+        .orElseThrow(() -> new RuntimeException("Could not find property appHome")));
+    assertThat(appHome.exists(), is(true));
+    assertThat(appHome.getName(), is(globalPropertyAppFileBuilder.getId()));
   }
 
   @Test

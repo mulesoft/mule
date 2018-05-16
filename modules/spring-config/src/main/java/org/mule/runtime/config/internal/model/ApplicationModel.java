@@ -377,27 +377,32 @@ public class ApplicationModel {
                                                     Optional<ConfigurationProperties> parentConfigurationProperties,
                                                     Map<String, String> deploymentProperties) {
 
-    EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
-        new EnvironmentPropertiesConfigurationProvider();
-    ConfigurationPropertiesProvider globalPropertiesConfigurationAttributeProvider =
-        createProviderFromGlobalProperties(artifactConfig);
-    DefaultConfigurationPropertiesResolver localResolver =
-        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(
-                                                                                                 of(new DefaultConfigurationPropertiesResolver(empty(),
-                                                                                                                                               environmentPropertiesConfigurationProvider)),
-                                                                                                 globalPropertiesConfigurationAttributeProvider)),
-                                                   environmentPropertiesConfigurationProvider);
-    List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
-        getConfigurationPropertiesProvidersFromComponents(artifactConfig, localResolver);
-    FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
-        new FileConfigurationPropertiesProvider(externalResourceProvider, "External files");
-
     ConfigurationPropertiesProvider deploymentPropertiesConfigurationProperties = null;
     if (!deploymentProperties.isEmpty()) {
       deploymentPropertiesConfigurationProperties =
           new MapConfigurationPropertiesProvider(deploymentProperties,
                                                  "Deployment properties");
     }
+
+    EnvironmentPropertiesConfigurationProvider environmentPropertiesConfigurationProvider =
+        new EnvironmentPropertiesConfigurationProvider();
+    ConfigurationPropertiesProvider globalPropertiesConfigurationAttributeProvider =
+        createProviderFromGlobalProperties(artifactConfig);
+
+    DefaultConfigurationPropertiesResolver environmentPropertiesConfigurationPropertiesResolver =
+        new DefaultConfigurationPropertiesResolver(empty(), environmentPropertiesConfigurationProvider);
+    DefaultConfigurationPropertiesResolver localResolver =
+        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(
+                                                                                                 deploymentPropertiesConfigurationProperties != null
+                                                                                                     ? of(new DefaultConfigurationPropertiesResolver(of(environmentPropertiesConfigurationPropertiesResolver),
+                                                                                                                                                     deploymentPropertiesConfigurationProperties))
+                                                                                                     : of(environmentPropertiesConfigurationPropertiesResolver),
+                                                                                                 globalPropertiesConfigurationAttributeProvider)),
+                                                   environmentPropertiesConfigurationProvider);
+    List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
+        getConfigurationPropertiesProvidersFromComponents(artifactConfig, localResolver);
+    FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
+        new FileConfigurationPropertiesProvider(externalResourceProvider, "External files");
 
     Optional<ConfigurationPropertiesResolver> parentConfigurationPropertiesResolver = of(localResolver);
     if (parentConfigurationProperties.isPresent()) {
@@ -429,7 +434,12 @@ public class ApplicationModel {
                                                                                                                                               deploymentPropertiesConfigurationProperties))
                                                                                                 : parentConfigurationPropertiesResolver,
                                                                                             configurationAttributesProvider));
+    } else if (deploymentPropertiesConfigurationProperties != null) {
+      parentConfigurationPropertiesResolver =
+          of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
+                                                        deploymentPropertiesConfigurationProperties));
     }
+
     DefaultConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
                                                    globalPropertiesConfigurationAttributeProvider);
