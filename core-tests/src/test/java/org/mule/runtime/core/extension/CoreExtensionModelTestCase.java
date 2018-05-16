@@ -49,6 +49,7 @@ import org.mule.metadata.api.model.impl.DefaultNumberType;
 import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
@@ -508,6 +509,53 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(onErrorDelegate.getAllowedStereotypes(), hasSize(1));
     assertThat(onErrorDelegate.getAllowedStereotypes().iterator().next().getType(), is(ON_ERROR.getType()));
   }
+
+  @Test
+  public void setPayload() {
+    OperationModel setPayload = coreExtensionModel.getOperationModel("setPayload").get();
+    ParameterModel value = setPayload.getAllParameterModels().get(0);
+    ParameterModel encoding = setPayload.getAllParameterModels().get(1);
+    ParameterModel mimeType = setPayload.getAllParameterModels().get(2);
+
+    assertThat(value.getName(), is("value"));
+    assertThat(value.getExpressionSupport(), is(SUPPORTED));
+    assertThat(value.getType(), is(instanceOf(StringType.class)));
+
+    assertThat(encoding.getName(), is("encoding"));
+    assertThat(encoding.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(encoding.getType(), is(instanceOf(StringType.class)));
+
+    assertThat(mimeType.getName(), is("mimeType"));
+    assertThat(mimeType.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(mimeType.getType(), is(instanceOf(StringType.class)));
+  }
+
+  @Test
+  public void setVariable() {
+    OperationModel setVariable = coreExtensionModel.getOperationModel("setVariable").get();
+
+    ParameterModel variableName = setVariable.getAllParameterModels().get(0);
+    ParameterModel value = setVariable.getAllParameterModels().get(1);
+    ParameterModel encoding = setVariable.getAllParameterModels().get(2);
+    ParameterModel mimeType = setVariable.getAllParameterModels().get(3);
+
+    assertThat(variableName.getName(), is("variableName"));
+    assertThat(variableName.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(variableName.getType(), is(instanceOf(StringType.class)));
+
+    assertThat(value.getName(), is("value"));
+    assertThat(value.getExpressionSupport(), is(SUPPORTED));
+    assertThat(value.getType(), is(instanceOf(StringType.class)));
+
+    assertThat(encoding.getName(), is("encoding"));
+    assertThat(encoding.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(encoding.getType(), is(instanceOf(StringType.class)));
+
+    assertThat(mimeType.getName(), is("mimeType"));
+    assertThat(mimeType.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(mimeType.getType(), is(instanceOf(StringType.class)));
+  }
+
 
   void verifyOnError(NestedRouteModel route) {
     List<ParameterModel> allParameterModels = route.getAllParameterModels();

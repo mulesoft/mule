@@ -307,16 +307,16 @@ class MuleExtensionModelDeclarer {
     setPayload.withOutputAttributes().ofType(typeLoader.load(void.class));
 
     setPayload.onDefaultParameterGroup()
+        .withRequiredParameter("value")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(SUPPORTED)
+        .describedAs("The value to be set on the payload. Supports expressions.");
+
+    setPayload.onDefaultParameterGroup()
         .withOptionalParameter("encoding")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The encoding of the value assigned to the payload.");
-
-    setPayload.onDefaultParameterGroup()
-        .withRequiredParameter("value")
-        .ofType(typeLoader.load(String.class))
-        .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The value to be set on the payload. Supports expressions.");
 
     setPayload.onDefaultParameterGroup()
         .withOptionalParameter("mimeType")
@@ -337,25 +337,25 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("variableName")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The variable name.");
+        .describedAs("The name of the variable.");
 
     setVariable.onDefaultParameterGroup()
         .withRequiredParameter("value")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(SUPPORTED)
-        .describedAs("The variable value.");
+        .describedAs("The value assigned to the variable. Supports expressions.");
 
     setVariable.onDefaultParameterGroup()
         .withOptionalParameter("encoding")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The encoding of the value assigned to the payload.");
+        .describedAs("The encoding of the value assigned to the variable.");
 
     setVariable.onDefaultParameterGroup()
         .withOptionalParameter("mimeType")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The mime type, e.g. text/plain or application/json");
+        .describedAs("The mime type of the value assigned to the variable, e.g. text/plain or application/json");
   }
 
   private void declareParseTemplate(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
