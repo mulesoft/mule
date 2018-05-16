@@ -432,6 +432,17 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void testModuleResources() {
+    String modulePath = "modules/module-resources.xml";
+    ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+
+    assertThat(extensionModel.getName(), is("module-resources"));
+    assertThat(extensionModel.getConfigurationModels().size(), is(0));
+    assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
+    assertThat(extensionModel.getOperationModels().size(), is(0));
+  }
+
+  @Test
   @Description("UX test to ensure parameterized stereotypes properly tells which config can be fed from the tools/UI")
   public void testModuleStereotypes() {
     String modulePath = "modules/module-stereotypes.xml";
@@ -487,13 +498,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(parameterModel.getName(), is(propertyName));
     assertThat(parameterModel.getAllowedStereotypes(), containsInAnyOrder(stereotypeModel));
   }
-
-
-  //TODO add test with two stereotypes usages for the same property that belong to different types, and then fail during compile time
-  //TODO add a test with something that has stereotype and also a usage for simple strings, making it work
-  //TODO add a test with something that has stereotype in two different properties and choose the more restrictive one
-
-
 
   /**
    * If {@link #validateXml} is true, the XML of the smart connector must be validated when reading it. False otherwise. Useful to

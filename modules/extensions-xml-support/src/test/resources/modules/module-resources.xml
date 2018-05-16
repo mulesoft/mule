@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-resources"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd">
+    <!-- =================================================================================================================
+    ============ This smart connector is empty as it will be used just to export resources (such as DWL files) ===========
+    ============================================= And it must remain empty ===============================================
+    ===================================================================================================================-->
+</module>
