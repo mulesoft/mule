@@ -1,4 +1,28 @@
 {
+  "4.1.3": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.core.api.config.MuleProperties.DOMAIN_HOME_DIRECTORY_PROPERTY",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleProperties",
+          "fieldName": "DOMAIN_HOME_DIRECTORY_PROPERTY",
+          "elementKind": "field",
+          "justification": "MULE-15027: app.name is resolved from Domain deployment properties when used as property place holder on file configuration properties"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.core.api.config.MuleProperties.DOMAIN_NAME_PROPERTY",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "MuleProperties",
+          "fieldName": "DOMAIN_NAME_PROPERTY",
+          "elementKind": "field",
+          "justification": "MULE-15027: app.name is resolved from Domain deployment properties when used as property place holder on file configuration properties"
+        }
+      ]
+    }
+  },
   "4.1.2": {
     "revapi": {
       "ignore": [
