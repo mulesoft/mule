@@ -209,7 +209,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">
                 <xsd:sequence maxOccurs="unbounded" minOccurs="1">
-                    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                    <xsd:choice minOccurs="0" maxOccurs="unbounded">
                         <xsd:element ref="property"/>
                         <xsd:element ref="connection"/>
                         <xsd:element ref="operation" />
