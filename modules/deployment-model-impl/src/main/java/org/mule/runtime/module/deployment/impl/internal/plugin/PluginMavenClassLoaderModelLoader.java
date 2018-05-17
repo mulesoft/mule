@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -37,9 +36,8 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  public PluginMavenClassLoaderModelLoader(MavenClient mavenClient,
-                                           LocalRepositorySupplierFactory localRepositorySupplierFactory) {
-    super(mavenClient, localRepositorySupplierFactory);
+  public PluginMavenClassLoaderModelLoader(MavenClient mavenClient) {
+    super(mavenClient);
   }
 
   @Override

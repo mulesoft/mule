@@ -13,7 +13,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
@@ -44,7 +43,6 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   private MavenClient mockMavenClient = mock(MavenClient.class);
-  private LocalRepositorySupplierFactory mockLocalRepository = mock(LocalRepositorySupplierFactory.class);
 
   @Test
   public void patchedApplicationLoadsUpdatedConnector() throws InvalidDescriptorLoaderException {
@@ -92,7 +90,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   private ClassLoaderModel buildClassLoaderModel(File rootApplication)
       throws InvalidDescriptorLoaderException {
     DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader =
-        new DeployableMavenClassLoaderModelLoader(mockMavenClient, mockLocalRepository);
+        new DeployableMavenClassLoaderModelLoader(mockMavenClient);
 
     return deployableMavenClassLoaderModelLoader.load(rootApplication, emptyMap(), APP);
   }
