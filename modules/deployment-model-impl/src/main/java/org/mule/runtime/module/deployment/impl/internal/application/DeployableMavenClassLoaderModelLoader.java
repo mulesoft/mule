@@ -17,7 +17,6 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
-import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -54,9 +53,8 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient,
-                                               LocalRepositorySupplierFactory localRepositorySupplierFactory) {
-    super(mavenClient, localRepositorySupplierFactory);
+  public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient) {
+    super(mavenClient);
   }
 
   @Override

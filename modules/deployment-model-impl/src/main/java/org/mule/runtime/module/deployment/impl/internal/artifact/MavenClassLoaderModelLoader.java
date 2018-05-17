@@ -54,9 +54,9 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
     MavenClient mavenClient = mavenClientProvider.createMavenClient(mavenRuntimeConfig);
 
     deployableMavenClassLoaderModelLoader =
-        new DeployableMavenClassLoaderModelLoader(mavenClient, mavenClientProvider.getLocalRepositorySuppliers());
+        new DeployableMavenClassLoaderModelLoader(mavenClient);
     pluginMavenClassLoaderModelLoader =
-        new PluginMavenClassLoaderModelLoader(mavenClient, mavenClientProvider.getLocalRepositorySuppliers());
+        new PluginMavenClassLoaderModelLoader(mavenClient);
 
     libFolderClassLoaderModelLoader = new LibFolderClassLoaderModelLoader();
   }

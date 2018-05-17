@@ -25,7 +25,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.maven.client.api.model.BundleScope.COMPILE;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.maven.client.api.model.MavenConfiguration;
@@ -69,7 +68,6 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   private MavenClient mockMavenClient = mock(MavenClient.class, RETURNS_DEEP_STUBS);
-  private LocalRepositorySupplierFactory mockLocalRepository = mock(LocalRepositorySupplierFactory.class);
 
   @Test
   public void patchedApplicationLoadsUpdatedConnector() throws InvalidDescriptorLoaderException {
@@ -171,7 +169,6 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     File app = toFile(getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER, "no-dependencies").toString()));
 
     when(mockMavenClient.getMavenConfiguration()).thenReturn(mock(MavenConfiguration.class, RETURNS_DEEP_STUBS));
-    when(mockLocalRepository.composeSuppliers(any(), any())).thenReturn(() -> app);
 
     ClassLoaderModel classLoaderModel = buildClassLoaderModel(app);
     assertThat(classLoaderModel.getDependencies(), hasSize(expectedDependencies));
@@ -228,7 +225,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   private ClassLoaderModel buildClassLoaderModel(File rootApplication)
       throws InvalidDescriptorLoaderException {
     DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader =
-        new DeployableMavenClassLoaderModelLoader(mockMavenClient, mockLocalRepository);
+        new DeployableMavenClassLoaderModelLoader(mockMavenClient);
 
     return deployableMavenClassLoaderModelLoader.load(rootApplication, emptyMap(), APP);
   }
