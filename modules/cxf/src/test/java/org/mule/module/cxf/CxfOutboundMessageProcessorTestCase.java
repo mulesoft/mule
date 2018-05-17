@@ -6,8 +6,13 @@
  */
 package org.mule.module.cxf;
 
-import org.hamcrest.core.Is;
+import static org.apache.cxf.endpoint.ClientImpl.THREAD_LOCAL_REQUEST_CONTEXT;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.hamcrest.core.IsInstanceOf;
+import org.junit.Test;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -15,12 +20,6 @@ import org.mule.api.component.simple.EchoService;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.cxf.builder.SimpleClientMessageProcessorBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
@@ -73,12 +72,16 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
         
         MuleEvent event = getTestEvent("hello", getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
         MuleEvent response = processor.process(event);
-        assertThat(processor.getClient().getRequestContext().isEmpty(), Is.is(true));
-        assertThat(processor.getClient().getResponseContext().isEmpty(), Is.is(true));
+        // After CXF-7710, when the request context is cleared, the Thread is also removed from the context
+        // so when you invoke getRequestContext, the requestContext is recreated with
+        // the current context. That is why getRequestContext is not empty and THREAD_LOCAL_REQUEST_CONTEXT is present.
+        assertThat(processor.getClient().getRequestContext().entrySet(), hasSize(1));
+        assertThat((Boolean) processor.getClient().getRequestContext().get(THREAD_LOCAL_REQUEST_CONTEXT), is(true));
+        assertThat(processor.getClient().getResponseContext().isEmpty(), is(true));
         Object payload = response.getMessage().getPayload();
         assertThat(payload, IsInstanceOf.instanceOf(String.class));
-        assertThat((String) payload,Is.is("hello"));
-        assertThat(gotEvent,Is.is(true));
+        assertThat((String) payload, is("hello"));
+        assertThat(gotEvent, is(true));
     }
 
 }
