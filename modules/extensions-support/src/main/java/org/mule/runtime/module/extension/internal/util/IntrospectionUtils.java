@@ -120,6 +120,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -571,20 +572,33 @@ public final class IntrospectionUtils {
     return emptyList();
   }
 
-  public static List<ResolvableType> getInterfaceGenerics(final java.lang.reflect.Type type,
-                                                          final Class<?> implementedInterface) {
+  public static List<java.lang.reflect.Type> getInterfaceGenerics(final java.lang.reflect.Type type,
+                                                                  final Class<?> implementedInterface) {
 
     ResolvableType interfaceType = null;
     ResolvableType searchClass = ResolvableType.forType(type);
 
-    if (searchClass.getRawClass().equals(implementedInterface)) {
-      return asList(ResolvableType.forType(type).getGenerics());
+    if (implementedInterface.equals(searchClass.getRawClass())) {
+      return stream(searchClass.getGenerics()).map(resolvableType -> resolvableType.getType()).collect(toList());
     }
+
+    Map<String, java.lang.reflect.Type> genericTypes = new HashMap<>();
+
+    addGenericsToMap(genericTypes, searchClass);
 
     while (!Object.class.equals(searchClass.getRawClass())) {
       for (ResolvableType iType : searchClass.getInterfaces()) {
         if (implementedInterface.isAssignableFrom(iType.getRawClass())) {
+          addGenericsToMap(genericTypes, iType);
           interfaceType = iType;
+          while (!implementedInterface.equals(interfaceType.getRawClass())) {
+            for (ResolvableType innerIType : interfaceType.getInterfaces()) {
+              if (implementedInterface.isAssignableFrom(innerIType.getRawClass())) {
+                addGenericsToMap(genericTypes, innerIType);
+                interfaceType = innerIType;
+              }
+            }
+          }
           break;
         }
       }
@@ -593,6 +607,7 @@ public final class IntrospectionUtils {
         break;
       } else {
         searchClass = searchClass.getSuperType();
+        addGenericsToMap(genericTypes, searchClass);
       }
     }
 
@@ -603,12 +618,24 @@ public final class IntrospectionUtils {
 
     List<ResolvableType> generics = asList(interfaceType.getGenerics());
 
-    if (generics.stream().anyMatch(obj -> isNull(obj.getRawClass()))) {
-      return findGenericsInSuperHierarchy(ResolvableType.forType(type).getRawClass()).stream().map(ResolvableType::forClass)
-          .collect(toList());
-    }
+    return generics.stream().map(resolvableType -> {
+      java.lang.reflect.Type genericType = resolvableType.getType();
+      if (genericType instanceof TypeVariable) {
+        genericType = genericTypes.get(resolvableType.toString());
+      }
+      return genericType;
+    }).collect(toList());
+  }
 
-    return generics;
+  private static void addGenericsToMap(Map<String, java.lang.reflect.Type> genericTypes, ResolvableType type) {
+    ResolvableType[] generics = type.getGenerics();
+    for (ResolvableType resolvableType : generics) {
+      java.lang.reflect.Type foundType = resolvableType.getType();
+
+      if (!(foundType instanceof TypeVariable)) {
+        genericTypes.put(resolvableType.toString(), foundType);
+      }
+    }
   }
 
   public static List<Class<?>> findGenericsInSuperHierarchy(final Class<?> type) {
@@ -657,16 +684,19 @@ public final class IntrospectionUtils {
     return emptyList();
   }
 
-  public static List<java.lang.reflect.Type> getSuperClassGenerics(Class<?> currentType, Class<?> superClass) {
-    if (!superClass.isAssignableFrom(currentType)) {
+  public static List<java.lang.reflect.Type> getSuperClassGenerics(java.lang.reflect.Type currentType, Class<?> superClass) {
+    ResolvableType searchType = ResolvableType.forType(currentType);
+
+
+    if (!superClass.isAssignableFrom(searchType.getRawClass())) {
       throw new IllegalArgumentException(
-                                         format("Class '%s' does not extend the '%s' class", currentType.getName(),
+                                         format("Class '%s' does not extend the '%s' class",
+                                                searchType.getRawClass().getCanonicalName(),
                                                 superClass.getName()));
     }
 
     Map<String, java.lang.reflect.Type> genericTypes = new HashMap<>();
 
-    ResolvableType searchType = ResolvableType.forType(currentType);
     while (!Object.class.equals(searchType.getType())) {
 
       ResolvableType[] generics = searchType.getGenerics();
@@ -1498,8 +1528,8 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Given a {@link ParameterizedModel} iterates over all the parameter groups show in dsl and returns a mapping of
-   * parameter name and parameter group name.
+   * Given a {@link ParameterizedModel} iterates over all the parameter groups show in dsl and returns a mapping of parameter name
+   * and parameter group name.
    *
    * @param parameterizedModel Model to introspect.
    * @return A map with parameters from Show in DSL parameters

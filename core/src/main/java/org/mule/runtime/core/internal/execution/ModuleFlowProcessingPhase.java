@@ -58,6 +58,7 @@ import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
@@ -288,7 +289,9 @@ public class ModuleFlowProcessingPhase
 
       if (resultValue instanceof Collection && adapter.isCollection()) {
         message = toMessage(Result.<Collection<Message>, TypedValue>builder()
-            .output(toMessageCollection((Collection<Result>) resultValue, adapter.getCursorProviderFactory(),
+            .output(toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
+                                                                               adapter.getMediaTypeResolver()),
+                                        adapter.getCursorProviderFactory(),
                                         templateEvent))
             .mediaType(result.getMediaType().orElse(ANY))
             .build());

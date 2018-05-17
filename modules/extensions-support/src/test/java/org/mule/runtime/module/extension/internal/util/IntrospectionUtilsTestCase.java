@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.util;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static org.apache.commons.collections.CollectionUtils.find;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -30,6 +31,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.a
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -51,6 +53,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -108,8 +111,12 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   public static final String PAGING_PROVIDER = "pagingProvider";
   public static final String PAGING_PROVIDER_OPERATION_RESULT = "pagingProviderOperationResult";
   public static final String FOO = "foo";
+  public static final String LIST_RESULT_STRING = "listResultStringObject";
   public static ProcessingEnvironment processingEnvironment;
   private List<FruitBasket> baskets;
+
+
+  private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   @Rule
   public CompilationRule compilationRule = new CompilationRule();
@@ -150,6 +157,24 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   public void getMethodReturnType() throws Exception {
     MetadataType metadataType = IntrospectionUtils.getMethodReturnType(getMethod(FOO));
     assertDictionary(metadataType, Apple.class);
+  }
+
+  @Test
+  public void getGenericsFromReturnType() throws Exception {
+    OperationElement listResultStringObject = getMethod(LIST_RESULT_STRING, null);
+    Type returnType = listResultStringObject.getReturnType();
+    List<Type> listGeneric = returnType.getSuperTypeGenerics(Collection.class);
+    assertThat(listGeneric.get(0).getTypeName(), containsString("Result"));
+    List<Type> resultGenerics = listGeneric.get(0).getSuperTypeGenerics(Result.class);
+    assertThat(resultGenerics.get(0).getTypeName(), containsString("String"));
+  }
+
+  @Test
+  public void getGenericsFromIndirectInterface() throws Exception {
+    Type classType = typeSupplier.apply(OtherClass.class);
+    List<Type> listGeneric = classType.getSuperTypeGenerics(RootInterface.class);
+    assertThat(listGeneric.get(0).getTypeName(), containsString("Integer"));
+    assertThat(listGeneric.get(1).getTypeName(), containsString("String"));
   }
 
   @Test
@@ -442,6 +467,10 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     return new HashMap<>();
   }
 
+  public List<Result<String, Object>> listResultStringObject() {
+    return null;
+  }
+
   public List listNoGenerics() {
     return new ArrayList();
   }
@@ -549,6 +578,36 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     public void onStop() {
 
     }
+  }
+
+  public interface RootInterface<T, A> {
+
+    public void doSomething();
+  }
+
+  public interface SecondInterface<K> extends RootInterface<Integer, K> {
+
+    public void doSomethingElse();
+  }
+
+  public interface ThirdInterface extends SecondInterface<String> {
+
+    public void doNothing();
+  }
+
+  public static class BaseClass implements ThirdInterface {
+
+    @Override
+    public void doSomething() {}
+
+    @Override
+    public void doSomethingElse() {}
+
+    @Override
+    public void doNothing() {}
+  }
+
+  public static class OtherClass extends BaseClass {
   }
 
   public static class SomePojo {

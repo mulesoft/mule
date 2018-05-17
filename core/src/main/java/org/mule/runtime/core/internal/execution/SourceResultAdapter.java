@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.execution;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.internal.util.mediatype.MediaTypeResolver;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class SourceResultAdapter {
   private final boolean isCollection;
   private final MediaType mediaType;
   private final Optional<String> correlationId;
+  private final MediaTypeResolver mediaTypeResolver;
 
   /**
    * Creates a new instance
@@ -36,16 +38,37 @@ public class SourceResultAdapter {
    * @param isCollection          whether the {@code result} represents a {@link List} of messages.
    * @param correlationId         the correlationId of the message to be set
    */
+  @Deprecated
   public SourceResultAdapter(Result<?, ?> result,
                              CursorProviderFactory cursorProviderFactory,
                              MediaType mediaType,
                              boolean isCollection,
                              Optional<String> correlationId) {
+    this(result, cursorProviderFactory, mediaType, isCollection, correlationId, null);
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @param result the source result
+   * @param cursorProviderFactory the {@link CursorStreamProviderFactory} used by the source
+   * @param mediaType the {@link MediaType} to set in the message
+   * @param isCollection whether the {@code result} represents a {@link List} of messages.
+   * @param correlationId the correlationId of the message to be set
+   * @param mediaTypeResolver resolver used in case result is a {@link List} of results.
+   */
+  public SourceResultAdapter(Result<?, ?> result,
+                             CursorProviderFactory cursorProviderFactory,
+                             MediaType mediaType,
+                             boolean isCollection,
+                             Optional<String> correlationId,
+                             MediaTypeResolver mediaTypeResolver) {
     this.result = result;
     this.cursorProviderFactory = cursorProviderFactory;
     this.mediaType = mediaType;
     this.isCollection = isCollection;
     this.correlationId = correlationId;
+    this.mediaTypeResolver = mediaTypeResolver;
   }
 
   /**
@@ -79,5 +102,12 @@ public class SourceResultAdapter {
 
   public MediaType getMediaType() {
     return mediaType;
+  }
+
+  /**
+   * @since 4.2
+   */
+  public MediaTypeResolver getMediaTypeResolver() {
+    return mediaTypeResolver;
   }
 }

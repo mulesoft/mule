@@ -23,6 +23,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -50,6 +51,8 @@ import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
@@ -76,6 +79,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -104,6 +109,131 @@ public class HeisenbergOperations implements Disposable {
 
   @Inject
   private ExtensionManager extensionManager;
+
+  public List<Result<String, Object>> getSimpleBlacklist(@Config HeisenbergExtension config) {
+    List<Result<String, Object>> blacklist = new LinkedList<>();
+    blacklist.add(Result.<String, Object>builder().output("Fring").build());
+    blacklist.add(Result.<String, Object>builder().output("Salamanca").build());
+    blacklist.add(Result.<String, Object>builder().output("Ehrmantraut").build());
+    return blacklist;
+  }
+
+  public List<Result<InputStream, Object>> getBlacklist(@Config HeisenbergExtension config) {
+    List<Result<InputStream, Object>> blacklist = new LinkedList<>();
+    blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Fring".getBytes())).build());
+    blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Salamanca".getBytes())).build());
+    blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Ehrmantraut".getBytes())).build());
+    return blacklist;
+  }
+
+  public PagingProvider<HeisenbergConnection, Result<InputStream, Object>> getPagedBlacklist(@Config HeisenbergExtension config) {
+
+    return new PagingProvider<HeisenbergConnection, Result<InputStream, Object>>() {
+
+      private final static int LIST_PAGE_SIZE = 2;
+
+      private boolean initialized = false;
+      private List<Result<InputStream, Object>> blacklist;
+      private Iterator<Result<InputStream, Object>> blacklistIterator;
+
+      public void initializeList() {
+        blacklist = new LinkedList<>();
+        blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Fring".getBytes())).build());
+        blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Salamanca".getBytes())).build());
+        blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Ehrmantraut".getBytes())).build());
+        blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Alquist".getBytes())).build());
+        blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Schrader".getBytes())).build());
+        blacklist.add(Result.<InputStream, Object>builder().output(new ByteArrayInputStream("Gomez".getBytes())).build());
+        blacklistIterator = blacklist.iterator();
+      }
+
+      @Override
+      public List<Result<InputStream, Object>> getPage(HeisenbergConnection connection) {
+        if (blacklist == null) {
+          initializeList();
+        }
+        List<Result<InputStream, Object>> page = new LinkedList<>();
+        for (int i = 0; i < LIST_PAGE_SIZE && blacklistIterator.hasNext(); i++) {
+          page.add(blacklistIterator.next());
+        }
+        return page;
+      }
+
+      @Override
+      public java.util.Optional<Integer> getTotalResults(HeisenbergConnection connection) {
+        if (blacklist == null) {
+          initializeList();
+        }
+        return java.util.Optional.of(blacklist.size());
+      }
+
+      @Override
+      public void close(HeisenbergConnection connection) throws MuleException {
+        connection.disconnect();
+      }
+    };
+  }
+
+  public PagingProvider<HeisenbergConnection, Result<CursorProvider, Object>> getPagedCursorProviderBlacklist(@Config HeisenbergExtension config,
+                                                                                                              StreamingHelper streamingHelper) {
+
+    return new PagingProvider<HeisenbergConnection, Result<CursorProvider, Object>>() {
+
+      private final static int LIST_PAGE_SIZE = 2;
+
+      private boolean initialized = false;
+      private List<Result<CursorProvider, Object>> blacklist;
+      private Iterator<Result<CursorProvider, Object>> blacklistIterator;
+
+      public void initializeList() {
+        blacklist = new LinkedList<>();
+        blacklist.add(Result.<CursorProvider, Object>builder()
+            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream("Fring".getBytes()))))
+            .build());
+        blacklist.add(Result.<CursorProvider, Object>builder()
+            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream("Salamanca".getBytes()))))
+            .build());
+        blacklist.add(Result.<CursorProvider, Object>builder()
+            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream("Ehrmantraut".getBytes()))))
+            .build());
+        blacklist.add(Result.<CursorProvider, Object>builder()
+            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream("Alquist".getBytes()))))
+            .build());
+        blacklist.add(Result.<CursorProvider, Object>builder()
+            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream("Schrader".getBytes()))))
+            .build());
+        blacklist.add(Result.<CursorProvider, Object>builder()
+            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream("Gomez".getBytes()))))
+            .build());
+        blacklistIterator = blacklist.iterator();
+      }
+
+      @Override
+      public List<Result<CursorProvider, Object>> getPage(HeisenbergConnection connection) {
+        if (blacklist == null) {
+          initializeList();
+        }
+        List<Result<CursorProvider, Object>> page = new LinkedList<>();
+        for (int i = 0; i < LIST_PAGE_SIZE && blacklistIterator.hasNext(); i++) {
+          page.add(blacklistIterator.next());
+        }
+        return page;
+      }
+
+      @Override
+      public java.util.Optional<Integer> getTotalResults(HeisenbergConnection connection) {
+        if (blacklist == null) {
+          initializeList();
+        }
+        return java.util.Optional.of(blacklist.size());
+      }
+
+      @Override
+      public void close(HeisenbergConnection connection) throws MuleException {
+        connection.disconnect();
+      }
+    };
+  }
 
   @Streaming
   @MediaType(value = ANY, strict = false)

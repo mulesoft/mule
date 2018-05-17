@@ -244,7 +244,7 @@ public class TypeWrapper implements Type {
           .map(e -> new TypeWrapper(e, typeLoader))
           .collect(toList());
     } else {
-      return IntrospectionUtils.getSuperClassGenerics(aClass, superType)
+      return IntrospectionUtils.getSuperClassGenerics(type, superType)
           .stream()
           .map(e -> new TypeWrapper(e, typeLoader))
           .collect(toList());

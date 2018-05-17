@@ -12,6 +12,7 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.probe.PollingProber.check;
@@ -117,7 +118,7 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
 
   @Test
   public void sourceOverridesContentType() throws Exception {
-    ((Startable) getFlowConstruct("sourceMimeType")).start();
+    startFlow("sourceMimeType");
     check(PROBER_TIMEOUT, PROBER_FREQUENCY, () -> {
       if (MediaTypeCollectorProcessor.getMediaTypes().size() == 2) {
         return true;
@@ -133,9 +134,67 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
   }
 
   @Test
+  public void sourceWithAListAsResultOverridesContentType() throws Exception {
+    startFlow("sourceListMimeType");
+    check(PROBER_TIMEOUT, PROBER_FREQUENCY, () -> {
+      if (MediaTypeCollectorProcessor.getMediaTypes().size() == 3) {
+        return true;
+      }
+      return false;
+    });
+
+    assertTrue(MediaTypeCollectorProcessor.getMediaTypes().stream()
+        .allMatch(mediaType -> mediaType.getPrimaryType().equals("pet")));
+
+    assertTrue(MediaTypeCollectorProcessor.getMediaTypes().stream()
+        .allMatch(mediaType -> mediaType.getSubType().equals("plain")));
+  }
+
+  @Test
+  public void operationWithListResultStringOutputOverridesContentType() throws Exception {
+    runFlow("listStringMediaType");
+
+    assertTrue(MediaTypeCollectorProcessor.getMediaTypes().stream()
+        .allMatch(mediaType -> mediaType.getPrimaryType().equals("application")));
+
+    assertTrue(MediaTypeCollectorProcessor.getMediaTypes().stream()
+        .allMatch(mediaType -> mediaType.getSubType().equals("java")));
+  }
+
+  @Test
+  public void operationWithListResultStreamOutputOverridesContentType() throws Exception {
+    runFlow("listStreamMediaType");
+    assertTrue(MediaTypeCollectorProcessor.getMediaTypes().stream()
+        .allMatch(mediaType -> mediaType.getCharset().get().displayName().equals("UTF-16")));
+
+    assertTrue(MediaTypeCollectorProcessor.getMediaTypes().stream()
+        .allMatch(mediaType -> mediaType.getPrimaryType().equals("application")));
+
+    assertTrue(MediaTypeCollectorProcessor.getMediaTypes().stream()
+        .allMatch(mediaType -> mediaType.getSubType().equals("java")));
+  }
+
+  @Test
+  public void operationWithPagingProviderResultCursorProviderOutputOverridesContentType() throws Exception {
+    runFlow("pagedCursorProviderMediaType");
+    assertTrue(MediaTypeCollectorProcessor.getMediaTypes().stream()
+        .allMatch(mediaType -> mediaType.getCharset().get().displayName().equals("UTF-16")));
+
+    assertTrue(MediaTypeCollectorProcessor.getMediaTypes().stream()
+        .allMatch(mediaType -> mediaType.getPrimaryType().equals("application")));
+
+    assertTrue(MediaTypeCollectorProcessor.getMediaTypes().stream()
+        .allMatch(mediaType -> mediaType.getSubType().equals("java")));
+  }
+
+  @Test
   public void strictMimeType() throws Exception {
     CoreEvent response = runFlow("strictMimeType");
     assertThat(response.getMessage().getPayload().getDataType().getMediaType().matches(TEXT), is(true));
+  }
+
+  private void startFlow(String flowName) throws Exception {
+    ((Startable) getFlowConstruct(flowName)).start();
   }
 
   private void assertCustomMimeType(DataType dataType) {

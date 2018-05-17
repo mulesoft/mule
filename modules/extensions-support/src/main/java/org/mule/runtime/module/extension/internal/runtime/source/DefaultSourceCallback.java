@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
@@ -29,6 +31,7 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.core.internal.util.mediatype.MediaTypeResolver;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -197,12 +200,18 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     validateNotifications(contextAdapter);
     MessageProcessContext messageProcessContext = processContextSupplier.get();
-
-    MediaType mediaType = resolveMediaType(result, messageSource.getInitialisationParameters());
+    Map<String, Object> initialisationParameters = messageSource.getInitialisationParameters();
+    MediaType mediaType = resolveMediaType(result, initialisationParameters);
+    MediaTypeResolver mediaTypeResolver = new MediaTypeResolver(getDefaultEncoding(muleContext),
+                                                                defaultMediaType,
+                                                                ofNullable((String) initialisationParameters
+                                                                    .get(ENCODING_PARAMETER_NAME)),
+                                                                ofNullable((String) initialisationParameters
+                                                                    .get(MIME_TYPE_PARAMETER_NAME)));
 
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
-                                context.getCorrelationId());
+                                context.getCorrelationId(), mediaTypeResolver);
     Message message = of(resultAdapter);
 
     executeFlow(context, messageProcessContext, message);

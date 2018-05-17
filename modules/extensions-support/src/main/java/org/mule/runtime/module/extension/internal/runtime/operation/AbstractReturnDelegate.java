@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
@@ -33,6 +35,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.util.StreamingUtils;
+import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
+import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultIterator;
+import org.mule.runtime.core.internal.util.mediatype.MediaTypeResolver;
 import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -54,10 +59,9 @@ import java.util.Optional;
  * Contains the logic for taking an operation's output value and turn it into a {@link Message} which not only contains the
  * updated payload but also the proper {@link DataType} and attributes.
  * <p>
- * It also consider the case in which the value is a {@code List<Result>} which should be turned into a {@code List<Message>}.
- * For any of this cases, it also allows specifying a {@link CursorProviderFactory} which will transform the streaming payload
- * values into {@link CursorProvider} instances. As said before, this is also applied then the value is a message or list of
- * them
+ * It also consider the case in which the value is a {@code List<Result>} which should be turned into a {@code List<Message>}. For
+ * any of this cases, it also allows specifying a {@link CursorProviderFactory} which will transform the streaming payload values
+ * into {@link CursorProvider} instances. As said before, this is also applied then the value is a message or list of them
  *
  * @since 4.0
  */
@@ -73,9 +77,10 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   /**
    * Creates a new instance
    *
-   * @param componentModel        the component which produces the return value
-   * @param cursorProviderFactory the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be {@code null}
-   * @param muleContext           the {@link MuleContext} of the owning application
+   * @param componentModel the component which produces the return value
+   * @param cursorProviderFactory the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be
+   *        {@code null}
+   * @param muleContext the {@link MuleContext} of the owning application
    */
   protected AbstractReturnDelegate(ComponentModel componentModel,
                                    CursorProviderFactory cursorProviderFactory,
@@ -122,10 +127,22 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
           ? MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event, returnHandler.getDataType())
           : MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event);
     } else {
+      MediaTypeResolver mediaTypeResolver = new MediaTypeResolver(getDefaultEncoding(muleContext),
+                                                                  defaultMediaType,
+                                                                  operationContext.hasParameter(ENCODING_PARAMETER_NAME)
+                                                                      ? of((String) operationContext
+                                                                          .getParameter(ENCODING_PARAMETER_NAME))
+                                                                      : empty(),
+                                                                  operationContext.hasParameter(MIME_TYPE_PARAMETER_NAME)
+                                                                      ? of((String) operationContext
+                                                                          .getParameter(MIME_TYPE_PARAMETER_NAME))
+                                                                      : empty());
       if (value instanceof Collection && returnsListOfMessages) {
-        value = toMessageCollection((Collection<Result>) value, cursorProviderFactory, event);
+        value = toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) value, mediaTypeResolver),
+                                    cursorProviderFactory, event);
       } else if (value instanceof Iterator && returnsListOfMessages) {
-        value = toMessageIterator((Iterator<Result>) value, cursorProviderFactory, event);
+        value = toMessageIterator(new MediaTypeDecoratedResultIterator((Iterator<Result>) value, mediaTypeResolver),
+                                  cursorProviderFactory, event);
       }
 
       value = streamingContent(value, operationContext, cursorProviderFactory, event);
