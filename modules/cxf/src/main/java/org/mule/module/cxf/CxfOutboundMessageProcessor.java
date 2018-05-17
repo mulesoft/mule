@@ -23,6 +23,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.cxf.i18n.CxfMessages;
 import org.mule.module.cxf.security.WebServiceSecurityException;
+import org.mule.module.cxf.support.CxfUtils;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConnector;
@@ -81,10 +82,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     {
         // MULE-4899: cleans up client's request and response context to avoid a
         // memory leak.
-        Map<String, Object> requestContext = client.getRequestContext();
-        requestContext.clear();
-        Map<String, Object> responseContext = client.getResponseContext();
-        responseContext.clear();
+        CxfUtils.clearClientContextIfNeeded(client);
     }
 
     protected Object[] getArgs(MuleEvent event) throws TransformerException

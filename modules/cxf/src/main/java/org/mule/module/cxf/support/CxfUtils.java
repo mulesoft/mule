@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.SoapVersionFactory;
+import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
@@ -27,6 +28,20 @@ import org.apache.cxf.transport.MessageObserver;
 public final class CxfUtils
 {
 
+    /**
+     * Clear observer contexts if needed
+     * 
+     * @param client observer to be cleared in case it needed
+     */
+    public static void clearClientContextIfNeeded(MessageObserver client)
+    {
+        if (client instanceof ClientImpl)
+        {
+            ((ClientImpl) client).getRequestContext().clear();
+            ((ClientImpl) client).getResponseContext().clear();
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     public static boolean removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name)
     {

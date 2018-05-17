@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf.transport;
 
+import static org.mule.module.cxf.support.CxfUtils.clearClientContextIfNeeded;
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -325,6 +326,7 @@ public class MuleUniversalConduit extends AbstractConduit
                 inMessage.setContent(InputStream.class, is);
                 inMessage.setExchange(m.getExchange());
                 getMessageObserver().onMessage(inMessage);
+                clearClientContextIfNeeded(getMessageObserver());
                 return;
             }
         }
@@ -453,6 +455,7 @@ public class MuleUniversalConduit extends AbstractConduit
             inMessage.remove(Message.ASYNC_POST_RESPONSE_DISPATCH);
 
             incomingObserver.onMessage(inMessage);
+            clearClientContextIfNeeded(getMessageObserver());
         }
     }
     
