@@ -36,6 +36,8 @@ public interface HttpResponseReadyCallback {
    * @param responseStatusCallback callback to be called if there's a failure while sending the response or when it is successfully sent.
    * @param encoding the encoding the {@link Writer} will use
    * @return an HTTP body {@link Writer}
+   *
+   * @since 4.2
    */
   Writer startResponse(HttpResponse response, ResponseStatusCallback responseStatusCallback, Charset encoding);
 
