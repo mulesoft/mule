@@ -19,7 +19,17 @@
           "methodName": "sendAsync",
           "elementKind": "method",
           "justification": "Services implementations should match container API"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.io.Writer org.mule.runtime.http.api.server.async.HttpResponseReadyCallback::startResponse(org.mule.runtime.http.api.domain.message.response.HttpResponse, org.mule.runtime.http.api.server.async.ResponseStatusCallback, java.nio.charset.Charset)",
+          "package": "org.mule.runtime.http.api.server.async",
+          "classSimpleName": "HttpResponseReadyCallback",
+          "methodName": "startResponse",
+          "elementKind": "method",
+          "justification": "Services implementations should match container API"
         }
+
       ]
     }
   },
