@@ -139,6 +139,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
@@ -209,7 +210,7 @@ class SpringMuleContextServiceConfigurator {
                .getBeanDefinition())
       .put(OBJECT_LOCAL_STORE_PERSISTENT,
            getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultPersistentObjectStore"))
-      .put(OBJECT_STORE_MANAGER, getBeanDefinition(MuleObjectStoreManager.class))
+      .put(OBJECT_STORE_MANAGER, getPrimaryBeanDefinition(MuleObjectStoreManager.class))
       .put(OBJECT_QUEUE_MANAGER, getBeanDefinition(TransactionalQueueManager.class))
       .put(OBJECT_SECURITY_MANAGER, getBeanDefinition(DefaultMuleSecurityManager.class))
       .put(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, getBeanDefinition(MuleMessageProcessingManager.class))
@@ -289,7 +290,7 @@ class SpringMuleContextServiceConfigurator {
       }
 
       final CustomService customService = customServices.get(serviceName);
-      final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService);
+      final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);
 
       registerBeanDefinition(serviceName, beanDefinition);
     }
@@ -297,13 +298,13 @@ class SpringMuleContextServiceConfigurator {
 
   private void registerBeanDefinition(String serviceId, BeanDefinition beanDefinition) {
     beanDefinition = customServiceRegistry.getOverriddenService(serviceId)
-        .map(this::getCustomServiceBeanDefinition)
+        .map(customService -> getCustomServiceBeanDefinition(customService, serviceId))
         .orElse(beanDefinition);
 
     beanDefinitionRegistry.registerBeanDefinition(serviceId, beanDefinition);
   }
 
-  private BeanDefinition getCustomServiceBeanDefinition(CustomService customService) {
+  private BeanDefinition getCustomServiceBeanDefinition(CustomService customService, String serviceId) {
     BeanDefinition beanDefinition;
 
     Optional<Class> customServiceClass = customService.getServiceClass();
@@ -320,6 +321,11 @@ class SpringMuleContextServiceConfigurator {
     } else {
       throw new IllegalStateException("A custom service must define a service class or instance");
     }
+
+    if (OBJECT_STORE_MANAGER.equals(serviceId)) {
+      beanDefinition.setPrimary(true);
+    }
+
     return beanDefinition;
   }
 
@@ -327,7 +333,7 @@ class SpringMuleContextServiceConfigurator {
     AtomicBoolean customManagerDefined = new AtomicBoolean(false);
     customServiceRegistry.getOverriddenService(OBJECT_QUEUE_MANAGER).ifPresent(customService -> {
       customManagerDefined.set(true);
-      registerBeanDefinition(OBJECT_QUEUE_MANAGER, getCustomServiceBeanDefinition(customService));
+      registerBeanDefinition(OBJECT_QUEUE_MANAGER, getCustomServiceBeanDefinition(customService, OBJECT_QUEUE_MANAGER));
     });
 
     if (customManagerDefined.get()) {
@@ -341,7 +347,8 @@ class SpringMuleContextServiceConfigurator {
     AtomicBoolean customLockFactoryWasDefined = new AtomicBoolean(false);
     customServiceRegistry.getOverriddenService(OBJECT_LOCK_FACTORY).ifPresent(customService -> {
       customLockFactoryWasDefined.set(true);
-      beanDefinitionRegistry.registerBeanDefinition(OBJECT_LOCK_FACTORY, getCustomServiceBeanDefinition(customService));
+      beanDefinitionRegistry.registerBeanDefinition(OBJECT_LOCK_FACTORY,
+                                                    getCustomServiceBeanDefinition(customService, OBJECT_LOCK_FACTORY));
     });
 
     if (customLockFactoryWasDefined.get()) {
@@ -357,15 +364,18 @@ class SpringMuleContextServiceConfigurator {
     OBJECT_STORE_NAME_TO_LOCAL_OBJECT_STORE_NAME.entrySet().forEach(objectStoreLocal -> customServiceRegistry
         .getOverriddenService(objectStoreLocal.getKey()).ifPresent(customService -> {
           anyBaseStoreWasRedefined.set(true);
-          beanDefinitionRegistry.registerBeanDefinition(objectStoreLocal.getKey(), getCustomServiceBeanDefinition(customService));
+          beanDefinitionRegistry.registerBeanDefinition(objectStoreLocal.getKey(), getCustomServiceBeanDefinition(customService,
+                                                                                                                  objectStoreLocal
+                                                                                                                      .getKey()));
         }));
 
     if (anyBaseStoreWasRedefined.get()) {
-      beanDefinitionRegistry
-          .registerBeanDefinition(LOCAL_OBJECT_STORE_MANAGER, getBeanDefinitionBuilder(MuleObjectStoreManager.class)
-              .addPropertyValue("basePersistentStoreKey", OBJECT_LOCAL_STORE_PERSISTENT)
-              .addPropertyValue("baseTransientStoreKey", OBJECT_LOCAL_STORE_IN_MEMORY)
-              .getBeanDefinition());
+      final AbstractBeanDefinition beanDefinition = getBeanDefinitionBuilder(MuleObjectStoreManager.class)
+          .addPropertyValue("basePersistentStoreKey", OBJECT_LOCAL_STORE_PERSISTENT)
+          .addPropertyValue("baseTransientStoreKey", OBJECT_LOCAL_STORE_IN_MEMORY)
+          .getBeanDefinition();
+      beanDefinition.setPrimary(false);
+      beanDefinitionRegistry.registerBeanDefinition(LOCAL_OBJECT_STORE_MANAGER, beanDefinition);
     } else {
       beanDefinitionRegistry.registerAlias(OBJECT_STORE_MANAGER, LOCAL_OBJECT_STORE_MANAGER);
     }
@@ -399,6 +409,13 @@ class SpringMuleContextServiceConfigurator {
 
   private static BeanDefinition getBeanDefinition(Class<?> beanType) {
     return getBeanDefinitionBuilder(beanType).getBeanDefinition();
+  }
+
+  private static BeanDefinition getPrimaryBeanDefinition(Class<?> beanType) {
+    BeanDefinition beanDefinition = getBeanDefinition(beanType);
+    beanDefinition.setPrimary(true);
+
+    return beanDefinition;
   }
 
   private static BeanDefinition getConstantObjectBeanDefinition(Object impl) {
