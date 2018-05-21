@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.petstore.extension.FailingPetStoreSource;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
 import org.junit.After;
@@ -41,11 +42,13 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
   @Before
   public void setUp() throws Exception {
     PetStoreConnector.timesStarted = 0;
+    FailingPetStoreSource.failedDueOnException = false;
   }
 
   @After
   public void tearDown() {
     PetStoreConnector.timesStarted = 0;
+    FailingPetStoreSource.failedDueOnException = false;
     if (executor != null) {
       executor.shutdownNow();
     }
@@ -70,6 +73,32 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
   @Test
   public void retryPolicySourceFailWithConnectionException() throws Exception {
     startFlow("source-fail-with-connection-exception");
+    new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
+        .check(new JUnitLambdaProbe(() -> {
+          assertThat(PetStoreConnector.timesStarted, is(3));
+          return true;
+        }));
+  }
+
+  @Test
+  public void retryPolicySourceFailOnStartFallbackToConnection() throws Exception {
+    exception.expect(RetryPolicyExhaustedException.class);
+    exception.expectCause(sameInstance(connectionException));
+    try {
+      startFlow("source-fail-on-start-fallback-to-connection");
+    } catch (Exception e) {
+      new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
+          .check(new JUnitLambdaProbe(() -> {
+            assertThat(PetStoreConnector.timesStarted, is(2));
+            return true;
+          }));
+      throw e;
+    }
+  }
+
+  @Test
+  public void retryPolicySourceFailWithConnectionExceptionFallbackToConnection() throws Exception {
+    startFlow("source-fail-with-connection-exception-fallback-to-connection");
     new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
         .check(new JUnitLambdaProbe(() -> {
           assertThat(PetStoreConnector.timesStarted, is(3));

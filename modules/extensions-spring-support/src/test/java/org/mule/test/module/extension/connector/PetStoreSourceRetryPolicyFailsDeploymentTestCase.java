@@ -18,6 +18,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.petstore.extension.FailingPetStoreSource;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -63,7 +64,7 @@ public class PetStoreSourceRetryPolicyFailsDeploymentTestCase extends AbstractEx
                              "petstore-source-retry-policy-error.xml", 2},
                          new Object[] {false, "petstore-connection-dont-fail-deployment.xml",
                              "petstore-source-retry-policy-connection-exception.xml", 3},
-                         new Object[] {true, "petstore-connection-fail-deployment.xml",
+                         new Object[] {false, "petstore-connection-fail-deployment.xml",
                              "petstore-source-retry-policy-connection-exception.xml", 3});
   }
 
@@ -79,11 +80,13 @@ public class PetStoreSourceRetryPolicyFailsDeploymentTestCase extends AbstractEx
   @Before
   public void setUp() throws Exception {
     PetStoreConnector.timesStarted = 0;
+    FailingPetStoreSource.failedDueOnException = false;
   }
 
   @After
   public void tearDown() {
     PetStoreConnector.timesStarted = 0;
+    FailingPetStoreSource.failedDueOnException = false;
     if (executor != null) {
       executor.shutdownNow();
     }

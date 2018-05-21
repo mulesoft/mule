@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
-
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
@@ -24,7 +23,6 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.BackPressureStrategyModelProperty;
@@ -140,7 +138,8 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   }
 
   private RetryPolicyTemplate getRetryPolicyTemplate() throws ConfigurationException {
-    return retryPolicyTemplate != null ? retryPolicyTemplate : ReconnectionConfig.getDefault().getRetryPolicyTemplate();
+    // return retryPolicyTemplate != null ? retryPolicyTemplate : ReconnectionConfig.getDefault().getRetryPolicyTemplate();
+    return retryPolicyTemplate;
   }
 
   public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate) {
