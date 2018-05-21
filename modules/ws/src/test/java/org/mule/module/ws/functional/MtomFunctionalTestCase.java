@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.is;
 
 import org.apache.cxf.attachment.AttachmentImpl;
+import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -140,7 +141,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
         assertThat(attachments, hasItem(new AttachmentMatcher()));
     }
 
-    private class AttachmentMatcher implements org.hamcrest.Matcher<AttachmentImpl> {
+    private class AttachmentMatcher extends BaseMatcher<AttachmentImpl> {
 
         @Override
         public boolean matches(Object o) {
@@ -149,18 +150,8 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
         }
 
         @Override
-        public void describeMismatch(Object o, Description description) {
-            description.appendText("Attachment doesn't have Content-Disposition Header, or it's not defined with the value 'attachment'");
-        }
-
-        @Override
-        public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {
-
-        }
-
-        @Override
         public void describeTo(Description description) {
-
+            description.appendText("Attachment doesn't have Content-Disposition Header, or it's not defined with the value 'attachment'");
         }
     }
 
