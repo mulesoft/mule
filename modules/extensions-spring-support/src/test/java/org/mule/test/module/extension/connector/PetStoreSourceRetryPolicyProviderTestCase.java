@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.connectionException;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.executor;
 import org.mule.runtime.core.api.construct.Flow;
@@ -61,11 +62,10 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
     try {
       startFlow("source-fail-on-start");
     } catch (Exception e) {
-      new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
-          .check(new JUnitLambdaProbe(() -> {
-            assertThat(PetStoreConnector.timesStarted, is(2));
-            return true;
-          }));
+      probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
+        assertThat(PetStoreConnector.timesStarted, is(2));
+        return true;
+      });
       throw e;
     }
   }
@@ -73,11 +73,10 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
   @Test
   public void retryPolicySourceFailWithConnectionException() throws Exception {
     startFlow("source-fail-with-connection-exception");
-    new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
-        .check(new JUnitLambdaProbe(() -> {
-          assertThat(PetStoreConnector.timesStarted, is(3));
-          return true;
-        }));
+    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
+      assertThat(PetStoreConnector.timesStarted, is(3));
+      return true;
+    });
   }
 
   @Test
@@ -87,11 +86,10 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
     try {
       startFlow("source-fail-on-start-fallback-to-connection");
     } catch (Exception e) {
-      new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
-          .check(new JUnitLambdaProbe(() -> {
-            assertThat(PetStoreConnector.timesStarted, is(2));
-            return true;
-          }));
+      probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
+        assertThat(PetStoreConnector.timesStarted, is(2));
+        return true;
+      });
       throw e;
     }
   }
@@ -99,11 +97,10 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
   @Test
   public void retryPolicySourceFailWithConnectionExceptionFallbackToConnection() throws Exception {
     startFlow("source-fail-with-connection-exception-fallback-to-connection");
-    new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
-        .check(new JUnitLambdaProbe(() -> {
-          assertThat(PetStoreConnector.timesStarted, is(3));
-          return true;
-        }));
+    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
+      assertThat(PetStoreConnector.timesStarted, is(3));
+      return true;
+    });
   }
 
   private void startFlow(String flowName) throws Exception {
