@@ -35,4 +35,12 @@ public class JmsEndpointURIBuilderTest
         assertThat(u.getAddress(), equalTo("address::queue1"));
         assertThat(u.getResourceInfo(), is(nullValue()));
     }
+    
+    @Test
+    public void testWithArtemisFullyQualifiedQueueNameEndedWithColon() throws Exception
+    {
+        JmsEndpointURIBuilder b = new JmsEndpointURIBuilder();
+        EndpointURI u = b.build(new URI("jms://address:"), null);
+        assertThat(u.getAddress(), equalTo(""));
+    }
 }

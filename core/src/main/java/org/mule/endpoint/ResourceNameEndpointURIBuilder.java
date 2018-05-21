@@ -23,6 +23,13 @@ import org.apache.commons.logging.LogFactory;
 public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
 
+    private static final String REGEX_SEPARATOR = "^([^:]*:[^:]).*|^([^:]+:)"; // begin with a string (possibly empty) of characters different from a colon
+                                                                               // then a colon, then something different from a colon
+                                                                               // and then an arbitrary string of characters.
+                                                                               // OR
+                                                                               // a string that ends with a colon and that is the only
+                                                                               // appearance of a colon.
+
     protected static final Log logger = LogFactory.getLog(ResourceNameEndpointURIBuilder.class);
     
     public static final String RESOURCE_INFO_PROPERTY = "resourceInfo";
@@ -74,11 +81,10 @@ public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
         {
             userInfo = credentials;
         }
-        
-        int x = address.indexOf(":", y);
-        int repeatedColon = address.indexOf("::", y);
-        if (x > -1 && x != repeatedColon)
+
+        if (address.substring(y).matches(REGEX_SEPARATOR))
         {
+            int x = address.indexOf(":", y);
             String resourceInfo = address.substring(y, x);
             props.setProperty(RESOURCE_INFO_PROPERTY, resourceInfo);
             address = address.substring(x + 1);
