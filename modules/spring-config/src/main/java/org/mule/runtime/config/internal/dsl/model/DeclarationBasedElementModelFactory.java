@@ -181,11 +181,14 @@ class DeclarationBasedElementModelFactory {
         .withIdentifier(asIdentifier(configDsl))
         .withParameter(NAME_ATTRIBUTE_NAME, configDeclaration.getRefName());
 
-    DslElementModel.Builder<ConfigurationModel> element =
-        createParameterizedElementModel(model, configDsl, configDeclaration, configuration);
+    DslElementModel.Builder<ConfigurationModel> element = DslElementModel.<ConfigurationModel>builder()
+        .withModel(model)
+        .withDsl(configDsl);
 
     configDeclaration.getConnection()
         .ifPresent(connection -> addConnectionProvider(connection, model, configuration, element));
+
+    enrichParameterizedElementModel(model, configDsl, configDeclaration, configuration, element);
 
     return element.withConfig(configuration.build()).build();
   }
@@ -320,6 +323,15 @@ class DeclarationBasedElementModelFactory {
         .withModel(model)
         .withDsl(elementDsl);
 
+    enrichParameterizedElementModel(model, elementDsl, declaration, parentConfig, parentElement);
+
+    return parentElement;
+  }
+
+  private <T extends ParameterizedModel> void enrichParameterizedElementModel(T model, DslElementSyntax elementDsl,
+                                                                              ParameterizedElementDeclaration declaration,
+                                                                              InternalComponentConfiguration.Builder parentConfig,
+                                                                              DslElementModel.Builder<T> parentElement) {
     addAllDeclaredParameters(model.getParameterGroupModels(), declaration, elementDsl, parentConfig, parentElement);
 
     if (model instanceof SourceModel) {
@@ -336,8 +348,6 @@ class DeclarationBasedElementModelFactory {
     addCustomParameters(declaration, parentConfig, parentElement);
 
     declaration.getMetadataProperties().forEach(parentConfig::withProperty);
-
-    return parentElement;
   }
 
   private <T extends ParameterizedModel> void addCustomParameters(ParameterizedElementDeclaration declaration,
