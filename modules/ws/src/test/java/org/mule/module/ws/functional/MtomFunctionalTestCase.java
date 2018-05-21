@@ -6,14 +6,17 @@
  */
 package org.mule.module.ws.functional;
 
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.is;
 
 import org.apache.cxf.attachment.AttachmentImpl;
+import org.hamcrest.Description;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.construct.Flow;
@@ -61,11 +64,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
                           "<result>OK</result></ns2:uploadAttachmentResponse>";
 
         assertXMLEqual(expected, event.getMessage().getPayloadAsString());
-        assertThat(event.getMessage().getInvocationProperty("cxf_attachments"), notNullValue());
-        AttachmentImpl collection[] = ((Collection<AttachmentImpl>) event.getMessage().getInvocationProperty("cxf_attachments"))
-                .toArray(new AttachmentImpl[] {});
-        assertThat(collection.length, is(1));
-        assertThat(collection[0].getHeader("Content-Disposition"), containsString("attachment"));
+        testAttachments(event.getMessage());
     }
 
     @Test
@@ -96,11 +95,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
         event = flow.process(event);
 
         assertAttachmentInResponse(event.getMessage(), TEST_FILE_ATTACHMENT);
-        assertThat(event.getMessage().getInvocationProperty("cxf_attachments"), notNullValue());
-        AttachmentImpl collection[] = ((Collection<AttachmentImpl>) event.getMessage().getInvocationProperty("cxf_attachments"))
-                .toArray(new AttachmentImpl[] {});
-        assertThat(collection.length, is(1));
-        assertThat(collection[0].getHeader("Content-Disposition"), containsString("attachment"));
+        testAttachments(event.getMessage());
     }
 
     private void addAttachment(MuleMessage message, String fileName, String attachmentId) throws Exception
@@ -138,5 +133,36 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
         throw new IllegalArgumentException("Payload does not contain an attachment id");
     }
 
+    private void testAttachments(MuleMessage message) {
+        assertThat(message.getInvocationProperty("cxf_attachments"), notNullValue());
+
+        Collection<AttachmentImpl> attachments = message.getInvocationProperty("cxf_attachments");
+        assertThat(attachments, hasSize(1));
+        assertThat(attachments, hasItem(new AttachmentMatcher()));
+    }
+
+    private class AttachmentMatcher implements org.hamcrest.Matcher<AttachmentImpl> {
+
+        @Override
+        public boolean matches(Object o) {
+            AttachmentImpl attachment = (AttachmentImpl) o;
+            return attachment.getHeader(CONTENT_DISPOSITION).contains("attachment");
+        }
+
+        @Override
+        public void describeMismatch(Object o, Description description) {
+            description.appendText("Attachment doesn't have Content-Disposition Header, or it's not defined with the value 'attachment'");
+        }
+
+        @Override
+        public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {
+
+        }
+
+        @Override
+        public void describeTo(Description description) {
+
+        }
+    }
 
 }
