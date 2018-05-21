@@ -7,6 +7,8 @@
 
 package org.mule.module.ws.consumer;
 
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -34,9 +36,7 @@ import org.mule.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.processor.NonBlockingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transport.http.HttpConnector;
-import org.mule.util.IOUtils;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,7 +52,6 @@ import javax.wsdl.Service;
 import javax.wsdl.extensions.soap.SOAPOperation;
 import javax.wsdl.extensions.soap12.SOAP12Operation;
 import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLLocator;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
@@ -474,7 +473,11 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
             for (String outboundAttachmentName : message.getOutboundAttachmentNames())
             {
-                Attachment attachment = new AttachmentImpl(outboundAttachmentName, message.getOutboundAttachment(outboundAttachmentName));
+                AttachmentImpl attachment = new AttachmentImpl(outboundAttachmentName, message.getOutboundAttachment(outboundAttachmentName));
+                if (mtomEnabled)
+                {
+                    attachment.setHeader(CONTENT_DISPOSITION, "attachment; name=\"" + outboundAttachmentName + "\"");
+                }
                 attachments.add(attachment);
             }
             message.setInvocationProperty(CxfConstants.ATTACHMENTS, attachments);
