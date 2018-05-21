@@ -6,10 +6,17 @@
  */
 package org.mule.module.ws.functional;
 
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.is;
+
+import org.apache.cxf.attachment.AttachmentImpl;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.construct.Flow;
@@ -17,6 +24,7 @@ import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,6 +64,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
                           "<result>OK</result></ns2:uploadAttachmentResponse>";
 
         assertXMLEqual(expected, event.getMessage().getPayloadAsString());
+        testAttachments(event.getMessage());
     }
 
     @Test
@@ -86,6 +95,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
         event = flow.process(event);
 
         assertAttachmentInResponse(event.getMessage(), TEST_FILE_ATTACHMENT);
+        testAttachments(event.getMessage());
     }
 
     private void addAttachment(MuleMessage message, String fileName, String attachmentId) throws Exception
@@ -97,16 +107,16 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 
     private void assertAttachmentInResponse(MuleMessage message, String fileName) throws Exception
     {
-        assertEquals(1, message.getInboundAttachmentNames().size());
+        assertThat(message.getInboundAttachmentNames(), hasSize(1));
 
         String attachmentId = extractAttachmentId(message.getPayloadAsString());
         DataHandler attachment = message.getInboundAttachment(attachmentId);
 
-        assertNotNull(attachment);
+        assertThat(attachment, notNullValue());
 
         InputStream expected = IOUtils.getResourceAsStream(fileName, getClass());
 
-        assertTrue(IOUtils.contentEquals(expected, attachment.getInputStream()));
+        assertThat(IOUtils.contentEquals(expected, attachment.getInputStream()), is(true));
     }
 
 
@@ -123,5 +133,26 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
         throw new IllegalArgumentException("Payload does not contain an attachment id");
     }
 
+    private void testAttachments(MuleMessage message) {
+        assertThat(message.getInvocationProperty("cxf_attachments"), notNullValue());
+
+        Collection<AttachmentImpl> attachments = message.getInvocationProperty("cxf_attachments");
+        assertThat(attachments, hasSize(1));
+        assertThat(attachments, hasItem(new AttachmentMatcher()));
+    }
+
+    private class AttachmentMatcher extends BaseMatcher<AttachmentImpl> {
+
+        @Override
+        public boolean matches(Object o) {
+            AttachmentImpl attachment = (AttachmentImpl) o;
+            return attachment.getHeader(CONTENT_DISPOSITION).contains("attachment");
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("Attachment doesn't have Content-Disposition Header, or it's not defined with the value 'attachment'");
+        }
+    }
 
 }
