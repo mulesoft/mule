@@ -54,6 +54,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -70,7 +71,6 @@ import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHan
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
@@ -182,7 +182,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     return this.getConfigurationInstance()
         .map(config -> config.getConnectionProvider().orElse(null))
         .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(customTemplate))
-        .orElse(customTemplate);
+        .orElseGet(() -> customTemplate != null ? customTemplate : ReconnectionConfig.getDefault().getRetryPolicyTemplate());
   }
 
   private void stopSource() throws MuleException {

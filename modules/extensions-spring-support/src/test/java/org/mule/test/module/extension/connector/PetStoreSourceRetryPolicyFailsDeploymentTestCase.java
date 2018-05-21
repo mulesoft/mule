@@ -11,13 +11,13 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
+import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.connectionException;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.executor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.petstore.extension.FailingPetStoreSource;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -63,7 +63,7 @@ public class PetStoreSourceRetryPolicyFailsDeploymentTestCase extends AbstractEx
                              "petstore-source-retry-policy-error.xml", 2},
                          new Object[] {false, "petstore-connection-dont-fail-deployment.xml",
                              "petstore-source-retry-policy-connection-exception.xml", 3},
-                         new Object[] {true, "petstore-connection-fail-deployment.xml",
+                         new Object[] {false, "petstore-connection-fail-deployment.xml",
                              "petstore-source-retry-policy-connection-exception.xml", 3});
   }
 
@@ -79,11 +79,13 @@ public class PetStoreSourceRetryPolicyFailsDeploymentTestCase extends AbstractEx
   @Before
   public void setUp() throws Exception {
     PetStoreConnector.timesStarted = 0;
+    FailingPetStoreSource.failedDueOnException = false;
   }
 
   @After
   public void tearDown() {
     PetStoreConnector.timesStarted = 0;
+    FailingPetStoreSource.failedDueOnException = false;
     if (executor != null) {
       executor.shutdownNow();
     }
@@ -101,11 +103,10 @@ public class PetStoreSourceRetryPolicyFailsDeploymentTestCase extends AbstractEx
 
   @Test
   public void retryPolicySourceFailOnStart() throws Exception {
-    new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
-        .check(new JUnitLambdaProbe(() -> {
-          assertThat(PetStoreConnector.timesStarted, is(expectedRetries));
-          return true;
-        }));
+    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
+      assertThat(PetStoreConnector.timesStarted, is(expectedRetries));
+      return true;
+    });
   }
 
 }
