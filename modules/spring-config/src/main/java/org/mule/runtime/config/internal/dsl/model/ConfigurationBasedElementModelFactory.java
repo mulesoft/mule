@@ -52,6 +52,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComposableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -130,53 +131,53 @@ class ConfigurationBasedElementModelFactory {
     dsl = entry.get().getValue();
 
 
+
     Reference<DslElementModel> elementModel = new Reference<>();
     new ExtensionWalker() {
 
       @Override
       protected void onConfiguration(ConfigurationModel model) {
         final DslElementSyntax elementDsl = dsl.resolve(model);
-        getIdentifier(elementDsl).ifPresent(elementId -> {
-          if (elementId.equals(identifier)) {
-            DslElementModel.Builder<ConfigurationModel> element = createElementModel(model, elementDsl, configuration);
-            addConnectionProvider(model, dsl, element, configuration);
-            elementModel.set(element.build());
-            stop();
-          }
-        });
+        getIdentifier(elementDsl)
+            .filter(elementId -> elementId.equals(identifier))
+            .ifPresent(elementId -> {
+              DslElementModel.Builder<ConfigurationModel> builder = DslElementModel.<ConfigurationModel>builder()
+                  .withModel(model)
+                  .withDsl(elementDsl)
+                  .withConfig(configuration);
+
+              addConnectionProvider(model, dsl, builder, configuration);
+
+              enrichElementModel(model, elementDsl, configuration, builder);
+
+              elementModel.set(builder.build());
+              stop();
+            });
       }
 
       @Override
       protected void onConstruct(HasConstructModels owner, ConstructModel model) {
-        final DslElementSyntax elementDsl = dsl.resolve(model);
-        getIdentifier(elementDsl).ifPresent(elementId -> {
-          if (elementId.equals(identifier)) {
-            elementModel.set(createElementModel(model, elementDsl, configuration).build());
-            stop();
-          }
-        });
+        onComponentModel(model);
       }
 
       @Override
       protected void onOperation(HasOperationModels owner, OperationModel model) {
-        final DslElementSyntax elementDsl = dsl.resolve(model);
-        getIdentifier(elementDsl).ifPresent(elementId -> {
-          if (elementId.equals(identifier)) {
-            elementModel.set(createElementModel(model, elementDsl, configuration).build());
-            stop();
-          }
-        });
+        onComponentModel(model);
       }
 
       @Override
       protected void onSource(HasSourceModels owner, SourceModel model) {
+        onComponentModel(model);
+      }
+
+      private void onComponentModel(final ComponentModel model) {
         final DslElementSyntax elementDsl = dsl.resolve(model);
-        getIdentifier(elementDsl).ifPresent(elementId -> {
-          if (elementId.equals(identifier)) {
-            elementModel.set(createElementModel(model, elementDsl, configuration).build());
-            stop();
-          }
-        });
+        getIdentifier(elementDsl)
+            .filter(elementId -> elementId.equals(identifier))
+            .ifPresent(elementId -> {
+              elementModel.set(createElementModel(model, elementDsl, configuration).build());
+              stop();
+            });
       }
 
     }.walk(currentExtension);
@@ -449,6 +450,14 @@ class ConfigurationBasedElementModelFactory {
         .withDsl(elementDsl)
         .withConfig(configuration);
 
+    enrichElementModel(model, elementDsl, configuration, builder);
+
+    return builder;
+  }
+
+  private <T extends ParameterizedModel> void enrichElementModel(T model, DslElementSyntax elementDsl,
+                                                                 ComponentConfiguration configuration,
+                                                                 DslElementModel.Builder<T> builder) {
     populateParameterizedElements(model, elementDsl, builder, configuration);
     if (model instanceof ComposableModel) {
       populateComposableElements((ComposableModel) model, elementDsl, builder, configuration);
@@ -461,8 +470,6 @@ class ConfigurationBasedElementModelFactory {
       ((SourceModel) model).getErrorCallback()
           .ifPresent(cb -> populateParameterizedElements(cb, elementDsl, builder, configuration));
     }
-
-    return builder;
   }
 
   private void populateParameterizedElements(ParameterizedModel model, DslElementSyntax elementDsl,
@@ -687,12 +694,20 @@ class ConfigurationBasedElementModelFactory {
   private void resolveWrappedElement(DslElementModel.Builder<ParameterGroupModel> groupElementBuilder, ParameterModel p,
                                      DslElementSyntax pDsl, ComponentConfiguration paramComponent) {
     if (paramComponent != null) {
-      DslElementModel.Builder<ParameterModel> paramElement =
-          DslElementModel.<ParameterModel>builder().withModel(p).withDsl(pDsl).withConfig(paramComponent);
+      DslElementModel.Builder<ParameterModel> paramElement = DslElementModel.<ParameterModel>builder()
+          .withModel(p)
+          .withDsl(pDsl)
+          .withConfig(paramComponent);
 
       if (paramComponent.getNestedComponents().size() > 0) {
+        ExtensionModel wrapperExtension = this.currentExtension;
+        DslSyntaxResolver wrapperDsl = this.dsl;
+
         ComponentConfiguration wrappedComponent = paramComponent.getNestedComponents().get(0);
         this.create(wrappedComponent).ifPresent(paramElement::containing);
+
+        this.currentExtension = wrapperExtension;
+        this.dsl = wrapperDsl;
       }
 
       groupElementBuilder.containing(paramElement.build());

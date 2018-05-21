@@ -22,13 +22,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
+import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
+import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -36,15 +36,6 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
-import org.mule.runtime.app.declaration.api.ElementDeclaration;
-import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
-import org.mule.runtime.app.declaration.api.SourceElementDeclaration;
-import org.mule.runtime.app.declaration.api.TopLevelParameterDeclaration;
-import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
-import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
-import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -57,7 +48,15 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
-import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
+import org.mule.runtime.app.declaration.api.ElementDeclaration;
+import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
+import org.mule.runtime.app.declaration.api.SourceElementDeclaration;
+import org.mule.runtime.app.declaration.api.TopLevelParameterDeclaration;
+import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
+import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
+import org.mule.runtime.config.api.dsl.model.DslElementModel;
+import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -88,6 +87,10 @@ public class DeclarationElementModelFactoryTestCase {
   private static final String CONFIGURATION_NAME = "configuration";
   private static final String CONNECTION_PROVIDER_NAME = "connection";
   private static final BaseTypeBuilder TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
+  public static final String BEHAVIOUR_VALUE = "additional";
+  public static final String CONTENT_VALUE = "#[{field: value}]";
+  public static final String ITEM_VALUE = "itemValue";
+  public static final String ITEM_NAME = "list-name-item";
 
   @Mock
   private ExtensionModel extension;
@@ -132,12 +135,6 @@ public class DeclarationElementModelFactoryTestCase {
 
     initializeExtensionMock(extension);
 
-    when(configuration.getName()).thenReturn(CONFIGURATION_NAME);
-    when(configuration.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
-    when(configuration.getOperationModels()).thenReturn(asList(operation));
-    when(configuration.getSourceModels()).thenReturn(asList(source));
-    when(configuration.getConnectionProviders()).thenReturn(asList(connectionProvider));
-
     when(behaviourParameter.getName()).thenReturn(BEHAVIOUR_NAME);
     when(behaviourParameter.getExpressionSupport()).thenReturn(ExpressionSupport.NOT_SUPPORTED);
     when(behaviourParameter.getModelProperty(any())).thenReturn(empty());
@@ -171,6 +168,15 @@ public class DeclarationElementModelFactoryTestCase {
     when(parameterGroupModel.getParameterModels()).thenReturn(parameterModels);
     when(parameterGroupModel.getParameter(anyString())).thenReturn(empty());
 
+    when(connectionProvider.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
+    when(connectionProvider.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
+
+    when(configuration.getName()).thenReturn(CONFIGURATION_NAME);
+    when(configuration.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
+    when(configuration.getOperationModels()).thenReturn(asList(operation));
+    when(configuration.getSourceModels()).thenReturn(asList(source));
+    when(configuration.getConnectionProviders()).thenReturn(asList(connectionProvider));
+
     when(source.getName()).thenReturn(SOURCE_NAME);
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
     when(source.getSuccessCallback()).thenReturn(empty());
@@ -178,9 +184,6 @@ public class DeclarationElementModelFactoryTestCase {
     when(operation.getName()).thenReturn(OPERATION_NAME);
     when(operation.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
     visitableMock(operation, source);
-
-    when(connectionProvider.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
-    when(connectionProvider.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
 
     when(typeCatalog.getSubTypes(any())).thenReturn(emptySet());
     when(typeCatalog.getSuperTypes(any())).thenReturn(emptySet());
@@ -240,34 +243,57 @@ public class DeclarationElementModelFactoryTestCase {
     ElementDeclarer ext = ElementDeclarer.forExtension(EXTENSION_NAME);
     ConfigurationElementDeclaration declaration = ext.newConfiguration(CONFIGURATION_NAME)
         .withRefName("sample")
+        .withParameterGroup(newParameterGroup()
+            .withParameter(CONTENT_NAME, CONTENT_VALUE)
+            .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
+            .withParameter(LIST_NAME, newListValue().withValue(ITEM_VALUE).build())
+            .getDeclaration())
         .withConnection(ext.newConnection(CONNECTION_PROVIDER_NAME)
             .withParameterGroup(newParameterGroup()
-                .withParameter(CONTENT_NAME, "#[{field: value}]")
-                .withParameter(BEHAVIOUR_NAME, "additional")
-                .withParameter(LIST_NAME, newListValue().withValue("additional").build())
+                .withParameter(CONTENT_NAME, CONTENT_VALUE)
+                .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
+                .withParameter(LIST_NAME, newListValue().withValue(ITEM_VALUE).build())
                 .getDeclaration())
             .getDeclaration())
         .getDeclaration();
 
-    DslElementModel<ConfigurationModel> element = create(declaration);
-    assertThat(element.getModel(), is(configuration));
-    assertThat(element.getContainedElements().size(), is(1));
-    DslElementModel connectionElement = element.getContainedElements().get(0);
-    assertThat(connectionElement.getContainedElements().size(), is(3));
-    assertThat(element.findElement(LIST_NAME).isPresent(), is(true));
+    DslElementModel<ConfigurationModel> configElement = create(declaration);
+    assertThat(configElement.getModel(), is(configuration));
+    assertThat(configElement.getContainedElements().size(), is(4));
 
-    DslElementModel<Object> listModel = element.findElement(LIST_NAME).get();
+    assertThat(configElement.findElement(BEHAVIOUR_NAME).isPresent(), is(true));
+    assertBehaviourParameter(configElement);
+
+    assertThat(configElement.findElement(CONTENT_NAME).isPresent(), is(true));
+    assertContentParameter(configElement.getContainedElements().get(1));
+
+    assertThat(configElement.findElement(LIST_NAME).isPresent(), is(true));
+    assertListParameter(configElement.getContainedElements().get(3));
+
+
+    assertThat(configElement.findElement(CONNECTION_PROVIDER_NAME).isPresent(), is(true));
+    DslElementModel connectionElement = configElement.getContainedElements().get(0);
+    assertThat(connectionElement.getContainedElements().size(), is(3));
+    assertBehaviourParameter(connectionElement);
+    assertContentParameter((DslElementModel) connectionElement.findElement(CONTENT_NAME).get());
+    assertListParameter((DslElementModel) connectionElement.findElement(LIST_NAME).get());
+  }
+
+  private void assertContentParameter(DslElementModel<?> contentModel) {
+    assertThat(contentModel.getConfiguration().get().getValue().get(), is(CONTENT_VALUE));
+  }
+
+  private void assertBehaviourParameter(DslElementModel<?> elementModel) {
+    assertThat(elementModel.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is(BEHAVIOUR_VALUE));
+  }
+
+  private void assertListParameter(DslElementModel<?> listModel) {
     assertThat(listModel.getContainedElements().size(), is(1));
-    assertThat(listModel.getContainedElements().get(0).getDsl().getElementName(), is("list-name-item"));
+    assertThat(listModel.getContainedElements().get(0).getDsl().getElementName(), is(ITEM_NAME));
+
     DslElementModel<Object> itemModel = listModel.getContainedElements().get(0);
     assertThat(itemModel.getContainedElements().get(0).getDsl().getAttributeName(), is(VALUE_ATTRIBUTE_NAME));
-    assertThat(itemModel.getContainedElements().get(0).getValue().get(), is("additional"));
-
-    assertThat(element.findElement(CONNECTION_PROVIDER_NAME).isPresent(), is(true));
-    assertThat(element.findElement(CONTENT_NAME).get().getConfiguration().get().getValue().get(), is("#[{field: value}]"));
-    assertThat(((ComponentConfiguration) connectionElement.getConfiguration().get())
-        .getParameters().get(BEHAVIOUR_NAME), is("additional"));
-
+    assertThat(itemModel.getContainedElements().get(0).getValue().get(), is(ITEM_VALUE));
   }
 
   @Test
@@ -277,8 +303,8 @@ public class DeclarationElementModelFactoryTestCase {
     OperationElementDeclaration declaration = ext.newOperation(OPERATION_NAME)
         .withConfig(CONFIGURATION_NAME)
         .withParameterGroup(newParameterGroup()
-            .withParameter(CONTENT_NAME, "#[{field: value}]")
-            .withParameter(BEHAVIOUR_NAME, "additional")
+            .withParameter(CONTENT_NAME, CONTENT_VALUE)
+            .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
             .getDeclaration())
         .getDeclaration();
 
@@ -286,8 +312,8 @@ public class DeclarationElementModelFactoryTestCase {
     assertThat(element.getModel(), is(operation));
     assertThat(element.getContainedElements().size(), is(2));
     assertThat(element.findElement(BEHAVIOUR_NAME).isPresent(), is(true));
-    assertThat(element.findElement(CONTENT_NAME).get().getConfiguration().get().getValue().get(), is("#[{field: value}]"));
-    assertThat(element.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is("additional"));
+    assertThat(element.findElement(CONTENT_NAME).get().getConfiguration().get().getValue().get(), is(CONTENT_VALUE));
+    assertThat(element.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is(BEHAVIOUR_VALUE));
   }
 
   @Test
@@ -297,8 +323,8 @@ public class DeclarationElementModelFactoryTestCase {
     SourceElementDeclaration declaration = ext.newSource(SOURCE_NAME)
         .withConfig(CONFIGURATION_NAME)
         .withParameterGroup(newParameterGroup()
-            .withParameter(BEHAVIOUR_NAME, "additional")
-            .withParameter(CONTENT_NAME, "#[{field: value}]")
+            .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
+            .withParameter(CONTENT_NAME, CONTENT_VALUE)
             .getDeclaration())
         .getDeclaration();
 
@@ -306,8 +332,8 @@ public class DeclarationElementModelFactoryTestCase {
     assertThat(element.getModel(), is(source));
     assertThat(element.getContainedElements().size(), is(2));
     assertThat(element.findElement(BEHAVIOUR_NAME).isPresent(), is(true));
-    assertThat(element.findElement(CONTENT_NAME).get().getConfiguration().get().getValue().get(), is("#[{field: value}]"));
-    assertThat(element.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is("additional"));
+    assertThat(element.findElement(CONTENT_NAME).get().getConfiguration().get().getValue().get(), is(CONTENT_VALUE));
+    assertThat(element.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is(BEHAVIOUR_VALUE));
   }
 
   @Test
@@ -315,8 +341,8 @@ public class DeclarationElementModelFactoryTestCase {
 
     ElementDeclarer ext = ElementDeclarer.forExtension(EXTENSION_NAME);
     final ParameterObjectValue.Builder value = newObjectValue()
-        .withParameter(BEHAVIOUR_NAME, "additional")
-        .withParameter(CONTENT_NAME, "#[{field: value}]");
+        .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
+        .withParameter(CONTENT_NAME, CONTENT_VALUE);
     getId(complexType).ifPresent(value::ofType);
 
     TopLevelParameterDeclaration declaration = ext.newGlobalParameter(SOURCE_NAME)
@@ -330,8 +356,8 @@ public class DeclarationElementModelFactoryTestCase {
     assertThat(element.getContainedElements().size(), is(2));
     assertThat(element.findElement(BEHAVIOUR_NAME).isPresent(), is(true));
     assertThat(element.findElement("myCamelCaseName").get()
-        .getValue().get(), is("#[{field: value}]"));
-    assertThat(element.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is("additional"));
+        .getValue().get(), is(CONTENT_VALUE));
+    assertThat(element.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is(BEHAVIOUR_VALUE));
   }
 
   @Test
