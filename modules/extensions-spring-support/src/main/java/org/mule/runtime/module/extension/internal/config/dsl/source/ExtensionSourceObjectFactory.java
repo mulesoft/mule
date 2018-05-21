@@ -138,7 +138,6 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   }
 
   private RetryPolicyTemplate getRetryPolicyTemplate() throws ConfigurationException {
-    // return retryPolicyTemplate != null ? retryPolicyTemplate : ReconnectionConfig.getDefault().getRetryPolicyTemplate();
     return retryPolicyTemplate;
   }
 
