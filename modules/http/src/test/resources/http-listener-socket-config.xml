@@ -14,6 +14,7 @@
 
     <http:listener-config name="globalConfig" host="localhost" port="${port1}" usePersistentConnections="false"/>
     <http:listener-config name="timeoutConfig" host="localhost" port="${port2}" connectionIdleTimeout="${connectionTimeout}"/>
+    <http:listener-config name="noTimeoutConfig" host="localhost" port="${port3}" connectionIdleTimeout="-1"/>
 
     <flow name="globalConfigFlow">
         <http:listener config-ref="globalConfig" path="/global"/>
@@ -21,7 +22,12 @@
     </flow>
 
     <flow name="timeoutConfigFlow">
-        <http:listener config-ref="timeoutConfig" path="/timeout"/>
+        <http:listener config-ref="timeoutConfig" path="/global"/>
+        <echo-component />
+    </flow>
+
+    <flow name="noTimeoutConfigFlow">
+        <http:listener config-ref="noTimeoutConfig" path="/global"/>
         <echo-component />
     </flow>
 

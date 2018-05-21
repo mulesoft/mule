@@ -204,7 +204,7 @@ public class GrizzlyServerManager implements HttpServerManager
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
         startTransportIfNotStarted();
-        timeoutFilterDelegate.addFilterForAddress(serverAddress, createTimeoutFilter(usePersistentConnections, connectionIdleTimeout));
+        addTimeoutFilter(serverAddress, usePersistentConnections, connectionIdleTimeout);
         sslFilterDelegate.addFilterForAddress(serverAddress, createSslFilter(tlsContextFactory));
         httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
         executorProvider.addExecutor(serverAddress, workManagerSource);
@@ -224,7 +224,7 @@ public class GrizzlyServerManager implements HttpServerManager
             throw new IllegalStateException(String.format("Could not create a server for %s since there's already one.", serverAddress));
         }
         startTransportIfNotStarted();
-        timeoutFilterDelegate.addFilterForAddress(serverAddress, createTimeoutFilter(usePersistentConnections, connectionIdleTimeout));
+        addTimeoutFilter(serverAddress, usePersistentConnections, connectionIdleTimeout);
         httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
         executorProvider.addExecutor(serverAddress, workManagerSource);
         final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
@@ -244,19 +244,16 @@ public class GrizzlyServerManager implements HttpServerManager
         }
     }
 
-    private IdleTimeoutFilter createTimeoutFilter(boolean usePersistentConnections, int connectionIdleTimeout)
+    private void addTimeoutFilter(ServerAddress serverAddress, boolean usePersistentConnections, int connectionIdleTimeout)
     {
-        int timeout;
-        if (usePersistentConnections && serverTimeout < connectionIdleTimeout)
-        {
-            // Avoid interfering with the keep alive timeout but secure plain TCP connections
-            timeout = connectionIdleTimeout + SERVER_TIMEOUT_DELAY_MILLIS;
+        if (serverTimeout >= 0 && (!usePersistentConnections || connectionIdleTimeout >= 0)) {
+            int timeout = serverTimeout;
+            if (usePersistentConnections && serverTimeout < connectionIdleTimeout) {
+                // Avoid interfering with the keep alive timeout but secure plain TCP connections
+                timeout = connectionIdleTimeout + SERVER_TIMEOUT_DELAY_MILLIS;
+            }
+            timeoutFilterDelegate.addFilterForAddress(serverAddress, new IdleTimeoutFilter(idleTimeoutDelayedExecutor, timeout, MILLISECONDS));
         }
-        else
-        {
-            timeout = serverTimeout;
-        }
-        return new IdleTimeoutFilter(idleTimeoutDelayedExecutor, timeout, MILLISECONDS);
     }
 
     private SSLFilter createSslFilter(final TlsContextFactory tlsContextFactory)
@@ -313,8 +310,14 @@ public class GrizzlyServerManager implements HttpServerManager
 
     private int convertToSeconds(int milliseconds)
     {
-        return (int) Math.ceil((double) milliseconds / 1000.0);
-
+        if (milliseconds < 0)
+        {
+            return -1;
+        }
+        else
+        {
+            return (int) Math.ceil((double) milliseconds / 1000.0);
+        }
     }
 
 }
