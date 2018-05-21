@@ -9,10 +9,9 @@ package org.mule.module.ws.functional;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.mule.api.MuleEvent;
@@ -62,7 +61,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
                           "<result>OK</result></ns2:uploadAttachmentResponse>";
 
         assertXMLEqual(expected, event.getMessage().getPayloadAsString());
-        assertNotNull(event.getMessage().getInvocationProperty("cxf_attachments"));
+        assertThat(event.getMessage().getInvocationProperty("cxf_attachments"), notNullValue());
         AttachmentImpl collection[] = ((Collection<AttachmentImpl>) event.getMessage().getInvocationProperty("cxf_attachments"))
                 .toArray(new AttachmentImpl[] {});
         assertThat(collection.length, is(1));
@@ -97,7 +96,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
         event = flow.process(event);
 
         assertAttachmentInResponse(event.getMessage(), TEST_FILE_ATTACHMENT);
-        assertNotNull(event.getMessage().getInvocationProperty("cxf_attachments"));
+        assertThat(event.getMessage().getInvocationProperty("cxf_attachments"), notNullValue());
         AttachmentImpl collection[] = ((Collection<AttachmentImpl>) event.getMessage().getInvocationProperty("cxf_attachments"))
                 .toArray(new AttachmentImpl[] {});
         assertThat(collection.length, is(1));
@@ -113,16 +112,16 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 
     private void assertAttachmentInResponse(MuleMessage message, String fileName) throws Exception
     {
-        assertEquals(1, message.getInboundAttachmentNames().size());
+        assertThat(message.getInboundAttachmentNames(), hasSize(1));
 
         String attachmentId = extractAttachmentId(message.getPayloadAsString());
         DataHandler attachment = message.getInboundAttachment(attachmentId);
 
-        assertNotNull(attachment);
+        assertThat(attachment, notNullValue());
 
         InputStream expected = IOUtils.getResourceAsStream(fileName, getClass());
 
-        assertTrue(IOUtils.contentEquals(expected, attachment.getInputStream()));
+        assertThat(IOUtils.contentEquals(expected, attachment.getInputStream()), is(true));
     }
 
 
