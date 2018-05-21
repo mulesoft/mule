@@ -474,7 +474,11 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
             for (String outboundAttachmentName : message.getOutboundAttachmentNames())
             {
-                Attachment attachment = new AttachmentImpl(outboundAttachmentName, message.getOutboundAttachment(outboundAttachmentName));
+                AttachmentImpl attachment = new AttachmentImpl(outboundAttachmentName, message.getOutboundAttachment(outboundAttachmentName));
+                if (mtomEnabled)
+                {
+                    attachment.setHeader("Content-Disposition", "attachment; name=\"" + outboundAttachmentName + "\"");
+                }
                 attachments.add(attachment);
             }
             message.setInvocationProperty(CxfConstants.ATTACHMENTS, attachments);

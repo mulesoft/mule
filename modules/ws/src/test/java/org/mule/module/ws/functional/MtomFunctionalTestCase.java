@@ -7,9 +7,14 @@
 package org.mule.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.apache.cxf.attachment.AttachmentImpl;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.construct.Flow;
@@ -17,6 +22,7 @@ import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,6 +62,11 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
                           "<result>OK</result></ns2:uploadAttachmentResponse>";
 
         assertXMLEqual(expected, event.getMessage().getPayloadAsString());
+        assertNotNull(event.getMessage().getInvocationProperty("cxf_attachments"));
+        AttachmentImpl collection[] = ((Collection<AttachmentImpl>) event.getMessage().getInvocationProperty("cxf_attachments"))
+                .toArray(new AttachmentImpl[] {});
+        assertThat(collection.length, is(1));
+        assertThat(collection[0].getHeader("Content-Disposition"), containsString("attachment"));
     }
 
     @Test
@@ -86,6 +97,11 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
         event = flow.process(event);
 
         assertAttachmentInResponse(event.getMessage(), TEST_FILE_ATTACHMENT);
+        assertNotNull(event.getMessage().getInvocationProperty("cxf_attachments"));
+        AttachmentImpl collection[] = ((Collection<AttachmentImpl>) event.getMessage().getInvocationProperty("cxf_attachments"))
+                .toArray(new AttachmentImpl[] {});
+        assertThat(collection.length, is(1));
+        assertThat(collection[0].getHeader("Content-Disposition"), containsString("attachment"));
     }
 
     private void addAttachment(MuleMessage message, String fileName, String attachmentId) throws Exception
