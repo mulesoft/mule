@@ -38,6 +38,8 @@ public class HttpListenerSocketConfigTestCase extends FunctionalTestCase
     @Rule
     public DynamicPort listenPort2 = new DynamicPort("port2");
     @Rule
+    public DynamicPort listenPort3 = new DynamicPort("port3");
+    @Rule
     public SystemProperty serverTimeout = new SystemProperty("serverTimeout", valueOf(SERVER_TIMEOUT_MILLIS));
     @Rule
     public SystemProperty connectionTimeout = new SystemProperty("connectionTimeout", valueOf(CONNECTION_TIMEOUT_MILLIS));
@@ -52,8 +54,8 @@ public class HttpListenerSocketConfigTestCase extends FunctionalTestCase
     public void serverTimeoutsTcpConnection() throws Exception
     {
         Socket socket = new Socket("localhost", listenPort1.getNumber());
-        sleep(SERVER_TIMEOUT_MILLIS * 2);
-        sendRequest(socket, "global");
+        sleep(SERVER_TIMEOUT_MILLIS * 3);
+        sendRequest(socket);
         assertThat(getResponse(socket), is(nullValue()));
     }
 
@@ -61,20 +63,31 @@ public class HttpListenerSocketConfigTestCase extends FunctionalTestCase
     public void keepAlivePreventsServerTimeout() throws Exception
     {
         Socket socket = new Socket("localhost", listenPort2.getNumber());
-        sendRequest(socket, "timeout");
+        sendRequest(socket);
         assertThat(getResponse(socket), is(notNullValue()));
-        sleep(SERVER_TIMEOUT_MILLIS * 2);
-        sendRequest(socket, "timeout");
+        sleep(SERVER_TIMEOUT_MILLIS * 3);
+        sendRequest(socket);
         assertThat(getResponse(socket), is(notNullValue()));
-        sleep(CONNECTION_TIMEOUT_MILLIS + SERVER_TIMEOUT_MILLIS * 2);
-        sendRequest(socket, "timeout");
+        sleep(CONNECTION_TIMEOUT_MILLIS + SERVER_TIMEOUT_MILLIS * 3);
+        sendRequest(socket);
         assertThat(getResponse(socket), is(nullValue()));
     }
 
-    private void sendRequest(Socket socket, final String path) throws IOException
+    @Test
+    public void infiniteKeepAlivePreventsServerTimeout() throws Exception
+    {
+        Socket socket = new Socket("localhost", listenPort3.getNumber());
+        sendRequest(socket);
+        assertThat(getResponse(socket), is(notNullValue()));
+        sleep(SERVER_TIMEOUT_MILLIS * 3);
+        sendRequest(socket);
+        assertThat(getResponse(socket), is(notNullValue()));
+    }
+
+    private void sendRequest(Socket socket) throws IOException
     {
         PrintWriter writer = new PrintWriter(socket.getOutputStream());
-        writer.println("GET /" + path + " HTTP/1.1");
+        writer.println("GET /global HTTP/1.1");
         writer.println("Host: www.example.com");
         writer.println("");
         writer.flush();
