@@ -9,7 +9,6 @@ package org.mule.module.ws.functional;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
