@@ -7,7 +7,6 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static com.google.common.io.Files.createTempDir;
-import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.util.Optional.of;
@@ -15,6 +14,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.mule.maven.client.api.model.BundleScope.PROVIDED;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
@@ -25,14 +25,11 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.isStandalone;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
-import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -53,7 +50,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.apache.maven.model.Model;
 import org.slf4j.Logger;
@@ -77,13 +73,10 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   public static final String CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER = "_classLoaderModelMavenReactorResolver";
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-  private final LocalRepositorySupplierFactory localRepositorySupplierFactory;
   private MavenClient mavenClient;
 
-  public AbstractMavenClassLoaderModelLoader(MavenClient mavenClient,
-                                             LocalRepositorySupplierFactory localRepositorySupplierFactory) {
+  public AbstractMavenClassLoaderModelLoader(MavenClient mavenClient) {
     this.mavenClient = mavenClient;
-    this.localRepositorySupplierFactory = localRepositorySupplierFactory;
   }
 
   @Override
@@ -218,29 +211,13 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
   private ClassLoaderModel createLightPackageClassLoaderModel(File artifactFile, Map<String, Object> attributes,
                                                               ArtifactType artifactType) {
-    File containerRepository;
-    if (isStandalone() && !getBoolean("mule.mode.embedded")) {
-      containerRepository = new File(getMuleHomeFolder(), "repository");
-      if (!containerRepository.exists()) {
-        if (!containerRepository.mkdirs()) {
-          // check again since it may have been created already.
-          if (!containerRepository.exists()) {
-            throw new MuleRuntimeException(I18nMessageFactory
-                .createStaticMessage("Failure creating repository folder in MULE_HOME folder "
-                    + containerRepository.getAbsolutePath()));
-          }
-        }
-      }
+    File mavenRepository = mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation();
+    if (mavenRepository == null) {
+      throw new MuleRuntimeException(createStaticMessage(
+                                                         format("Missing Maven local repository configuration while trying to resolve class loader model for lightweight artifact: %s",
+                                                                artifactFile.getName())));
     }
 
-    File localMavenRepositoryLocation = mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation();
-
-    Supplier<File> compositeRepoLocationSupplier =
-        localRepositorySupplierFactory
-            .composeSuppliers(localRepositorySupplierFactory.artifactFolderRepositorySupplier(artifactFile,
-                                                                                              localMavenRepositoryLocation),
-                              localRepositorySupplierFactory.fixedFolderSupplier(localMavenRepositoryLocation));
-    File mavenRepository = compositeRepoLocationSupplier.get();
     File temporaryDirectory = createTempDir();
     try {
       List<org.mule.maven.client.api.model.BundleDependency> dependencies =
