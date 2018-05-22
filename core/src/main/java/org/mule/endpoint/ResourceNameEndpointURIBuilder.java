@@ -6,25 +6,33 @@
  */
 package org.mule.endpoint;
 
+import static java.util.regex.Pattern.compile;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.util.StringUtils;
 
 import java.net.URI;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>ResourceNameEndpointBuilder</code> extracts a resource name from a uri
- * endpointUri
+ * <code>ResourceNameEndpointBuilder</code> extracts a resource name from a uri endpointUri
  * 
  */
 public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
 
+    private Pattern REGEX_SEPARATOR = compile("([^:]*:(?!:))?([^:]*(?::*)?[^:]*)"); // Two capturing groups
+                                                                                    // First capturing group: (Optional) string of 0..n characters different from colon
+                                                                                    // followed by a single colon.
+                                                                                    // Second capturing group:
+                                                                                    // String of 0..n characters with possible multiple contiguous colons.
+
     protected static final Log logger = LogFactory.getLog(ResourceNameEndpointURIBuilder.class);
-    
+
     public static final String RESOURCE_INFO_PROPERTY = "resourceInfo";
 
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
@@ -38,7 +46,7 @@ public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
 
         String path = uri.getPath();
         String authority = uri.getAuthority();
-        
+
         if (path != null && path.length() != 0)
         {
             if (address.length() > 0)
@@ -50,7 +58,7 @@ public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
         else if (authority != null && !authority.equals(address))
         {
             address += authority;
-            
+
             int atCharIndex = -1;
             if (address != null && address.length() != 0 && ((atCharIndex = address.indexOf("@")) > -1))
             {
@@ -59,7 +67,7 @@ public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
             }
 
         }
-        
+
         // is user info specified?
         int y = address.indexOf("@");
         if (y > -1)
@@ -74,13 +82,23 @@ public class ResourceNameEndpointURIBuilder extends AbstractEndpointURIBuilder
         {
             userInfo = credentials;
         }
-        
-        int x = address.indexOf(":", y);
-        if (x > -1)
+
+        Matcher matcher = REGEX_SEPARATOR.matcher(address);
+
+        if (matcher.matches())
         {
-            String resourceInfo = address.substring(y, x);
+            String resourceInfo = matcher.group(1);
+            setResourceInfoAsPropertyIfNeeded(props, resourceInfo);
+            address = matcher.group(2);
+        }
+    }
+
+    private void setResourceInfoAsPropertyIfNeeded(Properties props, String resourceInfo)
+    {
+        if (resourceInfo != null)
+        {
+            resourceInfo = resourceInfo == null ? resourceInfo : resourceInfo.substring(0, resourceInfo.length() - 1);
             props.setProperty(RESOURCE_INFO_PROPERTY, resourceInfo);
-            address = address.substring(x + 1);
         }
     }
 }
