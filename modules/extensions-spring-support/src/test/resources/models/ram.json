@@ -425,8 +425,16 @@
             "MULE:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "INVOKE",
+            "namespace": "RAM",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "RAM",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {

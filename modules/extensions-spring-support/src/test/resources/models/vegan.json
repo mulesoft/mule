@@ -440,8 +440,16 @@
             "VEGAN:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "EAT_APPLE",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -761,8 +769,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_FRUIT_SAMPLE",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -922,8 +938,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_NOT_OVERRIDEN_PARAMETER",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1098,8 +1122,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_PRODUCERS",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1291,8 +1323,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_TIME_TO_PEEL",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1469,8 +1509,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SPREAD_THE_WORD",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1896,8 +1944,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "SOURCE",
-            "namespace": "MULE"
+            "type": "PAUL_MC_CARTNEY_SOURCE",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -2164,8 +2220,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "SOURCE",
-            "namespace": "MULE"
+            "type": "HARVEST-APPLES",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -2942,8 +3006,16 @@
             "VEGAN:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "EAT_BANANA",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3209,8 +3281,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "EAT_PEALED",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3364,8 +3444,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_CONFIG",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3478,8 +3566,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_FRUIT_SAMPLE",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3633,8 +3729,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_LUNCH",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3753,8 +3857,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_NOT_OVERRIDEN_PARAMETER",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3929,8 +4041,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_PRODUCERS",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -4122,8 +4242,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_TIME_TO_PEEL",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -4300,8 +4428,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SPREAD_THE_WORD",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -4769,8 +4905,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "SOURCE",
-            "namespace": "MULE"
+            "type": "PAUL_MC_CARTNEY_SOURCE",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -5124,8 +5268,16 @@
             "VEGAN:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GRAPE_OPERATION",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -5660,8 +5812,16 @@
             "VEGAN:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "EAT_KIWI",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -6366,8 +6526,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "SOURCE",
-            "namespace": "MULE"
+            "type": "HARVEST-PEACHES",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "VEGAN",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -6751,8 +6919,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "ADD_VEGAN_PRODUCTS_DESCRIPTIONS",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VEGAN",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -6971,8 +7147,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "APPLY_POLICY",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VEGAN",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -7191,8 +7375,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "CONSUMING_GROUPED_FOOD",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VEGAN",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -7496,8 +7688,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "CONVINCE_ANIMAL_KILLER",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VEGAN",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -7696,8 +7896,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "EAT_WATERMELON",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VEGAN",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -7872,8 +8080,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET_ALL_APPLES",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VEGAN",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -8049,8 +8265,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET_HEALTHY_FOOD",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VEGAN",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -8248,8 +8472,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET_PRODUCTION",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VEGAN",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -8475,8 +8707,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "REGISTER_VEGAN_PRODUCTS",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VEGAN",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -8701,8 +8941,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "TRY_EAT",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VEGAN",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -9083,8 +9331,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "TRY_TO_EAT_THIS_LIST_OF_MAPS",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "VEGAN",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {

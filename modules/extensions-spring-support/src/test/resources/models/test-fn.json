@@ -85,8 +85,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "EVALUATE",
+        "namespace": "FN",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "FN",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {

@@ -11,7 +11,6 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.TYPE_SUFFIX;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -54,9 +53,7 @@ class SourceSchemaDelegate extends ExecutableTypeSchemaDelegate {
   }
 
   private QName getSourceSubstitutionGroup(SourceModel sourceModel) {
-    return sourceModel.getStereotype().equals(SOURCE)
-        ? MULE_ABSTRACT_MESSAGE_SOURCE
-        : getSubstitutionGroup(sourceModel.getStereotype());
+    return getSubstitutionGroup(sourceModel, MULE_ABSTRACT_MESSAGE_SOURCE);
   }
 
   private void registerSourceType(String name, SourceModel sourceModel, DslElementSyntax dslSyntax, boolean hasImplicitConfig) {

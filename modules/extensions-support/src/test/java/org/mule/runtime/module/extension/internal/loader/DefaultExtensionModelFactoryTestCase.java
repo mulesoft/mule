@@ -33,12 +33,7 @@ import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DRO
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR_DEFINITION;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR_DEFINITION;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_FILE_NAME;
@@ -98,7 +93,6 @@ import org.mule.test.heisenberg.extension.model.CarWash;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
-import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
@@ -116,19 +110,16 @@ import org.junit.rules.ExpectedException;
 public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private final ExtensionModel heisenbergExtension = loadExtension(HeisenbergExtension.class);
+  private final ExtensionModel veganExtension = loadExtension(VeganExtension.class);
 
   @Rule
   public ExpectedException expectedException = none();
 
-  private ExtensionModel createExtension(Class<?> annotatedClass) {
-    return loadExtension(annotatedClass);
-  }
-
   @Test
   public void flyweight() {
-    ExtensionModel extensionModel = createExtension(VeganExtension.class);
-    final ConfigurationModel appleConfiguration = aggressiveGet(extensionModel.getConfigurationModel(APPLE));
-    final ConfigurationModel bananaConfiguration = aggressiveGet(extensionModel.getConfigurationModel(BANANA));
+    final ConfigurationModel appleConfiguration = aggressiveGet(veganExtension.getConfigurationModel(APPLE));
+    final ConfigurationModel bananaConfiguration = aggressiveGet(veganExtension.getConfigurationModel(BANANA));
 
     final String sourceName = PaulMcCartneySource.class.getSimpleName();
     SourceModel appleSource = aggressiveGet(appleConfiguration.getSourceModel(sourceName));
@@ -149,7 +140,6 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     final List<String> nonBlockingOperations = Arrays.asList("killMany", "executeAnything", "alwaysFailsWrapper", "getChain",
                                                              "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier");
 
-    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
     Reference<Boolean> cpuIntensive = new Reference<>(false);
     Reference<Boolean> blocking = new Reference<>(false);
     new IdempotentExtensionWalker() {
@@ -170,7 +160,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
           assertThat(operation.getExecutionType(), is(CPU_LITE));
         }
       }
-    }.walk(extensionModel);
+    }.walk(heisenbergExtension);
 
     assertThat(cpuIntensive.get(), is(true));
     assertThat(blocking.get(), is(true));
@@ -178,7 +168,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void nonBlockingExecutionType() {
-    ExtensionModel extensionModel = createExtension(MarvelExtension.class);
+    ExtensionModel extensionModel = loadExtension(MarvelExtension.class);
     OperationModel operation =
         extensionModel.getConfigurationModel(CONFIG_NAME).get().getOperationModel("fireMissile").get();
     assertThat(operation.isBlocking(), is(false));
@@ -189,19 +179,18 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void contentParameter() {
-    assertSinglePrimaryContentParameter(createExtension(VeganExtension.class), "getAllApples", PAYLOAD);
+    assertSinglePrimaryContentParameter(veganExtension, "getAllApples", PAYLOAD);
   }
 
   @Test
   public void contentParameterWithCustomDefault() {
-    assertSinglePrimaryContentParameter(createExtension(VeganExtension.class), "tryToEatThisListOfMaps",
+    assertSinglePrimaryContentParameter(veganExtension, "tryToEatThisListOfMaps",
                                         null);
   }
 
   @Test
   public void exportedLibraries() {
-    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
-    assertExternalLibraries(extensionModel);
+    assertExternalLibraries(heisenbergExtension);
     new IdempotentExtensionWalker() {
 
       @Override
@@ -213,13 +202,12 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
       protected void onConnectionProvider(ConnectionProviderModel model) {
         assertExternalLibraries(model);
       }
-    }.walk(extensionModel);
+    }.walk(heisenbergExtension);
   }
 
   @Test
   public void streamingHintOnOperation() throws Exception {
-    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
-    OperationModel operationModel = extensionModel.getConfigurationModels().get(0).getOperationModel("sayMyName").get();
+    OperationModel operationModel = heisenbergExtension.getConfigurationModels().get(0).getOperationModel("sayMyName").get();
     ParameterModel streamingParameter = operationModel.getAllParameterModels().stream()
         .filter(p -> p.getName().equals(STREAMING_STRATEGY_PARAMETER_NAME))
         .findFirst()
@@ -230,8 +218,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void streamingHintOnSource() throws Exception {
-    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
-    SourceModel sourceModel = extensionModel.getConfigurationModels().get(0).getSourceModel("ListenPayments").get();
+    SourceModel sourceModel = heisenbergExtension.getConfigurationModels().get(0).getSourceModel("ListenPayments").get();
     ParameterModel streamingParameter = sourceModel.getAllParameterModels().stream()
         .filter(p -> p.getName().equals(STREAMING_STRATEGY_PARAMETER_NAME))
         .findFirst()
@@ -241,49 +228,8 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void customStereotype() {
-    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
-    OperationModel operation = extensionModel.getConfigurationModels().get(0).getOperationModel("callSaul").get();
-
-    StereotypeModel stereotypeModel = operation.getStereotype();
-    assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
-
-    assertThat(stereotypeModel.getType(), is(new EmpireStereotype().getName().toUpperCase()));
-    assertThat(stereotypeModel.getNamespace(), is(HEISENBERG.toUpperCase()));
-    assertThat(stereotypeModel.getParent().get(), is(PROCESSOR));
-  }
-
-  @Test
-  public void validatorStereotype() {
-    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
-    OperationModel operation = extensionModel.getOperationModel("validateMoney").get();
-
-    StereotypeModel stereotypeModel = operation.getStereotype();
-    assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
-    assertThat(stereotypeModel.isAssignableTo(VALIDATOR), is(true));
-
-    assertThat(stereotypeModel.getType(), is(VALIDATOR_DEFINITION.getName()));
-    assertThat(stereotypeModel.getNamespace(), is(HEISENBERG.toUpperCase()));
-    assertThat(stereotypeModel.getParent().get(), is(VALIDATOR));
-  }
-
-  @Test
-  public void defaultStereotype() {
-    ExtensionModel extensionModel = createExtension(VeganExtension.class);
-    OperationModel operation = extensionModel.getConfigurationModel(APPLE).get().getOperationModel("eatApple").get();
-
-    StereotypeModel stereotypeModel = operation.getStereotype();
-    assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
-
-    assertThat(stereotypeModel.getType(), is(PROCESSOR_DEFINITION.getName()));
-    assertThat(stereotypeModel.getNamespace(), is("MULE"));
-    assertThat(stereotypeModel.getParent().isPresent(), is(false));
-  }
-
-  @Test
   public void untesteableConnetionProvider() throws Exception {
-    ExtensionModel extensionModel = createExtension(VeganExtension.class);
-    ConnectionProviderModel connectionProviderModel = extensionModel.getConfigurationModel(APPLE)
+    ConnectionProviderModel connectionProviderModel = veganExtension.getConfigurationModel(APPLE)
         .map(c -> c.getConnectionProviders().get(0))
         .get();
 
@@ -292,8 +238,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testeableConnectionProvider() throws Exception {
-    ExtensionModel extensionModel = createExtension(VeganExtension.class);
-    ConnectionProviderModel connectionProviderModel = extensionModel.getConfigurationModel(BANANA)
+    ConnectionProviderModel connectionProviderModel = veganExtension.getConfigurationModel(BANANA)
         .map(c -> c.getConnectionProviders().get(0))
         .get();
 
@@ -302,8 +247,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void sourceWithReducedBackPressureStrategies() {
-    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
-    SourceModel source = extensionModel.getConfigurationModels().get(0).getSourceModel("ListenPayments").get();
+    SourceModel source = heisenbergExtension.getConfigurationModels().get(0).getSourceModel("ListenPayments").get();
 
     ParameterModel parameter = source.getAllParameterModels().stream()
         .filter(p -> BACK_PRESSURE_STRATEGY_PARAMETER_NAME.equals(p.getName()))
@@ -320,8 +264,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void sourceWithFixedBackPressureStrategy() {
-    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
-    SourceModel source = extensionModel.getSourceModels().get(0);
+    SourceModel source = heisenbergExtension.getSourceModels().get(0);
 
     Optional<ParameterModel> parameter = source.getAllParameterModels().stream()
         .filter(p -> BACK_PRESSURE_STRATEGY_PARAMETER_NAME.equals(p.getName()))
@@ -332,8 +275,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void sourceWithDefaultBackPressureStrategies() {
-    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
-    SourceModel source = extensionModel.getConfigurationModels().get(0).getSourceModel("ReconnectableListenPayments").get();
+    SourceModel source = heisenbergExtension.getConfigurationModels().get(0).getSourceModel("ReconnectableListenPayments").get();
 
     Optional<ParameterModel> parameter = source.getAllParameterModels().stream()
         .filter(p -> BACK_PRESSURE_STRATEGY_PARAMETER_NAME.equals(p.getName()))
@@ -348,20 +290,19 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     expectedException
         .expectMessage("backPressureStrategy parameter has a default value which is not listed as an available option");
 
-    createExtension(BadBackPressureHeisenbergExtension.class);
+    loadExtension(BadBackPressureHeisenbergExtension.class);
   }
 
   @Test
   public void sourceWithInvalidBackPressureStrategies() {
     expectedException.expect(IllegalModelDefinitionException.class);
 
-    createExtension(IllegalBackPressureHeisenbergExtension.class);
+    loadExtension(IllegalBackPressureHeisenbergExtension.class);
   }
 
   @Test
   public void objectStoreParameters() {
-    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
-    OperationModel operationModel = extensionModel.getOperationModel("storeMoney").get();
+    OperationModel operationModel = heisenbergExtension.getOperationModel("storeMoney").get();
     ParameterModel parameter =
         operationModel.getAllParameterModels().stream().filter(p -> "objectStore".equals(p.getName())).findFirst().get();
 
@@ -372,7 +313,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
     assertThat(stereotype.getNamespace(), equalTo(OBJECT_STORE.getNamespace()));
 
-    Optional<ImportedTypeModel> typeImport = extensionModel.getImportedTypes().stream()
+    Optional<ImportedTypeModel> typeImport = heisenbergExtension.getImportedTypes().stream()
         .filter(i -> getTypeId(i.getImportedType()).map(id -> ObjectStore.class.getName().equals(id)).orElse(false))
         .findFirst();
 
