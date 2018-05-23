@@ -32,6 +32,7 @@ import org.apache.maven.shared.invoker.InvokerLogger;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.apache.maven.shared.invoker.SystemOutLogger;
 
+
 /**
  * Provides Maven related utilities for testing purposes
  */
@@ -97,7 +98,7 @@ public class MavenTestUtils {
     return artifact;
   }
 
-  private static File getMavenLocalRepository() {
+  public static File getMavenLocalRepository() {
     String buildDirectory = getProperty("localRepository");
     if (buildDirectory == null) {
       buildDirectory = getProperty(USER_HOME) + M_2_REPO;
