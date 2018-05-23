@@ -1,0 +1,825 @@
+{
+  "name": "module-xsd-custom-types",
+  "description": "",
+  "version": "4.0.0",
+  "vendor": "MuleSoft",
+  "category": "COMMUNITY",
+  "xmlDsl": {
+    "prefix": "module-xsd-custom-types",
+    "namespace": "http://www.mulesoft.org/schema/mule/module-xsd-custom-types",
+    "schemaLocation": "http://www.mulesoft.org/schema/mule/module-xsd-custom-types/current/mule-module-xsd-custom-types.xsd",
+    "schemaVersion": "4.0.0",
+    "xsdFileName": "mule-module-xsd-custom-types.xsd"
+  },
+  "resources": [],
+  "subTypes": [],
+  "privilegedPackages": [],
+  "privilegedArtifacts": [],
+  "externalLibraries": [],
+  "importedTypes": [],
+  "configurations": [],
+  "operations": [
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "xml",
+          "type": "@ref:{http://validationnamespace.raml.org}User"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "xml",
+                "type": "@ref:{http://validationnamespace.raml.org}User"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "General"
+              },
+              "allowedStereotypeModels": [],
+              "name": "aParameter",
+              "displayModel": {},
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "copy-xsdtype1",
+      "displayModel": {},
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "xml",
+          "type": "@ref:{http://validationnamespace.raml.org}User"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "get-hardcoded-xsdtype1",
+      "displayModel": {},
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Boolean"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "xml",
+                "type": "@ref:{http://validationnamespace.raml.org}User"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "General"
+              },
+              "allowedStereotypeModels": [],
+              "name": "aParameter",
+              "displayModel": {},
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "is-xsdtype1",
+      "displayModel": {},
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "xml",
+          "type": "@ref:{http://uri}Root0"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "xml",
+                "type": "@ref:{http://validationnamespace.raml.org}User"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "General"
+              },
+              "allowedStereotypeModels": [],
+              "name": "value",
+              "displayModel": {},
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "xml",
+                "type": "@ref:Root"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "General"
+              },
+              "allowedStereotypeModels": [],
+              "name": "value2",
+              "displayModel": {},
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "operation-with-custom-types",
+      "displayModel": {},
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    }
+  ],
+  "functions": [],
+  "constructs": [],
+  "connectionProviders": [],
+  "messageSources": [],
+  "notifications": [],
+  "errors": [],
+  "modelProperties": {
+    "org.mule.runtime.extension.api.property.XmlExtensionModelProperty": {
+      "namespacesDependencies": [
+        "http://www.w3.org/2001/XMLSchema-instance",
+        "http://www.mulesoft.org/schema/mule/core"
+      ]
+    }
+  },
+  "types": [
+    {
+      "format": "xml",
+      "type": "Object",
+      "annotations": {
+        "typeId": "Root"
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "Root",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "#AnonType_Root",
+              "description": {
+                "lang": "en",
+                "value": "A user with all the information"
+              }
+            },
+            "ordered": true,
+            "fields": [
+              {
+                "key": {
+                  "name": "name",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              },
+              {
+                "key": {
+                  "name": "lastName",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              },
+              {
+                "key": {
+                  "name": "male",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Boolean"
+                }
+              },
+              {
+                "key": {
+                  "name": "age",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Number"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "format": "xml",
+      "type": "Object",
+      "annotations": {
+        "typeId": "{http://uri}Root0"
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "{http://uri}Root0",
+            "attributes": [
+              {
+                "key": {
+                  "name": "extraAttribute"
+                },
+                "model": {
+                  "type": "String",
+                  "annotations": {
+                    "default": "wubbalubbadubdub"
+                  }
+                }
+              }
+            ],
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "{http://uri}#AnonType_Root0",
+              "description": {
+                "lang": "en",
+                "value": "A user with all the information"
+              }
+            },
+            "ordered": true,
+            "fields": [
+              {
+                "key": {
+                  "name": "{http://uri}name",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              },
+              {
+                "key": {
+                  "name": "{http://uri}lastName",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              },
+              {
+                "key": {
+                  "name": "{http://uri}male",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Boolean"
+                }
+              },
+              {
+                "key": {
+                  "name": "{http://uri}age",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Number"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "format": "xml",
+      "type": "Object",
+      "annotations": {
+        "typeId": "{http://validationnamespace.raml.org}User"
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "{http://validationnamespace.raml.org}User",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "{http://validationnamespace.raml.org}#AnonType_User"
+            },
+            "ordered": true,
+            "fields": [
+              {
+                "key": {
+                  "name": "{http://validationnamespace.raml.org}name",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              },
+              {
+                "key": {
+                  "name": "{http://validationnamespace.raml.org}kind",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              },
+              {
+                "key": {
+                  "name": "{http://validationnamespace.raml.org}weight",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "range": {
+                      "from": 3.0,
+                      "to": 5.0
+                    }
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "{http://validationnamespace.raml.org}email",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String",
+                  "annotations": {
+                    "pattern": "^note\\d+$",
+                    "length": {
+                      "min": 2,
+                      "max": 6
+                    }
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "{http://validationnamespace.raml.org}userId",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
