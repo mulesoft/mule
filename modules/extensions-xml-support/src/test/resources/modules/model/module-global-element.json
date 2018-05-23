@@ -19,6 +19,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "MODULE-GLOBAL-ELEMENT",
+        "parent": {
+          "type": "MODULE_CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -228,8 +236,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "DO-GET-CLIENT",
+            "namespace": "MODULE-GLOBAL-ELEMENT",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-GLOBAL-ELEMENT",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -335,8 +351,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "DO-GET-CLIENT-WITH-PRIVATE-OPERATION",
+            "namespace": "MODULE-GLOBAL-ELEMENT",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-GLOBAL-ELEMENT",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -442,8 +466,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "DO-GET-PETS",
+            "namespace": "MODULE-GLOBAL-ELEMENT",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-GLOBAL-ELEMENT",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -563,6 +595,14 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": false,
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "MODULE-GLOBAL-ELEMENT",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "parameterGroupModels": [],
           "name": "connection",
           "description": "",

@@ -47,8 +47,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "DO-GET-CLIENT",
+        "namespace": "MODULE-GLOBAL-ELEMENT-DEFAULT",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-GLOBAL-ELEMENT-DEFAULT",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -154,8 +162,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "DO-GET-CLIENT-WITH-PRIVATE-OPERATION",
+        "namespace": "MODULE-GLOBAL-ELEMENT-DEFAULT",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-GLOBAL-ELEMENT-DEFAULT",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -261,8 +277,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "DO-GET-PETS",
+        "namespace": "MODULE-GLOBAL-ELEMENT-DEFAULT",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-GLOBAL-ELEMENT-DEFAULT",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {

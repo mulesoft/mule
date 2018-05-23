@@ -47,8 +47,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "COPY-XSDTYPE1",
+        "namespace": "MODULE-XSD-CUSTOM-TYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-XSD-CUSTOM-TYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -190,8 +198,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET-HARDCODED-XSDTYPE1",
+        "namespace": "MODULE-XSD-CUSTOM-TYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-XSD-CUSTOM-TYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -297,8 +313,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "IS-XSDTYPE1",
+        "namespace": "MODULE-XSD-CUSTOM-TYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-XSD-CUSTOM-TYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -440,8 +464,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "OPERATION-WITH-CUSTOM-TYPES",
+        "namespace": "MODULE-XSD-CUSTOM-TYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-XSD-CUSTOM-TYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {

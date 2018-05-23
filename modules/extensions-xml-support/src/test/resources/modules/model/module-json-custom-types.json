@@ -47,8 +47,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "CHECK-STREET-IS-AVENUE",
+        "namespace": "MODULE-JSON-CUSTOM-TYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-JSON-CUSTOM-TYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -218,8 +226,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "COPY-JSONTYPE1",
+        "namespace": "MODULE-JSON-CUSTOM-TYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-JSON-CUSTOM-TYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -417,8 +433,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET-HARDCODED-TYPE1",
+        "namespace": "MODULE-JSON-CUSTOM-TYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-JSON-CUSTOM-TYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -552,8 +576,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET-HARDCODED-TYPE1-AS-JSON",
+        "namespace": "MODULE-JSON-CUSTOM-TYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-JSON-CUSTOM-TYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -659,8 +691,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "IS-JSONTYPE1",
+        "namespace": "MODULE-JSON-CUSTOM-TYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-JSON-CUSTOM-TYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -830,8 +870,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "IS-JSONTYPE1-CONTENT",
+        "namespace": "MODULE-JSON-CUSTOM-TYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-JSON-CUSTOM-TYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -1002,8 +1050,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "IS-JSONTYPE2",
+        "namespace": "MODULE-JSON-CUSTOM-TYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-JSON-CUSTOM-TYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -1225,8 +1281,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "OPERATION-WITH-CUSTOM-TYPES",
+        "namespace": "MODULE-JSON-CUSTOM-TYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MODULE-JSON-CUSTOM-TYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {

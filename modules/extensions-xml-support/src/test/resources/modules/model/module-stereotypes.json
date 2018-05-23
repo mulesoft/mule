@@ -19,6 +19,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "MODULE-STEREOTYPES",
+        "parent": {
+          "type": "MODULE_CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -290,8 +298,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "DO-SOMETHING",
+            "namespace": "MODULE-STEREOTYPES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-STEREOTYPES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -411,6 +427,14 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": false,
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "MODULE-STEREOTYPES",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "parameterGroupModels": [
             {
               "parameters": [

@@ -19,6 +19,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "MODULE-DOCUMENTATION",
+        "parent": {
+          "type": "MODULE_CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -290,8 +298,16 @@
             "MODULE-DOCUMENTATION:ANOTHER_CUSTOM_ERROR_HERE"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "OPERATION-WITH-DOC",
+            "namespace": "MODULE-DOCUMENTATION",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-DOCUMENTATION",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {

@@ -58,14 +58,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 /**
  * {@link DeclarationEnricher} implementation which enriches the {@link ExtensionModel} and their {@link OperationModel} from the
  * used {@link ErrorTypes} and {@link Throws} in an Annotation based extension.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 public class StereotypesDeclarationEnricher implements DeclarationEnricher {
 
@@ -84,88 +83,132 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
 
     private final Map<StereotypeDefinition, StereotypeModel> stereotypes = new HashMap<>();
 
+    private String namespace;
+    private StereotypeModel sourceParent;
+    private StereotypeModel processorParent;
+    private ClassTypeLoader typeLoader;
+
     public void apply(ExtensionLoadingContext extensionLoadingContext) {
       ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
-      ClassTypeLoader typeLoader =
+      this.typeLoader =
           new DefaultExtensionsTypeLoaderFactory().createTypeLoader(extensionLoadingContext.getExtensionClassLoader());
-      ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
-      Optional<ImplementingTypeModelProperty> implementingType =
-          extensionDeclaration.getModelProperty(ImplementingTypeModelProperty.class);
+      ExtensionDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
+      this.namespace = getStereotypePrefix(extensionDeclarer);
+      this.processorParent = newStereotype(PROCESSOR.getType(), namespace).withParent(PROCESSOR).build();
+      this.sourceParent = newStereotype(SOURCE.getType(), namespace).withParent(SOURCE).build();
 
-      final String namespace = getStereotypePrefix(extensionDeclarer);
+      IdempotentDeclarationWalker enricher = declaration.getModelProperty(ImplementingTypeModelProperty.class).isPresent()
+          ? getJavaBasedStereotypeEnricher()
+          : getDefaultStereotypeEnricher();
 
-      if (implementingType.isPresent()) {
-        final StereotypeModel processorParent = newStereotype(PROCESSOR.getType(), namespace).withParent(PROCESSOR).build();
-        final StereotypeModel sourceParent = newStereotype(SOURCE.getType(), namespace).withParent(SOURCE).build();
+      enricher.walk(declaration);
 
-        new IdempotentDeclarationWalker() {
+      resolveDeclaredTypesStereotypes(declaration, namespace);
+    }
 
-          @Override
-          protected void onConfiguration(ConfigurationDeclaration declaration) {
-            final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), CONFIG);
-            ifPresent(declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
-                .map(ExtensionTypeDescriptorModelProperty::getType),
-                      type -> resolveStereotype(type, declaration, defaultStereotype),
-                      () -> declaration.withStereotype(defaultStereotype));
-          }
+    private IdempotentDeclarationWalker getJavaBasedStereotypeEnricher() {
+      return new IdempotentDeclarationWalker() {
 
-          @Override
-          protected void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
-            final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), CONNECTION);
-            ifPresent(declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
-                .map(ExtensionTypeDescriptorModelProperty::getType),
-                      type -> resolveStereotype(type, declaration, defaultStereotype),
-                      () -> declaration.withStereotype(defaultStereotype));
-          }
+        @Override
+        protected void onConfiguration(ConfigurationDeclaration declaration) {
+          final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), CONFIG);
+          ifPresent(declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+              .map(ExtensionTypeDescriptorModelProperty::getType),
+                    type -> resolveStereotype(type, declaration, defaultStereotype),
+                    () -> declaration.withStereotype(defaultStereotype));
+        }
 
-          @Override
-          protected void onConstruct(WithConstructsDeclaration owner, ConstructDeclaration declaration) {
-            final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), processorParent);
-            ifPresent(declaration.getModelProperty(ImplementingMethodModelProperty.class)
-                .map(ImplementingMethodModelProperty::getMethod)
-                .map((Method method) -> new MethodWrapper(method, typeLoader)),
-                      methodElement -> resolveStereotype(methodElement, declaration, defaultStereotype),
-                      () -> declaration.withStereotype(defaultStereotype));
+        @Override
+        protected void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
+          final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), CONNECTION);
+          ifPresent(declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+              .map(ExtensionTypeDescriptorModelProperty::getType),
+                    type -> resolveStereotype(type, declaration, defaultStereotype),
+                    () -> declaration.withStereotype(defaultStereotype));
+        }
 
-          }
+        @Override
+        protected void onConstruct(WithConstructsDeclaration owner, ConstructDeclaration declaration) {
+          final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), processorParent);
+          ifPresent(declaration.getModelProperty(ImplementingMethodModelProperty.class)
+              .map(ImplementingMethodModelProperty::getMethod)
+              .map((Method method) -> new MethodWrapper(method, typeLoader)),
+                    methodElement -> resolveStereotype(methodElement, declaration, defaultStereotype),
+                    () -> declaration.withStereotype(defaultStereotype));
 
-          @Override
-          public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration) {
-            final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), processorParent);
-            ifPresent(declaration.getModelProperty(ImplementingMethodModelProperty.class)
-                .map(ImplementingMethodModelProperty::getMethod)
-                .map(method -> new MethodWrapper(method, typeLoader)),
-                      methodElement -> resolveStereotype(methodElement, declaration, defaultStereotype),
-                      () -> declaration.withStereotype(defaultStereotype));
-          }
+        }
 
-          @Override
-          protected void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
-            final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), sourceParent);
-            ifPresent(declaration.getModelProperty(ImplementingTypeModelProperty.class)
-                .map(ImplementingTypeModelProperty::getType)
-                .map(declaringType -> new TypeWrapper(declaringType, typeLoader)),
-                      type -> resolveStereotype(type, declaration, defaultStereotype),
-                      () -> declaration.withStereotype(defaultStereotype));
+        @Override
+        public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration) {
+          final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), processorParent);
+          ifPresent(declaration.getModelProperty(ImplementingMethodModelProperty.class)
+              .map(ImplementingMethodModelProperty::getMethod)
+              .map(method -> new MethodWrapper(method, typeLoader)),
+                    methodElement -> resolveStereotype(methodElement, declaration, defaultStereotype),
+                    () -> declaration.withStereotype(defaultStereotype));
+        }
 
-          }
+        @Override
+        protected void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
+          final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), sourceParent);
+          ifPresent(declaration.getModelProperty(ImplementingTypeModelProperty.class)
+              .map(ImplementingTypeModelProperty::getType)
+              .map(declaringType -> new TypeWrapper(declaringType, typeLoader)),
+                    type -> resolveStereotype(type, declaration, defaultStereotype),
+                    () -> declaration.withStereotype(defaultStereotype));
 
-          private StereotypeModel createStereotype(String name, StereotypeModel parent) {
-            return newStereotype(name, namespace).withParent(parent).build();
-          }
+        }
 
-          private void resolveStereotype(Type type, StereotypedDeclaration<?> declaration, StereotypeModel fallback) {
-            new ClassStereotypeResolver(type, declaration, namespace, fallback, stereotypes).resolveStereotype();
-          }
+        private void resolveStereotype(Type type, StereotypedDeclaration<?> declaration, StereotypeModel fallback) {
+          new ClassStereotypeResolver(type, declaration, namespace, fallback, stereotypes).resolveStereotype();
+        }
 
-          private void resolveStereotype(MethodWrapper<?> method, ComponentDeclaration<?> declaration, StereotypeModel fallback) {
-            new MethodStereotypeResolver(method, declaration, namespace, fallback, stereotypes).resolveStereotype();
-          }
+        private void resolveStereotype(MethodWrapper<?> method, ComponentDeclaration<?> declaration, StereotypeModel fallback) {
+          new MethodStereotypeResolver(method, declaration, namespace, fallback, stereotypes).resolveStereotype();
+        }
 
-        }.walk(extensionDeclaration);
-      }
+      };
+    }
 
-      resolveDeclaredTypesStereotypes(extensionDeclaration, namespace);
+    private IdempotentDeclarationWalker getDefaultStereotypeEnricher() {
+      return new IdempotentDeclarationWalker() {
+
+        @Override
+        protected void onConfiguration(ConfigurationDeclaration declaration) {
+          final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), CONFIG);
+          declaration.withStereotype(defaultStereotype);
+        }
+
+        @Override
+        protected void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
+          final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), CONNECTION);
+          declaration.withStereotype(defaultStereotype);
+        }
+
+        @Override
+        protected void onConstruct(WithConstructsDeclaration owner, ConstructDeclaration declaration) {
+          final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), processorParent);
+          declaration.withStereotype(defaultStereotype);
+
+        }
+
+        @Override
+        public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration) {
+          final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), processorParent);
+          declaration.withStereotype(defaultStereotype);
+        }
+
+        @Override
+        protected void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
+          final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), sourceParent);
+          declaration.withStereotype(defaultStereotype);
+        }
+
+      };
+    }
+
+    private StereotypeModel createStereotype(String name, StereotypeModel parent) {
+      return newStereotype(name, namespace).withParent(parent).build();
     }
 
     private void resolveDeclaredTypesStereotypes(ExtensionDeclaration declaration, String namespace) {

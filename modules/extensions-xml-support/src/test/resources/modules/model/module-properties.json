@@ -19,6 +19,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "MODULE-PROPERTIES",
+        "parent": {
+          "type": "MODULE_CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -284,8 +292,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SET-PAYLOAD-ADD-PARAM-AND-PROPERTY-VALUES",
+            "namespace": "MODULE-PROPERTIES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-PROPERTIES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -427,8 +443,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SET-PAYLOAD-CONFIG-DEFAULT-PARAM-VALUE",
+            "namespace": "MODULE-PROPERTIES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-PROPERTIES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -534,8 +558,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SET-PAYLOAD-CONFIG-DEFAULT-PROPERTY-USE-OPTIONAL",
+            "namespace": "MODULE-PROPERTIES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-PROPERTIES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -641,8 +673,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SET-PAYLOAD-CONFIG-OPTIONAL-PROPERTY",
+            "namespace": "MODULE-PROPERTIES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-PROPERTIES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -748,8 +788,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SET-PAYLOAD-CONFIG-PARAM-VALUE",
+            "namespace": "MODULE-PROPERTIES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-PROPERTIES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -855,8 +903,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SET-PAYLOAD-HARDCODED-FILE-PROPERTY",
+            "namespace": "MODULE-PROPERTIES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-PROPERTIES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -962,8 +1018,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SET-PAYLOAD-HARDCODED-GLOBAL-PROPERTY",
+            "namespace": "MODULE-PROPERTIES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-PROPERTIES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1069,8 +1133,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SET-PAYLOAD-HARDCODED-SYSTEM-PROPERTY",
+            "namespace": "MODULE-PROPERTIES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-PROPERTIES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1176,8 +1248,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SET-PAYLOAD-HARDCODED-VALUE",
+            "namespace": "MODULE-PROPERTIES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-PROPERTIES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1283,8 +1363,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SET-PAYLOAD-PARAM-VALUE",
+            "namespace": "MODULE-PROPERTIES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MODULE-PROPERTIES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
