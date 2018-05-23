@@ -1083,8 +1083,16 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "FAIL_CONNECTION",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "PETSTORE",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1370,8 +1378,16 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "FAIL_OPERATION_WITH_EXCEPTION",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "PETSTORE",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1657,8 +1673,16 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "FAIL_OPERATION_WITH_THROWABLE",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "PETSTORE",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1934,8 +1958,16 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "FAILS_TO_READ_STREAM",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "PETSTORE",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -2242,8 +2274,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_CAGE",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "PETSTORE",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -2359,8 +2399,16 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_CLIENT",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "PETSTORE",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -2629,8 +2677,16 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_CLIENT_ON_LATCH",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "PETSTORE",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3001,8 +3057,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_CONFIG",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "PETSTORE",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3139,8 +3203,16 @@
             "PETSTORE:RETRY_EXHAUSTED"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_PETS",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "PETSTORE",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -8200,7 +8272,15 @@
           "errors": [],
           "stereotype": {
             "type": "SOURCE",
-            "namespace": "MULE"
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "PETSTORE",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -8629,8 +8709,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "DESCRIBE_SERIALIZED_ANIMAL",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -8809,8 +8897,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "FAIL",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -8985,8 +9081,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET_AQUARIUM",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -9140,8 +9244,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET_BREEDER",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -9329,8 +9441,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET_CASHIER",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -10101,8 +10221,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET_CONNECTION_THREADS",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -10221,8 +10349,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET_DEFAULT_ENCODING",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -10412,8 +10548,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET_FISH_FROM_RIVER_STREAM",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -10658,8 +10802,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET_FORBIDDEN_PETS",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -10864,8 +11016,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET_PET_CORRELATION",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -10978,8 +11138,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "GET_PET_STORE_DEAL",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -11133,8 +11301,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "MAKE_PHONE_CALL",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -11212,8 +11388,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "RESET_CONNECTION_THREADS",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [],
       "name": "resetConnectionThreads",
@@ -11249,8 +11433,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "SET_SECURE_CAGE",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -11419,8 +11611,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "SPELL_BUILT_IN",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -11611,8 +11811,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "SPELL_CLASS",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -11806,8 +12014,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "SPELL_OBJECT",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -16693,8 +16909,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "SOURCE",
-        "namespace": "MULE"
+        "type": "PET_ADOPTION_SOURCE",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -17013,8 +17237,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "SOURCE",
-        "namespace": "MULE"
+        "type": "SENTIENT_SOURCE",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -17242,8 +17474,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "SOURCE",
-        "namespace": "MULE"
+        "type": "PET-SOURCE",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -17562,8 +17802,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "SOURCE",
-        "namespace": "MULE"
+        "type": "PET-SOURCE-STREAM",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {

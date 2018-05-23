@@ -280,8 +280,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "CRASH_CAR",
+            "namespace": "MARVEL",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [],
           "name": "crashCar",
@@ -327,8 +335,16 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "READ_STREAM",
+            "namespace": "MARVEL",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -672,8 +688,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SAY_MAGIC_WORDS",
+            "namespace": "MARVEL",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1214,8 +1238,16 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SEEK_STREAM",
+            "namespace": "MARVEL",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1605,8 +1637,16 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "TO_STREAM",
+            "namespace": "MARVEL",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -2104,8 +2144,8 @@
             "type": "REFERABLE_OPERATION",
             "namespace": "MARVEL",
             "parent": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+              "type": "PROCESSOR",
+              "namespace": "MULE"
             }
           },
           "parameterGroupModels": [
@@ -2976,8 +3016,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "SOURCE",
-            "namespace": "MULE"
+            "type": "BYTES-CASTER",
+            "namespace": "MARVEL",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3727,8 +3775,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "COMPUTE_FLIGHT_PLAN",
+            "namespace": "MARVEL",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [],
           "name": "computeFlightPlan",
@@ -3773,8 +3829,16 @@
             "MARVEL:RETRY_EXHAUSTED"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "FIRE_MISSILE",
+            "namespace": "MARVEL",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -4605,8 +4669,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "FIND_INSTRUCTIONS",
+        "namespace": "MARVEL",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MARVEL",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -4824,8 +4896,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "READ_OBJECT_STREAM",
+        "namespace": "MARVEL",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MARVEL",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {

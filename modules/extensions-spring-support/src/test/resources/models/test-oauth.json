@@ -189,8 +189,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "CAPTURE_CALLBACK_PAYLOADS",
+            "namespace": "TEST-OAUTH",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -335,8 +343,16 @@
             "TEST-OAUTH:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_CONNECTION",
+            "namespace": "TEST-OAUTH",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -605,8 +621,16 @@
             "TEST-OAUTH:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "TOKEN_EXPIRED",
+            "namespace": "TEST-OAUTH",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {

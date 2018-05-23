@@ -217,8 +217,16 @@
             "TX:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "GET_CONNECTION",
+            "namespace": "TX",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TX",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -552,8 +560,16 @@
             "TX:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "INJECT_TRANSACTIONAL_ACTION",
+            "namespace": "TX",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TX",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -910,8 +926,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "PAGED_TRANSACTIONAL_OPERATION",
+            "namespace": "TX",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TX",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1396,8 +1420,16 @@
             "TX:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "VERIFY_NO_TRANSACTION",
+            "namespace": "TX",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TX",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1644,8 +1676,16 @@
             "TX:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "VERIFY_SAME_CONNECTION",
+            "namespace": "TX",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TX",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1919,8 +1959,16 @@
             "TX:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "VERIFY_TRANSACTION_BEGUN",
+            "namespace": "TX",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TX",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -2167,8 +2215,16 @@
             "TX:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "VERIFY_TRANSACTION_COMMITED",
+            "namespace": "TX",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TX",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -2415,8 +2471,16 @@
             "TX:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "VERIFY_TRANSACTION_ROLLEDBACK",
+            "namespace": "TX",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "TX",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3410,8 +3474,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "SOURCE",
-            "namespace": "MULE"
+            "type": "TRANSACTIONAL_SOURCE",
+            "namespace": "TX",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "TX",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3876,8 +3948,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "SOURCE",
-            "namespace": "MULE"
+            "type": "TRANSACTIONAL_SOURCE_WITH_TX_PARAMETERS",
+            "namespace": "TX",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "TX",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -4320,8 +4400,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "FAIL",
+        "namespace": "TX",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "TX",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [],
       "name": "fail",

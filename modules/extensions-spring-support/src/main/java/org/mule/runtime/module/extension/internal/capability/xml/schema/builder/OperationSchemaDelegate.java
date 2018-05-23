@@ -10,7 +10,6 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_OPERATOR;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_OPERATOR_TYPE;
 import static org.mule.runtime.config.internal.dsl.SchemaConstants.TYPE_SUFFIX;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -60,8 +59,6 @@ class OperationSchemaDelegate extends ExecutableTypeSchemaDelegate {
   }
 
   private QName getOperationSubstitutionGroup(ComponentModel componentModel) {
-    return componentModel.getStereotype().equals(PROCESSOR)
-        ? MULE_ABSTRACT_OPERATOR
-        : getSubstitutionGroup(componentModel.getStereotype());
+    return getSubstitutionGroup(componentModel, MULE_ABSTRACT_OPERATOR);
   }
 }

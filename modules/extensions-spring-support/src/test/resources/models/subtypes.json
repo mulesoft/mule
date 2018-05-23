@@ -920,8 +920,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "CONFIG_RETRIEVER",
+            "namespace": "SUBTYPES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "SUBTYPES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1037,8 +1045,16 @@
             "SUBTYPES:RETRY_EXHAUSTED"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "CONNECTION_RETRIEVER",
+            "namespace": "SUBTYPES",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "SUBTYPES",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1633,8 +1649,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "DOOR_RETRIEVER",
+        "namespace": "SUBTYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "SUBTYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -1788,8 +1812,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "NO_GLOBAL_POJO",
+        "namespace": "SUBTYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "SUBTYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -1985,8 +2017,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "PROCESS_DOOR",
+        "namespace": "SUBTYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "SUBTYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -2187,8 +2227,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "SHAPE_RETRIEVER",
+        "namespace": "SUBTYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "SUBTYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -2382,8 +2430,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "SUBTYPED_AND_CONCRETE_PARAMETERS",
+        "namespace": "SUBTYPES",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "SUBTYPES",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -3024,8 +3080,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "SOURCE",
-        "namespace": "MULE"
+        "type": "SUBTYPES_SOURCE",
+        "namespace": "SUBTYPES",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "SUBTYPES",
+          "parent": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {

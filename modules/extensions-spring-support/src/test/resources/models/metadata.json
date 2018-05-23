@@ -331,8 +331,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "BOOLEAN_METADATA_KEY",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -728,8 +736,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "CONTENT_AND_OUTPUT_CACHE_RESOLVER",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1117,8 +1133,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "CONTENT_AND_OUTPUT_METADATA_WITH_KEY_ID",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1507,8 +1531,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "CONTENT_AND_OUTPUT_METADATA_WITHOUT_KEY_ID",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -1857,8 +1889,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "CONTENT_METADATA_WITH_KEY_ID",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -2247,8 +2287,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "CONTENT_METADATA_WITHOUT_KEY_ID",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -2578,8 +2626,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "CONTENT_METADATA_WITHOUT_KEYS_WITH_KEY_ID",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -2891,8 +2947,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "CONTENT_ONLY_CACHE_RESOLVER",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3261,8 +3325,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "CONTENT_ONLY_IGNORES_OUTPUT",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3567,8 +3639,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "ENUM_METADATA_KEY",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -3979,8 +4059,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "FAIL_WITH_RESOLVING_EXCEPTION",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -4369,8 +4457,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "FAIL_WITH_RUNTIME_EXCEPTION",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -4759,8 +4855,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "METADATA_KEY_WITH_DEFAULT_VALUE",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -5149,8 +5253,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -5493,8 +5605,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -5927,8 +6047,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "OUTPUT_METADATA_WITH_KEY_ID",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -6316,8 +6444,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "OUTPUT_METADATA_WITHOUT_KEY_ID",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -6665,8 +6801,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_ID",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -7008,8 +7152,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "OUTPUT_ONLY_WITHOUT_CONTENT_PARAM",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -7350,8 +7502,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "PAGED_OPERATION_METADATA",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -7882,8 +8042,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "PAGED_OPERATION_RESULT",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -8446,8 +8614,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "PAGED_OPERATION_RESULT_WITH_ATTRIBUTES_RESOLVER",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -8932,8 +9108,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "PARTIAL_MULTI_LEVEL_KEY_RESOLVER",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -9383,8 +9567,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SHOULD_INHERIT_EXTENSION_RESOLVERS",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -9695,8 +9887,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -10065,8 +10265,16 @@
             "METADATA:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
+            "type": "SIMPLE_MULTI_LEVEL_KEY_RESOLVER",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "PROCESSOR",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -10762,8 +10970,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "SOURCE",
-            "namespace": "MULE"
+            "type": "METADATA_SOURCE",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -11166,8 +11382,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "CONTENT_PARAMETER_SHOULD_NOT_GENERATE_LIST_CHILD_ELEMENT",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -11267,8 +11491,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "CONTENT_PARAMETER_SHOULD_NOT_GENERATE_MAP_CHILD_ELEMENT",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -11387,8 +11619,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "CONTENT_PARAMETER_SHOULD_NOT_GENERATE_POJO_CHILD_ELEMENT",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -11467,8 +11707,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "CUSTOM_ATTRIBUTES_OUTPUT",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -11581,8 +11829,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "CUSTOM_INPUT_AND_OUTPUT",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -11736,8 +11992,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "CUSTOM_TYPE_INPUT",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -11891,8 +12155,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "CUSTOM_TYPE_OUTPUT",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -11985,7 +12257,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -11999,7 +12270,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -12059,8 +12331,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "CUSTOM_TYPE_OUTPUT_WITH_STATIC_ATTRIBUTES",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -12415,8 +12695,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "DO_QUERY",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -12627,8 +12915,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "DYNAMIC_LIST_OF_MESSAGES",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -12835,8 +13131,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "DYNAMIC_LIST_OF_OBJECTS",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -13050,8 +13354,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "INPUT_HAS_EXCLUSIVE_OPTIONAL_PARAMETER_GROUP",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -13239,8 +13551,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "INPUT_HAS_POJO_WITH_EXCLUSIVE_OPTIONAL_PARAMETER_GROUP",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -13400,7 +13720,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -13414,7 +13733,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -13465,8 +13785,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "JSON_ATTRIBUTES",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -13594,8 +13922,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "JSON_INPUT_MAP",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -13605,7 +13941,6 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
-                  "label": "Person",
                   "classInformation": {
                     "classname": "java.util.Map",
                     "hasDefaultConstructor": false,
@@ -13617,7 +13952,8 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": true
-                  }
+                  },
+                  "label": "Person"
                 },
                 "open": {
                   "type": "Any"
@@ -13801,8 +14137,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "JSON_INPUT_STREAM",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -13812,7 +14156,6 @@
                 "format": "json",
                 "type": "Object",
                 "annotations": {
-                  "label": "Person",
                   "classInformation": {
                     "classname": "java.io.InputStream",
                     "hasDefaultConstructor": true,
@@ -13826,7 +14169,8 @@
                     "parent": "",
                     "genericTypes": [],
                     "isMap": false
-                  }
+                  },
+                  "label": "Person"
                 },
                 "open": {
                   "type": "Any"
@@ -13990,7 +14334,6 @@
           "format": "json",
           "type": "Object",
           "annotations": {
-            "label": "Person",
             "classInformation": {
               "classname": "java.io.InputStream",
               "hasDefaultConstructor": true,
@@ -14004,7 +14347,8 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            }
+            },
+            "label": "Person"
           },
           "open": {
             "type": "Any"
@@ -14064,8 +14408,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "JSON_OUTPUT",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -14439,8 +14791,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "JSON_OUTPUT_ARRAY",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -14799,8 +15159,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "LIST_OF_MESSAGES",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -14913,8 +15281,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "MESSAGE_ATTRIBUTES_ANY_TYPE_METADATA",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -15046,8 +15422,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "MESSAGE_ATTRIBUTES_PERSON_TYPE_METADATA",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -15254,8 +15638,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "OBJECT_LIST_AS_INPUT",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -15488,8 +15880,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "OUTPUT_ATTRIBUTES_WITH_DECLARED_SUBTYPES_METADATA",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -15621,8 +16021,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "OUTPUT_ATTRIBUTES_WITH_DYNAMIC_METADATA",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -15806,8 +16214,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "RECEIVE_JSON_INPUT_STREAM",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -16165,8 +16581,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "RESOLVER_CONTENT_WITH_CONTEXT_CLASS_LOADER",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -16323,8 +16747,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "RESOLVER_OUTPUT_WITH_CONTEXT_CLASS_LOADER",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -16497,8 +16929,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "RETURN_QUERY",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -16668,8 +17108,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "TYPE_WITH_DECLARED_SUBTYPES_METADATA",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -16892,8 +17340,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "XML_ATTRIBUTES",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -17006,8 +17462,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "XML_INPUT",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -17161,8 +17625,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "XML_OUTPUT",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -17728,8 +18200,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "SOURCE",
-        "namespace": "MULE"
+        "type": "METADATA_SOURCE_WITH_MULTILEVEL",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -18078,7 +18558,6 @@
                   "format": "json",
                   "type": "Object",
                   "annotations": {
-                    "label": "Person",
                     "classInformation": {
                       "classname": "java.io.InputStream",
                       "hasDefaultConstructor": true,
@@ -18092,7 +18571,8 @@
                       "parent": "",
                       "genericTypes": [],
                       "isMap": false
-                    }
+                    },
+                    "label": "Person"
                   },
                   "open": {
                     "type": "Any"
@@ -18190,8 +18670,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "SOURCE",
-        "namespace": "MULE"
+        "type": "CUSTOM-STATIC-METADATA",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {
@@ -18394,8 +18882,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "SOURCE",
-        "namespace": "MULE"
+        "type": "XML-STATIC-METADATA",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {

@@ -44,6 +44,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Na
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
+import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.CustomStereotypeModelProperty;
 
 import java.math.BigInteger;
 import java.util.LinkedHashMap;
@@ -235,5 +236,11 @@ abstract class ExecutableTypeSchemaDelegate {
     }
 
     return name;
+  }
+
+  protected QName getSubstitutionGroup(ComponentModel componentModel, QName fallback) {
+    return componentModel.getModelProperty(CustomStereotypeModelProperty.class)
+        .map(mp -> getSubstitutionGroup(componentModel.getStereotype()))
+        .orElse(fallback);
   }
 }

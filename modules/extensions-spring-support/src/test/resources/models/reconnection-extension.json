@@ -448,8 +448,16 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "SOURCE",
-            "namespace": "MULE"
+            "type": "RECONECTION_SOURCE",
+            "namespace": "RECONNECTION",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "RECONNECTION",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE"
+              }
+            }
           },
           "parameterGroupModels": [
             {
@@ -812,8 +820,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
+        "type": "SWITCH_CONNECTION",
+        "namespace": "RECONNECTION",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "RECONNECTION",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [],
       "name": "switchConnection",

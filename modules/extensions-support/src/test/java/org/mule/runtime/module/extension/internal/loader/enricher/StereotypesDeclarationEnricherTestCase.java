@@ -11,9 +11,15 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR_DEFINITION;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import static org.mule.test.marvel.drstrange.DrStrangeStereotypeDefinition.DR_STRANGE_STEREOTYPE_NAME;
 import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
@@ -25,10 +31,13 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
+import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.CustomStereotypeModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.marvel.drstrange.DrStrange;
+import org.mule.test.marvel.ironman.IronMan;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,15 +46,17 @@ import org.junit.Test;
 
 public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
-  private final ExtensionModel extension = loadExtension(MarvelExtension.class);
-  private final ConfigurationModel configuration = extension.getConfigurationModel(DrStrange.CONFIG_NAME).get();
+  public static final String MARVEL_NAMESPACE = MARVEL_EXTENSION.toUpperCase();
+  private final ExtensionModel marvelExtension = loadExtension(MarvelExtension.class);
+  private final ExtensionModel heisenbergExtension = loadExtension(HeisenbergExtension.class);
+  private final ConfigurationModel configuration = marvelExtension.getConfigurationModel(DrStrange.CONFIG_NAME).get();
 
   @Test
   public void connectionProviderWithMultipleConfigReferenceParameter() {
     ParameterModel paramWithReferences = configuration.getConnectionProviders().get(0).getAllParameterModels().get(0);
     List<StereotypeModel> allowedStereotypes = paramWithReferences.getAllowedStereotypes();
     assertThat(allowedStereotypes, hasSize(2));
-    assertStereotype(allowedStereotypes.get(0), HeisenbergExtension.HEISENBERG, "config", CONFIG);
+    assertStereotype(allowedStereotypes.get(0), HEISENBERG, "config", CONFIG);
     assertStereotype(allowedStereotypes.get(1), MARVEL_EXTENSION, CONFIG_NAME, CONFIG);
   }
 
@@ -62,7 +73,7 @@ public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase
 
   @Test
   public void exportedTypesWithStereotypes() {
-    Optional<ObjectType> withStereoType = extension.getTypes().stream()
+    Optional<ObjectType> withStereoType = marvelExtension.getTypes().stream()
         .filter(type -> type.getAnnotation(StereotypeTypeAnnotation.class).isPresent())
         .findFirst();
     assertThat(withStereoType.isPresent(), is(true));
@@ -95,6 +106,7 @@ public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase
     assertThat(stereotypes.get(0), is(FLOW));
   }
 
+  @Test
   public void configurationWithConfigReferenceParameter() {
     List<ParameterModel> params = configuration.getAllParameterModels();
     assertThat(params, hasSize(3));
@@ -104,14 +116,88 @@ public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase
     assertStereotype(allowedStereotypes.get(0), MARVEL_EXTENSION, CONFIG_NAME, CONFIG);
   }
 
+  @Test
+  public void defaultConfigStereotype() {
+    StereotypeModel stereotypeModel = marvelExtension.getConfigurationModel(IronMan.CONFIG_NAME).get().getStereotype();
+
+    assertThat(stereotypeModel.isAssignableTo(CONFIG), is(true));
+    assertStereotype(stereotypeModel, MARVEL_NAMESPACE, "IRON_MAN", CONFIG);
+  }
+
+  @Test
+  public void defaultConnectionStereotype() {
+    StereotypeModel stereotypeModel = marvelExtension.getConfigurationModel(DrStrange.CONFIG_NAME).get()
+        .getConnectionProviderModel("mystic").get().getStereotype();
+
+    assertThat(stereotypeModel.isAssignableTo(CONNECTION), is(true));
+    assertStereotype(stereotypeModel, MARVEL_NAMESPACE, "MYSTIC", CONNECTION);
+  }
+
+  @Test
+  public void defaultProcessorStereotype() {
+    StereotypeModel stereotypeModel = marvelExtension.getConfigurationModel(IronMan.CONFIG_NAME).get()
+        .getOperationModel("fireMissile").get().getStereotype();
+
+    assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
+    StereotypeModel expectedParent = newStereotype(PROCESSOR.getType(), MARVEL_NAMESPACE).withParent(PROCESSOR).build();
+    assertStereotype(stereotypeModel, MARVEL_NAMESPACE, "FIRE_MISSILE", expectedParent);
+  }
+
+  @Test
+  public void defaultSourceStereotype() {
+    StereotypeModel stereotypeModel = marvelExtension.getConfigurationModel(DrStrange.CONFIG_NAME).get()
+        .getSourceModel("bytes-caster").get().getStereotype();
+
+    assertThat(stereotypeModel.isAssignableTo(SOURCE), is(true));
+    StereotypeModel expectedParent = newStereotype(SOURCE.getType(), MARVEL_NAMESPACE).withParent(SOURCE).build();
+    assertStereotype(stereotypeModel, MARVEL_NAMESPACE, "BYTES-CASTER", expectedParent);
+  }
+
+  @Test
+  public void defaultConstructStereotype() {
+    StereotypeModel stereotypeModel = heisenbergExtension.getConstructModel("simpleRouter").get().getStereotype();
+
+    assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
+    String namespace = HEISENBERG.toUpperCase();
+    StereotypeModel expectedParent = newStereotype(PROCESSOR.getType(), namespace).withParent(PROCESSOR).build();
+    assertStereotype(stereotypeModel, namespace, "SIMPLE_ROUTER", expectedParent);
+  }
+
+  @Test
+  public void customStereotype() {
+    OperationModel operation = heisenbergExtension.getConfigurationModels().get(0).getOperationModel("callSaul").get();
+
+    StereotypeModel stereotypeModel = operation.getStereotype();
+    assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
+
+    assertThat(stereotypeModel.getType(), is(new EmpireStereotype().getName().toUpperCase()));
+    assertThat(stereotypeModel.getNamespace(), is(HEISENBERG.toUpperCase()));
+    assertThat(stereotypeModel.getParent().get(), is(PROCESSOR));
+
+    assertThat(operation.getModelProperty(CustomStereotypeModelProperty.class).isPresent(), is(true));
+  }
+
+  @Test
+  public void validatorStereotype() {
+    OperationModel operation = heisenbergExtension.getOperationModel("validateMoney").get();
+
+    StereotypeModel stereotypeModel = operation.getStereotype();
+    assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
+    assertThat(stereotypeModel.isAssignableTo(VALIDATOR), is(true));
+
+    assertThat(stereotypeModel.getType(), is(VALIDATOR_DEFINITION.getName()));
+    assertThat(stereotypeModel.getNamespace(), is(HEISENBERG.toUpperCase()));
+    assertThat(stereotypeModel.getParent().get(), is(VALIDATOR));
+  }
+
   private void assertStereotype(StereotypeModel stereotypeModel, String ns, String name, StereotypeModel parent) {
     StereotypeModel expected = newStereotype(name, ns).withParent(parent).build();
     assertThat(stereotypeModel.getNamespace(), is(expected.getNamespace()));
     assertThat(stereotypeModel.getType(), is(expected.getType()));
     if (stereotypeModel.getParent().isPresent()) {
       assertThat(expected.getParent().isPresent(), is(true));
-      assertStereotype(stereotypeModel.getParent().get(), parent.getNamespace(), parent.getType(),
-                       parent.getParent().orElse(null));
+      assertStereotype(stereotypeModel.getParent().get(),
+                       parent.getNamespace(), parent.getType(), parent.getParent().orElse(null));
     } else {
       assertThat(expected.getParent().isPresent(), is(false));
     }
