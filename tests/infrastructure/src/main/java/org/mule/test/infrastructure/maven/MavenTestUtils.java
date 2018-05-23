@@ -12,8 +12,14 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
-
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
@@ -23,13 +29,6 @@ import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.InvokerLogger;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.apache.maven.shared.invoker.SystemOutLogger;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
 
 
 /**
@@ -95,7 +94,7 @@ public class MavenTestUtils {
     return artifact;
   }
 
-  private static File getMavenLocalRepository() {
+  public static File getMavenLocalRepository() {
     String buildDirectory = getProperty("localRepository");
     if (buildDirectory == null) {
       buildDirectory = getProperty(USER_HOME) + M_2_REPO;
