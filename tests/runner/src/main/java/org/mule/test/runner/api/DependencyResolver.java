@@ -68,9 +68,17 @@ public class DependencyResolver {
     checkNotNull(mavenConfiguration, "mavenConfiguration cannot be null");
 
     this.resolutionContext = new AetherResolutionContext(mavenConfiguration);
-    this.repositoryState =
-        new AetherRepositoryState(this.resolutionContext.getLocalRepositoryLocation(), workspaceReader, false,
-                                  false, resolutionContext.getAuthenticatorSelector(), true);
+    this.repositoryState = new AetherRepositoryState(resolutionContext.getLocalRepositoryLocation(), workspaceReader,
+                                                     resolutionContext.getAuthenticatorSelector(),
+                                                     resolutionContext.getProxySelector(),
+                                                     resolutionContext.getMirrorSelector(),
+                                                     mavenConfiguration.getForcePolicyUpdateNever(),
+                                                     mavenConfiguration.getOfflineMode(),
+                                                     mavenConfiguration
+                                                         .getIgnoreArtifactDescriptorRepositories(),
+                                                     session -> {
+                                                     });
+
     if (logger.isDebugEnabled()) {
       resolutionContext.getAuthenticatorSelector()
           .ifPresent(selector -> logger.debug("Using authenticator selector: " + ReflectionToStringBuilder.toString(selector)));
