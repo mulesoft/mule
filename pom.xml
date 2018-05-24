@@ -223,8 +223,8 @@
         <woodstoxVersion>4.4.1</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
-        <allureJunitVersion>2.0-BETA17</allureJunitVersion>
-        <allureReportVersion>2.3.4</allureReportVersion>
+        <allureJunitVersion>2.6.0</allureJunitVersion>
+        <allureReportVersion>2.6.0</allureReportVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.2.0-SNAPSHOT</muleDslApiVersion>
