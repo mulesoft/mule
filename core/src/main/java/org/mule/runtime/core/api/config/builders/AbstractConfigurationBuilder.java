@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.api.config.builders;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -51,7 +53,7 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
       doConfigure(muleContext);
       applyLifecycle(muleContext.getLifecycleManager());
     } catch (Exception e) {
-      throw new ConfigurationException(e);
+      throw new ConfigurationException(createStaticMessage(e.getMessage()), e);
     }
   }
 

@@ -489,7 +489,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
                               artifact.getArtifactName())));
         logger.error(t.getMessage());
       } else {
-        log(miniSplash(format("Failed to deploy artifact '%s', see below", artifact.getArtifactName())));
+        log(miniSplash(format("Failed to deploy artifact '%s', %s", artifact.getArtifactName(), t.getCause().getMessage())));
         logger.info(t.getMessage(), t);
       }
 

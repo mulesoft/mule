@@ -16,7 +16,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.rules.ExternalResource;
 import org.junit.runner.Description;
@@ -59,13 +62,13 @@ public class MuleInstallation extends ExternalResource {
     this(zippedDistributionFromProperty);
   }
 
-  public MuleInstallation(String zippedDistribution) {
-    if (StringUtils.isEmpty(zippedDistribution)) {
+  public MuleInstallation(String distribution) {
+    if (StringUtils.isEmpty(distribution)) {
       logger.error("You must configure the location for Mule distribution in the system property: " + DISTRIBUTION_PROPERTY);
     }
-    distribution = new File(zippedDistribution);
-    if (!distribution.exists()) {
-      throw new IllegalArgumentException("Packed distribution not found: " + distribution);
+    this.distribution = new File(distribution);
+    if (!this.distribution.exists()) {
+      throw new IllegalArgumentException("Distribution not found: " + this.distribution);
     }
   }
 
@@ -81,8 +84,35 @@ public class MuleInstallation extends ExternalResource {
 
   @Override
   protected void before() throws Throwable {
-    logger.info("Unpacking Mule Distribution: " + distribution);
-    muleHome = new DistroUnzipper(distribution, WORKING_DIRECTORY.resolve(location).toFile()).unzip().muleHome();
+    if (distribution.isDirectory()) {
+      installDistributionFromDirectory();
+    } else {
+      logger.info("Unpacking Mule Distribution: " + distribution);
+      muleHome = new DistroUnzipper(distribution, WORKING_DIRECTORY.resolve(location).toFile()).unzip().muleHome();
+    }
+  }
+
+  private void installDistributionFromDirectory() {
+    muleHome = WORKING_DIRECTORY.resolve(location).toFile();
+    if (muleHome.exists()) {
+      return;
+    }
+    muleHome.mkdirs();
+    Arrays.stream(distribution.listFiles())
+        .forEach(file -> {
+          try {
+            if (file.isDirectory()) {
+              FileUtils.copyDirectory(file, new File(muleHome, file.getName()));
+            } else {
+              FileUtils.copyFile(file, new File(muleHome, file.getName()));
+            }
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+
+        });
+    FileUtils.listFilesAndDirs(muleHome, TrueFileFilter.TRUE, TrueFileFilter.TRUE)
+        .forEach(file -> DistroUnzipper.chmodRwx(file));
   }
 
   @Override

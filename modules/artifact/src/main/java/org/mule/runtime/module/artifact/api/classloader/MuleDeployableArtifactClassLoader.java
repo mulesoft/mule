@@ -8,10 +8,10 @@ package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-
 import java.net.URL;
 import java.util.List;
+
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 /**
  * Base {@link ArtifactClassLoader} implementation of deployable artifacts.

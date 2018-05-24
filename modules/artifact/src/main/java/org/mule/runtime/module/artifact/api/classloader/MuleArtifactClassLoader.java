@@ -14,13 +14,13 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import org.slf4j.Logger;
 
@@ -73,6 +73,16 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   @Override
   public <T extends ArtifactDescriptor> T getArtifactDescriptor() {
     return (T) artifactDescriptor;
+  }
+
+  @Override
+  public URL findInternalResource(String resource) {
+    return findResource(resource);
+  }
+
+  @Override
+  public Class<?> loadInternalClass(String name) throws ClassNotFoundException {
+    return loadClass(name);
   }
 
   protected String[] getLocalResourceLocations() {

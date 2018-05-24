@@ -17,12 +17,6 @@ import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.core.api.util.CompoundEnumeration;
-import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-
-import org.slf4j.Logger;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -33,6 +27,12 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.mule.runtime.core.api.util.CompoundEnumeration;
+import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+
+import org.slf4j.Logger;
 
 /**
  * Defines a classloader for a Mule artifact composed of other artifacts.
@@ -284,7 +284,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     return resource;
   }
 
-  private ArtifactClassLoader getOwnerClassLoader() {
+  public ArtifactClassLoader getOwnerClassLoader() {
     return ownerClassLoader;
   }
 

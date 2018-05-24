@@ -6,16 +6,14 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static java.lang.Boolean.getBoolean;
 import static org.apache.commons.collections.MapUtils.getObject;
 import static org.apache.commons.lang3.ClassUtils.primitiveToWrapper;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.metadata.java.api.utils.ClassUtils.getInnerClassName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getDefaultFactory;
 import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
-
-import com.google.common.primitives.Primitives;
 
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
@@ -32,6 +30,7 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PrivilegedAction;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -42,6 +41,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+
+import com.google.common.primitives.Primitives;
 
 /**
  * Extend the Apache Commons ClassUtils to provide additional functionality.
@@ -58,6 +63,15 @@ public class ClassUtils {
 
   private static final Map<Class<?>, Class<?>> wrapperToPrimitiveMap = new HashMap<>();
   private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<>(32);
+  public static final String MULE_DESIGN_MODE = "mule.designMode";
+
+  private static LazyValue<ClassLoaderResourceNotFoundExceptionFactory> resourceNotFoundExceptionFactoryLazyValue =
+      new LazyValue(() -> {
+        Collection<ClassLoaderResourceNotFoundExceptionFactory> providers =
+            new SpiServiceRegistry().lookupProviders(ClassLoaderResourceNotFoundExceptionFactory.class,
+                                                     ClassUtils.class.getClassLoader());
+        return providers.isEmpty() ? getDefaultFactory() : providers.iterator().next();
+      });
 
   static {
     wrapperToPrimitiveMap.put(Boolean.class, Boolean.TYPE);
@@ -114,6 +128,42 @@ public class ClassUtils {
     }
 
     return url;
+  }
+
+  /**
+   * Loads a resource from the {@code classLoader} with the given {@code resourceName}. If the resource could not be found then it
+   * will fail with details information of the problem and classloading state.
+   *
+   * @param resourceName the resource to load.
+   * @param classLoader the classloader used to load the resource.
+   * @return the {@link URL} pointing to the resource.
+   */
+  public static URL getResourceOrFail(final String resourceName, ClassLoader classLoader) {
+    URL url = AccessController
+        .doPrivileged((PrivilegedAction<URL>) () -> classLoader != null ? classLoader.getResource(resourceName) : null);
+    if (url != null) {
+      return url;
+    }
+    if (isDesignModeEnabled()) {
+      throw resourceNotFoundExceptionFactoryLazyValue.get().createResourceNotFoundException(resourceName, classLoader);
+    } else {
+      throw getDefaultFactory().createResourceNotFoundException(resourceName, classLoader);
+    }
+  }
+
+  public static Boolean isDesignModeEnabled() {
+    return getBoolean(MULE_DESIGN_MODE);
+  }
+
+  /**
+   * Same as {@link #getResourceOrFail(String, ClassLoader)} but will used the thread current classloader.
+   *
+   * @param resourceName the resource to load.
+   * @return the {@link URL} pointing to the resource.
+   */
+  public static URL getResourceOrFail(final String resourceName) {
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    return getResourceOrFail(resourceName, cl);
   }
 
   @Deprecated
@@ -272,6 +322,8 @@ public class ClassUtils {
 
   /**
    * Load a class with a given name from the given classloader.
+   * <p/>
+   * This method must be used when the resource to load it's dependant on user configuration.
    *
    * @param className the name of the class to load
    * @param classLoader the loader to load it from
@@ -283,7 +335,15 @@ public class ClassUtils {
     try {
       clazz = classLoader.loadClass(className);
     } catch (ClassNotFoundException e) {
-      clazz = classLoader.loadClass(getInnerClassName(className));
+      try {
+        clazz = classLoader.loadClass(getInnerClassName(className));
+      } catch (ClassNotFoundException e2) {
+        if (isDesignModeEnabled()) {
+          throw resourceNotFoundExceptionFactoryLazyValue.get().createClassNotFoundException(className, classLoader);
+        } else {
+          throw getDefaultFactory().createClassNotFoundException(className, classLoader);
+        }
+      }
     }
     return clazz;
   }

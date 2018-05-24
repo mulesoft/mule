@@ -53,7 +53,7 @@ public class DistroUnzipper {
     }
   }
 
-  private void chmodRwx(File destFile) {
+  public static void chmodRwx(File destFile) {
     destFile.setExecutable(true, false);
     destFile.setWritable(true, false);
     destFile.setReadable(true, false);

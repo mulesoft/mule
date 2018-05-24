@@ -9,14 +9,15 @@ package org.mule.runtime.config.internal.dsl.model.config;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
-import org.mule.runtime.core.api.util.IOUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
+
+import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.core.api.exception.ResourceNotFoundException;
+import org.mule.runtime.core.api.util.IOUtils;
 
 /**
  * File based properties provider, using an external resource provider.
@@ -41,7 +42,7 @@ public class FileConfigurationPropertiesProvider implements ConfigurationPropert
           String value = IOUtils.toString(is);
           return of(new DefaultConfigurationProperty(this, configurationAttributeKey, value));
         }
-      } catch (IOException e) {
+      } catch (IOException | ResourceNotFoundException e) {
         // ignore close exception
       }
     }

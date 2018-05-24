@@ -9,7 +9,7 @@
     </parent>
     <artifactId>mule-module-reboot</artifactId>
     <packaging>jar</packaging>
-    <name>Mule 3 Container</name>
+    <name>Mule 4 Container</name>
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>

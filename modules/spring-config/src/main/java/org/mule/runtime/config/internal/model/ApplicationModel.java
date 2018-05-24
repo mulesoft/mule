@@ -40,6 +40,22 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+import javax.xml.namespace.QName;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -47,7 +63,6 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -85,27 +100,11 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
-import javax.xml.namespace.QName;
-
-import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.Logger;
 import org.w3c.dom.Node;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -434,7 +433,10 @@ public class ApplicationModel {
       parentConfigurationPropertiesResolver = of(new DefaultConfigurationPropertiesResolver(
                                                                                             deploymentPropertiesConfigurationProperties != null
                                                                                                 ?
-                                                                                                // deployment properties provider has to go as parent here so we can reference them from configuration properties files
+                                                                                                // deployment properties provider
+                                                                                                // has to go as parent here so we
+                                                                                                // can reference them from
+                                                                                                // configuration properties files
                                                                                                 of(new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
                                                                                                                                               deploymentPropertiesConfigurationProperties))
                                                                                                 : parentConfigurationPropertiesResolver,
@@ -455,7 +457,8 @@ public class ApplicationModel {
     DefaultConfigurationPropertiesResolver externalPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(
                                                    deploymentPropertiesConfigurationProperties != null ?
-                                                   // deployment properties provider has to go as parent here so we can reference them from external files
+                                                   // deployment properties provider has to go as parent here so we can reference
+                                                   // them from external files
                                                        of(new DefaultConfigurationPropertiesResolver(of(systemPropertiesResolver),
                                                                                                      deploymentPropertiesConfigurationProperties))
                                                        : of(systemPropertiesResolver),
@@ -573,11 +576,9 @@ public class ApplicationModel {
           String classParameter = componentModel.getParameters().get(CLASS_ATTRIBUTE);
           if (classParameter != null) {
             try {
-              componentModel.setType(ClassUtils.getClass(classParameter));
+              componentModel.setType(ClassUtils.loadClass(classParameter, Thread.currentThread().getContextClassLoader()));
             } catch (ClassNotFoundException e) {
-              throw new RuntimeConfigurationException(I18nMessageFactory.createStaticMessage(String
-                  .format("Could not resolve class '%s' for component '%s'", classParameter,
-                          componentModel.getComponentLocation())));
+              throw new RuntimeConfigurationException(createStaticMessage(e.getMessage()), e);
             }
           }
           return null;

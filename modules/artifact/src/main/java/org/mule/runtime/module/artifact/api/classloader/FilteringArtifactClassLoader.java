@@ -16,10 +16,6 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import org.mule.api.annotation.NoInstantiate;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
-import org.mule.runtime.module.artifact.api.classloader.exception.NotExportedClassException;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.io.IOException;
 import java.net.URL;
@@ -28,6 +24,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.core.internal.util.EnumerationAdapter;
+import org.mule.runtime.module.artifact.api.classloader.exception.NotExportedClassException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,6 +168,11 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   }
 
   @Override
+  public URL findInternalResource(String resource) {
+    return findResource(resource);
+  }
+
+  @Override
   public Enumeration<URL> findResources(String name) throws IOException {
     return artifactClassLoader.findResources(name);
   }
@@ -185,6 +191,11 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   protected Package[] getPackages() {
     Package[] packagesList = super.getPackages();
     return stream(packagesList).filter(aPackage -> filter.exportsPackage(aPackage.getName())).toArray(Package[]::new);
+  }
+
+  @Override
+  public Class<?> loadInternalClass(String name) throws ClassNotFoundException {
+    return artifactClassLoader.getClassLoader().loadClass(name);
   }
 
   @Override

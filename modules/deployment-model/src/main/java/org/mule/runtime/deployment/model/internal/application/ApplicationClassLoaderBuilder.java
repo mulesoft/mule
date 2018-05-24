@@ -10,6 +10,11 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -24,10 +29,6 @@ import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * {@link ArtifactClassLoader} builder for class loaders required by {@link Application} artifacts
@@ -83,7 +84,11 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
    */
   @Override
   protected ArtifactClassLoader getParentClassLoader() {
-    return this.domain.getArtifactClassLoader();
+    return (ArtifactClassLoader) this.domain.getArtifactClassLoader().getClassLoader().getParent();
+  }
+
+  protected DomainDescriptor getDomainDescriptor() {
+    return this.domain.getArtifactClassLoader().getArtifactDescriptor();
   }
 
   /**

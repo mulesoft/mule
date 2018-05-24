@@ -177,7 +177,7 @@ public class DefaultMuleDomain implements Domain {
       artifactContext = artifactBuilder.build();
     } catch (Exception e) {
       // log it here so it ends up in app log, sys log will only log a message without stacktrace
-      logger.error(null, getRootCause(e));
+      logger.error(e.getMessage(), getRootCause(e));
       throw new DeploymentInitException(createStaticMessage(getRootCauseMessage(e)), e);
     }
   }

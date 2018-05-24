@@ -9,6 +9,13 @@ package org.mule.runtime.globalconfig.internal;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.valueOf;
 import static java.lang.String.format;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Comparator;
+import java.util.Map;
+
 import org.mule.maven.client.api.model.Authentication;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.api.model.RemoteRepository;
@@ -19,12 +26,6 @@ import org.mule.runtime.globalconfig.api.exception.RuntimeGlobalConfigException;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigObject;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Comparator;
-import java.util.Map;
 
 /**
  * Configuration builder for {@link MavenConfiguration} instances.
@@ -49,7 +50,8 @@ public class MavenConfigBuilder {
           mavenConfig.hasPath("repositoryLocation") ? mavenConfig.getString("repositoryLocation") : null;
       boolean ignoreArtifactDescriptorRepositories =
           mavenConfig.hasPath("ignoreArtifactDescriptorRepositories")
-              ? mavenConfig.getBoolean("ignoreArtifactDescriptorRepositories") : true;
+              ? mavenConfig.getBoolean("ignoreArtifactDescriptorRepositories")
+              : true;
 
       boolean offLineMode =
           mavenConfig.hasPath("offLineMode")
