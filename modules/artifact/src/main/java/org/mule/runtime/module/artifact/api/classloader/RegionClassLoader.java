@@ -124,7 +124,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
       for (String exportedResource : filter.getExportedResources()) {
         List<ArtifactClassLoader> classLoaders =
-            resourceMapping.computeIfAbsent(normalize(exportedResource), k -> new ArrayList<>());
+            resourceMapping.computeIfAbsent(normalize(exportedResource, true), k -> new ArrayList<>());
 
         classLoaders.add(artifactClassLoader);
       }
@@ -217,7 +217,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   @Override
   public final URL findResource(final String name) {
     URL resource = null;
-    String normalizedName = normalize(name);
+    String normalizedName = normalize(name, true);
     final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(normalizedName);
     if (artifactClassLoaders != null) {
       for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
@@ -233,7 +233,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   @Override
   public final Enumeration<URL> findResources(final String name) throws IOException {
-    String normalizedName = normalize(name);
+    String normalizedName = normalize(name, true);
     final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(normalizedName);
     List<Enumeration<URL>> enumerations = new ArrayList<>(registeredClassLoaders.size());
 
