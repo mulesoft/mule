@@ -8,9 +8,11 @@ package org.mule.runtime.extension.api.loader.xml;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
@@ -57,6 +59,11 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
   public static final String RESOURCE_DECLARATION = "resource-declaration";
 
   /**
+   * Attribute to determine a set of files that should be exported by the {@link ExtensionDeclarer}
+   */
+  public static final String RESOURCES_PATHS = "resources-paths";
+
+  /**
    * The ID which represents {@code this} loader that will be used to execute the lookup when reading the descriptor file.
    * @see MulePluginModel#getExtensionModelLoaderDescriptor()
    */
@@ -73,7 +80,9 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
         .orElseThrow(() -> new IllegalArgumentException(format("The attribute '%s' is missing", RESOURCE_XML)));
     final boolean validateXml = context.<Boolean>getParameter(VALIDATE_XML).orElse(false);
     final Optional<String> declarationPath = context.getParameter(RESOURCE_DECLARATION);
-    final XmlExtensionLoaderDelegate delegate = new XmlExtensionLoaderDelegate(modulePath, validateXml, declarationPath);
+    final List<String> resourcesPaths = context.<List<String>>getParameter(RESOURCES_PATHS).orElse(emptyList());
+    final XmlExtensionLoaderDelegate delegate =
+        new XmlExtensionLoaderDelegate(modulePath, validateXml, declarationPath, resourcesPaths);
     delegate.declare(context);
   }
 

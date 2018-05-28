@@ -211,19 +211,24 @@ public final class XmlExtensionLoaderDelegate {
   private final String modulePath;
   private final boolean validateXml;
   private final Optional<String> declarationPath;
+  private final List<String> resourcesPaths;
   private TypeResolver typeResolver;
   private Map<String, DeclarationOperation> declarationMap;
 
   /**
    * @param modulePath relative path to a file that will be loaded from the current {@link ClassLoader}. Non null.
-   * @param validateXml true if the XML of the Smart Connector must ve valid, false otherwise. It will be false at runtime, as
+   * @param validateXml true if the XML of the Smart Connector must ve valid, false otherwise. It will be false at runtime,
+   *                    as the packaging of a connector will previously validate it's XML.
    * @param declarationPath relative path to a file that contains the {@link MetadataType}s of all <operations/>.
+   * @param resourcesPaths set of resources that will be exported in the {@link ExtensionModel}
    */
-  public XmlExtensionLoaderDelegate(String modulePath, boolean validateXml, Optional<String> declarationPath) {
+  public XmlExtensionLoaderDelegate(String modulePath, boolean validateXml, Optional<String> declarationPath,
+                                    List<String> resourcesPaths) {
     checkArgument(!isEmpty(modulePath), "modulePath must not be empty");
     this.modulePath = modulePath;
     this.validateXml = validateXml;
     this.declarationPath = declarationPath;
+    this.resourcesPaths = resourcesPaths;
   }
 
   public void declare(ExtensionLoadingContext context) {
@@ -417,6 +422,7 @@ public final class XmlExtensionLoaderDelegate {
                                                                 xmlDslModel.getNamespace(),
                                                                 xmlnsTnsValue)));
     }
+    resourcesPaths.stream().forEach(declarer::withResource);
 
     DirectedGraph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
 
