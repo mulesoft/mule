@@ -290,7 +290,7 @@ public class ModuleFlowProcessingPhase
       if (resultValue instanceof Collection && adapter.isCollection()) {
         message = toMessage(Result.<Collection<Message>, TypedValue>builder()
             .output(toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
-                                                                               adapter.getMediaTypeResolver()),
+                                                                               adapter.getPayloadMediaTypeResolver()),
                                         adapter.getCursorProviderFactory(),
                                         templateEvent))
             .mediaType(result.getMediaType().orElse(ANY))

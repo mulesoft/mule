@@ -12,16 +12,20 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 /**
+ * {@link Iterator<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
+ *
+ * This allows to avoid preemptive decoration of an entire collection of {@link Result}
+ * 
  * @since 4.2
  */
 public class MediaTypeDecoratedResultIterator implements Iterator<Result> {
 
   private Iterator<Result> delegate;
-  private MediaTypeResolver mediaTypeResolver;
+  private PayloadMediaTypeResolver payloadMediaTypeResolver;
 
-  public MediaTypeDecoratedResultIterator(Iterator<Result> delegate, MediaTypeResolver mediaTypeResolver) {
+  public MediaTypeDecoratedResultIterator(Iterator<Result> delegate, PayloadMediaTypeResolver payloadMediaTypeResolver) {
     this.delegate = delegate;
-    this.mediaTypeResolver = mediaTypeResolver;
+    this.payloadMediaTypeResolver = payloadMediaTypeResolver;
   }
 
   @Override
@@ -31,7 +35,7 @@ public class MediaTypeDecoratedResultIterator implements Iterator<Result> {
 
   @Override
   public Result next() {
-    return mediaTypeResolver.resolve(delegate.next());
+    return payloadMediaTypeResolver.resolve(delegate.next());
   }
 
   @Override
@@ -42,7 +46,7 @@ public class MediaTypeDecoratedResultIterator implements Iterator<Result> {
   @Override
   public void forEachRemaining(Consumer<? super Result> action) {
     delegate.forEachRemaining(value -> {
-      action.accept(mediaTypeResolver.resolve(value));
+      action.accept(payloadMediaTypeResolver.resolve(value));
     });
   }
 }

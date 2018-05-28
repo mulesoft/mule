@@ -97,13 +97,8 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
         }
 
         private Optional<Type> getOperationReturnType(OperationDeclaration declaration) {
-          Optional<ExtensionOperationDescriptorModelProperty> extensionOperationDescriptorModelProperty =
-              declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class);
-          if (extensionOperationDescriptorModelProperty.isPresent()) {
-            return of(extensionOperationDescriptorModelProperty.get().getOperationMethod().getReturnType());
-          } else {
-            return empty();
-          }
+          return declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+              .map(mp -> mp.getOperationMethod().getReturnType());
         }
 
         @Override
@@ -112,14 +107,8 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
         }
 
         private Optional<Type> getSourceOutputType(SourceDeclaration declaration) {
-
-          Optional<ExtensionTypeDescriptorModelProperty> extensionTypeDescriptorModelProperty =
-              declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
-          if (extensionTypeDescriptorModelProperty.isPresent()) {
-            return of(extensionTypeDescriptorModelProperty.get().getType().getSuperTypeGenerics(Source.class).get(0));
-          } else {
-            return empty();
-          }
+          return declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+              .map(mp -> mp.getType().getSuperTypeGenerics(Source.class).get(0));
         }
 
       }.walk(declaration);
@@ -165,14 +154,7 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
             return;
           }
 
-          Type type = outputType.get();
-          Type itemType = getItemType(type);
-
-          if (itemType == null) {
-            return;
-          }
-
-          Type resultPayloadType = getResultPayloadType(itemType);
+          Type resultPayloadType = getResultPayloadType(outputType.get());
 
           if (resultPayloadType == null) {
             return;
@@ -187,7 +169,11 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
           }
         }
 
-        private Type getResultPayloadType(Type itemType) {
+        private Type getResultPayloadType(Type type) {
+          Type itemType = getItemType(type);
+          if (itemType == null) {
+            return null;
+          }
           if (itemType.isAssignableTo(Result.class)) {
             return itemType.getSuperTypeGenerics(Result.class).get(0);
           }

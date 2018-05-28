@@ -136,12 +136,7 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
   @Test
   public void sourceWithAListAsResultOverridesContentType() throws Exception {
     startFlow("sourceListMimeType");
-    check(PROBER_TIMEOUT, PROBER_FREQUENCY, () -> {
-      if (MediaTypeCollectorProcessor.getMediaTypes().size() == 3) {
-        return true;
-      }
-      return false;
-    });
+    check(PROBER_TIMEOUT, PROBER_FREQUENCY, () -> MediaTypeCollectorProcessor.getMediaTypes().size() == 3);
 
     assertTrue(MediaTypeCollectorProcessor.getMediaTypes().stream()
         .allMatch(mediaType -> mediaType.getPrimaryType().equals("pet")));

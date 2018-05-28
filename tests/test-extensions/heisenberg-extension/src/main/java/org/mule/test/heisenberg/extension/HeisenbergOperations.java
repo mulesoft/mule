@@ -132,7 +132,6 @@ public class HeisenbergOperations implements Disposable {
 
       private final static int LIST_PAGE_SIZE = 2;
 
-      private boolean initialized = false;
       private List<Result<InputStream, Object>> blacklist;
       private Iterator<Result<InputStream, Object>> blacklistIterator;
 
@@ -181,31 +180,23 @@ public class HeisenbergOperations implements Disposable {
 
       private final static int LIST_PAGE_SIZE = 2;
 
-      private boolean initialized = false;
       private List<Result<CursorProvider, Object>> blacklist;
       private Iterator<Result<CursorProvider, Object>> blacklistIterator;
 
       public void initializeList() {
         blacklist = new LinkedList<>();
-        blacklist.add(Result.<CursorProvider, Object>builder()
-            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream("Fring".getBytes()))))
-            .build());
-        blacklist.add(Result.<CursorProvider, Object>builder()
-            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream("Salamanca".getBytes()))))
-            .build());
-        blacklist.add(Result.<CursorProvider, Object>builder()
-            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream("Ehrmantraut".getBytes()))))
-            .build());
-        blacklist.add(Result.<CursorProvider, Object>builder()
-            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream("Alquist".getBytes()))))
-            .build());
-        blacklist.add(Result.<CursorProvider, Object>builder()
-            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream("Schrader".getBytes()))))
-            .build());
-        blacklist.add(Result.<CursorProvider, Object>builder()
-            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream("Gomez".getBytes()))))
-            .build());
+        blacklist.add(asCursorProviderResult("Fring"));
+        blacklist.add(asCursorProviderResult("Salamanca"));
+        blacklist.add(asCursorProviderResult("Ehrmantraut"));
+        blacklist.add(asCursorProviderResult("Alquist"));
+        blacklist.add(asCursorProviderResult("Schrader"));
+        blacklist.add(asCursorProviderResult("Gomez"));
         blacklistIterator = blacklist.iterator();
+      }
+
+      private Result<CursorProvider, Object> asCursorProviderResult(String name) {
+        return Result.<CursorProvider, Object>builder()
+            .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream(name.getBytes())))).build();
       }
 
       @Override

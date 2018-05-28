@@ -12,6 +12,10 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 /**
+ * {@link ListIterator<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
+ * 
+ * This allows to avoid preemptive decoration of an entire collection of {@link Result}
+ * 
  * @since 4.2
  */
 public class MediaTypeDecoratedResultListIterator implements ListIterator<Result> {

@@ -17843,8 +17843,16 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "SOURCE",
-        "namespace": "MULE"
+        "type": "PET-SOURCE-LIST",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          }
+        }
       },
       "parameterGroupModels": [
         {

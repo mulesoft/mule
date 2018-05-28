@@ -16,61 +16,56 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 
 /**
+ * Holds the logic to resolve which is the {@link MediaType} a {@link Result} payload should have.
+ * 
  * @since 4.2
  */
-public class MediaTypeResolver {
+public class PayloadMediaTypeResolver {
 
   private Charset defaultEncoding;
   private MediaType defaultMediaType;
   private Optional<String> encoding;
   private Optional<String> mimeType;
 
-  public MediaTypeResolver(Charset defaultEncoding, MediaType defaultMediaType, Optional<String> encoding,
-                           Optional<String> mimeType) {
+  /**
+   * Creates a new instance
+   * 
+   * @param defaultEncoding     the default encoding used by the system
+   * @param defaultMediaType    the default {@link MediaType} to use in case one is not specified
+   * @param encoding            {@link Optional} encoding to be used if present
+   * @param mimeType            {@link Optional} mimeType to be used if present
+   */
+  public PayloadMediaTypeResolver(Charset defaultEncoding, MediaType defaultMediaType, Optional<String> encoding,
+                                  Optional<String> mimeType) {
     this.defaultEncoding = defaultEncoding;
     this.defaultMediaType = defaultMediaType;
     this.encoding = encoding;
     this.mimeType = mimeType;
   }
 
+  /**
+   * 
+   * @param result  {@link Result} whose payload {@link MediaType} has to be resolved
+   * @return        {@link Result} with the payload {@link MediaType} resolved
+   */
   public Result resolve(Result result) {
-    return Result.builder()
-        .attributesMediaType((MediaType) result.getAttributesMediaType().orElse(null))
-        .attributes(result.getAttributes().orElse(null))
-        .output(result.getOutput())
-        .mediaType(resolveMediaType(result))
-        .build();
+    return new MediaTypeDecoratedResult(result, resolveMediaType(result));
   }
 
-  private MediaType resolveMediaType(Result value) {
+  private MediaType resolveMediaType(Result result) {
     Charset existingEncoding = defaultEncoding;
-    MediaType mediaType = defaultMediaType;
-    final Optional<MediaType> optionalMediaType = ((Result) value).getMediaType();
-    if (optionalMediaType.isPresent()) {
-      mediaType = optionalMediaType.get();
-      if (mediaType.getCharset().isPresent()) {
-        existingEncoding = mediaType.getCharset().get();
-      }
+    MediaType mediaType = (MediaType) result.getMediaType().orElse(defaultMediaType);
+    if (result.getMediaType().isPresent() && mediaType.getCharset().isPresent()) {
+      existingEncoding = mediaType.getCharset().get();
     }
-
-
-    if (mediaType == null) {
-      mediaType = ANY;
-    }
-
     if (mimeType.isPresent()) {
       mediaType = MediaType.parse(mimeType.get());
     }
-
     if (encoding.isPresent()) {
       mediaType = mediaType.withCharset(parseCharset(encoding.get()));
     } else {
       mediaType = mediaType.withCharset(existingEncoding);
     }
-
     return mediaType;
   }
-
-
-
 }

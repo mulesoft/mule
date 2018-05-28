@@ -37,7 +37,7 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.util.StreamingUtils;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultIterator;
-import org.mule.runtime.core.internal.util.mediatype.MediaTypeResolver;
+import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
 import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -127,21 +127,15 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
           ? MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event, returnHandler.getDataType())
           : MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event);
     } else {
-      MediaTypeResolver mediaTypeResolver = new MediaTypeResolver(getDefaultEncoding(muleContext),
-                                                                  defaultMediaType,
-                                                                  operationContext.hasParameter(ENCODING_PARAMETER_NAME)
-                                                                      ? of((String) operationContext
-                                                                          .getParameter(ENCODING_PARAMETER_NAME))
-                                                                      : empty(),
-                                                                  operationContext.hasParameter(MIME_TYPE_PARAMETER_NAME)
-                                                                      ? of((String) operationContext
-                                                                          .getParameter(MIME_TYPE_PARAMETER_NAME))
-                                                                      : empty());
+      PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(getDefaultEncoding(muleContext),
+                                                                                       defaultMediaType,
+                                                                                       getContextMimeType(operationContext),
+                                                                                       getContextEncoding(operationContext));
       if (value instanceof Collection && returnsListOfMessages) {
-        value = toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) value, mediaTypeResolver),
+        value = toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) value, payloadMediaTypeResolver),
                                     cursorProviderFactory, event);
       } else if (value instanceof Iterator && returnsListOfMessages) {
-        value = toMessageIterator(new MediaTypeDecoratedResultIterator((Iterator<Result>) value, mediaTypeResolver),
+        value = toMessageIterator(new MediaTypeDecoratedResultIterator((Iterator<Result>) value, payloadMediaTypeResolver),
                                   cursorProviderFactory, event);
       }
 
@@ -149,7 +143,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
       Message.Builder messageBuilder;
 
-      //TODO MULE-13302: this doesn't completely makes sense. IT doesn't account for an Iterator<Message>
+      // TODO MULE-13302: this doesn't completely makes sense. IT doesn't account for an Iterator<Message>
       // org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION doesn't completely makes sense
       if (returnsListOfMessages && value instanceof Collection) {
         messageBuilder = Message.builder().collectionValue((Collection) value, Message.class);
@@ -161,6 +155,18 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
       return messageBuilder.mediaType(mediaType).build();
     }
+  }
+
+  private Optional<String> getContextMimeType(ExecutionContextAdapter operationContext) {
+    return operationContext.hasParameter(ENCODING_PARAMETER_NAME)
+        ? of((String) operationContext.getParameter(ENCODING_PARAMETER_NAME))
+        : empty();
+  }
+
+  private Optional<String> getContextEncoding(ExecutionContextAdapter operationContext) {
+    return operationContext.hasParameter(MIME_TYPE_PARAMETER_NAME)
+        ? of((String) operationContext.getParameter(MIME_TYPE_PARAMETER_NAME))
+        : empty();
   }
 
   private Object streamingContent(Object value,

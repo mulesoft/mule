@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.util.mediatype;
 
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
@@ -14,14 +13,18 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
+ * {@link List<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
+ * 
+ * This allows to avoid preemptive decoration of an entire collection of {@link Result}
+ * 
  * @since 4.2
  */
 public class MediaTypeDecoratedResultList extends MediaTypeDecoratedResultCollection implements List<Result> {
 
   private List<Result> delegate;
 
-  public MediaTypeDecoratedResultList(List<Result> delegate, MediaTypeResolver mediaTypeResolver) {
-    super(delegate, mediaTypeResolver);
+  public MediaTypeDecoratedResultList(List<Result> delegate, PayloadMediaTypeResolver payloadMediaTypeResolver) {
+    super(delegate, payloadMediaTypeResolver);
     this.delegate = delegate;
   }
 
@@ -32,7 +35,7 @@ public class MediaTypeDecoratedResultList extends MediaTypeDecoratedResultCollec
 
   @Override
   public Result get(int index) {
-    return mediaTypeResolver.resolve(delegate.get(index));
+    return payloadMediaTypeResolver.resolve(delegate.get(index));
   }
 
   @Override
@@ -52,34 +55,18 @@ public class MediaTypeDecoratedResultList extends MediaTypeDecoratedResultCollec
 
   @Override
   public int indexOf(Object o) {
-    int indexA = delegate.indexOf(o);
-    int indexB = -1;
     if (o instanceof Result) {
-      indexB = delegate.indexOf(mediaTypeResolver.resolve((Result) o));
+      return delegate.indexOf(payloadMediaTypeResolver.resolve((Result) o));
     }
-    if (indexA > -1 && indexB > -1) {
-      return Math.min(indexA, indexB);
-    } else if (indexA > -1) {
-      return indexA;
-    } else {
-      return indexB;
-    }
+    return delegate.indexOf(o);
   }
 
   @Override
   public int lastIndexOf(Object o) {
-    int indexA = delegate.lastIndexOf(o);
-    int indexB = -1;
     if (o instanceof Result) {
-      indexB = delegate.lastIndexOf(mediaTypeResolver.resolve((Result) o));
+      return delegate.lastIndexOf(payloadMediaTypeResolver.resolve((Result) o));
     }
-    if (indexA > -1 && indexB > -1) {
-      return Math.max(indexA, indexB);
-    } else if (indexA > -1) {
-      return indexA;
-    } else {
-      return indexB;
-    }
+    return delegate.lastIndexOf(o);
   }
 
   @Override
@@ -94,6 +81,6 @@ public class MediaTypeDecoratedResultList extends MediaTypeDecoratedResultCollec
 
   @Override
   public List<Result> subList(int fromIndex, int toIndex) {
-    return new MediaTypeDecoratedResultList(delegate.subList(fromIndex, toIndex), mediaTypeResolver);
+    return new MediaTypeDecoratedResultList(delegate.subList(fromIndex, toIndex), payloadMediaTypeResolver);
   }
 }

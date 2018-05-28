@@ -12,21 +12,26 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
 /**
+ * {@link Collection<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
+ *
+ * This allows to avoid preemptive decoration of an entire collection of {@link Result}
+ *
  * @since 4.2
  */
 public class MediaTypeDecoratedResultCollection implements Collection<Result> {
 
   private Collection<Result> delegate;
-  protected MediaTypeResolver mediaTypeResolver;
+  protected PayloadMediaTypeResolver payloadMediaTypeResolver;
 
-  public MediaTypeDecoratedResultCollection(Collection<Result> delegate, MediaTypeResolver mediaTypeResolver) {
+  public MediaTypeDecoratedResultCollection(Collection<Result> delegate, PayloadMediaTypeResolver payloadMediaTypeResolver) {
     this.delegate = delegate;
-    this.mediaTypeResolver = mediaTypeResolver;
+    this.payloadMediaTypeResolver = payloadMediaTypeResolver;
   }
 
   @Override
@@ -41,16 +46,15 @@ public class MediaTypeDecoratedResultCollection implements Collection<Result> {
 
   @Override
   public boolean contains(Object o) {
-    boolean contains = delegate.contains(o);
-    if (!contains && o instanceof Result) {
-      contains = delegate.contains(mediaTypeResolver.resolve((Result) o));
+    if (o instanceof Result) {
+      return delegate.contains(payloadMediaTypeResolver.resolve((Result) o));
     }
-    return contains;
+    return delegate.contains(o);
   }
 
   @Override
   public Iterator<Result> iterator() {
-    return new MediaTypeDecoratedResultIterator(delegate.iterator(), mediaTypeResolver);
+    return new MediaTypeDecoratedResultIterator(delegate.iterator(), payloadMediaTypeResolver);
   }
 
   @Override
@@ -65,7 +69,7 @@ public class MediaTypeDecoratedResultCollection implements Collection<Result> {
 
   private <T> T[] transformArray(T[] array) {
     return (T[]) Stream.of(array)
-        .map(o -> o instanceof Result ? mediaTypeResolver.resolve((Result) o) : o)
+        .map(o -> o instanceof Result ? payloadMediaTypeResolver.resolve((Result) o) : o)
         .toArray(Object[]::new);
   }
 
@@ -76,19 +80,15 @@ public class MediaTypeDecoratedResultCollection implements Collection<Result> {
 
   @Override
   public boolean remove(Object o) {
-    boolean itemRemoved = delegate.remove(o);
-    if (!itemRemoved && o instanceof Result) {
-      itemRemoved = delegate.remove(mediaTypeResolver.resolve((Result) o));
+    if (o instanceof Result) {
+      return delegate.remove(payloadMediaTypeResolver.resolve((Result) o));
     }
-    return itemRemoved;
+    return delegate.remove(o);
   }
 
   @Override
   public boolean containsAll(Collection<?> c) {
-    if (c == null) {
-      throw new NullPointerException();
-    }
-    return c.stream().allMatch(this::contains);
+    return c.stream().allMatch(delegate::contains);
   }
 
   @Override
@@ -98,17 +98,19 @@ public class MediaTypeDecoratedResultCollection implements Collection<Result> {
 
   @Override
   public boolean removeAll(Collection<?> c) {
-    return c.stream().map(this::remove).anyMatch(p -> p);
+    return c.stream().map(delegate::remove).anyMatch(deleted -> deleted);
   }
 
   @Override
   public boolean removeIf(Predicate<? super Result> filter) {
-    return delegate.removeIf(result -> filter.test(mediaTypeResolver.resolve(result)));
+    return delegate.removeIf(result -> filter.test(payloadMediaTypeResolver.resolve(result)));
   }
 
   @Override
   public boolean retainAll(Collection<?> c) {
-    return delegate.retainAll(c);
+    return delegate
+        .retainAll(c.stream().map(item -> item instanceof Result ? payloadMediaTypeResolver.resolve((Result) item) : item)
+            .collect(Collectors.toSet()));
   }
 
   @Override
@@ -118,18 +120,18 @@ public class MediaTypeDecoratedResultCollection implements Collection<Result> {
 
   @Override
   public Spliterator<Result> spliterator() {
-    return delegate.stream().map(mediaTypeResolver::resolve).collect(toList())
+    return delegate.stream().map(payloadMediaTypeResolver::resolve).collect(toList())
         .spliterator();
   }
 
   @Override
   public Stream<Result> stream() {
-    return delegate.stream().map(mediaTypeResolver::resolve);
+    return delegate.stream().map(payloadMediaTypeResolver::resolve);
   }
 
   @Override
   public Stream<Result> parallelStream() {
-    return delegate.parallelStream().map(mediaTypeResolver::resolve);
+    return delegate.parallelStream().map(payloadMediaTypeResolver::resolve);
   }
 
 }
