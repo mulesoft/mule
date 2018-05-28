@@ -35,6 +35,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.reflections.ReflectionUtils.getAllFields;
+import static org.springframework.core.ResolvableType.NONE;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -586,29 +587,10 @@ public final class IntrospectionUtils {
 
     addGenericsToMap(genericTypes, searchClass);
 
-    while (!Object.class.equals(searchClass.getRawClass())) {
-      for (ResolvableType iType : searchClass.getInterfaces()) {
-        if (implementedInterface.isAssignableFrom(iType.getRawClass())) {
-          addGenericsToMap(genericTypes, iType);
-          interfaceType = iType;
-          while (!implementedInterface.equals(interfaceType.getRawClass())) {
-            for (ResolvableType innerIType : interfaceType.getInterfaces()) {
-              if (implementedInterface.isAssignableFrom(innerIType.getRawClass())) {
-                addGenericsToMap(genericTypes, innerIType);
-                interfaceType = innerIType;
-              }
-            }
-          }
-          break;
-        }
-      }
+    ResolvableType baseImplementingClass = getInterfaceBaseImplementingClass(genericTypes, searchClass, implementedInterface);
 
-      if (interfaceType != null) {
-        break;
-      } else {
-        searchClass = searchClass.getSuperType();
-        addGenericsToMap(genericTypes, searchClass);
-      }
+    if (baseImplementingClass != null) {
+      interfaceType = getInterfaceTypeFromClass(genericTypes, baseImplementingClass, implementedInterface);
     }
 
     if (interfaceType == null) {
@@ -625,6 +607,31 @@ public final class IntrospectionUtils {
       }
       return genericType;
     }).collect(toList());
+  }
+
+  private static ResolvableType getInterfaceTypeFromClass(Map<String, java.lang.reflect.Type> genericTypes,
+                                                          ResolvableType implementingType, Class<?> implementedInterface) {
+    while (!implementedInterface.equals(implementingType.getRawClass())
+        && implementedInterface.isAssignableFrom(implementingType.getRawClass())) {
+      for (ResolvableType innerIType : implementingType.getInterfaces()) {
+        if (implementedInterface.isAssignableFrom(innerIType.getRawClass())) {
+          addGenericsToMap(genericTypes, innerIType);
+          implementingType = innerIType;
+          break;
+        }
+      }
+    }
+    return implementedInterface.isAssignableFrom(implementingType.getRawClass()) ? implementingType : null;
+  }
+
+  private static ResolvableType getInterfaceBaseImplementingClass(Map<String, java.lang.reflect.Type> genericTypes,
+                                                                  ResolvableType searchClass, Class<?> implementedInterface) {
+    while (!Object.class.equals(searchClass.getRawClass()) && searchClass.getSuperType() != NONE
+        && implementedInterface.isAssignableFrom(searchClass.getSuperType().getRawClass())) {
+      searchClass = searchClass.getSuperType();
+      addGenericsToMap(genericTypes, searchClass);
+    }
+    return implementedInterface.isAssignableFrom(searchClass.getRawClass()) ? searchClass : null;
   }
 
   private static void addGenericsToMap(Map<String, java.lang.reflect.Type> genericTypes, ResolvableType type) {
