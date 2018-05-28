@@ -49,7 +49,11 @@ public interface HttpClient {
   @Deprecated
   default HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpAuthentication authentication)
       throws IOException, TimeoutException {
-    return send(request, new DefaultHttpRequestOptions(responseTimeout, followRedirects, authentication));
+    return send(request, HttpRequestOptions.builder()
+        .responseTimeout(responseTimeout)
+        .followsRedirect(followRedirects)
+        .authentication(authentication)
+        .build());
   }
 
   /**
@@ -94,7 +98,11 @@ public interface HttpClient {
   @Deprecated
   default CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
                                                     HttpAuthentication authentication) {
-    return sendAsync(request, new DefaultHttpRequestOptions(responseTimeout, followRedirects, authentication));
+    return sendAsync(request, HttpRequestOptions.builder()
+        .responseTimeout(responseTimeout)
+        .followsRedirect(followRedirects)
+        .authentication(authentication)
+        .build());
   }
 
   /**

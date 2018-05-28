@@ -8,7 +8,10 @@ package org.mule.runtime.http.api.client;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
+import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+
+import java.util.Optional;
 
 /**
  * Options for setting up an {@link HttpRequest}. Instances can only be obtained through a {@link HttpRequestOptionsBuilder}.
@@ -46,6 +49,21 @@ public interface HttpRequestOptions {
   /**
    * @return the {@link HttpAuthentication} to use, if any.
    */
-  HttpAuthentication getAuthentication();
+  Optional<HttpAuthentication> getAuthentication();
+
+  /**
+   * @return whether or not to stream responses, if overriding the global configuration
+   */
+  Optional<Boolean> isStreamResponse();
+
+  /**
+   * @return if streaming, the size of buffer to use, in bytes
+   */
+  Optional<Integer> getResponseBufferSize();
+
+  /**
+   * @return the {@link ProxyConfig} to use, if any.
+   */
+  Optional<ProxyConfig> getProxyConfig();
 
 }
