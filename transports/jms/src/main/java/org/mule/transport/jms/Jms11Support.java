@@ -299,4 +299,10 @@ public class Jms11Support implements JmsSupport
             priority, ttl);
     }
 
+    @Override
+    public void closeConsumerIfNeeded(MessageConsumer consumer)
+    {
+        connector.closeQuietly(consumer);
+    }
+
 }
