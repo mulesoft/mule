@@ -320,7 +320,7 @@ public class Jms102bSupport extends Jms11Support
     @Override
     public void closeConsumerIfNeeded(MessageConsumer consumer)
     {
-        // In this case the consumer it doesn't need to be closed
+        // In this case the consumer doesn't need to be closed
     }
 
 }
