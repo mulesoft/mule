@@ -82,6 +82,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
           params.put(XmlExtensionModelLoader.RESOURCE_XML, modulePath);
           params.put(XmlExtensionModelLoader.VALIDATE_XML, shouldValidateXml());
           operationsOutputPath().ifPresent(path -> params.put(XmlExtensionModelLoader.RESOURCE_DECLARATION, path));
+          resourcesPaths().ifPresent(resourcesPaths -> params.put(XmlExtensionModelLoader.RESOURCES_PATHS, resourcesPaths));
           final DslResolvingContext dslResolvingContext = getDefault(extensions);
           final ExtensionModel extensionModel =
               new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), dslResolvingContext, params);
@@ -111,6 +112,14 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
    * @return the string of the parameter that represents the declaration file.
    */
   protected Optional<String> operationsOutputPath() {
+    return Optional.empty();
+  }
+
+  /**
+   * Parameter to add resources to the {@link ExtensionModel} generation.
+   * @return the collection of resources that must be exported
+   */
+  protected Optional<List<String>> resourcesPaths() {
     return Optional.empty();
   }
 

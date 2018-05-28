@@ -8,6 +8,7 @@ package org.mule.runtime.extension.internal.loader;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -60,6 +61,7 @@ import org.mule.test.petstore.extension.PetStoreConnector;
 import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -271,10 +273,13 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
   @Test
   public void testModuleDocumentation() throws IOException {
     String modulePath = "modules/module-documentation.xml";
-    ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+    List<String> expectedResources = Arrays.asList("resource1.txt", "functions.dwl");
+    final ExtensionModel extensionModel = getExtensionModelFrom(modulePath, expectedResources);
 
     assertThat(extensionModel.getName(), is("module-documentation"));
     assertThat(extensionModel.getDescription(), is("Documentation for the connector"));
+    assertThat(extensionModel.getResources(), is(containsInAnyOrder(expectedResources.toArray())));
+
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
@@ -507,9 +512,24 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
    * @return an {@link ExtensionModel}
    */
   private ExtensionModel getExtensionModelFrom(String modulePath) {
+    return getExtensionModelFrom(modulePath, emptyList());
+  }
+
+  /**
+   * If {@link #validateXml} is true, the XML of the smart connector must be validated when reading it. False otherwise. Useful to
+   * simulate the {@link ExtensionModel} generation of a connector that has malformed message processors in the <body/> element.
+   *
+   * @param modulePath relative path to the XML connector.
+   * @param expectedResources list of resources to export
+   * @return an {@link ExtensionModel}
+   */
+  private ExtensionModel getExtensionModelFrom(String modulePath, List<String> expectedResources) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, modulePath);
     parameters.put(XmlExtensionModelLoader.VALIDATE_XML, validateXml);
+    if (!expectedResources.isEmpty()) {
+      parameters.put(XmlExtensionModelLoader.RESOURCES_PATHS, expectedResources);
+    }
     final ExtensionModel extensionModel = new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(),
                                                                                            getDefault(getDependencyExtensions()),
                                                                                            parameters);
