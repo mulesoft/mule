@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.http.api.client;
 
+import static java.util.Optional.ofNullable;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
+import org.mule.runtime.http.api.client.proxy.ProxyConfig;
+
+import java.util.Optional;
 
 /**
  * Basic implementation of {@link HttpRequestOptions}. Instances can only be obtained through {@link HttpRequestOptionsBuilder}.
@@ -18,11 +22,18 @@ class DefaultHttpRequestOptions implements HttpRequestOptions {
   private int responseTimeout;
   private boolean followsRedirect;
   private HttpAuthentication authentication;
+  private Boolean streamResponse;
+  private ProxyConfig proxyConfig;
+  private Integer responseBufferSize;
 
-  DefaultHttpRequestOptions(int responseTimeout, boolean followsRedirect, HttpAuthentication authentication) {
+  DefaultHttpRequestOptions(int responseTimeout, boolean followsRedirect, HttpAuthentication authentication,
+                            Boolean streamResponse, Integer responseBufferSize, ProxyConfig proxyConfig) {
     this.responseTimeout = responseTimeout;
     this.followsRedirect = followsRedirect;
     this.authentication = authentication;
+    this.streamResponse = streamResponse;
+    this.responseBufferSize = responseBufferSize;
+    this.proxyConfig = proxyConfig;
   }
 
   @Override
@@ -36,8 +47,22 @@ class DefaultHttpRequestOptions implements HttpRequestOptions {
   }
 
   @Override
-  public HttpAuthentication getAuthentication() {
-    return authentication;
+  public Optional<HttpAuthentication> getAuthentication() {
+    return ofNullable(authentication);
   }
 
+  @Override
+  public Optional<Boolean> isStreamResponse() {
+    return ofNullable(streamResponse);
+  }
+
+  @Override
+  public Optional<Integer> getResponseBufferSize() {
+    return ofNullable(responseBufferSize);
+  }
+
+  @Override
+  public Optional<ProxyConfig> getProxyConfig() {
+    return ofNullable(proxyConfig);
+  }
 }
