@@ -316,4 +316,11 @@ public class Jms102bSupport extends Jms11Support
             throw new IllegalArgumentException("Producer and domain type do not match");
         }
     }
+
+    @Override
+    public void closeConsumerIfNeeded(MessageConsumer consumer)
+    {
+        // In this case the consumer doesn't need to be closed
+    }
+
 }

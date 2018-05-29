@@ -80,4 +80,6 @@ public interface JmsSupport
               int priority,
               long ttl,
               boolean topic, ImmutableEndpoint endpoint) throws JMSException;
+
+    void closeConsumerIfNeeded(MessageConsumer consumer);
 }
