@@ -12,13 +12,16 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedMap;
 import static java.util.Collections.unmodifiableSet;
 import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.component.DynamicallyComponent;
+import org.mule.runtime.core.internal.component.DynamicallySerializableComponent;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -27,6 +30,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import org.slf4j.Logger;
 
 import net.sf.cglib.proxy.CallbackHelper;
 import net.sf.cglib.proxy.Enhancer;
@@ -40,6 +45,8 @@ import net.sf.cglib.proxy.NoOp;
  * @since 4.0
  */
 public final class AnnotatedObjectInvocationHandler {
+
+  private static final Logger LOGGER = getLogger(AnnotatedObjectInvocationHandler.class);
 
   private static final Set<Method> MANAGED_METHODS =
       unmodifiableSet(new HashSet<>(asList(Component.class.getDeclaredMethods())));
@@ -62,18 +69,38 @@ public final class AnnotatedObjectInvocationHandler {
           + Component.class.getName() + "'");
     }
 
+    Class dynamicInterface;
+    if (Serializable.class.isAssignableFrom(clazz)) {
+      try {
+        clazz.getConstructor();
+        dynamicInterface = DynamicallySerializableComponent.class;
+      } catch (SecurityException e) {
+        throw new UnsupportedOperationException("Class '" + clazz.getName() + "' cannot be enhanced for annotations ("
+            + e.getMessage() + ")", e);
+      } catch (NoSuchMethodException e) {
+        LOGGER.warn("Class '" + clazz.getName() + "' implements Serializable but does not provide a default public constructor."
+            + " The mechanism to add annotations dynamically requires a default public constructor in a Serializable class.");
+        dynamicInterface = DynamicallyComponent.class;
+      }
+    } else {
+      dynamicInterface = DynamicallyComponent.class;
+    }
+
     Enhancer enhancer = new Enhancer();
-    enhancer.setInterfaces(new Class[] {DynamicallyComponent.class});
+    enhancer.setInterfaces(new Class[] {dynamicInterface});
     enhancer.setSuperclass(clazz);
 
     ComponentInterceptor annotatedObjectInvocationHandler = new ComponentInterceptor(MANAGED_METHODS);
+    final MethodInterceptor removeDynamicAnnotationsInterceptor = (obj, method, args, proxy) -> removeDynamicAnnotations(obj);
 
-    CallbackHelper callbackHelper = new CallbackHelper(clazz, new Class[] {DynamicallyComponent.class}) {
+    CallbackHelper callbackHelper = new CallbackHelper(clazz, new Class[] {dynamicInterface}) {
 
       @Override
       protected Object getCallback(Method method) {
         if (MANAGED_METHODS.contains(method) || annotatedObjectInvocationHandler.getOverridingMethods().containsKey(method)) {
           return annotatedObjectInvocationHandler;
+        } else if ("writeReplace".equals(method.getName())) {
+          return removeDynamicAnnotationsInterceptor;
         } else {
           Optional<Method> overridingMethod = MANAGED_METHODS.stream().filter(m -> m.getName().equals(method.getName())
               && Arrays.equals(m.getParameterTypes(), method.getParameterTypes())).findFirst();
@@ -165,7 +192,7 @@ public final class AnnotatedObjectInvocationHandler {
     }
 
     @Override
-    public Object intercept(Object obj, java.lang.reflect.Method method, Object[] args, MethodProxy proxy) throws Throwable {
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
       if (overridingMethods.containsKey(method)) {
         return overridingMethods.get(method).invoke(this, args);
       } else {

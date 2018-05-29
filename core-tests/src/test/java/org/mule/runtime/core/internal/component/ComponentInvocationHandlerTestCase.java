@@ -29,13 +29,18 @@ import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Test;
-
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
+
+import org.junit.Test;
 
 @SmallTest
 public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
@@ -84,6 +89,24 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
     assertThat(annotated.getAnnotations().keySet(), empty());
     annotated.setAnnotations(singletonMap(LOCATION_KEY, "value"));
     assertThat(annotated.getAnnotations().keySet(), contains(LOCATION_KEY));
+  }
+
+  @Test
+  public void serializable() throws Exception {
+    Component annotated = addAnnotationsToClass(IsSerializable.class).newInstance();
+    annotated.setAnnotations(singletonMap(LOCATION_KEY, "value"));
+    ((IsSerializable) annotated).setValue("Hello World!");
+
+    final ByteArrayOutputStream serializedFormStream = new ByteArrayOutputStream();
+    final ObjectOutputStream oos = new ObjectOutputStream(serializedFormStream);
+
+    oos.writeObject(annotated);
+
+    final Object deserialized = new ObjectInputStream(new ByteArrayInputStream(serializedFormStream.toByteArray())).readObject();
+
+    assertThat(deserialized, instanceOf(IsSerializable.class));
+    assertThat(deserialized, not(instanceOf(Component.class)));
+    assertThat(((IsSerializable) deserialized).getValue(), is("Hello World!"));
   }
 
   @Test
@@ -171,6 +194,22 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
 
     @Override
     public void initialise() throws InitialisationException {}
+
+  }
+
+  public static class IsSerializable implements Serializable {
+
+    private static final long serialVersionUID = 9207437524543640942L;
+
+    private String value;
+
+    public String getValue() {
+      return value;
+    }
+
+    public void setValue(String value) {
+      this.value = value;
+    }
 
   }
 
