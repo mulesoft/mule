@@ -119,7 +119,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_VALUE_PROVIDER_SERVICE,
                                                                      MuleValueProviderService.class);
 
-
     muleContext.getCustomizationService().overrideDefaultServiceImpl(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, this);
   }
 
