@@ -12,9 +12,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextAware;
+import org.mule.context.notification.ServerNotification;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
 
+import java.io.Serializable;
 import java.util.EventObject;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,7 +64,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
     public static final int NULL_ACTION = 0;
     public static final Object NULL_RESOURCE = "";
 
-    public final String EVENT_NAME = ClassUtils.getClassName(getClass());
+    public final Object EVENT_NAME = new LazyEventName();
 
     private volatile String serverId;
 
@@ -262,6 +264,29 @@ public abstract class ServerNotification extends EventObject implements MuleCont
         }
 
         return resource;
+    }
+
+    private final class LazyEventName implements Serializable
+    {
+        private static final long serialVersionUID = 5162290824647627016L;
+
+        private volatile String eventClassName;
+
+        @Override
+        public String toString()
+        {
+            if(eventClassName == null)
+            {
+                synchronized (this)
+                {
+                    if(eventClassName == null)
+                    {
+                        eventClassName = ServerNotification.this.getClass().getSimpleName();
+                    }
+                }
+            }
+            return eventClassName;
+        }
     }
 
 }
