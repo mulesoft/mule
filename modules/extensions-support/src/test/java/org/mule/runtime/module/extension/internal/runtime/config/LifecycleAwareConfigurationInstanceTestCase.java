@@ -131,7 +131,8 @@ public class LifecycleAwareConfigurationInstanceTestCase
   protected void doSetUp() throws Exception {
     ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
     ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_CONFIGURATION_PROPERTIES, configurationProperties);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_CONFIGURATION_PROPERTIES,
+                                                                           configurationProperties);
 
     doReturn(empty()).when(configurationProperties).resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY);
 

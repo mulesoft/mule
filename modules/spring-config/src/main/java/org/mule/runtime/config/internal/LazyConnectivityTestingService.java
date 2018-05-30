@@ -52,13 +52,7 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
         throw new ObjectNotFoundException(location.toString());
       }
       List<Throwable> causalChain = getCausalChain(e);
-      return causalChain.stream()
-          .filter(exception -> exception.getClass().equals(ConnectionException.class)
-              && ((ConnectionException) exception).getErrorType().isPresent())
-          .map(exception -> failure(exception.getMessage(), ((ConnectionException) exception).getErrorType().get(),
-                                    (Exception) exception))
-          .findFirst()
-          .orElse(unknownFailureResponse(lastMessage(causalChain), e));
+      return unknownFailureResponse(lastMessage(causalChain), e);
     } catch (Exception e) {
       return unknownFailureResponse(e.getCause().getMessage(), e);
     }
