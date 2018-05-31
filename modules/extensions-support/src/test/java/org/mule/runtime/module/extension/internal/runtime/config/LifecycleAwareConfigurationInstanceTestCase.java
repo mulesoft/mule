@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -19,6 +20,7 @@ import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -28,10 +30,14 @@ import static org.mockito.Mockito.withSettings;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CONTEXT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -97,6 +103,9 @@ public class LifecycleAwareConfigurationInstanceTestCase
   @Mock
   private ConfigurationState configurationState;
 
+  @Mock
+  private ConfigurationProperties configurationProperties;
+
   protected Lifecycle value = mock(Lifecycle.class, withSettings().extraInterfaces(Component.class));
 
   @Mock
@@ -122,6 +131,10 @@ public class LifecycleAwareConfigurationInstanceTestCase
   protected void doSetUp() throws Exception {
     ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
     ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_CONFIGURATION_PROPERTIES,
+                                                                           configurationProperties);
+
+    doReturn(empty()).when(configurationProperties).resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY);
 
     retryPolicyTemplate = createRetryTemplate();
     retryPolicyTemplate.setNotifier(mock(RetryNotifier.class));
