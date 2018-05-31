@@ -30,6 +30,9 @@ public class WindowsController extends AbstractOSController {
   public void start(String... args) {
     install(args);
     super.start(args);
+    if (status() != 0) {
+      throw new MuleControllerException("The mule instance couldn't be started");
+    }
   }
 
   @Override
