@@ -35,6 +35,10 @@
           "description" : "Location of the maven user settings.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the repositories and proxies configured on it will be used by the runtime. If a global settings is configured, it will be merged with the user settings",
           "type" : "string"
         },
+        "settingsSecurityLocation" : {
+          "description" : "Location of the maven settings-security.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the encrypted passwords for servers on user and global settings will be decrypted using the master password defined on this file",
+          "type" : "string"
+        },
         "repositoryLocation" : {
           "description" : "Repository location for the mule runtime to use. If not provided it will be the MULE_HOME/repository folder"
         },

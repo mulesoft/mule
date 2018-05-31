@@ -43,6 +43,8 @@ public class MavenConfigBuilder {
           mavenConfig.hasPath("globalSettingsLocation") ? mavenConfig.getString("globalSettingsLocation") : null;
       String userSettingsLocation =
           mavenConfig.hasPath("userSettingsLocation") ? mavenConfig.getString("userSettingsLocation") : null;
+      String settingsSecurityLocation =
+          mavenConfig.hasPath("settingsSecurityLocation") ? mavenConfig.getString("settingsSecurityLocation") : null;
       String repositoryLocation =
           mavenConfig.hasPath("repositoryLocation") ? mavenConfig.getString("repositoryLocation") : null;
       boolean ignoreArtifactDescriptorRepositories =
@@ -55,6 +57,7 @@ public class MavenConfigBuilder {
 
       File globalSettingsFile = findResource(globalSettingsLocation);
       File userSettingsFile = findResource(userSettingsLocation);
+      File settingsSecurityFile = findResource(settingsSecurityLocation);
 
       File repositoryFolder = getRuntimeRepositoryFolder();
       if (repositoryLocation != null) {
@@ -75,6 +78,9 @@ public class MavenConfigBuilder {
       }
       if (userSettingsFile != null) {
         mavenConfigurationBuilder.userSettingsLocation(userSettingsFile);
+      }
+      if (settingsSecurityFile != null) {
+        mavenConfigurationBuilder.settingsSecurityLocation(settingsSecurityFile);
       }
 
       ConfigObject repositories =
