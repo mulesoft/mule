@@ -258,19 +258,12 @@ public class Controller {
 
   public File getLog() {
     String muleHome = osSpecificController.getMuleHome();
-    List<String> logFiles = Arrays.asList(
-                                          MULE_SERVICE_NAME,
-                                          MULE_EE_SERVICE_NAME,
-                                          osSpecificController.getMuleAppName())
-        .stream().map(l -> l + ".log").collect(Collectors.toList());
+    List<String> serviceNames = Arrays.asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME, osSpecificController.getMuleAppName());
 
-    for (String logFile : logFiles) {
-      File log = Paths.get(muleHome, "logs", logFile).toFile();
-      if (log.exists() && log.isFile()) {
-        return log;
-      }
-    }
-    throw new MuleControllerException(String.format("There is no mule log available at %s/logs/", muleHome));
+    return serviceNames.stream().map(s -> Paths.get(muleHome, "logs", s + ".log").toFile())
+        .filter(f -> f.exists() && f.isFile())
+        .findFirst()
+        .orElseThrow(() -> new MuleControllerException(String.format("There is no mule log available at %s/logs/", muleHome)));
   }
 
   public File getLog(String appName) {
