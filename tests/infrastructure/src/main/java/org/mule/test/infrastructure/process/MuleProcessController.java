@@ -27,6 +27,13 @@ public class MuleProcessController {
     controller = buildController(muleHome, osSpecificController);
   }
 
+  public MuleProcessController(String muleHome, String locationSuffix) {
+    AbstractOSController osSpecificController =
+        IS_OS_WINDOWS ? new WindowsController(muleHome, DEFAULT_TIMEOUT, locationSuffix)
+            : new UnixController(muleHome, DEFAULT_TIMEOUT);
+    controller = buildController(muleHome, osSpecificController);
+  }
+
   protected Controller buildController(String muleHome, AbstractOSController osSpecificController) {
     return new Controller(osSpecificController, muleHome);
   }

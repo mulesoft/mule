@@ -9,6 +9,8 @@ package org.mule.test.infrastructure.process;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +21,10 @@ public class WindowsController extends AbstractOSController {
 
   public WindowsController(String muleHome, int timeout) {
     super(muleHome, timeout);
+  }
+
+  public WindowsController(String muleHome, int defaultTimeout, String locationSuffix) {
+    super(muleHome, defaultTimeout, locationSuffix);
   }
 
   @Override
@@ -47,24 +53,23 @@ public class WindowsController extends AbstractOSController {
 
   @Override
   public int getProcessId() {
-    String muleResult = executeCmd("sc queryex \"mule\" ");
-    String muleEEResult = executeCmd("sc queryex \"mule_ee\" ");
-    if (muleResult.contains("RUNNING")) {
-      return getId(muleResult);
-    } else if (muleEEResult.contains("RUNNING")) {
-      return getId(muleEEResult);
-    } else {
-      throw new MuleControllerException("No mule instance is running");
+    List<String> serviceNames = Arrays.asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME, muleAppName);
+    for (String serviceName : serviceNames) {
+      if (isServiceRunning(serviceName)) {
+        return getId(serviceName);
+      }
     }
+    throw new MuleControllerException("No mule instance is running");
   }
 
-  private int getId(String str) {
-    Matcher matcher = PID_PATTERN_WINDOWS.matcher(str);
+  private int getId(String serviceName) {
+    String getServiceStatus = getServiceStatus(serviceName);
+    Matcher matcher = PID_PATTERN_WINDOWS.matcher(getServiceStatus);
     String result;
     if (matcher.find()) {
       result = matcher.group(0);
     } else {
-      throw new MuleControllerException("PID pattern not recognized in " + str);
+      throw new MuleControllerException("PID pattern not recognized in " + getServiceStatus);
     }
     String[] resultArray = result.split(": ");
     return Integer.parseInt(resultArray[1]);
@@ -72,10 +77,21 @@ public class WindowsController extends AbstractOSController {
 
   @Override
   public int status(String... args) {
-    String muleResult = executeCmd("sc queryex \"mule\" ");
-    String muleEEResult = executeCmd("sc queryex \"mule_ee\" ");
-    Boolean result = muleResult.contains("RUNNING") || muleEEResult.contains("RUNNING");
-    return result ? 0 : 1;
+    List<String> serviceNames = Arrays.asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME, muleAppName);
+    for (String serviceName : serviceNames) {
+      if (isServiceRunning(serviceName)) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+
+  private boolean isServiceRunning(String serviceName) {
+    return getServiceStatus(serviceName).contains("RUNNING");
+  }
+
+  private String getServiceStatus(String serviceName) {
+    return executeCmd("sc queryex \"" + serviceName + "\" ");
   }
 
   private String executeCmd(String cmd) {
