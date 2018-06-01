@@ -293,7 +293,11 @@ public class MuleDeployment extends MuleInstallation {
   protected void before() throws Throwable {
     super.before();
     prober = new PollingProber(deploymentTimeout, POLL_DELAY_MILLIS);
-    mule = new MuleProcessController(getMuleHome());
+    if (locationSuffix != null && !locationSuffix.isEmpty()) {
+      mule = new MuleProcessController(getMuleHome(), locationSuffix);
+    } else {
+      mule = new MuleProcessController(getMuleHome());
+    }
     addShutdownHooks();
     try {
       doBefore();
