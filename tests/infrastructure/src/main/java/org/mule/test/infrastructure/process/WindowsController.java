@@ -17,8 +17,6 @@ import java.util.regex.Pattern;
 public class WindowsController extends AbstractOSController {
 
   protected static final String PID_WINDOWS = "(\\s)*PID (\\s)+ :(\\s)*([0-9])+";
-  protected static final String MULE_SERVICE_NAME = "mule";
-  protected static final String MULE_EE_SERVICE_NAME = "mule_ee";
   protected static final Pattern PID_PATTERN_WINDOWS = Pattern.compile(PID_WINDOWS);
 
   public WindowsController(String muleHome, int timeout) {

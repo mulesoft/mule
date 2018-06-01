@@ -32,6 +32,8 @@ public abstract class AbstractOSController {
   private static final String MULE_HOME_VARIABLE = "MULE_HOME";
   private static final String MULE_APP_VARIABLE = "MULE_APP";
   private static final String MULE_APP_LONG_VARIABLE = "MULE_APP_LONG";
+  protected static final String MULE_SERVICE_NAME = "mule";
+  protected static final String MULE_EE_SERVICE_NAME = "mule_ee";
 
   protected final String muleHome;
   protected final String muleAppName;

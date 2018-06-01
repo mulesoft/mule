@@ -18,6 +18,8 @@ import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.test.infrastructure.process.AbstractOSController.MULE_EE_SERVICE_NAME;
+import static org.mule.test.infrastructure.process.AbstractOSController.MULE_SERVICE_NAME;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,11 +33,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
-
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 public class Controller {
@@ -256,7 +258,11 @@ public class Controller {
 
   public File getLog() {
     String muleHome = osSpecificController.getMuleHome();
-    List<String> logFiles = Arrays.asList("mule_ee.log", "mule.log", osSpecificController.getMuleAppName() + ".log");
+    List<String> logFiles = Arrays.asList(
+                                          MULE_SERVICE_NAME,
+                                          MULE_EE_SERVICE_NAME,
+                                          osSpecificController.getMuleAppName())
+        .stream().map(l -> l + ".log").collect(Collectors.toList());
 
     for (String logFile : logFiles) {
       File log = Paths.get(muleHome, "logs", logFile).toFile();
