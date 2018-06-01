@@ -17,6 +17,8 @@ import java.util.regex.Pattern;
 public class WindowsController extends AbstractOSController {
 
   protected static final String PID_WINDOWS = "(\\s)*PID (\\s)+ :(\\s)*([0-9])+";
+  protected static final String MULE_SERVICE_NAME = "mule";
+  protected static final String MULE_EE_SERVICE_NAME = "mule_ee";
   protected static final Pattern PID_PATTERN_WINDOWS = Pattern.compile(PID_WINDOWS);
 
   public WindowsController(String muleHome, int timeout) {
@@ -53,23 +55,23 @@ public class WindowsController extends AbstractOSController {
 
   @Override
   public int getProcessId() {
-    List<String> serviceNames = Arrays.asList("mule", "mule_ee", muleAppName);
+    List<String> serviceNames = Arrays.asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME, muleAppName);
     for (String serviceName : serviceNames) {
-      String cmdOutput = executeCmd("sc queryex \"" + serviceName + "\" ");
-      if (cmdOutput.contains("RUNNING")) {
-        return getId(cmdOutput);
+      if (isServiceRunning(serviceName)) {
+        return getId(serviceName);
       }
     }
     throw new MuleControllerException("No mule instance is running");
   }
 
-  private int getId(String str) {
-    Matcher matcher = PID_PATTERN_WINDOWS.matcher(str);
+  private int getId(String serviceName) {
+    String getServiceStatus = getServiceStatus(serviceName);
+    Matcher matcher = PID_PATTERN_WINDOWS.matcher(getServiceStatus);
     String result;
     if (matcher.find()) {
       result = matcher.group(0);
     } else {
-      throw new MuleControllerException("PID pattern not recognized in " + str);
+      throw new MuleControllerException("PID pattern not recognized in " + getServiceStatus);
     }
     String[] resultArray = result.split(": ");
     return Integer.parseInt(resultArray[1]);
@@ -77,14 +79,21 @@ public class WindowsController extends AbstractOSController {
 
   @Override
   public int status(String... args) {
-    List<String> serviceNames = Arrays.asList("mule", "mule_ee", muleAppName);
+    List<String> serviceNames = Arrays.asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME, muleAppName);
     for (String serviceName : serviceNames) {
-      boolean serviceRunning = executeCmd("sc queryex \"" + serviceName + "\" ").contains("RUNNING");
-      if (serviceRunning) {
+      if (isServiceRunning(serviceName)) {
         return 0;
       }
     }
     return 1;
+  }
+
+  private boolean isServiceRunning(String serviceName) {
+    return getServiceStatus(serviceName).contains("RUNNING");
+  }
+
+  private String getServiceStatus(String serviceName) {
+    return executeCmd("sc queryex \"" + serviceName + "\" ");
   }
 
   private String executeCmd(String cmd) {
