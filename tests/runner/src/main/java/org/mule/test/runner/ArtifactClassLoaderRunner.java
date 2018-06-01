@@ -242,6 +242,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     final Optional<File> globalSettings = settingsSupplierFactory.environmentGlobalSettingsSupplier();
     final Optional<File> userSettings = settingsSupplierFactory.environmentUserSettingsSupplier();
+    final Optional<File> settingsSecurity = settingsSupplierFactory.environmentSettingsSecuritySupplier();
 
     final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
         .forcePolicyUpdateNever(true)
@@ -258,6 +259,12 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
       mavenConfigurationBuilder.userSettingsLocation(userSettings.get());
     } else {
       LOGGER.info("Maven user settings couldn't be found, this could cause a wrong resolution for dependencies");
+    }
+
+    if (settingsSecurity.isPresent()) {
+      mavenConfigurationBuilder.settingsSecurityLocation(settingsSecurity.get());
+    } else {
+      LOGGER.info("Maven settings security couldn't be found");
     }
 
     final MavenConfiguration mavenConfiguration = mavenConfigurationBuilder.build();
