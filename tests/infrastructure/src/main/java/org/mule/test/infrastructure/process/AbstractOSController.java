@@ -30,8 +30,12 @@ public abstract class AbstractOSController {
   protected static final Pattern STATUS_PATTERN = Pattern.compile(STATUS);
   private static final int DEFAULT_TIMEOUT = 30000;
   private static final String MULE_HOME_VARIABLE = "MULE_HOME";
+  private static final String MULE_APP_VARIABLE = "MULE_APP";
+  private static final String MULE_APP_LONG_VARIABLE = "MULE_APP_LONG";
 
   protected final String muleHome;
+  protected final String muleAppName;
+  protected final String muleAppLongName;
   protected final String muleBin;
   protected final int timeout;
 
@@ -39,6 +43,16 @@ public abstract class AbstractOSController {
     this.muleHome = muleHome;
     this.muleBin = getMuleBin();
     this.timeout = timeout != 0 ? timeout : DEFAULT_TIMEOUT;
+    this.muleAppName = null;
+    this.muleAppLongName = null;
+  }
+
+  public AbstractOSController(String muleHome, int timeout, String locationSuffix) {
+    this.muleHome = muleHome;
+    this.muleBin = getMuleBin();
+    this.timeout = timeout != 0 ? timeout : DEFAULT_TIMEOUT;
+    this.muleAppName = "mule_ee_node_" + locationSuffix;
+    this.muleAppLongName = "MuleEnterpriseEditionNode" + locationSuffix;
   }
 
   public String getMuleHome() {
@@ -61,6 +75,10 @@ public abstract class AbstractOSController {
   public abstract int status(String... args);
 
   public abstract int getProcessId();
+
+  public String getMuleAppName() {
+    return muleAppName;
+  }
 
   public void restart(String... args) {
     int error = runSync("restart", args);
@@ -110,6 +128,12 @@ public abstract class AbstractOSController {
       newEnv.put(it.getKey(), it.getValue());
     }
     newEnv.put(MULE_HOME_VARIABLE, muleHome);
+
+    if (muleAppName != null && muleAppLongName != null) {
+      newEnv.put(MULE_APP_VARIABLE, muleAppName);
+      newEnv.put(MULE_APP_LONG_VARIABLE, muleAppLongName);
+    }
+
     return newEnv;
   }
 }

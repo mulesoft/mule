@@ -25,7 +25,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -253,16 +255,16 @@ public class Controller {
   }
 
   public File getLog() {
-    File logEE = newFile(osSpecificController.getMuleHome() + "/logs/mule_ee.log");
-    File logCE = newFile(osSpecificController.getMuleHome() + "/logs/mule.log");
-    if (logCE.exists() && logCE.isFile()) {
-      return logCE;
+    String muleHome = osSpecificController.getMuleHome();
+    List<String> logFiles = Arrays.asList("mule_ee.log", "mule.log", osSpecificController.getMuleAppName() + ".log");
+
+    for (String logFile : logFiles) {
+      File log = Paths.get(muleHome, "logs", logFile).toFile();
+      if (log.exists() && log.isFile()) {
+        return log;
+      }
     }
-    if (logEE.exists() && logEE.isFile()) {
-      return logEE;
-    }
-    throw new MuleControllerException(String.format("There is no mule log available at %s/logs/",
-                                                    osSpecificController.getMuleHome()));
+    throw new MuleControllerException(String.format("There is no mule log available at %s/logs/", muleHome));
   }
 
   public File getLog(String appName) {
