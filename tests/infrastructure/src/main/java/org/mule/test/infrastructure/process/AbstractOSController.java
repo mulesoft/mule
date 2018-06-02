@@ -7,6 +7,7 @@
 
 package org.mule.test.infrastructure.process;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.HashMap;
@@ -129,9 +130,9 @@ public abstract class AbstractOSController {
     for (Map.Entry<String, String> it : env.entrySet()) {
       newEnv.put(it.getKey(), it.getValue());
     }
-    newEnv.put(MULE_HOME_VARIABLE, muleHome);
 
-    if (muleAppName != null && muleAppLongName != null) {
+    newEnv.put(MULE_HOME_VARIABLE, muleHome);
+    if (isNotEmpty(muleAppName) && isNotEmpty(muleAppLongName)) {
       newEnv.put(MULE_APP_VARIABLE, muleAppName);
       newEnv.put(MULE_APP_LONG_VARIABLE, muleAppLongName);
     }
