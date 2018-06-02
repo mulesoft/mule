@@ -7,6 +7,8 @@
 
 package org.mule.test.infrastructure.process;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -53,13 +55,10 @@ public class WindowsController extends AbstractOSController {
 
   @Override
   public int getProcessId() {
-    List<String> serviceNames = Arrays.asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME, muleAppName);
-    for (String serviceName : serviceNames) {
-      if (isServiceRunning(serviceName)) {
-        return getId(serviceName);
-      }
-    }
-    throw new MuleControllerException("No mule instance is running");
+    return getServiceList().stream()
+        .filter(s -> isServiceRunning(s))
+        .map(s -> getId(s)).findAny()
+        .orElseThrow(() -> new MuleControllerException("No mule instance is running"));
   }
 
   private int getId(String serviceName) {
@@ -77,13 +76,11 @@ public class WindowsController extends AbstractOSController {
 
   @Override
   public int status(String... args) {
-    List<String> serviceNames = Arrays.asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME, muleAppName);
-    for (String serviceName : serviceNames) {
-      if (isServiceRunning(serviceName)) {
-        return 0;
-      }
-    }
-    return 1;
+    return getServiceList().stream().filter(s -> isServiceRunning(s)).findAny().isPresent() ? 0 : 1;
+  }
+
+  private List<String> getServiceList() {
+    return isNotEmpty(muleAppName) ? Arrays.asList(muleAppName) : Arrays.asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME);
   }
 
   private boolean isServiceRunning(String serviceName) {
