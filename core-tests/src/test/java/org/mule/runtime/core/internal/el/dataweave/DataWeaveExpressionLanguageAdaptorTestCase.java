@@ -246,6 +246,20 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   }
 
   @Test
+  public void errorIsOfExpectedTypeWhenParsingLogExpression() throws Exception {
+    final String invalidExpression = "#[INVALID_EXPRESSION()]";
+
+    Error error = mock(Error.class);
+    Optional opt = Optional.of(error);
+    CoreEvent event = getEventWithError(opt);
+    doReturn(testEvent().getMessage()).when(event).getMessage();
+
+    expectedEx.expect(ExpressionRuntimeException.class);
+
+    expressionLanguage.evaluateLogExpression(invalidExpression, event, null, BindingContext.builder().build());
+  }
+
+  @Test
   public void payloadBinding() throws Exception {
     CoreEvent event = getEventWithError(empty());
     InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
