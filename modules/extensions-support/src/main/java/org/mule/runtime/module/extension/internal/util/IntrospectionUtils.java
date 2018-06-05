@@ -144,6 +144,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Types;
 
+import com.google.common.collect.ImmutableList;
 import org.reflections.ReflectionUtils;
 import org.springframework.core.ResolvableType;
 
@@ -190,17 +191,22 @@ public final class IntrospectionUtils {
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        Class itemClass = getType(arrayType.getType()).get();
-        if (Collection.class.isAssignableFrom(type)) {
-          dataType.set(DataType.builder()
-              .collectionType((Class<? extends Collection>) type)
-              .itemType(itemClass)
-              .build());
-        } else if (Iterator.class.isAssignableFrom(type)) {
-          dataType.set(DataType.builder()
-              .streamType((Class<? extends Iterator>) type)
-              .itemType(itemClass)
-              .build());
+        Optional<Class<Object>> optionalItemClass = getType(arrayType.getType());
+        if (optionalItemClass.isPresent()) {
+          Class<Object> itemClass = optionalItemClass.get();
+          if (Collection.class.isAssignableFrom(type)) {
+            dataType.set(DataType.builder()
+                .collectionType((Class<? extends Collection>) type)
+                .itemType(itemClass)
+                .build());
+          } else if (Iterator.class.isAssignableFrom(type)) {
+            dataType.set(DataType.builder()
+                .streamType((Class<? extends Iterator>) type)
+                .itemType(itemClass)
+                .build());
+          } else {
+            defaultVisit(arrayType);
+          }
         } else {
           defaultVisit(arrayType);
         }
