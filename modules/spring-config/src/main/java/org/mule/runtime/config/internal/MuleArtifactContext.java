@@ -435,6 +435,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   public void close() {
     if (isRunning()) {
       super.close();
+      applicationModel.close();
     }
   }
 

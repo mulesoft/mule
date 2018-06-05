@@ -7,16 +7,39 @@
 package org.mule.runtime.config.internal.dsl.model.config;
 
 import static java.util.Optional.empty;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 
 import java.util.List;
 import java.util.Optional;
 
-public class CompositeConfigurationPropertiesProvider implements ConfigurationPropertiesProvider {
+import org.slf4j.Logger;
 
+public class CompositeConfigurationPropertiesProvider implements ConfigurationPropertiesProvider, Initialisable, Disposable {
+
+  private static final Logger LOGGER = getLogger(CompositeConfigurationPropertiesProvider.class);
   private List<ConfigurationPropertiesProvider> configurationPropertiesProviders;
+
+  @Override
+  public void dispose() {
+    for(ConfigurationPropertiesProvider configurationPropertiesProvider : configurationPropertiesProviders ) {
+      disposeIfNeeded(configurationPropertiesProvider, LOGGER);
+    }
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    for(ConfigurationPropertiesProvider configurationPropertiesProvider : configurationPropertiesProviders ) {
+      initialiseIfNeeded(configurationPropertiesProvider);
+    }
+  }
 
   public CompositeConfigurationPropertiesProvider(List<ConfigurationPropertiesProvider> configurationPropertiesProviders) {
     this.configurationPropertiesProviders = configurationPropertiesProviders;
