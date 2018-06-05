@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
@@ -18,7 +19,6 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIM
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MediaType;
@@ -29,13 +29,13 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
 
@@ -197,12 +197,18 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     validateNotifications(contextAdapter);
     MessageProcessContext messageProcessContext = processContextSupplier.get();
-
-    MediaType mediaType = resolveMediaType(result, messageSource.getInitialisationParameters());
+    Map<String, Object> initialisationParameters = messageSource.getInitialisationParameters();
+    MediaType mediaType = resolveMediaType(result, initialisationParameters);
+    PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(getDefaultEncoding(muleContext),
+                                                                                     defaultMediaType,
+                                                                                     ofNullable((String) initialisationParameters
+                                                                                         .get(ENCODING_PARAMETER_NAME)),
+                                                                                     ofNullable((String) initialisationParameters
+                                                                                         .get(MIME_TYPE_PARAMETER_NAME)));
 
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
-                                context.getCorrelationId());
+                                context.getCorrelationId(), payloadMediaTypeResolver);
     Message message = of(resultAdapter);
 
     executeFlow(context, messageProcessContext, message);

@@ -469,7 +469,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(extensionDeclaration.getOperations(), hasSize(48));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(15));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(19));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(withOperationsDeclaration, NAME_AS_STREAM, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
