@@ -32,4 +32,11 @@
             <module-content:primary>#['smart' ++ ' connector primary']</module-content:primary>
         </module-content:set-payload-using-content-and-primary-and-simple-parameter>
     </flow>
+
+    <flow name="testSetPayloadUsingContentAndPrimaryCamelCaseAndSimpleParameter">
+        <module-content:set-payload-using-content-and-primary-camel-case-and-simple-parameter parameter1="value from attribute">
+            <module-content:content-camel-case>#['smart' ++ ' connector content']</module-content:content-camel-case>
+            <module-content:primary-camel-case-too>#['smart' ++ ' connector primary']</module-content:primary-camel-case-too>
+        </module-content:set-payload-using-content-and-primary-camel-case-and-simple-parameter>
+    </flow>
 </mule>
