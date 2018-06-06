@@ -7,8 +7,14 @@
 package org.mule.runtime.config.internal.dsl.model.config;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
@@ -18,6 +24,8 @@ import com.google.common.cache.CacheBuilder;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
+
 /**
  * Resolves attribute placeholders.
  * <p>
@@ -25,13 +33,15 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class DefaultConfigurationPropertiesResolver implements ConfigurationPropertiesResolver {
+public class DefaultConfigurationPropertiesResolver implements ConfigurationPropertiesResolver, Initialisable, Disposable {
 
+  private static final Logger LOGGER = getLogger(DefaultConfigurationPropertiesResolver.class);
   public static final String PLACEHOLDER_PREFIX = "${";
   public static final String PLACEHOLDER_SUFFIX = "}";
   private final Optional<ConfigurationPropertiesResolver> parentResolver;
   private final ConfigurationPropertiesProvider configurationPropertiesProvider;
   private Cache<String, Object> resolutionCache = CacheBuilder.<String, String>newBuilder().build();
+  private boolean initialized = false;
 
   public DefaultConfigurationPropertiesResolver(Optional<ConfigurationPropertiesResolver> parentResolver,
                                                 ConfigurationPropertiesProvider configurationPropertiesProvider) {
@@ -65,6 +75,22 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
         throw new MuleRuntimeException(createStaticMessage("Failure processing configuration attribute " + value, e));
       }
     }
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(parentResolver);
+    if (!initialized) {
+      initialiseIfNeeded(configurationPropertiesProvider);
+      initialized = true;
+    }
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(configurationPropertiesProvider, LOGGER);
+    disposeIfNeeded(parentResolver, LOGGER);
+    initialized = false;
   }
 
   /**
