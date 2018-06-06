@@ -88,24 +88,8 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
 
   @Override
   public void dispose() {
-    Throwable disposingException = null;
-    try {
-      disposeIfNeeded(configurationPropertiesProvider, LOGGER);
-    } catch (Throwable e) {
-      disposingException = e;
-    }
-    try {
-      disposeIfNeeded(parentResolver, LOGGER);
-    } catch (Throwable e) {
-      if (disposingException == null) {
-        disposingException = e;
-      } else {
-        disposingException.addSuppressed(e);
-      }
-    }
-    if (disposingException != null) {
-      throw new MuleRuntimeException(disposingException);
-    }
+    disposeIfNeeded(configurationPropertiesProvider, LOGGER);
+    disposeIfNeeded(parentResolver, LOGGER);
     initialized = false;
   }
 

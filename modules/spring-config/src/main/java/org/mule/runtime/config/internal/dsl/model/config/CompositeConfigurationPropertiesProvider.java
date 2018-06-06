@@ -7,18 +7,15 @@
 package org.mule.runtime.config.internal.dsl.model.config;
 
 import static java.util.Optional.empty;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
-import org.mule.runtime.core.api.lifecycle.DisposeException;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,29 +29,12 @@ public class CompositeConfigurationPropertiesProvider implements ConfigurationPr
 
   @Override
   public void dispose() {
-    DisposeException disposeException = null;
-    for (ConfigurationPropertiesProvider configurationPropertiesProvider : configurationPropertiesProviders) {
-      try {
-        disposeIfNeeded(configurationPropertiesProvider, LOGGER);
-      } catch (Throwable e) {
-        disposeException =
-            disposeException == null
-                ? new DisposeException(createStaticMessage("Exception while disposing all configuration properties providers"),
-                                       this)
-                : disposeException;
-        disposeException.addSuppressed(e);
-      }
-    }
-    if (disposeException != null) {
-      throw new MuleRuntimeException(disposeException);
-    }
+    disposeIfNeeded(configurationPropertiesProviders, LOGGER);
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    for (ConfigurationPropertiesProvider configurationPropertiesProvider : configurationPropertiesProviders) {
-      initialiseIfNeeded(configurationPropertiesProvider);
-    }
+    initialiseIfNeeded(configurationPropertiesProviders);
   }
 
   public CompositeConfigurationPropertiesProvider(List<ConfigurationPropertiesProvider> configurationPropertiesProviders) {
