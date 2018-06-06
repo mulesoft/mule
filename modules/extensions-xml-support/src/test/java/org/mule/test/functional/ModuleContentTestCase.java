@@ -55,4 +55,11 @@ public class ModuleContentTestCase extends AbstractXmlExtensionMuleArtifactFunct
     assertThat(muleEvent.getMessage().getPayload().getValue(),
                is("attribute value:[value from attribute], value of content:[smart connector content], value of primary:[smart connector primary]"));
   }
+
+  @Test
+  public void testSetPayloadUsingContentAndPrimaryCamelCaseAndSimpleParameter() throws Exception {
+    final CoreEvent muleEvent = flowRunner("testSetPayloadUsingContentAndPrimaryCamelCaseAndSimpleParameter").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(),
+               is("attribute value:[value from attribute], value of content:[smart connector content], value of primary:[smart connector primary]"));
+  }
 }
