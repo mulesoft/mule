@@ -44,10 +44,7 @@ import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-import org.hamcrest.core.IsCollectionContaining;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -55,7 +52,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
@@ -70,7 +66,6 @@ import java.util.function.Supplier;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import reactor.core.publisher.Mono;
 
 /**
  * TODO MULE-14000 Create hamcrest matchers to assert EventContext state
@@ -262,6 +257,50 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     }, "A hard reference is being mantained to the child event."));
 
     parent.success(eventParent);
+  }
+
+  @Test
+  public void terminatedChildContextsCleared() {
+    child = addChild(parent);
+    child.success();
+
+    assertThat(child.isTerminated(), is(true));
+
+    PhantomReference<BaseEventContext> childRef = new PhantomReference<>(child, new ReferenceQueue<>());
+    child = null;
+    new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      System.gc();
+      assertThat(childRef.isEnqueued(), is(true));
+      return true;
+    }, "A hard reference is being mantained to the child eventContext."));
+  }
+
+  @Test
+  public void terminatedContextClearsCallbacks() {
+    PhantomReference<Object> referencedInCallbackRef = configureEventContextCallbacks();
+
+    new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      System.gc();
+      assertThat(referencedInCallbackRef.isEnqueued(), is(true));
+      return true;
+    }, "A hard reference is being mantained to an event context callback."));
+  }
+
+  private PhantomReference<Object> configureEventContextCallbacks() {
+    final Object referencedInCallback = new Object();
+
+    parent.onResponse((e, t) -> {
+      System.out.println(referencedInCallback.toString());
+    });
+    parent.onComplete((e, t) -> {
+      System.out.println(referencedInCallback.toString());
+    });
+    parent.onTerminated((e, t) -> {
+      System.out.println(referencedInCallback.toString());
+    });
+
+    parent.success();
+    return new PhantomReference<>(referencedInCallback, new ReferenceQueue<>());
   }
 
   @Test
