@@ -80,7 +80,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
   @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(parentResolver);
-    if(!initialized) {
+    if (!initialized) {
       initialiseIfNeeded(configurationPropertiesProvider);
       initialized = true;
     }

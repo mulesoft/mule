@@ -29,14 +29,14 @@ public class CompositeConfigurationPropertiesProvider implements ConfigurationPr
 
   @Override
   public void dispose() {
-    for(ConfigurationPropertiesProvider configurationPropertiesProvider : configurationPropertiesProviders ) {
+    for (ConfigurationPropertiesProvider configurationPropertiesProvider : configurationPropertiesProviders) {
       disposeIfNeeded(configurationPropertiesProvider, LOGGER);
     }
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    for(ConfigurationPropertiesProvider configurationPropertiesProvider : configurationPropertiesProviders ) {
+    for (ConfigurationPropertiesProvider configurationPropertiesProvider : configurationPropertiesProviders) {
       initialiseIfNeeded(configurationPropertiesProvider);
     }
   }
