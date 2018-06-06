@@ -49,4 +49,16 @@
         </body>
         <output type="string"/>
     </operation>
+
+    <operation name="set-payload-using-content-and-primary-camel-case-and-simple-parameter">
+        <parameters>
+            <parameter name="parameter1" type="string"/>
+            <parameter name="contentCamelCase" type="string" role="CONTENT"/>
+            <parameter name="primaryCamelCaseToo" type="string" role="PRIMARY"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#['attribute value:[' ++ vars.parameter1 ++ '], value of content:[' ++ vars.contentCamelCase ++ '], value of primary:[' ++ vars.primaryCamelCaseToo ++ ']']"/>
+        </body>
+        <output type="string"/>
+    </operation>
 </module>

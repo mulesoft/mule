@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
@@ -22,6 +23,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -40,6 +42,7 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
 import java.util.ArrayList;
@@ -507,8 +510,11 @@ public class MacroExpansionModuleModel {
           break;
         case CONTENT:
         case PRIMARY_CONTENT:
+          final DslResolvingContext dslResolvingContext = DslResolvingContext.getDefault(emptySet());
+          final DslSyntaxResolver dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext);
+          final String resolvedName = dslSyntaxResolver.resolve(parameterExtension).getElementName();
           final Optional<ComponentModel> childComponentModel = componentModel.getInnerComponents().stream()
-              .filter(cm -> paramName.equals(cm.getIdentifier().getName()))
+              .filter(cm -> resolvedName.equals(cm.getIdentifier().getName()))
               .findFirst();
           if (childComponentModel.isPresent()) {
             value = childComponentModel.get().getTextContent();
