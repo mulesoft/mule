@@ -34,7 +34,9 @@ public class CompositeConfigurationPropertiesProvider implements ConfigurationPr
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(configurationPropertiesProviders);
+    for (ConfigurationPropertiesProvider configurationPropertiesProvider : configurationPropertiesProviders) {
+      initialiseIfNeeded(configurationPropertiesProvider);
+    }
   }
 
   public CompositeConfigurationPropertiesProvider(List<ConfigurationPropertiesProvider> configurationPropertiesProviders) {
