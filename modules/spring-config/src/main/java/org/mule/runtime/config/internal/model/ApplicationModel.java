@@ -33,11 +33,13 @@ import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -102,6 +104,7 @@ import java.util.function.Consumer;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.ClassUtils;
+import org.slf4j.Logger;
 import org.w3c.dom.Node;
 
 /**
@@ -118,6 +121,8 @@ import org.w3c.dom.Node;
  * @since 4.0
  */
 public class ApplicationModel {
+
+  private static final Logger LOGGER = getLogger(ApplicationModel.class);
 
   // TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
   public static final String POLICY_ROOT_ELEMENT = "policy";
@@ -463,6 +468,12 @@ public class ApplicationModel {
           new PropertiesResolverConfigurationProperties(new DefaultConfigurationPropertiesResolver(of(externalPropertiesResolver),
                                                                                                    deploymentPropertiesConfigurationProperties));
     }
+
+    try {
+      initialiseIfNeeded(configurationProperties.getConfigurationPropertiesResolver());
+    } catch (InitialisationException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   private List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactConfig artifactConfig,
@@ -518,14 +529,13 @@ public class ApplicationModel {
                 }
                 configConfigurationPropertiesProviders.add(provider);
 
-                try {
-                  initialiseIfNeeded(provider);
-                } catch (InitialisationException e) {
-                  throw new MuleRuntimeException(e);
-                }
               }
             }));
     return configConfigurationPropertiesProviders;
+  }
+
+  public void close() {
+    disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
   }
 
   private ConfigurationParameters resolveConfigurationParameters(DefaultConfigurationParameters.Builder configurationParametersBuilder,
