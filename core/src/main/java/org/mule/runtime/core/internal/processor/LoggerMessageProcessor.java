@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.processor;
 
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
-import static org.mule.runtime.core.api.util.StreamingUtils.withCursoredEvent;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -56,10 +55,8 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
-    return withCursoredEvent(event, cursored -> {
-      log(cursored);
-      return event;
-    });
+    log(event);
+    return event;
   }
 
   protected void log(CoreEvent event) {
