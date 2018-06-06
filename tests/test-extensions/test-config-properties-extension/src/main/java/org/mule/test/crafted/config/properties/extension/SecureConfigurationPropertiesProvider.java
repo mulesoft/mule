@@ -9,7 +9,6 @@ package org.mule.test.crafted.config.properties.extension;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -17,7 +16,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
 
 import java.util.Optional;
 
@@ -55,6 +53,20 @@ public class SecureConfigurationPropertiesProvider extends DefaultConfigurationP
     disposeCount++;
   }
 
+  /**
+   * Returns the configuration property loaded from the file with the given key.
+   * <p/>
+   * MULE-15032:
+   * There are 2 special keys used for testing purposes: "lifecycle::initialize" and "lifecycle::dispose".
+   * If this custom configuration properties provider is loaded by SPI in any integration test, asking for a property
+   * with any of those keys will return the number of times this provider was initialized or disposed.
+   * This was added as a workaround for testing that those phases were actually being applied to the ConfigurationPropertiesProviders when
+   * creating or clearing an ApplicationModel.
+   * keep in mind that this extension is only intended for testing purposes and this behaviour will not be replicated for
+   * any productive code.
+   * @param configurationAttributeKey
+   * @return an Optional with the value of the given key or {@link Optional#empty()} otherwise.
+   */
   @Override
   public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
     if (configurationAttributeKey.startsWith(SECURE_PREFIX)) {
