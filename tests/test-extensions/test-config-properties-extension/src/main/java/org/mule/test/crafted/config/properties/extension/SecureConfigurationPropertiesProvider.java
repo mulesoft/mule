@@ -99,5 +99,4 @@ public class SecureConfigurationPropertiesProvider extends DefaultConfigurationP
   protected String createValue(String key, String value) {
     return format("%s:%s:%s:%s", key, value, algorithm, mode);
   }
-
 }
