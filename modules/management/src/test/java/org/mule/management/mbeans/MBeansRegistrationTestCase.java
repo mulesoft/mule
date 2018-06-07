@@ -6,8 +6,12 @@
  */
 package org.mule.management.mbeans;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.mule.module.management.agent.JmxServerNotificationAgent.SERVER_NOTIFICATION_SOURCE_NAME;
+import static org.mule.module.management.agent.JmxServerNotificationAgent.LISTENER_JMX_OBJECT_NAME;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +22,9 @@ import java.util.Set;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
+import javax.management.Notification;
 import javax.management.ObjectInstance;
+import javax.management.ObjectName;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -65,8 +71,8 @@ public class MBeansRegistrationTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mbeans-test-service.xml"},
-            {ConfigVariant.FLOW, "mbeans-test-flow.xml"}});
+        return Arrays.asList(new Object[][] {{ConfigVariant.SERVICE, "mbeans-test-service.xml"},
+                                             {ConfigVariant.FLOW, "mbeans-test-flow.xml"}});
     }
 
     /**
@@ -77,43 +83,42 @@ public class MBeansRegistrationTestCase extends AbstractServiceAndFlowTestCase
     {
         List<String> mbeanClasses = getMBeanClasses();
 
-        assertTrue(mbeanClasses.contains(JmxServerNotificationAgent.class.getName()
+        assertThat(mbeanClasses, hasItem(JmxServerNotificationAgent.class.getName()
                                          + "$BroadcastNotificationService"));
-        assertTrue(mbeanClasses.contains(JmxServerNotificationAgent.class.getName() + "$NotificationListener"));
-        assertTrue(mbeanClasses.contains(MuleService.class.getName()));
-        assertTrue(mbeanClasses.contains(MuleConfigurationService.class.getName()));
-        assertTrue(mbeanClasses.contains(StatisticsService.class.getName()));
-        assertTrue(mbeanClasses.contains(ModelService.class.getName()));
+        assertThat(mbeanClasses, hasItem(JmxServerNotificationAgent.class.getName() + "$NotificationListener"));
+        assertThat(mbeanClasses, hasItem(MuleService.class.getName()));
+        assertThat(mbeanClasses, hasItem(MuleConfigurationService.class.getName()));
+        assertThat(mbeanClasses, hasItem(StatisticsService.class.getName()));
+        assertThat(mbeanClasses, hasItem(ModelService.class.getName()));
 
         // Only if registerMx4jAdapter="true"
-        assertTrue(mbeanClasses.contains(mx4j.tools.adaptor.http.HttpAdaptor.class.getName()));
+        assertThat(mbeanClasses, hasItem(mx4j.tools.adaptor.http.HttpAdaptor.class.getName()));
     }
 
     /**
-     * Verify that all expected MBeans are registered for connectors, services,
-     * routers, and endpoints.
+     * Verify that all expected MBeans are registered for connectors, services, routers, and endpoints.
      */
     @Test
     public void testServiceMBeansRegistration() throws Exception
     {
         List<String> mbeanClasses = getMBeanClasses();
 
-        assertTrue(mbeanClasses.contains(ConnectorService.class.getName()));
-        assertTrue(mbeanClasses.contains(ModelService.class.getName()));
-        
-        if(variant.equals(ConfigVariant.SERVICE))
+        assertThat(mbeanClasses, hasItem(ConnectorService.class.getName()));
+        assertThat(mbeanClasses, hasItem(ModelService.class.getName()));
+
+        if (variant.equals(ConfigVariant.SERVICE))
         {
-            assertTrue(mbeanClasses.contains(ServiceService.class.getName()));
-            assertTrue(mbeanClasses.contains(RouterStats.class.getName()));
+            assertThat(mbeanClasses, hasItem(ServiceService.class.getName()));
+            assertThat(mbeanClasses, hasItem(RouterStats.class.getName()));
         }
         else
         {
-            assertTrue(mbeanClasses.contains(FlowConstructService.class.getName()));            
-            assertTrue(mbeanClasses.contains(FlowConstructStats.class.getName()));
+            assertThat(mbeanClasses, hasItem(FlowConstructService.class.getName()));
+            assertThat(mbeanClasses, hasItem(FlowConstructStats.class.getName()));
         }
-               
-        
-        assertTrue(mbeanClasses.contains(EndpointService.class.getName()));
+
+
+        assertThat(mbeanClasses, hasItem(EndpointService.class.getName()));
     }
 
     /**
@@ -123,8 +128,18 @@ public class MBeansRegistrationTestCase extends AbstractServiceAndFlowTestCase
     public void testMBeansUnregistration() throws Exception
     {
         muleContext.dispose();
-        assertEquals("No MBeans should be registered after disposal of MuleContext", 0,
-            getMBeanClasses().size());
+        assertThat(getMBeanClasses(), empty());
+    }
+
+    @Test
+    public void testLogNotificationSourceIsIntentedStringOnRegistration() throws Exception
+    {
+        ObjectName notificationListenerName = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":" + LISTENER_JMX_OBJECT_NAME);
+        List<Notification> notifications = (List<Notification>) mBeanServer.getAttribute(notificationListenerName, "NotificationsList");
+        for (Notification notification : notifications)
+        {
+            assertThat((String) notification.getSource(), equalTo(SERVER_NOTIFICATION_SOURCE_NAME));
+        }
     }
 
     protected List<String> getMBeanClasses() throws MalformedObjectNameException
