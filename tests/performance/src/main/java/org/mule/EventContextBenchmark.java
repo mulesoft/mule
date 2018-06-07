@@ -6,11 +6,13 @@
  */
 package org.mule;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.exception.NullExceptionHandler.getInstance;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 import static reactor.core.publisher.Mono.from;
@@ -26,10 +28,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
@@ -37,8 +35,14 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Warmup;
 
-@Warmup(iterations = 10)
-@Measurement(iterations = 10)
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
+@Warmup(iterations = 20)
+@Measurement(iterations = 100)
 @OutputTimeUnit(NANOSECONDS)
 public class EventContextBenchmark extends AbstractBenchmark {
 
@@ -79,7 +83,7 @@ public class EventContextBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public Object[] createEventContextWithFlowAndComplete() {
-    AtomicReference<CoreEvent> result = new AtomicReference();
+    AtomicReference<CoreEvent> result = new AtomicReference<>();
     AtomicBoolean complete = new AtomicBoolean();
     BaseEventContext eventContext = (BaseEventContext) create(flow, CONNECTOR_LOCATION);
     from(from(eventContext.getResponsePublisher())).doOnSuccess(response -> result.set(response)).subscribe();
@@ -91,13 +95,70 @@ public class EventContextBenchmark extends AbstractBenchmark {
   @Benchmark
   public Object[] createEventContextWithFlowAndCompleteWithExternalCompletion() {
     CompletableFuture<Void> completableFuture = new CompletableFuture<>();
-    AtomicReference<CoreEvent> result = new AtomicReference();
+    AtomicReference<CoreEvent> result = new AtomicReference<>();
     AtomicBoolean complete = new AtomicBoolean();
     BaseEventContext eventContext = (BaseEventContext) create(flow, CONNECTOR_LOCATION, null, of(completableFuture));
     from(from(eventContext.getResponsePublisher())).doOnSuccess(response -> result.set(response)).subscribe();
     eventContext.onTerminated((response, throwable) -> complete.set(true));
     eventContext.success(event);
     completableFuture.complete(null);
+    return new Object[] {result, complete};
+  }
+
+  @Benchmark
+  public Object[] createEventContextWith10ChildrenTerminateAllAtOnce() {
+    return createEventContextTerminateAllAtOnce(10);
+  }
+
+  @Benchmark
+  public Object[] createEventContextWith1000ChildrenTerminateAllAtOnce() {
+    return createEventContextTerminateAllAtOnce(1000);
+  }
+
+  private Object[] createEventContextTerminateAllAtOnce(int childrenCount) {
+    AtomicReference<CoreEvent> result = new AtomicReference<>();
+    AtomicBoolean complete = new AtomicBoolean();
+    BaseEventContext eventContext = (BaseEventContext) create(flow, CONNECTOR_LOCATION);
+
+    List<BaseEventContext> children = new ArrayList<>(childrenCount);
+    for (int i = 0; i < childrenCount; ++i) {
+      children.add(child(eventContext, empty()));
+    }
+
+    from(from(eventContext.getResponsePublisher())).doOnSuccess(response -> result.set(response)).subscribe();
+    eventContext.onTerminated((response, throwable) -> complete.set(true));
+    eventContext.success(event);
+
+    for (BaseEventContext child : children) {
+      child.success();
+    }
+
+    return new Object[] {result, complete};
+  }
+
+  @Benchmark
+  public Object[] createEventContextWith10ChildrenForEach() {
+    return childEventContextForEach(10);
+  }
+
+  @Benchmark
+  public Object[] createEventContextWith1000ChildrenForEach() {
+    return childEventContextForEach(1000);
+  }
+
+  private Object[] childEventContextForEach(int childrenCount) {
+    AtomicReference<CoreEvent> result = new AtomicReference<>();
+    AtomicBoolean complete = new AtomicBoolean();
+    BaseEventContext eventContext = (BaseEventContext) create(flow, CONNECTOR_LOCATION);
+
+    for (int i = 0; i < childrenCount; ++i) {
+      BaseEventContext child = child(eventContext, empty());
+      child.success();
+    }
+
+    from(from(eventContext.getResponsePublisher())).doOnSuccess(response -> result.set(response)).subscribe();
+    eventContext.onTerminated((response, throwable) -> complete.set(true));
+    eventContext.success(event);
     return new Object[] {result, complete};
   }
 
