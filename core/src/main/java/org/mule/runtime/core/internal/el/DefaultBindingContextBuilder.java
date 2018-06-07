@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+
 import org.mule.runtime.api.el.Binding;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
@@ -71,7 +72,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
     return new BindingContextImplementation(bindings, modules);
   }
 
-  private class BindingContextImplementation implements BindingContext {
+  private static class BindingContextImplementation implements BindingContext {
 
     private Map<String, Supplier<TypedValue>> bindings;
     private List<ExpressionModule> modules;
