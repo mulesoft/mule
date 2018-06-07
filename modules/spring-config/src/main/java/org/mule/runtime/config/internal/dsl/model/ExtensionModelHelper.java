@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.dsl.model;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
@@ -160,6 +161,11 @@ public class ExtensionModelHelper {
             if (!componentModel.isPresent()) {
               componentModel = resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
                                             componentIdentifier.getName());
+            }
+            if (!componentModel.isPresent()) {
+              componentName = capitalize(componentName);
+              componentModel =
+                  resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName);
             }
             return componentModel;
           }
