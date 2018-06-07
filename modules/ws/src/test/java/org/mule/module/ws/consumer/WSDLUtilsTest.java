@@ -33,6 +33,7 @@ public class WSDLUtilsTest
 {
 
     private static final String TEST_SCHEMAS = "TestSchemasWithBareSchemaLocationFile.wsdl";
+    private static final String TEST_SCHEMAS_SELF_REFERENCE = "TestSchemasWithSelfReference.wsdl";
     private static final String FILE_PREFIX = "file:";
     private static final String IMPORTED_SCHEMA = "TestSchema.xsd";
     public static final Pattern SCHEMA_LOCATION = compile("schemaLocation=\"([^\"]*)\"");
@@ -52,6 +53,24 @@ public class WSDLUtilsTest
         String testRoot = getClassPathRoot(WSDLUtilsTest.class).getPath();
         Definition wsdlDefinition = wsdlReader.readWSDL(testRoot + TEST_SCHEMAS);
         validateProcessedWsdl(wsdlDefinition);
+
+        List<String> schemas = getSchemas(wsdlDefinition);
+        for (String schema : schemas)
+        {
+            Matcher matcher = SCHEMA_LOCATION.matcher(schema);
+            assertThat(matcher.find(), equalTo(true));
+            String file = matcher.group(1);
+            assertThat(file, startsWith(FILE_PREFIX));
+            assertThat(file, containsString(IMPORTED_SCHEMA));
+        }
+    }
+
+    @Test
+    public void testSchemasWithSelfReference() throws Exception
+    {
+        WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
+        String testRoot = getClassPathRoot(WSDLUtilsTest.class).getPath();
+        Definition wsdlDefinition = wsdlReader.readWSDL(testRoot + TEST_SCHEMAS_SELF_REFERENCE);
 
         List<String> schemas = getSchemas(wsdlDefinition);
         for (String schema : schemas)
