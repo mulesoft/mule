@@ -30,6 +30,7 @@ import javax.management.ObjectName;
  */
 public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
 {
+    public static final String SERVER_NOTIFICATION_SOURCE_NAME = "Server Notification";
     public static final String LISTENER_JMX_OBJECT_NAME = "type=org.mule.Notification,name=MuleNotificationListener";
     public static final String BROADCASTER_JMX_OBJECT_NAME = "type=org.mule.Notification,name=MuleNotificationBroadcaster";
     public static final String DEFAULT_AGENT_NAME = "Jmx Notification Agent";
@@ -105,7 +106,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
     @Override
     protected void logEvent(ServerNotification e)
     {
-        broadcastNotificationMbean.sendNotification(new Notification(e.getClass().getName(), e, e.getTimestamp(), e.toString()));
+        broadcastNotificationMbean.sendNotification(new Notification(e.getClass().getName(), SERVER_NOTIFICATION_SOURCE_NAME, e.getTimestamp(), e.toString()));
     }
 
     /**
