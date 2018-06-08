@@ -20,6 +20,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBas
 import org.mule.runtime.module.extension.internal.runtime.resolver.RequiredParameterValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import com.google.common.base.Joiner;
 
@@ -44,8 +45,9 @@ public final class ExclusiveParameterGroupObjectBuilder<T> extends DefaultObject
    */
   public ExclusiveParameterGroupObjectBuilder(Class<T> prototypeClass,
                                               ExclusiveOptionalsTypeAnnotation exclusiveOptionalsTypeAnnotation,
-                                              boolean lazyInitEnabled) {
-    super(prototypeClass);
+                                              boolean lazyInitEnabled,
+                                              ReflectionCache reflectionCache) {
+    super(prototypeClass, reflectionCache);
     this.exclusiveOptionalsTypeAnnotation = exclusiveOptionalsTypeAnnotation;
     this.lazyInitEnabled = lazyInitEnabled;
   }

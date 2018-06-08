@@ -20,6 +20,7 @@ import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -46,7 +47,7 @@ public final class ReflectiveOperationExecutorFactory<T, M extends ComponentMode
 
   @Override
   public ComponentExecutor<M> createExecutor(M operationModel, Map<String, Object> parameters) {
-    DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder(implementationClass);
+    DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder(implementationClass, new ReflectionCache());
     parameters.forEach((k, v) -> objectBuilder.addPropertyResolver(k, new StaticValueResolver<>(v)));
     Object delegate;
     CoreEvent initialiserEvent = null;

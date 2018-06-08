@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -26,15 +25,15 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -63,7 +62,7 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
-    builder = new DefaultObjectBuilder(PROTOTYPE_CLASS);
+    builder = new DefaultObjectBuilder(PROTOTYPE_CLASS, reflectionCache);
 
     nameField = getField(PROTOTYPE_CLASS, "name", reflectionCache).get();
     ageField = getField(PROTOTYPE_CLASS, "age", reflectionCache).get();
@@ -114,25 +113,25 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void buildInterface() throws Exception {
-    builder = new DefaultObjectBuilder(InternalMessage.class);
+    builder = new DefaultObjectBuilder(InternalMessage.class, reflectionCache);
     builder.build(resolvingContext);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void abstractClass() throws Exception {
-    builder = new DefaultObjectBuilder(TestAbstract.class);
+    builder = new DefaultObjectBuilder(TestAbstract.class, reflectionCache);
     builder.build(resolvingContext);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void noDefaultConstructor() throws Exception {
-    builder = new DefaultObjectBuilder(TestNoDefaultConstructor.class);
+    builder = new DefaultObjectBuilder(TestNoDefaultConstructor.class, reflectionCache);
     builder.build(resolvingContext);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void noPublicConstructor() throws Exception {
-    builder = new DefaultObjectBuilder(NoPublicConstructor.class);
+    builder = new DefaultObjectBuilder(NoPublicConstructor.class, reflectionCache);
     builder.build(resolvingContext);
   }
 

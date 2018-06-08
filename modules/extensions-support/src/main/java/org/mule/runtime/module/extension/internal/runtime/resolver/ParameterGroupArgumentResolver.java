@@ -19,14 +19,11 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver<T> {
 
-  private final ParameterGroupDescriptor group;
-
-  private final ReflectionCache reflectionCache;
+  private final ParameterGroupObjectBuilder<T> builder;
 
   public ParameterGroupArgumentResolver(ParameterGroupDescriptor group, ReflectionCache reflectionCache) {
     checkState(group.getType().isInstantiable(), "Class %s cannot be instantiated.");
-    this.group = group;
-    this.reflectionCache = reflectionCache;
+    builder = new ParameterGroupObjectBuilder<T>(group, reflectionCache);
   }
 
   /**
@@ -36,7 +33,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
   public LazyValue<T> resolve(ExecutionContext executionContext) {
     return new LazyValue<>(() -> {
       try {
-        return new ParameterGroupObjectBuilder<T>(group, reflectionCache).build((EventedExecutionContext) executionContext);
+        return builder.build((EventedExecutionContext) executionContext);
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage("Could not create parameter group"), e);
       }

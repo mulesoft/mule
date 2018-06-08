@@ -33,7 +33,6 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
 
   private final ParameterGroupDescriptor groupDescriptor;
 
-  private final ReflectionCache reflectionCache;
 
   /**
    * Create a new instance
@@ -42,9 +41,8 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
    * @param reflectionCache the cache for expensive reflection lookups
    */
   public ParameterGroupObjectBuilder(ParameterGroupDescriptor groupDescriptor, ReflectionCache reflectionCache) {
-    super((Class<T>) groupDescriptor.getType().getDeclaringClass().get());
+    super((Class<T>) groupDescriptor.getType().getDeclaringClass().get(), reflectionCache);
     this.groupDescriptor = groupDescriptor;
-    this.reflectionCache = reflectionCache;
   }
 
   public T build(EventedExecutionContext executionContext) throws MuleException {
