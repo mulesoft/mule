@@ -9,10 +9,13 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEndpointsForRouter;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.internal.routing.FirstSuccessfulRoutingStrategy.validateMessageIsNotConsumable;
 import static reactor.core.publisher.Flux.fromIterable;
+
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.Router;
@@ -21,6 +24,8 @@ import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrateg
 
 import java.util.List;
 import java.util.function.Consumer;
+
+import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 
@@ -41,6 +46,9 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
 
   private List<MessageProcessorChain> routes = emptyList();
 
+  @Inject
+  ConfigurationProperties configurationProperties;
+
   @Override
   protected Consumer<CoreEvent> onEvent() {
     return event -> validateMessageIsNotConsumable(event.getMessage());
@@ -49,7 +57,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    if (routes.size() < 2) {
+    if (routes.size() < 2 && !isLazyInit()) {
       throw new InitialisationException(noEndpointsForRouter(), null);
     }
   }
@@ -65,7 +73,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
   }
 
   public void setRoutes(List<MessageProcessorChain> routes) {
-    checkArgument(routes.size() > 1, "At least 2 routes are required for ScatterGather");
+    checkArgument(routes.size() > 1 || isLazyInit(), "At least 2 routes are required for ScatterGather");
     this.routes = routes;
   }
 
@@ -82,5 +90,9 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
   @Override
   protected ForkJoinStrategyFactory getDefaultForkJoinStrategyFactory() {
     return new CollectMapForkJoinStrategyFactory();
+  }
+
+  private boolean isLazyInit() {
+    return configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
   }
 }

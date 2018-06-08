@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -26,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_MAP;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
@@ -33,8 +33,10 @@ import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ScatterGatherStory.SCATTER_GATHER;
 import static reactor.core.publisher.Flux.from;
 
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
@@ -48,18 +50,19 @@ import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrateg
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import java.io.StringBufferInputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(ROUTERS)
 @Story(SCATTER_GATHER)
@@ -70,11 +73,17 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
   private ScatterGatherRouter router = new ScatterGatherRouter();
   private ForkJoinStrategyFactory mockForkJoinStrategyFactory = mock(ForkJoinStrategyFactory.class);
+  private ConfigurationProperties configurationProperties = mock(ConfigurationProperties.class);
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     when(componentLocator.find(Location.builder().globalName(APPLE_FLOW).build())).thenReturn(of(mock(Flow.class)));
-    return singletonMap(REGISTRY_KEY, componentLocator);
+    when(configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY)).thenReturn(Optional.of(false));
+
+    Map<String, Object> registryObjects = new HashMap<>();
+    registryObjects.put(REGISTRY_KEY, componentLocator);
+    registryObjects.put("_configurationProperties", configurationProperties);
+    return registryObjects;
   }
 
   @After
@@ -90,6 +99,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     MessageProcessorChain route2 = mock(MessageProcessorChain.class);
     MessageProcessorChain route3 = mock(MessageProcessorChain.class);
 
+    muleContext.getInjector().inject(router);
     router.setRoutes(asList(route1, route2, route3));
 
     List<RoutingPair> routingPairs = from(router.getRoutingPairs(event)).collectList().block();
@@ -127,10 +137,10 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     MessageProcessorChain route1 = newChain(empty(), event -> event);
     MessageProcessorChain route2 = newChain(empty(), event -> event);
 
+    muleContext.getInjector().inject(router);
     router.setRoutes(asList(route1, route2));
     router.setTarget(variableName);
     router.setTargetValue("#[message]");
-    muleContext.getInjector().inject(router);
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     router.initialise();
 
@@ -198,7 +208,8 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Description("The router must be configured with at least two routes.")
-  public void minimumTwoRoutes() {
+  public void minimumTwoRoutes() throws MuleException {
+    muleContext.getInjector().inject(router);
     expectedException.expect(instanceOf(IllegalArgumentException.class));
     router.setRoutes(singletonList(mock(MessageProcessorChain.class)));
   }
@@ -209,8 +220,8 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     MessageProcessorChain route1 = newChain(empty(), event -> event);
     MessageProcessorChain route2 = newChain(empty(), event -> event);
 
-    router.setRoutes(asList(route1, route2));
     muleContext.getInjector().inject(router);
+    router.setRoutes(asList(route1, route2));
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     router.initialise();
 
