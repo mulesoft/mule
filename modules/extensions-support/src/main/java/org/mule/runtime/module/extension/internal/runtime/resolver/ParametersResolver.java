@@ -280,10 +280,11 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     if (groupField.getAnnotation(ExclusiveOptionalsTypeAnnotation.class).isPresent()) {
       return new ExclusiveParameterGroupObjectBuilder(type,
                                                       groupField.getAnnotation(ExclusiveOptionalsTypeAnnotation.class).get(),
-                                                      lazyInitEnabled);
+                                                      lazyInitEnabled,
+                                                      reflectionCache);
     }
 
-    return new DefaultObjectBuilder(type);
+    return new DefaultObjectBuilder(type, reflectionCache);
   }
 
   /**

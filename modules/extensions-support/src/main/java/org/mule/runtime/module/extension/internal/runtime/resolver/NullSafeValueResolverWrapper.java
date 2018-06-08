@@ -125,7 +125,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
           if (defaultValue.isPresent()) {
             fieldResolver = getFieldDefaultValueValueResolver(objectField, muleContext);
           } else if (isFlattenedParameterGroup(objectField)) {
-            DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder<>(getType(objectField.getValue()));
+            DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder<>(getType(objectField.getValue()), reflectionCache);
             resolverSet.add(field.getName(), new ObjectBuilderValueResolver<T>(groupBuilder, muleContext));
 
             ObjectType childGroup = (ObjectType) objectField.getValue();

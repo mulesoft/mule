@@ -8,19 +8,24 @@ package org.mule.runtime.module.extension.internal.config.dsl.construct;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.func.Once.of;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve {@link NestedRouteModel} elements.
@@ -38,6 +43,10 @@ public class RouteComponentObjectFactory extends AbstractExtensionObjectFactory<
   private final ObjectType objectType;
   private final ClassLoader classLoader;
   private final List<Processor> nestedProcessors;
+  private final RunOnce initialiser;
+
+  @Inject
+  private ReflectionCache reflectionCache;
 
   public RouteComponentObjectFactory(NestedRouteModel model, ObjectType objectType, ClassLoader classLoader,
                                      MuleContext muleContext, List<Processor> nestedProcessors) {
@@ -46,15 +55,16 @@ public class RouteComponentObjectFactory extends AbstractExtensionObjectFactory<
     this.model = model;
     this.objectType = objectType;
     this.nestedProcessors = nestedProcessors;
-    withContextClassLoader(classLoader, () -> {
+    initialiser = of(() -> {
       objectClass = getType(objectType);
-      builder = new DefaultObjectBuilder(objectClass);
+      builder = new DefaultObjectBuilder(objectClass, reflectionCache);
     });
   }
 
   @Override
   public Object doGetObject() throws Exception {
     return withContextClassLoader(classLoader, () -> {
+      initialiser.runOnce();
 
       if (nestedProcessors != null) {
         model.getNestedComponents().stream()
