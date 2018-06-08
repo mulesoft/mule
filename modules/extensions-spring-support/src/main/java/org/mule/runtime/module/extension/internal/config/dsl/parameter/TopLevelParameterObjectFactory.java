@@ -22,6 +22,9 @@ import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionOb
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+
+import javax.inject.Inject;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve extension objects that can be defined as named top level elements and be
@@ -33,6 +36,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
  * @since 4.0
  */
 public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> implements ObjectTypeProvider {
+
+  @Inject
+  private ReflectionCache reflectionCache;
 
   private LazyValue<DefaultObjectBuilder> builder;
   private LazyValue<Class<?>> objectClass;
@@ -51,7 +57,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
       // with the annotations stuff.
       return addAnnotationsToClass(getType(type));
     }));
-    builder = new LazyValue<>(() -> new DefaultObjectBuilder(objectClass.get()));
+    builder = new LazyValue<>(() -> new DefaultObjectBuilder(objectClass.get(), reflectionCache));
   }
 
   @Override

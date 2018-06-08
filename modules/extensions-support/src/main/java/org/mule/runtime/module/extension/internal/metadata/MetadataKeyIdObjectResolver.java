@@ -59,6 +59,7 @@ final class MetadataKeyIdObjectResolver {
   private static final DsqlParser dsqlParser = DsqlParser.getInstance();
   private final ComponentModel component;
   private final List<ParameterModel> keyParts;
+  private final ReflectionCache reflectionCache = new ReflectionCache();
 
   public MetadataKeyIdObjectResolver(ComponentModel component) {
     checkArgument(component != null, "The ComponentModel cannot be null");
@@ -191,7 +192,7 @@ final class MetadataKeyIdObjectResolver {
   private Object instantiateFromFieldValue(Class<?> metadataKeyType, Map<Field, String> fieldValueMap)
       throws MetadataResolvingException {
     try {
-      DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder<>(metadataKeyType);
+      DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder<>(metadataKeyType, reflectionCache);
       fieldValueMap.forEach((f, v) -> objectBuilder.addPropertyResolver(f.getName(), new StaticValueResolver<>(v)));
       return objectBuilder.build(null);
     } catch (Exception e) {

@@ -853,14 +853,13 @@ public final class IntrospectionUtils {
 
   private static List<TypeElement> getAllSuperTypes(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
     TypeElement objectType = processingEnvironment.getElementUtils().getTypeElement(Object.class.getTypeName());
-    List<TypeElement> typeElements = new ArrayList<>();
+    LinkedList<TypeElement> typeElements = new LinkedList<>();
     TypeElement currentType = typeElement;
     while (currentType != null && !objectType.equals(currentType)) {
-      typeElements.add(currentType);
+      typeElements.addFirst(currentType);
       currentType = (TypeElement) processingEnvironment.getTypeUtils().asElement(currentType.getSuperclass());
     }
-    // Required to have the order as when introspecting with classes.
-    reverse(typeElements);
+
     return typeElements;
   }
 
