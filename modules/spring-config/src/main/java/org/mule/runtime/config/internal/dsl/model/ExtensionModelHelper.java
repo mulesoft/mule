@@ -8,6 +8,8 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static java.util.stream.Stream.of;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
@@ -47,6 +49,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Helper class to work with a set of {@link ExtensionModel}s
@@ -58,6 +62,7 @@ import java.util.concurrent.ExecutionException;
  *
  * since 4.0
  */
+//TODO MULE-15143 Support a lightweight implementation of DslElementModelFactory to only identify the model from ComponentIdentifier
 public class ExtensionModelHelper {
 
   private final Set<ExtensionModel> extensionsModels;
@@ -139,14 +144,18 @@ public class ExtensionModelHelper {
                 .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
             List<HasConstructModels> constructModelsProviders = singletonList(extensionModel);
 
-            Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> componentModel =
-                resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName);
-            //TODO MULE-13894 remove this once unified extensionModel names to use camelCase (see smart connectors and crafted declared extesion models)
-            if (!componentModel.isPresent()) {
-              componentModel = resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
-                                            componentIdentifier.getName());
-            }
-            return componentModel;
+            Stream<Supplier<Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>>> stream =
+                of(() -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName),
+                   () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
+                                      componentIdentifier.getName()),
+                   () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
+                                      capitalize(componentName)));
+
+            return stream
+                .map(Supplier::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst();
           }
         }
         return empty();
