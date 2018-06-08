@@ -161,8 +161,10 @@ public class ExtensionModelHelper {
 
             Stream<Supplier<Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>>> stream =
                 of(() -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName),
-                   () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentIdentifier.getName()),
-                   () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, capitalize(componentName)));
+                   () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
+                                      componentIdentifier.getName()),
+                   () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
+                                      capitalize(componentName)));
 
             return stream
                 .map(Supplier::get)
@@ -219,9 +221,9 @@ public class ExtensionModelHelper {
 
 
   private Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> resolveModel(List<HasOperationModels> operationModelsProviders,
-                                                                      List<HasSourceModels> sourceModelsProviders,
-                                                                      List<HasConstructModels> constructModelsProviders,
-                                                                      String componentName) {
+                                                                                          List<HasSourceModels> sourceModelsProviders,
+                                                                                          List<HasConstructModels> constructModelsProviders,
+                                                                                          String componentName) {
     for (HasOperationModels operationModelsProvider : operationModelsProviders) {
       Optional<OperationModel> operationModel = operationModelsProvider.getOperationModel(componentName);
       if (operationModel.isPresent()) {
