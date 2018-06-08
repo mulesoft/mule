@@ -81,6 +81,16 @@ public class ContainerClassLoaderFilterFactory {
     }
 
     @Override
+    public boolean exportsPackage(String name) {
+      boolean exported = moduleClassLoaderFilter.exportsPackage(name);
+
+      if (!exported) {
+        exported = isExportedBooPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
+      }
+      return exported;
+    }
+
+    @Override
     public boolean exportsResource(String name) {
       boolean exported = moduleClassLoaderFilter.exportsResource(name);
 

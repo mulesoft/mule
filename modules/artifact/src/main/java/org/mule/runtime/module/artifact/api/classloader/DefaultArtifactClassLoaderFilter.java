@@ -74,7 +74,14 @@ public final class DefaultArtifactClassLoaderFilter implements ArtifactClassLoad
     checkArgument(!StringUtils.isEmpty(className), "Class name cannot be empty");
     final String packageName = getPackageName(className);
 
-    return exportedClassPackages.contains(packageName);
+    return exportsPackage(packageName);
+  }
+
+  @Override
+  public boolean exportsPackage(String name) {
+    checkArgument(!StringUtils.isEmpty(name), "Package name cannot be empty");
+
+    return exportedClassPackages.contains(name);
   }
 
   @Override

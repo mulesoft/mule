@@ -46,6 +46,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
   private static final String CLASS_NAME = "java.lang.Object";
+  private static final String CLASS_PACKAGE_NAME = "java.lang";
   public static final String RESOURCE_NAME = "dummy.txt";
   private static final String SERVICE_INTERFACE_NAME = "org.foo.Service";
   private static final String SERVICE_RESOURCE_NAME = "META-INF/services/" + SERVICE_INTERFACE_NAME;
@@ -131,6 +132,33 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
     URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
     assertThat(resource, equalTo(expectedResource));
+  }
+
+  @Test
+  public void getPackageExportedResource() throws ClassNotFoundException, IOException {
+    TestClassLoader classLoader = new TestClassLoader(null);
+    classLoader.addClass(CLASS_NAME, this.getClass());
+
+    when(filter.exportsPackage(CLASS_PACKAGE_NAME)).thenReturn(true);
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+    Package aPackage = filteringArtifactClassLoader.getPackage(CLASS_PACKAGE_NAME);
+    assertThat(aPackage.getName(), equalTo(CLASS_PACKAGE_NAME));
+  }
+
+  @Test
+  public void getPackagesOnlyReturnsExportedResource() throws ClassNotFoundException, IOException {
+    TestClassLoader classLoader = new TestClassLoader(null);
+    classLoader.addClass(CLASS_NAME, this.getClass());
+
+    when(filter.exportsPackage(CLASS_PACKAGE_NAME)).thenReturn(true);
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+    Package[] packageList = filteringArtifactClassLoader.getPackages();
+    assertThat(packageList.length, is(1));
+    assertThat(packageList[0].getName(), equalTo(CLASS_PACKAGE_NAME));
   }
 
   @Test
