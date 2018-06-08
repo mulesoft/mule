@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursor;
@@ -18,11 +19,9 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import static org.springframework.util.ReflectionUtils.setField;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.api.util.MuleExtensionUtils;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
@@ -62,7 +61,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
    * @param prototypeClass a {@link Class} which needs to have a public defualt constructor
    */
   public DefaultObjectBuilder(Class<T> prototypeClass, ReflectionCache reflectionCache) {
-    Preconditions.checkState(reflectionCache != null, "null reflection cache");
+    checkState(reflectionCache != null, "null reflection cache");
     checkInstantiable(prototypeClass, reflectionCache);
     this.prototypeClass = prototypeClass;
     this.reflectionCache = reflectionCache;

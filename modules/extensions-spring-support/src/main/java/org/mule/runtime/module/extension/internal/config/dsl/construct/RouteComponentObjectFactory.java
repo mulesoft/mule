@@ -8,13 +8,13 @@ package org.mule.runtime.module.extension.internal.config.dsl.construct;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.func.Once.of;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -55,7 +55,7 @@ public class RouteComponentObjectFactory extends AbstractExtensionObjectFactory<
     this.model = model;
     this.objectType = objectType;
     this.nestedProcessors = nestedProcessors;
-    initialiser = Once.of(() -> {
+    initialiser = of(() -> {
       objectClass = getType(objectType);
       builder = new DefaultObjectBuilder(objectClass, reflectionCache);
     });

@@ -8,10 +8,10 @@ package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.func.Once.of;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -45,7 +45,7 @@ public class InlineParameterGroupObjectFactory extends AbstractExtensionObjectFa
     super(muleContext);
     this.classLoader = classLoader;
     this.objectType = type;
-    initialiser = Once.of(() -> {
+    initialiser = of(() -> {
       objectClass = getType(type);
       builder = new DefaultObjectBuilder(objectClass, reflectionCache);
     });
