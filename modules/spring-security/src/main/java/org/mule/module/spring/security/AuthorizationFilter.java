@@ -28,6 +28,7 @@ import java.util.LinkedHashSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.util.StringUtils;
+import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
@@ -87,16 +88,27 @@ public class AuthorizationFilter extends AbstractSecurityFilter
         }
     }
 
-    public String getRequiredAuthorities()
+    public Object getRequiredAuthorities()
     {
         return StringUtils.join(this.requiredAuthorities, ", ");
     }
 
-    public void setRequiredAuthorities(String requiredAuthorities)
+    public void setRequiredAuthorities(Object requiredAuthorities)
     {
         if (requiredAuthorities != null)
         {
-            this.requiredAuthorities = new LinkedHashSet<>(Arrays.asList(StringUtils.splitAndTrim(requiredAuthorities, ",")));
+            if (requiredAuthorities instanceof String)
+            {
+                this.requiredAuthorities = new LinkedHashSet<>(Arrays.asList(StringUtils.splitAndTrim((String) requiredAuthorities, ",")));
+            }
+            else if (requiredAuthorities instanceof Collection<?>)
+            {
+                this.requiredAuthorities = (Collection<String>) requiredAuthorities;
+            }
+            else
+            {
+                throw new ConversionNotSupportedException(requiredAuthorities, this.requiredAuthorities.getClass(), null);
+            }
         }
     }
 }

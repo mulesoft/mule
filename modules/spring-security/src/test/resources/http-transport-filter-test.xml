@@ -49,6 +49,13 @@
         <logger/>
     </flow>
 
+	<flow name="authorizeAnySpEL">
+		<inbound-endpoint address="http://localhost:${port1}/authorizeany-spel" exchange-pattern="request-response" />
+		<http:basic-security-filter realm="mule-realm" />
+		<mule-ss:authorization-filter requiredAuthorities="#{{'ROLE_ADMIN', 'ROLE_CONTRIBUTOR'}}" />
+		<logger />
+	</flow>
+
     <flow name="authorizeAll">
         <inbound-endpoint address="http://localhost:${port1}/authorizeall" exchange-pattern="request-response"/>
         <http:basic-security-filter realm="mule-realm"/>

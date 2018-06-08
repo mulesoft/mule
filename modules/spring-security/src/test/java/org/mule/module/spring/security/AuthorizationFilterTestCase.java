@@ -86,9 +86,21 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testAuthorizedAnySpEL() throws Exception
+    {
+        doRequest("mule-realm", "localhost", "max", "max", getUrl() + "any-spel", false, 200);
+    }
+
+    @Test
     public void testNotAuthorizedAny() throws Exception
     {
         doRequest("mule-realm", "localhost", "anon", "anon", getUrl() + "any", false, 403);
+    }
+
+    @Test
+    public void testNotAuthorizedAnySpEL() throws Exception
+    {
+        doRequest("mule-realm", "localhost", "anon", "anon", getUrl() + "any-spel", false, 403);
     }
 
     @Test
