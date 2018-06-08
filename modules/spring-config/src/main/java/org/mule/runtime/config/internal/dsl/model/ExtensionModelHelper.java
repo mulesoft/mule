@@ -65,7 +65,7 @@ import java.util.stream.Stream;
  * <p>
  * since 4.0
  */
-//TODO MULE-13894 remove this once unified extensionModel names to use camelCase or a lightweight version DSLSyntaxResolver
+//TODO MULE-15143 Support a lightweight implementation of DslElementModelFactory to only identify the model from ComponentIdentifier
 public class ExtensionModelHelper {
 
   private final Set<ExtensionModel> extensionsModels;
