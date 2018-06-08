@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Stream.of;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
@@ -52,6 +52,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Helper class to work with a set of {@link ExtensionModel}s
@@ -148,7 +150,6 @@ public class ExtensionModelHelper {
   public Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> findComponentModel(ComponentIdentifier componentIdentifier) {
     try {
       return extensionComponentModelByComponentIdentifier.get(componentIdentifier, () -> {
-        // Java connectors, use camel case for componentIdentifier.name
         String componentName = toCamelCase(componentIdentifier.getName(), COMPONENT_NAME_SEPARATOR);
         for (ExtensionModel extensionModel : extensionsModels) {
           if (extensionModel.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace())) {
@@ -158,18 +159,16 @@ public class ExtensionModelHelper {
                 .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
             List<HasConstructModels> constructModelsProviders = singletonList(extensionModel);
 
-            org.mule.runtime.api.meta.model.ComponentModel componentModel =
-                resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName);
-            // Particular case for SmartConnectors, use just xml componentIdentifier.name
-            if (componentModel == null) {
-              componentModel = resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
-                                            componentIdentifier.getName());
-            }
-            if (componentModel == null) {
-              // Particular case for @Sources where SourceModel.name is the name of the class, therefore used capitalized the camel case componentName.
-              componentModel = resolveModel(emptyList(), sourceModelsProviders, emptyList(), capitalize(componentName));
-            }
-            return ofNullable(componentModel);
+            Stream<Supplier<Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>>> stream =
+                of(() -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName),
+                   () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentIdentifier.getName()),
+                   () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, capitalize(componentName)));
+
+            return stream
+                .map(Supplier::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst();
           }
         }
         return empty();
@@ -219,29 +218,29 @@ public class ExtensionModelHelper {
   }
 
 
-  private org.mule.runtime.api.meta.model.ComponentModel resolveModel(List<HasOperationModels> operationModelsProviders,
+  private Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> resolveModel(List<HasOperationModels> operationModelsProviders,
                                                                       List<HasSourceModels> sourceModelsProviders,
                                                                       List<HasConstructModels> constructModelsProviders,
                                                                       String componentName) {
     for (HasOperationModels operationModelsProvider : operationModelsProviders) {
       Optional<OperationModel> operationModel = operationModelsProvider.getOperationModel(componentName);
       if (operationModel.isPresent()) {
-        return operationModel.get();
+        return operationModel;
       }
     }
     for (HasSourceModels sourceModelsProvider : sourceModelsProviders) {
       Optional<SourceModel> sourceModel = sourceModelsProvider.getSourceModel(componentName);
       if (sourceModel.isPresent()) {
-        return sourceModel.get();
+        return sourceModel;
       }
     }
     for (HasConstructModels constructModelsProvider : constructModelsProviders) {
       Optional<ConstructModel> constructModel = constructModelsProvider.getConstructModel(componentName);
       if (constructModel.isPresent()) {
-        return constructModel.get();
+        return constructModel;
       }
     }
-    return null;
+    return empty();
   }
 
   static class IsRouteVisitor implements NestableElementModelVisitor {
