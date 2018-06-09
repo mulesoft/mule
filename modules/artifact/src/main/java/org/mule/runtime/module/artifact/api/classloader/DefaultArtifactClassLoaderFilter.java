@@ -13,9 +13,8 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import org.mule.api.annotation.NoInstantiate;
-import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.util.Set;
@@ -71,7 +70,7 @@ public final class DefaultArtifactClassLoaderFilter implements ArtifactClassLoad
 
   @Override
   public boolean exportsClass(String className) {
-    checkArgument(!StringUtils.isEmpty(className), "Class name cannot be empty");
+    checkArgument(!isEmpty(className), "Class name cannot be empty");
     final String packageName = getPackageName(className);
 
     return exportsPackage(packageName);
@@ -79,7 +78,7 @@ public final class DefaultArtifactClassLoaderFilter implements ArtifactClassLoad
 
   @Override
   public boolean exportsPackage(String name) {
-    checkArgument(!StringUtils.isEmpty(name), "Package name cannot be empty");
+    checkArgument(!isEmpty(name), "Package name cannot be empty");
 
     return exportedClassPackages.contains(name);
   }
