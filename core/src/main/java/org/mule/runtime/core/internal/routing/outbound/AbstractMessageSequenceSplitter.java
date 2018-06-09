@@ -22,6 +22,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.AbstractSplitter;
 import org.mule.runtime.core.internal.routing.MessageSequence;
 import org.mule.runtime.core.privileged.event.Acceptor;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.privileged.routing.DefaultRouterResultsHandler;
 import org.mule.runtime.core.privileged.routing.RouterResultsHandler;
@@ -102,7 +103,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
       final Builder builder = builder(originalEvent);
 
-      propagateFlowVars(lastResult, builder);
       if (counterVariableName != null) {
         builder.addVariable(counterVariableName, correlationSequence);
       }
@@ -113,10 +113,11 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
       initEventBuilder(nextValue, originalEvent, builder, resolvePropagatedFlowVars(lastResult));
 
       try {
-        // TODO MULE-13052 Migrate Splitter and Foreach implementation to non-blocking
+        // TODO MULE-13052 Migrate Splitter implementation to non-blocking
         CoreEvent resultEvent = processToApplyWithChildContext(builder.build(), applyNext());
         if (resultEvent != null) {
-          resultEvents.add(builder(originalEvent.getContext(), resultEvent).build());
+          resultEvents.add(PrivilegedEvent.builder(originalEvent.getContext(), resultEvent)
+              .session(((PrivilegedEvent) originalEvent).getSession()).build());
           lastResult = resultEvent;
         }
       } catch (MessagingException e) {
@@ -137,10 +138,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
   protected Map<String, ?> resolvePropagatedFlowVars(CoreEvent lastResult) {
     return emptyMap();
-  }
-
-  protected void propagateFlowVars(CoreEvent previousResult, final Builder builder) {
-    // Nothing to do
   }
 
   private void initEventBuilder(Object sequenceValue, CoreEvent originalEvent, Builder builder,
