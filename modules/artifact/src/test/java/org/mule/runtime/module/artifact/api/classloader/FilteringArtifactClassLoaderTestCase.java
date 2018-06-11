@@ -138,7 +138,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getPackageExported() throws ClassNotFoundException, IOException {
+  public void getExportedPackage() throws ClassNotFoundException, IOException {
     TestClassLoader classLoader = new TestClassLoader(null);
     classLoader.addClass(CLASS_NAME, this.getClass());
 
@@ -151,20 +151,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getPackageNoExported() throws ClassNotFoundException, IOException {
-    TestClassLoader classLoader = new TestClassLoader(null);
-    classLoader.addClass(CLASS_NAME, this.getClass());
-
-    when(filter.exportsPackage(CLASS_PACKAGE_NAME)).thenReturn(false);
-    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
-
-    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
-    Package aPackage = filteringArtifactClassLoader.getPackage(CLASS_PACKAGE_NAME);
-    assertThat(aPackage, is(nullValue()));
-  }
-
-  @Test
-  public void getPackagesExported() throws ClassNotFoundException, IOException {
+  public void getExportedPackages() throws ClassNotFoundException, IOException {
     TestClassLoader classLoader = new TestClassLoader(null);
     classLoader.addClass(CLASS_NAME, this.getClass());
     classLoader.addClass(ANOTHER_CLASS_NAME, this.getClass());
@@ -177,10 +164,12 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     Package[] packageList = filteringArtifactClassLoader.getPackages();
     assertThat(packageList.length, is(1));
     assertThat(packageList[0].getName(), equalTo(CLASS_PACKAGE_NAME));
+
+    assertThat(filteringArtifactClassLoader.getPackage(ANOTHER_CLASS_PACKAGE_NAME), is(nullValue()));
   }
 
   @Test
-  public void getPackagesNoExported() throws ClassNotFoundException, IOException {
+  public void getNoExportedPackages() throws ClassNotFoundException, IOException {
     TestClassLoader classLoader = new TestClassLoader(null);
     classLoader.addClass(CLASS_NAME, this.getClass());
 
