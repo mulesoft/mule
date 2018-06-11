@@ -87,7 +87,7 @@ public final class TestArtifactClassLoaderFilter implements ArtifactClassLoaderF
 
   @Override
   public boolean exportsPackage(String name) {
-    return getExportedResources().contains(name);
+    return getExportedClassPackages().contains(name);
   }
 
   @Override
