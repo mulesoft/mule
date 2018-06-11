@@ -12,6 +12,7 @@ import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.System.identityHashCode;
+import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
@@ -173,6 +174,17 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   @Override
   public Class<?> findLocalClass(String name) throws ClassNotFoundException {
     return artifactClassLoader.findLocalClass(name);
+  }
+
+  @Override
+  protected Package getPackage(String name) {
+    return filter.exportsPackage(name) ? super.getPackage(name) : null;
+  }
+
+  @Override
+  protected Package[] getPackages() {
+    Package[] packagesList = super.getPackages();
+    return stream(packagesList).filter(aPackage -> filter.exportsPackage(aPackage.getName())).toArray(Package[]::new);
   }
 
   @Override
