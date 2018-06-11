@@ -51,7 +51,7 @@ final class ResultToMessageIterator implements Iterator<Message> {
       return (Message) value;
     }
 
-    return toMessage((Result) delegate.next(), cursorProviderFactory, event);
+    return toMessage((Result) value, cursorProviderFactory, event);
   }
 
   @Override
