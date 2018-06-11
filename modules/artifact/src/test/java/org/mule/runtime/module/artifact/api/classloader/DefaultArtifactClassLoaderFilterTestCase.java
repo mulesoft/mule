@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static com.google.common.collect.ImmutableSet.of;
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
@@ -72,6 +73,13 @@ public class DefaultArtifactClassLoaderFilterTestCase extends AbstractMuleTestCa
   @Test
   public void validatesEmptyResourceName() throws Exception {
     assertThat(filter.exportsResource(""), equalTo(false));
+  }
+
+  @Test
+  public void validatesEmptyPackageName() throws Exception {
+    ArtifactClassLoaderFilter filter =
+        new DefaultArtifactClassLoaderFilter(of("java.lang", ""), singleton("META-INF/schema.xsd"));
+    assertThat(filter.exportsPackage(""), is(true));
   }
 
   @Test

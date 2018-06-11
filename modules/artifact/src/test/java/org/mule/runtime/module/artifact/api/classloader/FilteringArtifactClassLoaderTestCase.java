@@ -165,7 +165,10 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     assertThat(packageList.length, is(1));
     assertThat(packageList[0].getName(), equalTo(CLASS_PACKAGE_NAME));
 
+    // No exported package should return null
     assertThat(filteringArtifactClassLoader.getPackage(ANOTHER_CLASS_PACKAGE_NAME), is(nullValue()));
+    // Default package should return null
+    assertThat(filteringArtifactClassLoader.getPackage(""), is(nullValue()));
   }
 
   @Test
