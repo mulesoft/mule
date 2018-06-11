@@ -15,6 +15,8 @@ import org.mule.api.annotation.NoImplement;
 @NoImplement
 public interface ClassLoaderFilter {
 
+  String OBJECT_SIMPLE_NAME = Object.class.getSimpleName();
+
   /**
    * Determines if a given name must be accepted or filtered.
    *
@@ -22,6 +24,16 @@ public interface ClassLoaderFilter {
    * @return true if the class is exported, false otherwise
    */
   boolean exportsClass(String name);
+
+  /**
+   * Determines if a given package is exported.
+   *
+   * @param name package name to check. Non empty.
+   * @return true if the package is exported, false otherwise
+   */
+  default boolean exportsPackage(String name) {
+    return exportsClass(name + OBJECT_SIMPLE_NAME);
+  }
 
   /**
    * Determines if a given resource must be accepted or filtered.

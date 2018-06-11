@@ -12,6 +12,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -46,6 +47,9 @@ import org.junit.runners.Parameterized.Parameters;
 public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
   private static final String CLASS_NAME = "java.lang.Object";
+  private static final String CLASS_PACKAGE_NAME = "java.lang";
+  private static final String ANOTHER_CLASS_NAME = "java.util.Collection";
+  private static final String ANOTHER_CLASS_PACKAGE_NAME = "java.util";
   public static final String RESOURCE_NAME = "dummy.txt";
   private static final String SERVICE_INTERFACE_NAME = "org.foo.Service";
   private static final String SERVICE_RESOURCE_NAME = "META-INF/services/" + SERVICE_INTERFACE_NAME;
@@ -131,6 +135,50 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
     URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
     assertThat(resource, equalTo(expectedResource));
+  }
+
+  @Test
+  public void getExportedPackage() throws ClassNotFoundException, IOException {
+    TestClassLoader classLoader = new TestClassLoader(null);
+    classLoader.addClass(CLASS_NAME, this.getClass());
+
+    when(filter.exportsPackage(CLASS_PACKAGE_NAME)).thenReturn(true);
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+    Package aPackage = filteringArtifactClassLoader.getPackage(CLASS_PACKAGE_NAME);
+    assertThat(aPackage.getName(), equalTo(CLASS_PACKAGE_NAME));
+  }
+
+  @Test
+  public void getExportedPackages() throws ClassNotFoundException, IOException {
+    TestClassLoader classLoader = new TestClassLoader(null);
+    classLoader.addClass(CLASS_NAME, this.getClass());
+    classLoader.addClass(ANOTHER_CLASS_NAME, this.getClass());
+
+    when(filter.exportsPackage(CLASS_PACKAGE_NAME)).thenReturn(true);
+    when(filter.exportsPackage(ANOTHER_CLASS_PACKAGE_NAME)).thenReturn(false);
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+    Package[] packageList = filteringArtifactClassLoader.getPackages();
+    assertThat(packageList.length, is(1));
+    assertThat(packageList[0].getName(), equalTo(CLASS_PACKAGE_NAME));
+
+    assertThat(filteringArtifactClassLoader.getPackage(ANOTHER_CLASS_PACKAGE_NAME), is(nullValue()));
+  }
+
+  @Test
+  public void getNoExportedPackages() throws ClassNotFoundException, IOException {
+    TestClassLoader classLoader = new TestClassLoader(null);
+    classLoader.addClass(CLASS_NAME, this.getClass());
+
+    when(filter.exportsPackage(CLASS_PACKAGE_NAME)).thenReturn(false);
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+    Package[] packageList = filteringArtifactClassLoader.getPackages();
+    assertThat(packageList.length, is(0));
   }
 
   @Test
