@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.Transformer;
 
 import javax.inject.Inject;
+import java.io.InputStream;
 
 /**
  * {@link ValueResolver} wrapper implementation which wraps another {@link ValueResolver} and ensures that the output is always of
@@ -66,7 +67,7 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
           : typeSafeTransformer.transform(resolvedValue, DataType.fromObject(resolvedValue), DataType.fromType(expectedType));
     };
 
-    if (!valueResolverDelegate.isDynamic()) {
+    if (!valueResolverDelegate.isDynamic() && !InputStream.class.isAssignableFrom(expectedType)) {
       resolver = new CachedResolver(resolver);
     }
   }
