@@ -1,4 +1,37 @@
 {
+  "4.1.3": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter.OBJECT_SIMPLE_NAME",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "ClassLoaderFilter",
+          "fieldName": "OBJECT_SIMPLE_NAME",
+          "elementKind": "field",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method boolean org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter::exportsPackage(java.lang.String)",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "ClassLoaderFilter",
+          "methodName": "exportsPackage",
+          "elementKind": "method",
+          "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter::exportsPackage(java.lang.String)",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "DefaultArtifactClassLoaderFilter",
+          "methodName": "exportsPackage",
+          "elementKind": "method",
+          "justification": "This interface is not meant to be implemented by the user"
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [
