@@ -9,9 +9,8 @@ package org.mule.runtime.module.artifact.api.classloader;
 
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -46,6 +45,11 @@ public class DefaultArtifactClassLoaderFilterTestCase extends AbstractMuleTestCa
   }
 
   @Test
+  public void acceptsExportedPackage() throws Exception {
+    assertThat(filter.exportsPackage("java.lang"), is(true));
+  }
+
+  @Test
   public void filtersNotExportedResource() throws Exception {
     assertThat(filter.exportsResource("/META-INF/readme.txt"), equalTo(false));
   }
@@ -69,4 +73,10 @@ public class DefaultArtifactClassLoaderFilterTestCase extends AbstractMuleTestCa
   public void validatesEmptyResourceName() throws Exception {
     assertThat(filter.exportsResource(""), equalTo(false));
   }
+
+  @Test
+  public void filterDefaultPackage() throws Exception {
+    assertThat(filter.exportsPackage(""), is(false));
+  }
+
 }
