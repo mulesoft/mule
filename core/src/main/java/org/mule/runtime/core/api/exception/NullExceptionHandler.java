@@ -50,7 +50,7 @@ public final class NullExceptionHandler implements FlowExceptionHandler {
     if (me != null) {
       LOGGER.error(me.getDetailedMessage());
     } else {
-      LOGGER.error("'{}: {}' has occurred.", exception.getClass().getName(), exception.getMessage());
+      LOGGER.error("'{}: {}' has occurred.", exception.getClass().getName(), exception.getMessage(), exception);
     }
   }
 }
