@@ -46,7 +46,7 @@
           "description" : "Flag to ignore additional repositories from artifact descriptors, false to merge those with the originally specified remote repositories. Default value is true"
         },
         "offLineMode" : {
-          "description" : "Flag to controls whether the repository system operates in offline mode and avoids/refuses any access to remote repositories"
+          "description" : "Flag to control whether the repository system operates in offline mode and avoids/refuses any access to remote repositories"
         }
       }
     }
