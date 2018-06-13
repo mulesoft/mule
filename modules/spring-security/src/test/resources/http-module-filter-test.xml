@@ -51,6 +51,13 @@
         <logger/>
     </flow>
 
+	<flow name="authorizeAnySpEL">
+		<http:listener config-ref="listenerConfig" path="authorizeany-spel" />
+		<http:basic-security-filter realm="mule-realm" />
+		<mule-ss:authorization-filter requiredAuthorities="#{{'ROLE_ADMIN', 'ROLE_CONTRIBUTOR'}}" />
+		<logger />
+	</flow>
+
     <flow name="authorizeAll">
         <http:listener config-ref="listenerConfig" path="authorizeall"/>
         <http:basic-security-filter realm="mule-realm"/>
