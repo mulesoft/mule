@@ -7,11 +7,14 @@
 
 package org.mule.runtime.core.api.exception;
 
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
+import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.reactivestreams.Publisher;
-
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -22,6 +25,7 @@ import reactor.core.publisher.Mono;
 public final class NullExceptionHandler implements FlowExceptionHandler {
 
   private static final NullExceptionHandler INSTANCE = new NullExceptionHandler();
+  private static final Logger LOGGER = getLogger(NullExceptionHandler.class);
 
   private NullExceptionHandler() {}
 
@@ -31,11 +35,22 @@ public final class NullExceptionHandler implements FlowExceptionHandler {
 
   @Override
   public CoreEvent handleException(Exception exception, CoreEvent event) {
+    logException(exception);
     throw new RuntimeException(exception);
   }
 
   @Override
   public Publisher<CoreEvent> apply(Exception exception) {
+    logException(exception);
     return Mono.error(exception);
+  }
+
+  private void logException(Exception exception) {
+    MuleException me = getRootMuleException(exception);
+    if (me != null) {
+      LOGGER.error(me.getDetailedMessage());
+    } else {
+      LOGGER.error("'{}: {}' has occurred.", exception.getClass().getName(), exception.getMessage());
+    }
   }
 }
