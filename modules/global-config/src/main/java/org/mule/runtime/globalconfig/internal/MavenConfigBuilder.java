@@ -51,6 +51,10 @@ public class MavenConfigBuilder {
           mavenConfig.hasPath("ignoreArtifactDescriptorRepositories")
               ? mavenConfig.getBoolean("ignoreArtifactDescriptorRepositories") : true;
 
+      boolean offLineMode =
+          mavenConfig.hasPath("offLineMode")
+              ? mavenConfig.getBoolean("offLineMode") : false;
+
       File globalSettingsFile = findResource(globalSettingsLocation);
       File userSettingsFile = findResource(userSettingsLocation);
       File settingsSecurityFile = findResource(settingsSecurityLocation);
@@ -67,7 +71,8 @@ public class MavenConfigBuilder {
       MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder =
           MavenConfiguration.newMavenConfigurationBuilder()
               .localMavenRepositoryLocation(repositoryFolder)
-              .ignoreArtifactDescriptorRepositories(ignoreArtifactDescriptorRepositories);
+              .ignoreArtifactDescriptorRepositories(ignoreArtifactDescriptorRepositories)
+              .offlineMode(offLineMode);
       if (globalSettingsFile != null) {
         mavenConfigurationBuilder.globalSettingsLocation(globalSettingsFile);
       }
