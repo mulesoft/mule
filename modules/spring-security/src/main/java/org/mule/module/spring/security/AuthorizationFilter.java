@@ -6,6 +6,13 @@
  */
 package org.mule.module.spring.security;
 
+import static java.text.MessageFormat.format;
+import static java.util.Arrays.asList;
+import static org.mule.config.i18n.CoreMessages.authNoCredentials;
+import static org.mule.module.spring.security.i18n.SpringSecurityMessages.noGrantedAuthority;
+import static org.mule.module.spring.security.i18n.SpringSecurityMessages.springAuthenticationRequired;
+import static org.mule.util.StringUtils.splitAndTrim;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.Authentication;
@@ -16,18 +23,15 @@ import org.mule.api.security.SecurityException;
 import org.mule.api.security.SecurityProviderNotFoundException;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.module.spring.security.i18n.SpringSecurityMessages;
 import org.mule.security.AbstractSecurityFilter;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.util.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
@@ -45,12 +49,12 @@ public class AuthorizationFilter extends AbstractSecurityFilter
         Authentication auth = event.getSession().getSecurityContext().getAuthentication();
         if (auth == null)
         {
-            throw new UnauthorisedException(CoreMessages.authNoCredentials());
+            throw new UnauthorisedException(authNoCredentials());
         }
 
         if (!(auth instanceof SpringAuthenticationAdapter))
         {
-            throw new UnauthorisedException(SpringSecurityMessages.springAuthenticationRequired());
+            throw new UnauthorisedException(springAuthenticationRequired());
         }
 
         SpringAuthenticationAdapter springAuth = (SpringAuthenticationAdapter) auth;
@@ -81,22 +85,31 @@ public class AuthorizationFilter extends AbstractSecurityFilter
 
         if (!authorized)
         {
-            logger.info(MessageFormat.format("Could not find required authorities for {0}. Required authorities: {1}. Authorities found: {2}.", 
+            logger.info(format("Could not find required authorities for {0}. Required authorities: {1}. Authorities found: {2}.", 
                 principalName, Arrays.toString(requiredAuthorities.toArray()), Arrays.toString(authorities)));
-            throw new NotPermittedException(SpringSecurityMessages.noGrantedAuthority(principalName));
+            throw new NotPermittedException(noGrantedAuthority(principalName));
         }
     }
 
-    public String getRequiredAuthorities()
+    public Collection<String> getRequiredAuthorities()
     {
-        return StringUtils.join(this.requiredAuthorities, ", ");
+        return requiredAuthorities;
     }
 
-    public void setRequiredAuthorities(String requiredAuthorities)
+    public void setRequiredAuthorities(Collection<String> requiredAuthorities)
     {
-        if (requiredAuthorities != null)
+        if (requiredAuthorities instanceof Set)
         {
-            this.requiredAuthorities = new LinkedHashSet<>(Arrays.asList(StringUtils.splitAndTrim(requiredAuthorities, ",")));
+            this.requiredAuthorities = new LinkedHashSet<>();
+            for (String item : (Set<String>) requiredAuthorities)
+            {
+                this.requiredAuthorities.addAll(asList(splitAndTrim(item, ",")));
+            }
+        }
+        else
+        {
+            this.requiredAuthorities = requiredAuthorities;
         }
     }
+
 }
