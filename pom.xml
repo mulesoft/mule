@@ -360,12 +360,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
                 <version>${springVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -379,10 +373,6 @@
                     <exclusion>
                         <groupId>org.aopalliance</groupId>
                         <artifactId>com.springsource.org.aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -399,10 +389,7 @@
                         <groupId>org.aopalliance</groupId>
                         <artifactId>com.springsource.org.aopalliance</artifactId>
                     </exclusion>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
+
                 </exclusions>
             </dependency>
             <dependency>
