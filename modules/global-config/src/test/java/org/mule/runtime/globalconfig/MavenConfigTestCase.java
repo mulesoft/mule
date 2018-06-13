@@ -177,6 +177,32 @@ public class MavenConfigTestCase extends AbstractMuleTestCase {
     });
   }
 
+  @Description("Loads the ignoreArtifactDescriptorRepositories flag from system properties")
+  @Test
+  public void loadIgnoreArtifactDescriptorRepositories() throws Exception {
+    Map<String, String> properties = new HashMap<>();
+    properties.put("muleRuntimeConfig.maven.ignoreArtifactDescriptorRepositories", "false");
+
+    testWithSystemProperties(properties, () -> {
+      GlobalConfigLoader.reset();
+      MavenConfiguration mavenConfig = getMavenConfig();
+      assertThat(mavenConfig.getIgnoreArtifactDescriptorRepositories(), is(false));
+    });
+  }
+
+  @Description("Loads the offLineMode flag from system properties")
+  @Test
+  public void loadOffLineMode() throws Exception {
+    Map<String, String> properties = new HashMap<>();
+    properties.put("muleRuntimeConfig.maven.offLineMode", "true");
+
+    testWithSystemProperties(properties, () -> {
+      GlobalConfigLoader.reset();
+      MavenConfiguration mavenConfig = getMavenConfig();
+      assertThat(mavenConfig.getOfflineMode(), is(true));
+    });
+  }
+
   @Description("Loads the configuration from mule-config.json and defines the maven local repository location wrongly")
   @Test
   public void wrongLocalRepositoryLocationConfig() throws Exception {
