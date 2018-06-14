@@ -659,4 +659,19 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="response" type="responseType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                An outbound endpoint
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:complexType name="responseType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 </xsd:schema>
