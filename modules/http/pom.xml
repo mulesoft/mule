@@ -54,19 +54,19 @@
             <artifactId>geronimo-servlet_3.0_spec</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
+            <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>grizzly-framework</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
+            <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>grizzly-http-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
+            <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>connection-pool</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
+            <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>tls-sni</artifactId>
             <version>${grizzlyVersion}</version>
             <scope>test</scope>
@@ -76,7 +76,7 @@
             <artifactId>mail</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
+            <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>grizzly-http-client</artifactId>
             <exclusions>
                 <exclusion>
@@ -86,7 +86,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
+            <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>grizzly-websockets</artifactId>
         </dependency>
         <dependency>
