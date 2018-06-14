@@ -16,8 +16,10 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
@@ -52,11 +54,11 @@ public class WSDLUtils
      *
      * @throws TransformerException If unable to transform a Schema into String.
      */
-    public static List<String> getSchemas(Definition wsdlDefinition) throws TransformerException
+    private static List<String> getSchemas(Definition wsdlDefinition, Set<Import> resolved) throws TransformerException
     {
         Map<String, String> wsdlNamespaces = wsdlDefinition.getNamespaces();
-        List<String> schemas = new ArrayList<String>();
-        List<Types> typesList = new ArrayList<Types>();
+        List<String> schemas = new ArrayList<>();
+        List<Types> typesList = new ArrayList<>();
 
         // Add current types definition if present
         if (wsdlDefinition.getTypes() != null)
@@ -94,11 +96,25 @@ public class WSDLUtils
         {
             for (Import wsdlImport : (List<Import>) wsdlImportList)
             {
-                schemas.addAll(getSchemas(wsdlImport.getDefinition()));
+                if (!resolved.contains(wsdlImport))
+                {
+                    resolved.add(wsdlImport);
+                    schemas.addAll(getSchemas(wsdlImport.getDefinition(), resolved));
+                }
             }
         }
 
         return schemas;
+    }
+
+    /**
+     * Returns all the XML schemas from a WSDL definition.
+     *
+     * @throws TransformerException If unable to transform a Schema into String.
+     */
+    public static List<String> getSchemas(Definition wsdlDefinition) throws TransformerException
+    {
+        return getSchemas(wsdlDefinition, new HashSet<Import>());
     }
 
     /**
