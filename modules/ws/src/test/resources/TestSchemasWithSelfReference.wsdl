@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+    <wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  name="TestService" targetNamespace="http://consumer.ws.module.mule.org/">
+
+    <wsdl:import namespace="http://consumer.ws.module.mule.org/" location="TestSchemasWithSelfReference.wsdl"/>
+
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://consumer.ws.module.mule.org/">
+            <xsd:import schemaLocation="TestSchema.xsd"/>
+        </xsd:schema>
+    </wsdl:types>
+</wsdl:definitions>
