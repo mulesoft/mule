@@ -45,8 +45,10 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -56,7 +58,6 @@ import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
@@ -72,10 +73,8 @@ import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -693,11 +692,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   public void brokenAppArchiveAsArgument() throws Exception {
-    Map<String, Object> startupOptions = new HashMap<>();
-    startupOptions.put("app", brokenAppFileBuilder.getId());
-    StartupContext.get().setStartupOptions(startupOptions);
-
-    doBrokenAppArchiveTest();
+    testWithSystemProperty(DEPLOYMENT_APPLICATION_PROPERTY, brokenAppFileBuilder.getId(), () -> doBrokenAppArchiveTest());
   }
 
   @Test
@@ -754,24 +749,22 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedAppFromBuilder(app2, "2.jar");
     addPackedAppFromBuilder(app3, "3.jar");
 
-    Map<String, Object> startupOptions = new HashMap<>();
-    startupOptions.put("app", "3:1:2");
-    StartupContext.get().setStartupOptions(startupOptions);
+    testWithSystemProperty(DEPLOYMENT_APPLICATION_PROPERTY, "3:1:2", () -> {
+      startDeployment();
 
-    startDeployment();
+      assertApplicationDeploymentSuccess(applicationDeploymentListener, "1");
+      assertApplicationDeploymentSuccess(applicationDeploymentListener, "2");
+      assertApplicationDeploymentSuccess(applicationDeploymentListener, "3");
+      assertAppsDir(NONE, new String[] {"1", "2", "3"}, true);
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, "1");
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, "2");
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, "3");
-    assertAppsDir(NONE, new String[] {"1", "2", "3"}, true);
-
-    // When apps are passed as -app app1:app2:app3 the startup order matters
-    List<Application> applications = deploymentService.getApplications();
-    assertNotNull(applications);
-    assertEquals(3, applications.size());
-    assertEquals("3", applications.get(0).getArtifactName());
-    assertEquals("1", applications.get(1).getArtifactName());
-    assertEquals("2", applications.get(2).getArtifactName());
+      // When apps are passed as -app app1:app2:app3 the startup order matters
+      List<Application> applications = deploymentService.getApplications();
+      assertNotNull(applications);
+      assertEquals(3, applications.size());
+      assertEquals("3", applications.get(0).getArtifactName());
+      assertEquals("1", applications.get(1).getArtifactName());
+      assertEquals("2", applications.get(2).getArtifactName());
+    });
   }
 
   private ApplicationFileBuilder createEmptyApp() {
@@ -786,43 +779,41 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     addExplodedAppFromBuilder(emptyAppFileBuilder, "2");
     addExplodedAppFromBuilder(emptyAppFileBuilder, "3");
 
-    Map<String, Object> startupOptions = new HashMap<>();
-    startupOptions.put("app", "3:1:2");
-    StartupContext.get().setStartupOptions(startupOptions);
+    testWithSystemProperty(DEPLOYMENT_APPLICATION_PROPERTY, "3:1:2", () -> {
+      startDeployment();
 
-    startDeployment();
+      assertApplicationDeploymentSuccess(applicationDeploymentListener, "1");
+      assertApplicationDeploymentSuccess(applicationDeploymentListener, "2");
+      assertApplicationDeploymentSuccess(applicationDeploymentListener, "3");
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, "1");
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, "2");
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, "3");
+      assertAppsDir(NONE, new String[] {"1", "2", "3"}, true);
 
-    assertAppsDir(NONE, new String[] {"1", "2", "3"}, true);
-
-    // When apps are passed as -app app1:app2:app3 the startup order matters
-    List<Application> applications = deploymentService.getApplications();
-    assertNotNull(applications);
-    assertEquals(3, applications.size());
-    assertEquals("3", applications.get(0).getArtifactName());
-    assertEquals("1", applications.get(1).getArtifactName());
-    assertEquals("2", applications.get(2).getArtifactName());
+      // When apps are passed as -app app1:app2:app3 the startup order matters
+      List<Application> applications = deploymentService.getApplications();
+      assertNotNull(applications);
+      assertEquals(3, applications.size());
+      assertEquals("3", applications.get(0).getArtifactName());
+      assertEquals("1", applications.get(1).getArtifactName());
+      assertEquals("2", applications.get(2).getArtifactName());
+    });
   }
 
   @Test
   public void deploysAppJustOnce() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
-    Map<String, Object> startupOptions = new HashMap<>();
     String appName = "empty-app-1.0.0-mule-application";
-    startupOptions.put("app", format("%s:%s:%s", appName, appName, appName));
-    StartupContext.get().setStartupOptions(startupOptions);
+    String apps = format("%s:%s:%s", appName, appName, appName);
 
-    startDeployment();
+    testWithSystemProperty(DEPLOYMENT_APPLICATION_PROPERTY, apps, () -> {
+      startDeployment();
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
+      assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+      assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
 
-    List<Application> applications = deploymentService.getApplications();
-    assertEquals(1, applications.size());
+      List<Application> applications = deploymentService.getApplications();
+      assertEquals(1, applications.size());
+    });
   }
 
   @Test

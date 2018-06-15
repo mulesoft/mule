@@ -6,13 +6,18 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
-
+import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
+import static org.mule.runtime.module.launcher.MuleContainer.APP_COMMAND_LINE_OPTION;
+import static org.mule.runtime.module.launcher.MuleContainer.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
@@ -25,21 +30,29 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 
 @SmallTest
 public class MuleContainerTestCase extends AbstractMuleTestCase {
 
+  private static final String APP_NAME = "testApp";
   // Required to run the test, otherwise we need to configure a fake mule
   // folder with a conf/log4j2.xml
   @Rule
   public SystemProperty simpleLog = new SystemProperty(MuleProperties.MULE_SIMPLE_LOG, "true");
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   private MuleContainer container;
 
@@ -54,13 +67,24 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
   private final ExtensionModelLoaderManager extensionModelLoaderManager = mock(ExtensionModelLoaderManager.class);
 
   private ToolingService toolingService = mock(ToolingService.class);
+  private Map<String, Object> commandLineOptions = new HashMap<>();
 
   @Before
   public void setUp() throws Exception {
     coreExtensionManager = mock(MuleCoreExtensionManagerServer.class);
-    container = new MuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
-                                  extensionModelLoaderManager);
+    container = createMuleContainer();
     FileUtils.deleteDirectory(getExecutionFolder());
+  }
+
+  private MuleContainer createMuleContainer() {
+    return new MuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
+                             extensionModelLoaderManager) {
+
+      @Override
+      Map<String, Object> getCommandLineOptions(String[] args) {
+        return commandLineOptions;
+      }
+    };
   }
 
   @Test
@@ -156,5 +180,32 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
     InOrder inOrder = inOrder(serviceManager, deploymentService);
     inOrder.verify(deploymentService).stop();
     inOrder.verify(serviceManager).stop();
+  }
+
+  @Test
+  public void setsMuleDeployApplicationsPropertyWhenAppOptionIsUsed() throws Exception {
+    try {
+      commandLineOptions.put(APP_COMMAND_LINE_OPTION, APP_NAME);
+      container = createMuleContainer();
+
+      container.start(false);
+
+      assertThat(System.getProperty(DEPLOYMENT_APPLICATION_PROPERTY), equalTo(APP_NAME));
+    } finally {
+      if (System.getProperty(DEPLOYMENT_APPLICATION_PROPERTY) != null) {
+        System.clearProperty(DEPLOYMENT_APPLICATION_PROPERTY);
+      }
+    }
+  }
+
+  @Test
+  public void failsToStartWhenMuleDeployApplicationsPropertyAndAppOptionAreUsed() throws Exception {
+    testWithSystemProperty(DEPLOYMENT_APPLICATION_PROPERTY, APP_NAME, () -> {
+      commandLineOptions.put(APP_COMMAND_LINE_OPTION, APP_NAME);
+
+      expectedException.expect(IllegalArgumentException.class);
+      expectedException.expectMessage(INVALID_DEPLOY_APP_CONFIGURATION_ERROR);
+      createMuleContainer();
+    });
   }
 }

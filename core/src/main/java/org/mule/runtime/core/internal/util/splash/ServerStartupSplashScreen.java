@@ -57,11 +57,6 @@ public class ServerStartupSplashScreen extends SplashScreen {
       // ignore
     }
 
-    // Dev/Production mode
-    // TODO for now now used, potentially a 'production' mode can disable direcotry (non-api) hot-deployment for tight app control
-    // final boolean productionMode = StartupContext.get().getStartupOptions().containsKey("production");
-    // header.add("Mode: " + (productionMode ? "Production" : "Development"));
-
     header.add(" ");
   }
 
