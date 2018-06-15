@@ -7,12 +7,14 @@
 package org.mule.runtime.module.launcher;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
+import static java.lang.String.format;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
+import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -21,7 +23,6 @@ import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.SystemUtils;
-import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
@@ -64,6 +65,10 @@ public class MuleContainer {
    * logger used by this class
    */
   private static final Logger logger;
+
+  static final String APP_COMMAND_LINE_OPTION = "app";
+  static final String INVALID_DEPLOY_APP_CONFIGURATION_ERROR =
+      format("Cannot set both '%s' option and '%s' property", APP_COMMAND_LINE_OPTION, DEPLOYMENT_APPLICATION_PROPERTY);
 
   /**
    * A properties file to be read at startup. This can be useful for setting properties which depend on the run-time environment
@@ -162,13 +167,7 @@ public class MuleContainer {
 
   protected void init(String[] args) throws IllegalArgumentException {
     // TODO(pablo.kraan): move initialization of others classes outside this method
-    Map<String, Object> commandlineOptions;
-
-    try {
-      commandlineOptions = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
-    } catch (MuleException me) {
-      throw new IllegalArgumentException(me.toString());
-    }
+    Map<String, Object> commandlineOptions = getCommandLineOptions(args);
 
     // set our own UrlStreamHandlerFactory to become more independent of system
     // properties
@@ -180,16 +179,41 @@ public class MuleContainer {
     if (propertiesFile != null) {
       setStartupPropertiesFile(propertiesFile);
     }
-    StartupContext.get().setStartupOptions(commandlineOptions);
+
+    String appOption = (String) commandlineOptions.get(APP_COMMAND_LINE_OPTION);
+    if (appOption != null) {
+      if (System.getProperty(DEPLOYMENT_APPLICATION_PROPERTY) != null) {
+        throw new IllegalArgumentException(INVALID_DEPLOY_APP_CONFIGURATION_ERROR);
+      }
+      System.setProperty(DEPLOYMENT_APPLICATION_PROPERTY, appOption);
+    }
+  }
+
+  /**
+   * Allows subclasses to obtain command line options differently.
+   * <p/>
+   * Useful for testing purposes
+   *
+   * @param args arguments received from command line
+   * @return map containing each configuration option name and value
+   */
+  Map<String, Object> getCommandLineOptions(String[] args) {
+    Map<String, Object> commandlineOptions;
+    try {
+      commandlineOptions = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
+    } catch (MuleException me) {
+      throw new IllegalArgumentException(me.toString());
+    }
+    return commandlineOptions;
   }
 
   private void createExecutionMuleFolder() {
     File executionFolder = MuleFoldersUtil.getExecutionFolder();
     if (!executionFolder.exists()) {
       if (!executionFolder.mkdirs()) {
-        throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format(
-                                                                                      "Could not create folder %s, validate that the process has permissions over that directory",
-                                                                                      executionFolder.getAbsolutePath())));
+        throw new MuleRuntimeException(CoreMessages.createStaticMessage(format(
+                                                                               "Could not create folder %s, validate that the process has permissions over that directory",
+                                                                               executionFolder.getAbsolutePath())));
       }
     }
   }

@@ -19,12 +19,12 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
+import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -126,10 +126,7 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   private boolean isDeployingSelectedAppsInOrder() {
-    final Map<String, Object> options = StartupContext.get().getStartupOptions();
-    String appString = (String) options.get("app");
-
-    return !isEmpty(appString);
+    return !isEmpty(System.getProperty(DEPLOYMENT_APPLICATION_PROPERTY));
   }
 
   @Override

@@ -8,10 +8,10 @@ package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
 import static java.util.Arrays.sort;
+import static java.util.Optional.empty;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static java.util.Optional.empty;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.collections.CollectionUtils.select;
 import static org.apache.commons.collections.CollectionUtils.subtract;
@@ -23,7 +23,6 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -74,6 +73,15 @@ public class DeploymentDirectoryWatcher implements Runnable {
       new AndFileFilter(new SuffixFileFilter(JAR_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
   public static final IOFileFilter ZIP_ARTIFACT_FILTER =
       new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
+
+  /**
+   * Property used to change the deployment mode to deploy only the indicated applications with no redeployment.
+   * mule -M-Dmule.deploy.applications=app1:app2:app3
+   * This can also be done passing an additional command line option (deprecated) like:
+   *  mule -app app1:app2:app3 will restrict deployment only to those specified apps.
+   */
+  public static final String DEPLOYMENT_APPLICATION_PROPERTY = "mule.deploy.applications";
+
   protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
@@ -136,9 +144,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     deploymentLock.lock();
     deleteAllAnchors();
 
-    // mule -app app1:app2:app3 will restrict deployment only to those specified apps
-    final Map<String, Object> options = StartupContext.get().getStartupOptions();
-    String appString = (String) options.get("app");
+    String appString = System.getProperty(DEPLOYMENT_APPLICATION_PROPERTY);
 
     try {
       if (appString == null) {
