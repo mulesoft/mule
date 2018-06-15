@@ -87,11 +87,11 @@ public abstract class Controller
 
     protected int runSync(String command, String... args)
     {
-        Map<Object, Object> newEnv = copyEnvironmentVariables();
+        Map<String, String> newEnv = copyEnvironmentVariables();
         return executeSyncCommand(command, args, newEnv, timeout);
     }
 
-    private int executeSyncCommand(String command, String[] args, Map<Object, Object> newEnv, int timeout)
+    private int executeSyncCommand(String command, String[] args, Map<String, String> newEnv, int timeout)
             throws MuleControllerException
     {
         CommandLine commandLine = new CommandLine(muleBin);
@@ -104,7 +104,7 @@ public abstract class Controller
         return doExecution(executor, commandLine, newEnv);
     }
 
-    protected int doExecution(DefaultExecutor executor, CommandLine commandLine, Map<Object, Object> env)
+    protected int doExecution(DefaultExecutor executor, CommandLine commandLine, Map<String, String> env)
     {
         try
         {
@@ -121,10 +121,10 @@ public abstract class Controller
         }
     }
 
-    protected Map<Object, Object> copyEnvironmentVariables()
+    protected Map<String, String> copyEnvironmentVariables()
     {
         Map<String, String> env = System.getenv();
-        Map<Object, Object> newEnv = new HashMap<Object, Object>();
+        Map<String, String> newEnv = new HashMap<String, String>();
         for (Map.Entry<String, String> it : env.entrySet())
         {
             newEnv.put(it.getKey(), it.getValue());

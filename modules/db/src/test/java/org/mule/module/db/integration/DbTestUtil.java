@@ -28,7 +28,7 @@ public class DbTestUtil
         QueryRunner qr = new QueryRunner(dataSource);
 
         @SuppressWarnings({"unchecked"})
-        List<Map<String, T>> result = (List<Map<String, T>>) qr.query(query, new MapListHandler());
+        List<Map<String, T>> result = (List<Map<String, T>>) (T) qr.query(query, new MapListHandler());
 
         return result;
     }

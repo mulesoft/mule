@@ -36,7 +36,7 @@ public class UnixController extends Controller
     @Override
     public int getProcessId()
     {
-        Map<Object, Object> newEnv = this.copyEnvironmentVariables();
+        Map<String, String> newEnv = this.copyEnvironmentVariables();
         DefaultExecutor executor = new DefaultExecutor();
         ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
         executor.setWatchdog(watchdog);
