@@ -18,6 +18,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.execution.AsyncResponseFlowProcessingPhaseTemplate;
 import org.mule.execution.ResponseCompletionCallback;
 import org.mule.execution.ThrottlingPhaseTemplate;
+import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
@@ -92,6 +93,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
         final org.mule.module.http.internal.domain.response.HttpResponseBuilder errorResponseBuilder = new org.mule.module.http.internal.domain.response.HttpResponseBuilder();
         final HttpResponse errorResponse = errorResponseBuilder.setStatusCode(INTERNAL_SERVER_ERROR.getStatusCode())
                                                                .setReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
+                                                               .setEntity(new EmptyHttpEntity())
                                                                .build();
         return errorResponse;
     }

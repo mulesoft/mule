@@ -62,7 +62,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor
             {
                 fallbackWarning.warn(processor.getClass());
                 // Make event synchronous so that non-blocking is not used
-                event = new DefaultMuleEvent(event, event.getFlowConstruct(), event.getReplyToHandler(), event.getReplyToDestination(), true);
+                event = new DefaultMuleEvent(event, event.getFlowConstruct(), null, null, true);
                 // Update RequestContext ThreadLocal for backwards compatibility
                 OptimizedRequestContext.unsafeSetEvent(event);
             }

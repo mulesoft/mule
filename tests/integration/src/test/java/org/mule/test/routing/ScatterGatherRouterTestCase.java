@@ -15,9 +15,12 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -36,6 +39,7 @@ import org.mule.routing.AggregationStrategy;
 import org.mule.routing.CompositeRoutingException;
 import org.mule.tck.functional.FlowAssert;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
@@ -44,7 +48,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.client.fluent.Response;
 import org.hamcrest.Matchers;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class ScatterGatherRouterTestCase extends FunctionalTestCase
@@ -296,6 +305,29 @@ public class ScatterGatherRouterTestCase extends FunctionalTestCase
         assertThat(((DefaultMessageCollection) response).getMessage(2).getDataType().getMimeType(), is("*/*"));
     }
 
+    @Rule
+    public DynamicPort httpPort = new DynamicPort("http.port");
+
+    @Test
+    public void nonBlockingFallbackToBlocking() throws Exception
+    {
+        final Response response = Request.Get("http://localhost:" + httpPort.getNumber() + "/ok").execute();
+        HttpResponse httpResponse = response.returnResponse();
+        
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), not(isEmptyOrNullString()));
+    }
+    
+    @Test
+    public void nonBlockingFallbackToBlockingError() throws Exception
+    {
+        final Response response = Request.Get("http://localhost:" + httpPort.getNumber() + "/error").execute();
+        HttpResponse httpResponse = response.returnResponse();
+        
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("error"));
+    }
+    
     public static class TestAggregationStrategy implements AggregationStrategy
     {
 

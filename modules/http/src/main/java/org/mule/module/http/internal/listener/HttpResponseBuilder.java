@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.listener;
 
+import static org.mule.api.transformer.DataType.BYTE_ARRAY_DATA_TYPE;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.NO_CONTENT;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_PREFIX;
 import static org.mule.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
@@ -208,7 +209,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                     {
                         try
                         {
-                            ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
+                        ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayload(BYTE_ARRAY_DATA_TYPE));
                             setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
                             httpEntity = byteArrayHttpEntity;
                         }
@@ -222,7 +223,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
                 {
                     try
                     {
-                        ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayloadAsBytes());
+                        ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessage().getPayload(BYTE_ARRAY_DATA_TYPE));
                         resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding(event), byteArrayHttpEntity);
                         httpEntity = byteArrayHttpEntity;
                     }
