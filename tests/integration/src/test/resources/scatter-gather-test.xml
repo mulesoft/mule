@@ -3,12 +3,14 @@
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <spring:bean id="testMergeStrategy"
@@ -333,4 +335,27 @@
         <set-session-variable variableName="session" value="sessionvar"/>
     </sub-flow>
 
+    <http:listener-config name="httpListener" host="0.0.0.0" port="${http.port}"/>
+
+    <flow name="nonBlockingFallbackToBlocking" processingStrategy="non-blocking">
+        <http:listener config-ref="httpListener" path="/ok"/>
+        <scatter-gather doc:name="Scatter-Gather">
+            <logger message="Scatter-Gather Branch 1" level="INFO"/>
+            <logger message="Scatter-Gather Branch 2" level="INFO"/>
+        </scatter-gather>
+    </flow>
+
+    <flow name="nonBlockingFallbackToBlockingError" processingStrategy="non-blocking">
+        <http:listener config-ref="httpListener" path="/error"/>
+        <scatter-gather doc:name="Scatter-Gather">
+            <logger message="Scatter-Gather Branch 1" level="INFO"/>
+            <logger message="Scatter-Gather Branch 2" level="INFO"/>
+        </scatter-gather>
+        <set-payload value="success so far"/>
+        <test:component throwException="true"/>
+        <catch-exception-strategy logException="true">
+            <set-payload value="error"/>
+            <logger message="Exception Caught! " level="WARN"/>
+        </catch-exception-strategy>
+    </flow>
 </mule>
