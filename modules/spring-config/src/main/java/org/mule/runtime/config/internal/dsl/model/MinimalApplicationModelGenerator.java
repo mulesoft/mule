@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP_LEVEL;
 import org.mule.runtime.api.component.location.Location;
@@ -89,10 +90,11 @@ public class MinimalApplicationModelGenerator {
     final Set<DependencyNode> componentDependencies = dependencyResolver.resolveComponentDependencies(requestedComponentModel);
     final Set<DependencyNode> alwaysEnabledComponents = dependencyResolver.resolveAlwaysEnabledComponents();
     final ImmutableSet.Builder<DependencyNode> otherRequiredGlobalComponentsSetBuilder =
-        ImmutableSet.<DependencyNode>builder().addAll(componentDependencies).addAll(alwaysEnabledComponents);
+        ImmutableSet.<DependencyNode>builder().addAll(componentDependencies)
+            .addAll(alwaysEnabledComponents.stream().filter(dependencyNode -> dependencyNode.isTopLevel()).collect(toList()));
     if (requestComponentModelName != null
         && dependencyResolver.getApplicationModel().findTopLevelNamedComponent(requestComponentModelName).isPresent()) {
-      otherRequiredGlobalComponentsSetBuilder.add(new DependencyNode(requestComponentModelName, TOP_LEVEL));
+      otherRequiredGlobalComponentsSetBuilder.add(new DependencyNode(requestComponentModelName, null, TOP_LEVEL));
     }
     Set<DependencyNode> allRequiredComponentModels = resolveDependencies(otherRequiredGlobalComponentsSetBuilder.build());
     enableTopLevelElementDependencies(allRequiredComponentModels);
@@ -103,6 +105,16 @@ public class MinimalApplicationModelGenerator {
       parentModel.setEnabled(true);
       parentModel = parentModel.getParent();
     }
+
+    alwaysEnabledComponents.stream()
+        .filter(dependencyNode -> dependencyNode.isUnnamedTopLevel() && dependencyNode.getComponentIdentifier().isPresent())
+        .forEach(dependencyNode -> dependencyResolver.getApplicationModel()
+            .findComponentDefinitionModel(dependencyNode.getComponentIdentifier().get())
+            .ifPresent(componentModel -> {
+              componentModel.setEnabled(true);
+              componentModel.executedOnEveryInnerComponent(innerComponent -> innerComponent.setEnabled(true));
+            }));
+
 
     // Finally we set the requested componentModel as enabled as it could have been disabled when traversing dependencies
     requestedComponentModel.setEnabled(true);

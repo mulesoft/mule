@@ -41,7 +41,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -89,6 +88,20 @@ import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -113,19 +126,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
@@ -488,6 +488,19 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     List<Pair<ComponentModel, Optional<String>>> objectProvidersByName =
         lookObjectProvidersComponentModels(applicationModel);
 
+    Set<String> alwaysEnabledTopLevelComponents = new HashSet<>();
+    Set<ComponentIdentifier> alwaysEnabledUnnamedTopLevelComponents = new HashSet<>();
+    Set<String> alwaysEnabledGeneratedTopLevelComponentsName = new HashSet<>();
+
+    dependencyResolver.resolveAlwaysEnabledComponents()
+        .forEach(dependencyNode -> {
+          if (dependencyNode.isTopLevel()) {
+            alwaysEnabledTopLevelComponents.add(dependencyNode.getComponentName());
+          } else if (dependencyNode.isUnnamedTopLevel() && dependencyNode.getComponentIdentifier().isPresent()) {
+            alwaysEnabledUnnamedTopLevelComponents.add(dependencyNode.getComponentIdentifier().get());
+          }
+        });
+
     List<String> createdComponentModels = new ArrayList<>();
     applicationModel.executeOnEveryMuleComponentTree(cm -> {
       SpringComponentModel componentModel = (SpringComponentModel) cm;
@@ -502,7 +515,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
             ? (SpringComponentModel) componentModel.getParent()
             : (SpringComponentModel) applicationModel.getRootComponentModel();
 
-        if (componentModel.isEnabled()) {
+        if (componentModel.isEnabled() || alwaysEnabledUnnamedTopLevelComponents.contains(componentModel.getIdentifier())) {
           if (componentModel.getNameAttribute() != null && componentModel.isRoot()) {
             createdComponentModels.add(componentModel.getNameAttribute());
           }
@@ -519,6 +532,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                  // This may be a configuration that does not requires a name.
                                                  nameAttribute = uniqueValue(resolvedSpringComponentModel.getBeanDefinition()
                                                      .getBeanClassName());
+
+                                                 if (alwaysEnabledUnnamedTopLevelComponents
+                                                     .contains(resolvedSpringComponentModel.getIdentifier())) {
+                                                   alwaysEnabledGeneratedTopLevelComponentsName.add(nameAttribute);
+                                                   createdComponentModels.add(nameAttribute);
+                                                 }
                                                }
                                                registry.registerBeanDefinition(nameAttribute,
                                                                                resolvedSpringComponentModel.getBeanDefinition());
@@ -539,9 +558,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
             .collect(toList()));
     registerObjectFromObjectProviders(beanFactory);
 
-    Set<String> alwaysEnabledComponents = dependencyResolver.resolveAlwaysEnabledComponents().stream()
-        .map(dependencyNode -> dependencyNode.getComponentName())
-        .collect(toSet());
     Set<String> objectProviderNames = objectProvidersByName.stream().map(Pair::getSecond).filter(Optional::isPresent)
         .map(Optional::get).collect(toSet());
 
@@ -549,10 +565,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     createdComponentModels.sort(Comparator.comparing(beanName -> {
       if (objectProviderNames.contains(beanName)) {
         return 1;
-      } else if (alwaysEnabledComponents.contains(beanName)) {
+      } else if (alwaysEnabledTopLevelComponents.contains(beanName)) {
         return 2;
-      } else {
+      } else if (alwaysEnabledGeneratedTopLevelComponentsName.contains(beanName)) {
         return 3;
+      } else {
+        return 4;
       }
     }));
 

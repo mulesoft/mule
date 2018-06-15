@@ -133,7 +133,7 @@ public class MavenTestUtils {
     try {
       InvocationResult result = invoker.execute(request);
       if (result.getExitCode() != 0) {
-        LOGGER.error(result.getExecutionException().getMessage());
+        LOGGER.error("Error while running Maven invoker", result.getExecutionException());
       }
 
     } catch (MavenInvocationException e) {

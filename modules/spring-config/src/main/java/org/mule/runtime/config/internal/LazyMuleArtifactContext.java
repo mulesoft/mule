@@ -19,6 +19,7 @@ import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SER
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyMetadataService.NON_LAZY_METADATA_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -41,7 +42,9 @@ import org.mule.runtime.core.api.config.MuleDeploymentProperties;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -98,6 +101,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     this.componentLocator = new SpringConfigurationComponentLocator();
 
     this.applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
+
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
     muleContext.getCustomizationService().overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
@@ -208,6 +212,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     checkState(predicateOptional.isPresent() != locationOptional.isPresent(), "predicate or location has to be passed");
 
     List<String> alreadyCreatedApplicationComponents = new ArrayList<>();
+    // SecurityManager has to be unregistered explicitly in order to allow registering providers on each request.
+    if (!trackingPostProcessor.getBeansTracked().isEmpty()) {
+      alreadyCreatedApplicationComponents.add(OBJECT_SECURITY_MANAGER);
+    }
     alreadyCreatedApplicationComponents.addAll(trackingPostProcessor.getBeansTracked());
     reverse(alreadyCreatedApplicationComponents);
 
@@ -229,6 +237,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
       // First unregister any already initialized/started component
       unregisterBeans(alreadyCreatedApplicationComponents);
+      if (alreadyCreatedApplicationComponents.contains(OBJECT_SECURITY_MANAGER)) {
+        try {
+          muleContext.getRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
+        } catch (RegistrationException e) {
+          throw new IllegalStateException("Couldn't create a new instance of Mule security manager", e);
+        }
+      }
       objectProviders.clear();
 
       if (parentComponentModelInitializerAdapter.isPresent()) {
