@@ -15,6 +15,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 
+import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -22,8 +23,9 @@ import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -34,12 +36,13 @@ import java.util.regex.Pattern;
 public final class AttributeEvaluator {
 
   private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = compile("^#\\[(?:(?!#\\[).)*]$", DOTALL);
-  private static final List<Class<?>> BLACK_LIST_TYPES =
-      asList(Object.class, InputStream.class, Iterator.class, Serializable.class);
+  private static final Set<Class<?>> BLACK_LIST_TYPES =
+      new HashSet<>(asList(Object.class, InputStream.class, Iterator.class, Serializable.class));
 
   private String attributeValue;
   private ExtendedExpressionManager expressionManager;
-  private Function<CoreEvent, TypedValue> expressionResolver;
+  private Function<CoreEvent, TypedValue> expressionEventResolver;
+  private Function<BindingContext, TypedValue> expressionContextResolver;
 
   /**
    * Creates a new Attribute Evaluator instance with a given attribute value
@@ -64,18 +67,24 @@ public final class AttributeEvaluator {
 
     switch (resolveAttributeType()) {
       case EXPRESSION:
-        if (!(expectedDataType == null || BLACK_LIST_TYPES.contains(expectedDataType.getType()))) {
-          expressionResolver =
+        if (expectedDataType != null && !BLACK_LIST_TYPES.contains(expectedDataType.getType())) {
+          expressionEventResolver =
               event -> expressionManager.evaluate(this.attributeValue, expectedDataType, NULL_BINDING_CONTEXT, event);
+          expressionContextResolver = context -> expressionManager.evaluate(this.attributeValue, expectedDataType, context);
         } else {
-          expressionResolver = event -> expressionManager.evaluate(this.attributeValue, event);
+          expressionEventResolver = event -> expressionManager.evaluate(this.attributeValue, event);
+          expressionContextResolver = context -> expressionManager.evaluate(this.attributeValue, context);
         }
         break;
       case PARSE_EXPRESSION:
-        expressionResolver = event -> new TypedValue<>(expressionManager.parse(this.attributeValue, event, null), STRING);
+        expressionEventResolver = event -> new TypedValue<>(expressionManager.parse(this.attributeValue, event, null), STRING);
+        expressionContextResolver = context -> {
+          throw new UnsupportedOperationException("Cannot use a PARSE_EXPRESSION attribute type without an event.");
+        };
         break;
       case STATIC_VALUE:
-        expressionResolver = event -> new TypedValue<>(this.attributeValue, this.attributeValue == null ? OBJECT : STRING);
+        expressionEventResolver = event -> new TypedValue<>(this.attributeValue, this.attributeValue == null ? OBJECT : STRING);
+        expressionContextResolver = event -> new TypedValue<>(this.attributeValue, this.attributeValue == null ? OBJECT : STRING);
     }
   }
 
@@ -111,8 +120,12 @@ public final class AttributeEvaluator {
     return remainingString.contains(DEFAULT_EXPRESSION_POSTFIX);
   }
 
+  public <T> TypedValue<T> resolveTypedValue(BindingContext context) {
+    return expressionContextResolver.apply(context);
+  }
+
   public <T> TypedValue<T> resolveTypedValue(CoreEvent event) {
-    return expressionResolver.apply(event);
+    return expressionEventResolver.apply(event);
   }
 
   public <T> T resolveValue(CoreEvent event) {

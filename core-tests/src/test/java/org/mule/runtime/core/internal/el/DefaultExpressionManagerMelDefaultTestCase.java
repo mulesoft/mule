@@ -24,6 +24,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
@@ -48,6 +49,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.ByteArrayInputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import io.qameta.allure.Description;
@@ -62,12 +64,20 @@ public class DefaultExpressionManagerMelDefaultTestCase extends AbstractMuleCont
   private static final String MY_VAR = "myVar";
 
   @Rule
-  public SystemProperty melDefualt = new SystemProperty(MULE_MEL_AS_DEFAULT, TRUE.toString());
+  public SystemProperty melDefault = new SystemProperty(MULE_MEL_AS_DEFAULT, TRUE.toString());
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
   private ExtendedExpressionManager expressionManager;
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    Map<String, Object> objects = new HashMap<>();
+    objects.putAll(super.getStartUpRegistryObjects());
+    objects.put(COMPATIBILITY_PLUGIN_INSTALLED, new Object());
+    return objects;
+  }
 
   @Before
   public void configureExpressionManager() throws MuleException {

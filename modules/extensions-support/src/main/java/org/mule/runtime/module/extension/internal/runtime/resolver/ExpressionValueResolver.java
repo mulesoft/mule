@@ -7,9 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
+import static org.mule.runtime.core.internal.el.DefaultExpressionManager.hasMelExpression;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -37,20 +40,29 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
 
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
+
+  @Inject
+  private Registry registry;
+
   final AttributeEvaluator evaluator;
-  private boolean evaluatorInitialized = false;
+  private volatile boolean evaluatorInitialized = false;
   private final String expression;
-  private BiConsumer<AttributeEvaluator, ExtendedExpressionManager> evaluatorInitialiser =
+  private volatile BiConsumer<AttributeEvaluator, ExtendedExpressionManager> evaluatorInitialiser =
       (evaluator, extendedExpressionManager) -> {
-        synchronized (extendedExpressionManager) {
-          if (!evaluatorInitialized) {
-            evaluator.initialize(extendedExpressionManager);
-            evaluatorInitialiser = (e, c) -> {
-            };
-            evaluatorInitialized = true;
+        if (!evaluatorInitialized) {
+          synchronized (extendedExpressionManager) {
+            if (!evaluatorInitialized) {
+
+              evaluator.initialize(extendedExpressionManager);
+              evaluatorInitialiser = (e, c) -> {
+              };
+              evaluatorInitialized = true;
+            }
           }
         }
       };
+
+  private boolean melAvailable;
 
   ExpressionValueResolver(String expression, DataType expectedDataType) {
     checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
@@ -73,11 +85,12 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
     // TODO (elrodro83) MULE-13627 remove this initialization
     initialiseIfNeeded(extendedExpressionManager);
     initEvaluator();
+    melAvailable = registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent();
   }
 
   @Override
   public T resolve(ValueResolvingContext context) throws MuleException {
-    TypedValue typedValue = evaluator.resolveTypedValue(context.getEvent());
+    TypedValue<T> typedValue = resolveTypedValue(context);
 
     Object value = typedValue.getValue();
 
@@ -86,6 +99,15 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
     }
 
     return (T) value;
+  }
+
+  protected <V> TypedValue<V> resolveTypedValue(ValueResolvingContext context) {
+    if (isMelAvailable() && hasMelExpression(expression)) {
+      // MEL requires an actual event, so in this case we may not optimize by using a precalculated binding context
+      return evaluator.resolveTypedValue(context.getEvent());
+    } else {
+      return evaluator.resolveTypedValue(context.getEvent().asBindingContext());
+    }
   }
 
   void initEvaluator() {
@@ -106,5 +128,9 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
   @Override
   public String getExpression() {
     return expression;
+  }
+
+  public boolean isMelAvailable() {
+    return melAvailable;
   }
 }
