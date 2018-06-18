@@ -6,6 +6,13 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP_LEVEL;
+import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.UNNAMED_TOP_LEVEL;
+import org.mule.runtime.api.component.ComponentIdentifier;
+
+import java.util.Optional;
+
 /**
  * Represents a {@link org.mule.runtime.config.internal.model.ComponentModel} dependency.
  *
@@ -14,10 +21,17 @@ package org.mule.runtime.config.internal.dsl.model;
 public class DependencyNode {
 
   private String componentName;
+  private ComponentIdentifier componentIdentifier;
   private final Type type;
 
   public DependencyNode(String componentName, Type type) {
     this.componentName = componentName;
+    this.type = type;
+  }
+
+  public DependencyNode(String componentName, ComponentIdentifier componentIdentifier, Type type) {
+    this.componentName = componentName;
+    this.componentIdentifier = componentIdentifier;
     this.type = type;
   }
 
@@ -30,11 +44,19 @@ public class DependencyNode {
   }
 
   public boolean isTopLevel() {
-    return Type.TOP_LEVEL.equals(getType());
+    return TOP_LEVEL.equals(getType());
+  }
+
+  public boolean isUnnamedTopLevel() {
+    return UNNAMED_TOP_LEVEL.equals(getType());
+  }
+
+  public Optional<ComponentIdentifier> getComponentIdentifier() {
+    return ofNullable(this.componentIdentifier);
   }
 
   public enum Type {
-    TOP_LEVEL, INNER
+    TOP_LEVEL, INNER, UNNAMED_TOP_LEVEL
   }
 
   @Override
@@ -48,7 +70,10 @@ public class DependencyNode {
 
     DependencyNode that = (DependencyNode) o;
 
-    if (!componentName.equals(that.componentName)) {
+    if (componentName != null ? !componentName.equals(that.componentName) : that.componentName != null) {
+      return false;
+    }
+    if (componentIdentifier != null ? !componentIdentifier.equals(that.componentIdentifier) : that.componentIdentifier != null) {
       return false;
     }
     return type == that.type;
@@ -56,8 +81,18 @@ public class DependencyNode {
 
   @Override
   public int hashCode() {
-    int result = componentName.hashCode();
+    int result = componentName != null ? componentName.hashCode() : 0;
+    result = 31 * result + (componentIdentifier != null ? componentIdentifier.hashCode() : 0);
     result = 31 * result + type.hashCode();
     return result;
+  }
+
+  @Override
+  public String toString() {
+    return "DependencyNode{" +
+        "componentName='" + componentName + '\'' +
+        ", componentIdentifier=" + componentIdentifier +
+        ", type=" + type +
+        '}';
   }
 }
