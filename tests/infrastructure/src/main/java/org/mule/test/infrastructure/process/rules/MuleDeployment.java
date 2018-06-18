@@ -337,9 +337,7 @@ public class MuleDeployment extends MuleInstallation {
         mule.addConfProperty(format("-D%s=%s", MULE_REMOTE_REPOSITORIES_PROPERTY, REMOTE_REPOSITORIES));
       }
       resolvePropertiesUsingLambdas();
-      mule.start(addAll(toArray(parameters), toArray(properties)));
-      domains.forEach((domain) -> checkDomainIsDeployed(getName(domain)));
-      applications.forEach((application) -> checkAppIsDeployed(getName(application)));
+      startMule();
       logger.info("Deployment successful");
     }
   }
@@ -418,11 +416,23 @@ public class MuleDeployment extends MuleInstallation {
     removeShutdownHooks();
   }
 
-  private void stopMule() {
+  public void startMule() {
+    if (!mule.isRunning()) {
+      mule.start(addAll(toArray(parameters), toArray(properties)));
+      domains.forEach((domain) -> checkDomainIsDeployed(getName(domain)));
+      applications.forEach((application) -> checkAppIsDeployed(getName(application)));
+    } else {
+      logger.warn("Mule Server was already running");
+    }
+  }
+
+  public void stopMule() {
     if (mule.isRunning()) {
       logger.info("Stopping Mule Server");
       mule.stop();
       prober.check(isNotRunning(mule));
+    } else {
+      logger.warn("Mule Server was not running");
     }
   }
 
