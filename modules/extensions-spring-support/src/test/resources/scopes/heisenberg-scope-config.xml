@@ -95,8 +95,7 @@
 
     <flow name="getChain">
         <heisenberg:get-chain>
-            <set-variable variableName="newPayload" value="#[payload]"/>
-            <set-variable variableName="newAttributes" value="#[attributes]"/>
+            <heisenberg:validate-money/>
         </heisenberg:get-chain>
     </flow>
 

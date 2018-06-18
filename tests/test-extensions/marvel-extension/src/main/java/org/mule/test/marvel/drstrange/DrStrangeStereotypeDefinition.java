@@ -7,12 +7,9 @@
 
 package org.mule.test.marvel.drstrange;
 
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
-import org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition;
-import org.mule.runtime.extension.api.stereotype.ObjectStoreStereotype;
+import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
 
-public class DrStrangeStereotypeDefinition extends MuleStereotypeDefinition {
+public class DrStrangeStereotypeDefinition implements StereotypeDefinition {
 
   public static final String DR_STRANGE_STEREOTYPE_NAME = "DR_STRANGE_STEREOTYPE";
 

@@ -20,11 +20,13 @@ import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
+import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.marvel.MarvelExtension;
@@ -38,6 +40,7 @@ import org.junit.Test;
 public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   private final ExtensionModel extension = loadExtension(MarvelExtension.class);
+  private final ExtensionModel heisenbergExtension = loadExtension(HeisenbergExtension.class);
   private final ConfigurationModel configuration = extension.getConfigurationModel(DrStrange.CONFIG_NAME).get();
 
   @Test
@@ -95,6 +98,7 @@ public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase
     assertThat(stereotypes.get(0), is(FLOW));
   }
 
+  @Test
   public void configurationWithConfigReferenceParameter() {
     List<ParameterModel> params = configuration.getAllParameterModels();
     assertThat(params, hasSize(3));
@@ -102,6 +106,17 @@ public class StereotypesDeclarationEnricherTestCase extends AbstractMuleTestCase
     List<StereotypeModel> allowedStereotypes = param.getAllowedStereotypes();
     assertThat(allowedStereotypes, hasSize(1));
     assertStereotype(allowedStereotypes.get(0), MARVEL_EXTENSION, CONFIG_NAME, CONFIG);
+  }
+
+  @Test
+  public void allowedStereotypeOnScopeChain() {
+    OperationModel operation = heisenbergExtension.getOperationModel("getChain").get();
+
+    NestedChainModel nestedChain = (NestedChainModel) operation.getNestedComponents().get(0);
+    assertThat(nestedChain.getAllowedStereotypes().size(), is(1));
+
+    StereotypeModel stereotypeModel = nestedChain.getAllowedStereotypes().iterator().next();
+    assertThat(stereotypeModel.toString(), stereotypeModel, is(MuleStereotypes.VALIDATOR));
   }
 
   private void assertStereotype(StereotypeModel stereotypeModel, String ns, String name, StereotypeModel parent) {
