@@ -11,13 +11,14 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
-import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
+import org.mule.runtime.extension.api.stereotype.ValidatorStereotype;
 
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class HeisenbergScopes implements Initialisable {
     return initialiasedCounter;
   }
 
-  public void getChain(Chain chain, CompletionCallback<Chain, Void> cb) {
+  public void getChain(@AllowedStereotypes(ValidatorStereotype.class) Chain chain, CompletionCallback<Chain, Void> cb) {
     cb.success(Result.<Chain, Void>builder().output(chain).build());
   }
 

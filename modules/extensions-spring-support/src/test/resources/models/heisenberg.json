@@ -15509,8 +15509,12 @@
           "isRequired": true,
           "allowedStereotypes": [
             {
+              "type": "VALIDATOR",
+              "namespace": "MULE",
+              "parent": {
               "type": "PROCESSOR",
               "namespace": "MULE"
+            }
             }
           ],
           "name": "chain",
