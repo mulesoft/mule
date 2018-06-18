@@ -68,7 +68,8 @@ public abstract class StereotypeResolver<T extends WithAnnotations> {
                                                          namespace));
       }
 
-      final StereotypeModelBuilder builder = newStereotype(stereotypeDefinition.getName(), namespace);
+      String resolvedNamespace = isBlank(stereotypeDefinition.getNamespace()) ? namespace : stereotypeDefinition.getNamespace();
+      final StereotypeModelBuilder builder = newStereotype(stereotypeDefinition.getName(), resolvedNamespace);
       stereotypeDefinition.getParent().ifPresent(parent -> {
         String parentNamespace = parent.getNamespace();
         if (isBlank(parentNamespace)) {

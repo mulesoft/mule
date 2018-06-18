@@ -1932,7 +1932,7 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="1" maxOccurs="1">
           <xs:choice minOccurs="1" maxOccurs="unbounded">
-            <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+            <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstract-validator"></xs:element>
           </xs:choice>
         </xs:sequence>
         <xs:attribute type="mule:substitutableInt" use="optional" default="0" name="fieldParam"></xs:attribute>

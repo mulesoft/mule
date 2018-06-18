@@ -149,8 +149,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
       if (shouldUpdateExpectedFilesOnError()) {
         updateExpectedJson(json);
       } else {
-        System.out.println("Expected: \n " + expectedJson);
-        System.out.println("\n\nBut Got: \n " + json);
+        System.out.println(json);
 
         throw e;
       }
