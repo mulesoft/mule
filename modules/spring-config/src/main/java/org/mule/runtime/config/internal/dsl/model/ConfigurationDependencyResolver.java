@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
@@ -14,6 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.INNER;
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP_LEVEL;
+import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.UNNAMED_TOP_LEVEL;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
@@ -25,8 +27,6 @@ import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +42,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
   private final ApplicationModel applicationModel;
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
   private List<DependencyNode> missingElementNames = new ArrayList<>();
+  private Set<DependencyNode> alwaysEnabledComponents = newHashSet();
 
   /**
    * Creates a new instance associated to a complete {@link ApplicationModel}.
@@ -55,6 +56,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
                                          ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
     this.applicationModel = applicationModel;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
+    fillAlwaysEnabledComponents();
   }
 
   private Set<DependencyNode> resolveComponentModelDependencies(ComponentModel componentModel) {
@@ -224,19 +226,24 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
    * @return the set of component names that must always be enabled.
    */
   public Set<DependencyNode> resolveAlwaysEnabledComponents() {
-    ImmutableSet.Builder<DependencyNode> namesBuilder = ImmutableSet.builder();
+    return alwaysEnabledComponents;
+  }
+
+  private void fillAlwaysEnabledComponents() {
     this.applicationModel.executeOnEveryRootElement(componentModel -> {
       Optional<ComponentBuildingDefinition<?>> buildingDefinition =
           this.componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
       buildingDefinition.ifPresent(definition -> {
         if (definition.isAlwaysEnabled()) {
           if (componentModel.getNameAttribute() != null) {
-            namesBuilder.add(new DependencyNode(componentModel.getNameAttribute(), TOP_LEVEL));
+            alwaysEnabledComponents
+                .add(new DependencyNode(componentModel.getNameAttribute(), componentModel.getIdentifier(), TOP_LEVEL));
+          } else if (componentModel.isRoot()) {
+            alwaysEnabledComponents.add(new DependencyNode(null, componentModel.getIdentifier(), UNNAMED_TOP_LEVEL));
           }
         }
       });
     });
-    return namesBuilder.build();
   }
 
   public List<DependencyNode> getMissingDependencies() {
