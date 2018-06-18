@@ -94,7 +94,7 @@ public class MinimalApplicationModelGenerator {
             .addAll(alwaysEnabledComponents.stream().filter(dependencyNode -> dependencyNode.isTopLevel()).collect(toList()));
     if (requestComponentModelName != null
         && dependencyResolver.getApplicationModel().findTopLevelNamedComponent(requestComponentModelName).isPresent()) {
-      otherRequiredGlobalComponentsSetBuilder.add(new DependencyNode(requestComponentModelName, null, TOP_LEVEL));
+      otherRequiredGlobalComponentsSetBuilder.add(new DependencyNode(requestComponentModelName, TOP_LEVEL));
     }
     Set<DependencyNode> allRequiredComponentModels = resolveDependencies(otherRequiredGlobalComponentsSetBuilder.build());
     enableTopLevelElementDependencies(allRequiredComponentModels);

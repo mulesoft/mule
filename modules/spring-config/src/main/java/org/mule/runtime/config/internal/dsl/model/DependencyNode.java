@@ -24,6 +24,11 @@ public class DependencyNode {
   private ComponentIdentifier componentIdentifier;
   private final Type type;
 
+  public DependencyNode(String componentName, Type type) {
+    this.componentName = componentName;
+    this.type = type;
+  }
+
   public DependencyNode(String componentName, ComponentIdentifier componentIdentifier, Type type) {
     this.componentName = componentName;
     this.componentIdentifier = componentIdentifier;

@@ -239,6 +239,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       unregisterBeans(alreadyCreatedApplicationComponents);
       if (alreadyCreatedApplicationComponents.contains(OBJECT_SECURITY_MANAGER)) {
         try {
+          // Has to be created before as the factory for SecurityManager (MuleSecurityManagerConfigurator) is expecting to retrieve
+          // it (through MuleContext and registry) while creating it. See org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator.doGetObject
           muleContext.getRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
         } catch (RegistrationException e) {
           throw new IllegalStateException("Couldn't create a new instance of Mule security manager", e);

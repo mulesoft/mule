@@ -104,7 +104,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
     } else if (isAggregatorComponent(requestedComponentModel, "aggregatorName")) {
       // TODO (MULE-14429): use extensionModel to get the dependencies instead of ComponentBuildingDefinition to solve cases like this (flow-ref)
       String name = requestedComponentModel.getParameters().get("aggregatorName");
-      DependencyNode dependency = new DependencyNode(name, null, INNER);
+      DependencyNode dependency = new DependencyNode(name, INNER);
       if (applicationModel.findNamedElement(name).isPresent()) {
         otherDependencies.add(dependency);
       } else {
@@ -138,7 +138,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
   private void appendTopLevelDependency(Set<DependencyNode> otherDependencies, ComponentModel requestedComponentModel,
                                         String parametersReferencingDependency) {
     DependencyNode dependency =
-        new DependencyNode(requestedComponentModel.getParameters().get(parametersReferencingDependency), null, TOP_LEVEL);
+        new DependencyNode(requestedComponentModel.getParameters().get(parametersReferencingDependency), TOP_LEVEL);
     if (applicationModel.findTopLevelNamedComponent(dependency.getComponentName()).isPresent()) {
       otherDependencies.add(dependency);
     } else {
