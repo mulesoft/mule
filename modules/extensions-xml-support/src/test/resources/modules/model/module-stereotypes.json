@@ -333,7 +333,12 @@
                     "query": false,
                     "tabName": "General"
                   },
-                  "allowedStereotypeModels": [],
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "FLOW",
+                      "namespace": "MULE"
+                    }
+                  ],
                   "name": "reference",
                   "displayModel": {},
                   "description": "",
