@@ -19,12 +19,15 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarati
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
@@ -88,6 +91,21 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
             walkDeclaration(modelProperty, declaration.getAllParameters());
           }
         }
+
+        @Override
+        protected void onOperation(OperationDeclaration declaration) {
+          declaration.getModelProperty(OperationComponentModelModelProperty.class)
+              .ifPresent(modelProperty -> {
+                ComponentModel bodyComponentModel = modelProperty.getBodyComponentModel();
+
+                declaration.getAllParameters().stream()
+                    .filter(parameterDeclaration -> parameterDeclaration.getType() instanceof StringType)
+                    .forEach(parameterDeclaration -> traverseProperty(bodyComponentModel.getInnerComponents(),
+                                                                      parameterDeclaration));
+              });
+
+
+        }
       }.walk(extensionDeclaration);
     }
 
@@ -100,24 +118,24 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
     }
 
     /**
-     * Given a {@code propertyDeclaration} it will look up all the usages in the global elements of the smart connector where
+     * Given a {@code parameterDeclaration} it will look up all the usages in the elements of the smart connector where
      * for each occurrence it will extract the stereotypes of the underlying connector's parameter to copy into the current
      * declaration.
      * <br/>
      * If the result of those finding throws repeated stereotypes, then it will reduce that collection by taking the intersection,
      * making its usage within the smart connector compliant.
      *
-     * @param globalElements global elements of the smart connector to read the possible usages of the property.
-     * @param propertyDeclaration property used to look up in the global elements' usages, and the one that will hold the
+     * @param componentModels elements of the smart connector to read the possible usages of the parametrization
+     * @param parameterDeclaration parameter used to look up in the elements' usages, and the one that will hold the
      *                             stereotypes if found.
      */
-    private void traverseProperty(List<ComponentModel> globalElements,
-                                  ParameterDeclaration propertyDeclaration) {
+    private void traverseProperty(List<ComponentModel> componentModels,
+                                  ParameterDeclaration parameterDeclaration) {
       final List<List<StereotypeModel>> allowedStereotypeModels = new ArrayList<>();
-      globalElements.forEach(componentModel -> {
-        allowedStereotypeModels.add(findStereotypes(componentModel, propertyDeclaration));
+      componentModels.forEach(componentModel -> {
+        allowedStereotypeModels.add(findStereotypes(componentModel, parameterDeclaration));
         componentModel.executedOnEveryInnerComponent(innerComponentModel -> allowedStereotypeModels
-            .add(findStereotypes(innerComponentModel, propertyDeclaration)));
+            .add(findStereotypes(innerComponentModel, parameterDeclaration)));
       });
 
       allowedStereotypeModels.stream()
@@ -126,7 +144,7 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
             final List<StereotypeModel> partialIntersection = new ArrayList<>(stereotypeModels);
             partialIntersection.retainAll(stereotypeModels2);
             return partialIntersection;
-          }).ifPresent(propertyDeclaration::setAllowedStereotypeModels);
+          }).ifPresent(parameterDeclaration::setAllowedStereotypeModels);
     }
 
     private List<StereotypeModel> findStereotypes(ComponentModel componentModel, ParameterDeclaration propertyDeclaration) {
@@ -149,15 +167,27 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
 
             final DslSyntaxResolver dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext);
 
-            for (ConfigurationModel configurationModel : extensionModel.getConfigurationModels()) {
-              allowedStereotypes
-                  .addAll(getStereotypeModels(configurationModel, attributeName, dslSyntaxResolver, componentModelIdentifier));
-              for (ConnectionProviderModel connectionProviderModel : configurationModel.getConnectionProviders()) {
+            new IdempotentExtensionWalker() {
+
+              @Override
+              protected void onConfiguration(ConfigurationModel configurationModel) {
+                allowedStereotypes
+                    .addAll(getStereotypeModels(configurationModel, attributeName, dslSyntaxResolver, componentModelIdentifier));
+              }
+
+              @Override
+              protected void onConnectionProvider(ConnectionProviderModel connectionProviderModel) {
                 allowedStereotypes
                     .addAll(getStereotypeModels(connectionProviderModel, attributeName, dslSyntaxResolver,
                                                 componentModelIdentifier));
               }
-            }
+
+              @Override
+              protected void onOperation(OperationModel operationModel) {
+                allowedStereotypes
+                    .addAll(getStereotypeModels(operationModel, attributeName, dslSyntaxResolver, componentModelIdentifier));
+              }
+            }.walk(extensionModel);
           });
       return allowedStereotypes;
     }

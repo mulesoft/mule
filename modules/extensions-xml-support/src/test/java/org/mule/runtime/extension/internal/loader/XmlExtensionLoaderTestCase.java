@@ -48,6 +48,7 @@ import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
+import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
@@ -484,18 +485,27 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(globalElementComponentModelModelProperty.isPresent(), is(true));
     assertThat(globalElementComponentModelModelProperty.get().getGlobalElements().size(), is(3));
 
-    assertThat(configurationModel.getOperationModels().size(), is(1));
-    Optional<OperationModel> operationModel = configurationModel.getOperationModel("do-something");
-    assertThat(operationModel.isPresent(), is(true));
-    assertThat(operationModel.get().getAllParameterModels().size(), is(3));
-    assertThat(operationModel.get().getAllParameterModels().get(0).getName(), is("aData"));
-    assertThat(operationModel.get().getAllParameterModels().get(1).getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(operationModel.get().getAllParameterModels().get(2).getName(), is(TARGET_VALUE_PARAMETER_NAME));
+    assertThat(configurationModel.getOperationModels().size(), is(2));
+    Optional<OperationModel> doSomethingOp = configurationModel.getOperationModel("do-something");
+    assertThat(doSomethingOp.isPresent(), is(true));
+    assertThat(doSomethingOp.get().getAllParameterModels().size(), is(3));
+    assertThat(doSomethingOp.get().getAllParameterModels().get(0).getName(), is("aData"));
+    assertThat(doSomethingOp.get().getAllParameterModels().get(1).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(doSomethingOp.get().getAllParameterModels().get(2).getName(), is(TARGET_VALUE_PARAMETER_NAME));
 
     Optional<OperationComponentModelModelProperty> modelProperty =
-        operationModel.get().getModelProperty(OperationComponentModelModelProperty.class);
+        doSomethingOp.get().getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
     assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(2));
+
+    Optional<OperationModel> callFlowOp = configurationModel.getOperationModel("call-flow");
+    assertThat(callFlowOp.isPresent(), is(true));
+    assertThat(callFlowOp.get().getAllParameterModels().size(), is(3));
+    ParameterModel referenceParameter = callFlowOp.get().getAllParameterModels().get(0);
+    assertParameterWithStereotypes(referenceParameter, "reference", MuleStereotypes.FLOW);
+    assertThat(callFlowOp.get().getAllParameterModels().get(1).getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(callFlowOp.get().getAllParameterModels().get(2).getName(), is(TARGET_VALUE_PARAMETER_NAME));
+
   }
 
   private void assertParameterWithStereotypes(ParameterModel parameterModel, String propertyName,
@@ -555,7 +565,8 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
   private Set<ExtensionModel> getDependencyExtensions() {
     ExtensionModel petstore = loadExtension(PetStoreConnector.class, emptySet());
     ExtensionModel marvel = loadExtension(MarvelExtension.class, emptySet());
-    return ImmutableSet.<ExtensionModel>builder().add(petstore).add(marvel).build();
+    ExtensionModel ce = MuleExtensionModelProvider.getExtensionModel();
+    return ImmutableSet.<ExtensionModel>builder().add(petstore).add(marvel).add(ce).build();
   }
 
   private ExtensionModel loadExtension(Class extension, Set<ExtensionModel> deps) {

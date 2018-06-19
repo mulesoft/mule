@@ -8,9 +8,10 @@ package org.mule.test.functional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import org.mule.runtime.core.api.event.CoreEvent;
+
 import io.qameta.allure.Description;
 import org.junit.Test;
-import org.mule.runtime.core.api.event.CoreEvent;
 
 public class ModuleStereotypesTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
@@ -25,11 +26,18 @@ public class ModuleStereotypesTestCase extends AbstractXmlExtensionMuleArtifactF
   }
 
   @Test
-  @Description("Runtime test to ensure parameterized stereotypes works")
+  @Description("Runtime test to ensure parameterized stereotypes in global element works")
   public void parameterizedStereotypeDoesCorrectBindingAndConnectorWorks() throws Exception {
     final String data = "some parameterized data";
     final CoreEvent muleEvent = flowRunner("testParameterizedStereotypeDoesCorrectBindingAndConnectorWorks")
         .withVariable("aData", data).run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(data));
+  }
+
+  @Test
+  @Description("Runtime test to ensure parameterized stereotypes in operation works")
+  public void testParameterizedStereotypeDoesCorrectBindingAndConnectorWorksForOperation() throws Exception {
+    final CoreEvent muleEvent = flowRunner("testParameterizedStereotypeDoesCorrectBindingAndConnectorWorksForOperation").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("a value"));
   }
 }

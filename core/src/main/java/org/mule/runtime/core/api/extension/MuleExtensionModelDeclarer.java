@@ -269,6 +269,7 @@ class MuleExtensionModelDeclarer {
     flowRef.onDefaultParameterGroup()
         .withRequiredParameter("name")
         .ofType(typeLoader.load(String.class))
+        .withAllowedStereotypes(singletonList(FLOW))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the flow to call");
   }
