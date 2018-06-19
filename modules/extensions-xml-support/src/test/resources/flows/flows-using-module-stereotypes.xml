@@ -36,4 +36,12 @@
     <flow name="testParameterizedStereotypeDoesCorrectBindingAndConnectorWorks">
         <module-stereotypes:do-something config-ref="stereotype-module" aData="#[vars.aData]"/>
     </flow>
+
+    <flow name="testParameterizedStereotypeDoesCorrectBindingAndConnectorWorksForOperation">
+        <module-stereotypes:call-flow config-ref="stereotype-module" reference="simpleFlow"/>
+    </flow>
+
+    <flow name="simpleFlow">
+        <set-payload value="a value" />
+    </flow>
 </mule>

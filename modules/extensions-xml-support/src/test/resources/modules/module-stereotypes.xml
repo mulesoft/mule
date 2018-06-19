@@ -37,4 +37,14 @@
         </body>
         <output type="string"/>
     </operation>
+
+    <operation name="call-flow">
+        <parameters>
+            <parameter name="reference" type="string"/>
+        </parameters>
+        <body>
+            <mule:flow-ref name="#[vars.reference]" />
+        </body>
+        <output type="any"/>
+    </operation>
 </module>

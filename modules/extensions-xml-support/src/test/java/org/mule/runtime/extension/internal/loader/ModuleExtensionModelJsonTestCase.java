@@ -21,6 +21,7 @@ import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtension
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
@@ -154,7 +155,8 @@ public class ModuleExtensionModelJsonTestCase extends AbstractMuleTestCase {
   private static Set<ExtensionModel> getDependencyExtensions() {
     ExtensionModel petstore = loadExtension(PetStoreConnector.class, emptySet());
     ExtensionModel marvel = loadExtension(MarvelExtension.class, emptySet());
-    return ImmutableSet.<ExtensionModel>builder().add(petstore).add(marvel).build();
+    ExtensionModel ce = MuleExtensionModelProvider.getExtensionModel();
+    return ImmutableSet.<ExtensionModel>builder().add(petstore).add(marvel).add(ce).build();
   }
 
   private static ExtensionModel loadExtension(Class extension, Set<ExtensionModel> deps) {
