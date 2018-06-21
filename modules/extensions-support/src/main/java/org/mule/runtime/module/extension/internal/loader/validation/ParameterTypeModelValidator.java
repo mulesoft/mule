@@ -100,8 +100,7 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
         } else {
           parameter.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
             .map(descriptor -> descriptor.getExtensionParameter().getType())
-            .ifPresent(type -> {               ComponentIdFieldTypeAnnotation.java
-
+            .ifPresent(type -> {
               final String typeName = type.getName();
                 type.getFields()
                     .forEach(field -> checkInvalidFieldAnnotations(parameter, typeName, field,
