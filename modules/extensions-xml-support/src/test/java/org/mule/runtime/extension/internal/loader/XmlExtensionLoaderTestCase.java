@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DESCRIPTION;
@@ -505,13 +506,45 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertParameterWithStereotypes(referenceParameter, "reference", MuleStereotypes.FLOW);
     assertThat(callFlowOp.get().getAllParameterModels().get(1).getName(), is(TARGET_PARAMETER_NAME));
     assertThat(callFlowOp.get().getAllParameterModels().get(2).getName(), is(TARGET_VALUE_PARAMETER_NAME));
-
   }
 
   private void assertParameterWithStereotypes(ParameterModel parameterModel, String propertyName,
                                               StereotypeModel... stereotypeModel) {
     assertThat(parameterModel.getName(), is(propertyName));
     assertThat(parameterModel.getAllowedStereotypes(), containsInAnyOrder(stereotypeModel));
+  }
+
+  @Test
+  public void testModuleTestConnection() {
+    String modulePath = "modules/module-test-connection.xml";
+    assertTestConnectionModuleOn(modulePath);
+  }
+
+  @Test
+  public void testModuleTestConnectionMultipleConfigFirst() {
+    String modulePath = "modules/module-test-connection-multiple-configs-first.xml";
+    assertTestConnectionModuleOn(modulePath);
+  }
+
+  @Test
+  public void testModuleTestConnectionMultipleConfigSecond() {
+    String modulePath = "modules/module-test-connection-multiple-configs-second.xml";
+    assertTestConnectionModuleOn(modulePath);
+  }
+
+  private void assertTestConnectionModuleOn(String modulePath) {
+    ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+
+    assertThat(extensionModel.getName(), is("module-test-connection"));
+    assertThat(extensionModel.getConfigurationModels().size(), is(1));
+    ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
+    assertThat(configurationModel.getName(), is(CONFIG_NAME));
+    assertThat(configurationModel.getAllParameterModels().size(), is(3));
+
+    Optional<ConnectionProviderModel> connectionProviderModel =
+        configurationModel.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME);
+    assertThat(connectionProviderModel.isPresent(), is(true));
+    assertThat(connectionProviderModel.get().supportsConnectivityTesting(), is(true));
   }
 
   /**

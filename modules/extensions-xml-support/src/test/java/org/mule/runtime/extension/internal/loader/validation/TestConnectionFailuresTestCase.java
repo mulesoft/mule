@@ -64,14 +64,14 @@ public class TestConnectionFailuresTestCase extends AbstractMuleTestCase {
     setExpectedMessage("first-config-not-defined-to-which-one-do-test-connection",
                        "second-config-not-defined-to-which-one-do-test-connection");
     getExtensionModelFrom("validation/testconnection/module-not-defined-test-connection.xml",
-                          new HashSet<>(Arrays.asList(getHttpExtension())));
+                          new HashSet<>(Arrays.asList(getHttpExtension(true))));
   }
 
   @Test
   public void multipleGlobalElementsWithTestConnectionAndNotEvenOneDefinedHttpAndFile() {
     setExpectedMessage("file-global-element", "http-global-element");
     getExtensionModelFrom("validation/testconnection/module-not-defined-test-connection-http-file.xml",
-                          new HashSet<>(Arrays.asList(getHttpExtension(), getFileExtension())));
+                          new HashSet<>(Arrays.asList(getHttpExtension(true), getFileExtension())));
   }
 
   @Test
@@ -86,19 +86,27 @@ public class TestConnectionFailuresTestCase extends AbstractMuleTestCase {
     getExtensionModelFrom("validation/testconnection/module-multiple-connection.xml");
   }
 
-  private ExtensionModel getFileExtension() {
-    return mockedExtension("file", "config", "connection");
+  @Test
+  public void invalidTestConnectionElement() {
+    setExpectedMessage("The annotated element [http-requester-config] with [xmlns:connection] is not valid to be used as a test connection (the [http:request-config] does not supports it)");
+    getExtensionModelFrom("validation/testconnection/module-invalid-test-connection.xml",
+                          new HashSet<>(Arrays.asList(getHttpExtension(false))));
   }
 
-  private ExtensionModel getHttpExtension() {
-    return mockedExtension("http", "request-config", "request-connection");
+  private ExtensionModel getFileExtension() {
+    return mockedExtension("file", "config", "connection", true);
+  }
+
+  private ExtensionModel getHttpExtension(boolean supportsConnectivityTesting) {
+    return mockedExtension("http", "request-config", "request-connection", supportsConnectivityTesting);
   }
 
   private void setExpectedMessage(String... conflictingGlobalElements) {
     exception.expectMessage(Arrays.stream(conflictingGlobalElements).collect(Collectors.joining(", ")));
   }
 
-  private ExtensionModel mockedExtension(final String name, final String config, final String connectionProvider) {
+  private ExtensionModel mockedExtension(final String name, final String config, final String connectionProvider,
+                                         boolean supportsConnectivityTesting) {
     final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
     extensionDeclarer.named(name)
         .onVersion("4.0.0")
@@ -106,6 +114,7 @@ public class TestConnectionFailuresTestCase extends AbstractMuleTestCase {
         .withCategory(Category.COMMUNITY)
         .withConfig(config)
         .withConnectionProvider(connectionProvider)
+        .supportsConnectivityTesting(supportsConnectivityTesting)
         .withConnectionManagementType(ConnectionManagementType.NONE);
 
     return new ExtensionModelFactory()

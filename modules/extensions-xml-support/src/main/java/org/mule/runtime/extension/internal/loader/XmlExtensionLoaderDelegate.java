@@ -607,8 +607,6 @@ public final class XmlExtensionLoaderDelegate {
                                                       connectionProviderDeclarer
                                                           .withModelProperty(new TestConnectionGlobalElementModelProperty(testConnectionGlobalElementName));
                                                     });
-      //TODO until MULE-12734, all test connection must be shut down in smart connectors
-      connectionProviderDeclarer.supportsConnectivityTesting(false);
     }
 
   }
@@ -632,6 +630,17 @@ public final class XmlExtensionLoaderDelegate {
     Optional<ComponentModel> testConnectionGlobalElement = markedAsTestConnectionGlobalElements.stream().findFirst();
     if (!testConnectionGlobalElement.isPresent()) {
       testConnectionGlobalElement = findTestConnectionGlobalElementFrom(globalElementsComponentModel, extensions);
+    } else {
+      //validates that the MODULE_CONNECTION_MARKER_ATTRIBUTE is on a correct XML element that supports test connection
+      Optional<ComponentModel> temporalTestConnectionGlobalElement =
+          findTestConnectionGlobalElementFrom(Collections.singletonList(testConnectionGlobalElement.get()), extensions);
+      if ((!temporalTestConnectionGlobalElement.isPresent())
+          || (!temporalTestConnectionGlobalElement.get().equals(testConnectionGlobalElement.get()))) {
+        throw new MuleRuntimeException(createStaticMessage(format("The annotated element [%s] with [%s] is not valid to be used as a test connection (the [%s] does not supports it)",
+                                                                  testConnectionGlobalElement.get().getNameAttribute(),
+                                                                  MODULE_CONNECTION_MARKER_ATTRIBUTE,
+                                                                  testConnectionGlobalElement.get().getIdentifier().toString())));
+      }
     }
     return testConnectionGlobalElement;
   }
@@ -663,7 +672,7 @@ public final class XmlExtensionLoaderDelegate {
                                                                                       globalElementConfigurationModelName)) {
               for (ConnectionProviderModel connectionProviderModel : configurationModel.getConnectionProviders()) {
                 if (dslSyntaxResolver.resolve(connectionProviderModel).getElementName()
-                    .equals(childConnectionProviderName)) {
+                    .equals(childConnectionProviderName) && connectionProviderModel.supportsConnectivityTesting()) {
                   testConnectionComponentModels.add(globalElementComponentModel);
                 }
               }
