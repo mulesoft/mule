@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParameterFields;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
 import static org.springframework.util.ClassUtils.isPrimitiveWrapper;
@@ -32,10 +31,10 @@ import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -99,10 +98,12 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
 
           objectType.getOpenRestriction().get().accept(this);
         } else {
-          ExtensionMetadataTypeUtils.getType(objectType)
-              .ifPresent(clazz -> {
-                final String typeName = clazz.getSimpleName();
-                getParameterFields(clazz)
+          parameter.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+            .map(descriptor -> descriptor.getExtensionParameter().getType())
+            .ifPresent(type -> {               ComponentIdFieldTypeAnnotation.java
+
+              final String typeName = type.getName();
+                type.getFields()
                     .forEach(field -> checkInvalidFieldAnnotations(parameter, typeName, field,
                                                                    ConfigOverride.class, ComponentId.class,
                                                                    MetadataKeyId.class, MetadataKeyPart.class));
@@ -121,10 +122,10 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
         }
       }
 
-      private void checkInvalidFieldAnnotations(NamedObject model, String typeName, Field field,
+      private void checkInvalidFieldAnnotations(NamedObject model, String typeName, FieldElement field,
                                                 Class<? extends Annotation>... invalidAnnotations) {
         for (Class<? extends Annotation> annotation : invalidAnnotations) {
-          if (field.getAnnotation(annotation) != null) {
+          if (field.getAnnotation(annotation).isPresent()) {
             problemsReporter.addError(new Problem(model,
                                                   format(
                                                          "Type '%s' has a field with name '%s' declared as '%s', which is not allowed.",

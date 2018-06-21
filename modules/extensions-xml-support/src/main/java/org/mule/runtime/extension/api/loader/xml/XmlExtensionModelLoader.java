@@ -66,7 +66,7 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
   public static final String RESOURCES_PATHS = "resources-paths";
 
   /**
-   * The ID which represents {@code this} loader that will be used to execute the lolkjhokup when reading the descriptor file.
+   * The ID which represents {@code this} loader that will be used to execute the lookup when reading the descriptor file.
    * @see MulePluginModel#getExtensionModelLoaderDescriptor()
    */
   public static final String DESCRIBER_ID = "xml-based";
