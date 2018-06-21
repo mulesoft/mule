@@ -234,6 +234,7 @@
         <xaPoolVersion>1.5.0</xaPoolVersion>
         <allureJunitVersion>2.0-BETA17</allureJunitVersion>
         <allureReportVersion>2.3.4</allureReportVersion>
+        <muleMvelVersion>2.1.9-MULE-016</muleMvelVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.1.3-SNAPSHOT</muleDslApiVersion>
