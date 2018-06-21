@@ -114,6 +114,7 @@ public final class NullSafeModelValidator implements ExtensionModelValidator {
                     .collect(joining(", "));
 
                 if (!isBlank(requiredFields) && isCompiletime(extensionModel)) {
+                  // TODO MULE-14517
                   problemsReporter
                       .addError(new Problem(model,
                                             format("Class '%s' cannot be used with '@%s' parameter since it contains non optional fields: [%s]",

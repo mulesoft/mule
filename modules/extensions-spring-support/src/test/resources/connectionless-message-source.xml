@@ -8,7 +8,8 @@
     <marvel:dr-strange-config name="drStrange" />
 
     <flow name="source">
-        <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain" />
+        <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain"
+                             listenerId="source"/>
         <logger />
     </flow>
 

@@ -337,6 +337,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                         parameterMetadataDescriptor.isDynamic(),
                                         parameterModel.isRequired(),
                                         parameterModel.isOverrideFromConfig(),
+                                        parameterModel.isComponentId(),
                                         parameterModel.getExpressionSupport(),
                                         parameterModel.getDefaultValue(),
                                         parameterModel.getRole(),
