@@ -582,7 +582,7 @@
         {
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
-          "supportsConnectivityTesting": false,
+          "supportsConnectivityTesting": true,
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "MODULE-STEREOTYPES",
