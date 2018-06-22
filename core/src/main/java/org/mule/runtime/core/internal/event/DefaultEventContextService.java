@@ -8,19 +8,12 @@ package org.mule.runtime.core.internal.event;
 
 import static java.lang.System.lineSeparator;
 import static java.util.concurrent.ConcurrentHashMap.newKeySet;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import org.slf4j.Logger;
-
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,46 +25,26 @@ import java.util.Set;
  */
 public class DefaultEventContextService implements EventContextService {
 
-  private static Logger LOGGER = getLogger(DefaultEventContextService.class);
-
-  private final ReferenceQueue<DefaultEventContext> queue = new ReferenceQueue<>();
-  private Set<WeakReference<DefaultEventContext>> currentContexts = newKeySet(512);
+  private Set<DefaultEventContext> currentContexts = newKeySet(512);
 
   @Override
   public List<FlowStackEntry> getCurrentlyActiveFlowStacks() {
     List<FlowStackEntry> flowStacks = new ArrayList<>();
 
-    Set<WeakReference<DefaultEventContext>> gcdContexts = new HashSet<>();
-
-    for (WeakReference<DefaultEventContext> contextRef : currentContexts) {
-      DefaultEventContext context = contextRef.get();
-
-      if (context == null) {
-        gcdContexts.add(contextRef);
-      } else {
-        flowStacks.add(new DefaultFlowStackEntry(context));
-        context.forEachChild(childContext -> flowStacks.add(new DefaultFlowStackEntry(childContext)));
-      }
+    for (DefaultEventContext context : currentContexts) {
+      flowStacks.add(new DefaultFlowStackEntry(context));
+      context.forEachChild(childContext -> flowStacks.add(new DefaultFlowStackEntry(childContext)));
     }
-
-    currentContexts.removeAll(gcdContexts);
 
     return flowStacks;
   }
 
   public void addContext(DefaultEventContext context) {
-    currentContexts.add(new WeakReference<>(context, queue));
+    currentContexts.add(context);
   }
 
   public void removeContext(DefaultEventContext context) {
-    // MULE-14151 This is a temporary workaround until all possible causes of the logged warning are fixed.
-    Reference<? extends DefaultEventContext> polled = queue.poll();
-    while (polled != null) {
-      LOGGER.warn("EventContext with id {} was not terminated.", polled.get().getId());
-      currentContexts.remove(polled);
-
-      polled = queue.poll();
-    }
+    currentContexts.remove(context);
   }
 
   private static final class DefaultFlowStackEntry implements FlowStackEntry {
