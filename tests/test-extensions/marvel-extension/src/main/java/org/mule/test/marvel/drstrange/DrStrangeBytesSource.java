@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
+import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -59,6 +60,10 @@ public class DrStrangeBytesSource extends Source<InputStream, Void> {
   @Optional
   @AllowedStereotypes(ReferableOperationStereotypeDefinition.class)
   private String nextOperationReference;
+
+  @Parameter
+  @ComponentId
+  private String listenerId;
 
   @Config
   private DrStrange config;

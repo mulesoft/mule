@@ -63,6 +63,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -89,6 +90,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -192,6 +194,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -288,6 +291,7 @@
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
+                  "isComponentId": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -318,6 +322,7 @@
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
+                  "isComponentId": false,
                   "expressionSupport": "REQUIRED",
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
@@ -416,6 +421,7 @@
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
+                  "isComponentId": false,
                   "expressionSupport": "SUPPORTED",
                   "defaultValue": "This is a default string",
                   "role": "BEHAVIOUR",
@@ -458,6 +464,7 @@
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
+                  "isComponentId": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -488,6 +495,7 @@
                   "hasDynamicType": false,
                   "required": false,
                   "isConfigOverride": false,
+                  "isComponentId": false,
                   "expressionSupport": "REQUIRED",
                   "defaultValue": "#[payload]",
                   "role": "BEHAVIOUR",
@@ -629,6 +637,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -655,6 +664,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -681,6 +691,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "CONTENT",
               "dslConfiguration": {
@@ -707,6 +718,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "CONTENT",
               "dslConfiguration": {
@@ -773,6 +785,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "CONTENT",
               "dslConfiguration": {
@@ -839,6 +852,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "PRIMARY_CONTENT",
               "dslConfiguration": {
@@ -880,6 +894,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -906,6 +921,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -947,6 +963,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -977,6 +994,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -1107,6 +1125,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "PRIMARY_CONTENT",
@@ -1283,6 +1302,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1336,6 +1356,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1366,6 +1387,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -1496,6 +1518,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "PRIMARY_CONTENT",
@@ -1538,6 +1561,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1568,6 +1592,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -1660,6 +1685,7 @@
               "hasDynamicType": false,
               "required": true,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1701,6 +1727,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1731,6 +1758,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -1865,6 +1893,7 @@
               "hasDynamicType": false,
               "required": true,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1906,6 +1935,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1936,6 +1966,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -2070,6 +2101,7 @@
               "hasDynamicType": false,
               "required": true,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2111,6 +2143,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2141,6 +2174,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -2233,6 +2267,7 @@
               "hasDynamicType": false,
               "required": true,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2274,6 +2309,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2304,6 +2340,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -2396,6 +2433,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "PRIMARY_CONTENT",
@@ -2423,6 +2461,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "CONTENT",
               "dslConfiguration": {
@@ -2466,6 +2505,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2507,6 +2547,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2537,6 +2578,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -2671,6 +2713,7 @@
               "hasDynamicType": false,
               "required": true,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2712,6 +2755,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2742,6 +2786,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -2918,6 +2963,7 @@
               "hasDynamicType": false,
               "required": true,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2959,6 +3005,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2989,6 +3036,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -3123,6 +3171,7 @@
               "hasDynamicType": false,
               "required": true,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -3164,6 +3213,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -3194,6 +3244,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -3292,6 +3343,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "PRIMARY_CONTENT",
@@ -3334,6 +3386,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -3364,6 +3417,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -3426,6 +3480,7 @@
                 "hasDynamicType": false,
                 "required": true,
                 "isConfigOverride": false,
+                "isComponentId": false,
                 "expressionSupport": "SUPPORTED",
                 "role": "BEHAVIOUR",
                 "dslConfiguration": {
@@ -3534,6 +3589,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": false,
               "role": "BEHAVIOUR",
@@ -3647,6 +3703,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {

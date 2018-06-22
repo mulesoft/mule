@@ -69,6 +69,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -98,6 +99,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -184,6 +186,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -213,6 +216,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -299,6 +303,7 @@
               "hasDynamicType": false,
               "required": true,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -335,6 +340,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -364,6 +370,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
+              "isComponentId": false,
               "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",

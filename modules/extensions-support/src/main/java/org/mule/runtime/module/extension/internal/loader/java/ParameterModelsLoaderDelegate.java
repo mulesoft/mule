@@ -50,6 +50,7 @@ import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
@@ -133,6 +134,7 @@ public final class ParameterModelsLoaderDelegate {
       parseParameterRole(extensionParameter, parameter);
       parseExpressionSupport(extensionParameter, parameter);
       parseConfigOverride(extensionParameter, parameter);
+      parseComponentId(extensionParameter, parameter);
       parseNullSafe(extensionParameter, parameter);
       parseLayout(extensionParameter, parameter);
       parseExclusiveOptional(extensionParameter, groupDeclarer, parameter);
@@ -174,9 +176,13 @@ public final class ParameterModelsLoaderDelegate {
   }
 
   private void parseConfigOverride(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
-    if (extensionParameter.getAnnotation(ConfigOverride.class).isPresent()) {
-      parameter.asConfigOverride();
-    }
+    extensionParameter.getAnnotation(ConfigOverride.class)
+        .ifPresent(a -> parameter.asConfigOverride());
+  }
+
+  private void parseComponentId(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
+    extensionParameter.getAnnotation(ComponentId.class)
+        .ifPresent(a -> parameter.asComponentId());
   }
 
   private List<ParameterDeclarer> declaredAsGroup(HasParametersDeclarer component,

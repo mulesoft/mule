@@ -61,6 +61,7 @@
         <xs:attribute type="xs:string" use="required" name="spell"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="spellSize"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="nextOperationReference"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="listenerId"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
           <xs:annotation>
             <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
@@ -202,7 +203,7 @@
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="flowRef"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="required" name="name"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

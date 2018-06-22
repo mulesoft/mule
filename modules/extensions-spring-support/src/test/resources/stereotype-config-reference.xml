@@ -16,7 +16,8 @@
 
     <flow name="matchingOperationFlow" initialState="stopped">
         <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain"
-                             nextOperationReference="theNextOperation"/>
+                             nextOperationReference="theNextOperation"
+                             listenerId="matchingOperationFlow"/>
         <marvel:with-flow-reference flowRef="referencedFlow" name="theNextOperation"/>
     </flow>
 
@@ -28,7 +29,8 @@
 
     <flow name="operationMismatch" initialState="stopped">
         <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain"
-                             nextOperationReference="theNextOperation"/>
+                             nextOperationReference="theNextOperation"
+                             listenerId="operationMismatch"/>
         <marvel:with-flow-reference flowRef="referencedFlow" name="otherOperation"/>
     </flow>
 

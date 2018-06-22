@@ -25,6 +25,7 @@ import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
+import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
@@ -76,7 +77,7 @@ public class DrStrangeOperations {
   }
 
   @Stereotype(ReferableOperationStereotypeDefinition.class)
-  public void withFlowReference(@Config DrStrange dr, @Optional @FlowReference String flowRef, String name) {
+  public void withFlowReference(@Config DrStrange dr, @Optional @FlowReference String flowRef, @ComponentId String name) {
 
     if (!StringUtils.isBlank(flowRef)) {
       if (!locator.find(Location.builder().globalName(flowRef).build()).isPresent()) {

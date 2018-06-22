@@ -9,21 +9,35 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 import static java.lang.String.format;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
 import static org.springframework.util.ClassUtils.isPrimitiveWrapper;
+import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
+import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
+import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 
+import java.lang.annotation.Annotation;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Validates that the parameter types are valid
@@ -35,6 +49,12 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
+    if (!isCompiletime(extensionModel)) {
+      // TODO MULE-14517: Validations for types will be added to 4.2,
+      // so we need to keep backwards compatibility somehow for now.
+      return;
+    }
+
     new ExtensionWalker() {
 
       @Override
@@ -47,8 +67,24 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
   private void validateParameterType(ParameterModel parameter, ProblemsReporter problemsReporter) {
     parameter.getType().accept(new MetadataTypeVisitor() {
 
+      private Set<MetadataType> visitedTypes = new HashSet<>();
+
+      @Override
+      public void visitUnion(UnionType unionType) {
+        unionType.getTypes().forEach(t -> t.accept(this));
+      }
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        arrayType.getType().accept(this);
+      }
+
       @Override
       public void visitObject(ObjectType objectType) {
+        if (!visitedTypes.add(objectType)) {
+          return;
+        }
+
         if (isMap(objectType)) {
           objectType.getAnnotation(ClassInformationAnnotation.class)
               .filter(classInformation -> !classInformation.getGenericTypes().isEmpty())
@@ -59,7 +95,21 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
                                                                                           parameter.getName(),
                                                                                           getType(objectType).getName(),
                                                                                           String.class.getName()))));
+
+          objectType.getOpenRestriction().get().accept(this);
+        } else {
+          parameter.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+            .map(descriptor -> descriptor.getExtensionParameter().getType())
+            .ifPresent(type -> {
+              final String typeName = type.getName();
+                type.getFields()
+                    .forEach(field -> checkInvalidFieldAnnotations(parameter, typeName, field,
+                                                                   ConfigOverride.class, ComponentId.class,
+                                                                   MetadataKeyId.class, MetadataKeyPart.class));
+              });
         }
+
+        objectType.getFields().forEach(f -> f.getValue().accept(this));
       }
 
       @Override
@@ -68,6 +118,18 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
           problemsReporter
               .addError(new Problem(parameter, format("Parameter '%s' is of type '%s'. Use primitive type boolean instead.",
                                                       parameter.getName(), Boolean.class.getName())));
+        }
+      }
+
+      private void checkInvalidFieldAnnotations(NamedObject model, String typeName, FieldElement field,
+                                                Class<? extends Annotation>... invalidAnnotations) {
+        for (Class<? extends Annotation> annotation : invalidAnnotations) {
+          if (field.getAnnotation(annotation).isPresent()) {
+            problemsReporter.addError(new Problem(model,
+                                                  format(
+                                                         "Type '%s' has a field with name '%s' declared as '%s', which is not allowed.",
+                                                         typeName, field.getName(), annotation.getSimpleName())));
+          }
         }
       }
     });

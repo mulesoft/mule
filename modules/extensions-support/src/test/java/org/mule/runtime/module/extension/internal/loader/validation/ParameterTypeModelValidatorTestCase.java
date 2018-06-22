@@ -15,7 +15,14 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.v
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
+import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -23,6 +30,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,6 +56,10 @@ public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
   @Mock
   private ParameterModel parameter;
 
+  @Mock
+  private ExtensionParameter extensionParameter;
+
+
   private Type objectKey = new TypeToken<Map<Object, Object>>() {}.getType();
   private Type stringMap = new TypeToken<Map<String, Object>>() {}.getType();
   private Type wildcardMap = new TypeToken<Map<?, ?>>() {}.getType();
@@ -57,8 +69,14 @@ public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
+    when(extensionModel.getModelProperty(CompileTimeModelProperty.class)).thenReturn(Optional.of(new CompileTimeModelProperty()));
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
+
     when(parameter.getName()).thenReturn("parameter");
+    when(parameter.getModelProperty(ExtensionParameterDescriptorModelProperty.class))
+        .thenReturn(Optional.of(new ExtensionParameterDescriptorModelProperty(extensionParameter)));
+
+
     mockParameters(operationModel, parameter);
   }
 
@@ -99,5 +117,45 @@ public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
   public void primitiveBoolean() {
     when(parameter.getType()).thenReturn(TYPE_LOADER.load(boolean.class));
     validate(extensionModel, validator);
+  }
+
+  @Test
+  public void configOverrideInPojo() {
+    expectedException.expect(IllegalModelDefinitionException.class);
+    expectedException
+        .expectMessage("Type 'InvalidPojoWithConfigOverride' has a field with name 'overriden' declared as 'ConfigOverride', which is not allowed.");
+    when(parameter.getType()).thenReturn(TYPE_LOADER.load(InvalidPojoWithConfigOverride.class));
+    when(extensionParameter.getType()).thenReturn(new TypeWrapper(InvalidPojoWithConfigOverride.class, TYPE_LOADER));
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void componentIdInPojo() {
+    expectedException.expect(IllegalModelDefinitionException.class);
+    expectedException
+        .expectMessage("Type 'InvalidPojoWithComponentId' has a field with name 'id' declared as 'ComponentId', which is not allowed.");
+    when(parameter.getType()).thenReturn(TYPE_LOADER.load(InvalidPojoWithComponentId.class));
+    when(extensionParameter.getType()).thenReturn(new TypeWrapper(InvalidPojoWithComponentId.class, TYPE_LOADER));
+    validate(extensionModel, validator);
+  }
+
+  private static class InvalidPojoWithConfigOverride {
+
+    @Parameter
+    private String foo;
+
+    @Parameter
+    @ConfigOverride
+    private String overriden;
+  }
+
+  private static class InvalidPojoWithComponentId {
+
+    @Parameter
+    private String bar;
+
+    @Parameter
+    @ComponentId
+    private String id;
   }
 }
