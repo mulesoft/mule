@@ -345,17 +345,29 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             stackTraceFilter = p.split(",");
         }
+        else
+        {
+            stackTraceFilter = DEFAULT_STACKTRACE_FILTER;
+        }
 
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "verbose.exceptions");
         if (p != null)
         {
             verboseExceptions = BooleanUtils.toBoolean(p);
         }
+        else
+        {
+            verboseExceptions = false;
+        }
 
         p = System.getProperty(MuleProperties.MULE_FLOW_TRACE);
         if (p != null)
         {
             flowTrace = BooleanUtils.toBoolean(p);
+        }
+        else
+        {
+            flowTrace = false;
         }
 
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "validate.expressions");
