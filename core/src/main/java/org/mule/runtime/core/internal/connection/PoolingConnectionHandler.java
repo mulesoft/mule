@@ -65,6 +65,9 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
 
     boolean returnAttempted = false;
     try {
+      if (!connectionProvider.validate(connection).isValid()) {
+        return;
+      }
       poolingListener.onReturn(connection);
 
       pool.returnObject(connection);
