@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import org.mule.runtime.api.util.Lapse;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
@@ -49,7 +50,9 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
     this.springRegistry = springRegistry;
   }
 
-  public Collection<Object> resolveBeanDependencies(Set<String> beanNames) {
+  @Override
+  public List<Object> resolveBeanDependencies(Set<String> beanNames) {
+    Lapse lapse = new Lapse();
     final DependencyNode root = new DependencyNode(null);
 
     for (String beanName : beanNames) {
@@ -72,6 +75,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
 
       orderedObjects.add(node.getValue());
     }
+    lapse.mark("resolveBeanDependency");
     return orderedObjects;
   }
 

@@ -14,17 +14,13 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.LifecycleObject;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.registry.Registry;
+import org.mule.runtime.core.privileged.routing.OutboundRouter;
+import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * The Start phase for the MuleContext. Calling {@link MuleContext#start()} will initiate this phase via the
@@ -50,18 +46,18 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase {
   }
 
   public MuleContextStartPhase(Class<?>[] ignoredObjects) {
-    super(Startable.PHASE_NAME, Startable.class, Stoppable.PHASE_NAME);
-
-    Set<LifecycleObject> startOrderedObjects = new LinkedHashSet<>();
-    startOrderedObjects.add(new LifecycleObject(QueueManager.class));
-    startOrderedObjects.add(new LifecycleObject(ConfigurationProvider.class));
-    startOrderedObjects.add(new LifecycleObject(Config.class));
-    startOrderedObjects.add(new LifecycleObject(LegacyConnector.class));
-    startOrderedObjects.add(new LifecycleObject(FlowConstruct.class));
-    startOrderedObjects.add(new LifecycleObject(Startable.class));
+    super(Startable.PHASE_NAME, Startable.class, o -> ((Startable) o).start());
 
     setIgnoredObjectTypes(ignoredObjects);
-    setOrderedLifecycleObjects(startOrderedObjects);
+    setOrderedLifecycleTypes(new Class<?>[] {
+        QueueManager.class,
+        ConfigurationProvider.class,
+        Config.class,
+        LegacyConnector.class,
+        FlowConstruct.class,
+        Startable.class
+    });
+
     registerSupportedPhase(Initialisable.PHASE_NAME);
     // Start/Stop/Start
     registerSupportedPhase(Stoppable.PHASE_NAME);

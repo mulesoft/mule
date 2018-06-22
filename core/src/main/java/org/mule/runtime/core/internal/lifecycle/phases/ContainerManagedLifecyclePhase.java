@@ -15,7 +15,7 @@ package org.mule.runtime.core.internal.lifecycle.phases;
 @Deprecated
 public class ContainerManagedLifecyclePhase extends DefaultLifecyclePhase {
 
-  public ContainerManagedLifecyclePhase(String name, Class<?> lifecycleClass, String oppositePhaseName) {
-    super(name, lifecycleClass, oppositePhaseName);
+  public ContainerManagedLifecyclePhase(String name, Class<?> lifecycleClass) {
+    super(name, lifecycleClass, null);
   }
 }

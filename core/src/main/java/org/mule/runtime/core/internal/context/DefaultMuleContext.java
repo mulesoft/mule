@@ -47,17 +47,6 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
-import javax.transaction.TransactionManager;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -82,6 +71,7 @@ import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.api.util.Lapse;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
@@ -136,8 +126,17 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 
-import org.slf4j.Logger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.transaction.TransactionManager;
+
+import org.slf4j.Logger;
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistries, PrivilegedMuleContext {
@@ -296,7 +295,9 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
         getRegistry().initialise();
 
         fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISING));
+        Lapse lapse = new Lapse();
         getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
+        lapse.mark("Initialise");
         fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISED));
         listeners.forEach(l -> l.onInitialization(this, getApiRegistry()));
 
@@ -331,9 +332,12 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
       startIfNeeded(extensionManager);
       fireNotification(new MuleContextNotification(this, CONTEXT_STARTING));
+      Lapse lapse = new Lapse();
       getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
+      lapse.mark("start");
       overridePollingController();
       overrideClusterConfiguration();
+      lapse.mark("start message sources");
       startMessageSources();
 
       fireNotification(new MuleContextNotification(this, CONTEXT_STARTED));

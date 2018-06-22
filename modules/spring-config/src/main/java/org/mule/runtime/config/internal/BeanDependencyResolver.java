@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -22,6 +22,6 @@ public interface BeanDependencyResolver {
    * @param beanNames the bean names to resolve dependencies
    * @return a order collection of bean objects.
    */
-  Collection<Object> resolveBeanDependencies(Set<String> beanNames);
+  List<Object> resolveBeanDependencies(Set<String> beanNames);
 
 }
