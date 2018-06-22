@@ -12,6 +12,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
@@ -27,6 +28,7 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -57,9 +59,8 @@ import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
-
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
 import org.hamcrest.Description;
 import org.junit.After;
@@ -71,6 +72,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.ArgumentMatcher;
 
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 @RunWith(Parameterized.class)
 public class PipelineMessageNotificationTestCase extends AbstractReactiveProcessorTestCase {
@@ -134,7 +137,19 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
     process(pipeline, event);
 
-    verifySucess();
+    switch (mode) {
+      case BLOCKING:
+        verifySucess();
+        break;
+      case NON_BLOCKING:
+        new PollingProber().check(new JUnitLambdaProbe(() -> {
+          verifySucess();
+          return true;
+        }));
+        break;
+      default:
+        fail();
+    }
   }
 
   @Test
@@ -152,7 +167,19 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     try {
       process(pipeline, event);
     } finally {
-      verifyException();
+      switch (mode) {
+        case BLOCKING:
+          verifyException();
+          break;
+        case NON_BLOCKING:
+          new PollingProber().check(new JUnitLambdaProbe(() -> {
+            verifyException();
+            return true;
+          }));
+          break;
+        default:
+          fail();
+      }
     }
   }
 

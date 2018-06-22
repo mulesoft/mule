@@ -7,22 +7,29 @@
 
 package org.mule.functional.junit4;
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
-import javax.inject.Inject;
-
 import org.junit.Rule;
+
+import javax.inject.Inject;
 
 /**
  * Base class for mule functional test cases that run tests using class loading isolation. This class will set the default values
@@ -63,7 +70,8 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
   private EventContextService eventContextService;
 
   /**
-   * Sets to disable initial state manager from MUnit as the plugin will be discovered and register to the ExtensionManager if declared in the pom.xml.
+   * Sets to disable initial state manager from MUnit as the plugin will be discovered and register to the ExtensionManager if
+   * declared in the pom.xml.
    */
   @Rule
   public SystemProperty mUnitDisableInitialStateManagerProperty =
@@ -102,9 +110,11 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
     }
     super.doTearDown();
 
-    if (eventContextService != null) {
-      // MULE-14151 Force a cleanup of stale contexts. This should be changed to an empty assertion
-      eventContextService.getCurrentlyActiveFlowStacks();
+    if (eventContextService != null && DefaultMuleConfiguration.isFlowTrace()) {
+      new PollingProber(1000, 10).check(new JUnitLambdaProbe(() -> {
+        assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(empty()));
+        return true;
+      }));
     }
   }
 }

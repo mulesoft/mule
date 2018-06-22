@@ -276,6 +276,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     p = getProperty(MuleProperties.MULE_FLOW_TRACE);
     if (p != null) {
       flowTrace = BooleanUtils.toBoolean(p);
+    } else {
+      flowTrace = false;
     }
 
     p = getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "validate.expressions");
