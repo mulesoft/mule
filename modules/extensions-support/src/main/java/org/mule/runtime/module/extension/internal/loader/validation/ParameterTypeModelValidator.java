@@ -99,9 +99,9 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
           objectType.getOpenRestriction().get().accept(this);
         } else {
           parameter.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
-            .map(descriptor -> descriptor.getExtensionParameter().getType())
-            .ifPresent(type -> {
-              final String typeName = type.getName();
+              .map(descriptor -> descriptor.getExtensionParameter().getType())
+              .ifPresent(type -> {
+                final String typeName = type.getName();
                 type.getFields()
                     .forEach(field -> checkInvalidFieldAnnotations(parameter, typeName, field,
                                                                    ConfigOverride.class, ComponentId.class,
