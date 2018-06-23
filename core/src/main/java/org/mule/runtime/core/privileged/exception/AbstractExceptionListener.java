@@ -101,7 +101,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   protected void doInitialise(MuleContext context) throws InitialisationException {
     requireNonNull(muleContext);
-    logger.debug("Initialising exception listener: " + toString());
+    if (logger.isDebugEnabled()) {
+      logger.debug("Initialising exception listener: " + toString());
+    }
   }
 
   protected void fireNotification(Exception ex, CoreEvent event) {
