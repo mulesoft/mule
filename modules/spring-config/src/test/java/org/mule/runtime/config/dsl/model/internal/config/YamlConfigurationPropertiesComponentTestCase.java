@@ -76,13 +76,4 @@ public class YamlConfigurationPropertiesComponentTestCase {
     configurationComponent.initialise();
   }
 
-  @Description("Validates encoding")
-  @Test
-  public void validConfigEncoding() throws InitialisationException {
-    configurationComponent =
-        new DefaultConfigurationPropertiesProvider("properties-utf16.yaml", "UTF-16", externalResourceProvider);
-    configurationComponent.initialise();
-    assertThat(configurationComponent.getConfigurationProperty("number").get().getRawValue(), is("34843"));
-  }
-
 }

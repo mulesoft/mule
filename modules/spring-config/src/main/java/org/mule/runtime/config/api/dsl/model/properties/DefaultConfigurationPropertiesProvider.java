@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,17 +46,11 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
 
   protected final Map<String, ConfigurationProperty> configurationAttributes = new HashMap<>();
   protected String fileLocation;
-  protected String encoding;
   protected ResourceProvider resourceProvider;
 
-  public DefaultConfigurationPropertiesProvider(String fileLocation, String encoding, ResourceProvider resourceProvider) {
+  public DefaultConfigurationPropertiesProvider(String fileLocation, ResourceProvider resourceProvider) {
     this.fileLocation = fileLocation;
     this.resourceProvider = resourceProvider;
-    this.encoding = encoding;
-  }
-
-  public DefaultConfigurationPropertiesProvider(String fileLocation, ResourceProvider resourceProvider) {
-    this(fileLocation, null, resourceProvider);
   }
 
   @Override
@@ -82,11 +75,6 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
     return isAbsolutePath(fileLocation) ? new FileInputStream(file) : resourceProvider.getResourceAsStream(file);
   }
 
-  protected InputStreamReader getResourceInputStreamReader(String file) throws IOException {
-    InputStream in = getResourceInputStream(file);
-    return encoding != null ? new InputStreamReader(in, encoding) : new InputStreamReader(in);
-  }
-
   @Override
   public void initialise() throws InitialisationException {
     if (!fileLocation.endsWith(PROPERTIES_EXTENSION) && !fileLocation.endsWith(YAML_EXTENSION)) {
@@ -95,7 +83,7 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
                                                  this);
     }
 
-    try (InputStreamReader is = getResourceInputStreamReader(fileLocation)) {
+    try (InputStream is = getResourceInputStream(fileLocation)) {
       if (is == null) {
         throw new ConfigurationPropertiesException(createStaticMessage(format("Couldn't find configuration properties file %s neither on classpath or in file system",
                                                                               fileLocation)),
@@ -111,7 +99,7 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
     }
   }
 
-  protected void readAttributesFromFile(InputStreamReader is) throws IOException {
+  protected void readAttributesFromFile(InputStream is) throws IOException {
     if (fileLocation.endsWith(PROPERTIES_EXTENSION)) {
       Properties properties = new Properties();
       properties.load(is);
