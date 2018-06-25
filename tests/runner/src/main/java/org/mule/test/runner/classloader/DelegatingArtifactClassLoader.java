@@ -65,6 +65,11 @@ class DelegatingArtifactClassLoader extends ClassLoader implements ArtifactClass
   }
 
   @Override
+  public URL findInternalResource(String resource) {
+    return null;
+  }
+
+  @Override
   public Enumeration<URL> findResources(String name) throws IOException {
     return getParent().getResources(name);
   }
@@ -72,6 +77,11 @@ class DelegatingArtifactClassLoader extends ClassLoader implements ArtifactClass
   @Override
   public Class<?> findLocalClass(String name) throws ClassNotFoundException {
     return getParent().loadClass(name);
+  }
+
+  @Override
+  public Class<?> loadInternalClass(String name) throws ClassNotFoundException {
+    return null;
   }
 
   @Override
