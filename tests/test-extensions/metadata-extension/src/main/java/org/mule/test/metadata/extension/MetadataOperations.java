@@ -116,7 +116,6 @@ public class MetadataOperations {
     return type;
   }
 
-  @OutputResolver(output = TestInputAndOutputResolverWithKeyResolver.class)
   public void contentOnlyIgnoresOutput(@Connection MetadataConnection connection,
                                        @MetadataKeyId(TestInputAndOutputResolverWithKeyResolver.class) String type,
                                        @Content @TypeResolver(TestInputAndOutputResolverWithKeyResolver.class) Object content) {}

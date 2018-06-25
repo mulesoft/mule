@@ -607,6 +607,8 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Map<String, Object> ctx = new HashMap<>();
     ctx.put(TYPE_PROPERTY_NAME, extension.getName());
     ctx.put(VERSION, "1.0.0-SNAPSHOT");
+    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+    ctx.put("COMPILATION_MODE", true);
     return loader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps), ctx);
   }
 }

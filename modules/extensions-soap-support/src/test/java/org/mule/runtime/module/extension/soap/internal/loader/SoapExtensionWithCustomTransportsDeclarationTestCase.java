@@ -25,7 +25,6 @@ import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
-import org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider;
 import org.mule.test.ram.DefaultPortalGunDispatcherProvider;
 import org.mule.test.ram.MiniverseDispatcherProvider;
 import org.mule.test.ram.RickAndMortyExtension;
@@ -44,6 +43,8 @@ public class SoapExtensionWithCustomTransportsDeclarationTestCase extends Abstra
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, RickAndMortyExtension.class.getName());
     params.put(VERSION, getProductVersion());
+    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+    params.put("COMPILATION_MODE", true);
     ExtensionModel model =
         loader.loadExtensionModel(RickAndMortyExtension.class.getClassLoader(), getDefault(emptySet()), params);
 

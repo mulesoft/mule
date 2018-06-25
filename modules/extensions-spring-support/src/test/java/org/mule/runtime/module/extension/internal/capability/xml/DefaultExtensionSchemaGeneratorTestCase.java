@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.capability.xml.DefaultExtensionSchemaGeneratorTestCase.SchemaGeneratorTestUnit.newTestUnit;
+import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 import org.mule.extension.test.extension.reconnection.ReconnectionExtension;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -201,6 +202,9 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, clazz.getName());
     params.put(VERSION, getProductVersion());
+    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+    params.put(COMPILATION_MODE, true);
+
     //TODO MULE-11797: as this utils is consumed from org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel), this util should get dropped once the ticket gets implemented.
     final DslResolvingContext dslResolvingContext = getDefault(new LinkedHashSet<>(extensionModels.values()));
     return loader.loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
