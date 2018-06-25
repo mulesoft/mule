@@ -14,6 +14,13 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -21,12 +28,6 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
         domainClassLoader = domainArtifactClassLoaders.get(domainId);
         if (domainClassLoader == null) {
           if (descriptor.getName().equals(DEFAULT_DOMAIN_NAME)) {
-            domainClassLoader = getDefaultDomainClassLoader(parent.getClassLoaderLookupPolicy());
+            domainClassLoader = getDefaultDomainClassLoader(parent, parent.getClassLoaderLookupPolicy());
           } else {
             domainClassLoader = getCustomDomainClassLoader(parent, descriptor, artifactClassLoaders);
           }
@@ -113,8 +114,9 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     return parent.getClassLoaderLookupPolicy().extend(pluginsLookupStrategies);
   }
 
-  private ArtifactClassLoader getDefaultDomainClassLoader(ClassLoaderLookupPolicy containerLookupPolicy) {
-    return new MuleSharedDomainClassLoader(new DomainDescriptor(DEFAULT_DOMAIN_NAME), containerClassLoader,
+  private ArtifactClassLoader getDefaultDomainClassLoader(ArtifactClassLoader parent,
+                                                          ClassLoaderLookupPolicy containerLookupPolicy) {
+    return new MuleSharedDomainClassLoader(new DomainDescriptor(DEFAULT_DOMAIN_NAME), parent.getClassLoader(),
                                            containerLookupPolicy.extend(emptyMap()), emptyList(), emptyList());
   }
 

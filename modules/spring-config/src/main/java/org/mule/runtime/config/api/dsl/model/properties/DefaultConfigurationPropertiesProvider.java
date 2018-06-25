@@ -10,14 +10,6 @@ import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,6 +21,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+
+import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesException;
+import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
+import org.mule.runtime.core.api.exception.ResourceNotFoundException;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -103,7 +105,7 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
       }
 
       readAttributesFromFile(is);
-    } catch (ConfigurationPropertiesException e) {
+    } catch (ConfigurationPropertiesException | ResourceNotFoundException e) {
       throw e;
     } catch (Exception e) {
       throw new ConfigurationPropertiesException(createStaticMessage("Couldn't read from file "

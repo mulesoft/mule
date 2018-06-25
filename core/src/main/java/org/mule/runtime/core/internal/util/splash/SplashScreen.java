@@ -67,7 +67,7 @@ public abstract class SplashScreen {
 
   public static String miniSplash(final String message) {
     // middle dot char
-    return StringMessageUtils.getBoilerPlate(message, '+', 60);
+    return StringMessageUtils.getBoilerPlate(message, '+', 80);
   }
 
   protected void doHeader(MuleContext context) {

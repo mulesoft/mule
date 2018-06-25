@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
-import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+
+import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 @NoImplement
 public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourceLocator, ClassLoaderLookupPolicyProvider {
@@ -34,6 +34,14 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
   URL findResource(String resource);
 
   /**
+   * Same as {@link #findResource(String)} but it won't have in mind filtered resources.
+   *
+   * @param resource name of the resource to find.
+   * @return the resource URL, null if it doesn't exists.
+   */
+  URL findInternalResource(String resource);
+
+  /**
    * Returns an enumeration of {@link java.net.URL <tt>URL</tt>} objects representing all the resources with the given name which
    * are local to the classloader
    *
@@ -51,6 +59,15 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
    * @throws ClassNotFoundException If the class was not found
    */
   Class<?> findLocalClass(String name) throws ClassNotFoundException;
+
+  /**
+   * Same as {@link ClassLoader#findClass(String)} but will not use class filtering.
+   *
+   * @param name the class to load
+   * @return the loaded class
+   * @throws ClassNotFoundException
+   */
+  Class<?> loadInternalClass(String name) throws ClassNotFoundException;
 
   /**
    * ClassLoader is an abstract class. Not an interface. There are parts of the code that requires a ClassLoader and others that

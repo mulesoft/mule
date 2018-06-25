@@ -7,21 +7,23 @@
 package org.mule.runtime.deployment.model.internal.tooling;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+
 /**
- * Tooling {@link ClassLoader} that will delegate every call to it's delegate (the specific {@link org.eclipse.aether.artifact.Artifact} under
- * {@link #delegateArtifactClassLoader}, but when doing the {@link #dispose()} it will dispatch
- * to the {@link RegionClassLoader} pointed by {@link #regionClassLoader} that contains all the related class loaders in it.
+ * Tooling {@link ClassLoader} that will delegate every call to it's delegate (the specific
+ * {@link org.eclipse.aether.artifact.Artifact} under {@link #delegateArtifactClassLoader}, but when doing the {@link #dispose()}
+ * it will dispatch to the {@link RegionClassLoader} pointed by {@link #regionClassLoader} that contains all the related class
+ * loaders in it.
  *
  * @since 4.0
  */
@@ -31,8 +33,8 @@ public class ToolingArtifactClassLoader implements ArtifactClassLoader {
   private final ArtifactClassLoader delegateArtifactClassLoader;
 
   /**
-   * Generates an instance of an {@link ArtifactClassLoader} if the parametrized {@code regionClassLoader} does contain
-   * within its {@link RegionClassLoader#getArtifactPluginClassLoaders()} the class loader responsible of handling the
+   * Generates an instance of an {@link ArtifactClassLoader} if the parametrized {@code regionClassLoader} does contain within its
+   * {@link RegionClassLoader#getArtifactPluginClassLoaders()} the class loader responsible of handling the
    * {@code artifactPluginDescriptor}.
    *
    * @param regionClassLoader class loader used to execute the {@link #dispose()} properly.
@@ -77,6 +79,11 @@ public class ToolingArtifactClassLoader implements ArtifactClassLoader {
   }
 
   @Override
+  public URL findInternalResource(String resource) {
+    return delegateArtifactClassLoader.findInternalResource(resource);
+  }
+
+  @Override
   public Enumeration<URL> findResources(String name) throws IOException {
     return delegateArtifactClassLoader.findResources(name);
   }
@@ -84,6 +91,11 @@ public class ToolingArtifactClassLoader implements ArtifactClassLoader {
   @Override
   public Class<?> findLocalClass(String name) throws ClassNotFoundException {
     return delegateArtifactClassLoader.findLocalClass(name);
+  }
+
+  @Override
+  public Class<?> loadInternalClass(String name) throws ClassNotFoundException {
+    return delegateArtifactClassLoader.loadInternalClass(name);
   }
 
   @Override
@@ -107,8 +119,8 @@ public class ToolingArtifactClassLoader implements ArtifactClassLoader {
   }
 
   /**
-   * We want tooling believe the {@link ArtifactClassLoader} he's handling is the plugin's or application's one, but we are actually shipping
-   * more than that with the {@link RegionClassLoader}.
+   * We want tooling believe the {@link ArtifactClassLoader} he's handling is the plugin's or application's one, but we are
+   * actually shipping more than that with the {@link RegionClassLoader}.
    * <p>
    * So, to avoid any leaks the {@link #dispose()} of the plugin's {@link ArtifactClassLoader} is actually the one for the
    * {@link RegionClassLoader}, which will eventually execute a {@link #dispose()} over the plugin's or application's one.

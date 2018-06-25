@@ -51,7 +51,6 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.logging.LogUtil;
-import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.DeploymentStopException;
@@ -223,7 +222,7 @@ public class DefaultMuleApplication implements Application {
       setStatusToFailed();
 
       // log it here so it ends up in app log, sys log will only log a message without stacktrace
-      logger.error(null, getRootCause(e));
+      logger.error(e.getMessage(), getRootCause(e));
       throw new DeploymentInitException(createStaticMessage(getRootCauseMessage(e)), e);
     }
   }

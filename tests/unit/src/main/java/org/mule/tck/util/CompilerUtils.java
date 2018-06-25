@@ -14,9 +14,6 @@ import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.tck.ZipUtils.compress;
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.tck.ZipUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.StringJoiner;
 
 import javax.tools.JavaCompiler;
@@ -35,6 +33,11 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 
 import org.apache.commons.io.filefilter.NameFileFilter;
+
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.tck.ZipUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,12 +55,14 @@ public class CompilerUtils {
 
   /**
    * Base class to create compiler utilities.
+   * 
    * @param <T> class of the implemented compiler
    */
   private static abstract class AbstractCompiler<T extends AbstractCompiler> {
 
     protected File[] requiredJars = {};
     protected File[] sources = {};
+    protected Path javaPackage;
 
     /**
      * @return current instance. Used just to avoid compilation warnings.
@@ -98,8 +103,12 @@ public class CompilerUtils {
     protected void compileJavaSources(File targetFolder) {
       checkArgument(targetFolder != null, "targetFolder cannot be null");
 
+      File targetPackage = Optional.ofNullable(javaPackage)
+          .map(javaPackage -> targetFolder.toPath().resolve(javaPackage).toFile()).orElse(targetFolder);
+      targetPackage.mkdirs();
       CompilerTask compilerTask = new CompilerTaskBuilder().compiling(sources)
-          .dependingOn(requiredJars).toTarget(targetFolder).build();
+          .dependingOn(requiredJars).toTarget(targetPackage)
+          .build();
       compilerTask.compile();
     }
   }
@@ -121,6 +130,26 @@ public class CompilerUtils {
 
       targetFolder = createTargetFolder();
       sources = new File[] {source};
+
+      compileJavaSources(targetFolder);
+
+      return getCompiledClass(targetFolder, source.getName());
+    }
+
+    /**
+     * Indicates which source file must be compiled.
+     *
+     * @param source source files. Non empty.
+     * @param javaPackage the package for the sources. Non empty.
+     * @return the same compiler instance
+     */
+    public File compiling(Path javaPackage, File source) {
+      checkArgument(source != null, "source cannot be null");
+      checkArgument(javaPackage != null, "javaPackage cannot be null");
+
+      targetFolder = createTargetFolder();
+      sources = new File[] {source};
+      this.javaPackage = javaPackage;
 
       compileJavaSources(targetFolder);
 
@@ -151,6 +180,7 @@ public class CompilerUtils {
 
   /**
    * Base class to create a compiler that compiles multiple source files.
+   * 
    * @param <T> class of the implemented compiler
    */
   protected static abstract class MultipleFileCompiler<T extends MultipleFileCompiler> extends AbstractCompiler<T> {
@@ -159,13 +189,29 @@ public class CompilerUtils {
 
     /**
      * Indicates which source file must be compiled.
-     * 
+     *
      * @param sources source files. Non empty.
      * @return the same compiler instance
      */
     public T compiling(File... sources) {
-      checkArgument(sources != null && sources.length > 0, "source cannot be empty");
+      checkArgument(sources != null && sources.length > 0, "sources cannot be empty");
       this.sources = sources;
+
+      return getThis();
+    }
+
+    /**
+     * Indicates which source file must be compiled.
+     *
+     * @param sources source files. Non empty.
+     * @param javaPackage the package in which the files will be placed.
+     * @return the same compiler instance
+     */
+    public T compiling(Path javaPackage, File... sources) {
+      checkArgument(sources != null && sources.length > 0, "source cannot be empty");
+      checkArgument(javaPackage != null, "javaPackage cannot be empty");
+      this.sources = sources;
+      this.javaPackage = javaPackage;
 
       return getThis();
     }
@@ -260,7 +306,7 @@ public class CompilerUtils {
      * Compiles all the provided sources generating a JAR file.
      *
      * @param jarName name of the JAR file to create. Non empty.
-     * @param  extensionVersion version of the extension being compiled. Non empty.
+     * @param extensionVersion version of the extension being compiled. Non empty.
      * @return the created file.
      */
     public File compile(String jarName, String extensionVersion) {
