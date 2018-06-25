@@ -25,6 +25,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 public final class MuleClientFlowConstruct extends AbstractComponent implements FlowConstruct {
 
   MuleContext muleContext;
+  FlowExceptionHandler exceptionHandler;
 
   public MuleClientFlowConstruct(MuleContext muleContext) {
     this.muleContext = muleContext;
@@ -47,13 +48,15 @@ public final class MuleClientFlowConstruct extends AbstractComponent implements 
 
   @Override
   public FlowExceptionHandler getExceptionListener() {
-    final FlowExceptionHandler exceptionListener = muleContext.getDefaultErrorHandler(empty());
-    try {
-      initialiseIfNeeded(exceptionListener, true, muleContext);
-    } catch (InitialisationException e) {
-      throw new MuleRuntimeException(e);
+    if (exceptionHandler == null) {
+      exceptionHandler = muleContext.getDefaultErrorHandler(empty());
+      try {
+        initialiseIfNeeded(exceptionHandler, true, muleContext);
+      } catch (InitialisationException e) {
+        throw new MuleRuntimeException(e);
+      }
     }
-    return exceptionListener;
+    return exceptionHandler;
   }
 
   @Override
