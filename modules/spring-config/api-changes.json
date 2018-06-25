@@ -1,4 +1,37 @@
 {
+  "4.1.3": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.field.added",
+          "new": "field org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider.encoding",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProvider",
+          "fieldName": "encoding",
+          "elementKind": "field",
+          "justification": "Added field to support file encoding for configuration properties"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider::<init>(java.lang.String, java.lang.String, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProvider",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "Added constructor that receives the file encoding"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.io.InputStreamReader org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider::getResourceInputStreamReader(java.lang.String) throws java.io.IOException",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProvider",
+          "methodName": "getResourceInputStreamReader",
+          "elementKind": "method",
+          "justification": "Added (private) method that uses the file encoding"
+        }
+      ]
+    }
+  },
   "4.1.2": {
     "revapi": {
       "ignore": [
