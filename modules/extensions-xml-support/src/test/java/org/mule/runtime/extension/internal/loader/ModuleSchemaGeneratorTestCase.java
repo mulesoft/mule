@@ -85,6 +85,8 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
       ClassLoader contextClassLoader = currentThread().getContextClassLoader();
       Map<String, Object> parameters = new HashMap<>();
       parameters.put(RESOURCE_XML, modulePath);
+      // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+      parameters.put("COMPILATION_MODE", true);
       ExtensionModel extensionModel =
           new XmlExtensionModelLoader().loadExtensionModel(contextClassLoader, getDefault(emptySet()), parameters);
 

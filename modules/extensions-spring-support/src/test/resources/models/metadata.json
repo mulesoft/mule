@@ -3341,7 +3341,7 @@
               "format": "java",
               "type": "Void"
             },
-            "hasDynamicType": true,
+            "hasDynamicType": false,
             "description": "",
             "modelProperties": {}
           },

@@ -81,6 +81,8 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
           Map<String, Object> params = new HashMap<>();
           params.put(XmlExtensionModelLoader.RESOURCE_XML, modulePath);
           params.put(XmlExtensionModelLoader.VALIDATE_XML, shouldValidateXml());
+          // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+          params.put("COMPILATION_MODE", true);
           operationsOutputPath().ifPresent(path -> params.put(XmlExtensionModelLoader.RESOURCE_DECLARATION, path));
           resourcesPaths().ifPresent(resourcesPaths -> params.put(XmlExtensionModelLoader.RESOURCES_PATHS, resourcesPaths));
           final DslResolvingContext dslResolvingContext = getDefault(extensions);

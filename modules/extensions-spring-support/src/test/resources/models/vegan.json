@@ -10422,7 +10422,7 @@
                       "model": {
                         "type": "Boolean",
                         "annotations": {
-                          "typeId": "java.lang.Boolean"
+                          "typeId": "boolean"
                         }
                       },
                       "annotations": {
@@ -10576,7 +10576,7 @@
                       "model": {
                         "type": "Boolean",
                         "annotations": {
-                          "typeId": "java.lang.Boolean"
+                          "typeId": "boolean"
                         }
                       },
                       "annotations": {
@@ -10862,7 +10862,7 @@
                 "model": {
                   "type": "Boolean",
                   "annotations": {
-                    "typeId": "java.lang.Boolean"
+                    "typeId": "boolean"
                   }
                 },
                 "annotations": {
@@ -11039,7 +11039,7 @@
           "model": {
             "type": "Boolean",
             "annotations": {
-              "typeId": "java.lang.Boolean"
+              "typeId": "boolean"
             }
           },
           "annotations": {

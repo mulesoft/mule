@@ -60,6 +60,8 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, FootballSoapExtension.class.getName());
     params.put(VERSION, getProductVersion());
+    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+    params.put("COMPILATION_MODE", true);
     ExtensionModel model =
         loader.loadExtensionModel(FootballSoapExtension.class.getClassLoader(), getDefault(emptySet()), params);
 

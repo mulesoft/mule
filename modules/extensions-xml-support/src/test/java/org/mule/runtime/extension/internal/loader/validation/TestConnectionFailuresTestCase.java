@@ -129,6 +129,8 @@ public class TestConnectionFailuresTestCase extends AbstractMuleTestCase {
   private ExtensionModel getExtensionModelFrom(String modulePath, Set<ExtensionModel> extensions) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, modulePath);
+    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+    parameters.put("COMPILATION_MODE", true);
     return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), getDefault(extensions), parameters);
   }
 }

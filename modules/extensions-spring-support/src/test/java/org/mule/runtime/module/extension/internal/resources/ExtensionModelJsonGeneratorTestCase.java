@@ -176,6 +176,8 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, clazz.getName());
     params.put(VERSION, "4.0.0-SNAPSHOT");
+    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+    params.put("COMPILATION_MODE", true);
     // TODO MULE-11797: as this utils is consumed from
     // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
     // this util should get dropped once the ticket gets implemented.

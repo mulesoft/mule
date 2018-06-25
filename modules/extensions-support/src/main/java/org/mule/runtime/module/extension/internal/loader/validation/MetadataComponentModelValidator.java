@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isCollection;
@@ -20,9 +21,11 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isRouter;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isScope;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.NamedObject;
@@ -48,9 +51,9 @@ import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
+import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -70,7 +73,7 @@ import java.util.Set;
  */
 public class MetadataComponentModelValidator implements ExtensionModelValidator {
 
-  private static final String EMPTY_RESOLVER_NAME = "%s '%s' specifies a metadata resolver [%s] which has an empty %s name";
+  private static final String EMPTY_RESOLVER_NAME = "%s '%s' specifies a metadata resolver '%s' which has an empty %s name";
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
@@ -100,7 +103,7 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
 
       private void validateComponent(ConnectableComponentModel model) {
         validateMetadataReturnType(extensionModel, model, problemsReporter);
-        MetadataResolverFactory resolverFactory = MuleExtensionUtils.getMetadataResolverFactory(model);
+        MetadataResolverFactory resolverFactory = getMetadataResolverFactory(model);
         validateMetadataOutputAttributes(model, resolverFactory, problemsReporter);
         validateMetadataKeyId(model, resolverFactory, problemsReporter);
         validateCategoriesInScope(model, resolverFactory, problemsReporter);
@@ -121,15 +124,15 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
           if (isBlank(r.getResolverName())) {
             problemsReporter.addError(new Problem(model,
                                                   format(EMPTY_RESOLVER_NAME,
-                                                         getComponentModelTypeName(model), model.getName(),
+                                                         capitalize(getComponentModelTypeName(model)), model.getName(),
                                                          r.getClass().getSimpleName(), "resolver")));
           } else {
             if (names.get(r.getCategoryName(), r.getResolverName()) != null
                 && names.get(r.getCategoryName(), r.getResolverName()) != r.getClass()) {
               problemsReporter
                   .addError(new Problem(model,
-                                        format("%s [%s] specifies metadata resolvers with repeated name [%s] for the same category [%s]. Resolver names should be unique for a given category. Affected resolvers are '%s' and '%s'",
-                                               getComponentModelTypeName(model), model.getName(),
+                                        format("%s '%s' specifies metadata resolvers with repeated name '%s' for the same category '%s'. Resolver names should be unique for a given category. Affected resolvers are '%s' and '%s'",
+                                               capitalize(getComponentModelTypeName(model)), model.getName(),
                                                r.getResolverName(), r.getCategoryName(),
                                                names.get(r.getCategoryName(), r.getResolverName()).getSimpleName(),
                                                r.getClass().getSimpleName())));
@@ -142,14 +145,15 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
 
   private void validateMetadataKeyId(ComponentModel model, MetadataResolverFactory resolverFactory,
                                      ProblemsReporter problemsReporter) {
+    final String modelTypeName = capitalize(getComponentModelTypeName(model));
     Optional<MetadataKeyIdModelProperty> keyId = model.getModelProperty(MetadataKeyIdModelProperty.class);
     if (keyId.isPresent()) {
 
       if (resolverFactory.getOutputResolver() instanceof NullMetadataResolver &&
           getAllInputResolvers(model, resolverFactory).isEmpty()) {
-        problemsReporter.addError(new Problem(model, format("Component [%s] defines a MetadataKeyId parameter but neither"
+        problemsReporter.addError(new Problem(model, format("%s '%s' defines a MetadataKeyId parameter but neither"
             + " an Output nor Type resolver that makes use of it was defined",
-                                                            model.getName())));
+                                                            modelTypeName, model.getName())));
       }
 
       keyId.get().getType().accept(new MetadataTypeVisitor() {
@@ -164,16 +168,19 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
             String typeName = ExtensionMetadataTypeUtils.getId(objectType).orElse("Anonymous type");
             problemsReporter
                 .addError(new Problem(model,
-                                      format("[%s] type multilevel key defines [%s] MetadataKeyPart with default values, but the type contains [%s] "
+                                      format("%s '%s' uses the multilevel key of type '%s', which defines '%s' MetadataKeyPart with default values, but the type contains '%s' "
                                           + "MetadataKeyParts. All the annotated MetadataKeyParts should have a default value if at least one part "
-                                          + "has a default value.", typeName, defaultParts.size(), parts.size())));
+                                          + "has a default value. Either add the missing defaults or remove all of them.",
+                                             modelTypeName, model.getName(),
+                                             typeName, defaultParts.size(), parts.size())));
           }
         }
       });
     } else {
       if (!(resolverFactory.getKeyResolver() instanceof NullMetadataResolver)) {
-        problemsReporter.addError(new Problem(model, format("Component [%s] does not define a MetadataKeyId parameter but "
-            + "a type keys resolver of type [%s] was associated to it",
+        problemsReporter.addError(new Problem(model, format("%s '%s' does not define a MetadataKeyId parameter but "
+            + "a TypeKeysResolver of type '%s' was associated to it.",
+                                                            modelTypeName,
                                                             model.getName(),
                                                             resolverFactory.getKeyResolver().getClass().getName())));
       }
@@ -186,9 +193,10 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
     if (isVoid(component.getOutputAttributes().getType())
         && !(resolverFactory.getOutputAttributesResolver() instanceof NullMetadataResolver)
         && (!isCollection(component.getOutput().getType()))) {
-      problemsReporter.addError(new Problem(component, String
-          .format("%s '%s' has an attributes metadata resolver defined but it doesn't set any attributes",
-                  getComponentModelTypeName(component), component.getName())));
+      problemsReporter
+          .addError(new Problem(component,
+                                format("%s '%s' has an AttributesTypeResolver defined but it doesn't declare any attributes as part of its output.",
+                                       capitalize(getComponentModelTypeName(component)), component.getName())));
     }
   }
 
@@ -198,24 +206,59 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
     if (!shouldValidateComponentOutputMetadata(component)) {
       return;
     }
-    if (MuleExtensionUtils.getMetadataResolverFactory(component).getOutputResolver() instanceof NullMetadataResolver) {
-      component.getOutput().getType().accept(new MetadataTypeVisitor() {
+    OutputTypeResolver<Object> outputResolver = getMetadataResolverFactory(component).getOutputResolver();
+    MetadataType modelOutputType = component.getOutput().getType();
+    if (outputResolver instanceof NullMetadataResolver) {
+      validateNoOutputResolverIsNeeded(extensionModel, component, problemsReporter, modelOutputType);
 
-        @Override
-        public void visitObject(ObjectType objectType) {
-          if (!isCustomStaticType(objectType)) {
-            objectType.getOpenRestriction().ifPresent(t -> checkValidType(component, extensionModel, t, problemsReporter));
-            checkValidType(component, extensionModel, objectType, problemsReporter);
-          }
-        }
+    } else if (extensionModel.getModelProperty(CompileTimeModelProperty.class).isPresent()) {
+      // TODO MULE-14517: Validations for types added since 4.1.1, so we need to keep backwards compatibility somehow for now.
+      validateVoidOperationsDontDeclareOutputResolver(component, problemsReporter, outputResolver, modelOutputType);
+    }
+  }
 
-        @Override
-        public void visitArrayType(ArrayType arrayType) {
-          if (!isCustomStaticType(arrayType)) {
-            arrayType.getType().accept(this);
-          }
+  private void validateNoOutputResolverIsNeeded(ExtensionModel extensionModel, ConnectableComponentModel component,
+                                                ProblemsReporter problemsReporter, MetadataType modelOutputType) {
+    modelOutputType.accept(new MetadataTypeVisitor() {
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        if (!isCustomStaticType(objectType)) {
+          objectType.getOpenRestriction().ifPresent(t -> checkValidType(component, extensionModel, t, problemsReporter));
+          checkValidType(component, extensionModel, objectType, problemsReporter);
         }
-      });
+      }
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        if (!isCustomStaticType(arrayType)) {
+          arrayType.getType().accept(this);
+        }
+      }
+    });
+  }
+
+  private void validateVoidOperationsDontDeclareOutputResolver(ConnectableComponentModel component,
+                                                               ProblemsReporter problemsReporter,
+                                                               OutputTypeResolver<Object> outputResolver,
+                                                               MetadataType modelOutputType) {
+    if (modelOutputType instanceof VoidType) {
+      problemsReporter
+          .addError(new Problem(component,
+                                format("A Metadata OutputResolver named '%s' in category '%s' was defined for the Void Operation '%s'. "
+                                    + "Output resolvers cannot be used on Void Operations, since they produce no output.",
+                                       outputResolver.getResolverName(),
+                                       outputResolver.getCategoryName(),
+                                       component.getName())));
+    } else if (isCustomStaticType(modelOutputType)) {
+      component.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+          .map(mp -> mp.getOperationMethod().getReturnMetadataType())
+          .filter(t -> t instanceof VoidType)
+          .ifPresent(t -> problemsReporter.addError(new Problem(component,
+                                                                format("An Static Metadata OutputResolver was defined for the Void Operation '%s'. "
+                                                                    + "Output resolvers cannot be used on Void Operations, since they produce no output.",
+                                                                       component.getName()))));
+
     }
   }
 
@@ -223,7 +266,6 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
     return metadataType.getAnnotation(CustomDefinedStaticTypeAnnotation.class).isPresent();
   }
 
-  // todo refactor with metadata factory getCategoryName()
   private void validateCategoriesInScope(ComponentModel componentModel, MetadataResolverFactory metadataResolverFactory,
                                          ProblemsReporter problemsReporter) {
 
@@ -239,10 +281,11 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
   private void validateCategoryNames(ComponentModel componentModel, ProblemsReporter problemsReporter,
                                      List<NamedTypeResolver> resolvers) {
     resolvers.stream().filter(r -> StringUtils.isBlank(r.getCategoryName()))
-        .findFirst().ifPresent(r -> problemsReporter.addError(new Problem(componentModel, String
-            .format(EMPTY_RESOLVER_NAME,
-                    getComponentModelTypeName(componentModel), componentModel.getName(),
-                    r.getClass().getSimpleName(), "category"))));
+        .findFirst().ifPresent(r -> problemsReporter.addError(new Problem(componentModel, format(EMPTY_RESOLVER_NAME,
+                                                                                                 capitalize(getComponentModelTypeName(componentModel)),
+                                                                                                 componentModel.getName(),
+                                                                                                 r.getClass().getSimpleName(),
+                                                                                                 "category"))));
 
     Set<String> names = resolvers.stream()
         .filter(r -> !isNullResolver(r))
@@ -250,46 +293,40 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
         .collect(toSet());
 
     if (names.size() > 1) {
-      problemsReporter.addError(new Problem(componentModel, String.format(
-                                                                          "%s '%s' specifies metadata resolvers that doesn't belong to the same category. The following categories were the ones found [%s]",
-                                                                          getComponentModelTypeName(componentModel),
-                                                                          componentModel.getName(),
-                                                                          join(names, ","))));
+      problemsReporter.addError(new Problem(componentModel,
+                                            format("%s '%s' specifies metadata resolvers that doesn't belong to the same category. The following categories were the ones found '%s'",
+                                                   capitalize(getComponentModelTypeName(componentModel)),
+                                                   componentModel.getName(),
+                                                   join(names, ","))));
     }
   }
 
-  private void failIfTypeIsObject(ComponentModel componentModel, ExtensionModel extensionModel,
-                                  MetadataType metadataType, String componentTypeName, Class<?> type,
-                                  ProblemsReporter problemsReporter) {
-    if (Object.class.equals(type)) {
-      problemsReporter
-          .addError(new Problem(extensionModel,
-                                format("Extension '%s' specifies a/an %s named '%s' with type '%s' as return type. Components that return a type "
-                                    + "such as Object or Map (or a collection of any of those) must have defined an OutputResolver",
-                                       extensionModel.getName(), componentTypeName, componentModel.getName(),
-                                       type)));
-    }
-  }
-
-  private void failIfTypeIsInterface(ComponentModel componentModel, ExtensionModel extensionModel, MetadataType metadataType,
-                                     String componentTypeName, Class<?> type,
-                                     ProblemsReporter problemsReporter) {
-    if (isInvalidInterface(metadataType, type)) {
-      problemsReporter
-          .addError(new Problem(extensionModel,
-                                format("Extension '%s' specifies a/an %s named '%s' with type '%s' as return type. Components that return an interface "
-                                    + "(or a collection of interfaces) must have defined an OutputResolver",
-                                       extensionModel.getName(), componentTypeName, componentModel.getName(),
-                                       type)));
-    }
-  }
-
-  private void checkValidType(ComponentModel componentModel, ExtensionModel extensionModel, MetadataType metadataType,
+  private void checkValidType(ConnectableComponentModel componentModel, ExtensionModel extensionModel, MetadataType metadataType,
                               ProblemsReporter problemsReporter) {
     String componentTypeName = getComponentModelTypeName(componentModel);
     getType(metadataType).ifPresent(type -> {
-      failIfTypeIsObject(componentModel, extensionModel, metadataType, componentTypeName, type, problemsReporter);
-      failIfTypeIsInterface(componentModel, extensionModel, metadataType, componentTypeName, type, problemsReporter);
+      String declarationMessageModifier = "";
+      MetadataType modelType = componentModel.getOutput().getType();
+      if (modelType instanceof ArrayType) {
+        declarationMessageModifier = "a collection of ";
+      } else if (modelType instanceof ObjectType && ((ObjectType) modelType).isOpen()) {
+        declarationMessageModifier = "a map of ";
+      }
+
+      if (Object.class.equals(type)) {
+        problemsReporter.addError(new Problem(extensionModel,
+                                              format("%s '%s' declares %s'%s' as its return type. Components that return a type "
+                                                  + "such as Object or Map (or a collection of any of those) must have defined an OutputResolver",
+                                                     capitalize(componentTypeName), componentModel.getName(),
+                                                     declarationMessageModifier, type)));
+
+      } else if (isInvalidInterface(metadataType, type)) {
+        problemsReporter.addError(new Problem(extensionModel,
+                                              format("%s '%s' declares %s'%s' as its return type. Components that return an interface "
+                                                  + "(or a collection of interfaces) must have defined an OutputResolver",
+                                                     capitalize(componentTypeName), componentModel.getName(),
+                                                     declarationMessageModifier, type)));
+      }
     });
   }
 

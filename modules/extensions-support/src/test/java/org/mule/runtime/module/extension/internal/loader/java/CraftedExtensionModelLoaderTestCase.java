@@ -13,7 +13,6 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.module.extension.api.loader.java.CraftedExtensionModelLoader.TYPE_PROPERTY_NAME;
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -57,6 +56,8 @@ public class CraftedExtensionModelLoaderTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
     attributes.put(TYPE_PROPERTY_NAME, TestExtensionLoadingDelegate.class.getName());
+    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+    attributes.put("COMPILATION_MODE", true);
   }
 
   @Test

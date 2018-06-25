@@ -123,6 +123,7 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
     params.put(ROUND_ENVIRONMENT, roundEnvironment);
 
     if (!simulateRuntimeLoading()) {
+      // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
       params.put(COMPILATION_MODE, true);
     }
 

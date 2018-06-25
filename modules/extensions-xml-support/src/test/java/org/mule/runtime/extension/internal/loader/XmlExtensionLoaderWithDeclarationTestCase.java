@@ -22,11 +22,6 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.test.allure.AllureConstants.XmlSdk.Declaration.DECLARATION_DATASENSE;
 import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
@@ -42,6 +37,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 @Feature(XML_SDK)
@@ -179,6 +180,8 @@ public class XmlExtensionLoaderWithDeclarationTestCase extends AbstractMuleTestC
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, MODULE_DECLARATION_RESOURCE_FILE);
     parameters.put(XmlExtensionModelLoader.VALIDATE_XML, validateXml);
+    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+    parameters.put("COMPILATION_MODE", true);
     declarationPath.ifPresent(path -> parameters.put(XmlExtensionModelLoader.RESOURCE_DECLARATION, path));
     return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(),
                                                             getDefault(EMPTY_SET),

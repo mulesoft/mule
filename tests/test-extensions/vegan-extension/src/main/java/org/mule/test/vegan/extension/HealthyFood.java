@@ -32,7 +32,7 @@ public class HealthyFood implements FarmedFood {
 
     @Parameter
     @Optional(defaultValue = "false")
-    private Boolean tasty = null;
+    private boolean tasty;
 
     public boolean isTasty() {
       return tasty;

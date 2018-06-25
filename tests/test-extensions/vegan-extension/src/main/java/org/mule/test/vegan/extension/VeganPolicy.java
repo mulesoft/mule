@@ -14,7 +14,7 @@ public class VeganPolicy {
 
   @Parameter
   @Optional(defaultValue = "false")
-  private Boolean meetAllowed;
+  private boolean meetAllowed;
 
   @ParameterGroup(name = "Ingredients")
   private VeganIngredients ingredients;
@@ -23,7 +23,7 @@ public class VeganPolicy {
   @Optional(defaultValue = "500")
   private Integer maxCalories;
 
-  public Boolean getMeetAllowed() {
+  public boolean getMeetAllowed() {
     return meetAllowed;
   }
 

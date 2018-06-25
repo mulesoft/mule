@@ -12,12 +12,6 @@ import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.VALIDATE_XML;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
@@ -31,6 +25,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  * Tests if the current module contains cycles with its TNS references through operations, and fails accordingly.
@@ -98,6 +99,8 @@ public class DetectCyclesTestCase extends AbstractMuleTestCase {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, modulePath);
     parameters.put(VALIDATE_XML, validateXml);
+    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+    parameters.put("COMPILATION_MODE", true);
     return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), getDefault(emptySet()), parameters);
   }
 }
