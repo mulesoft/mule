@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.classloader;
 
+import static java.lang.Math.max;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.center;
 import static org.apache.commons.lang3.StringUtils.repeat;
 
@@ -57,7 +59,7 @@ public class DefaultClassLoaderNode implements ClassLoaderNode {
 
   @Override
   public Optional<ClassLoaderNode> getParent() {
-    return Optional.ofNullable(parent);
+    return ofNullable(parent);
   }
 
   public static DefaultClassLoaderNodeBuilder builder() {
@@ -71,9 +73,9 @@ public class DefaultClassLoaderNode implements ClassLoaderNode {
     int maximumIdLength = 0;
     do {
       classLoaderNodes.push(currentNode);
-      maximumIdLength = Math.max(maximumIdLength, currentNode.getId().length());
+      maximumIdLength = max(maximumIdLength, currentNode.getId().length());
       for (ClassLoaderNode childNode : currentNode.getDelegateNodes()) {
-        maximumIdLength = Math.max(maximumIdLength, childNode.getId().length());
+        maximumIdLength = max(maximumIdLength, childNode.getId().length());
       }
     } while ((currentNode = currentNode.getParent().orElse(null)) != null);
     final StringBuilder stringBuilder = new StringBuilder();
