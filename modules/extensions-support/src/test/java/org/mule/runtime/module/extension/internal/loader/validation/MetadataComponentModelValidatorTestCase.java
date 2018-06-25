@@ -244,9 +244,6 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     when(sourceModel.getErrorCallback()).thenReturn(of(sourceCallbackModel));
     mockMetadataResolverFactory(sourceModel, null);
 
-    // MetadataKeyIdModelProperty keyIdModelProperty =
-    //     new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class), EMPTY);
-    // when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
     when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
     when(sourceModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)).thenReturn(empty());
