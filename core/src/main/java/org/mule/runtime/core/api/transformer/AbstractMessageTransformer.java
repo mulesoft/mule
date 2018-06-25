@@ -17,6 +17,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -37,6 +38,14 @@ import java.nio.charset.Charset;
  */
 
 public abstract class AbstractMessageTransformer extends AbstractTransformer implements MessageTransformer {
+
+  private MuleClientFlowConstruct flowConstruct;
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    super.setMuleContext(context);
+    flowConstruct = new MuleClientFlowConstruct(context);
+  }
 
   /**
    * @param dataType the type to check against
@@ -122,8 +131,6 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     Object result;
     // TODO MULE-9342 Clean up transformer vs message transformer confusion
     if (event == null) {
-      MuleClientFlowConstruct flowConstruct =
-          new MuleClientFlowConstruct(muleContext);
       ComponentLocation location = getLocation() != null ? getLocation() : fromSingleComponent("AbstractMessageTransformer");
       event = InternalEvent.builder(create(flowConstruct, location)).message(message).build();
     }

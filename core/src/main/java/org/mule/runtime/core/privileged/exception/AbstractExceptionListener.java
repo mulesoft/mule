@@ -18,7 +18,6 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.api.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
@@ -38,14 +37,14 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the base class for exception strategies which contains several helper methods. However, you should probably inherit
@@ -102,7 +101,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   protected void doInitialise(MuleContext context) throws InitialisationException {
     requireNonNull(muleContext);
-    logger.info("Initialising exception listener: " + toString());
+    if (logger.isDebugEnabled()) {
+      logger.debug("Initialising exception listener: " + toString());
+    }
   }
 
   protected void fireNotification(Exception ex, CoreEvent event) {
