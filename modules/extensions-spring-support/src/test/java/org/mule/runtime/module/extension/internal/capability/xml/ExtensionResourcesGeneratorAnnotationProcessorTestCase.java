@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
@@ -71,7 +72,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends Abst
                                                               TestExtensionWithDocumentationAndMultipleConfig.class.getName())
                                                          .put(VERSION, "4.0.0")
                                                          // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
-                                                         .put("COMPILATION_MODE", true)
+                                                         .put(COMPILATION_MODE, true)
                                                          .build());
     String generatedSchema = new DefaultExtensionSchemaGenerator().generate(model, DslResolvingContext.getDefault(emptySet()));
     assertThat(generatedSchema, is(notNullValue()));
