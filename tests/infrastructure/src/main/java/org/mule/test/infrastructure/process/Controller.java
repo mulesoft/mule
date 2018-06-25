@@ -237,6 +237,10 @@ public class Controller {
     return new File(appsDir, appName + ANCHOR_SUFFIX).exists();
   }
 
+  protected boolean isUndeployed(String appName) {
+    return !(new File(appsDir, appName + ANCHOR_SUFFIX).exists() || new File(appsDir, appName).exists());
+  }
+
   protected boolean isDomainDeployed(String domainName) {
     return new File(domainsDir, domainName + ANCHOR_SUFFIX).exists();
   }
