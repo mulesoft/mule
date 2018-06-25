@@ -35,7 +35,12 @@ public final class DefaultConfigurationPropertiesProviderFactory implements Conf
 
     String file = parameters.getStringParameter("file");
     Preconditions.checkArgument(file != null, "Required attribute 'file' of 'configuration-properties' not found");
-    String encoding = parameters.getStringParameter("encoding");
+    String encoding = null;
+    try {
+      encoding = parameters.getStringParameter("encoding");
+    } catch (Exception e) {
+
+    }
 
     return new DefaultConfigurationPropertiesProvider(file, encoding, externalResourceProvider);
   }
