@@ -85,12 +85,8 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
   }
 
   protected InputStreamReader getResourceInputStreamReader(String file) throws IOException {
-    try {
-      InputStream in = getResourceInputStream(file);
-      return encoding != null ? new InputStreamReader(in, encoding) : new InputStreamReader(in);
-    } catch (ResourceNotFoundException e) {
-      return null;
-    }
+    InputStream in = getResourceInputStream(file);
+    return encoding != null ? new InputStreamReader(in, encoding) : new InputStreamReader(in);
   }
 
   @Override
