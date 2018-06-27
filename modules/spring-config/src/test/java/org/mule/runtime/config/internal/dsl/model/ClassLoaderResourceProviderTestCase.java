@@ -11,16 +11,15 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 public class ClassLoaderResourceProviderTestCase extends AbstractMuleTestCase {
 
