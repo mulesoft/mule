@@ -71,7 +71,6 @@ import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.transformation.TransformationService;
-import org.mule.runtime.api.util.Lapse;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
@@ -295,9 +294,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
         getRegistry().initialise();
 
         fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISING));
-        Lapse lapse = new Lapse();
         getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
-        lapse.mark("Initialise");
         fireNotification(new MuleContextNotification(this, CONTEXT_INITIALISED));
         listeners.forEach(l -> l.onInitialization(this, getApiRegistry()));
 
@@ -332,12 +329,9 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
       startIfNeeded(extensionManager);
       fireNotification(new MuleContextNotification(this, CONTEXT_STARTING));
-      Lapse lapse = new Lapse();
       getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
-      lapse.mark("start");
       overridePollingController();
       overrideClusterConfiguration();
-      lapse.mark("start message sources");
       startMessageSources();
 
       fireNotification(new MuleContextNotification(this, CONTEXT_STARTED));

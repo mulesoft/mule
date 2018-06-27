@@ -79,21 +79,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
           objects.addAll(bucket);
         }
       }
-      //sort(objects, (left, right) -> {
-        //for (int i = 0; i < orderedLifecycleTypes.length; i++) {
-        //  boolean c1 = orderedLifecycleTypes[i].isInstance(left);
-        //  boolean c2 = orderedLifecycleTypes[i].isInstance(right);
-        //  if (c1 && c2) {
-        //    return 0;
-        //  } else if (c1) {
-        //    return -1;
-        //  } else if (c2) {
-        //    return 1;
-        //  }
-        //}
-        //
-        //return 0;
-      //});
     }
 
     return objects;
@@ -103,8 +88,8 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
     if (ignoredObjectTypes == null) {
       return false;
     } else {
-      for (Class<?> ignorredObjectType : ignoredObjectTypes) {
-        if (ignorredObjectType.isAssignableFrom(type)) {
+      for (Class<?> ignoredType : ignoredObjectTypes) {
+        if (ignoredType.isAssignableFrom(type)) {
           return true;
         }
       }

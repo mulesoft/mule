@@ -484,7 +484,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected List<String> createApplicationComponents(DefaultListableBeanFactory beanFactory, ApplicationModel applicationModel,
                                                      boolean mustBeRoot) {
 
-    Lapse lapse = new Lapse();
     // This should only be done once at the initial application model creation, called from Spring
     List<Pair<ComponentModel, Optional<String>>> objectProvidersByName =
         lookObjectProvidersComponentModels(applicationModel);
@@ -575,7 +574,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       }
     }));
 
-    lapse.mark("createApplicationComponents");
     return createdComponentModels;
   }
 

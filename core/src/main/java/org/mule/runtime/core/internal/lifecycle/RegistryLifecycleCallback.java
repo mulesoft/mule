@@ -83,7 +83,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     }
 
     for (Object target : targetObjects) {
-      if (duplicates.contains(target) || target == null) {
+      if (target == null || duplicates.contains(target)) {
         continue;
       }
 
@@ -93,15 +93,6 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
 
       applyLifecycle(phase, duplicates, target);
     }
-
-    // the target object might have created and registered a new object
-    // (e.g.: an endpoint which registers a connector)
-    // check if there're new objects for the phase
-    //int originalTargetCount = targetObjects.size();
-    //targetObjects = lookupObjectsForLifecycle(lifecycleObject);
-    //if (targetObjects.size() > originalTargetCount) {
-    //  doApplyLifecycle(phase, duplicates, lifecycleObject, targetObjects);
-    //}
   }
 
   private void applyLifecycle(LifecyclePhase phase, Set<Object> duplicates, Object target) throws LifecycleException {
