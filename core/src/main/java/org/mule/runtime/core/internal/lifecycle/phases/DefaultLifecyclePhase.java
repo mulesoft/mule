@@ -61,6 +61,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
     if (orderedLifecycleTypes == null || orderedLifecycleTypes.length > 0) {
       List<Object>[] sorted = new List[orderedLifecycleTypes.length];
       for (Object object : objects) {
+        boolean bucketed = false;
         for (int i = 0; i < orderedLifecycleTypes.length; i++) {
           if (orderedLifecycleTypes[i].isInstance(object)) {
             List<Object> bucket = sorted[i];
@@ -69,7 +70,13 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
               sorted[i] = bucket;
             }
             bucket.add(object);
+            bucketed = true;
+            break;
           }
+        }
+
+        if (!bucketed) {
+          throw new RuntimeException("HA!");
         }
       }
 
