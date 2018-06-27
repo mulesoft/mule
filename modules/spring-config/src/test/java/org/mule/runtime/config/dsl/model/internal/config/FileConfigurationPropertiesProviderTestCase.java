@@ -9,6 +9,7 @@ package org.mule.runtime.config.dsl.model.internal.config;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.CONFIGURATION_PROPERTIES_RESOLVER_STORY;
 
@@ -45,7 +46,8 @@ public class FileConfigurationPropertiesProviderTestCase extends AbstractMuleTes
 
   @Test
   public void fileIsResolved() {
-    assertThat(resolver.resolveValue("${file::dummy.xml}"), is("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo/>\n"));
+    assertThat((String) resolver.resolveValue("${file::dummy.xml}"),
+               is(equalToIgnoringLineBreaks("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo/>\n")));
   }
 
   @Test

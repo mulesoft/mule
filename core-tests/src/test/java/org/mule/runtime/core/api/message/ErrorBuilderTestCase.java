@@ -16,7 +16,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
-import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalIgnoringLineBreaks;
+import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
 
 import org.mule.runtime.api.exception.ComposedErrorException;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -112,7 +112,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
         .build();
 
     assertThat(error.toString(),
-               is(equalIgnoringLineBreaks("\norg.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
+               is(equalToIgnoringLineBreaks("\norg.mule.runtime.core.internal.message.ErrorBuilder$ErrorImplementation\n"
                    + "{\n"
                    + "  description=message\n"
                    + "  detailedDescription=message\n"
