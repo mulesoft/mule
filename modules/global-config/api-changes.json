@@ -1,4 +1,37 @@
 {
+  "4.1.4": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.maven.client.api.model.MavenConfiguration.MavenConfigurationBuilder org.mule.maven.client.api.model.MavenConfiguration.MavenConfigurationBuilder::activeProfiles(java.util.List<java.lang.String>)",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "MavenConfigurationBuilder",
+          "methodName": "activeProfiles",
+          "elementKind": "method",
+          "justification": "Support for profiles activation"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.maven.client.api.model.MavenConfiguration.MavenConfigurationBuilder org.mule.maven.client.api.model.MavenConfiguration.MavenConfigurationBuilder::inactiveProfiles(java.util.List<java.lang.String>)",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "MavenConfigurationBuilder",
+          "methodName": "inactiveProfiles",
+          "elementKind": "method",
+          "justification": "Support for profiles inactivation"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.maven.client.api.model.MavenConfiguration.MavenConfigurationBuilder org.mule.maven.client.api.model.MavenConfiguration.MavenConfigurationBuilder::userProperties(java.util.Properties)",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "MavenConfigurationBuilder",
+          "methodName": "userProperties",
+          "elementKind": "method",
+          "justification": "Support for user properties"
+        }
+      ]
+    }
+  },
   "4.1.3": {
     "revapi": {
       "ignore": [

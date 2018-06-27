@@ -8,6 +8,7 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.base.Joiner.on;
+import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
@@ -76,6 +77,7 @@ public class DependencyResolver {
                                                      mavenConfiguration.getOfflineMode(),
                                                      mavenConfiguration
                                                          .getIgnoreArtifactDescriptorRepositories(),
+                                                     empty(),
                                                      session -> {
                                                      });
 
