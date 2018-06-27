@@ -38,8 +38,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalIgnoringLineBreaks;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
@@ -256,10 +258,10 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
             + "\n  payload=test\n  mediaType=*/*\n  attributes=<not set>\n  attributesMediaType=*/*\n}";
     assertThat(expressionManager.parseLogTemplate("current message is #[mel:message]", testEvent(), TEST_CONNECTOR_LOCATION,
                                                   NULL_BINDING_CONTEXT),
-               is(expectedOutput));
+               is(equalIgnoringLineBreaks(expectedOutput)));
     assertThat(expressionManager.parseLogTemplate("current message is #[message]", testEvent(), TEST_CONNECTOR_LOCATION,
                                                   NULL_BINDING_CONTEXT),
-               is(expectedOutput));
+               is(equalIgnoringLineBreaks(expectedOutput)));
   }
 
   @Test

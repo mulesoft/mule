@@ -18,6 +18,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.metadata.DataType.JSON_STRING;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
+import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalIgnoringLineBreaks;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -133,14 +135,14 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
         .mediaType(TEXT)
         .build();
 
-    assertThat(message.toString(), is("\n" +
+    assertThat(message.toString(), is(equalIgnoringLineBreaks("\n" +
         "org.mule.runtime.core.internal.message.DefaultMessageBuilder$MessageImplementation\n"
         + "{\n"
         + "  payload=test\n"
         + "  mediaType=text/plain\n"
         + "  attributes={}\n"
         + "  attributesMediaType=application/json\n"
-        + "}"));
+        + "}")));
   }
 
   @Test
@@ -154,7 +156,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
         .exceptionPayload(new DefaultExceptionPayload(new NullPointerException("error")))
         .build();
 
-    assertThat(message.toString(), is("\n"
+    assertThat(message.toString(), is(equalIgnoringLineBreaks("\n"
         + "org.mule.runtime.core.internal.message.DefaultMessageBuilder$MessageImplementation\n"
         + "{\n"
         + "  payload=test\n"
@@ -169,7 +171,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
         + "    bar=in\n"
         + "    OUTBOUND scoped properties:\n"
         + "    foo=out\n"
-        + "}"));
+        + "}")));
   }
 
 }
