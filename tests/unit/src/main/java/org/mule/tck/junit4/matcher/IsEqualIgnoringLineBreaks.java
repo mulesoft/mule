@@ -41,11 +41,11 @@ public class IsEqualIgnoringLineBreaks extends TypeSafeMatcher<String> {
   }
 
   public void describeTo(Description description) {
-    description.appendText("equalIgnoringLineBreaks(").appendValue(this.string).appendText(")");
+    description.appendText("equalToIgnoringLineBreaks(").appendValue(this.string).appendText(")");
   }
 
   @Factory
-  public static Matcher<String> equalIgnoringLineBreaks(String expectedString) {
+  public static Matcher<String> equalToIgnoringLineBreaks(String expectedString) {
     return new IsEqualIgnoringLineBreaks(expectedString);
   }
 }

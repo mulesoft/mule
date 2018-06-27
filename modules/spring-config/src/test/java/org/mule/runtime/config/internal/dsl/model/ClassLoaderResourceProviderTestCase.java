@@ -33,17 +33,17 @@ public class ClassLoaderResourceProviderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void sameJarResourceGetsLoaded() {
-    verifyResourceGetsLoadedSuccessfully(Paths.get("META-INF", "mule-core.xsd").toString());
+    verifyResourceGetsLoadedSuccessfully("META-INF/mule-core.xsd");
   }
 
   @Test
   public void differentJarResourceGetsLoaded() {
-    verifyResourceGetsLoadedSuccessfully(Paths.get("javax", "inject", "Inject.class").toString());
+    verifyResourceGetsLoadedSuccessfully("javax/inject/Inject.class");
   }
 
   @Test
   public void absolutePathResourceGetsLoaded() {
-    File file = FileUtils.toFile(getClass().getClassLoader().getResource(Paths.get("META-INF", "mule-core.xsd").toString()));
+    File file = FileUtils.toFile(getClass().getClassLoader().getResource("META-INF/mule-core.xsd"));
     verifyResourceGetsLoadedSuccessfully(file.getAbsolutePath());
   }
 
