@@ -87,7 +87,7 @@ public class ModuleExtensionModelJsonTestCase extends AbstractMuleTestCase {
 
     Function<String, Object[]> stringFunction = moduleName -> {
       String moduleModelPath = "modules" + separator + "model" + separator + moduleName + ".json";
-      String modulePath = "modules" + separator + moduleName + ".xml";
+      String modulePath = "modules/" + moduleName + ".xml";
 
       ClassLoader contextClassLoader = currentThread().getContextClassLoader();
       Map<String, Object> parameters = new HashMap<>();
