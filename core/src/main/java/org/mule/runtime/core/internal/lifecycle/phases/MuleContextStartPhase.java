@@ -40,13 +40,14 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
  */
 public class MuleContextStartPhase extends DefaultLifecyclePhase {
 
-  public MuleContextStartPhase() {
-    this(new Class[] {Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class,
-        OutboundRouter.class, MuleContext.class, Service.class});
+  public MuleContextStartPhase(Registry registry) {
+    this(registry,
+         new Class[] {Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class,
+             OutboundRouter.class, MuleContext.class, Service.class});
   }
 
-  public MuleContextStartPhase(Class<?>[] ignoredObjects) {
-    super(Startable.PHASE_NAME, Startable.class, o -> ((Startable) o).start());
+  public MuleContextStartPhase(Registry registry, Class<?>[] ignoredObjects) {
+    super(Startable.PHASE_NAME, registry, Startable.class, o -> ((Startable) o).start());
 
     setIgnoredObjectTypes(ignoredObjects);
     setOrderedLifecycleTypes(new Class<?>[] {

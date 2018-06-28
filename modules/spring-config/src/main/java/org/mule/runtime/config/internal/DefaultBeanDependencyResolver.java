@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.config.internal;
 
+import static com.google.common.graph.Traverser.forTree;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
-
-import com.google.common.collect.TreeTraverser;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -50,29 +49,18 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
   }
 
   @Override
-  public List<Object> resolveBeanDependencies(Set<String> beanNames) {
+  public List<Object> resolveBeanDependencies(String beanName) {
     final DependencyNode root = new DependencyNode(null);
 
-    for (String beanName : beanNames) {
-      addDependency(root, beanName, springRegistry.get(beanName));
-    }
-
-    Iterable<DependencyNode> orderedNodes = new TreeTraverser<DependencyNode>() {
-
-      @Override
-      public Iterable children(DependencyNode node) {
-        return node.getChildren();
-      }
-    }.postOrderTraversal(root);
+    addDependency(root, beanName, springRegistry.get(beanName));
 
     List<Object> orderedObjects = new LinkedList<>();
-    for (DependencyNode node : orderedNodes) {
-      if (node == root) {
-        break;
+    forTree(DependencyNode::getChildren).depthFirstPostOrder(root).forEach(node -> {
+      if (node != root) {
+        orderedObjects.add(node.getValue());
       }
+    });
 
-      orderedObjects.add(node.getValue());
-    }
     return orderedObjects;
   }
 

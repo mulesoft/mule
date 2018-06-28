@@ -11,7 +11,6 @@ import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * A {@link RegistryLifecycleCallback} to be used with instances of {@link SpringRegistry}. For each object in which a
@@ -35,8 +34,9 @@ class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry> 
 
   @Override
   protected Collection<Object> lookupObjectsForLifecycle(Class<?> type) {
-    Map<String, Object> objects = (Map<String, Object>) getSpringRegistry().lookupEntriesForLifecycle(type);
-    return springRegistry.getBeanDependencyResolver().resolveBeanDependencies(objects.keySet());
+    return (Collection<Object>) getSpringRegistry().lookupEntriesForLifecycle(type).values();
+    //Map<String, Object> objects = (Map<String, Object>) getSpringRegistry().lookupEntriesForLifecycle(type);
+    //return springRegistry.getBeanDependencyResolver().resolveBeanDependencies(objects.keySet());
   }
 
   private SpringRegistry getSpringRegistry() {

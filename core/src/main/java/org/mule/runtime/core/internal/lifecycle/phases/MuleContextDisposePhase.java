@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
@@ -48,15 +49,20 @@ import javax.annotation.PreDestroy;
  */
 public class MuleContextDisposePhase extends DefaultLifecyclePhase {
 
-  public MuleContextDisposePhase() {
-    super(Disposable.PHASE_NAME, Disposable.class, o -> ((Disposable) o).dispose());
+  public MuleContextDisposePhase(Registry registry) {
+    super(Disposable.PHASE_NAME, registry, Object.class, o -> {
+      if (o instanceof Disposable) {
+        ((Disposable) o).dispose();
+      }
+    });
 
     setOrderedLifecycleTypes(new Class<?>[] {
         FlowConstruct.class,
         LegacyConnector.class,
         ConfigurationProvider.class,
         Config.class,
-        Disposable.class
+        Disposable.class,
+        Object.class
     });
 
     // Can call dispose from all lifecycle Phases

@@ -47,6 +47,11 @@ import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
   public SpringRegistryLifecycleManager(String id, SpringRegistry springRegistry, MuleContext muleContext,
@@ -58,11 +63,11 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
   protected void registerPhases(Registry registry) {
     final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
     registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), emptyCallback);
-    registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(),
+    registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(registry),
                   new SpringLifecycleCallback(this, (SpringRegistry) registry));
-    registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
-    registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);
-    registerPhase(Disposable.PHASE_NAME, new SpringContextDisposePhase());
+    registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(registry), emptyCallback);
+    registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(registry), emptyCallback);
+    registerPhase(Disposable.PHASE_NAME, new SpringContextDisposePhase(registry));
   }
 
   // ///////////////////////////////////////////////////////////////////////////////////
@@ -72,8 +77,8 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
   class SpringContextInitialisePhase extends MuleContextInitialisePhase {
 
-    public SpringContextInitialisePhase() {
-      super();
+    public SpringContextInitialisePhase(Registry registry) {
+      super(registry);
 
       setOrderedLifecycleTypes(new Class<?>[] {
           LockFactory.class,
@@ -106,44 +111,79 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
         super.applyLifecycle(o);
       }
     }
-  }
-
-  /**
-   * Detects if a bean is an inner bean to prevent applying lifecycle to it since lifecycle is already applied by the owner, i.e.:
-   * a flow
-   *
-   * @param name bean name.
-   * @return true if contains inner bean as prefix of the bean name, false otherwise.
-   */
-  private boolean isNamedBean(String name) {
-    return name != null && !name.startsWith(INNER_BEAN_PREFIX);
-  }
-
-  /**
-   * A lifecycle phase that will delegate to the {@link SpringRegistry#doDispose()} method which in turn will destroy the
-   * application context managed by this registry
-   */
-  class SpringContextDisposePhase extends MuleContextDisposePhase {
-
-    public SpringContextDisposePhase() {
-      super();
-      setIgnoredObjectTypes(new Class[] {Component.class, MessageSource.class, InterceptingMessageProcessor.class,
-          OutboundRouter.class, MuleContext.class, ServerNotificationManager.class, Service.class});
-    }
 
     @Override
-    public void applyLifecycle(Object o) throws LifecycleException {
-      if (o instanceof SpringRegistry) {
-        ((SpringRegistry) o).doDispose();
-      } else if (o instanceof Transformer) {
-        String name = ((Transformer) o).getName();
-        if (isNamedBean(name)) {
-          super.applyLifecycle(o);
+    public List<Object> getLifecycleObjects() {
+      final SpringRegistry springRegistry = (SpringRegistry) getLifecycleObject();
+
+      Map<String, Initialisable> objects = springRegistry.lookupEntriesForLifecycle(Initialisable.class);
+      List<Object>[] buckets = new List[orderedLifecycleTypes.length];
+      int objectCount = 0;
+
+      for (Map.Entry<String, Initialisable> entry : objects.entrySet()) {
+        for (int i = 0; i < orderedLifecycleTypes.length; i++) {
+          Initialisable object = entry.getValue();
+          if (orderedLifecycleTypes[i].isInstance(object)) {
+            List<Object> bucket = buckets[i];
+            if (bucket == null) {
+              bucket = new LinkedList<>();
+              buckets[i] = bucket;
+            }
+            final List<Object> dependencies = springRegistry.getBeanDependencyResolver().resolveBeanDependencies(entry.getKey());
+            bucket.addAll(dependencies);
+            bucket.add(object);
+            objectCount += dependencies.size() + 1;
+            break;
+          }
         }
-      } else {
-        super.applyLifecycle(o);
       }
+
+      List<Object> sorted = new ArrayList<>(objectCount);
+      for (List<Object> bucket : buckets) {
+        if (bucket != null) {
+          sorted.addAll(bucket);
+        }
+      }
+      return sorted;
     }
   }
 
-}
+    /**
+     * Detects if a bean is an inner bean to prevent applying lifecycle to it since lifecycle is already applied by the owner, i.e.:
+     * a flow
+     *
+     * @param name bean name.
+     * @return true if contains inner bean as prefix of the bean name, false otherwise.
+     */
+    private boolean isNamedBean(String name) {
+      return name != null && !name.startsWith(INNER_BEAN_PREFIX);
+    }
+
+    /**
+     * A lifecycle phase that will delegate to the {@link SpringRegistry#doDispose()} method which in turn will destroy the
+     * application context managed by this registry
+     */
+    class SpringContextDisposePhase extends MuleContextDisposePhase {
+
+      public SpringContextDisposePhase(Registry registry) {
+        super(registry);
+        setIgnoredObjectTypes(new Class[] {Component.class, MessageSource.class, InterceptingMessageProcessor.class,
+            OutboundRouter.class, MuleContext.class, ServerNotificationManager.class, Service.class});
+      }
+
+      @Override
+      public void applyLifecycle(Object o) throws LifecycleException {
+        if (o instanceof SpringRegistry) {
+          ((SpringRegistry) o).doDispose();
+        } else if (o instanceof Transformer) {
+          String name = ((Transformer) o).getName();
+          if (isNamedBean(name)) {
+            super.applyLifecycle(o);
+          }
+        } else {
+          super.applyLifecycle(o);
+        }
+      }
+    }
+
+  }

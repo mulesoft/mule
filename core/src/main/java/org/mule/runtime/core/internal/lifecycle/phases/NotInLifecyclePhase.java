@@ -16,7 +16,7 @@ public class NotInLifecyclePhase extends DefaultLifecyclePhase {
   public static final String PHASE_NAME = "not in lifecycle";
 
   public NotInLifecyclePhase() {
-    super(PHASE_NAME, NotInLifecyclePhase.class, null);
+    super(PHASE_NAME, null, NotInLifecyclePhase.class, null);
     registerSupportedPhase(Initialisable.PHASE_NAME);
   }
 }

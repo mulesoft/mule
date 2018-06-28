@@ -13,12 +13,13 @@ import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
 import org.mule.runtime.core.internal.lifecycle.LifecycleTransitionResult;
+import org.mule.runtime.core.internal.registry.Registry;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,52 +44,51 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
 
   private final Class<?> lifecycleClass;
   private final CheckedConsumer<Object> lifecycleInvoker;
-  private Class<?>[] orderedLifecycleTypes;
+  private final Registry registry;
+  protected Class<?>[] orderedLifecycleTypes;
   private Class<?>[] ignoredObjectTypes;
   private final String name;
   private Set<String> supportedPhases;
 
-  public DefaultLifecyclePhase(String name, Class<?> lifecycleClass, CheckedConsumer<Object> lifecycleInvoker) {
+  public DefaultLifecyclePhase(String name, Registry registry, Class<?> lifecycleClass,
+                               CheckedConsumer<Object> lifecycleInvoker) {
     this.name = name;
     this.lifecycleClass = lifecycleClass;
     this.lifecycleInvoker = lifecycleInvoker;
+    this.registry = registry;
   }
 
   @Override
-  public List<Object> getSortedLifecycleObjects(Function<Class<?>, List<Object>> repository) {
-    List<Object> objects = repository.apply(getLifecycleClass());
+  public List<Object> getLifecycleObjects() {
+    return sortLifecycleObjects((List<Object>) registry.lookupObjectsForLifecycle(lifecycleClass));
+  }
 
-    if (orderedLifecycleTypes == null || orderedLifecycleTypes.length > 0) {
-      List<Object>[] sorted = new List[orderedLifecycleTypes.length];
-      for (Object object : objects) {
-        boolean bucketed = false;
-        for (int i = 0; i < orderedLifecycleTypes.length; i++) {
-          if (orderedLifecycleTypes[i].isInstance(object)) {
-            List<Object> bucket = sorted[i];
-            if (bucket == null) {
-              bucket = new LinkedList<>();
-              sorted[i] = bucket;
-            }
-            bucket.add(object);
-            bucketed = true;
-            break;
+  protected List<Object> sortLifecycleObjects(List<Object> objects) {
+    List<Object>[] buckets = new List[orderedLifecycleTypes.length];
+    int objectCount = 0;
+
+    for (Object object : objects) {
+      for (int i = 0; i < orderedLifecycleTypes.length; i++) {
+        if (orderedLifecycleTypes[i].isInstance(object)) {
+          List<Object> bucket = buckets[i];
+          if (bucket == null) {
+            bucket = new LinkedList<>();
+            buckets[i] = bucket;
           }
-        }
-
-        if (!bucketed) {
-          throw new RuntimeException("HA!");
-        }
-      }
-
-      objects = new LinkedList<>();
-      for (List<Object> bucket : sorted) {
-        if (bucket != null) {
-          objects.addAll(bucket);
+          bucket.add(object);
+          objectCount++;
+          break;
         }
       }
     }
 
-    return objects;
+    List<Object> sorted = new ArrayList<>(objectCount);
+    for (List<Object> bucket : buckets) {
+      if (bucket != null) {
+        sorted.addAll(bucket);
+      }
+    }
+    return sorted;
   }
 
   protected boolean ignoreType(Class<?> type) {
@@ -113,11 +113,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
   }
 
   @Override
-  public Class<?> getLifecycleClass() {
-    return lifecycleClass;
-  }
-
-  @Override
   public String getName() {
     return name;
   }
@@ -138,7 +133,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
     if (ignoreType(o.getClass())) {
       return;
     }
-    if (!getLifecycleClass().isAssignableFrom(o.getClass())) {
+    if (!lifecycleClass.isAssignableFrom(o.getClass())) {
       return;
     }
     if (o instanceof LifecycleStateEnabled) {

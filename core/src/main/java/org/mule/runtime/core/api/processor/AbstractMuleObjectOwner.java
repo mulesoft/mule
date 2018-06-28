@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
@@ -20,12 +19,12 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An object that owns Mule objects and delegates startup/shutdown events to them.
@@ -54,7 +53,7 @@ public abstract class AbstractMuleObjectOwner<T> extends AbstractComponent
 
   @Override
   public void initialise() throws InitialisationException {
-    // TODO TMULE-10764 This shouldn't happen here.
+    // TODO MULE-10764 This shouldn't happen here.
     setMuleContext(muleContext);
     initialiseIfNeeded(getOwnedObjects(), true, muleContext);
   }

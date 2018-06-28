@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.lifecycle;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -38,10 +37,10 @@ public class RegistryBrokerLifecycleManager extends RegistryLifecycleManager {
   protected void registerPhases(Registry registry) {
     RegistryLifecycleCallback callback = new RegistryLifecycleCallback(this);
     LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
-    registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(), emptyCallback);
-    registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), callback);
-    registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), callback);
-    registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(), emptyCallback);
+    registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(registry), emptyCallback);
+    registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(registry), callback);
+    registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(registry), callback);
+    registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(registry), emptyCallback);
   }
 
   public void fireInitialisePhase(LifecycleCallback<AbstractRegistryBroker> callback) throws InitialisationException {

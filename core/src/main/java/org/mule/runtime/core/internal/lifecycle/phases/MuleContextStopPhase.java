@@ -42,13 +42,14 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
  */
 public class MuleContextStopPhase extends DefaultLifecyclePhase {
 
-  public MuleContextStopPhase() {
-    this(new Class[] {Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class,
-        OutboundRouter.class, Service.class});
+  public MuleContextStopPhase(Registry registry) {
+    this(registry,
+         new Class[] {Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class,
+             OutboundRouter.class, Service.class});
   }
 
-  public MuleContextStopPhase(Class<?>[] ignorredObjects) {
-    super(Stoppable.PHASE_NAME, Stoppable.class, o -> ((Stoppable) o).stop());
+  public MuleContextStopPhase(Registry registry, Class<?>[] ignorredObjects) {
+    super(Stoppable.PHASE_NAME, registry, Stoppable.class, o -> ((Stoppable) o).stop());
 
     setOrderedLifecycleTypes(new Class<?>[] {
         FlowConstruct.class,

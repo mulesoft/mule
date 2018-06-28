@@ -10,7 +10,6 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.meta.NamedObject;
 
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Encapsulates the notion of a lifecycle phase i.e. 'stop'. Implementations of this class are responsible for invoking the
@@ -24,11 +23,9 @@ public interface LifecyclePhase extends NamedObject {
 
   String ALL_PHASES = "all";
 
-  Class<?> getLifecycleClass();
-
   void registerSupportedPhase(String phase);
 
-  List<Object> getSortedLifecycleObjects(Function<Class<?>, List<Object>> repository);
+  List<Object> getLifecycleObjects();
 
   void applyLifecycle(Object o) throws LifecycleException;
 }

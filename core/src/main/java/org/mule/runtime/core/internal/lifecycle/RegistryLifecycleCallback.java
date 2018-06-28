@@ -17,11 +17,9 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
-import org.mule.runtime.core.internal.lifecycle.phases.ContainerManagedLifecyclePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
 import org.mule.runtime.core.internal.registry.Registry;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -66,13 +64,8 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
       LOGGER.debug(format("Applying lifecycle phase: %s for registry: %s", phase, object.getClass().getSimpleName()));
     }
 
-    if (phase instanceof ContainerManagedLifecyclePhase) {
-      phase.applyLifecycle(object);
-      return;
-    }
-
-    doApplyLifecycle(phase, new HashSet<>(),
-                     phase.getSortedLifecycleObjects(type -> new ArrayList<>(lookupObjectsForLifecycle(type))));
+    doApplyLifecycle(phase, new HashSet<>(), phase.getLifecycleObjects());
+    //phase.getSortedLifecycleObjects(type -> new ArrayList<>(lookupObjectsForLifecycle(type))));
     interceptor.onPhaseCompleted(phase);
   }
 
