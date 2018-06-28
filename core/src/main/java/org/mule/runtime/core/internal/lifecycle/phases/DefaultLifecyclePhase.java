@@ -161,4 +161,9 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
       throw new LifecycleException(failedToInvokeLifecycle(name, o), getNonMuleException(t), o);
     }
   }
+
+  @Override
+  public Class<?> getLifecycleClass() {
+    return lifecycleClass;
+  }
 }

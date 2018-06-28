@@ -25,6 +25,8 @@ public interface LifecyclePhase extends NamedObject {
 
   void registerSupportedPhase(String phase);
 
+  Class<?> getLifecycleClass();
+
   List<Object> getLifecycleObjects();
 
   void applyLifecycle(Object o) throws LifecycleException;
