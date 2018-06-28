@@ -559,6 +559,12 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                 <xsd:attribute name="resetControllerAfterEachTransformation" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>Whether the underlying saxon controller must be reset after each transformation to reduce memory footprint
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
