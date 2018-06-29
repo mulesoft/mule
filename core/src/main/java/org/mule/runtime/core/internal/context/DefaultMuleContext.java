@@ -111,8 +111,6 @@ import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
-import org.mule.runtime.core.internal.registry.Registry;
-import org.mule.runtime.core.internal.registry.RegistryBroker;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.runtime.core.internal.util.splash.ArtifactShutdownSplashScreen;
@@ -155,11 +153,6 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   private static Logger logger = getLogger(DefaultMuleContext.class);
 
   private CustomizationService customizationService = new DefaultCustomizationService();
-
-  /**
-   * Internal registry facade which delegates to other registries.
-   */
-  private RegistryBroker registryBroker;
 
   /**
    * Simplified Mule configuration interface
@@ -304,7 +297,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
         getNotificationManager().initialise();
 
         // refresh object serializer reference in case a default one was redefined in the config.
-        objectSerializer = registryBroker.get(DEFAULT_OBJECT_SERIALIZER_NAME);
+        objectSerializer = muleRegistryHelper.get(DEFAULT_OBJECT_SERIALIZER_NAME);
       } catch (InitialisationException e) {
         dispose();
         throw e;
@@ -549,7 +542,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   public void setSecurityManager(SecurityManager securityManager) {
     checkLifecycleForPropertySet(OBJECT_SECURITY_MANAGER, Initialisable.PHASE_NAME);
     try {
-      registryBroker.registerObject(OBJECT_SECURITY_MANAGER, securityManager);
+      muleRegistryHelper.registerObject(OBJECT_SECURITY_MANAGER, securityManager);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
@@ -564,9 +557,9 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
    */
   @Override
   public SecurityManager getSecurityManager() {
-    SecurityManager securityManager = registryBroker.lookupObject(OBJECT_SECURITY_MANAGER);
+    SecurityManager securityManager = muleRegistryHelper.lookupObject(OBJECT_SECURITY_MANAGER);
     if (securityManager == null) {
-      Collection<SecurityManager> temp = registryBroker.lookupObjects(SecurityManager.class);
+      Collection<SecurityManager> temp = muleRegistryHelper.lookupObjects(SecurityManager.class);
       if (temp.size() > 0) {
         securityManager = (temp.iterator().next());
       }
@@ -599,9 +592,9 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   @Override
   public QueueManager getQueueManager() {
     if (queueManager == null) {
-      queueManager = registryBroker.lookupObject(OBJECT_QUEUE_MANAGER);
+      queueManager = muleRegistryHelper.lookupObject(OBJECT_QUEUE_MANAGER);
       if (queueManager == null) {
-        Collection<QueueManager> temp = registryBroker.lookupObjects(QueueManager.class);
+        Collection<QueueManager> temp = muleRegistryHelper.lookupObjects(QueueManager.class);
         if (temp.size() > 0) {
           queueManager = temp.iterator().next();
         }
@@ -688,7 +681,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   @Override
   public void setTransactionManager(TransactionManager manager) throws RegistrationException {
     // checkLifecycleForPropertySet(MuleProperties.OBJECT_TRANSACTION_MANAGER, Initialisable.PHASE_NAME);
-    registryBroker.registerObject(OBJECT_TRANSACTION_MANAGER, manager);
+    muleRegistryHelper.registerObject(OBJECT_TRANSACTION_MANAGER, manager);
   }
 
   /**
@@ -758,24 +751,6 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   @Override
   public ClassLoader getExecutionClassLoader() {
     return executionClassLoader;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  @Deprecated
-  public void addRegistry(Registry registry) {
-    registryBroker.addRegistry(registry);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  @Deprecated
-  public void removeRegistry(Registry registry) {
-    registryBroker.removeRegistry(registry);
   }
 
   private SplashScreen buildStartupSplash() {
@@ -891,7 +866,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   @Override
   public ExtendedExpressionManager getExpressionManager() {
     if (expressionManager == null) {
-      expressionManager = registryBroker.lookupObject(OBJECT_EXPRESSION_MANAGER);
+      expressionManager = muleRegistryHelper.lookupObject(OBJECT_EXPRESSION_MANAGER);
     }
     return expressionManager;
   }
@@ -899,7 +874,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   @Override
   public LockFactory getLockFactory() {
     if (this.lockFactory == null) {
-      this.lockFactory = registryBroker.get(OBJECT_LOCK_FACTORY);
+      this.lockFactory = muleRegistryHelper.get(OBJECT_LOCK_FACTORY);
     }
     return this.lockFactory;
   }
@@ -907,7 +882,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   @Override
   public ProcessingTimeWatcher getProcessorTimeWatcher() {
     if (this.processingTimeWatcher == null) {
-      this.processingTimeWatcher = registryBroker.get(OBJECT_PROCESSING_TIME_WATCHER);
+      this.processingTimeWatcher = muleRegistryHelper.get(OBJECT_PROCESSING_TIME_WATCHER);
     }
 
     return this.processingTimeWatcher;
@@ -947,10 +922,6 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
       throw new MuleRuntimeException(msg);
     }
     this.lifecycleManager = (MuleContextLifecycleManager) lifecycleManager;
-  }
-
-  public void setRegistryBroker(RegistryBroker registryBroker) {
-    this.registryBroker = registryBroker;
   }
 
   public void setInjector(Injector injector) {

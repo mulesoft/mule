@@ -6,5 +6,5 @@ public interface LifecycleObjectSorter {
 
   void addObject(String name, Object object);
 
-  List<Object> getSortedList();
+  List<Object> getSortedObjects();
 }

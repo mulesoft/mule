@@ -33,7 +33,7 @@ public class NotInLifecyclePhase extends DefaultLifecyclePhase {
       }
 
       @Override
-      public List<Object> getSortedList() {
+      public List<Object> getSortedObjects() {
         return emptyList();
       }
     };

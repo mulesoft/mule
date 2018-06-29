@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.lifecycle;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.toMap;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -24,7 +23,6 @@ import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhas
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.runtime.core.internal.registry.AbstractRegistryBroker;
 import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.lifecycle.AbstractLifecycleManager;
 
@@ -40,7 +38,6 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
 
   protected Map<String, LifecyclePhase> phases = new HashMap<>();
   protected SortedMap<String, LifecycleCallback> callbacks = new TreeMap<>();
-  private Map<String, List<Object>> phaseObjects = null;
 
   protected MuleContext muleContext;
   private final LifecycleInterceptor lifecycleInterceptor;
@@ -56,12 +53,11 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
 
   protected void registerPhases(Registry registry) {
     final RegistryLifecycleCallback<Object> callback = new RegistryLifecycleCallback<>(this);
-    final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
 
-    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), emptyCallback);
+    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), new EmptyLifecycleCallback<>());
     registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(), callback);
-    registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
-    registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);
+    registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), callback);
+    registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), callback);
     registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(), callback);
   }
 
@@ -184,20 +180,10 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
   }
 
   protected List<Object> getObjectsForPhase(LifecyclePhase phase) {
-    if (phaseObjects == null) {
-      phaseObjects = calculateObjectsForPhases();
-    }
+    LifecycleObjectSorter sorter = phase.newLifecycleObjectSorter();
 
-    return phaseObjects.get(phase.getName());
-  }
-
-  protected Map<String, List<Object>> calculateObjectsForPhases() {
-    Map<String, LifecycleObjectSorter> sorters = phases.entrySet().stream()
-        .collect(toMap(Map.Entry::getKey, entry -> entry.getValue().newLifecycleObjectSorter()));
-
-    lookupObjectsForLifecycle().forEach((key, value) -> sorters.values().forEach(sorter -> sorter.addObject(key, value)));
-
-    return sorters.entrySet().stream().collect(toMap(Map.Entry::getKey, entry -> entry.getValue().getSortedList()));
+    lookupObjectsForLifecycle().forEach((key, value) -> sorter.addObject(key, value));
+    return sorter.getSortedObjects();
   }
 
   protected Map<String, Object> lookupObjectsForLifecycle() {

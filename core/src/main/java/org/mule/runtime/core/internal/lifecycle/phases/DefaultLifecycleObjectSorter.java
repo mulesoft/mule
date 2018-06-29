@@ -42,7 +42,7 @@ public class DefaultLifecycleObjectSorter implements LifecycleObjectSorter {
   }
 
   @Override
-  public List<Object> getSortedList() {
+  public List<Object> getSortedObjects() {
     List<Object> sorted = new ArrayList<>(objectCount);
     for (List<Object> bucket : buckets) {
       if (bucket != null) {

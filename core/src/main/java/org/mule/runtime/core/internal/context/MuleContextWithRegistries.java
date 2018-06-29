@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.context;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
-import org.mule.runtime.core.internal.registry.Registry;
 
 /**
  * Declares {@link MuleRegistry} handling methods for {@link MuleContext}.
@@ -22,9 +21,5 @@ import org.mule.runtime.core.internal.registry.Registry;
 public interface MuleContextWithRegistries extends MuleContext {
 
   MuleRegistry getRegistry();
-
-  void addRegistry(Registry registry);
-
-  void removeRegistry(Registry registry);
 
 }
