@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -40,14 +41,13 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
  */
 public class MuleContextStartPhase extends DefaultLifecyclePhase {
 
-  public MuleContextStartPhase(Registry registry) {
-    this(registry,
-         new Class[] {Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class,
+  public MuleContextStartPhase() {
+    this(new Class[] {Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class,
              OutboundRouter.class, MuleContext.class, Service.class});
   }
 
-  public MuleContextStartPhase(Registry registry, Class<?>[] ignoredObjects) {
-    super(Startable.PHASE_NAME, registry, Startable.class, o -> ((Startable) o).start());
+  public MuleContextStartPhase(Class<?>[] ignoredObjects) {
+    super(Startable.PHASE_NAME, LifecycleUtils::startIfNeeded);
 
     setIgnoredObjectTypes(ignoredObjects);
     setOrderedLifecycleTypes(new Class<?>[] {

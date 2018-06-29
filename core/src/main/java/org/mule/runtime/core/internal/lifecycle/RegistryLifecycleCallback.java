@@ -60,12 +60,9 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
 
     LifecyclePhase phase = registryLifecycleManager.phases.get(phaseName);
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Applying lifecycle phase: %s for registry: %s", phase, object.getClass().getSimpleName()));
-    }
+    LOGGER.debug("Applying lifecycle phase: {} for registry: {}", phase, object.getClass().getSimpleName());
 
-    doApplyLifecycle(phase, new HashSet<>(), phase.getLifecycleObjects());
-    //phase.getSortedLifecycleObjects(type -> new ArrayList<>(lookupObjectsForLifecycle(type))));
+    doApplyLifecycle(phase, new HashSet<>(), registryLifecycleManager.getObjectsForPhase(phase));
     interceptor.onPhaseCompleted(phase);
   }
 
@@ -97,10 +94,10 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
       } else {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug(format(
-                              "Skipping the application of the '%s' lifecycle phase over a certain object "
-                                  + "because a %s interceptor of type [%s] indicated so. Object is: %s",
-                              phase.getName(), LifecycleInterceptor.class.getSimpleName(),
-                              interceptor.getClass().getName(), target));
+              "Skipping the application of the '%s' lifecycle phase over a certain object "
+                  + "because a %s interceptor of type [%s] indicated so. Object is: %s",
+              phase.getName(), LifecycleInterceptor.class.getSimpleName(),
+              interceptor.getClass().getName(), target));
         }
       }
     } catch (Exception e) {
@@ -116,10 +113,6 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
         throw e;
       }
     }
-  }
-
-  protected Collection<Object> lookupObjectsForLifecycle(Class<?> type) {
-    return (Collection<Object>) registryLifecycleManager.getLifecycleObject().lookupObjectsForLifecycle(type);
   }
 
   @Override

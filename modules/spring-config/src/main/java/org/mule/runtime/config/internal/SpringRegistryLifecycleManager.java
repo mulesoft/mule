@@ -33,8 +33,9 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
+import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
-import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
@@ -48,9 +49,6 @@ import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
@@ -64,11 +62,15 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
   protected void registerPhases(Registry registry) {
     final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
     registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), emptyCallback);
-    registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(registry),
-                  new SpringLifecycleCallback(this, (SpringRegistry) registry));
-    registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(registry), emptyCallback);
-    registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(registry), emptyCallback);
-    registerPhase(Disposable.PHASE_NAME, new SpringContextDisposePhase(registry));
+    registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(), new RegistryLifecycleCallback(this));
+    registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
+    registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);
+    registerPhase(Disposable.PHASE_NAME, new SpringContextDisposePhase());
+  }
+
+  @Override
+  protected Map<String, Object> lookupObjectsForLifecycle() {
+    return getSpringRegistry().lookupEntriesForLifecycle(Object.class);
   }
 
   // ///////////////////////////////////////////////////////////////////////////////////
@@ -76,16 +78,10 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
   // ///////////////////////////////////////////////////////////////////////////////////
 
 
-  interface SpringLifecyclePhase extends LifecyclePhase {
+  class SpringContextInitialisePhase extends MuleContextInitialisePhase {
 
-    Class<?>[] getOrderedLifecycleTypes();
-  }
-
-
-  class SpringContextInitialisePhase extends MuleContextInitialisePhase implements SpringLifecyclePhase {
-
-    public SpringContextInitialisePhase(Registry registry) {
-      super(registry);
+    public SpringContextInitialisePhase() {
+      super();
 
       setOrderedLifecycleTypes(new Class<?>[] {
           LockFactory.class,
@@ -121,13 +117,8 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
     }
 
     @Override
-    public Class<?>[] getOrderedLifecycleTypes() {
-      return orderedLifecycleTypes;
-    }
-
-    @Override
-    public List<Object> getLifecycleObjects() {
-      return SpringRegistryLifecycleManager.this.getLifecycleObjects(this);
+    public LifecycleObjectSorter newLifecycleObjectSorter() {
+      return new SpringLifecycleObjectSorter(orderedLifecycleTypes, getSpringRegistry());
     }
   }
 
@@ -146,22 +137,12 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
    * A lifecycle phase that will delegate to the {@link SpringRegistry#doDispose()} method which in turn will destroy the
    * application context managed by this registry
    */
-  class SpringContextDisposePhase extends MuleContextDisposePhase implements SpringLifecyclePhase {
+  class SpringContextDisposePhase extends MuleContextDisposePhase {
 
-    public SpringContextDisposePhase(Registry registry) {
-      super(registry);
+    public SpringContextDisposePhase() {
+      super();
       setIgnoredObjectTypes(new Class[] {Component.class, MessageSource.class, InterceptingMessageProcessor.class,
           OutboundRouter.class, MuleContext.class, ServerNotificationManager.class, Service.class});
-    }
-
-    @Override
-    public List<Object> getLifecycleObjects() {
-      return SpringRegistryLifecycleManager.this.getLifecycleObjects(this);
-    }
-
-    @Override
-    public Class<?>[] getOrderedLifecycleTypes() {
-      return orderedLifecycleTypes;
     }
 
     @Override
@@ -177,42 +158,14 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
         super.applyLifecycle(o);
       }
     }
+
+    @Override
+    public LifecycleObjectSorter newLifecycleObjectSorter() {
+      return new SpringLifecycleObjectSorter(orderedLifecycleTypes, getSpringRegistry());
+    }
   }
 
-  private List<Object> getLifecycleObjects(SpringLifecyclePhase phase) {
-    final SpringRegistry springRegistry = (SpringRegistry) getLifecycleObject();
-
-    Map<String, Object> objects = springRegistry.lookupEntriesForLifecycle((Class<Object>) phase.getLifecycleClass());
-    Class<?>[] orderedLifecycleTypes = phase.getOrderedLifecycleTypes();
-    List<Object>[] buckets = new List[orderedLifecycleTypes.length];
-
-    int objectCount = 0;
-
-    for (Map.Entry<String, Object> entry : objects.entrySet()) {
-      for (int i = 0; i < phase.getOrderedLifecycleTypes().length; i++) {
-        Object object = entry.getValue();
-        if (orderedLifecycleTypes[i].isInstance(object)) {
-          List<Object> bucket = buckets[i];
-          if (bucket == null) {
-            bucket = new LinkedList<>();
-            buckets[i] = bucket;
-          }
-          final List<Object> dependencies = springRegistry.getBeanDependencyResolver().resolveBeanDependencies(entry.getKey());
-          bucket.addAll(dependencies);
-          bucket.add(object);
-          objectCount += dependencies.size() + 1;
-          break;
-        }
-      }
-    }
-
-    List<Object> sorted = new ArrayList<>(objectCount);
-    for (List<Object> bucket : buckets) {
-      if (bucket != null) {
-        sorted.addAll(bucket);
-      }
-    }
-    return sorted;
+  private SpringRegistry getSpringRegistry() {
+    return (SpringRegistry) getLifecycleObject();
   }
-
 }

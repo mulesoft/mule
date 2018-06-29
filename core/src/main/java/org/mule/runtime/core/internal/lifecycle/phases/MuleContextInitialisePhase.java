@@ -14,11 +14,11 @@ import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
@@ -45,8 +45,8 @@ import javax.annotation.PostConstruct;
  */
 public class MuleContextInitialisePhase extends DefaultLifecyclePhase {
 
-  public MuleContextInitialisePhase(Registry registry) {
-    super(Initialisable.PHASE_NAME, registry, Initialisable.class, o -> ((Initialisable) o).initialise());
+  public MuleContextInitialisePhase() {
+    super(Initialisable.PHASE_NAME, LifecycleUtils::initialiseIfNeeded);
     registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
     setOrderedLifecycleTypes(new Class<?>[] {
         StreamingManager.class,

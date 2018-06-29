@@ -13,12 +13,8 @@ import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
 import org.mule.runtime.core.internal.lifecycle.LifecycleTransitionResult;
-import org.mule.runtime.core.internal.registry.Registry;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -42,53 +38,20 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
 
   protected transient final Logger logger = LoggerFactory.getLogger(DefaultLifecyclePhase.class);
 
-  private final Class<?> lifecycleClass;
   private final CheckedConsumer<Object> lifecycleInvoker;
-  private final Registry registry;
   protected Class<?>[] orderedLifecycleTypes;
   private Class<?>[] ignoredObjectTypes;
   private final String name;
   private Set<String> supportedPhases;
 
-  public DefaultLifecyclePhase(String name, Registry registry, Class<?> lifecycleClass,
-                               CheckedConsumer<Object> lifecycleInvoker) {
+  public DefaultLifecyclePhase(String name, CheckedConsumer<Object> lifecycleInvoker) {
     this.name = name;
-    this.lifecycleClass = lifecycleClass;
     this.lifecycleInvoker = lifecycleInvoker;
-    this.registry = registry;
   }
 
   @Override
-  public List<Object> getLifecycleObjects() {
-    return sortLifecycleObjects((List<Object>) registry.lookupObjectsForLifecycle(lifecycleClass));
-  }
-
-  protected List<Object> sortLifecycleObjects(List<Object> objects) {
-    List<Object>[] buckets = new List[orderedLifecycleTypes.length];
-    int objectCount = 0;
-
-    for (Object object : objects) {
-      for (int i = 0; i < orderedLifecycleTypes.length; i++) {
-        if (orderedLifecycleTypes[i].isInstance(object)) {
-          List<Object> bucket = buckets[i];
-          if (bucket == null) {
-            bucket = new LinkedList<>();
-            buckets[i] = bucket;
-          }
-          bucket.add(object);
-          objectCount++;
-          break;
-        }
-      }
-    }
-
-    List<Object> sorted = new ArrayList<>(objectCount);
-    for (List<Object> bucket : buckets) {
-      if (bucket != null) {
-        sorted.addAll(bucket);
-      }
-    }
-    return sorted;
+  public LifecycleObjectSorter newLifecycleObjectSorter() {
+    return new DefaultLifecycleObjectSorter(orderedLifecycleTypes);
   }
 
   protected boolean ignoreType(Class<?> type) {
@@ -133,9 +96,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
     if (ignoreType(o.getClass())) {
       return;
     }
-    if (!lifecycleClass.isAssignableFrom(o.getClass())) {
-      return;
-    }
+
     if (o instanceof LifecycleStateEnabled) {
       // If an object has its own lifecycle manager "LifecycleStateEnabled" it
       // is possible that
@@ -160,10 +121,5 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
       // Need to get the cause of the MuleException so the LifecycleException wraps a non-mule exception
       throw new LifecycleException(failedToInvokeLifecycle(name, o), getNonMuleException(t), o);
     }
-  }
-
-  @Override
-  public Class<?> getLifecycleClass() {
-    return lifecycleClass;
   }
 }

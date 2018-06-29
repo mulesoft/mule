@@ -10,8 +10,6 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 
-import java.util.Collection;
-
 /**
  * A {@link RegistryLifecycleCallback} to be used with instances of {@link SpringRegistry}. For each object in which a
  * {@link Lifecycle} phase is going to be applied, it detects all the dependencies for that object and applies the same phase on
@@ -24,23 +22,7 @@ import java.util.Collection;
  */
 class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry> {
 
-  private final SpringRegistry springRegistry;
-
-  public SpringLifecycleCallback(RegistryLifecycleManager registryLifecycleManager,
-                                 SpringRegistry springRegistry) {
+  public SpringLifecycleCallback(RegistryLifecycleManager registryLifecycleManager) {
     super(registryLifecycleManager);
-    this.springRegistry = springRegistry;
   }
-
-  @Override
-  protected Collection<Object> lookupObjectsForLifecycle(Class<?> type) {
-    return (Collection<Object>) getSpringRegistry().lookupEntriesForLifecycle(type).values();
-    //Map<String, Object> objects = (Map<String, Object>) getSpringRegistry().lookupEntriesForLifecycle(type);
-    //return springRegistry.getBeanDependencyResolver().resolveBeanDependencies(objects.keySet());
-  }
-
-  private SpringRegistry getSpringRegistry() {
-    return (SpringRegistry) registryLifecycleManager.getLifecycleObject();
-  }
-
 }
