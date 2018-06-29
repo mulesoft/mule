@@ -6,14 +6,23 @@
  */
 package org.mule.runtime.core.internal.registry;
 
-import static org.mule.runtime.core.api.util.UUID.getUUID;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.tck.core.registry.AbstractRegistryTestCase;
 
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+@RunWith(MockitoJUnitRunner.class)
 public class CommonBehaviourTransientRegistryTestCase extends AbstractRegistryTestCase {
+
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private MuleContext muleContext;
 
   @Override
   public Registry getRegistry() {
-    return new TransientRegistry(getUUID(), null, new MuleLifecycleInterceptor());
+    return new SimpleRegistry(muleContext, new MuleLifecycleInterceptor());
   }
 }

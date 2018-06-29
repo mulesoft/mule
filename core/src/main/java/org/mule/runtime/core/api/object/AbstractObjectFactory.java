@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.util.BeanUtils;
 
 import org.slf4j.Logger;
@@ -112,7 +112,7 @@ public abstract class AbstractObjectFactory extends AbstractComponent implements
     }
 
     if (isAutoWireObject()) {
-      ((MuleContextWithRegistries) muleContext).getRegistry().applyProcessors(object);
+      ((MuleContextWithRegistry) muleContext).getRegistry().applyProcessors(object);
     }
     fireInitialisationCallbacks(object);
 

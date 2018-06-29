@@ -17,7 +17,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -205,7 +205,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void testLookupClassInstance() throws MuleException, Exception {
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("object", new TestInvokeObject());
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("object", new TestInvokeObject());
 
     invoker = new InvokerMessageProcessor();
     invoker.setMuleContext(muleContext);

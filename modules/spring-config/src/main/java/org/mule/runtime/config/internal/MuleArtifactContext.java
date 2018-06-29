@@ -83,7 +83,7 @@ import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
@@ -147,7 +147,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final DefaultRegistry serviceDiscoverer;
   private final ConfigurationDependencyResolver dependencyResolver;
   protected ApplicationModel applicationModel;
-  protected MuleContextWithRegistries muleContext;
+  protected MuleContextWithRegistry muleContext;
   private ConfigResource[] artifactConfigResources;
   protected BeanDefinitionFactory beanDefinitionFactory;
   private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
@@ -195,7 +195,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              Map<String, String> artifactProperties, ArtifactType artifactType,
                              List<ClassLoader> pluginsClassLoaders, boolean disableXmlValidations) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
-    this.muleContext = (MuleContextWithRegistries) muleContext;
+    this.muleContext = (MuleContextWithRegistry) muleContext;
     this.artifactConfigResources = artifactConfigResources;
     this.optionalObjectsController = optionalObjectsController;
     this.artifactProperties = artifactProperties;
@@ -671,7 +671,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   }
 
-  public MuleContextWithRegistries getMuleContext() {
+  public MuleContextWithRegistry getMuleContext() {
     return muleContext;
   }
 

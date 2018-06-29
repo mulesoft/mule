@@ -22,7 +22,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
@@ -63,7 +63,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
 
   @Override
   public void doConfigure(MuleContext muleContext) throws Exception {
-    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+    MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
     registry.registerObject(schedulerService.getName(), spy(schedulerService));
     registry.registerObject(OBJECT_SCHEDULER_BASE_CONFIG, config());
 

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -26,15 +25,12 @@ import org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBu
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -195,7 +191,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     // muleArtifactContext.refresh() gets called because
     // some beans may try to look up other beans via the Registry during
     // preInstantiateSingletons().
-    ((MuleContextWithRegistries) muleContext).addRegistry(registry);
+    ((MuleContextWithRegistry) muleContext).setRegistry(registry);
   }
 
   private void createRegistryWithParentContext(MuleContext muleContext, ApplicationContext applicationContext,
@@ -225,6 +221,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   @Override
   public void setParentContext(MuleContext domainContext) {
-    this.parentContext = ((MuleContextWithRegistries) domainContext).getRegistry().get("springApplicationContext");
+    this.parentContext = ((MuleContextWithRegistry) domainContext).getRegistry().get("springApplicationContext");
   }
 }

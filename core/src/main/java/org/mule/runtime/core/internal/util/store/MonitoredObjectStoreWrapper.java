@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import org.slf4j.Logger;
@@ -138,7 +138,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
 
   private ObjectStore<StoredObject<T>> getStore() {
     if (baseStore == null) {
-      baseStore = ((MuleContextWithRegistries) context).getRegistry().lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY);
+      baseStore = ((MuleContextWithRegistry) context).getRegistry().lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY);
     }
     return baseStore;
   }

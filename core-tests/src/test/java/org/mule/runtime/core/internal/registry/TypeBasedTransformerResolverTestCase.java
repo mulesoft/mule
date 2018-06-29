@@ -18,7 +18,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 @SmallTest
 public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase {
 
-  private MuleContextWithRegistries muleContext = mock(MuleContextWithRegistries.class, RETURNS_DEEP_STUBS);
+  private MuleContextWithRegistry muleContext = mock(MuleContextWithRegistry.class, RETURNS_DEEP_STUBS);
   private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
 
   public static class A {

@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.ObjectUtils;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -134,8 +134,8 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
   @Test
   public void testRegisterUnregister() throws MuleException, Exception {
     FlowConstruct construct = getFlowConstruct();
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerFlowConstruct(construct);
-    assertNotNull(((MuleContextWithRegistries) muleContext).getRegistry().lookupFlowConstruct(construct.getName()));
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerFlowConstruct(construct);
+    assertNotNull(((MuleContextWithRegistry) muleContext).getRegistry().lookupFlowConstruct(construct.getName()));
   }
 
   @Test

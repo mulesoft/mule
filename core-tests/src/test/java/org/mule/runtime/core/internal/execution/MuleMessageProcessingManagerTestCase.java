@@ -30,7 +30,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.execution.EndPhaseTemplate;
 import org.mule.runtime.core.privileged.execution.FlowProcessingPhaseTemplate;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
@@ -55,7 +55,7 @@ import java.util.Collection;
 @SmallTest
 public class MuleMessageProcessingManagerTestCase extends AbstractMuleTestCase {
 
-  private MuleContextWithRegistries mockMuleContext = mockContextWithServices();
+  private MuleContextWithRegistry mockMuleContext = mockContextWithServices();
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Registry registry;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)

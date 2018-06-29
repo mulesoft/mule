@@ -30,7 +30,7 @@ import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -182,11 +182,11 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
   }
 
   private NotificationDispatcher getNotificationDispatcher() throws RegistrationException {
-    return ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
+    return ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
   }
 
   private MuleRegistry getResgistry() {
-    return ((MuleContextWithRegistries) muleContext).getRegistry();
+    return ((MuleContextWithRegistry) muleContext).getRegistry();
   }
 
   @Override

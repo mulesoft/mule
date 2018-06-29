@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 
 import java.lang.reflect.Method;
@@ -87,7 +87,7 @@ public final class MuleTestUtils {
                                            ConfigurationComponentLocator mockComponentLocator)
       throws MuleException {
     Flow flow = createFlow(context, flowName);
-    MuleRegistry registry = ((MuleContextWithRegistries) context).getRegistry();
+    MuleRegistry registry = ((MuleContextWithRegistry) context).getRegistry();
     if (registry != null) {
       registry.registerFlowConstruct(flow);
     }

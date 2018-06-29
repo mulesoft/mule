@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -28,7 +28,7 @@ import java.util.List;
 @SmallTest
 public class DynamicDataTypeConverterResolverTestCase extends AbstractMuleTestCase {
 
-  private MuleContextWithRegistries muleContext = mock(MuleContextWithRegistries.class);
+  private MuleContextWithRegistry muleContext = mock(MuleContextWithRegistry.class);
   private MuleRegistry muleRegistry = mock(MuleRegistry.class);
 
   @Test

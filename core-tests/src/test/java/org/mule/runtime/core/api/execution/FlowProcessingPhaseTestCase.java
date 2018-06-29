@@ -31,7 +31,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.FlowProcessingPhase;
 import org.mule.runtime.core.internal.execution.MessageProcessPhase;
@@ -77,7 +77,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MessageSource messageSource;
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleContextWithRegistries muleContext;
+  private MuleContextWithRegistry muleContext;
   @Mock(answer = RETURNS_DEEP_STUBS)
   private Registry registry;
   @Mock(answer = RETURNS_DEEP_STUBS, extraInterfaces = {Component.class})

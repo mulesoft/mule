@@ -26,7 +26,7 @@ import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.routing.EventGroup;
 import org.mule.runtime.core.internal.store.PartitionedInMemoryObjectStore;
@@ -56,7 +56,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
 
   private static final Logger LOGGER = getLogger(EventCorrelatorTestCase.class);
 
-  private MuleContextWithRegistries mockMuleContext = mockContextWithServices();
+  private MuleContextWithRegistry mockMuleContext = mockContextWithServices();
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private EventCorrelatorCallback mockEventCorrelatorCallback;

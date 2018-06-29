@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.transformer.simple.SerialisedObjectTransformersTestCase;
 
 public class ObjectToByteArrayTransformerWithByteTestCase extends SerialisedObjectTransformersTestCase {
@@ -17,7 +17,7 @@ public class ObjectToByteArrayTransformerWithByteTestCase extends SerialisedObje
   @Override
   public Transformer getTransformer() throws Exception {
     ObjectToByteArray transfromer = new ObjectToByteArray();
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(String.valueOf(transfromer.hashCode()), transfromer);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(String.valueOf(transfromer.hashCode()), transfromer);
     return transfromer;
   }
 

@@ -15,7 +15,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCa
 
   @Test
   public void testLifecycleForMuleContext() throws Exception {
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("dummy", bean);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("dummy", bean);
     assertTrue(initLatch.await(TIMEOUT, MILLISECONDS));
     Thread.sleep(TIMEOUT);
     assertThat(startLatch.getCount(), is(1L));
@@ -66,7 +66,7 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCa
 
   @Test
   public void testLifecycleForUnregisteredObject() throws Exception {
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("dummy", bean);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("dummy", bean);
     assertTrue(initLatch.await(TIMEOUT, MILLISECONDS));
     Thread.sleep(TIMEOUT);
     assertThat(startLatch.getCount(), is(1L));
@@ -79,7 +79,7 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCa
     assertThat(stopLatch.getCount(), is(1L));
     assertThat(disposeLatch.getCount(), is(1L));
 
-    ((MuleContextWithRegistries) muleContext).getRegistry().unregisterObject("dummy");
+    ((MuleContextWithRegistry) muleContext).getRegistry().unregisterObject("dummy");
     assertTrue(stopLatch.await(TIMEOUT, MILLISECONDS));
     assertTrue(disposeLatch.await(TIMEOUT, MILLISECONDS));
   }

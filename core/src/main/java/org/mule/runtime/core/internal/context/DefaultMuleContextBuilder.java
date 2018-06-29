@@ -30,7 +30,6 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
-import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 
@@ -90,8 +89,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setArtifactType(artifactType);
 
     final SimpleRegistry registry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
-    MuleRegistryHelper muleRegistryHelper = new MuleRegistryHelper(registry, muleContext);
-    muleContext.setMuleRegistry(muleRegistryHelper);
+    muleContext.setRegistry(registry);
     muleContext.setInjector(registry);
 
     muleContext.setExceptionListener(createExceptionListener(muleContext));

@@ -34,7 +34,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptorHandler;
 import org.mule.runtime.core.internal.el.context.MessageContext;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
@@ -68,7 +68,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
   public void setUp() {
     super.setUp();
     MVELExpressionLanguage mvelExpressionLanguage =
-        ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+        ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
     expressionLanguageAdapter = new ExpressionLanguageAdaptorHandler(expressionLanguage, mvelExpressionLanguage);
   }
 

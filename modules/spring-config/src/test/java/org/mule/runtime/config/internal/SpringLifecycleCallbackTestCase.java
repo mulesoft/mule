@@ -16,7 +16,7 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -41,7 +41,7 @@ public class SpringLifecycleCallbackTestCase extends AbstractMuleTestCase {
   @Mock
   private SpringRegistry springRegistry;
 
-  private MuleContextWithRegistries muleContext = mockContextWithServices();
+  private MuleContextWithRegistry muleContext = mockContextWithServices();
 
   private SpringLifecycleCallback callback;
 
@@ -57,7 +57,7 @@ public class SpringLifecycleCallbackTestCase extends AbstractMuleTestCase {
         new SpringRegistryLifecycleManager("id", springRegistry, muleContext, new MuleLifecycleInterceptor());
     springRegistryLifecycleManager.registerPhases(springRegistry);
 
-    callback = new SpringLifecycleCallback(springRegistryLifecycleManager, springRegistry);
+    callback = new SpringLifecycleCallback(springRegistryLifecycleManager);
   }
 
   @Test

@@ -11,7 +11,6 @@ import static java.util.Optional.ofNullable;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Injector;
@@ -30,7 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
- * A very simple implementation of {@link LifecycleRegistry}. Useful for starting really lightweight contexts which don't depend
+ * A very simple implementation of {@link Registry}. Useful for starting really lightweight contexts which don't depend
  * on heavier object containers such as Spring or Guice (testing being the best example).
  * <p/>
  * The {@link #inject(Object)} operation will only consider fields annotated with {@link Inject} and will perform the injection
@@ -39,7 +38,7 @@ import javax.inject.Named;
  *
  * @since 3.7.0
  */
-public class SimpleRegistry extends TransientRegistry implements LifecycleRegistry, Injector {
+public class SimpleRegistry extends AbstractRegistry implements Injector {
 
   private static final String REGISTRY_ID = "org.mule.runtime.core.Registry.Simple";
 
@@ -50,7 +49,11 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
   @Override
   protected void doInitialise() throws InitialisationException {
     injectFieldDependencies();
-    super.doInitialise();
+  }
+
+  @Override
+  protected void doDispose() {
+
   }
 
   /**
@@ -67,7 +70,7 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
    */
   @Override
   protected void doRegisterObject(String key, Object object, Object metadata) throws RegistrationException {
-    Object previous = doGet(key);
+    Object previous = get(key);
     if (previous != null) {
       if (logger.isDebugEnabled()) {
         logger.debug(String.format("An entry already exists for key %s. It will be replaced", key));

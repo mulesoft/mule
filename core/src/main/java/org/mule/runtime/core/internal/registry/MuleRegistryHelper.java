@@ -52,12 +52,12 @@ public class MuleRegistryHelper implements MuleRegistry {
   /**
    * A reference to Mule's internal registry
    */
-  private LifecycleRegistry registry;
+  private Registry registry;
 
   /**
    * We cache transformer searches so that we only search once
    */
-  protected ConcurrentHashMap<String, Transformer> exactTransformerCache = new ConcurrentHashMap<>(8);
+  protected Map<String, Transformer> exactTransformerCache = new ConcurrentHashMap<>(8);
   protected Map<String, List<Transformer>> transformerListCache = new ConcurrentHashMap<>(8);
 
   private MuleContext muleContext;
@@ -78,7 +78,7 @@ public class MuleRegistryHelper implements MuleRegistry {
    */
   private Collection<Transformer> transformers = new CopyOnWriteArrayList<>();
 
-  public MuleRegistryHelper(LifecycleRegistry registry, MuleContext muleContext) {
+  public MuleRegistryHelper(Registry registry, MuleContext muleContext) {
     this.registry = registry;
     this.muleContext = muleContext;
   }
@@ -518,6 +518,10 @@ public class MuleRegistryHelper implements MuleRegistry {
       }
       return 0;
     }
+  }
+
+  public Registry getDelegate() {
+    return registry;
   }
 }
 

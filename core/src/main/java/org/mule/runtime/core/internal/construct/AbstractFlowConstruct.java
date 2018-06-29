@@ -30,7 +30,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
@@ -81,7 +81,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     this.exceptionListener = exceptionListener.orElse(muleContext.getDefaultErrorHandler(of(name)));
     this.initialState = initialState;
     try {
-      this.lifecycleManager = new FlowConstructLifecycleManager(this, ((MuleContextWithRegistries) muleContext).getRegistry()
+      this.lifecycleManager = new FlowConstructLifecycleManager(this, ((MuleContextWithRegistry) muleContext).getRegistry()
           .lookupObject(NotificationDispatcher.class));
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);

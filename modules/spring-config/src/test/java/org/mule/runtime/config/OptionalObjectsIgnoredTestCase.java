@@ -15,7 +15,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
@@ -36,14 +36,14 @@ public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase {
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
 
-  private MuleContextWithRegistries muleContext;
+  private MuleContextWithRegistry muleContext;
 
   @Before
   public void before() throws Exception {
     muleContext =
-        (MuleContextWithRegistries) new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
-                                                                                      new MockExtensionManagerConfigurationBuilder(),
-                                                                                      new SpringXmlConfigurationBuilder(new String[0],
+        (MuleContextWithRegistry) new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
+                                                                                    new MockExtensionManagerConfigurationBuilder(),
+                                                                                    new SpringXmlConfigurationBuilder(new String[0],
                                                                                                                         emptyMap()));
     muleContext.start();
     muleContext.getRegistry().lookupByType(Calendar.class);

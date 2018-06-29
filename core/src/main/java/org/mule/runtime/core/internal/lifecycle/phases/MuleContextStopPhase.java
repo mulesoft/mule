@@ -45,7 +45,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase {
 
   public MuleContextStopPhase() {
     this(new Class[] {Registry.class, MuleContext.class, MessageSource.class, InterceptingMessageProcessor.class, Component.class,
-             OutboundRouter.class, Service.class});
+        OutboundRouter.class, Service.class});
   }
 
   public MuleContextStopPhase(Class<?>[] ignorredObjects) {

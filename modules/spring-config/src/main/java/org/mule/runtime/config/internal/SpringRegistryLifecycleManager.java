@@ -22,7 +22,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.security.SecurityManager;
@@ -41,7 +40,6 @@ import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhas
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.runtime.core.internal.registry.AbstractRegistryBroker;
 import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.internal.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -60,12 +58,13 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
   @Override
   protected void registerPhases(Registry registry) {
-    final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
-    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), emptyCallback);
-    registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(), new RegistryLifecycleCallback(this));
-    registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
-    registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);
-    registerPhase(Disposable.PHASE_NAME, new SpringContextDisposePhase());
+    final RegistryLifecycleCallback callback = new RegistryLifecycleCallback(this);
+
+    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), new EmptyLifecycleCallback<>());
+    registerPhase(Initialisable.PHASE_NAME, new SpringContextInitialisePhase(), callback);
+    registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), callback);
+    registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), callback);
+    registerPhase(Disposable.PHASE_NAME, new SpringContextDisposePhase(), callback);
   }
 
   @Override

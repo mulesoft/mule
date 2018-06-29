@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -81,7 +81,7 @@ public class DefaultTransformationService implements TransformationService {
     Transformer transformer;
     if (value != null) {
       try {
-        transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(valueDataType, expectedDataType);
+        transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(valueDataType, expectedDataType);
       } catch (TransformerException e) {
         throw new TransformerException(createStaticMessage("The value '%s' of type %s could not be transformed to the desired type %s",
                                                            value.toString().trim(), value.getClass().getName(),
@@ -123,7 +123,7 @@ public class DefaultTransformationService implements TransformationService {
     // The transformer to execute on this message
     Transformer transformer = null;
     try {
-      transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(dataType, resultType);
+      transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(dataType, resultType);
       if (transformer == null) {
         throw new MessageTransformerException(noTransformerFoundForMessage(dataType, resultType), null, message);
       }

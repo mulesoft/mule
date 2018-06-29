@@ -28,7 +28,7 @@ import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.store.PartitionedInMemoryObjectStore;
 import org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
@@ -60,7 +60,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
 
   private SimpleUnitTestSupportSchedulerService schedulerService;
 
-  private MuleContextWithRegistries muleContext;
+  private MuleContextWithRegistry muleContext;
   private MuleObjectStoreManager storeManager;
 
   private volatile CountDownLatch expireDelayLatch = new CountDownLatch(0);
@@ -72,7 +72,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
   @Before
   public void setup() {
     schedulerService = new SimpleUnitTestSupportSchedulerService();
-    muleContext = mock(MuleContextWithRegistries.class);
+    muleContext = mock(MuleContextWithRegistry.class);
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleConfiguration.getWorkingDirectory()).thenReturn(tempWorkDir.getRoot().getAbsolutePath());
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
@@ -215,7 +215,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
     return store;
   }
 
-  private void createRegistryAndBaseStore(MuleContextWithRegistries muleContext, Registry registry) {
+  private void createRegistryAndBaseStore(MuleContextWithRegistry muleContext, Registry registry) {
     when(registry.lookupByName(BASE_PERSISTENT_OBJECT_STORE_KEY))
         .thenReturn(of(createPersistentPartitionableObjectStore(muleContext)));
     when(registry.lookupByName(BASE_IN_MEMORY_OBJECT_STORE_KEY)).thenReturn(of(createTransientPartitionableObjectStore()));

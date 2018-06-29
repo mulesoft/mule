@@ -9,7 +9,7 @@ package org.mule.runtime.core.privileged.registry;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 
 import java.util.Collection;
@@ -131,6 +131,6 @@ public final class LegacyRegistryUtils {
   }
 
   private static MuleRegistry getRegistry(MuleContext context) {
-    return ((MuleContextWithRegistries) context).getRegistry();
+    return ((MuleContextWithRegistry) context).getRegistry();
   }
 }

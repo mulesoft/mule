@@ -38,7 +38,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.ObjectUtils;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -144,7 +144,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   @Override
   public void initialise() throws InitialisationException {
     name = format(NAME_TEMPLATE, storePrefix, muleContext.getConfiguration().getId(), getLocation().getRootContainerName());
-    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+    MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
     store = ((ObjectStoreManager) registry.get(OBJECT_STORE_MANAGER))
         .createObjectStore(name, ObjectStoreSettings.builder()
             .persistent(false)
@@ -179,7 +179,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   public void dispose() {
     if (store != null) {
       try {
-        ((ObjectStoreManager) ((MuleContextWithRegistries) muleContext).getRegistry().get(OBJECT_STORE_MANAGER))
+        ((ObjectStoreManager) ((MuleContextWithRegistry) muleContext).getRegistry().get(OBJECT_STORE_MANAGER))
             .disposeStore(name);
       } catch (ObjectStoreException e) {
         logger.debug("Exception disposing of store", e);

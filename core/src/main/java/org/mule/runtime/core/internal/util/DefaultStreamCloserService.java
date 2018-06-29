@@ -10,7 +10,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Closeable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.StreamCloserService;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public class DefaultStreamCloserService implements StreamCloserService {
    */
   private Collection<StreamCloser> getAllStreamClosers() throws Exception {
     if (allStreamClosers == null) {
-      allStreamClosers = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObjects(StreamCloser.class);
+      allStreamClosers = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObjects(StreamCloser.class);
     }
 
     return allStreamClosers;

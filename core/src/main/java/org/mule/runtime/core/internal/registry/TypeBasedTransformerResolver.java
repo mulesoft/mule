@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.runtime.core.internal.transformer.graph.GraphTransformerResolver;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
@@ -83,7 +83,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
       return transformer;
     }
 
-    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+    MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
     List<Transformer> trans = registry.lookupTransformers(source, result);
 
     Transformer compositeTransformer = graphTransformerResolver.resolve(source, result);

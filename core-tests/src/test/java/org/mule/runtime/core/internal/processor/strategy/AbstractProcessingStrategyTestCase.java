@@ -60,7 +60,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -214,7 +214,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     cpuIntensive = new TestScheduler(2, CPU_INTENSIVE, true);
     custom = new TestScheduler(4, CUSTOM, true);
     ringBuffer = new TestScheduler(1, RING_BUFFER, true);
-    asyncExecutor = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(SchedulerService.class).ioScheduler();
+    asyncExecutor = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(SchedulerService.class).ioScheduler();
 
     flowBuilder = () -> builder("test", muleContext)
         .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix))

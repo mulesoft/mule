@@ -27,7 +27,7 @@ public class MuleRegistryHelperTransformersAsObjectsTestCase extends AbstractMul
 
   private static final DataType APPLE_DATA_TYPE = DataType.fromType(Apple.class);
 
-  private final LifecycleRegistry registry = mock(LifecycleRegistry.class);
+  private final Registry registry = mock(Registry.class);
   private final MuleContext muleContext = mock(MuleContext.class);
   private final MuleRegistryHelper muleRegistryHelper = new MuleRegistryHelper(registry, muleContext);
   private final Converter stringToApple = new MockConverterBuilder().from(DataType.STRING).to(APPLE_DATA_TYPE).build();

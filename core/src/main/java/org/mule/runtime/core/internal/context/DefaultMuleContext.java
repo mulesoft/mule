@@ -111,6 +111,8 @@ import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
+import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.runtime.core.internal.util.splash.ArtifactShutdownSplashScreen;
@@ -136,7 +138,7 @@ import javax.transaction.TransactionManager;
 import org.slf4j.Logger;
 import reactor.core.publisher.Hooks;
 
-public class DefaultMuleContext implements MuleContextWithRegistries, PrivilegedMuleContext {
+public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
 
   /**
    * TODO: Remove these constants. These constants only make sense until we have a reliable solution for durable persistence in
@@ -709,6 +711,14 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
     return muleRegistryHelper;
   }
 
+  @Override
+  public void setRegistry(Registry registry) {
+    if (!(registry instanceof MuleRegistryHelper)) {
+      registry = new MuleRegistryHelper(registry, this);
+    }
+    muleRegistryHelper = (MuleRegistryHelper) registry;
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -926,10 +936,6 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
 
   public void setInjector(Injector injector) {
     this.injector = injector;
-  }
-
-  public void setMuleRegistry(MuleRegistry muleRegistry) {
-    this.muleRegistryHelper = muleRegistry;
   }
 
   @Override

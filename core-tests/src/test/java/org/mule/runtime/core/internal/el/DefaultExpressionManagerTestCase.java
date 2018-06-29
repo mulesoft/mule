@@ -58,7 +58,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.util.MuleContextUtils;
@@ -349,7 +349,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
         .thenReturn(of(mock(DefaultExpressionLanguageFactoryService.class, RETURNS_DEEP_STUBS)));
     when(registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED)).thenReturn(empty());
 
-    final MuleContextWithRegistries mockMuleContext = MuleContextUtils.mockMuleContext();
+    final MuleContextWithRegistry mockMuleContext = MuleContextUtils.mockMuleContext();
     MuleConfiguration config = mockMuleContext.getConfiguration();
     doReturn(true).when(config).isValidateExpressions();
 

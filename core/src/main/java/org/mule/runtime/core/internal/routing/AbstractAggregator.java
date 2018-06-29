@@ -31,7 +31,7 @@ import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelator;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
@@ -96,7 +96,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
   private Supplier<ObjectStore> internalProcessedGroupsObjectStoreFactory() {
     return () -> {
-      ObjectStoreManager objectStoreManager = ((MuleContextWithRegistries) muleContext).getRegistry().get(OBJECT_STORE_MANAGER);
+      ObjectStoreManager objectStoreManager = ((MuleContextWithRegistry) muleContext).getRegistry().get(OBJECT_STORE_MANAGER);
       return objectStoreManager.createObjectStore(storePrefix + ".processedGroups", ObjectStoreSettings.builder()
           .persistent(persistentStores)
           .maxEntries(MAX_PROCESSED_GROUPS)
@@ -121,7 +121,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   private Supplier<ObjectStore> internalEventsGroupsObjectStoreSupplier() {
     return () -> {
       ObjectStore objectStore;
-      MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+      MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
       if (persistentStores) {
         objectStore = registry.lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY);
       } else {

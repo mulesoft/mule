@@ -8,16 +8,14 @@ package org.mule.runtime.core.internal.registry;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.internal.registry.TransientRegistry;
 import org.mule.runtime.core.privileged.registry.InjectProcessor;
 
 /**
- * Injects the MuleContext object for objects stored in the {@link TransientRegistry} where the object registered implements
+ * Injects the MuleContext object for objects stored in the {@link Registry} where the object registered implements
  * {@link org.mule.runtime.core.api.context.MuleContextAware}.
  *
- * @deprecated as of 3.7.0 since these are only used by {@link TransientRegistry} which is also
- *             deprecated. Use post processors for currently supported registries instead (i.e:
- *             {@link org.mule.runtime.core.config.spring.SpringRegistry})
+ * @deprecated as of 3.7.0 since these are only used by {@link Registry} which is also
+ *             deprecated. Use post processors for currently supported registries instead
  */
 @Deprecated
 public class MuleContextProcessor implements InjectProcessor {

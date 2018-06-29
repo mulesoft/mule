@@ -66,7 +66,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
@@ -142,7 +142,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected InternalMessage message;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  protected MuleContextWithRegistries context;
+  protected MuleContextWithRegistry context;
 
   @Mock
   protected ConfigurationInstance configurationInstance;
@@ -194,7 +194,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   @Before
   public void before() throws Exception {
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_STREAMING_MANAGER, streamingManager);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_STREAMING_MANAGER, streamingManager);
     cursorStreamProviderFactory = spy(getDefaultCursorStreamProviderFactory(streamingManager));
     event = configureEvent();
     when(context.getInjector().inject(any())).thenAnswer(invocationOnMock -> {
@@ -324,7 +324,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected OperationMessageProcessor setUpOperationMessageProcessor() throws Exception {
     OperationMessageProcessor messageProcessor = createOperationMessageProcessor();
     messageProcessor.setMuleContext(context);
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManagerAdapter);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManagerAdapter);
     muleContext.getInjector().inject(messageProcessor);
     messageProcessor.initialise();
     return messageProcessor;

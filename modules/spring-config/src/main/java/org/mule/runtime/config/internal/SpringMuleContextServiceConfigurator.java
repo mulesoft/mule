@@ -34,6 +34,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTOR
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
@@ -87,6 +88,7 @@ import org.mule.runtime.config.internal.NotificationConfig.EnabledNotificationCo
 import org.mule.runtime.config.internal.dsl.model.config.DefaultComponentInitialStateManager;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.ExtensionManagerFactoryBean;
+import org.mule.runtime.config.internal.factories.MuleContextFactoryBean;
 import org.mule.runtime.config.internal.factories.TransactionManagerFactoryBean;
 import org.mule.runtime.config.internal.processor.MuleObjectNameProcessor;
 import org.mule.runtime.core.api.MuleContext;
@@ -253,6 +255,7 @@ class SpringMuleContextServiceConfigurator {
   }
 
   void createArtifactServices() {
+    registerBeanDefinition(OBJECT_MULE_CONTEXT, createMuleContextDefinition());
     registerBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME, getConstantObjectBeanDefinition(muleContext.getObjectSerializer()));
     registerBeanDefinition(OBJECT_CONFIGURATION_PROPERTIES, getConstantObjectBeanDefinition(configurationProperties));
     registerBeanDefinition(ErrorTypeRepository.class.getName(),
@@ -394,6 +397,12 @@ class SpringMuleContextServiceConfigurator {
             .add(new EnabledNotificationConfig<>(TransactionNotificationListener.class, TransactionNotification.class))
             .add(new EnabledNotificationConfig<>(ExtensionNotificationListener.class, ExtensionNotification.class))
             .build())
+        .getBeanDefinition();
+  }
+
+  private BeanDefinition createMuleContextDefinition() {
+    return getBeanDefinitionBuilder(MuleContextFactoryBean.class)
+        .addConstructorArgValue(muleContext)
         .getBeanDefinition();
   }
 

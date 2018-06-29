@@ -50,7 +50,7 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
@@ -81,7 +81,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   public static final int MAX_REDELIVERY_COUNT = 5;
   private static ObjectSerializer serializer;
 
-  private MuleContextWithRegistries mockMuleContext = mockMuleContext();
+  private MuleContextWithRegistry mockMuleContext = mockMuleContext();
   private ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, RETURNS_DEEP_STUBS.get());
   private Processor mockFailingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
   private Processor mockWaitingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());

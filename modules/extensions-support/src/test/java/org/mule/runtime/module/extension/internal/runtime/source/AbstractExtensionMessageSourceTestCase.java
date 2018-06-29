@@ -52,7 +52,7 @@ import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
@@ -191,7 +191,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     when(result.getMediaType()).thenReturn(of(ANY));
     when(result.getAttributes()).thenReturn(empty());
 
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_STREAMING_MANAGER, streamingManager);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_STREAMING_MANAGER, streamingManager);
 
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
 
@@ -215,10 +215,10 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
 
     retryPolicyTemplate
-        .setNotificationFirer(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
+        .setNotificationFirer(((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
     initialiseIfNeeded(retryPolicyTemplate, muleContext);
 
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
 
     when(flowConstruct.getMuleContext()).thenReturn(muleContext);
 

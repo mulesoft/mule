@@ -126,7 +126,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
     final int clusterNodeId = 22;
     final String clusterId = "some-id";
     createMuleContext();
-    ((MuleContextWithRegistries) context).getRegistry().registerObject(OBJECT_CLUSTER_CONFIGURATION, new ClusterConfiguration() {
+    ((MuleContextWithRegistry) context).getRegistry().registerObject(OBJECT_CLUSTER_CONFIGURATION, new ClusterConfiguration() {
 
       @Override
       public String getClusterId() {
@@ -154,8 +154,8 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   @Test
   public void overriddenMulePollingController() throws Exception {
     createMuleContext();
-    ((MuleContextWithRegistries) context).getRegistry().registerObject(OBJECT_POLLING_CONTROLLER,
-                                                                       (SchedulerController) () -> false);
+    ((MuleContextWithRegistry) context).getRegistry().registerObject(OBJECT_POLLING_CONTROLLER,
+                                                                     (SchedulerController) () -> false);
     context.start();
     assertThat(context.isPrimaryPollingInstance(), is(false));
   }
@@ -164,9 +164,9 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   public void getStreamCloserService() throws Exception {
     createMuleContext();
     StreamCloserService serviceFromRegistry =
-        ((MuleContextWithRegistries) context).getRegistry().lookupObject(OBJECT_MULE_STREAM_CLOSER_SERVICE);
-    MuleRegistryHelper registry = spy((MuleRegistryHelper) ((MuleContextWithRegistries) context).getRegistry());
-    ((DefaultMuleContext) context).setMuleRegistry(registry);
+        ((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_MULE_STREAM_CLOSER_SERVICE);
+    MuleRegistryHelper registry = spy((MuleRegistryHelper) ((MuleContextWithRegistry) context).getRegistry());
+    ((DefaultMuleContext) context).setRegistry(registry);
 
     StreamCloserService streamCloserService = context.getStreamCloserService();
     assertThat(streamCloserService, not(nullValue()));
@@ -183,9 +183,9 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   @Test
   public void cachesDataTypeConversionResolver() throws Exception {
     createMuleContext();
-    disposeIfNeeded(((MuleContextWithRegistries) context).getRegistry(), LOGGER);
+    disposeIfNeeded(((MuleContextWithRegistry) context).getRegistry(), LOGGER);
     final MuleRegistryHelper muleRegistry = mock(MuleRegistryHelper.class);
-    ((DefaultMuleContext) context).setMuleRegistry(muleRegistry);
+    ((DefaultMuleContext) context).setRegistry(muleRegistry);
 
     DataTypeConversionResolver dataTypeConverterResolver1 = context.getDataTypeConverterResolver();
     DataTypeConversionResolver dataTypeConverterResolver2 = context.getDataTypeConverterResolver();

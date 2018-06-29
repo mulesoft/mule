@@ -19,7 +19,7 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.context.AbstractELTestCase;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -47,7 +47,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
   @Before
   public void setup() throws Exception {
     expressionLanguage = new MVELExpressionLanguage(muleContext);
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
   }
 
   @Test

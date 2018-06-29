@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +86,7 @@ public class TransformerUtils {
       StringTokenizer st = new StringTokenizer(names, COMMA);
       while (st.hasMoreTokens()) {
         String key = st.nextToken().trim();
-        Transformer transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(key);
+        Transformer transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(key);
 
         if (transformer == null) {
           throw new DefaultMuleException(objectNotRegistered("Transformer", key));
@@ -149,7 +149,7 @@ public class TransformerUtils {
                                                 MuleContext muleContext) {
     Transformer transformer;
     try {
-      transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(sourceDataType, resultDataType);
+      transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(sourceDataType, resultDataType);
     } catch (TransformerException e) {
       LOGGER.debug("Could not find a transformer from type {} to {}", sourceDataType.getType().getName(),
                    resultDataType.getType().getName());

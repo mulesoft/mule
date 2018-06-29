@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.context;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.internal.registry.Registry;
 
 /**
  * Declares {@link MuleRegistry} handling methods for {@link MuleContext}.
@@ -18,8 +19,10 @@ import org.mule.runtime.core.internal.registry.MuleRegistry;
  */
 // TODO MULE-13627 Remove downcasts to this interface
 @Deprecated
-public interface MuleContextWithRegistries extends MuleContext {
+public interface MuleContextWithRegistry extends MuleContext {
 
   MuleRegistry getRegistry();
+
+  void setRegistry(Registry registry);
 
 }

@@ -35,7 +35,7 @@ import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.util.OneTimeWarning;
@@ -177,7 +177,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   private TypedValue transform(TypedValue target, DataType sourceType, DataType outputType) throws TransformerException {
     if (target.getValue() != null && !isInstance(outputType.getType(), target.getValue())) {
-      Object result = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(sourceType, outputType)
+      Object result = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(sourceType, outputType)
           .transform(target.getValue());
       return new TypedValue<>(result, outputType);
     } else {

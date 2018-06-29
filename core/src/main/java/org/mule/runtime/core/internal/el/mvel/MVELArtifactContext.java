@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.el.mvel;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.context.AbstractArtifactContext;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.el.context.AbstractMapContext;
@@ -31,12 +31,12 @@ public class MVELArtifactContext extends AbstractArtifactContext {
 
   @Override
   public Map<String, Object> getRegistry() {
-    return new RegistryWrapperMap(((MuleContextWithRegistries) muleContext).getRegistry());
+    return new RegistryWrapperMap(((MuleContextWithRegistry) muleContext).getRegistry());
   }
 
   @Override
   protected Map<String, Object> createRegistry(Registry registry) {
-    return new RegistryWrapperMap(((MuleContextWithRegistries) muleContext).getRegistry());
+    return new RegistryWrapperMap(((MuleContextWithRegistry) muleContext).getRegistry());
   }
 
   protected static class RegistryWrapperMap extends AbstractMapContext<Object> {

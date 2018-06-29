@@ -40,7 +40,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringMessageUtils;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.EventGroup;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -109,7 +109,7 @@ public class EventCorrelator implements Startable, Stoppable {
     this.callback = callback;
     this.muleContext = muleContext;
     try {
-      this.notificationFirer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
+      this.notificationFirer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }

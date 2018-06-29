@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotSame;
 
 import org.mule.runtime.core.api.object.AbstractObjectFactory;
 import org.mule.runtime.core.api.object.AbstractObjectFactoryTestCase;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 public class PrototypeObjectFactoryTestCase extends AbstractObjectFactoryTestCase {
 
@@ -24,7 +24,7 @@ public class PrototypeObjectFactoryTestCase extends AbstractObjectFactoryTestCas
   public void testGetObjectClass() throws Exception {
     PrototypeObjectFactory factory = (PrototypeObjectFactory) getUninitialisedObjectFactory();
     factory.setObjectClass(Object.class);
-    ((MuleContextWithRegistries) muleContext).getRegistry().applyProcessorsAndLifecycle(factory);
+    ((MuleContextWithRegistry) muleContext).getRegistry().applyProcessorsAndLifecycle(factory);
 
     assertEquals(Object.class, factory.getObjectClass());
   }
@@ -33,7 +33,7 @@ public class PrototypeObjectFactoryTestCase extends AbstractObjectFactoryTestCas
   public void testGet() throws Exception {
     PrototypeObjectFactory factory = (PrototypeObjectFactory) getUninitialisedObjectFactory();
     factory.setObjectClass(Object.class);
-    ((MuleContextWithRegistries) muleContext).getRegistry().applyProcessorsAndLifecycle(factory);
+    ((MuleContextWithRegistry) muleContext).getRegistry().applyProcessorsAndLifecycle(factory);
 
     assertNotSame(factory.getInstance(muleContext), factory.getInstance(muleContext));
   }
