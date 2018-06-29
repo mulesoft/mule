@@ -7,6 +7,7 @@
 package org.mule.functional.listener;
 
 import static java.lang.String.format;
+import static java.util.Collections.synchronizedList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -30,9 +31,9 @@ public class ExceptionListener {
 
   private CountDownLatch exceptionThrownLatch = new Latch();
   private int timeout = 10000;
-  private List<ExceptionNotification> exceptionNotifications = new ArrayList<>();
+  private List<ExceptionNotification> exceptionNotifications = synchronizedList(new ArrayList<>());
   private AtomicInteger numberOfInvocations = new AtomicInteger();
-  private List<java.util.function.Consumer<ExceptionNotification>> listeners = new ArrayList<>();
+  private List<java.util.function.Consumer<ExceptionNotification>> listeners = synchronizedList(new ArrayList<>());
 
   /**
    * Constructor for creating a listener for any exception thrown within a flow or message source.
