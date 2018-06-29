@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.launcher;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.tck.junit4.matcher.StringContainsIgnoringLineBreaks.containsStringIgnoringLineBreaks;
+
 import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
 
 import java.io.File;
@@ -54,11 +55,11 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
 
   @Override
   protected Matcher<String> getSimpleLogMatcher() {
-    return not(containsString(COMPLEX_LOG_PART));
+    return not(containsStringIgnoringLineBreaks(COMPLEX_LOG_PART));
   }
 
   @Override
   protected Matcher<String> getComplexLogMatcher() {
-    return containsString(COMPLEX_LOG_PART);
+    return containsStringIgnoringLineBreaks(COMPLEX_LOG_PART);
   }
 }
