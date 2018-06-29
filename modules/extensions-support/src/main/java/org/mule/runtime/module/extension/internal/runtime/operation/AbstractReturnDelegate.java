@@ -118,9 +118,17 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
     if (value instanceof Result) {
       Result resultValue = (Result) value;
+      if (resultValue.getOutput() instanceof InputStream) {
+        ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
+        if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
+          resultValue = resultValue.copy()
+              .output(new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler))
+              .build();
+        }
+      }
       return isSpecialHandling && returnHandler.handles(resultValue.getOutput())
-          ? MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event, returnHandler.getDataType())
-          : MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event);
+          ? MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event, returnHandler.getDataType())
+          : MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event);
     } else {
       if (value instanceof Collection && returnsListOfMessages) {
         value = toMessageCollection((Collection<Result>) value, cursorProviderFactory, event);
