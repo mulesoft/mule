@@ -192,6 +192,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     // some beans may try to look up other beans via the Registry during
     // preInstantiateSingletons().
     ((MuleContextWithRegistry) muleContext).setRegistry(registry);
+    ((DefaultMuleContext) muleContext).setInjector(registry);
   }
 
   private void createRegistryWithParentContext(MuleContext muleContext, ApplicationContext applicationContext,

@@ -222,7 +222,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     PrivilegedEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(of("")).addVariable("app", "otherb").build();
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("foo",
                                                                          (ExpressionLanguageExtension) context -> context
-                                                                               .addVariable("app", "otherc"));
+                                                                             .addVariable("app", "otherc"));
     mvel.initialise();
     assertEquals(MVELArtifactContext.class, evaluate("app", event).getClass());
   }
@@ -234,7 +234,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
         this.<PrivilegedEvent.Builder>getEventBuilder().message(of("")).addVariable("message", "other2").build();
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("foo",
                                                                          (ExpressionLanguageExtension) context -> context
-                                                                               .addVariable("message", "other3"));
+                                                                             .addVariable("message", "other3"));
     mvel.initialise();
     assertEquals(MessageContext.class, evaluate("message", event).getClass());
   }

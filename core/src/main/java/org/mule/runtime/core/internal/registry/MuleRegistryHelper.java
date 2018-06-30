@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.registry;
 
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
 import static org.mule.runtime.core.internal.registry.TransformerResolver.RegistryAction.ADDED;
 import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
 import org.mule.runtime.api.exception.MuleException;
@@ -17,7 +18,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -147,14 +147,14 @@ public class MuleRegistryHelper implements MuleRegistry {
     Transformer trans = resolveTransformer(source, result);
 
     if (trans != null) {
-      Transformer concurrentlyAddedTransformer = (Transformer) exactTransformerCache.putIfAbsent(dataTypePairHash, trans);
+      Transformer concurrentlyAddedTransformer = exactTransformerCache.putIfAbsent(dataTypePairHash, trans);
       if (concurrentlyAddedTransformer != null) {
         return concurrentlyAddedTransformer;
       } else {
         return trans;
       }
     } else {
-      throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, result));
+      throw new TransformerException(noTransformerFoundForMessage(source, result));
     }
   }
 
@@ -170,7 +170,7 @@ public class MuleRegistryHelper implements MuleRegistry {
             return trans;
           }
         } catch (ResolverException e) {
-          throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, result), e);
+          throw new TransformerException(noTransformerFoundForMessage(source, result), e);
         }
       }
     } finally {
@@ -193,7 +193,7 @@ public class MuleRegistryHelper implements MuleRegistry {
 
     final String dataTypePairHash = getDataTypeSourceResultPairHash(source, result);
 
-    List<Transformer> results = (List<Transformer>) transformerListCache.get(dataTypePairHash);
+    List<Transformer> results = transformerListCache.get(dataTypePairHash);
     if (results != null) {
       return results;
     }
@@ -220,9 +220,9 @@ public class MuleRegistryHelper implements MuleRegistry {
     List<Transformer> concurrentlyAddedTransformers = transformerListCache.putIfAbsent(dataTypePairHash, results);
     if (concurrentlyAddedTransformers != null) {
       return concurrentlyAddedTransformers;
-    } else {
-      return results;
     }
+
+    return results;
   }
 
   /**
@@ -429,7 +429,6 @@ public class MuleRegistryHelper implements MuleRegistry {
   @Override
   public void registerObject(String key, Object value) throws RegistrationException {
     registry.registerObject(key, value);
-
 
     postObjectRegistrationActions(value);
   }

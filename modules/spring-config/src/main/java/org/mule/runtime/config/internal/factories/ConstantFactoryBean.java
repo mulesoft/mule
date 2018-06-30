@@ -12,6 +12,8 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.runtime.core.api.transformer.Transformer;
 
 import javax.inject.Inject;
 
@@ -32,10 +34,18 @@ public class ConstantFactoryBean<T> extends AbstractComponent implements Factory
   @Inject
   private MuleContext muleContext;
   private final T value;
+  private final Class<?> type;
 
   public ConstantFactoryBean(T value) {
     checkArgument(value != null, "value cannot be null");
     this.value = value;
+    if (value instanceof Converter) {
+      type = Converter.class;
+    } else if (value instanceof Transformer) {
+      type = Transformer.class;
+    } else {
+      type = value.getClass();
+    }
   }
 
   @Override
@@ -54,7 +64,7 @@ public class ConstantFactoryBean<T> extends AbstractComponent implements Factory
 
   @Override
   public Class<?> getObjectType() {
-    return value.getClass();
+    return type;
   }
 
   public void setMuleContext(MuleContext muleContext) {

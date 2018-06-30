@@ -163,6 +163,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   });
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
+  private org.mule.runtime.core.internal.registry.Registry originalRegistry;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -204,6 +205,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.parentConfigurationProperties = parentConfigurationProperties;
     this.xmlConfigurationDocumentLoader = disableXmlValidations ? noValidationDocumentLoader() : schemaValidatingDocumentLoader();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
+    originalRegistry = ((MuleRegistryHelper) this.muleContext.getRegistry()).getDelegate();
 
     registerComponentBuildingDefinitions(serviceRegistry, MuleArtifactContext.class.getClassLoader(),
                                          componentBuildingDefinitionRegistry,
@@ -587,9 +589,16 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
-    new SpringMuleContextServiceConfigurator(muleContext, applicationModel.getConfigurationProperties(), artifactType,
-                                             optionalObjectsController, beanFactory, componentLocator, serviceDiscoverer)
-                                                 .createArtifactServices();
+    new SpringMuleContextServiceConfigurator(muleContext,
+                                             applicationModel.getConfigurationProperties(),
+                                             artifactType,
+                                             optionalObjectsController,
+                                             beanFactory,
+                                             componentLocator,
+                                             serviceDiscoverer,
+                                             originalRegistry).createArtifactServices();
+
+    originalRegistry = null;
   }
 
   @Override

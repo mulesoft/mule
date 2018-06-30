@@ -288,8 +288,8 @@ public abstract class AbstractRegistry implements Registry {
       return objects.iterator().next();
     } else if (objects.size() > 1) {
       throw new RegistrationException(
-          createStaticMessage("More than one object of type %s registered but only one expected. Objects found are: %s",
-                              type, objects.toString()));
+                                      createStaticMessage("More than one object of type %s registered but only one expected. Objects found are: %s",
+                                                          type, objects.toString()));
     } else {
       return null;
     }
@@ -390,7 +390,7 @@ public abstract class AbstractRegistry implements Registry {
   protected Object doUnregisterObject(String key) throws RegistrationException {
     return registryMap.remove(key);
   }
-  
+
   protected boolean hasFlag(Object metaData, int flag) {
     return !(metaData == null || !(metaData instanceof Integer)) && ((Integer) metaData & flag) != 0;
   }

@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.processor;
 
 import static org.mule.runtime.config.internal.MuleArtifactContext.INNER_BEAN_PREFIX;
 
+import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 
 import java.util.HashSet;
@@ -61,9 +62,18 @@ public class PostRegistrationActionsPostProcessor implements BeanPostProcessor {
   // TODO MULE-9638 - remove check for duplicates. It should not happen anymore when old parsing mode is not used anymore.
   @Override
   public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    Object object = bean;
     // No need to take into account FactoryBeans
-    if (bean instanceof FactoryBean) {
-      return bean;
+    if (object instanceof FactoryBean) {
+      if (object instanceof ConstantFactoryBean) {
+        try {
+          object = ((ConstantFactoryBean) bean).getObject();
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      } else {
+        return bean;
+      }
     }
     // For now we don't process duplicate bean names. This is the case with <transformer ref="a"/> where the same bean is
     // registered twice by the old parsing mechanism.
@@ -73,7 +83,7 @@ public class PostRegistrationActionsPostProcessor implements BeanPostProcessor {
         return bean;
       }
       seenBeanNames.add(beanName);
-      registryHelper.postObjectRegistrationActions(bean);
+      registryHelper.postObjectRegistrationActions(object);
     }
     return bean;
   }
