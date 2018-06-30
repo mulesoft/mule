@@ -4,13 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.http.internal.request;
+package org.mule.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_RETRY_ATTEMPTS;
-import static org.mule.module.http.internal.request.DefaultHttpRequester.REMOTELY_CLOSED;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.RETRY_ATTEMPTS_PROPERTY;
 import org.mule.api.MuleEvent;
 import org.mule.module.http.utils.TestServerSocket;
@@ -31,7 +30,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class HttpRetryRequestTestCase extends FunctionalTestCase
 {
 
-    private static ThrowableMessageMatcher REMOTELY_CLOSE_CAUSE_MATCHER = new ThrowableMessageMatcher<>(containsString(REMOTELY_CLOSED));
+    private static ThrowableMessageMatcher REMOTELY_CLOSE_CAUSE_MATCHER = new ThrowableMessageMatcher<>(containsString("Remotely closed"));
 
     @Rule
     public DynamicPort port = new DynamicPort("httpPort");

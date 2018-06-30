@@ -66,6 +66,8 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
     public static final String DEFAULT_PAYLOAD_EXPRESSION = "#[payload]";
     public static final String DEFAULT_FOLLOW_REDIRECTS = "true";
+    public static String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.maxRetries";
+    public static final int DEFAULT_RETRY_ATTEMPTS = 3;
     private static final Logger logger = LoggerFactory.getLogger(DefaultHttpRequester.class);
 
     static final String URI_DEBUG = "URI";
@@ -83,9 +85,8 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     static final String WORKSTATION_DEBUG = "Workstation";
     static final String AUTHENTICATION_TYPE_DEBUG = "Authentication Type";
     static final String QUERY_PARAMS_DEBUG = "Query Params";
-    static String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.maxRetries";
+
     static final String REMOTELY_CLOSED = "Remotely closed";
-    static final int DEFAULT_RETRY_ATTEMPTS = 3;
 
     private DefaultHttpRequesterConfig requestConfig;
     private HttpRequesterRequestBuilder requestBuilder;

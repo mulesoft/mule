@@ -5,13 +5,15 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.http.internal.listener;
+package org.mule.module.http.functional.listener;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.apache.http.client.fluent.Request.Get;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.Collection;
 
@@ -21,8 +23,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 @RunWith(Parameterized.class)
 public class MultipleListenerTestCase extends FunctionalTestCase
