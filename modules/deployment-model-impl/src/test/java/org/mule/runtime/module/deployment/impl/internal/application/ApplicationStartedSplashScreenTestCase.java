@@ -12,6 +12,8 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
+
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -83,21 +85,23 @@ public class ApplicationStartedSplashScreenTestCase extends AbstractSplashScreen
 
   @Override
   protected Matcher<String> getSimpleLogMatcher() {
-    return is("\n**********************************************************************\n" + "* Started app '" + APP_NAME
+    return is(equalToIgnoringLineBreaks("\n**********************************************************************\n"
+        + "* Started app '" + APP_NAME
         + "'                                            *\n"
-        + "**********************************************************************");
+        + "**********************************************************************"));
   }
 
   @Override
   protected Matcher<String> getComplexLogMatcher() {
-    return is("\n**********************************************************************\n" + "* Started app '" + APP_NAME
+    return is(equalToIgnoringLineBreaks("\n**********************************************************************\n"
+        + "* Started app '" + APP_NAME
         + "'                                            *\n"
         + "* Application plugins:                                               *\n" + "*  - " + PLUGIN_NAME + " : "
         + PLUGIN_VERSION
         + "                                            *\n"
         + "* Application libraries:                                             *\n" + "*  - " + MY_JAR
         + "                                                       *\n"
-        + "**********************************************************************");
+        + "**********************************************************************"));
   }
 
   private static String getAppPathFor(String fileName) {

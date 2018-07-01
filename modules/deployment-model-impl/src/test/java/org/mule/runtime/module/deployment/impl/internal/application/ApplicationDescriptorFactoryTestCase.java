@@ -43,7 +43,7 @@ public class ApplicationDescriptorFactoryTestCase
 
   @Override
   protected String getArtifactRootFolder() {
-    return "apps/";
+    return "apps";
   }
 
   @Override
