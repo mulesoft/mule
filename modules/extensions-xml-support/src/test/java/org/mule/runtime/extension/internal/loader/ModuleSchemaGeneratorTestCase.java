@@ -79,7 +79,7 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
     };
 
     Function<String, Object[]> stringFunction = moduleName -> {
-      String moduleNamePrefix = "modules" + separator + "schema" + separator + moduleName;
+      String moduleNamePrefix = "modules/schema/" + moduleName;
       String modulePath = moduleNamePrefix + ".xml";
 
       ClassLoader contextClassLoader = currentThread().getContextClassLoader();

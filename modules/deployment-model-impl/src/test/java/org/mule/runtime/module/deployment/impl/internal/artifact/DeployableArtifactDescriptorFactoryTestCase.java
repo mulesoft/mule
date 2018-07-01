@@ -7,7 +7,9 @@
 
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
+import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.contains;
@@ -29,6 +31,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTOR
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
+
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -45,6 +48,7 @@ import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -135,8 +139,9 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
     assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
     assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(), equalTo(getArtifactFolder().toString()));
-    assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(),
-               endsWith(getArtifactRootFolder() + "test/repository/org/mule/test/shared/1.0.0/shared-1.0.0.jar"));
+    Path expectedPathEnd =
+        get(getArtifactRootFolder(), "test", "repository", "org", "mule", "test", "shared", "1.0.0", "shared-1.0.0.jar");
+    assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(), endsWith(expectedPathEnd.toString()));
     assertThat(desc.getClassLoaderModel().getExportedPackages(), contains("org.foo"));
     assertThat(desc.getClassLoaderModel().getExportedResources(), containsInAnyOrder("META-INF/MANIFEST.MF", "README.txt"));
   }
@@ -152,13 +157,14 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
     assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(), equalTo(getArtifactFolder().toString()));
     assertThat(desc.getClassLoaderModel().getExportedPackages(), is(empty()));
-    assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(),
-               endsWith(getArtifactRootFolder() + "test/repository/org/mule/test/runtime/1.0.0/runtime-1.0.0.jar"));
+    Path expectedPathEnd =
+        get(getArtifactRootFolder(), "test", "repository", "org", "mule", "test", "runtime", "1.0.0", "runtime-1.0.0.jar");
+    assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(), endsWith(expectedPathEnd.toString()));
   }
 
   @Test
   public void loadsDescriptorFromJson() throws Exception {
-    String artifactPath = getArtifactRootFolder() + "no-dependencies";
+    String artifactPath = getArtifactRootFolder() + "/no-dependencies";
     D desc = createArtifactDescriptor(artifactPath);
 
     assertThat(desc.getMinMuleVersion(), is(new MuleVersion("4.0.0")));
@@ -178,7 +184,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void loadsDescriptorFromJsonWithCustomConfigFiles() throws Exception {
-    String artifactPath = getArtifactRootFolder() + "custom-config-files";
+    String artifactPath = getArtifactRootFolder() + "/custom-config-files";
     D desc = createArtifactDescriptor(artifactPath);
 
     assertThat(desc.getConfigResources(), contains("file1.xml", "file2.xml"));
@@ -186,7 +192,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderModelWithIncludeTestDependencies() throws Exception {
-    D desc = createArtifactDescriptor(getArtifactRootFolder() + "include-test-dependencies");
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/include-test-dependencies");
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
@@ -195,7 +201,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderModelWithoutIncludeTestDependencies() throws Exception {
-    D desc = createArtifactDescriptor(getArtifactRootFolder() + "do-not-include-test-dependencies");
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/do-not-include-test-dependencies");
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
@@ -204,7 +210,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderModelDefaultIncludeTestDependencies() throws Exception {
-    D desc = createArtifactDescriptor(getArtifactRootFolder() + "custom-config-files");
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/custom-config-files");
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
@@ -213,7 +219,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderModelWithSingleDependency() throws Exception {
-    D desc = createArtifactDescriptor(getArtifactRootFolder() + "single-dependency");
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/single-dependency");
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
@@ -227,7 +233,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderModelWithPluginDependency() throws Exception {
-    D desc = createArtifactDescriptor(getArtifactRootFolder() + "plugin-dependency");
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency");
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
@@ -240,7 +246,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderModelWithPluginDependencyWithAnotherPlugin() throws Exception {
-    D desc = createArtifactDescriptor(getArtifactRootFolder() + "plugin-dependency-with-another-plugin");
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-another-plugin");
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
@@ -258,14 +264,14 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   public void missingRequiredProduct() throws Exception {
     String artifactName = "no-required-product";
     requiredProductValidationExpectedException(artifactName);
-    createArtifactDescriptor(getArtifactRootFolder() + artifactName);
+    createArtifactDescriptor(getArtifactRootFolder() + "/" + artifactName);
   }
 
   @Test
   public void wrongRequiredProductValue() throws Exception {
     String artifactName = "bad-required-product";
     requiredProductValidationExpectedException(artifactName);
-    createArtifactDescriptor(getArtifactRootFolder() + artifactName);
+    createArtifactDescriptor(getArtifactRootFolder() + separator + artifactName);
   }
 
   @Test
@@ -273,7 +279,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     expectedException.expect(IllegalStateException.class);
     expectedException
         .expectMessage("Artifact no-revision-artifact version 1.0 must contain a revision number. The version format must be x.y.z and the z part is missing");
-    createArtifactDescriptor(getArtifactRootFolder() + "no-revision-artifact");
+    createArtifactDescriptor(getArtifactRootFolder() + separator + "no-revision-artifact");
   }
 
   private void requiredProductValidationExpectedException(String appName) {

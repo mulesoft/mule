@@ -43,7 +43,7 @@ public class DomainDescriptorFactoryTestCase
 
   @Override
   protected String getArtifactRootFolder() {
-    return "domains/";
+    return "domains";
   }
 
   @Override

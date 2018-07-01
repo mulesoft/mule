@@ -11,9 +11,10 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
 
-import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,18 +47,20 @@ public class DomainStartedSplashScreenTestCase extends AbstractSplashScreenTestC
 
   @Override
   protected Matcher<String> getSimpleLogMatcher() {
-    return is("\n**********************************************************************\n" + "* Started domain '" + DOMAIN_NAME
+    return is(equalToIgnoringLineBreaks("\n**********************************************************************\n"
+        + "* Started domain '" + DOMAIN_NAME
         + "'                                      *\n"
-        + "**********************************************************************");
+        + "**********************************************************************"));
   }
 
   @Override
   protected Matcher<String> getComplexLogMatcher() {
-    return is("\n**********************************************************************\n" + "* Started domain '" + DOMAIN_NAME
+    return is(equalToIgnoringLineBreaks("\n**********************************************************************\n"
+        + "* Started domain '" + DOMAIN_NAME
         + "'                                      *\n"
         + "* Domain libraries:                                                  *\n" + "*  - " + SOME_JAR
         + "                                                        *\n"
-        + "**********************************************************************");
+        + "**********************************************************************"));
   }
 
   @Override
