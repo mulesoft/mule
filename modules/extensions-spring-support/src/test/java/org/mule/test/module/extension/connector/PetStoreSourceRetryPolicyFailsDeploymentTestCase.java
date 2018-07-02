@@ -24,8 +24,6 @@ import org.mule.test.runner.RunnerDelegateTo;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -76,19 +74,21 @@ public class PetStoreSourceRetryPolicyFailsDeploymentTestCase extends AbstractEx
     return new String[] {connectionConfig, sourceConfig};
   }
 
-  @Before
-  public void setUp() throws Exception {
+  @Override
+  protected void doSetUp() throws Exception {
     PetStoreConnector.timesStarted = 0;
     FailingPetStoreSource.failedDueOnException = false;
+    super.doSetUp();
   }
 
-  @After
-  public void tearDown() {
+  @Override
+  protected void doTearDown() throws Exception {
     PetStoreConnector.timesStarted = 0;
     FailingPetStoreSource.failedDueOnException = false;
     if (executor != null) {
       executor.shutdownNow();
     }
+    super.doTearDown();
   }
 
   @Override

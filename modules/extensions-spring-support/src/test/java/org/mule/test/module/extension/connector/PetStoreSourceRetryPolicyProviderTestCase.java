@@ -15,14 +15,10 @@ import static org.mule.test.petstore.extension.FailingPetStoreSource.connectionE
 import static org.mule.test.petstore.extension.FailingPetStoreSource.executor;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.FailingPetStoreSource;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -40,19 +36,21 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
     return "petstore-source-retry-policy.xml";
   }
 
-  @Before
-  public void setUp() throws Exception {
+  @Override
+  protected void doSetUp() throws Exception {
     PetStoreConnector.timesStarted = 0;
     FailingPetStoreSource.failedDueOnException = false;
+    super.doSetUp();
   }
 
-  @After
-  public void tearDown() {
+  @Override
+  protected void doTearDown() throws Exception {
     PetStoreConnector.timesStarted = 0;
     FailingPetStoreSource.failedDueOnException = false;
     if (executor != null) {
       executor.shutdownNow();
     }
+    super.doTearDown();
   }
 
   @Test
