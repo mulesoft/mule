@@ -6,28 +6,14 @@
  */
 package org.mule.module.http.functional.listener;
 
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
-
 import org.mule.construct.Flow;
 import org.mule.module.http.api.listener.HttpListener;
 import org.mule.module.http.api.listener.HttpListenerConfig;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.listener.HttpListenerRegistry;
-import org.mule.module.http.internal.listener.HttpListenerRegistryTestCase;
-import org.mule.module.http.internal.listener.RequestHandlerManager;
-import org.mule.module.http.internal.listener.ServiceTemporarilyUnavailableListenerRequestHandler;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
-import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
@@ -90,9 +76,9 @@ public class HttpListenerLifecycleTestCase extends FunctionalTestCase
         httpListener.stop();
         httpListener.start();
         final Response response = Request.Get(getLifecycleConfigUrl("/path/subpath")).execute();
-        final HttpResponse httoResponse = response.returnResponse();
-        assertThat(httoResponse.getStatusLine().getStatusCode(), is(200));
-        assertThat(IOUtils.toString(httoResponse.getEntity().getContent()), is("ok"));
+        final HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
+        assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("ok"));
     }
 
     @Test
@@ -101,8 +87,8 @@ public class HttpListenerLifecycleTestCase extends FunctionalTestCase
         HttpListener httpListener = (HttpListener) ((Flow) getFlowConstruct("catchAllWithinTestPathFlow")).getMessageSource();
         httpListener.dispose();
         final Response response = Request.Get(getLifecycleConfigUrl("/path/somepath")).execute();
-        final HttpResponse httoResponse = response.returnResponse();
-        assertThat(httoResponse.getStatusLine().getStatusCode(), is(404));
+        final HttpResponse httpResponse = response.returnResponse();
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(404));
     }
 
     @Test
