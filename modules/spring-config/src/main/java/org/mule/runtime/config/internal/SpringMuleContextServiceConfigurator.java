@@ -164,7 +164,7 @@ class SpringMuleContextServiceConfigurator {
   private final OptionalObjectsController optionalObjectsController;
   private final CustomServiceRegistry customServiceRegistry;
   private final BeanDefinitionRegistry beanDefinitionRegistry;
-  private final org.mule.runtime.core.internal.registry.Registry originalRegistry;
+  private org.mule.runtime.core.internal.registry.Registry originalRegistry;
 
   private static final ImmutableSet<String> APPLICATION_ONLY_SERVICES = ImmutableSet.<String>builder()
       .add(OBJECT_SECURITY_MANAGER)
@@ -358,6 +358,7 @@ class SpringMuleContextServiceConfigurator {
 
     originalRegistry.lookupByType(Object.class)
         .forEach((key, value) -> registerBeanDefinition(key, getConstantObjectBeanDefinition(value)));
+    originalRegistry = null;
   }
 
   private void createLocalLockFactoryBeanDefinitions() {
