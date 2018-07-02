@@ -9,13 +9,17 @@ package org.mule.module.http.internal.listener;
 public class DefaultRequestHandlerManager implements RequestHandlerManager
 {
 
-    private final HttpListenerRegistry.PathMap requestHandlerOwner;
+    private final HttpListenerRegistry.Path requestHandlerOwner;
     private final HttpListenerRegistry.RequestHandlerMatcherPair requestHandlerMatcherPair;
+    private final HttpListenerRegistry.ServerAddressRequestHandlerRegistry requestHandlerRegistry;
 
-    public DefaultRequestHandlerManager(HttpListenerRegistry.PathMap requestHandlerOwner, HttpListenerRegistry.RequestHandlerMatcherPair requestHandlerMatcherPair)
+    public DefaultRequestHandlerManager(HttpListenerRegistry.Path requestHandlerOwner,
+                                        HttpListenerRegistry.RequestHandlerMatcherPair requestHandlerMatcherPair,
+                                        HttpListenerRegistry.ServerAddressRequestHandlerRegistry serverAddressRequestHandlerRegistry)
     {
         this.requestHandlerOwner = requestHandlerOwner;
         this.requestHandlerMatcherPair = requestHandlerMatcherPair;
+        this.requestHandlerRegistry = serverAddressRequestHandlerRegistry;
     }
 
     @Override
@@ -34,5 +38,6 @@ public class DefaultRequestHandlerManager implements RequestHandlerManager
     public void dispose()
     {
         requestHandlerOwner.removeRequestHandlerMatcherPair(requestHandlerMatcherPair);
+        requestHandlerRegistry.removeRequestHandler(requestHandlerMatcherPair.getRequestMatcher());
     }
 }

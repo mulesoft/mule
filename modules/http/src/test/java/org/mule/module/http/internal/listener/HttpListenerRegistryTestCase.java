@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -86,7 +87,6 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
         this.testServer = mock(Server.class);
         when(testServer.getServerAddress()).thenReturn(testServerAddress);
     }
-
 
     @Test
     public void validateSimplePathAndAllMethodAllowedCollision()
@@ -281,6 +281,264 @@ public class HttpListenerRegistryTestCase extends AbstractMuleTestCase
         httpListenerRegistry.addRequestHandler(testServer, mock(RequestHandler.class), new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), ROOT_PATH));
         RequestHandler requestHandler = httpListenerRegistry.getRequestHandler(TEST_IP, TEST_PORT, createMockRequestWithPath(ANOTHER_PATH));
         assertThat(requestHandler, is(instanceOf(NoListenerRequestHandler.class)));
+    }
+
+
+    @Test
+    public void replacePathCatchAllForCatchAll()
+    {
+        replace("/a/b/*", "/a/*", "/a/b/c", "/a/c");
+    }
+
+    @Test
+    public void replacePathCatchAllForUriParam()
+    {
+        replace("/a/b/*", "/a/{b}", "/a/b/c", "/a/c");
+    }
+
+    @Test
+    public void replacePathForCatchAll()
+    {
+        replace("/a/b/c", "/a/*", "/a/b/c", "/a/c");
+    }
+
+    @Test
+    public void replacePathForUriParam()
+    {
+        replace("/a/b/c", "/a/{b}", "/a/b/c", "/a/c");
+    }
+
+    @Test
+    public void replacePathUriParamForCatchAll()
+    {
+        replace("/a/{b}/c", "/a/*", "/a/b/c", "/a/c");
+    }
+
+    @Test
+    public void replacePathUriParamForUriParam()
+    {
+        replace("/a/{b}/c", "/a/{b}", "/a/b/c", "/a/c");
+    }
+
+    @Test
+    public void removingCatchAllDoesNotAffectParentPath()
+    {
+        removeChildAndCheckParent("/a", "/*", "/a/b/c");
+    }
+
+    @Test
+    public void removingSubPathDoesNotAffectParentPath()
+    {
+        removeChildAndCheckParent("/a", "/b", "/a/b");
+    }
+
+    @Test
+    public void removingUriParamDoesNotAffectParentPath()
+    {
+        removeChildAndCheckParent("/a", "/{b}", "/a/c");
+    }
+
+    @Test
+    @Ignore("MULE-15247: Analyse HTTP listener path behavior for catch all")
+    public void removingCatchAllDoesNotAffectParentCatchAll()
+    {
+        removeChildAndCheckParent("/*", "/*", "/a/b/c");
+    }
+
+    @Test
+    public void removingSubPathDoesNotAffectParentCatchAll()
+    {
+        removeChildAndCheckParent("/*", "/b", "/a/b");
+    }
+
+    @Test
+    public void removingUriParamDoesNotAffectParentCatchAll()
+    {
+        removeChildAndCheckParent("/*", "/{param}", "/a/c");
+    }
+
+    @Test
+    public void removingCatchAllDoesNotAffectParentUriParam()
+    {
+        removeChildAndCheckParent("/{param}", "/*", "/a/b/c");
+    }
+
+    @Test
+    public void removingSubPathDoesNotAffectParentUriParam()
+    {
+        removeChildAndCheckParent("/{param}", "/b", "/a/b");
+    }
+
+    @Test
+    public void removingUriParamDoesNotAffectParentUriParam()
+    {
+        removeChildAndCheckParent("/{param}", "/{param}", "/a/c");
+    }
+
+    @Test
+    public void removingPathParentPathDoesNotAffectCatchAll()
+    {
+      removeParentAndCheckChild("/a", "/*", "/a/b/c");
+    }
+
+    @Test
+    @Ignore("MULE-15247: Analyse HTTP listener path behavior for catch all")
+    public void removingParentCatchAllDoesNotAffectCatchAll()
+    {
+        removeParentAndCheckChild("/*", "/*", "/a/b/c");
+    }
+
+
+    @Test
+    @Ignore("MULE-15247: Analyse HTTP listener path behavior for catch all")
+    public void removingParentUriParamDoesNotAffectCatchAll()
+    {
+        removeParentAndCheckChild("/{param}", "/*", "/a/b/c");
+    }
+
+    @Test
+    public void removingPathParentPathDoesNotAffectSubPath()
+    {
+      removeParentAndCheckChild("/a", "/b", "/a/b");
+    }
+
+    @Test
+    public void removingParentCatchAllDoesNotAffectSubPath()
+    {
+        removeParentAndCheckChild("/*", "/b", "/a/b");
+    }
+
+
+    @Test
+    public void removingParentUriParamDoesNotAffectSubPath()
+    {
+        removeParentAndCheckChild("/{param}", "/b", "/a/b");
+    }
+
+    @Test
+    public void removingPathParentPathDoesNotAffectUriParam()
+    {
+      removeParentAndCheckChild("/a", "/{param}", "/a/c");
+    }
+
+    @Test
+    public void removingParentCatchAllDoesNotAffectUriParam()
+    {
+        removeParentAndCheckChild("/*", "/{param}", "/a/c");
+    }
+
+
+    @Test
+    public void removingParentUriParamDoesNotAffectUriParam()
+    {
+        removeParentAndCheckChild("/{param}", "/{param}", "/a/c");
+    }
+
+    @Test
+    public void removingCatchAllHandlerDoesNotAffectOther()
+    {
+        removePostAndCheckGet("/*");
+    }
+
+    @Test
+    public void removingPathHandlerDoesNotAffectOther()
+    {
+      removePostAndCheckGet("/a");
+    }
+
+    @Test
+    public void removingUriParamHandlerDoesNotAffectOther()
+    {
+      removePostAndCheckGet("/{a}");
+    }
+
+    private void replace(String oldPath, String newPath, String oldRequestPath, String newRequestPath) {
+        httpListenerRegistry = new HttpListenerRegistry();
+        RequestHandler oldPathHandler = mock(RequestHandler.class);
+        RequestHandlerManager oldManager = httpListenerRegistry.addRequestHandler(testServer, oldPathHandler, new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), oldPath));
+
+        routePath(oldRequestPath, GET_METHOD, oldPathHandler);
+        routePath(newRequestPath, GET_METHOD, NoListenerRequestHandler.getInstance());
+
+        oldManager.dispose();
+
+        routePath(oldRequestPath, GET_METHOD, NoListenerRequestHandler.getInstance());
+        routePath(newRequestPath, GET_METHOD, NoListenerRequestHandler.getInstance());
+
+        RequestHandler newPathHandler = mock(RequestHandler.class);
+        httpListenerRegistry.addRequestHandler(testServer, newPathHandler, new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), newPath));
+
+        routePath(oldRequestPath, GET_METHOD, newPath.endsWith(WILDCARD_CHARACTER) ? newPathHandler : NoListenerRequestHandler.getInstance());
+        routePath(newRequestPath, GET_METHOD, newPathHandler);
+    }
+
+    private void removeChildAndCheckParent(String parent, String child, String childRequestPath)
+    {
+        httpListenerRegistry = new HttpListenerRegistry();
+        RequestHandler parentHandler = mock(RequestHandler.class);
+        RequestHandler childHandler = mock(RequestHandler.class);
+        httpListenerRegistry.addRequestHandler(testServer, parentHandler, new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), parent));
+        RequestHandlerManager childManager = httpListenerRegistry.addRequestHandler(testServer, childHandler, new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), parent + child));
+
+        routePath("/a", GET_METHOD, parentHandler);
+        routePath(childRequestPath, GET_METHOD, childHandler);
+
+        childManager.dispose();
+
+        routePath("/a", GET_METHOD, parentHandler);
+        routePath(childRequestPath, GET_METHOD, parent.endsWith(WILDCARD_CHARACTER) ? parentHandler : NoListenerRequestHandler.getInstance());
+
+        RequestHandler newChildHandler = mock(RequestHandler.class);
+        httpListenerRegistry.addRequestHandler(testServer, newChildHandler, new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), parent + child));
+
+        routePath("/a", GET_METHOD, parentHandler);
+        routePath(childRequestPath, GET_METHOD, newChildHandler);
+    }
+
+    private void removeParentAndCheckChild(String path, String child, String childRequestPath)
+    {
+        httpListenerRegistry = new HttpListenerRegistry();
+        RequestHandler parentHandler = mock(RequestHandler.class);
+        RequestHandler childHandler = mock(RequestHandler.class);
+        RequestHandlerManager parentManager = httpListenerRegistry.addRequestHandler(testServer, parentHandler, new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), path));
+        httpListenerRegistry.addRequestHandler(testServer, childHandler, new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), path + child));
+
+        routePath("/a", GET_METHOD, parentHandler);
+        routePath(childRequestPath, GET_METHOD, childHandler);
+
+        parentManager.dispose();
+
+        routePath("/a", GET_METHOD, child.endsWith(WILDCARD_CHARACTER) ? childHandler : NoListenerRequestHandler.getInstance());
+        routePath(childRequestPath, GET_METHOD, childHandler);
+
+        RequestHandler newParentHandler = mock(RequestHandler.class);
+        httpListenerRegistry.addRequestHandler(testServer, newParentHandler, new ListenerRequestMatcher(AcceptsAllMethodsRequestMatcher.instance(), path));
+
+        routePath("/a", GET_METHOD, newParentHandler);
+        routePath(childRequestPath, GET_METHOD, childHandler);
+    }
+
+    private void removePostAndCheckGet(String path)
+    {
+        httpListenerRegistry = new HttpListenerRegistry();
+        RequestHandler getHandler = mock(RequestHandler.class);
+        RequestHandler postHandler = mock(RequestHandler.class);
+        httpListenerRegistry.addRequestHandler(testServer, getHandler, new ListenerRequestMatcher(new MethodRequestMatcher(GET_METHOD), path));
+        RequestHandlerManager manager = httpListenerRegistry.addRequestHandler(testServer, postHandler, new ListenerRequestMatcher(new MethodRequestMatcher(POST_METHOD), path));
+
+        routePath("/a", GET_METHOD, getHandler);
+        routePath("/a", POST_METHOD, postHandler);
+
+        manager.dispose();
+
+        routePath("/a", GET_METHOD, getHandler);
+        routePath("/a", POST_METHOD, NoMethodRequestHandler.getInstance());
+
+        RequestHandler newPostHandler = mock(RequestHandler.class);
+        httpListenerRegistry.addRequestHandler(testServer, newPostHandler, new ListenerRequestMatcher(new MethodRequestMatcher(POST_METHOD), path));
+
+        routePath("/a", GET_METHOD, getHandler);
+        routePath("/a", POST_METHOD, newPostHandler);
     }
 
     private void routePath(String requestPath, String listenerPath)
