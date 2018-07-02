@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.http.internal.listener;
+package org.mule.module.http.functional.listener;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
@@ -69,7 +69,7 @@ public class WildcardPathsTestCase extends FunctionalTestCase
     @Override
     protected String getConfigFile()
     {
-        return "HttpTestPathsWildcard.xml";
+        return "http-test-paths-wildcard.xml";
     }
 
     @Parameters
