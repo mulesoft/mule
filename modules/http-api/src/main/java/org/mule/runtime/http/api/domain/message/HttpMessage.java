@@ -33,7 +33,10 @@ public interface HttpMessage {
   /**
    * @param headerName name of the header
    * @return first value of the header, regardless of the case
+   *
+   * @deprecated The underlying implementation is already case-insensitive. Use {@link #getHeaderValue(String)}
    */
+  @Deprecated
   String getHeaderValueIgnoreCase(String headerName);
 
   /**
@@ -47,7 +50,9 @@ public interface HttpMessage {
    * @param headerName name of the header
    * @return an immutable {@link Collection} containing all the values of that headers, regardless of the case. If not such
    *         headers exists return null, otherwise the collection of header values
+   * @deprecated The underlying implementation is already case-insensitive. Use {@link #getHeaderValues(String)}
    */
+  @Deprecated
   Collection<String> getHeaderValuesIgnoreCase(String headerName);
 
   /**
