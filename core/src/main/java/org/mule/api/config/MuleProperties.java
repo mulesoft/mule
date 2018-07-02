@@ -203,4 +203,5 @@ public class MuleProperties
     public static final String MULE_JMS_REDELIVERY_DELAY = SYSTEM_PROPERTY_PREFIX + "jms.redeliveryDelay";
     public static final String MULE_JMS_MAX_REDELIVERY_DELAY = SYSTEM_PROPERTY_PREFIX + "jms.maxRedeliveryDelay";
     public static final String MULE_JMS_INITIAL_REDELIVERY_DELAY = SYSTEM_PROPERTY_PREFIX + "jms.initialRedeliveryDelay";
+    public static final String MULE_XML_RESET_CONTROLLER_AFTER_EACH_TRANSFORMATION = SYSTEM_PROPERTY_PREFIX + "xml.resetControllerAfterEachTransformation";
 }

@@ -7,7 +7,11 @@
 package org.mule.transformers.xml.xslt;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.api.config.MuleProperties.MULE_XML_RESET_CONTROLLER_AFTER_EACH_TRANSFORMATION;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -15,13 +19,15 @@ import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.UUID;
 
+import net.sf.saxon.Controller;
+
 import java.io.File;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class XsltResultDocumentTestCase extends FunctionalTestCase
+public abstract class XsltResultDocumentTestCase extends FunctionalTestCase
 {
 
     private static final String INPUT_FILE = "cities.xml";
@@ -47,6 +53,28 @@ public class XsltResultDocumentTestCase extends FunctionalTestCase
 
         executeFlowAndValidateOutput(cities, outputFile);
         executeFlowAndValidateOutput(cities, outputFile);
+        
+        verifyControllerReset();
+    }
+
+    private void verifyControllerReset()
+    {
+        String resetControllerAfterEachTransformationProperty = System.getProperty(MULE_XML_RESET_CONTROLLER_AFTER_EACH_TRANSFORMATION, "false");
+        boolean resetControllerAfterEachTransformation = Boolean.parseBoolean(resetControllerAfterEachTransformationProperty);
+        
+        if (resetControllerAfterEachTransformation)
+        {
+            Controller controller = ((net.sf.saxon.jaxp.TransformerImpl) TestTransformerFactoryImpl.TRANSFORMER).getUnderlyingController();
+            if (resetControllerAfterEachTransformation)
+            {
+                assertThat(controller.getInitialContextItem(), is(nullValue()));
+            }
+            else
+            {
+                assertThat(controller.getInitialContextItem(), is(not(nullValue())));
+            }
+        }
+        
     }
 
     private void executeFlowAndValidateOutput(String payload, File outputFile) throws Exception

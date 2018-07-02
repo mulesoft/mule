@@ -6,6 +6,7 @@
  */
 package org.mule.module.xml.transformer;
 
+import static org.mule.api.config.MuleProperties.MULE_XML_RESET_CONTROLLER_AFTER_EACH_TRANSFORMATION;
 import static org.mule.module.xml.util.XMLUtils.createInstance;
 import static org.mule.module.xml.util.XMLUtils.createSaxonTransformerFactory;
 
@@ -19,6 +20,9 @@ import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.LocalURIResolver;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.IOUtils;
+
+import net.sf.saxon.Controller;
+import net.sf.saxon.jaxp.TransformerImpl;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -101,6 +105,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     private volatile String xslFile;
     private volatile String xslt;
     private volatile Map<String, Object> contextProperties;
+    private boolean resetControllerAfterEachTransformation;
 
     private URIResolver uriResolver;
 
@@ -112,6 +117,8 @@ public class XsltTransformer extends AbstractXmlTransformer
         transformerPool.setMaxIdle(MAX_IDLE_TRANSFORMERS);
         transformerPool.setMaxActive(MAX_ACTIVE_TRANSFORMERS);
         contextProperties = new HashMap<String, Object>();
+        String resetControllerAfterEachTransformationProperty = System.getProperty(MULE_XML_RESET_CONTROLLER_AFTER_EACH_TRANSFORMATION, "false");
+        resetControllerAfterEachTransformation = Boolean.parseBoolean(resetControllerAfterEachTransformationProperty);
     }
 
     @Override
@@ -358,18 +365,40 @@ public class XsltTransformer extends AbstractXmlTransformer
         @Override
         public void passivateObject(Object object) throws Exception
         {
-            javax.xml.transform.Transformer transformer = (javax.xml.transform.Transformer) object;
-
-            // Clear transformation parameters before returning transformer to the pool
-            transformer.clearParameters();
-
-            // Clean up transformer before return it to the pool
-            transformer.reset();
-
-            super.passivateObject(transformer);
+            super.passivateObject(XsltTransformer.passivateObject(object, resetControllerAfterEachTransformation));
         }
     }
 
+    private static javax.xml.transform.Transformer passivateObject(Object object, boolean resetControllerAfterEachTransformation) throws Exception 
+    {
+        javax.xml.transform.Transformer transformer = (javax.xml.transform.Transformer) object;
+
+        // Clear transformation parameters before returning transformer to the pool
+        transformer.clearParameters();
+
+        // Clean up transformer before return it to the pool
+        if (resetControllerAfterEachTransformation)
+        {
+            resetUnderlyingControllerIfNecessary(transformer);
+        }
+        transformer.reset();
+
+        
+        return transformer;
+    }
+
+    private static void resetUnderlyingControllerIfNecessary(javax.xml.transform.Transformer transformer)
+    {
+        if (transformer instanceof TransformerImpl)
+        {
+            Controller controller = ((TransformerImpl)transformer).getUnderlyingController();
+            if (controller != null)
+            {
+                controller.reset();
+            }
+        }
+    }
+    
     protected class DefaultErrorListener implements ErrorListener
     {
         private TransformerException e = null;
