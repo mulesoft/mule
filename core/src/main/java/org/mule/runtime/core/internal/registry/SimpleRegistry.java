@@ -11,6 +11,7 @@ import static java.util.Optional.ofNullable;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Injector;
@@ -38,7 +39,7 @@ import javax.inject.Named;
  *
  * @since 3.7.0
  */
-public class SimpleRegistry extends AbstractRegistry implements Injector {
+public class SimpleRegistry extends TransientRegistry implements Injector {
 
   private static final String REGISTRY_ID = "org.mule.runtime.core.Registry.Simple";
 
@@ -49,11 +50,7 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   @Override
   protected void doInitialise() throws InitialisationException {
     injectFieldDependencies();
-  }
-
-  @Override
-  protected void doDispose() {
-
+    super.doInitialise();
   }
 
   /**
@@ -70,7 +67,7 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
    */
   @Override
   protected void doRegisterObject(String key, Object object, Object metadata) throws RegistrationException {
-    Object previous = get(key);
+    Object previous = doGet(key);
     if (previous != null) {
       if (logger.isDebugEnabled()) {
         logger.debug(String.format("An entry already exists for key %s. It will be replaced", key));
