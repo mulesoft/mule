@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.api.domain;
 
+import static java.util.stream.Collectors.toMap;
+
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 
 import java.util.AbstractMap;
@@ -13,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Specialization of {@link CaseInsensitiveMapWrapper} where all map keys will be stored internally as lowercase. This means that
@@ -64,6 +65,11 @@ public class OptimizedCaseInsensitiveMapWrapper<T> extends CaseInsensitiveMapWra
     protected Iterator<String> createIterator(Set<CaseInsensitiveMapKey> keys) {
       return new KeyIterator(keys);
     }
+
+    @Override
+    protected CaseInsensitiveMapKey keyFor(Object o) {
+      return CaseInsensitiveMapKey.keyFor(o);
+    }
   }
 
   private static class EntrySet<T> extends AbstractConverterSet<Entry<CaseInsensitiveMapKey, T>, Entry<String, T>> {
@@ -75,6 +81,16 @@ public class OptimizedCaseInsensitiveMapWrapper<T> extends CaseInsensitiveMapWra
     @Override
     protected Iterator<Entry<String, T>> createIterator(Set<Entry<CaseInsensitiveMapKey, T>> entries) {
       return new EntryIterator<>(entries);
+    }
+
+    @Override
+    protected Entry<CaseInsensitiveMapKey, T> keyFor(Object o) {
+      if (o instanceof Entry) {
+        Entry<CaseInsensitiveMapKey, T> o2 = (Entry<CaseInsensitiveMapKey, T>) o;
+        return new AbstractMap.SimpleImmutableEntry<>(CaseInsensitiveMapKey.keyFor(o2.getKey()), o2.getValue());
+      }
+
+      return null;
     }
   }
 
@@ -135,7 +151,7 @@ public class OptimizedCaseInsensitiveMapWrapper<T> extends CaseInsensitiveMapWra
    */
   @Override
   public Map<String, T> asCaseSensitiveMap() {
-    return baseMap.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().getKey(), entry -> entry.getValue()));
+    return baseMap.entrySet().stream().collect(toMap(entry -> entry.getKey().getKey(), entry -> entry.getValue()));
   }
 
 }
