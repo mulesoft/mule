@@ -92,8 +92,8 @@ public class HttpListenerRegistry implements RequestHandlerProvider
     public class ServerAddressRequestHandlerRegistry
     {
         private Path serverRequestHandler;
-        private Path rootPath = new Path();
-        private Path catchAllPath = new Path();
+        private Path rootPath = new Path("root", null);
+        private Path catchAllPath = new Path(WILDCARD_CHARACTER, null);
         private Set<String> paths = new HashSet<>();
 
         /**
@@ -108,13 +108,13 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             String requestMatcherPath = normalizePathWithSpacesOrEncodedSpaces(requestMatcher.getPath());
             Preconditions.checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER), "path parameter must start with /");
             validateCollision(requestMatcher);
-            Path currentPathNode = rootPath;
+            Path currentPath = rootPath;
             paths.add(getMethodAndPath(requestMatcher));
             final RequestHandlerMatcherPair addedRequestHandlerMatcherPair;
             final Path requestHandlerOwner;
             if (requestMatcherPath.equals(WILDCARD_CHARACTER))
             {
-                serverRequestHandler = new Path();
+                serverRequestHandler = new Path("server", null);
                 addedRequestHandlerMatcherPair = new RequestHandlerMatcherPair(requestMatcher, requestHandler);
                 requestHandlerOwner = serverRequestHandler;
                 serverRequestHandler.addRequestHandlerMatcherPair(addedRequestHandlerMatcherPair);
@@ -137,25 +137,25 @@ public class HttpListenerRegistry implements RequestHandlerProvider
                 int insertionLevel = getPathPartsSize(requestMatcherPath);
                 for (int i = 1; i < insertionLevel - 1; i++)
                 {
-                    String currentPath = pathParts[i];
-                    Path path = currentPathNode.getChildPath(currentPath, null);
+                    String currentPathName = pathParts[i];
+                    Path path = currentPath.getChildPath(currentPathName, null);
                     if (i != insertionLevel - 1)
                     {
                         if (path == null)
                         {
-                            path = new Path();
-                            currentPathNode.addChildPathMap(currentPath, path);
+                            path = new Path(currentPathName, currentPath);
+                            currentPath.addChildPath(currentPathName, path);
                         }
                     }
 
-                    currentPathNode = path;
+                    currentPath = path;
                 }
-                String currentPath = pathParts[insertionLevel - 1];
-                Path path = currentPathNode.getLastChildPathMap(currentPath);
+                String currentPathName = pathParts[insertionLevel - 1];
+                Path path = currentPath.getLastChildPath(currentPathName);
                 if (path == null)
                 {
-                    path = new Path();
-                    currentPathNode.addChildPathMap(currentPath, path);
+                    path = new Path(currentPathName, currentPath);
+                    currentPath.addChildPath(currentPathName, path);
                 }
                 if (requestMatcherPath.endsWith(WILDCARD_CHARACTER))
                 {
@@ -213,19 +213,19 @@ public class HttpListenerRegistry implements RequestHandlerProvider
          */
         public RequestHandler findRequestHandler(final HttpRequest request)
         {
-            final String path = normalizePathWithSpacesOrEncodedSpaces(request.getPath());
-            Preconditions.checkArgument(path.startsWith(SLASH), "path parameter must start with /");
-            Stack<Path> foundPaths = findPossibleRequestHandlers(path);
+            final String pathName = normalizePathWithSpacesOrEncodedSpaces(request.getPath());
+            Preconditions.checkArgument(pathName.startsWith(SLASH), "path parameter must start with /");
+            Stack<Path> foundPaths = findPossibleRequestHandlers(pathName);
             boolean methodNotAllowed = false;
             RequestHandlerMatcherPair requestHandlerMatcherPair = null;
             while (!foundPaths.empty())
             {
-                final Path pathNode = foundPaths.pop();
-                List<RequestHandlerMatcherPair> requestHandlerMatcherPairs = pathNode.getRequestHandlerMatcherPairs();
+                final Path path = foundPaths.pop();
+                List<RequestHandlerMatcherPair> requestHandlerMatcherPairs = path.getRequestHandlerMatcherPairs();
 
-                if (requestHandlerMatcherPairs == null && pathNode.getCatchAll() != null)
+                if (requestHandlerMatcherPairs == null && path.getCatchAll() != null)
                 {
-                    requestHandlerMatcherPairs = pathNode.getCatchAll().requestHandlerMatcherPairs;
+                    requestHandlerMatcherPairs = path.getCatchAll().requestHandlerMatcherPairs;
                 }
                 requestHandlerMatcherPair = findRequestHandlerMatcherPair(requestHandlerMatcherPairs, request);
 
@@ -399,7 +399,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
     /**
      * Represents a URI path, which can be a parent to regular sub paths, a catch all sub path (/*) and a URI param path (/{param}).
      * Request handler and matcher pairs (handlers for different methods, for example) can be added and removed from it. If all
-     * its handlers and children handlers' are removed, it will notify its parent the path itself can be removed. This means that
+     * its handlers and children's handlers' are removed, it will notify its parent the path itself can be removed. This means that
      * the tree-like structure that results from binding paths together changes as handlers are created and disposed so special care
      * needs to be taken regarding available paths.
      */
@@ -414,12 +414,13 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         private Path catchAllUriParam;
 
         /**
-         * Makes this path self-aware within the path tree so that it can interact with its parent.
+         * Creates a new instance for the given name and with the provided parent.
          *
-         * @param name the name for this path
-         * @param parent the parent path
+         * @param name for this path
+         * @param parent of this path
          */
-        public void addIdentity(String name, Path parent) {
+        public Path(String name, Path parent)
+        {
             this.name = name;
             this.parent = parent;
         }
@@ -491,7 +492,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
          * @param subPath a sub part of the path
          * @return the node with the existent mappings. null if there's no such node.
          */
-        public Path getLastChildPathMap(final String subPath)
+        public Path getLastChildPath(final String subPath)
         {
             if (isCatchAllPath(subPath) || isUriParameter(subPath))
             {
@@ -512,32 +513,31 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         }
 
         /**
-         * Adds a new sub or uri param path, assigning itself as its parent and naming it.
+         * Adds a new sub or uri param path.
          *
-         * @param path the path name
-         * @param pathNode the node for this path
+         * @param pathName the path name
+         * @param path the representation of this path
          */
-        public void addChildPathMap(final String path, final Path pathNode)
+        public void addChildPath(final String pathName, final Path path)
         {
-            if (path.equals(WILDCARD_CHARACTER) || path.endsWith("}"))
+            if (pathName.equals(WILDCARD_CHARACTER) || pathName.endsWith("}"))
             {
-                catchAllUriParam = pathNode;
+                catchAllUriParam = path;
             }
             else
             {
-                subPaths.put(path, pathNode);
+                subPaths.put(pathName, path);
             }
-            pathNode.addIdentity(path, this);
         }
 
         /**
          * Removes a sub path and checks whether this path itself should be removed.
          *
-         * @param path the path name
+         * @param pathName the path name
          */
-        public void removeChildPathMap(final String path)
+        public void removeChildPath(final String pathName)
         {
-            subPaths.remove(path);
+            subPaths.remove(pathName);
             removeSelfIfEmpty();
         }
 
@@ -576,7 +576,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         {
             if (this.catchAll == null)
             {
-                this.catchAll = new Path();
+                this.catchAll = new Path(WILDCARD_CHARACTER, this);
             }
             this.catchAll.addRequestHandlerMatcherPair(requestHandlerMatcherPair);
         }
@@ -624,7 +624,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider
         {
             if (this.isEmpty() && parent != null)
             {
-                parent.removeChildPathMap(name);
+                parent.removeChildPath(name);
             }
         }
 
