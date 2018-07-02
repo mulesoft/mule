@@ -6,12 +6,29 @@
  */
 package org.mule.transformers.xml.xslt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mule.api.config.MuleProperties.MULE_XML_RESET_CONTROLLER_AFTER_EACH_TRANSFORMATION;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.URIResolver;
+
+import org.junit.Test;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
@@ -25,16 +42,8 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformers.xml.AbstractXmlTransformerTestCase;
 import org.mule.util.IOUtils;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.URIResolver;
-
-import org.junit.Test;
+import net.sf.saxon.Controller;
+import net.sf.saxon.TransformerFactoryImpl;
 
 public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {
@@ -97,15 +106,15 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         Iterator<?> it = list.iterator();
 
         Object expectedResult = getResultData();
-        assertNotNull(expectedResult);
+        assertThat(expectedResult, is(not(nullValue())));
 
         Object msg, result;
         while (it.hasNext())
         {
             msg = it.next();
             result = getTransformer().transform(msg);
-            assertNotNull(result);
-            assertTrue("Test failed for message type: " + msg.getClass(), compareResults(expectedResult, result));
+            assertThat(result, is(not(nullValue())));
+            assertThat(compareResults(expectedResult, result), equalTo(true));
         }
     }
 
@@ -113,7 +122,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     public void testTransformXMLStreamReader() throws Exception
     {
         Object expectedResult = getResultData();
-        assertNotNull(expectedResult);
+        assertThat(expectedResult, is(not(nullValue())));
 
         XsltTransformer transformer = (XsltTransformer) getTransformer();
 
@@ -122,15 +131,15 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         XMLStreamReader sr = XMLUtils.toXMLStreamReader(transformer.getXMLInputFactory(), is);
 
         Object result = transformer.transform(sr);
-        assertNotNull(result);
-        assertTrue("expected: " + expectedResult + "\nresult: " + result, compareResults(expectedResult, result));
+        assertThat(result, is(not(nullValue())));
+        assertThat(compareResults(expectedResult, result), equalTo(true));
     }
 
     @Test
     public void testTransformInputStream() throws Exception
     {
         Object expectedResult = getResultData();
-        assertNotNull(expectedResult);
+        assertThat(expectedResult, is(not(nullValue())));
 
         XsltTransformer transformer = (XsltTransformer) getTransformer();
 
@@ -138,8 +147,8 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         InputStream mockedInputStream = spy(is);
 
         Object result = transformer.transform(mockedInputStream);
-        assertNotNull(result);
-        assertTrue("expected: " + expectedResult + "\nresult: " + result, compareResults(expectedResult, result));
+        assertThat(result, is(not(nullValue())));
+        assertThat(compareResults(expectedResult, result), is(true));
         verify(mockedInputStream).close();
     }
 
@@ -150,6 +159,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         t.setXslTransformerFactory("com.nosuchclass.TransformerFactory");
         t.setXslFile(VALID_XSL_FILENAME);
 
+
         try
         {
             t.initialise();
@@ -157,7 +167,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         }
         catch (InitialisationException iex)
         {
-            assertEquals(ClassNotFoundException.class, iex.getCause().getClass());
+            assertThat(iex.getCause().getClass().getName(), equalTo(ClassNotFoundException.class.getName()));
         }
 
         t = new XsltTransformer();
@@ -208,7 +218,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         // remove doc type and CRLFs
         transformerResult = transformerResult.substring(transformerResult.indexOf("?>") + 2);
 
-        assertTrue(transformerResult.indexOf(expectedTransformedxml) > -1);
+        assertThat(transformerResult.indexOf(expectedTransformedxml), greaterThan(-1));
 
     }
 
@@ -271,7 +281,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         // remove doc type and CRLFs
         transformerResult = transformerResult.substring(transformerResult.indexOf("?>") + 2);
 
-        assertTrue(transformerResult.indexOf(expectedTransformedxml) > -1);
+        assertThat(transformerResult.indexOf(expectedTransformedxml), greaterThan(-1));
     }
 
     @Test
@@ -282,7 +292,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         try
         {
             xsltTransformer.initialise();
-            assertEquals(someXslText(), xsltTransformer.getXslt());
+            assertThat(xsltTransformer.getXslt(), equalTo(someXslText()));
         }
         catch (InitialisationException e)
         {
@@ -301,7 +311,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         }
         catch (InitialisationException e)
         {
-            assertTrue(e.getMessage().contains("xsl-file or xsl-text"));
+            assertThat(e.getMessage().contains("xsl-file or xsl-text"), equalTo(true));
         }
     }
 
@@ -319,7 +329,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         }
         catch (InitialisationException e)
         {
-            assertTrue(e.getMessage().contains(someNonExistentFileName));
+            assertThat(e.getMessage().contains(someNonExistentFileName), equalTo(true));
         }
     }
 
@@ -331,12 +341,11 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         try
         {
             xsltTransformer.initialise();
-            assertNotNull(xsltTransformer.getXslt());
+            assertThat(xsltTransformer.getXslt(), is(not(nullValue())));
             String someTextThatIsInTheXslFile = "My CD Collection";
-            assertTrue("Should contain the text '" + someTextThatIsInTheXslFile + "', because it is in the '"
-                       + VALID_XSL_FILENAME + "' file that we are setting.", xsltTransformer.getXslt()
-                .contains(
-                someTextThatIsInTheXslFile));
+
+            assertThat(xsltTransformer.getXslt(),
+                    containsString(someTextThatIsInTheXslFile));
         }
         catch (InitialisationException e)
         {
@@ -352,7 +361,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         xsltTransformer.setXslFile(VALID_XSL_FILENAME);
 
         xsltTransformer.initialise();
-        assertTrue(xsltTransformer.getUriResolver() instanceof LocalURIResolver);
+        assertThat(xsltTransformer.getUriResolver(), instanceOf(LocalURIResolver.class));
     }
 
     @Test
@@ -364,7 +373,59 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         URIResolver uriResolver = new LocalURIResolver();
         xsltTransformer.setUriResolver(uriResolver);
         xsltTransformer.initialise();
-        assertEquals(uriResolver, xsltTransformer.getUriResolver());
+        assertThat(uriResolver, equalTo(xsltTransformer.getUriResolver()));
+    }
+
+    @Test
+    public void testTransformerUnderlyingControllerIsReset() throws Exception
+    {
+        performTransformation(true);
+
+        Controller controller = ((net.sf.saxon.jaxp.TransformerImpl) TestTransformerFactoryImpl.TRANSFORMER).getUnderlyingController();
+
+        assertThat(controller.getInitialContextItem(), is(nullValue()));
+    }
+    
+    @Test
+    public void testTransformerUnderlyingControllerIsNotResetByDefault() throws Exception
+    {
+        performTransformation(false);
+        
+        Controller controller = ((net.sf.saxon.jaxp.TransformerImpl) TestTransformerFactoryImpl.TRANSFORMER).getUnderlyingController();
+
+        assertThat(controller.getInitialContextItem(), is(not(nullValue())));
+    }
+
+    private void performTransformation(boolean resetController) throws InitialisationException, TransformerException
+    {
+        System.setProperty(MULE_XML_RESET_CONTROLLER_AFTER_EACH_TRANSFORMATION, Boolean.toString(resetController));
+        
+        String xml =
+                "<node1>" +
+                     "<subnode1>sub node 1 original value</subnode1>" +
+                     "<subnode2>sub node 2 original value</subnode2>" +
+                 "</node1>";
+
+        String param = "sub node 2 cool new value";
+
+        String xsl = someXslText();
+
+        XsltTransformer transformer = new XsltTransformer();
+        transformer.setXslTransformerFactory(TestTransformerFactoryImpl.class.getTypeName());
+        transformer.setMuleContext(muleContext);
+        transformer.setReturnDataType(DataTypeFactory.STRING);
+        // set stylesheet
+        transformer.setXslt(xsl);
+
+        // set parameter
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("param1", param);
+        transformer.setContextProperties(params);
+
+        // init transformer
+        transformer.initialise();
+
+        transformer.transform(xml);
     }
 
 }
