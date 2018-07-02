@@ -40,10 +40,11 @@ import org.mule.module.xml.util.XMLTestUtils;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformers.xml.AbstractXmlTransformerTestCase;
+import org.mule.transformers.xml.xslt.TestTransformerFactoryImpl;
 import org.mule.util.IOUtils;
 
+
 import net.sf.saxon.Controller;
-import net.sf.saxon.TransformerFactoryImpl;
 
 public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {
@@ -411,7 +412,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         String xsl = someXslText();
 
         XsltTransformer transformer = new XsltTransformer();
-        transformer.setXslTransformerFactory(TestTransformerFactoryImpl.class.getTypeName());
+        transformer.setXslTransformerFactory(TestTransformerFactoryImpl.class.getCanonicalName());
         transformer.setMuleContext(muleContext);
         transformer.setReturnDataType(DataTypeFactory.STRING);
         // set stylesheet
