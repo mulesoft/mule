@@ -7,6 +7,7 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
+import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -66,7 +67,8 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
       artifactClassloader = true;
       artifactName = getArtifactName((ArtifactClassLoader) ownerClassLoader);
       artifactDescriptor = getArtifactDescriptor((ArtifactClassLoader) ownerClassLoader);
-      applicationClassloader = ownerClassLoader instanceof RegionClassLoader;
+      applicationClassloader = ownerClassLoader instanceof RegionClassLoader
+          && ((RegionClassLoader) ownerClassLoader).getOwnerClassLoader() instanceof ApplicationClassLoader;
     } else {
       artifactClassloader = false;
       applicationClassloader = false;

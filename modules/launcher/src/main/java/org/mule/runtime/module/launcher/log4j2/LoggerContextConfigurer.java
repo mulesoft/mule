@@ -116,7 +116,7 @@ final class LoggerContextConfigurer {
   }
 
   public boolean shouldConfigureContext(MuleLoggerContext context) {
-    if (!context.isApplicationClassloader()) {
+    if (!context.isArtifactClassloader()) {
       return true;
     }
 
