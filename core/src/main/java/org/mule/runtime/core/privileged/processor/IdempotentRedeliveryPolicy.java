@@ -33,11 +33,9 @@ import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.store.ObjectStorePartition;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 
 import java.io.Serializable;
@@ -202,8 +200,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
 
       try {
-        CoreEvent returnEvent = processNext(CoreEvent
-            .builder(DefaultEventContext.child((BaseEventContext) event.getContext(), empty()), event).build());
+        CoreEvent returnEvent = processNext(event);
         counter = findCounter(messageId);
         if (counter != null) {
           resetCounter(messageId);
