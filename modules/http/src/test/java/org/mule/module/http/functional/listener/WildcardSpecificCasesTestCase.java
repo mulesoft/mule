@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.http.internal.listener;
+package org.mule.module.http.functional.listener;
 
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
