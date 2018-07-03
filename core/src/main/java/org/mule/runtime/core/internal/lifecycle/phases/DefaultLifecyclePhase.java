@@ -7,11 +7,12 @@
 package org.mule.runtime.core.internal.lifecycle.phases;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getNonMuleException;
+import static org.mule.runtime.api.exception.ExceptionHelper.unwrap;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToInvokeLifecycle;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
-import org.mule.runtime.core.internal.config.ExceptionHelper;
 import org.mule.runtime.core.internal.lifecycle.LifecycleTransitionResult;
 
 import java.util.HashSet;
@@ -112,14 +113,13 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
     try {
       lifecycleInvoker.accept(o);
     } catch (final Exception e) {
-      Throwable t = ExceptionHelper.unwrap(e);
-
-      if (t instanceof LifecycleException) {
+      Throwable t = extractCauseOfType(e, LifecycleException.class).orElse(null);
+      if (t != null) {
         throw (LifecycleException) t;
       }
 
       // Need to get the cause of the MuleException so the LifecycleException wraps a non-mule exception
-      throw new LifecycleException(failedToInvokeLifecycle(name, o), getNonMuleException(t), o);
+      throw new LifecycleException(failedToInvokeLifecycle(name, o), getNonMuleException(unwrap(e)), o);
     }
   }
 }

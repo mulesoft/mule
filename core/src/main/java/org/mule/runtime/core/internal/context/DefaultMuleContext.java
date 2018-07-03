@@ -41,7 +41,6 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
@@ -152,7 +151,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   /**
    * logger used by this class
    */
-  private static Logger logger = getLogger(DefaultMuleContext.class);
+  private static Logger LOGGER = getLogger(DefaultMuleContext.class);
 
   private CustomizationService customizationService = new DefaultCustomizationService();
 
@@ -258,8 +257,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   static {
     // Log dropped events/errors
-    Hooks.onErrorDropped(error -> logger.debug("ERROR DROPPED " + error));
-    Hooks.onNextDropped(event -> logger.debug("EVENT DROPPED " + event));
+    Hooks.onErrorDropped(error -> LOGGER.debug("ERROR DROPPED " + error));
+    Hooks.onNextDropped(event -> LOGGER.debug("EVENT DROPPED " + event));
   }
 
   public DefaultMuleContext() {
@@ -322,7 +321,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       componentInitialStateManager = muleRegistryHelper.get(OBJECT_COMPONENT_INITIAL_STATE_MANAGER);
       startDate = System.currentTimeMillis();
 
-      startIfNeeded(extensionManager);
       fireNotification(new MuleContextNotification(this, CONTEXT_STARTING));
       getLifecycleManager().fireLifecycle(Startable.PHASE_NAME);
       overridePollingController();
@@ -334,7 +332,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       startLatch.release();
 
-      if (logger.isInfoEnabled()) {
+      if (LOGGER.isInfoEnabled()) {
         SplashScreen startupScreen = buildStartupSplash();
         log(startupScreen.toString());
       }
@@ -378,7 +376,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     synchronized (lifecycleStateLock) {
       startLatch.release();
 
-      stopIfNeeded(extensionManager);
       getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
       fireNotification(new MuleContextNotification(this, CONTEXT_STOPPING));
       getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
@@ -396,7 +393,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
         try {
           stop();
         } catch (MuleException e) {
-          logger.error("Failed to stop Mule context", e);
+          LOGGER.error("Failed to stop Mule context", e);
         }
       }
 
@@ -404,7 +401,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       fireNotification(new MuleContextNotification(this, CONTEXT_DISPOSING));
 
-      disposeIfNeeded(getExceptionListener(), logger);
+      disposeIfNeeded(getExceptionListener(), LOGGER);
 
       try {
         getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);
@@ -415,14 +412,14 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
           safely(() -> muleRegistryHelper.dispose());
         }
       } catch (Exception e) {
-        logger.debug("Failed to cleanly dispose Mule: " + e.getMessage(), e);
+        LOGGER.debug("Failed to cleanly dispose Mule: " + e.getMessage(), e);
       }
 
       notificationManager.fireNotification(new MuleContextNotification(this, CONTEXT_DISPOSED));
 
       disposeManagers();
 
-      if ((getStartDate() > 0) && logger.isInfoEnabled()) {
+      if ((getStartDate() > 0) && LOGGER.isInfoEnabled()) {
         SplashScreen shutdownScreen = buildShutdownSplash();
         log(shutdownScreen.toString());
       }
@@ -435,7 +432,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private void disposeManagers() {
     safely(() -> {
-      disposeIfNeeded(getFlowTraceManager(), logger);
+      disposeIfNeeded(getFlowTraceManager(), LOGGER);
       notificationManager.dispose();
     });
   }
@@ -528,8 +525,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     ServerNotificationManager notificationManager = getNotificationManager();
     if (notificationManager != null) {
       notificationManager.fireNotification(notification);
-    } else if (logger.isDebugEnabled()) {
-      logger.debug("MuleEvent Manager is not enabled, ignoring notification: " + notification);
+    } else if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("MuleEvent Manager is not enabled, ignoring notification: " + notification);
     }
   }
 
