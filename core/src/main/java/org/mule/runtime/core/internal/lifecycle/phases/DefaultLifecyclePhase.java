@@ -114,7 +114,12 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
     try {
       lifecycleInvoker.accept(o);
     } catch (final Exception e) {
-      Throwable t = extractCauseOfType(e, LifecycleException.class).orElse(null);
+      Throwable t = e.getCause();
+      if (t instanceof LifecycleException) {
+        throw (LifecycleException) t;
+      }
+
+      t = extractCauseOfType(e, LifecycleException.class).orElse(null);
       if (t != null) {
         throw (LifecycleException) t;
       }
