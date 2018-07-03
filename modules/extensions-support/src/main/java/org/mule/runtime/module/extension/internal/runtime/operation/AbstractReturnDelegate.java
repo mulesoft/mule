@@ -123,9 +123,17 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
     if (value instanceof Result) {
       Result resultValue = (Result) value;
+      if (resultValue.getOutput() instanceof InputStream) {
+        ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
+        if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
+          resultValue = resultValue.copy()
+              .output(new ConnectedInputStreamWrapper((InputStream) resultValue.getOutput(), connectionHandler))
+              .build();
+        }
+      }
       return isSpecialHandling && returnHandler.handles(resultValue.getOutput())
-          ? MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event, returnHandler.getDataType())
-          : MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event);
+          ? MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event, returnHandler.getDataType())
+          : MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event);
     } else {
       PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(getDefaultEncoding(muleContext),
                                                                                        defaultMediaType,
@@ -221,7 +229,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     return mediaType;
   }
 
-  private class ConnectedInputStreamWrapper extends InputStream {
+  protected class ConnectedInputStreamWrapper extends InputStream {
 
     private final InputStream delegate;
     private final ConnectionHandler<?> connectionHandler;
