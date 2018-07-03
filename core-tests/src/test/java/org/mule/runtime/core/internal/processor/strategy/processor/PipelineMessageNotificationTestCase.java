@@ -139,7 +139,10 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
     switch (mode) {
       case BLOCKING:
-        verifySucess();
+        new PollingProber().check(new JUnitLambdaProbe(() -> {
+          verifySucess();
+          return true;
+        }));
         break;
       case NON_BLOCKING:
         new PollingProber().check(new JUnitLambdaProbe(() -> {
@@ -169,7 +172,10 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     } finally {
       switch (mode) {
         case BLOCKING:
-          verifyException();
+          new PollingProber().check(new JUnitLambdaProbe(() -> {
+            verifyException();
+            return true;
+          }));
           break;
         case NON_BLOCKING:
           new PollingProber().check(new JUnitLambdaProbe(() -> {
