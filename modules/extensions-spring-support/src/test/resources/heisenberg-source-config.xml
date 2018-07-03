@@ -30,6 +30,7 @@
 
     <flow name="source" initialState="stopped">
         <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
+            <redelivery-policy maxRedeliveryCount="10" useSecureHash="true"/>
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
