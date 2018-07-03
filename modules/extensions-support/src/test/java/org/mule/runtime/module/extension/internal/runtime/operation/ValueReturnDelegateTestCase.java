@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.size.SmallTest;
@@ -22,8 +22,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ValueReturnDelegateTestCase extends ValueReturnDelegateContractTestCase {
 
   @Override
-  protected ReturnDelegate createReturnDelegate() {
-    return new ValueReturnDelegate(componentModel, getDefaultCursorStreamProviderFactory(), muleContext);
+  protected ReturnDelegate createReturnDelegate() throws InitialisationException {
+    return new ValueReturnDelegate(componentModel,
+                                   getCursorProviderFactory(), muleContext);
   }
 
   @Override

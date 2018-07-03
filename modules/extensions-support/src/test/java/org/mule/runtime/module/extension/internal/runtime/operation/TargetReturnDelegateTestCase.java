@@ -26,7 +26,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
   @Override
   protected ReturnDelegate createReturnDelegate() {
-    return new TargetReturnDelegate(TARGET, "#[message]", componentModel, getDefaultCursorStreamProviderFactory(), muleContext);
+    return new TargetReturnDelegate(TARGET, "#[message]", componentModel, getCursorProviderFactory(), muleContext);
   }
 
   @After
