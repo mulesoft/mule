@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.core.internal.lifecycle;
 
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
 
 import java.util.Map;
@@ -114,13 +110,5 @@ public class DefaultLifecycleInterceptor implements LifecycleInterceptor {
 
   private boolean isFinalPhase(LifecyclePhase phase) {
     return finalPhase.equals(phase.getName());
-  }
-
-  public static LifecycleInterceptor createInitDisposeLifecycleInterceptor() {
-    return new DefaultLifecycleInterceptor(Initialisable.PHASE_NAME, Disposable.PHASE_NAME, Initialisable.class);
-  }
-
-  public static LifecycleInterceptor createStartStopLifecycleInterceptor() {
-    return new DefaultLifecycleInterceptor(Startable.PHASE_NAME, Stoppable.PHASE_NAME, Startable.class);
   }
 }

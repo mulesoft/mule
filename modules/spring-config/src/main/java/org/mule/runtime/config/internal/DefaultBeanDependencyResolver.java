@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
@@ -104,8 +105,12 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
                                             DependencyNode node) {
     Collection<String> dependencies = configurationDependencyResolver.resolveComponentDependencies(key);
     for (String dependency : dependencies) {
-      if (springRegistry.isSingleton(dependency)) {
-        addDependency(node, dependency, springRegistry.get(dependency), processedKeys);
+      try {
+        if (springRegistry.isSingleton(dependency)) {
+          addDependency(node, dependency, springRegistry.get(dependency), processedKeys);
+        }
+      } catch (NoSuchBeanDefinitionException e) {
+        // we're starting in lazy mode... disregard.
       }
     }
   }
