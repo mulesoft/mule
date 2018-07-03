@@ -19,6 +19,22 @@ import static org.mule.module.http.api.HttpHeaders.Values.CONTINUE;
 import static org.mule.module.http.internal.listener.grizzly.ExecutorPerServerAddressIOStrategy.EXECUTOR_DISCARDED_ATTRIBUTE;
 import static org.mule.module.http.internal.listener.grizzly.ExecutorPerServerAddressIOStrategy.EXECUTOR_REJECTED_ATTRIBUTE;
 import static org.mule.module.http.internal.listener.grizzly.MuleSslFilter.SSL_SESSION_ATTRIBUTE_KEY;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+
+import javax.net.ssl.SSLSession;
+
+import org.glassfish.grizzly.filterchain.BaseFilter;
+import org.glassfish.grizzly.filterchain.FilterChainContext;
+import org.glassfish.grizzly.filterchain.FilterChainEvent;
+import org.glassfish.grizzly.filterchain.NextAction;
+import org.glassfish.grizzly.http.HttpContent;
+import org.glassfish.grizzly.http.HttpEvents.IncomingHttpUpgradeEvent;
+import org.glassfish.grizzly.http.HttpEvents.OutgoingHttpUpgradeEvent;
+import org.glassfish.grizzly.http.HttpHeader;
+import org.glassfish.grizzly.http.HttpRequestPacket;
+import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.mule.module.http.api.HttpConstants.HttpStatus;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
@@ -31,18 +47,6 @@ import org.mule.module.http.internal.listener.RequestHandlerProvider;
 import org.mule.module.http.internal.listener.async.HttpResponseReadyCallback;
 import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.async.ResponseStatusCallback;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-
-import javax.net.ssl.SSLSession;
-
-import org.glassfish.grizzly.filterchain.BaseFilter;
-import org.glassfish.grizzly.filterchain.FilterChainContext;
-import org.glassfish.grizzly.filterchain.NextAction;
-import org.glassfish.grizzly.http.HttpContent;
-import org.glassfish.grizzly.http.HttpRequestPacket;
-import org.glassfish.grizzly.http.HttpResponsePacket;
 
 /**
  * Grizzly filter that dispatches the request to the right request handler
@@ -167,6 +171,35 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
             clientConnection = new ClientConnection((InetSocketAddress) ctx.getConnection().getPeerAddress());
         }
         return new HttpRequestContext(httpRequest, clientConnection, scheme);
+    }
+    
+    @Override
+    public NextAction handleEvent(FilterChainContext ctx, FilterChainEvent event) throws IOException
+    {
+        if (event.type() == IncomingHttpUpgradeEvent.TYPE)
+        {
+            final HttpHeader header = ((IncomingHttpUpgradeEvent) event).getHttpHeader();
+            if (header.isRequest())
+            {
+                // This replicates the HTTP2 handling in Grizzly
+                header.setIgnoreContentModifiers(false);
+
+                return ctx.getStopAction();
+            }
+        }
+
+        if (event.type() == OutgoingHttpUpgradeEvent.TYPE)
+        {
+            final OutgoingHttpUpgradeEvent outUpgradeEvent =
+                    (OutgoingHttpUpgradeEvent) event;
+            // If it's HTTP2 outgoing upgrade message - we have to re-enable content modifiers control
+            // as the HTTP2 filters are not enabled.
+            outUpgradeEvent.getHttpHeader().setIgnoreContentModifiers(false);
+
+            return ctx.getStopAction();
+        }
+
+        return super.handleEvent(ctx, event);
     }
 
 }
