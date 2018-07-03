@@ -11,6 +11,7 @@ import static org.mule.runtime.api.exception.ExceptionHelper.unwrap;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToInvokeLifecycle;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.internal.lifecycle.LifecycleTransitionResult;
@@ -23,8 +24,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Represents a configurable lifecycle phase. This is a default implementation of a 'generic phase' in that is can be configured
- * to represnt any phase. Instances of this phase can then be registered with a
- * {@link org.mule.runtime.core.api.lifecycle.LifecycleManager} and by used to enforce a lifecycle phase on an object. Usually,
+ * to represents any phase. Instances of this phase can then be registered with a
+ * {@link LifecycleManager} and by used to enforce a lifecycle phase on an object. Usually,
  * Lifecycle phases have a fixed configuration in which case a specialisation of this class should be created that initialises its
  * configuration internally.
  * <p>
