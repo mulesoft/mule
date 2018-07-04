@@ -98,6 +98,7 @@ abstract class DispatchingLogger extends Logger {
         throw new RuntimeException(e);
       }
     }
+    super.updateConfiguration(config);
   }
 
   private boolean lookupUpdateConfigurationMethod() {
