@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
@@ -16,8 +17,10 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENC
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
+import org.mule.metadata.api.builder.AnyTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.BinaryTypeBuilder;
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
@@ -40,17 +43,24 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.util.NameUtils;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
+import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Enriches operations which return types are {@link InputStream}, {@link String} or {@link Object} by adding two parameters:
- * A {@link ExtensionProperties#MIME_TYPE_PARAMETER_NAME} that allows configuring the mimeType to the output operation payload
- * and a {@link ExtensionProperties#ENCODING_PARAMETER_NAME} that allows configuring the encoding to the output operation payload.
+ * Enriches operations which return types are {@link InputStream}, {@link String} or {@link Object} by adding two parameters: A
+ * {@link ExtensionProperties#MIME_TYPE_PARAMETER_NAME} that allows configuring the mimeType to the output operation payload and a
+ * {@link ExtensionProperties#ENCODING_PARAMETER_NAME} that allows configuring the encoding to the output operation payload.
  * <p>
  * Both added attributes are optional without default value and accept expressions.
  *
@@ -79,13 +89,24 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
 
         @Override
         protected void onOperation(OperationDeclaration declaration) {
-          declareMimeTypeParameters(declaration);
+          declareMimeTypeParameters(declaration, getOperationReturnType(declaration));
+        }
+
+        private Optional<Type> getOperationReturnType(OperationDeclaration declaration) {
+          return declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+              .map(mp -> mp.getOperationMethod().getReturnType());
         }
 
         @Override
         protected void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
-          declareMimeTypeParameters(declaration);
+          declareMimeTypeParameters(declaration, getSourceOutputType(declaration));
         }
+
+        private Optional<Type> getSourceOutputType(SourceDeclaration declaration) {
+          return declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+              .map(mp -> (Type) ((SourceTypeWrapper) (mp.getType())).getSuperClassGenerics().get(0));
+        }
+
       }.walk(declaration);
     }
 
@@ -97,23 +118,17 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
       group.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME, "The mime type of the payload that this operation outputs."));
     }
 
-    private void declareMimeTypeParameters(ExecutableComponentDeclaration<?> declaration) {
+    private void declareMimeTypeParameters(ExecutableComponentDeclaration<?> declaration, Optional<Type> outputType) {
       MediaTypeModelProperty property = declaration.getModelProperty(MediaTypeModelProperty.class).orElse(null);
-      declaration.getOutput().getType().accept(new MetadataTypeVisitor() {
+      if (property == null) {
+        return;
+      }
+      outputType.map(type -> type.asMetadataType()).orElse(declaration.getOutput().getType()).accept(new MetadataTypeVisitor() {
 
         @Override
         public void visitString(StringType stringType) {
           if (stringType.getAnnotation(EnumAnnotation.class).isPresent()) {
             return;
-          }
-
-          if (property == null) {
-            String componentType = NameUtils.getDeclarationTypeName(declaration);
-            throw new IllegalModelDefinitionException(String.format(
-                                                                    "%s '%s' has a String output but doesn't specify a default mime type. Please annotate it with @%s",
-                                                                    componentType, declaration.getName(),
-                                                                    org.mule.runtime.extension.api.annotation.param.MediaType.class
-                                                                        .getSimpleName()));
           }
 
           if (!property.isStrict()) {
@@ -125,14 +140,6 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
 
         @Override
         public void visitBinaryType(BinaryType binaryType) {
-          if (property == null) {
-            String componentType = NameUtils.getDeclarationTypeName(declaration);
-            throw new IllegalModelDefinitionException(String.format(
-                                                                    "%s '%s' has a binary output but doesn't specify a default mime type. Please annotate it with @%s",
-                                                                    componentType, declaration.getName(),
-                                                                    org.mule.runtime.extension.api.annotation.param.MediaType.class
-                                                                        .getSimpleName()));
-          }
 
           if (!property.isStrict()) {
             ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
@@ -147,19 +154,43 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
             return builder.build();
           });
         }
+
+        @Override
+        public void visitAnyType(AnyType anyType) {
+          if (!property.isStrict()) {
+            ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
+            declareOutputMimeTypeParameter(group);
+            declareOutputEncodingParameter(group);
+          }
+
+          replaceOutputType(declaration, property, format -> {
+            AnyTypeBuilder builder = BaseTypeBuilder.create(format).anyType();
+            declaration.getOutput().getType().getAnnotation(ClassInformationAnnotation.class).ifPresent(builder::with);
+            return builder.build();
+          });
+        }
       });
     }
 
     private void replaceOutputType(ExecutableComponentDeclaration<?> declaration, MediaTypeModelProperty property,
                                    Function<MetadataFormat, MetadataType> type) {
 
-      final MediaType mediaType = property.getMediaType();
-      if (mediaType.matches(ANY)) {
+      if (!shouldOverrideMetadataFormat(declaration)) {
+        return;
+      }
+
+      final MediaType mediaType = property.getMediaType().orElse(null);
+      if (mediaType != null || mediaType.matches(ANY)) {
         return;
       }
 
       final OutputDeclaration output = declaration.getOutput();
       output.setType(type.apply(toMetadataFormat(mediaType)), output.hasDynamicType());
+    }
+
+    private boolean shouldOverrideMetadataFormat(ExecutableComponentDeclaration declaration) {
+      return !declaration.getOutput().getType().getAnnotation(CustomDefinedStaticTypeAnnotation.class).isPresent() &&
+          declaration.getOutput().getType().getMetadataFormat().equals(JAVA);
     }
 
     private ParameterDeclaration newParameter(String name, String description) {

@@ -28,6 +28,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.MediaTypeUtils;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -54,10 +55,9 @@ import java.util.Optional;
  * Contains the logic for taking an operation's output value and turn it into a {@link Message} which not only contains the
  * updated payload but also the proper {@link DataType} and attributes.
  * <p>
- * It also consider the case in which the value is a {@code List<Result>} which should be turned into a {@code List<Message>}.
- * For any of this cases, it also allows specifying a {@link CursorProviderFactory} which will transform the streaming payload
- * values into {@link CursorProvider} instances. As said before, this is also applied then the value is a message or list of
- * them
+ * It also consider the case in which the value is a {@code List<Result>} which should be turned into a {@code List<Message>}. For
+ * any of this cases, it also allows specifying a {@link CursorProviderFactory} which will transform the streaming payload values
+ * into {@link CursorProvider} instances. As said before, this is also applied then the value is a message or list of them
  *
  * @since 4.0
  */
@@ -73,9 +73,10 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   /**
    * Creates a new instance
    *
-   * @param componentModel        the component which produces the return value
-   * @param cursorProviderFactory the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be {@code null}
-   * @param muleContext           the {@link MuleContext} of the owning application
+   * @param componentModel the component which produces the return value
+   * @param cursorProviderFactory the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be
+   *        {@code null}
+   * @param muleContext the {@link MuleContext} of the owning application
    */
   protected AbstractReturnDelegate(ComponentModel componentModel,
                                    CursorProviderFactory cursorProviderFactory,
@@ -98,18 +99,30 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
     this.muleContext = muleContext;
     this.cursorProviderFactory = cursorProviderFactory;
-    defaultMediaType = componentModel.getModelProperty(MediaTypeModelProperty.class)
-        .map(MediaTypeModelProperty::getMediaType)
-        .orElseGet(() -> {
-          if (componentModel instanceof HasOutputModel) {
-            MetadataType output = ((HasOutputModel) componentModel).getOutput().getType();
-            return JAVA.equals(output.getMetadataFormat()) && output instanceof ObjectType
-                ? MediaType.APPLICATION_JAVA
-                : ANY;
-          }
+    defaultMediaType = getDefaultMediaType(componentModel);
+  }
 
-          return ANY;
-        });
+  private MediaType getDefaultMediaType(ComponentModel componentModel) {
+    Optional<MediaTypeModelProperty> mediaTypeModelProperty = componentModel.getModelProperty(MediaTypeModelProperty.class);
+    if (mediaTypeModelProperty.isPresent() && mediaTypeModelProperty.get().getMediaType().isPresent()) {
+      return mediaTypeModelProperty.get().getMediaType().get();
+    }
+    if (componentModel instanceof HasOutputModel) {
+      MetadataType output = ((HasOutputModel) componentModel).getOutput().getType();
+      return JAVA.equals(output.getMetadataFormat()) && output instanceof ObjectType
+          ? MediaType.APPLICATION_JAVA
+          : getMediaTypeFromMetadataType(output);
+    }
+
+    return ANY;
+  }
+
+  private MediaType getMediaTypeFromMetadataType(MetadataType output) {
+    if (output.getMetadataFormat().getValidMimeTypes().size() == 1) {
+      return MediaType.parse(output.getMetadataFormat().getValidMimeTypes().iterator().next());
+    } else {
+      return ANY;
+    }
   }
 
   protected Message toMessage(Object value, ExecutionContextAdapter operationContext) {
@@ -140,7 +153,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
       Message.Builder messageBuilder;
 
-      //TODO MULE-13302: this doesn't completely makes sense. IT doesn't account for an Iterator<Message>
+      // TODO MULE-13302: this doesn't completely makes sense. IT doesn't account for an Iterator<Message>
       // org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION doesn't completely makes sense
       if (returnsListOfMessages && value instanceof Collection) {
         messageBuilder = Message.builder().collectionValue((Collection) value, Message.class);

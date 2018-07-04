@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
@@ -16,9 +17,13 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MediaType;
@@ -69,9 +74,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     public Builder<T, A> setSourceModel(SourceModel sourceModel) {
       product.sourceModel = sourceModel;
       product.returnsListOfMessages = returnsListOfMessages(sourceModel);
-      product.defaultMediaType = sourceModel.getModelProperty(MediaTypeModelProperty.class)
-          .map(MediaTypeModelProperty::getMediaType)
-          .orElse(ANY);
+      product.defaultMediaType = getDefaultMediaType(sourceModel);
       product.notificationModelNames = sourceModel.getNotificationModels()
           .stream()
           .map(NotificationModel::getIdentifier)
@@ -79,6 +82,29 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
       return this;
     }
+
+      private MediaType getDefaultMediaType(ComponentModel componentModel) {
+          Optional<MediaTypeModelProperty> mediaTypeModelProperty = componentModel.getModelProperty(MediaTypeModelProperty.class);
+          if (mediaTypeModelProperty.isPresent() && mediaTypeModelProperty.get().getMediaType().isPresent()) {
+              return mediaTypeModelProperty.get().getMediaType().get();
+          }
+          if (componentModel instanceof HasOutputModel) {
+              MetadataType output = ((HasOutputModel) componentModel).getOutput().getType();
+              return JAVA.equals(output.getMetadataFormat()) && output instanceof ObjectType
+                      ? MediaType.APPLICATION_JAVA
+                      : getMediaTypeFromMetadataType(output);
+          }
+
+          return ANY;
+      }
+
+      private MediaType getMediaTypeFromMetadataType(MetadataType output) {
+          if (output.getMetadataFormat().getValidMimeTypes().size() == 1) {
+              return MediaType.parse(output.getMetadataFormat().getValidMimeTypes().iterator().next());
+          } else {
+              return ANY;
+          }
+      }
 
     public Builder<T, A> setConfigurationInstance(ConfigurationInstance configurationInstance) {
       product.configurationInstance = configurationInstance;

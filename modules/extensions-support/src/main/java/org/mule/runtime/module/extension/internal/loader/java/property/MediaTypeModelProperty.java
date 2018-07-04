@@ -9,6 +9,11 @@ package org.mule.runtime.module.extension.internal.loader.java.property;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.metadata.MediaType;
 
+import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+
 /**
  * Indicates the output media type of the annotated component and whether that is strict or not.
  *
@@ -20,12 +25,16 @@ public class MediaTypeModelProperty implements ModelProperty {
   private final boolean strict;
 
   public MediaTypeModelProperty(String mimeType, boolean strict) {
-    mediaType = MediaType.parse(mimeType);
+    if (isBlank(mimeType)) {
+      mediaType = null;
+    } else {
+      mediaType = MediaType.parse(mimeType);
+    }
     this.strict = strict;
   }
 
-  public MediaType getMediaType() {
-    return mediaType;
+  public Optional<MediaType> getMediaType() {
+    return ofNullable(mediaType);
   }
 
   public boolean isStrict() {
