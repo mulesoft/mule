@@ -164,5 +164,4 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
     this.artifactDescriptor = null;
     return result;
   }
-
 }
