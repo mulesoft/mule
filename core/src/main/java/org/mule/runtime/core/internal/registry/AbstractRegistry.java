@@ -12,6 +12,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -122,9 +123,15 @@ public abstract class AbstractRegistry implements Registry {
       getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
     }
     // Don't fire lifecycle phase if it's Stop and the current state was not started
-    if (!Stoppable.PHASE_NAME.equals(phase) || lifecycleManager.getState().isStarted()) {
-      getLifecycleManager().fireLifecycle(phase);
+    if (Stoppable.PHASE_NAME.equals(phase) && !(lifecycleManager.getState().isStarted() || hasStartFailed())) {
+      return;
     }
+
+    getLifecycleManager().fireLifecycle(phase);
+  }
+
+  private boolean hasStartFailed() {
+    return lifecycleManager.hasLastExecutedPhaseFailed() && lifecycleManager.getLastPhaseExecuted().equals(Startable.PHASE_NAME);
   }
 
   @Override

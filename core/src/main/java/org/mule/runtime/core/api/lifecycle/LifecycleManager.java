@@ -92,4 +92,7 @@ public interface LifecycleManager {
 
   boolean isDirectTransition(String phase);
 
+  String getLastExecutedPhase();
+
+  boolean hasLastExecutedPhaseFailed();
 }
