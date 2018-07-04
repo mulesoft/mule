@@ -97,10 +97,10 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
       } else {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug(format(
-              "Skipping the application of the '%s' lifecycle phase over a certain object "
-                  + "because a %s interceptor of type [%s] indicated so. Object is: %s",
-              phase.getName(), LifecycleInterceptor.class.getSimpleName(),
-              interceptor.getClass().getName(), target));
+                              "Skipping the application of the '%s' lifecycle phase over a certain object "
+                                  + "because a %s interceptor of type [%s] indicated so. Object is: %s",
+                              phase.getName(), LifecycleInterceptor.class.getSimpleName(),
+                              interceptor.getClass().getName(), target));
         }
       }
     } catch (Exception e) {
