@@ -37,7 +37,7 @@ import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -236,7 +236,7 @@ public class DefaultFlowBuilder implements Builder {
     protected void doInitialise() throws MuleException {
       super.doInitialise();
 
-      if (((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(COMPATIBILITY_PLUGIN_INSTALLED) != null) {
+      if (((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(COMPATIBILITY_PLUGIN_INSTALLED) != null) {
         handleReplyTo = true;
       }
     }

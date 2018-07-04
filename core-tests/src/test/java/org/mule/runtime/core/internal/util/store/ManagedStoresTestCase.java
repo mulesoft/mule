@@ -26,7 +26,7 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.store.SimpleMemoryObjectStore;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.store.PartitionedInMemoryObjectStore;
 import org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore;
@@ -141,7 +141,7 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
   }
 
   private MuleRegistry getRegistry() {
-    return ((MuleContextWithRegistries) muleContext).getRegistry();
+    return ((MuleContextWithRegistry) muleContext).getRegistry();
   }
 
   private void testObjectStore(ObjectStore<String> store) throws ObjectStoreException {

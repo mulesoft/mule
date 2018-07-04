@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
@@ -29,7 +29,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
 
-  private MuleContextWithRegistries muleContextMock = mockContextWithServices();
+  private MuleContextWithRegistry muleContextMock = mockContextWithServices();
 
   private SimpleRegistry registry;
 

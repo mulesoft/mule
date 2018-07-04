@@ -16,7 +16,7 @@ import static org.mule.runtime.core.internal.util.store.MuleObjectStoreManager.U
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -57,7 +57,7 @@ public class MuleObjectStoreManagerIntegrationTestCase extends AbstractMuleConte
   @Before
   public void injectMuleContext() {
     objectStoreFactory
-        .setMuleObjectStoreManager(((MuleContextWithRegistries) muleContext).getRegistry().get(OBJECT_STORE_MANAGER));
+        .setMuleObjectStoreManager(((MuleContextWithRegistry) muleContext).getRegistry().get(OBJECT_STORE_MANAGER));
   }
 
   @Test

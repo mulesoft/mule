@@ -18,22 +18,21 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.internal.registry.TransformerResolver.RegistryAction.ADDED;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 public class ConvertersNotRegisteredTwiceTestCase extends AbstractMuleContextTestCase {
 
@@ -46,9 +45,9 @@ public class ConvertersNotRegisteredTwiceTestCase extends AbstractMuleContextTes
 
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
-        registryHelper = (MuleRegistryHelper) ((MuleContextWithRegistries) muleContext).getRegistry();
+        registryHelper = (MuleRegistryHelper) ((MuleContextWithRegistry) muleContext).getRegistry();
         registryHelper = spy(registryHelper);
-        ((DefaultMuleContext) muleContext).setMuleRegistry(registryHelper);
+        ((DefaultMuleContext) muleContext).setRegistry(registryHelper);
       }
     });
   }

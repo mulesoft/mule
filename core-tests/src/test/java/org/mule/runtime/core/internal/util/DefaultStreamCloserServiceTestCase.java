@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.streaming.iterator.Consumer;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
@@ -38,11 +38,11 @@ public class DefaultStreamCloserServiceTestCase {
 
   private DefaultStreamCloserService service;
 
-  private MuleContextWithRegistries muleContext;
+  private MuleContextWithRegistry muleContext;
 
   @Before
   public void setUp() {
-    this.muleContext = mock(MuleContextWithRegistries.class, Mockito.RETURNS_DEEP_STUBS);
+    this.muleContext = mock(MuleContextWithRegistry.class, Mockito.RETURNS_DEEP_STUBS);
 
     this.service = new DefaultStreamCloserService();
     this.service.setMuleContext(this.muleContext);

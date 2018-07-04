@@ -61,7 +61,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -215,7 +215,7 @@ public final class ExtensionsTestUtils {
   }
 
   public static void stubRegistryKeys(MuleContext muleContext, final String... keys) {
-    when(((MuleContextWithRegistries) muleContext).getRegistry().get(anyString())).thenAnswer(invocation -> {
+    when(((MuleContextWithRegistry) muleContext).getRegistry().get(anyString())).thenAnswer(invocation -> {
       String name = (String) invocation.getArguments()[0];
       if (name != null) {
         for (String key : keys) {

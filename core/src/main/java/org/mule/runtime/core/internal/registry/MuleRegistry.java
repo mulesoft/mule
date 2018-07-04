@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard Registry interface.
  */
-public interface MuleRegistry extends LifecycleRegistry {
+public interface MuleRegistry extends Registry {
 
   /**
    * Pass this flag as metadata of the {@link Registry#registerObject(String, Object, Object)} method to have lifecycle method

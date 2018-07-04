@@ -38,7 +38,7 @@ import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.util.JdkVersionUtils;
@@ -77,8 +77,8 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
     ctx = ctxBuilder.buildMuleContext();
 
     notificationListenerRegistry = new DefaultNotificationListenerRegistry();
-    ((MuleContextWithRegistries) ctx).getRegistry().registerObject(NotificationListenerRegistry.REGISTRY_KEY,
-                                                                   notificationListenerRegistry);
+    ((MuleContextWithRegistry) ctx).getRegistry().registerObject(NotificationListenerRegistry.REGISTRY_KEY,
+                                                                 notificationListenerRegistry);
     testServicesConfigurationBuilder.configure(ctx);
   }
 
@@ -373,10 +373,10 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
 
     // DefaultMuleContext refuses to start without these objects in place
     SecurityManager securityManager = mock(SecurityManager.class);
-    ((MuleContextWithRegistries) ctx).getRegistry().registerObject(UUID.getUUID(), securityManager);
+    ((MuleContextWithRegistry) ctx).getRegistry().registerObject(UUID.getUUID(), securityManager);
 
     QueueManager queueManager = mock(QueueManager.class);
-    ((MuleContextWithRegistries) ctx).getRegistry().registerObject(UUID.getUUID(), queueManager);
+    ((MuleContextWithRegistry) ctx).getRegistry().registerObject(UUID.getUUID(), queueManager);
 
     ctx.start();
     return ctx;

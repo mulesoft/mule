@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.registry;
 
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
 import static org.mule.runtime.core.internal.registry.TransformerResolver.RegistryAction.ADDED;
 import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
 import org.mule.runtime.api.exception.MuleException;
@@ -17,15 +18,12 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-
-import com.google.common.collect.ImmutableList;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -47,22 +45,20 @@ import org.slf4j.LoggerFactory;
 /**
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard Registry interface.
  */
-public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
+public class MuleRegistryHelper implements MuleRegistry {
 
   protected transient Logger logger = LoggerFactory.getLogger(MuleRegistryHelper.class);
 
   /**
    * A reference to Mule's internal registry
    */
-  private DefaultRegistryBroker registry;
+  private Registry registry;
 
   /**
    * We cache transformer searches so that we only search once
    */
-  protected ConcurrentHashMap/* <String, Transformer> */ exactTransformerCache =
-      new ConcurrentHashMap/* <String, Transformer> */(8);
-  protected ConcurrentHashMap/* Map<String, List<Transformer>> */ transformerListCache =
-      new ConcurrentHashMap/* <String, List<Transformer>> */(8);
+  protected Map<String, Transformer> exactTransformerCache = new ConcurrentHashMap<>(8);
+  protected Map<String, List<Transformer>> transformerListCache = new ConcurrentHashMap<>(8);
 
   private MuleContext muleContext;
 
@@ -82,7 +78,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
    */
   private Collection<Transformer> transformers = new CopyOnWriteArrayList<>();
 
-  public MuleRegistryHelper(DefaultRegistryBroker registry, MuleContext muleContext) {
+  public MuleRegistryHelper(Registry registry, MuleContext muleContext) {
     this.registry = registry;
     this.muleContext = muleContext;
   }
@@ -143,7 +139,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
     result = builder(result).mediaType(ANY).charset((Charset) null).build();
 
     final String dataTypePairHash = getDataTypeSourceResultPairHash(source, result);
-    Transformer cachedTransformer = (Transformer) exactTransformerCache.get(dataTypePairHash);
+    Transformer cachedTransformer = exactTransformerCache.get(dataTypePairHash);
     if (cachedTransformer != null) {
       return cachedTransformer;
     }
@@ -151,14 +147,14 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
     Transformer trans = resolveTransformer(source, result);
 
     if (trans != null) {
-      Transformer concurrentlyAddedTransformer = (Transformer) exactTransformerCache.putIfAbsent(dataTypePairHash, trans);
+      Transformer concurrentlyAddedTransformer = exactTransformerCache.putIfAbsent(dataTypePairHash, trans);
       if (concurrentlyAddedTransformer != null) {
         return concurrentlyAddedTransformer;
       } else {
         return trans;
       }
     } else {
-      throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, result));
+      throw new TransformerException(noTransformerFoundForMessage(source, result));
     }
   }
 
@@ -174,7 +170,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
             return trans;
           }
         } catch (ResolverException e) {
-          throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, result), e);
+          throw new TransformerException(noTransformerFoundForMessage(source, result), e);
         }
       }
     } finally {
@@ -197,7 +193,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
 
     final String dataTypePairHash = getDataTypeSourceResultPairHash(source, result);
 
-    List<Transformer> results = (List<Transformer>) transformerListCache.get(dataTypePairHash);
+    List<Transformer> results = transformerListCache.get(dataTypePairHash);
     if (results != null) {
       return results;
     }
@@ -221,13 +217,12 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
       readLock.unlock();
     }
 
-    List<Transformer> concurrentlyAddedTransformers =
-        (List<Transformer>) transformerListCache.putIfAbsent(dataTypePairHash, results);
+    List<Transformer> concurrentlyAddedTransformers = transformerListCache.putIfAbsent(dataTypePairHash, results);
     if (concurrentlyAddedTransformers != null) {
       return concurrentlyAddedTransformers;
-    } else {
-      return results;
     }
+
+    return results;
   }
 
   /**
@@ -339,35 +334,13 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
    */
   @Override
   public Object applyLifecycle(Object object, String phase) throws MuleException {
-    return withLifecycleRegistry(object, registry -> registry.applyLifecycle(object, phase));
+    return registry.applyLifecycle(object, phase);
   }
 
   @Override
   public void applyLifecycle(Object object, String startPhase, String toPhase) throws MuleException {
-    withLifecycleRegistry(object, registry -> {
-      registry.applyLifecycle(object, startPhase, toPhase);
-      return object;
-    });
+    registry.applyLifecycle(object, startPhase, toPhase);
   }
-
-  private Object withLifecycleRegistry(Object object, LifecycleDelegate delegate) throws MuleException {
-    LifecycleRegistry lifecycleRegistry = registry.getLifecycleRegistry();
-    if (lifecycleRegistry != null) {
-      return delegate.apply(lifecycleRegistry);
-    }
-
-    return object;
-  }
-
-  @FunctionalInterface
-  private interface LifecycleDelegate {
-
-    Object apply(LifecycleRegistry registry) throws MuleException;
-  }
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Delegate to internal registry
-  ////////////////////////////////////////////////////////////////////////////
 
   /**
    * {@inheritDoc}
@@ -457,7 +430,6 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
   public void registerObject(String key, Object value) throws RegistrationException {
     registry.registerObject(key, value);
 
-
     postObjectRegistrationActions(value);
   }
 
@@ -498,11 +470,6 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
   @Override
   public Object unregisterObject(String key) throws RegistrationException {
     return registry.unregisterObject(key);
-  }
-
-  @Override
-  public Collection<Registry> getRegistries() {
-    return ImmutableList.copyOf(registry.getRegistries());
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -550,6 +517,10 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
       }
       return 0;
     }
+  }
+
+  public Registry getDelegate() {
+    return registry;
   }
 }
 

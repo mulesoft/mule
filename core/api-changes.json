@@ -1,4 +1,39 @@
 {
+  "4.2.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.core.api.lifecycle.LifecycleManager",
+          "new": "interface org.mule.runtime.core.api.lifecycle.LifecycleManager",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.core.api.lifecycle",
+          "classSimpleName": "LifecycleManager",
+          "elementKind": "interface",
+          "justification": "This interface is not meant to be extended by the user"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.lang.String org.mule.runtime.core.api.lifecycle.LifecycleManager::getLastExecutedPhase()",
+          "package": "org.mule.runtime.core.api.lifecycle",
+          "classSimpleName": "LifecycleManager",
+          "methodName": "getLastExecutedPhase",
+          "elementKind": "method",
+          "justification": "This interface is not meant to be extended by the user"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method boolean org.mule.runtime.core.api.lifecycle.LifecycleManager::hasLastExecutedPhaseFailed()",
+          "package": "org.mule.runtime.core.api.lifecycle",
+          "classSimpleName": "LifecycleManager",
+          "methodName": "hasLastExecutedPhaseFailed",
+          "elementKind": "method",
+          "justification": "This interface is not meant to be extended by the user"
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [

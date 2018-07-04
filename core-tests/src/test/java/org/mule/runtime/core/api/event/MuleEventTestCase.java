@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
@@ -131,11 +131,11 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   private void createAndRegisterTransformersEndpointBuilderService() throws Exception {
     Transformer trans1 = new TestEventTransformer();
     trans1.setName("OptimusPrime");
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(trans1);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(trans1);
 
     Transformer trans2 = new TestEventTransformer();
     trans2.setName("Bumblebee");
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(trans2);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(trans2);
 
     List<Transformer> transformers = new ArrayList<>();
     transformers.add(trans1);

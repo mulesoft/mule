@@ -208,7 +208,7 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
   }
 
   @Override
-  public Collection<Object> resolveBeanDependencies(Set<String> beanNames) {
+  public List<Object> resolveBeanDependencies(String beanName) {
     return null;
   }
 

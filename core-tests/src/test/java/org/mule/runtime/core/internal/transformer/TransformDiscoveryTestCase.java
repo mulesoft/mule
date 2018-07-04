@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -29,13 +29,13 @@ public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected void doSetUp() throws Exception {
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(new StringToApple());
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(new StringToOrange());
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(new StringToApple());
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(new StringToOrange());
   }
 
   @Test
   public void testSimpleDiscovery() throws Exception {
-    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+    MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
     Transformer t = registry.lookupTransformer(DataType.STRING, DataType.fromType(Apple.class));
     assertNotNull(t);
     assertEquals(StringToApple.class, t.getClass());

@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 
@@ -134,7 +133,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   public void initialise() throws InitialisationException {
     operationPolicyProcessorFactory = new DefaultOperationPolicyProcessorFactory(policyStateHandler);
     sourcePolicyProcessorFactory = new DefaultSourcePolicyProcessorFactory(policyStateHandler);
-    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+    MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
     policyProvider = registry.lookupLocalObjects(PolicyProvider.class).stream().findFirst().orElse(new NullPolicyProvider());
     sourcePolicyParametersTransformerCollection = registry.lookupObjects(SourcePolicyParametersTransformer.class);
     operationPolicyParametersTransformerCollection = registry.lookupObjects(OperationPolicyParametersTransformer.class);

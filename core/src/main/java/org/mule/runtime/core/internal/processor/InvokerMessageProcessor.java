@@ -31,7 +31,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.TransformerTemplate;
@@ -118,7 +118,7 @@ public class InvokerMessageProcessor extends AbstractComponent implements Proces
     }
 
     try {
-      object = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(objectType);
+      object = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(objectType);
     } catch (RegistrationException e) {
       throw new InitialisationException(initialisationFailure(format("Muliple instances of '%s' were found in the registry so you need to configure a specific instance",
                                                                      objectType)),
@@ -220,7 +220,7 @@ public class InvokerMessageProcessor extends AbstractComponent implements Proces
   private Object transformArgument(Object arg, Class<?> type) throws TransformerException {
     if (!(type.isAssignableFrom(arg.getClass()))) {
       // Throws TransformerException if no suitable transformer is found
-      arg = ((MuleContextWithRegistries) muleContext).getRegistry()
+      arg = ((MuleContextWithRegistry) muleContext).getRegistry()
           .lookupTransformer(DataType.fromType(arg.getClass()), DataType.fromType(type)).transform(arg);
     }
     return arg;

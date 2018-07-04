@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -41,11 +41,11 @@ public class BasicTypeAutoTransformationTestCase extends AbstractMuleContextTest
   }
 
   private Transformer lookupFromStringTransformer(Class to) throws TransformerException {
-    return ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(to));
+    return ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(to));
   }
 
   private Transformer lookupToStringTransformer(Class from) throws TransformerException {
-    return ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(DataType.fromType(from), DataType.STRING);
+    return ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(DataType.fromType(from), DataType.STRING);
   }
 
 }

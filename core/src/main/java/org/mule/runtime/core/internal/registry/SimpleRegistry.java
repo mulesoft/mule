@@ -30,7 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
- * A very simple implementation of {@link LifecycleRegistry}. Useful for starting really lightweight contexts which don't depend
+ * A very simple implementation of {@link Registry}. Useful for starting really lightweight contexts which don't depend
  * on heavier object containers such as Spring or Guice (testing being the best example).
  * <p/>
  * The {@link #inject(Object)} operation will only consider fields annotated with {@link Inject} and will perform the injection
@@ -39,7 +39,7 @@ import javax.inject.Named;
  *
  * @since 3.7.0
  */
-public class SimpleRegistry extends TransientRegistry implements LifecycleRegistry, Injector {
+public class SimpleRegistry extends TransientRegistry implements Injector {
 
   private static final String REGISTRY_ID = "org.mule.runtime.core.Registry.Simple";
 

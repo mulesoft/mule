@@ -9,7 +9,7 @@ package org.mule.runtime.core.privileged.registry;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 
 import java.util.Collection;
@@ -18,7 +18,6 @@ import java.util.Collection;
  * Provides a way for privileged API clients to access certain functionality of the internal {@link MuleRegistry}.
  *
  * @since 4.0
- *
  * @deprecated inject {@link Registry} where possible instead of using this utility.
  */
 @Deprecated
@@ -70,7 +69,7 @@ public final class LegacyRegistryUtils {
   /**
    * Registers an object in the registry with a key.
    *
-   * @param key the key to store the value against. This is a non-null value
+   * @param key   the key to store the value against. This is a non-null value
    * @param value the object to store in the registry. This is a non-null value
    * @throws RegistrationException if an object with the same key already exists
    */
@@ -81,8 +80,8 @@ public final class LegacyRegistryUtils {
   /**
    * Registers an object in the registry with a key.
    *
-   * @param key the key to store the value against. This is a non-null value
-   * @param value the object to store in the registry. This is a non-null value
+   * @param key      the key to store the value against. This is a non-null value
+   * @param object   the object to store in the registry. This is a non-null value
    * @param metadata an implementation specific argument that can be passed into the method
    * @throws RegistrationException if an object with the same key already exists
    */
@@ -117,7 +116,7 @@ public final class LegacyRegistryUtils {
    * @param key the name or key of the object to remove from the registry
    * @return the unregistered object or {@code null} if no object was registered under that key
    * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because the object's
-   *         lifecycle threw an exception
+   *                               lifecycle threw an exception
    */
   public static Object unregisterObject(MuleContext context, String key) throws RegistrationException {
     return getRegistry(context).unregisterObject(key);
@@ -131,6 +130,6 @@ public final class LegacyRegistryUtils {
   }
 
   private static MuleRegistry getRegistry(MuleContext context) {
-    return ((MuleContextWithRegistries) context).getRegistry();
+    return ((MuleContextWithRegistry) context).getRegistry();
   }
 }

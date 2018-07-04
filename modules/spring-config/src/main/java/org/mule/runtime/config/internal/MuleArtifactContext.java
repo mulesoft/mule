@@ -83,7 +83,7 @@ import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
@@ -147,7 +147,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final DefaultRegistry serviceDiscoverer;
   private final ConfigurationDependencyResolver dependencyResolver;
   protected ApplicationModel applicationModel;
-  protected MuleContextWithRegistries muleContext;
+  protected MuleContextWithRegistry muleContext;
   private ConfigResource[] artifactConfigResources;
   protected BeanDefinitionFactory beanDefinitionFactory;
   private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
@@ -163,6 +163,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   });
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
+  private org.mule.runtime.core.internal.registry.Registry originalRegistry;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -195,7 +196,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              Map<String, String> artifactProperties, ArtifactType artifactType,
                              List<ClassLoader> pluginsClassLoaders, boolean disableXmlValidations) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
-    this.muleContext = (MuleContextWithRegistries) muleContext;
+    this.muleContext = (MuleContextWithRegistry) muleContext;
     this.artifactConfigResources = artifactConfigResources;
     this.optionalObjectsController = optionalObjectsController;
     this.artifactProperties = artifactProperties;
@@ -204,6 +205,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.parentConfigurationProperties = parentConfigurationProperties;
     this.xmlConfigurationDocumentLoader = disableXmlValidations ? noValidationDocumentLoader() : schemaValidatingDocumentLoader();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
+    originalRegistry = ((MuleRegistryHelper) this.muleContext.getRegistry()).getDelegate();
 
     registerComponentBuildingDefinitions(serviceRegistry, MuleArtifactContext.class.getClassLoader(),
                                          componentBuildingDefinitionRegistry,
@@ -587,9 +589,16 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
-    new SpringMuleContextServiceConfigurator(muleContext, applicationModel.getConfigurationProperties(), artifactType,
-                                             optionalObjectsController, beanFactory, componentLocator, serviceDiscoverer)
-                                                 .createArtifactServices();
+    new SpringMuleContextServiceConfigurator(muleContext,
+                                             applicationModel.getConfigurationProperties(),
+                                             artifactType,
+                                             optionalObjectsController,
+                                             beanFactory,
+                                             componentLocator,
+                                             serviceDiscoverer,
+                                             originalRegistry).createArtifactServices();
+
+    originalRegistry = null;
   }
 
   @Override
@@ -671,7 +680,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   }
 
-  public MuleContextWithRegistries getMuleContext() {
+  public MuleContextWithRegistry getMuleContext() {
     return muleContext;
   }
 

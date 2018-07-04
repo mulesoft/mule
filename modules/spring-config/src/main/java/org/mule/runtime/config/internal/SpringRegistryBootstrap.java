@@ -8,10 +8,8 @@ package org.mule.runtime.config.internal;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.config.internal.factories.BootstrapObjectFactoryBean;
@@ -24,18 +22,15 @@ import org.mule.runtime.core.internal.config.bootstrap.BootstrapObjectFactory;
 import org.mule.runtime.core.internal.config.bootstrap.ObjectBootstrapProperty;
 import org.mule.runtime.core.internal.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.internal.config.bootstrap.TransformerBootstrapProperty;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.registry.Registry;
-import org.mule.runtime.core.internal.registry.RegistryProvider;
 import org.mule.runtime.core.privileged.transformer.TransformerUtils;
+
+import java.util.function.BiConsumer;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
-
-import java.util.Map.Entry;
-import java.util.function.BiConsumer;
 
 /**
  * Specialization of {@link SimpleRegistryBootstrap which instead of registering the objects directly into a {@link Registry},
@@ -50,12 +45,12 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
   private BiConsumer<String, BeanDefinition> beanDefinitionRegister;
 
   /**
-   * @param artifactType type of artifact. Bootstrap entries may be associated to an specific type of artifact. If it's not
-   *        associated to the related artifact it will be ignored.
-   * @param muleContext the {@code MuleContext} of the artifact.
+   * @param artifactType              type of artifact. Bootstrap entries may be associated to an specific type of artifact. If it's not
+   *                                  associated to the related artifact it will be ignored.
+   * @param muleContext               the {@code MuleContext} of the artifact.
    * @param optionalObjectsController a controller for objects that may be optional. When an object can be optional and mule it's
-   *        not able to create it, then it gets ignored.
-   * @param beanDefinitionRegister a {@link BiConsumer} on which the bean definitions are registered
+   *                                  not able to create it, then it gets ignored.
+   * @param beanDefinitionRegister    a {@link BiConsumer} on which the bean definitions are registered
    */
   public SpringRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext,
                                  OptionalObjectsController optionalObjectsController,
@@ -63,16 +58,6 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
     super(artifactType, muleContext);
     this.optionalObjectsController = optionalObjectsController;
     this.beanDefinitionRegister = beanDefinitionRegister;
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    super.initialise();
-    try {
-      absorbAndDiscardOtherRegistries();
-    } catch (Exception e) {
-      throw new InitialisationException(e, this);
-    }
   }
 
   @Override
@@ -107,28 +92,6 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
 
     notifyIfOptional(name, bootstrapProperty.getOptional());
     doRegisterObject(name, builder);
-  }
-
-  /**
-   * We want the SpringRegistry to be the only default one. This method looks for other registries and absorbs its objects into
-   * the created {@code beanDefinitionRegistry}. Then, the absorbed registry is unregistered from the context
-   */
-  private void absorbAndDiscardOtherRegistries() {
-    if (!(((MuleContextWithRegistries) muleContext).getRegistry() instanceof RegistryProvider)) {
-      return;
-    }
-
-    for (Registry registry : ((RegistryProvider) ((MuleContextWithRegistries) muleContext).getRegistry()).getRegistries()) {
-      if (registry instanceof SpringRegistry) {
-        continue;
-      }
-
-      for (Entry<String, Object> entry : registry.lookupByType(Object.class).entrySet()) {
-        registerInstance(entry.getKey(), entry.getValue());
-      }
-
-      ((MuleContextWithRegistries) muleContext).removeRegistry(registry);
-    }
   }
 
   @Override

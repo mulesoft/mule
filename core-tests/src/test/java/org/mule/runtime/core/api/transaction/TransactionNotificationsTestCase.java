@@ -18,7 +18,7 @@ import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.transaction.AbstractSingleResourceTransaction;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -36,7 +36,7 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
     // a global TransactionCoordination instance, which binds it to the current thread.
     Transaction transaction = new DummyTransaction(muleContext);
 
-    ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationListenerRegistry.class)
+    ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationListenerRegistry.class)
         .registerListener(new TransactionNotificationListener<TransactionNotification>() {
 
           @Override

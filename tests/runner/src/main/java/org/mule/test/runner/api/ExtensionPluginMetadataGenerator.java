@@ -18,9 +18,9 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
-import org.mule.runtime.core.internal.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
+import org.mule.runtime.core.internal.registry.SimpleRegistry;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
@@ -110,8 +110,7 @@ class ExtensionPluginMetadataGenerator {
 
       @Override
       public MuleRegistry getRegistry() {
-        return new MuleRegistryHelper(new DefaultRegistryBroker(this, new MuleLifecycleInterceptor()),
-                                      this);
+        return new MuleRegistryHelper(new SimpleRegistry(this, new MuleLifecycleInterceptor()), this);
       }
 
       @Override
@@ -139,7 +138,7 @@ class ExtensionPluginMetadataGenerator {
    * (target/classes/ or target-test/classes).
    *
    * @param plugin the {@link Artifact} to generate its extension manifest if it is an extension.
-   * @param urls {@link URL}s to use for discovering {@link Class}es annotated with {@link Extension}
+   * @param urls   {@link URL}s to use for discovering {@link Class}es annotated with {@link Extension}
    * @return {@link Class} annotated with {@link Extension} or {@code null}
    */
   Class scanForExtensionAnnotatedClasses(Artifact plugin, List<URL> urls) {
@@ -173,9 +172,9 @@ class ExtensionPluginMetadataGenerator {
   /**
    * Discovers the extension and builds the {@link ExtensionModel}.
    *
-   * @param plugin the extension {@link Artifact} plugin
-   * @param extensionClass the {@link Class} annotated with {@link Extension}
-   * @param dependencyResolver the dependency resolver used to introspect the artifact pom.xml
+   * @param plugin                         the extension {@link Artifact} plugin
+   * @param extensionClass                 the {@link Class} annotated with {@link Extension}
+   * @param dependencyResolver             the dependency resolver used to introspect the artifact pom.xml
    * @param rootArtifactRemoteRepositories
    * @return {@link ExtensionModel} for the extensionClass
    */
@@ -190,9 +189,9 @@ class ExtensionPluginMetadataGenerator {
   /**
    * Generates the extension resources for the {@link Artifact} plugin with the {@link Extension}.
    *
-   * @param plugin the {@link Artifact} to generate its extension manifest if it is an extension.
-   * @param extensionClass {@link Class} annotated with {@link Extension}
-   * @param dependencyResolver the dependency resolver used to discover test extensions poms to find which loader to use
+   * @param plugin                         the {@link Artifact} to generate its extension manifest if it is an extension.
+   * @param extensionClass                 {@link Class} annotated with {@link Extension}
+   * @param dependencyResolver             the dependency resolver used to discover test extensions poms to find which loader to use
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
    * @return {@link File} folder where extension manifest resources were generated
    */

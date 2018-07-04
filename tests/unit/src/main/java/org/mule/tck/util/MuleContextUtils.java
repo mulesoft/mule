@@ -48,7 +48,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
@@ -156,8 +156,8 @@ public class MuleContextUtils {
     // No instances of this class allowed
   }
 
-  public static MuleContextWithRegistries mockMuleContext() {
-    final MuleContextWithRegistries muleContext =
+  public static MuleContextWithRegistry mockMuleContext() {
+    final MuleContextWithRegistry muleContext =
         mock(DefaultMuleContext.class,
              withSettings().defaultAnswer(RETURNS_DEEP_STUBS).extraInterfaces(PrivilegedMuleContext.class));
     when(muleContext.getUniqueIdString()).thenReturn(UUID.getUUID());
@@ -185,8 +185,8 @@ public class MuleContextUtils {
    *
    * @return the created {@code muleContext}.
    */
-  public static MuleContextWithRegistries mockContextWithServices() {
-    final MuleContextWithRegistries muleContext = mockMuleContext();
+  public static MuleContextWithRegistry mockContextWithServices() {
+    final MuleContextWithRegistry muleContext = mockMuleContext();
 
     SchedulerService schedulerService = spy(new SimpleUnitTestSupportSchedulerService());
 
@@ -233,21 +233,21 @@ public class MuleContextUtils {
   /**
    * Adds a mock registry to the provided {@code context}. If the context is not a mock, it is {@link Mockito#spy(Class)}ied.
    */
-  public static void mockRegistry(MuleContextWithRegistries context) {
+  public static void mockRegistry(MuleContextWithRegistry context) {
     doReturn(spy(context.getRegistry())).when(context).getRegistry();
   }
 
   /**
    * Configures the registry in the provided {@code context} to return the given {@code value} for the given {@code key}.
    */
-  public static void registerIntoMockContext(MuleContextWithRegistries context, String key, Object value) {
+  public static void registerIntoMockContext(MuleContextWithRegistry context, String key, Object value) {
     when(context.getRegistry().lookupObject(key)).thenReturn(value);
   }
 
   /**
    * Configures the registry in the provided {@code context} to return the given {@code value} for the given {@code clazz}.
    */
-  public static <T> void registerIntoMockContext(MuleContextWithRegistries context, Class<T> clazz, T value) {
+  public static <T> void registerIntoMockContext(MuleContextWithRegistry context, Class<T> clazz, T value) {
     try {
       when(context.getRegistry().lookupObject(clazz)).thenReturn(value);
     } catch (RegistrationException e) {
@@ -263,7 +263,7 @@ public class MuleContextUtils {
    * @return A transformer that exactly matches or the will accept the input and output parameters
    * @throws TransformerException will be thrown if there is more than one match
    */
-  public static <T> Transformer lookupTransformer(MuleContextWithRegistries context, DataType source, DataType result)
+  public static <T> Transformer lookupTransformer(MuleContextWithRegistry context, DataType source, DataType result)
       throws TransformerException {
     return context.getRegistry().lookupTransformer(source, result);
   }

@@ -53,7 +53,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
@@ -93,7 +93,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
 
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
-    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+    MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
 
     new SimpleRegistryBootstrap(APP, muleContext).initialise();
 
@@ -153,7 +153,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     if (serviceImpl instanceof MuleContextAware) {
       ((MuleContextAware) serviceImpl).setMuleContext(muleContext);
     }
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(serviceId, serviceImpl);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(serviceId, serviceImpl);
   }
 
   private void registerLocalObjectStoreManager(MuleContext muleContext, MuleRegistry registry) throws RegistrationException {

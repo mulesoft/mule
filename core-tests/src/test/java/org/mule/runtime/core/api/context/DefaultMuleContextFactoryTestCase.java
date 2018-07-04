@@ -41,7 +41,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -191,8 +191,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     assertMuleContextConfiguration(context);
     assertConfigurationBuilder1Objects(context);
 
-    assertEquals("testValue3", ((MuleContextWithRegistries) context).getRegistry().lookupObject("testKey3"));
-    assertEquals("testValue4", ((MuleContextWithRegistries) context).getRegistry().lookupObject("testKey4"));
+    assertEquals("testValue3", ((MuleContextWithRegistry) context).getRegistry().lookupObject("testKey3"));
+    assertEquals("testValue4", ((MuleContextWithRegistry) context).getRegistry().lookupObject("testKey4"));
 
     assertNoDefaults(context);
   }
@@ -221,17 +221,17 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   private void assertDefaults(MuleContext context) {
     // Assert existance of defaults in registry
-    assertNotNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
-    assertNotNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
-    assertNotNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY));
+    assertNotNull(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
+    assertNotNull(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
+    assertNotNull(((MuleContextWithRegistry) context).getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY));
   }
 
   private void assertNoDefaults(MuleContext context) {
     // Assert non-existance of defaults in registry
-    assertNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
-    assertNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
-    assertNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY));
-    assertNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
+    assertNull(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
+    assertNull(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
+    assertNull(((MuleContextWithRegistry) context).getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY));
+    assertNull(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
   }
 
   private void assertMuleContextConfiguration(MuleContext context) {
@@ -256,9 +256,9 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   private void assertConfigurationBuilder1Objects(MuleContext context) {
     // Test Registry contents for existance of object configured by
     // TestConfigurationBuilder
-    assertEquals(TEST_STRING_VALUE, ((MuleContextWithRegistries) context).getRegistry().lookupObject(TEST_STRING_KEY));
+    assertEquals(TEST_STRING_VALUE, ((MuleContextWithRegistry) context).getRegistry().lookupObject(TEST_STRING_KEY));
 
-    Object obj = ((MuleContextWithRegistries) context).getRegistry().lookupObject(TEST_OBJECT_NAME);
+    Object obj = ((MuleContextWithRegistry) context).getRegistry().lookupObject(TEST_OBJECT_NAME);
     assertNotNull(obj);
     assertEquals(Banana.class, obj.getClass());
   }
@@ -266,7 +266,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   private void assertConfigurationBuilder2Objects(MuleContext context) {
     // Test Registry contents for existance of object configured by
     // TestConfigurationBuilder2
-    assertEquals(TEST_STRING_VALUE2, ((MuleContextWithRegistries) context).getRegistry().lookupObject(TEST_STRING_KEY2));
+    assertEquals(TEST_STRING_VALUE2, ((MuleContextWithRegistry) context).getRegistry().lookupObject(TEST_STRING_KEY2));
   }
 
   static class TestMuleContextBuilder extends DefaultMuleContextBuilder {

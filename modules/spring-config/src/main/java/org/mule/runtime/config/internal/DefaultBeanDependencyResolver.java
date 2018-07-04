@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.config.internal;
 
+import static com.google.common.graph.Traverser.forTree;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
-
-import com.google.common.collect.TreeTraverser;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,6 +23,7 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
@@ -49,29 +49,19 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
     this.springRegistry = springRegistry;
   }
 
-  public Collection<Object> resolveBeanDependencies(Set<String> beanNames) {
+  @Override
+  public List<Object> resolveBeanDependencies(String beanName) {
     final DependencyNode root = new DependencyNode(null);
 
-    for (String beanName : beanNames) {
-      addDependency(root, beanName, springRegistry.get(beanName));
-    }
-
-    Iterable<DependencyNode> orderedNodes = new TreeTraverser<DependencyNode>() {
-
-      @Override
-      public Iterable children(DependencyNode node) {
-        return node.getChildren();
-      }
-    }.postOrderTraversal(root);
+    addDependency(root, beanName, springRegistry.get(beanName));
 
     List<Object> orderedObjects = new LinkedList<>();
-    for (DependencyNode node : orderedNodes) {
-      if (node == root) {
-        break;
+    forTree(DependencyNode::getChildren).depthFirstPostOrder(root).forEach(node -> {
+      if (node != root) {
+        orderedObjects.add(node.getValue());
       }
+    });
 
-      orderedObjects.add(node.getValue());
-    }
     return orderedObjects;
   }
 
@@ -115,8 +105,12 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
                                             DependencyNode node) {
     Collection<String> dependencies = configurationDependencyResolver.resolveComponentDependencies(key);
     for (String dependency : dependencies) {
-      if (springRegistry.isSingleton(dependency)) {
-        addDependency(node, dependency, springRegistry.get(dependency), processedKeys);
+      try {
+        if (springRegistry.isSingleton(dependency)) {
+          addDependency(node, dependency, springRegistry.get(dependency), processedKeys);
+        }
+      } catch (NoSuchBeanDefinitionException e) {
+        // we're starting in lazy mode... disregard.
       }
     }
   }

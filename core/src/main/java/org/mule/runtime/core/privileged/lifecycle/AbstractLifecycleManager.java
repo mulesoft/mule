@@ -21,13 +21,13 @@ import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleState;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.privileged.transport.LegacyConnector;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a base implementation of the {@link org.mule.runtime.core.api.lifecycle.LifecycleManager} interface and provides almost
@@ -272,6 +272,16 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager {
   @Override
   public LifecycleState getState() {
     return state;
+  }
+
+  @Override
+  public String getLastExecutedPhase() {
+    return lastPhaseExecuted;
+  }
+
+  @Override
+  public boolean hasLastExecutedPhaseFailed() {
+    return lastPhaseExecutionFailed;
   }
 
   /**

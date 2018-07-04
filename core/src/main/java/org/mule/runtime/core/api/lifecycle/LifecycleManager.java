@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 
 /**
@@ -14,6 +15,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
  *
  * @since 3.0
  */
+@NoImplement
 public interface LifecycleManager {
 
   /**
@@ -92,4 +94,7 @@ public interface LifecycleManager {
 
   boolean isDirectTransition(String phase);
 
+  String getLastExecutedPhase();
+
+  boolean hasLastExecutedPhaseFailed();
 }

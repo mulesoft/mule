@@ -28,7 +28,7 @@ import org.mule.runtime.api.connectivity.UnsupportedConnectivityTestingObjectExc
 import org.mule.runtime.api.exception.ObjectNotFoundException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -43,7 +43,7 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private MuleContextWithRegistries mockMuleContext = mock(MuleContextWithRegistries.class, RETURNS_DEEP_STUBS);
+  private MuleContextWithRegistry mockMuleContext = mock(MuleContextWithRegistry.class, RETURNS_DEEP_STUBS);
   private ServiceRegistry mockServiceRegistry = mock(ServiceRegistry.class, RETURNS_DEEP_STUBS);
   private ConnectivityTestingStrategy mockConnectivityTestingStrategy =
       mock(ConnectivityTestingStrategy.class, RETURNS_DEEP_STUBS);

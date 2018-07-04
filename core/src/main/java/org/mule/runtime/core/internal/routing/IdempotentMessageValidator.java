@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
 import org.slf4j.Logger;
@@ -111,7 +111,7 @@ public class IdempotentMessageValidator extends AbstractComponent
   }
 
   protected ObjectStore<String> createMessageIdStore() throws InitialisationException {
-    ObjectStoreManager objectStoreManager = ((MuleContextWithRegistries) muleContext).getRegistry().get(OBJECT_STORE_MANAGER);
+    ObjectStoreManager objectStoreManager = ((MuleContextWithRegistry) muleContext).getRegistry().get(OBJECT_STORE_MANAGER);
     return objectStoreManager.createObjectStore(storePrefix, ObjectStoreSettings.builder()
         .persistent(false)
         .entryTtl(MINUTES.toMillis(5))

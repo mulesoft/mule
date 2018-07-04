@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -82,7 +82,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleContextT
     AbstractObjectFactory factory = getUninitialisedObjectFactory();
     factory.setObjectClass(Object.class);
     // Will init the object
-    ((MuleContextWithRegistries) muleContext).getRegistry().applyProcessorsAndLifecycle(factory);
+    ((MuleContextWithRegistry) muleContext).getRegistry().applyProcessorsAndLifecycle(factory);
 
     assertNotNull(factory.getInstance(muleContext));
   }
@@ -92,7 +92,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleContextT
     AbstractObjectFactory factory = getUninitialisedObjectFactory();
     factory.setObjectClassName(Object.class.getName());
     // Will init the object
-    ((MuleContextWithRegistries) muleContext).getRegistry().applyProcessorsAndLifecycle(factory);
+    ((MuleContextWithRegistry) muleContext).getRegistry().applyProcessorsAndLifecycle(factory);
 
     assertNotNull(factory.getInstance(muleContext));
   }
@@ -103,7 +103,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleContextT
     addMockComponentLocation(factory);
     factory.setObjectClass(Object.class);
     // Will init the object
-    ((MuleContextWithRegistries) muleContext).getRegistry().applyProcessorsAndLifecycle(factory);
+    ((MuleContextWithRegistry) muleContext).getRegistry().applyProcessorsAndLifecycle(factory);
 
     factory.dispose();
 

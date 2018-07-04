@@ -32,7 +32,7 @@ public class MuleRegistryHelperTransformerLookupTestCase extends AbstractMuleTes
 
   private static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
 
-  private final DefaultRegistryBroker registry = mock(DefaultRegistryBroker.class);
+  private final Registry registry = mock(Registry.class);
   private final MuleContext muleContext = mock(MuleContext.class);
   private final MuleRegistryHelper muleRegistryHelper = new MuleRegistryHelper(registry, muleContext);
   private final Converter stringToOrange = new MockConverterBuilder().from(DataType.STRING).to(ORANGE_DATA_TYPE).build();

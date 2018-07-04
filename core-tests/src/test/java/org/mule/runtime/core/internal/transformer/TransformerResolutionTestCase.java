@@ -14,7 +14,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -34,14 +34,14 @@ public class TransformerResolutionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void resolvesMultipleApplicableTransformers() throws MuleException {
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(new StringToOrange());
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(new StringToApple());
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(new StringToFruit());
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(new StringToOrange());
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(new StringToApple());
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerTransformer(new StringToFruit());
 
 
     try {
       Transformer transformer =
-          ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(DataType.STRING, FRUIT_DATA_TYPE);
+          ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(DataType.STRING, FRUIT_DATA_TYPE);
       assertTrue(String.format("Expected a %s transformer but got %s", StringToFruit.class.getName(),
                                transformer.getClass().getName()),
                  transformer instanceof StringToFruit);

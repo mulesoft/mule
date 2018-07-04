@@ -35,8 +35,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -74,7 +73,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
   private CoreEvent event;
 
-  private MuleContextWithRegistries mockMuleContext = mockContextWithServices();
+  private MuleContextWithRegistry mockMuleContext = mockContextWithServices();
   @Mock
   private ErrorType mockErrorType;
   private MessagingException mockException;

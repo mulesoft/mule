@@ -24,7 +24,7 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -46,7 +46,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void before() throws RegistrationException {
-    objectStore = (PartitionableObjectStore) ((MuleContextWithRegistries) muleContext).getRegistry()
+    objectStore = (PartitionableObjectStore) ((MuleContextWithRegistry) muleContext).getRegistry()
         .lookupObject(DefaultObjectStoreFactoryBean.class)
         .createDefaultInMemoryObjectStore();
   }

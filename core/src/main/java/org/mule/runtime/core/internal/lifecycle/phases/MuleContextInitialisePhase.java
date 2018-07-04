@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.lifecycle.phases;
 
 import org.mule.runtime.api.ioc.ObjectProvider;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -15,7 +14,7 @@ import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.LifecycleObject;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -27,9 +26,7 @@ import org.mule.runtime.core.privileged.util.annotation.AnnotationUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.lang.reflect.Method;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -49,22 +46,20 @@ import javax.annotation.PostConstruct;
 public class MuleContextInitialisePhase extends DefaultLifecyclePhase {
 
   public MuleContextInitialisePhase() {
-    super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
+    super(Initialisable.PHASE_NAME, LifecycleUtils::initialiseIfNeeded);
     registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
-
-    Set<LifecycleObject> orderedObjects = new LinkedHashSet<>();
-    orderedObjects.add(new LifecycleObject(StreamingManager.class));
-    orderedObjects.add(new LifecycleObject(ConfigurationProvider.class));
-    orderedObjects.add(new LifecycleObject(Config.class));
-    orderedObjects.add(new LifecycleObject(LegacyConnector.class));
-    orderedObjects.add(new LifecycleObject(SecurityManager.class));
-    orderedObjects.add(new LifecycleObject(FlowConstruct.class));
-    orderedObjects.add(new LifecycleObject(Initialisable.class));
-    setOrderedLifecycleObjects(orderedObjects);
+    setOrderedLifecycleTypes(new Class<?>[] {
+        StreamingManager.class,
+        ConfigurationProvider.class,
+        Config.class,
+        LegacyConnector.class,
+        SecurityManager.class,
+        FlowConstruct.class,
+        Initialisable.class
+    });
     setIgnoredObjectTypes(new Class[] {Component.class, MessageSource.class, InterceptingMessageProcessor.class,
         OutboundRouter.class, MuleContext.class, ObjectProvider.class});
   }
-
 
   @Override
   public void applyLifecycle(Object o) throws LifecycleException {

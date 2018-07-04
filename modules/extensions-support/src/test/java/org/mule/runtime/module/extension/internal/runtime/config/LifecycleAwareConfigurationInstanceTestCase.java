@@ -31,7 +31,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CONTEXT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
@@ -52,7 +51,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
@@ -129,10 +128,10 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Override
   protected void doSetUp() throws Exception {
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_CONFIGURATION_PROPERTIES,
-                                                                           configurationProperties);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_CONFIGURATION_PROPERTIES,
+                                                                         configurationProperties);
 
     doReturn(empty()).when(configurationProperties).resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY);
 
@@ -301,7 +300,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
   @Test
   public void disposeMetadataCacheWhenConfigIsDisposed() throws Exception {
     MuleMetadataService muleMetadataManager =
-        ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(MuleMetadataService.class);
+        ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(MuleMetadataService.class);
     muleMetadataManager.getMetadataCache(NAME);
     interceptable.initialise();
     interceptable.start();

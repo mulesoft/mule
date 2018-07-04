@@ -14,17 +14,14 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.LifecycleObject;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.registry.Registry;
+import org.mule.runtime.core.privileged.routing.OutboundRouter;
+import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * The Stop phase for the Management context LifecycleManager. Calling {@link MuleContext#stop()} with initiate this phase via the
@@ -52,19 +49,18 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase {
   }
 
   public MuleContextStopPhase(Class<?>[] ignorredObjects) {
-    super(Stoppable.PHASE_NAME, Stoppable.class, Startable.PHASE_NAME);
+    super(Stoppable.PHASE_NAME, LifecycleUtils::stopIfNeeded);
 
-    Set<LifecycleObject> stopOrderedObjects = new LinkedHashSet<LifecycleObject>();
-    // Stop in the opposite order to start
-    stopOrderedObjects.add(new LifecycleObject(FlowConstruct.class));
-    stopOrderedObjects.add(new LifecycleObject(LegacyConnector.class));
-    stopOrderedObjects.add(new LifecycleObject(ConfigurationProvider.class));
-    stopOrderedObjects.add(new LifecycleObject(Config.class));
-    stopOrderedObjects.add(new LifecycleObject(QueueManager.class));
-    stopOrderedObjects.add(new LifecycleObject(Stoppable.class));
+    setOrderedLifecycleTypes(new Class<?>[] {
+        FlowConstruct.class,
+        LegacyConnector.class,
+        ConfigurationProvider.class,
+        Config.class,
+        QueueManager.class,
+        Stoppable.class
+    });
 
     setIgnoredObjectTypes(ignorredObjects);
-    setOrderedLifecycleObjects(stopOrderedObjects);
     // Yuo can initialise and stop
     registerSupportedPhase(Initialisable.PHASE_NAME);
     // Stop/Start/Stop

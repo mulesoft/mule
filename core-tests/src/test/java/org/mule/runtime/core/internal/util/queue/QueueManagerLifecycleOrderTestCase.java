@@ -30,7 +30,7 @@ import org.mule.runtime.core.api.util.queue.QueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.api.util.queue.QueueSession;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
@@ -78,10 +78,10 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testStartupOrder() throws Exception {
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_NOTIFICATION_DISPATCHER,
-                                                                           mock(NotificationDispatcher.class));
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_NOTIFICATION_DISPATCHER,
+                                                                         mock(NotificationDispatcher.class));
     FlowConstruct fc = new RecordingFlow("dummy", muleContext);
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerFlowConstruct(fc);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerFlowConstruct(fc);
     muleContext.start();
     muleContext.stop();
     assertEquals(4, startStopOrder.size());

@@ -20,7 +20,6 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresCo
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -45,15 +44,15 @@ import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicit
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link ExtensionManager}. This implementation uses standard Java SPI as a discovery mechanism.
@@ -281,11 +280,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
-
-  public ExtensionActivator getExtensionActivator() {
-    return extensionActivator;
-  }
-
 
   public ReflectionCache getReflectionCache() {
     if (reflectionCache == null) {

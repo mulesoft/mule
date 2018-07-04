@@ -29,7 +29,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -68,7 +68,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     OnErrorPropagateHandler exceptionHandler = new OnErrorPropagateHandler();
     exceptionHandler.setMuleContext(muleContext);
     exceptionHandler
-        .setNotificationFirer(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
+        .setNotificationFirer(((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
     exceptionHandler.initialise();
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     eventContext = (BaseEventContext) create(flow, TEST_CONNECTOR_LOCATION);

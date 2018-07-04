@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ public class DynamicDataTypeConversionResolver implements DataTypeConversionReso
 
     for (DataType targetDataType : targetDataTypes) {
       try {
-        transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(sourceType, targetDataType);
+        transformer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupTransformer(sourceType, targetDataType);
 
         if (transformer != null) {
           break;

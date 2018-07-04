@@ -48,7 +48,7 @@ import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -98,7 +98,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     muleContext = mockContextWithServices();
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
-    notificationFirer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
+    notificationFirer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
     when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new ErrorHandlerFactory().createDefault(notificationFirer));
     mockErrorTypeLocator();
     when(muleContext.getTransformationService()).thenReturn(new ExtendedTransformationService(muleContext));

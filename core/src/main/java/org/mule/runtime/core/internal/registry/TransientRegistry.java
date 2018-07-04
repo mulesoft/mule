@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.registry;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -26,11 +25,11 @@ import org.mule.runtime.core.privileged.registry.PreInitProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transport.LegacyConnector;
 
-import org.apache.commons.collections.functors.InstanceofPredicate;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.collections.functors.InstanceofPredicate;
 
 /**
  * Use the registryLock when reading/writing/iterating over the contents of the registry hashmap.
@@ -38,9 +37,7 @@ import java.util.Map;
  * @deprecated as of 3.7.0. Use {@link SimpleRegistry instead}.
  */
 @Deprecated
-public class TransientRegistry extends AbstractRegistry {
-
-  public static final String REGISTRY_ID = "org.mule.runtime.core.Registry.Transient";
+public abstract class TransientRegistry extends AbstractRegistry {
 
   private final RegistryMap registryMap = new RegistryMap(logger);
 
@@ -171,12 +168,14 @@ public class TransientRegistry extends AbstractRegistry {
    * @return the same object with lifecycle methods called (if it has any)
    * @throws MuleException if the registry fails to perform the lifecycle change for the object.
    */
-  Object applyLifecycle(Object object) throws MuleException {
+  @Override
+  public Object applyLifecycle(Object object) throws MuleException {
     getLifecycleManager().applyCompletedPhases(object);
     return object;
   }
 
-  Object applyLifecycle(Object object, String phase) throws MuleException {
+  @Override
+  public Object applyLifecycle(Object object, String phase) throws MuleException {
     getLifecycleManager().applyPhase(object, NotInLifecyclePhase.PHASE_NAME, phase);
     return object;
   }

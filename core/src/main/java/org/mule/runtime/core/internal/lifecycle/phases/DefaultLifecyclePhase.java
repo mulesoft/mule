@@ -7,31 +7,25 @@
 package org.mule.runtime.core.internal.lifecycle.phases;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getNonMuleException;
+import static org.mule.runtime.api.exception.ExceptionHelper.unwrap;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToInvokeLifecycle;
-import static org.reflections.ReflectionUtils.getAllMethods;
-import static org.reflections.ReflectionUtils.withName;
-
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.core.api.lifecycle.LifecycleObject;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
-import org.mule.runtime.core.internal.config.ExceptionHelper;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.internal.lifecycle.LifecycleTransitionResult;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Represents a configurable lifecycle phase. This is a default implementation of a 'generic phase' in that is can be configured
- * to represnt any phase. Instances of this phase can then be registered with a
- * {@link org.mule.runtime.core.api.lifecycle.LifecycleManager} and by used to enforce a lifecycle phase on an object. Usually,
+ * to represents any phase. Instances of this phase can then be registered with a
+ * {@link LifecycleManager} and by used to enforce a lifecycle phase on an object. Usually,
  * Lifecycle phases have a fixed configuration in which case a specialisation of this class should be created that initialises its
  * configuration internally.
  * <p>
@@ -45,50 +39,29 @@ import java.util.Set;
 public class DefaultLifecyclePhase implements LifecyclePhase {
 
   protected transient final Logger logger = LoggerFactory.getLogger(DefaultLifecyclePhase.class);
-  private Class<?> lifecycleClass;
-  private final Method lifecycleMethod;
-  private Set<LifecycleObject> orderedLifecycleObjects = new LinkedHashSet<>(6);
-  private Class<?>[] ignorredObjectTypes;
+
+  private final CheckedConsumer<Object> lifecycleInvoker;
+  protected Class<?>[] orderedLifecycleTypes;
+  private Class<?>[] ignoredObjectTypes;
   private final String name;
-  private final String oppositeLifecyclePhase;
   private Set<String> supportedPhases;
 
-  public DefaultLifecyclePhase(String name, Class<?> lifecycleClass, String oppositeLifecyclePhase) {
+  public DefaultLifecyclePhase(String name, CheckedConsumer<Object> lifecycleInvoker) {
     this.name = name;
-    this.lifecycleClass = lifecycleClass;
-    Set<Method> lifecycleMethodsCandidate = getAllMethods(lifecycleClass, withName(name));
-    lifecycleMethod = lifecycleMethodsCandidate.isEmpty() ? null : lifecycleMethodsCandidate.iterator().next();
-    this.oppositeLifecyclePhase = oppositeLifecyclePhase;
-  }
-
-  /**
-   * Subclasses can override this method to order <code>objects</code> before the lifecycle method is applied to them. This method
-   * does not apply any special ordering to <code>objects</code>.
-   *
-   * @param objects
-   * @param lo
-   * @return List with ordered objects
-   */
-  protected List<?> sortLifecycleInstances(Collection<?> objects, LifecycleObject lo) {
-    return new ArrayList<Object>(objects);
+    this.lifecycleInvoker = lifecycleInvoker;
   }
 
   @Override
-  public void addOrderedLifecycleObject(LifecycleObject lco) {
-    orderedLifecycleObjects.add(lco);
-  }
-
-  @Override
-  public void removeOrderedLifecycleObject(LifecycleObject lco) {
-    orderedLifecycleObjects.remove(lco);
+  public LifecycleObjectSorter newLifecycleObjectSorter() {
+    return new DefaultLifecycleObjectSorter(orderedLifecycleTypes);
   }
 
   protected boolean ignoreType(Class<?> type) {
-    if (ignorredObjectTypes == null) {
+    if (ignoredObjectTypes == null) {
       return false;
     } else {
-      for (Class<?> ignorredObjectType : ignorredObjectTypes) {
-        if (ignorredObjectType.isAssignableFrom(type)) {
+      for (Class<?> ignoredType : ignoredObjectTypes) {
+        if (ignoredType.isAssignableFrom(type)) {
           return true;
         }
       }
@@ -96,49 +69,17 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
     return false;
   }
 
-  @Override
-  public Set<LifecycleObject> getOrderedLifecycleObjects() {
-    return orderedLifecycleObjects;
+  protected void setOrderedLifecycleTypes(Class<?>[] orderedLifecycleTypes) {
+    this.orderedLifecycleTypes = orderedLifecycleTypes;
   }
 
-  @Override
-  public void setOrderedLifecycleObjects(Set<LifecycleObject> orderedLifecycleObjects) {
-    this.orderedLifecycleObjects = orderedLifecycleObjects;
-  }
-
-  @Override
-  public Class<?>[] getIgnoredObjectTypes() {
-    return ignorredObjectTypes;
-  }
-
-  @Override
-  public void setIgnoredObjectTypes(Class<?>[] ignorredObjectTypes) {
-    this.ignorredObjectTypes = ignorredObjectTypes;
-  }
-
-  @Override
-  public Class<?> getLifecycleClass() {
-    return lifecycleClass;
-  }
-
-  @Override
-  public void setLifecycleClass(Class<?> lifecycleClass) {
-    this.lifecycleClass = lifecycleClass;
+  protected void setIgnoredObjectTypes(Class<?>[] ignorredObjectTypes) {
+    this.ignoredObjectTypes = ignorredObjectTypes;
   }
 
   @Override
   public String getName() {
     return name;
-  }
-
-  @Override
-  public Set<String> getSupportedPhases() {
-    return supportedPhases;
-  }
-
-  @Override
-  public void setSupportedPhases(Set<String> supportedPhases) {
-    this.supportedPhases = supportedPhases;
   }
 
   @Override
@@ -150,19 +91,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
   }
 
   @Override
-  public boolean isPhaseSupported(String phase) {
-    if (getSupportedPhases() == null) {
-      return false;
-    } else {
-      if (getSupportedPhases().contains(ALL_PHASES)) {
-        return true;
-      } else {
-        return getSupportedPhases().contains(phase);
-      }
-    }
-  }
-
-  @Override
   public void applyLifecycle(Object o) throws LifecycleException {
     if (o == null) {
       return;
@@ -170,9 +98,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
     if (ignoreType(o.getClass())) {
       return;
     }
-    if (!getLifecycleClass().isAssignableFrom(o.getClass())) {
-      return;
-    }
+
     if (o instanceof LifecycleStateEnabled) {
       // If an object has its own lifecycle manager "LifecycleStateEnabled" it
       // is possible that
@@ -186,22 +112,20 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
       }
     }
     try {
-      lifecycleMethod.invoke(o);
+      lifecycleInvoker.accept(o);
     } catch (final Exception e) {
-      Throwable t = ExceptionHelper.unwrap(e);
-
+      Throwable t = e.getCause();
       if (t instanceof LifecycleException) {
         throw (LifecycleException) t;
       }
 
-      // Need to get the cause of the MuleException so the LifecycleException wraps a non-mule exception
-      throw new LifecycleException(failedToInvokeLifecycle(lifecycleMethod.getName(), o),
-                                   getNonMuleException(t), o);
-    }
-  }
+      t = extractOfType(e, LifecycleException.class).orElse(null);
+      if (t != null) {
+        throw (LifecycleException) t;
+      }
 
-  @Override
-  public String getOppositeLifecyclePhase() {
-    return oppositeLifecyclePhase;
+      // Need to get the cause of the MuleException so the LifecycleException wraps a non-mule exception
+      throw new LifecycleException(failedToInvokeLifecycle(name, o), getNonMuleException(unwrap(e)), o);
+    }
   }
 }

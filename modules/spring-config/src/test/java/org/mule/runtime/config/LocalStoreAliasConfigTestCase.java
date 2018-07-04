@@ -20,7 +20,7 @@ import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QU
 
 import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -46,19 +46,19 @@ public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase {
   public void queueManager() throws Exception {
     this.testSame(OBJECT_QUEUE_MANAGER, LOCAL_QUEUE_MANAGER_KEY);
     assertSame(muleContext.getQueueManager(),
-               ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(LOCAL_QUEUE_MANAGER_KEY));
+               ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(LOCAL_QUEUE_MANAGER_KEY));
   }
 
   @Test
   public void objectStoreManager() throws Exception {
     this.testSame(OBJECT_STORE_MANAGER, LOCAL_OBJECT_STORE_MANAGER_KEY);
     assertSame(muleContext.getObjectStoreManager(),
-               ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(LOCAL_OBJECT_STORE_MANAGER_KEY));
+               ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(LOCAL_OBJECT_STORE_MANAGER_KEY));
   }
 
   private void testSame(String key1, String key2) {
-    Object obj1 = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(key1);
-    Object obj2 = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(key2);
+    Object obj1 = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(key1);
+    Object obj2 = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(key2);
     assertSame(obj1, obj2);
   }
 }

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.privileged.registry;
 
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.internal.registry.TransientRegistry;
+import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationUtils;
 
@@ -32,9 +32,8 @@ import javax.annotation.PreDestroy;
  * container so the EJB case is ignored in Mule.</li>
  * </ol>
  *
- * @deprecated as of 3.7.0 since these are only used by {@link TransientRegistry} which is also
- *             deprecated. Use post processors for currently supported registries instead (i.e:
- *             {@link org.mule.runtime.core.config.spring.SpringRegistry})
+ * @deprecated as of 3.7.0 since these are only used by {@link Registry} which is also
+ *             deprecated. Use post processors for currently supported registries instead
  */
 @Deprecated
 public class JSR250ValidatorProcessor implements InjectProcessor {
