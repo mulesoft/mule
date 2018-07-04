@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.lifecycle;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.exception.ExceptionHelper.unwrap;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -16,6 +17,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
+import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
 import org.mule.runtime.core.internal.registry.Registry;
@@ -48,11 +50,12 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     try {
       registryLifecycleManager.muleContext.withLifecycleLock((CheckedRunnable) () -> doOnTransition(phaseName, object));
     } catch (RuntimeException e) {
-      if (e.getCause() instanceof MuleException) {
-        throw (MuleException) e.getCause();
-      } else {
-        throw new MuleRuntimeException(e);
+      MuleException muleException = ExceptionUtils.extractOfType(e, MuleException.class).orElse(null);
+      if (muleException != null) {
+        throw muleException;
       }
+
+      throw new MuleRuntimeException(unwrap(e));
     }
   }
 
@@ -94,10 +97,10 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
       } else {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug(format(
-                              "Skipping the application of the '%s' lifecycle phase over a certain object "
-                                  + "because a %s interceptor of type [%s] indicated so. Object is: %s",
-                              phase.getName(), LifecycleInterceptor.class.getSimpleName(),
-                              interceptor.getClass().getName(), target));
+              "Skipping the application of the '%s' lifecycle phase over a certain object "
+                  + "because a %s interceptor of type [%s] indicated so. Object is: %s",
+              phase.getName(), LifecycleInterceptor.class.getSimpleName(),
+              interceptor.getClass().getName(), target));
         }
       }
     } catch (Exception e) {

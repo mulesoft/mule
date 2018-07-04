@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.lifecycle.phases;
 import static org.mule.runtime.api.exception.ExceptionHelper.getNonMuleException;
 import static org.mule.runtime.api.exception.ExceptionHelper.unwrap;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToInvokeLifecycle;
-import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
@@ -119,7 +119,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
         throw (LifecycleException) t;
       }
 
-      t = extractCauseOfType(e, LifecycleException.class).orElse(null);
+      t = extractOfType(e, LifecycleException.class).orElse(null);
       if (t != null) {
         throw (LifecycleException) t;
       }
