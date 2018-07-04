@@ -45,14 +45,16 @@ public class MuleClassLoaderResourceNotFoundExceptionFactory implements ClassLoa
   public static final String PLUGIN_CL_ID_TEMPLATE = "%s Plugin CL";
 
   @Override
-  public ResourceNotFoundException createResourceNotFoundException(String resourceName, ClassLoader classLoader) {
+  public ResourceNotFoundException createResourceNotFoundException(String resourceName, ClassLoader classLoader,
+                                                                   boolean triedAbsolutePath) {
     BiFunction<String, ClassLoaderNode, List<ClassLoaderNode>> findPossibleOwnersFunction =
         (resource, classLoaderNode) -> classLoaderNode.findPossibleResourceOwners(resourceName);
-    Function<String, String> genericMsgProviderFunction = resource -> getResourceNotFoundErrorMessage(resourceName);
+    Function<String, String> genericMsgProviderFunction =
+        resource -> getResourceNotFoundErrorMessage(resourceName, triedAbsolutePath);
     BiFunction<String, ClassLoader, ResourceNotFoundException> genericExceptionProviderFunction =
         (resource, classloader) -> ClassLoaderResourceNotFoundExceptionFactory.getDefaultFactory()
             .createResourceNotFoundException(resourceName,
-                                             classLoader);
+                                             classLoader, triedAbsolutePath);
     BiFunction<String, ClassLoaderNode, ResourceNotFoundException> detailedExceptionProviderFunction =
         (msg, classLoaderNode) -> new ArtifactClassLoaderResourceNotFoundException(I18nMessageFactory.createStaticMessage(msg),
                                                                                    classLoaderNode);

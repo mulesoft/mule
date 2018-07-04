@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.core.api.exception.ResourceNotFoundException;
@@ -25,9 +26,11 @@ public interface ClassLoaderResourceNotFoundExceptionFactory {
    *
    * @param resourceName the resource to load.
    * @param classLoader the classloader to use for loading the resource.
+   * @param triedAbsolutePath if the resource was tried to be loaded from an absolute path as well.
    * @return a new {@link ResourceNotFoundException}
    */
-  ResourceNotFoundException createResourceNotFoundException(String resourceName, ClassLoader classLoader);
+  ResourceNotFoundException createResourceNotFoundException(String resourceName, ClassLoader classLoader,
+                                                            boolean triedAbsolutePath);
 
   /**
    * Creates a {@link ClassNotFoundException}
@@ -48,8 +51,9 @@ public interface ClassLoaderResourceNotFoundExceptionFactory {
   class DefaultClassLoaderResourceNotFoundExceptionFactory implements ClassLoaderResourceNotFoundExceptionFactory {
 
     @Override
-    public ResourceNotFoundException createResourceNotFoundException(String resourceName, ClassLoader classLoader) {
-      return new ResourceNotFoundException(createStaticMessage(getResourceNotFoundErrorMessage(resourceName)));
+    public ResourceNotFoundException createResourceNotFoundException(String resourceName, ClassLoader classLoader,
+                                                                     boolean triedAbsolutePath) {
+      return new ResourceNotFoundException(createStaticMessage(getResourceNotFoundErrorMessage(resourceName, triedAbsolutePath)));
     }
 
     @Override
@@ -59,8 +63,11 @@ public interface ClassLoaderResourceNotFoundExceptionFactory {
 
   }
 
-  static String getResourceNotFoundErrorMessage(String resourceName) {
-    return "Couldn't find resource: " + resourceName;
+  static String getResourceNotFoundErrorMessage(String resourceName, boolean triedAbsolutePath) {
+    if (triedAbsolutePath) {
+      return format("Couldn't find resource: %s neither on classpath or in file system", resourceName);
+    }
+    return format("Couldn't find resource: %s on classpath", resourceName);
   }
 
   static String getClassNotFoundErrorMessage(String className) {

@@ -11,8 +11,6 @@ import static java.lang.String.join;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -76,12 +74,8 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
 
   }
 
-  private boolean isAbsolutePath(String file) {
-    return new File(file).isAbsolute();
-  }
-
   protected InputStream getResourceInputStream(String file) throws IOException {
-    return isAbsolutePath(fileLocation) ? new FileInputStream(file) : resourceProvider.getResourceAsStream(file);
+    return resourceProvider.getResourceAsStream(file);
   }
 
   protected InputStreamReader getResourceInputStreamReader(String file) throws IOException {

@@ -17,7 +17,9 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
 
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -26,6 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.CodeSource;
@@ -138,17 +141,35 @@ public class ClassUtils {
    * @param classLoader the classloader used to load the resource.
    * @return the {@link URL} pointing to the resource.
    */
-  public static URL getResourceOrFail(final String resourceName, ClassLoader classLoader) {
+  public static URL getResourceOrFail(final String resourceName, ClassLoader classLoader, boolean tryAbsolutePath) {
     URL url = AccessController
         .doPrivileged((PrivilegedAction<URL>) () -> classLoader != null ? classLoader.getResource(resourceName) : null);
     if (url != null) {
       return url;
     }
-    if (isDesignModeEnabled()) {
-      throw resourceNotFoundExceptionFactoryLazyValue.get().createResourceNotFoundException(resourceName, classLoader);
-    } else {
-      throw getDefaultFactory().createResourceNotFoundException(resourceName, classLoader);
+    if (url == null && tryAbsolutePath) {
+      url = urlFromAbsolutePath(resourceName);
+      if (url != null) {
+        return url;
+      }
     }
+    if (isDesignModeEnabled()) {
+      throw resourceNotFoundExceptionFactoryLazyValue.get().createResourceNotFoundException(resourceName, classLoader, true);
+    } else {
+      throw getDefaultFactory().createResourceNotFoundException(resourceName, classLoader, true);
+    }
+  }
+
+  private static URL urlFromAbsolutePath(String uri) {
+    File file = new File(uri);
+    if (file.exists()) {
+      try {
+        return file.toURI().toURL();
+      } catch (MalformedURLException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }
+    return null;
   }
 
   public static Boolean isDesignModeEnabled() {
@@ -156,14 +177,14 @@ public class ClassUtils {
   }
 
   /**
-   * Same as {@link #getResourceOrFail(String, ClassLoader)} but will used the thread current classloader.
+   * Same as {@link #getResourceOrFail(String, ClassLoader, boolean)} but will used the thread current classloader.
    *
    * @param resourceName the resource to load.
    * @return the {@link URL} pointing to the resource.
    */
-  public static URL getResourceOrFail(final String resourceName) {
+  public static URL getResourceOrFail(final String resourceName, boolean tryAbsolutePath) {
     final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-    return getResourceOrFail(resourceName, cl);
+    return getResourceOrFail(resourceName, cl, tryAbsolutePath);
   }
 
   @Deprecated
