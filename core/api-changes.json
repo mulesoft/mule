@@ -155,6 +155,21 @@
       ]
     }
   },
+  "4.1.3": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method <T> org.mule.runtime.api.metadata.TypedValue<T> org.mule.runtime.core.privileged.util.AttributeEvaluator::resolveTypedValueFromContext(org.mule.runtime.api.el.BindingContext)",
+          "package": "org.mule.runtime.core.privileged.util",
+          "classSimpleName": "AttributeEvaluator",
+          "methodName": "resolveTypedValue",
+          "elementKind": "method",
+          "justification": "Added for performance"
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [

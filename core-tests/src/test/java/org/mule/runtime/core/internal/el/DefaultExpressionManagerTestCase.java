@@ -63,14 +63,6 @@ import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.util.MuleContextUtils;
 
-import java.io.ByteArrayInputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -78,6 +70,16 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_MVEL_DW)
@@ -93,6 +95,14 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   private StreamingManager streamingManager;
 
   private ExtendedExpressionManager expressionManager;
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    Map<String, Object> objects = new HashMap<>();
+    objects.putAll(super.getStartUpRegistryObjects());
+    objects.put(COMPATIBILITY_PLUGIN_INSTALLED, new Object());
+    return objects;
+  }
 
   @Before
   public void configureExpressionManager() throws MuleException {

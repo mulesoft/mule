@@ -6,14 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
@@ -49,10 +54,12 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   @Before
   public void setUp() {
     when(event.getFlowCallStack().clone()).thenReturn(mock(FlowCallStack.class));
-    when(event.getError()).thenReturn(java.util.Optional.empty());
-    when(event.getAuthentication()).thenReturn(java.util.Optional.empty());
-    when(event.getMessage()).thenReturn(of(null));
-    when(event.getItemSequenceInfo()).thenReturn(java.util.Optional.empty());
+    when(event.getError()).thenReturn(empty());
+    when(event.getAuthentication()).thenReturn(empty());
+    Message msg = of(null);
+    when(event.getMessage()).thenReturn(msg);
+    when(event.asBindingContext()).thenReturn(getTargetBindingContext(msg));
+    when(event.getItemSequenceInfo()).thenReturn(empty());
   }
 
   @Test
@@ -63,6 +70,8 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   @Test
   public void testPojoType() throws Exception {
     assertExpected(new StaticValueResolver(null), toMetadataType(DynamicPojo.class), true, new DynamicPojo(5));
+
+    verify(event, times(1)).asBindingContext();
   }
 
   @Test

@@ -17,6 +17,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
+import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
@@ -35,6 +36,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
 
   public static final String FOO_FLOW_VAR_EXPRESSION = "#[mel:flowVars['foo']]";
@@ -44,6 +48,14 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
 
   public MessageEnricherTestCase(Mode mode) {
     super(mode);
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    Map<String, Object> objects = new HashMap<>();
+    objects.putAll(super.getStartUpRegistryObjects());
+    objects.put(COMPATIBILITY_PLUGIN_INSTALLED, new Object());
+    return objects;
   }
 
   @Test

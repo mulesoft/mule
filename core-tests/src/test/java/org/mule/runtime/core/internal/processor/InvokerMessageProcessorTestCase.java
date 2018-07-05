@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -26,12 +27,21 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
   private InvokerMessageProcessor invoker;
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    Map<String, Object> objects = new HashMap<>();
+    objects.putAll(super.getStartUpRegistryObjects());
+    objects.put(COMPATIBILITY_PLUGIN_INSTALLED, new Object());
+    return objects;
+  }
 
   @Override
   protected void doSetUp() throws Exception {
