@@ -7,8 +7,10 @@
 
 package org.mule.module.cxf.support;
 
-import javax.xml.namespace.QName;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION;
 
+import javax.xml.namespace.QName;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
 import org.apache.cxf.databinding.stax.StaxDataBindingInterceptor;
 import org.apache.cxf.endpoint.Endpoint;
@@ -28,9 +30,9 @@ import org.apache.cxf.staxutils.StaxUtils;
  * is delegated to the StaxDataBindingInterceptor.
  *
  */
-public class ProxyRPCInInterceptor extends AbstractInDatabindingInterceptor
+public class ProxyAddBindingOperationInfoInterceptor extends AbstractInDatabindingInterceptor
 {
-    public ProxyRPCInInterceptor()
+    public ProxyAddBindingOperationInfoInterceptor()
     {
         super(Phase.UNMARSHAL);
         addAfter(URIMappingInterceptor.class.getName());
@@ -75,6 +77,14 @@ public class ProxyRPCInInterceptor extends AbstractInDatabindingInterceptor
     @Override
     public void handleMessage(Message message) throws Fault
     {
+        // In case there already exists an action, the binding operation should
+        // not be added.
+        String action = (String) message.get(SOAP_ACTION);
+        if (!isEmpty(action))
+        {
+            return;
+        }
+        
         DepthXMLStreamReader xmlReader = getXMLStreamReader(message);
 
         if (!StaxUtils.toNextElement(xmlReader))
