@@ -120,7 +120,7 @@ public final class AttributeEvaluator {
     return remainingString.contains(DEFAULT_EXPRESSION_POSTFIX);
   }
 
-  public <T> TypedValue<T> resolveTypedValue(BindingContext context) {
+  public <T> TypedValue<T> resolveTypedValueFromContext(BindingContext context) {
     return expressionContextResolver.apply(context);
   }
 

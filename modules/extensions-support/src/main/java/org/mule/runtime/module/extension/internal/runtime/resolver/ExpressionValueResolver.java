@@ -106,7 +106,7 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
       // MEL requires an actual event, so in this case we may not optimize by using a precalculated binding context
       return evaluator.resolveTypedValue(context.getEvent());
     } else {
-      return evaluator.resolveTypedValue(context.getEvent().asBindingContext());
+      return evaluator.resolveTypedValueFromContext(context.getEvent().asBindingContext());
     }
   }
 

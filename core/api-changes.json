@@ -39,7 +39,7 @@
       "ignore": [
         {
           "code": "java.method.added",
-          "new": "method <T> org.mule.runtime.api.metadata.TypedValue<T> org.mule.runtime.core.privileged.util.AttributeEvaluator::resolveTypedValue(org.mule.runtime.api.el.BindingContext)",
+          "new": "method <T> org.mule.runtime.api.metadata.TypedValue<T> org.mule.runtime.core.privileged.util.AttributeEvaluator::resolveTypedValueFromContext(org.mule.runtime.api.el.BindingContext)",
           "package": "org.mule.runtime.core.privileged.util",
           "classSimpleName": "AttributeEvaluator",
           "methodName": "resolveTypedValue",

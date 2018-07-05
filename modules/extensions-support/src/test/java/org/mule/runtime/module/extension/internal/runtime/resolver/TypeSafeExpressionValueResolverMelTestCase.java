@@ -10,6 +10,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
@@ -30,7 +31,9 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.verification.VerificationMode;
 
 import java.util.HashMap;
@@ -41,6 +44,9 @@ public class TypeSafeExpressionValueResolverMelTestCase extends AbstractMuleCont
   private static final String HELLO_WORLD = "Hello World!";
   private static final MetadataType STRING =
       new JavaTypeLoader(Thread.currentThread().getContextClassLoader()).load(String.class);
+
+  @Rule
+  public ExpectedException expected = none();
 
   private ExtendedExpressionManager expressionManager;
 
@@ -91,18 +97,24 @@ public class TypeSafeExpressionValueResolverMelTestCase extends AbstractMuleCont
         .resolve(ValueResolvingContext.from(eventBuilder(muleContext).message(of(HELLO_WORLD)).build())), "true", times(1));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void nullExpression() throws Exception {
+    expected.expect(IllegalArgumentException.class);
+    expected.expectMessage("Expression cannot be blank or null");
     getResolver(null, STRING);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void blankExpression() throws Exception {
+    expected.expect(IllegalArgumentException.class);
+    expected.expectMessage("Expression cannot be blank or null");
     getResolver(EMPTY, STRING);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void nullExpectedType() throws Exception {
+    expected.expect(IllegalArgumentException.class);
+    expected.expectMessage("expected type cannot be null");
     getResolver("#[mel:payload]", null);
   }
 
