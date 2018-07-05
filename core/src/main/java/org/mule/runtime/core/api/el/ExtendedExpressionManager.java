@@ -67,11 +67,11 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If a user needs to
    * evaluate a single expression they can use {@link #evaluate(String, CoreEvent, FlowConstruct, BindingContext)}.
    * <p>
-   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link CoreEvent} or
+   * This version of {@code evaluate} performs expression evaluation on an immutable event. Any {@link CoreEvent} or
    * {@link InternalMessage} mutation performed within the expression will impact within the context of expression evaluation but
    * will not mutated the {@code event} parameter.
    *
-   * @param expression one or more expressions ebedded in a literal string i.e. "Value is #[mel:xpath://foo] other value is
+   * @param expression one or more expressions embedded in a literal string i.e. "Value is #[mel:xpath://foo] other value is
    *        #[mel:header:foo]."
    * @param event The current event being processed
    * @param componentLocation the location of the component where the event is being processed

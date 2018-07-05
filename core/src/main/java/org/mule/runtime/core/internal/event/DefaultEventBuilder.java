@@ -32,6 +32,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -282,6 +283,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     private ItemSequenceInfo itemSequenceInfo;
 
+    private transient LazyValue<BindingContext> bindingContextBuilder =
+        new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
+
     // Use this constructor from the builder
     private InternalEventImplementation(BaseEventContext context, Message message, Map<String, TypedValue<?>> variables,
                                         Map<String, ?> internalParameters, MuleSession session, SecurityContext securityContext,
@@ -419,8 +423,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
         } catch (Exception e) {
           throw new DefaultMuleException(e);
         }
-
       }
+
+      bindingContextBuilder = new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
     }
 
     @Override
@@ -510,7 +515,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public BindingContext asBindingContext() {
-      return addEventBindings(this, NULL_BINDING_CONTEXT);
+      return bindingContextBuilder.get();
     }
   }
 
