@@ -11,7 +11,7 @@ import org.mule.module.cxf.support.CopyAttachmentInInterceptor;
 import org.mule.module.cxf.support.CopyAttachmentOutInterceptor;
 import org.mule.module.cxf.support.CxfUtils;
 import org.mule.module.cxf.support.OutputPayloadInterceptor;
-import org.mule.module.cxf.support.ProxyRPCInInterceptor;
+import org.mule.module.cxf.support.ProxyAddBindingOperationInfoInterceptor;
 import org.mule.module.cxf.support.ProxySchemaValidationInInterceptor;
 import org.mule.module.cxf.support.ProxyService;
 import org.mule.module.cxf.support.ProxyServiceFactoryBean;
@@ -84,6 +84,8 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         }
         CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getInInterceptors(), MustUnderstandInterceptor.class.getName());
 
+        server.getEndpoint().getBinding().getInInterceptors().add(new ProxyAddBindingOperationInfoInterceptor());
+        
         replaceRPCInterceptors(server);
 
         if (isValidationEnabled())
@@ -98,11 +100,8 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
      */
     private void replaceRPCInterceptors(Server server)
     {
-        if(CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getInInterceptors(), RPCInInterceptor.class.getName()))
-        {
-            server.getEndpoint().getBinding().getInInterceptors().add(new ProxyRPCInInterceptor());
-        }
-
+        CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getInInterceptors(), RPCInInterceptor.class.getName());
+        
         if(CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), RPCOutInterceptor.class.getName()))
         {
             server.getEndpoint().getBinding().getOutInterceptors().add(new BareOutInterceptor());
