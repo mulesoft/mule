@@ -1,0 +1,11 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:exam="http://example.cxf.module.mule.org/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <exam:addArtist>
+         <arg0>
+            <firstName>David</firstName>
+            <lastName>Foster Wallace</lastName>
+         </arg0>
+      </exam:addArtist>
+   </soapenv:Body>
+</soapenv:Envelope>
