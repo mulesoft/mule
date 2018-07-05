@@ -647,10 +647,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected DefaultListableBeanFactory createBeanFactory() {
     // Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
     DefaultListableBeanFactory beanFactory = new ObjectProviderAwareBeanFactory(getInternalParentBeanFactory());
-    beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
+    //beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
+    beanFactory.setAutowireCandidateResolver(new SalvameDeEsta());
     beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(),
                                                                              optionalObjectsController));
-
     return beanFactory;
   }
 
