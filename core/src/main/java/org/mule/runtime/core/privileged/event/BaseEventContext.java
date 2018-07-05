@@ -14,10 +14,10 @@ import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 
+import org.reactivestreams.Publisher;
+
 import java.util.Optional;
 import java.util.function.BiConsumer;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Context representing a message that is received by a Mule Runtime via a connector source. This context is immutable and
@@ -189,5 +189,12 @@ public interface BaseEventContext extends EventContext {
   default String getServerId() {
     return null;
   }
+
+  /**
+   * @return the distance of this eventContext to its root ,counting one for every ancestor.
+   *
+   * @since 4.1.3
+   */
+  int getDepthLevel();
 
 }

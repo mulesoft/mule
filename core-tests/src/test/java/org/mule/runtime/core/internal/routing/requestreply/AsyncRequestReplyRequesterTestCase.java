@@ -34,6 +34,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.store.SimpleMemoryObjectStore;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.Processor;
@@ -70,6 +71,8 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
   private TestAsyncRequestReplyRequester asyncReplyMP;
 
+  private Flow flow;
+
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     Map<String, Object> objects = new HashMap<>();
@@ -85,11 +88,12 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   protected void doSetUp() throws Exception {
     super.doSetUp();
     scheduler = muleContext.getSchedulerService().cpuIntensiveScheduler();
-    createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
+    flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
   }
 
   @Override
   protected void doTearDown() throws Exception {
+    disposeIfNeeded(flow, LOGGER);
     scheduler.stop();
     if (asyncReplyMP != null) {
       asyncReplyMP.stop();
@@ -118,8 +122,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   public void testSingleEventNoTimeoutAsync() throws Exception {
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
-    AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
-    initialiseIfNeeded(asyncMP, true, muleContext);
+    asyncMP = createAsyncMessageProcessor(target);
     asyncMP.start();
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
@@ -138,8 +141,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setTimeout(1);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     target.setWaitTime(30000);
-    AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
-    initialiseIfNeeded(asyncMP, true, muleContext);
+    asyncMP = createAsyncMessageProcessor(target);
     asyncMP.start();
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
@@ -208,7 +210,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
     SensingNullMessageProcessor target = getSensingNullMessageProcessor();
     target.setWaitTime(50);
-    AsyncDelegateMessageProcessor asyncMP = createAsyncMessageProcessor(target);
+    asyncMP = createAsyncMessageProcessor(target);
     asyncMP.initialise();
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());

@@ -22,8 +22,8 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.VALIDATION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -40,6 +40,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
+import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
 import org.mule.runtime.core.internal.routing.DuplicateMessageException;
 import org.mule.runtime.core.internal.routing.ValidationException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -84,6 +85,7 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(MessageRedeliveredException.class,
                                  errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED).get())
             .addExceptionMapping(Exception.class, unknown)
+            .addExceptionMapping(EventContextDeepNestingException.class, errorTypeRepository.getCriticalErrorType())
             .addExceptionMapping(Error.class, errorTypeRepository.getCriticalErrorType())
             .addExceptionMapping(StreamingBufferSizeExceededException.class,
                                  errorTypeRepository.lookupErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED).get())

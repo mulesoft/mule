@@ -45,6 +45,25 @@
           "methodName": "resolveTypedValue",
           "elementKind": "method",
           "justification": "Added for performance"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.privileged.client.MuleClientFlowConstruct::dispose()",
+          "package": "org.mule.runtime.core.privileged.client",
+          "classSimpleName": "MuleClientFlowConstruct",
+          "methodName": "dispose",
+          "elementKind": "method",
+          "justification": "Lifecycle fix"
+        },
+        {
+          "code": "java.class.nowImplementsInterface",
+          "old": "class org.mule.runtime.core.privileged.client.MuleClientFlowConstruct",
+          "new": "class org.mule.runtime.core.privileged.client.MuleClientFlowConstruct",
+          "interface": "org.mule.runtime.api.lifecycle.Disposable",
+          "package": "org.mule.runtime.core.privileged.client",
+          "classSimpleName": "MuleClientFlowConstruct",
+          "elementKind": "class",
+          "justification": "Lifecycle fix"
         }
       ]
     }

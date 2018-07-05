@@ -37,6 +37,7 @@ import static org.mule.runtime.api.notification.MessageProcessorNotification.MES
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
@@ -46,6 +47,7 @@ import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -731,8 +733,12 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     choiceRouter.addRoute("true", newChain(empty(), getAppendingMP("3")));
     initialiseIfNeeded(choiceRouter, muleContext);
 
-    assertThat(process(newChain(empty(), choiceRouter), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
-               equalTo("01"));
+    try {
+      assertThat(process(newChain(empty(), choiceRouter), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+                 equalTo("01"));
+    } finally {
+      disposeIfNeeded(choiceRouter, getLogger(getClass()));
+    }
   }
 
   @Test
