@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.util;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
@@ -24,7 +24,6 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -46,6 +45,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
@@ -81,6 +81,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,9 +92,6 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Utilities for handling {@link ExtensionModel extensions}
@@ -487,7 +487,7 @@ public class MuleExtensionUtils {
   public static ExtensionModel loadExtension(Class<?> clazz, Map<String, Object> params) {
     params.put(TYPE_PROPERTY_NAME, clazz.getName());
     params.put(VERSION, "4.0.0-SNAPSHOT");
-    final DslResolvingContext dslResolvingContext = getDefault(emptySet());
+    final DslResolvingContext dslResolvingContext = getDefault(singleton(MuleExtensionModelProvider.getExtensionModel()));
     return new DefaultJavaExtensionModelLoader().loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
 
