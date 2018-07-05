@@ -121,9 +121,9 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
 
     // These 2 calls below are called from within the evaluate method above
     verify(expressionManager, mode).evaluate(anyString(), any(DataType.class), any(BindingContext.class),
-                                                isNull(CoreEvent.class));
+                                             isNull(CoreEvent.class));
     verify(expressionManager, mode).evaluate(anyString(), any(DataType.class), any(BindingContext.class),
-                                                isNull(CoreEvent.class), isNull(ComponentLocation.class), anyBoolean());
+                                             isNull(CoreEvent.class), isNull(ComponentLocation.class), anyBoolean());
   }
 
   private <T> ValueResolver<T> getResolver(String expression, MetadataType expectedType) throws Exception {
