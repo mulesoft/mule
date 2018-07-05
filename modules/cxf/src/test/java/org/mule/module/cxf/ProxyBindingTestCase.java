@@ -20,12 +20,6 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.IOUtils;
 
-/**
- * With these tests we verify that the correct operation
- * is used when there are more than one operation in the
- * same binding.
- *
- */
 public class ProxyBindingTestCase extends FunctionalTestCase
 {
     @Rule
@@ -56,18 +50,17 @@ public class ProxyBindingTestCase extends FunctionalTestCase
         addArtistResponse = IOUtils.getResourceAsString("artistregistry-add-artist-response.xml", getClass());
         XMLUnit.setIgnoreWhitespace(true);
     }
-   
+
+    /**
+     * With this test we verify that the correct operation is used when there are more than one operation in the same
+     * binding.
+     */
     @Test
-    public void proxyGetAllRequest() throws Exception
+    public void proxyCorrectlyIdentifiesBothOperations() throws Exception
     {
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body", getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS);
-        assertTrue(XMLUnit.compareXML(getAllResponse, response.getPayloadAsString()).identical());
-    }
-    
-    @Test
-    public void proxyAddArtistRequest() throws Exception
-    {
-        MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body", getTestMuleMessage(addArtistRequest), HTTP_REQUEST_OPTIONS);
-        assertTrue(XMLUnit.compareXML(addArtistResponse, response.getPayloadAsString()).identical());
+        MuleMessage responseGetAll = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body", getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS);
+        assertTrue(XMLUnit.compareXML(getAllResponse, responseGetAll.getPayloadAsString()).identical());
+        MuleMessage responseAddArtist = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body", getTestMuleMessage(addArtistRequest), HTTP_REQUEST_OPTIONS);
+        assertTrue(XMLUnit.compareXML(addArtistResponse, responseAddArtist.getPayloadAsString()).identical());
     }
 }

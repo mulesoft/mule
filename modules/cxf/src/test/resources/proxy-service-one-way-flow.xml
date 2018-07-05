@@ -8,20 +8,20 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
-    <configuration>
-        <http:config useTransportForUris="true"/>
-    </configuration>
+	<http:listener-config name="config-proxy-body" host="localhost" port="${port1}"/>
+	<http:listener-config name="config-proxy-artist" host="localhost" port="${port2}"/>
+	<http:request-config name="config-http-request" host="localhost" port="${port2}"/>
 
     <flow name="proxy-body">
-        <http:inbound-endpoint host="localhost" port="${port1}" path="body" />
+    		<http:listener config-ref="config-proxy-body" path="/body"/>
         <cxf:proxy-service service="ArtistRegistryWebServicesService" namespace="http://example.cxf.module.mule.org/" port="ArtistRegistryWebServicesPort"
                            wsdlLocation="artistregistry.wsdl" />
         <cxf:proxy-client payload="body"/>
-        <http:outbound-endpoint host="localhost" port="${port2}" path="artistRegistry" exchange-pattern="request-response"/>
+        <http:request config-ref="config-http-request" path="/artistRegistry" method="POST" responseTimeout="100"/>
     </flow>
 
     <flow name="greeter-service">
-        <http:inbound-endpoint host="localhost" port="${port2}" path="artistRegistry"  />
+    		<http:listener config-ref="config-proxy-artist" path="/artistRegistry"/>
         <cxf:jaxws-service serviceClass="org.mule.module.cxf.testmodels.artistregistry.ArtistRegistryWebServices" />
         <component class="org.mule.module.cxf.testmodels.artistregistry.ArtistRegistry"/>
     </flow>
