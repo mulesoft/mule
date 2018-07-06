@@ -6,6 +6,15 @@
  */
 package org.mule.routing.correlation;
 
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -36,15 +45,6 @@ import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 import org.mule.util.store.DeserializationPostInitialisable;
-
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class EventCorrelator implements Startable, Stoppable, Disposable
 {
@@ -261,11 +261,15 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
                         throw routingException;
                     }
-                    returnEvent.getMessage().setCorrelationId(groupId);
-                    String rootId = group.getCommonRootId();
-                    if (rootId != null)
+                    if (returnEvent != null && !returnEvent.equals(VoidMuleEvent.getInstance()))
                     {
-                        returnEvent.getMessage().setMessageRootId(rootId);
+                        returnEvent.getMessage().setCorrelationId(groupId);
+                        
+                        String rootId = group.getCommonRootId();
+                        if (rootId != null)
+                        {
+                            returnEvent.getMessage().setMessageRootId(rootId);
+                        }
                     }
 
                     // remove the eventGroup as no further message will be received
