@@ -17195,7 +17195,7 @@
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
-                "allowsInlineDefinition": false,
+                "allowsInlineDefinition": true,
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
