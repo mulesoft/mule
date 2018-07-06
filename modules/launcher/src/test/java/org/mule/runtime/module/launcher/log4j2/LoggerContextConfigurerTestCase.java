@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -152,6 +153,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
   @Test
   public void perAppDefaultAppender() throws Exception {
     when(context.isArtifactClassloader()).thenReturn(true);
+    when(context.getArtifactDescriptor().getDeploymentProperties()).thenReturn(empty());
     contextConfigurer.update(context);
     ArgumentCaptor<RollingFileAppender> appenderCaptor = ArgumentCaptor.forClass(RollingFileAppender.class);
     verify(context.getConfiguration()).addAppender(appenderCaptor.capture());
