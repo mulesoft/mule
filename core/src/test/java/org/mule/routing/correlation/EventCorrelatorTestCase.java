@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.DefaultMessageCollection;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -103,6 +104,24 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     {
         when(mockMessagingInfoMapping.getCorrelationId(isA(MuleMessage.class))).thenReturn(TEST_GROUP_ID);
         when(mockEventCorrelatorCallback.shouldAggregateEvents(mockEventGroup)).thenReturn(false);
+        EventCorrelator eventCorrelator = createEventCorrelator();
+        eventCorrelator.process(mockMuleEvent);
+        verify(mockEventGroup, times(1)).initAfterDeserialisation(mockMuleContext);
+    }
+    
+    /**
+     * This test just verifies that in case the aggregation returns a VoidMuleMessage
+     * (for example because the group has expired just when it is beign aggregated),
+     * it is not attempted to retrieve the message from the event, resulting in an exception
+     * 
+     * @throws Exception exception in case it fails.
+     */
+    @Test
+    public void whenCollectionIsAggregatedInAVoidMessageTheReturnMessageIsHandledSuccessfully() throws Exception
+    {
+        when(mockMessagingInfoMapping.getCorrelationId(isA(MuleMessage.class))).thenReturn(TEST_GROUP_ID);
+        when(mockEventCorrelatorCallback.shouldAggregateEvents(mockEventGroup)).thenReturn(true);
+        when(mockEventCorrelatorCallback.aggregateEvents(mockEventGroup)).thenReturn(VoidMuleEvent.getInstance());
         EventCorrelator eventCorrelator = createEventCorrelator();
         eventCorrelator.process(mockMuleEvent);
         verify(mockEventGroup, times(1)).initAfterDeserialisation(mockMuleContext);
