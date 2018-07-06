@@ -540,4 +540,48 @@
         <xsd:attribute name="value" type="xsd:string" use="optional"/>
     </xsd:complexType>
 
+    <xsd:element name="stream-provider" type="streamProviderType" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A processor for testing which returns a stream of a specified size.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="streamProviderType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:attribute name="size" type="xsd:int" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The size in bytes of the stream to provide.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="stream-consumer" type="streamConsumerType" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A processor for testing which consumes a stream, either all at once or by chunks.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="streamConsumerType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:attribute name="chunked" type="xsd:boolean" use="optional" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether the stream should be consumed in chunks, returning the last, or all at once, returning its full content.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 </xsd:schema>
