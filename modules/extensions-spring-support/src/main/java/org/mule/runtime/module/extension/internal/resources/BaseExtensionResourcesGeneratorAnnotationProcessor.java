@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
@@ -18,6 +18,7 @@ import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtension
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
@@ -126,8 +127,8 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
       params.put(COMPILATION_MODE, true);
     }
 
-    return getExtensionModelLoader().loadExtensionModel(classLoader, getDefault(emptySet()),
-                                                        params);
+    return getExtensionModelLoader()
+        .loadExtensionModel(classLoader, getDefault(singleton(MuleExtensionModelProvider.getExtensionModel())), params);
   }
 
   private Optional<TypeElement> getExtension(RoundEnvironment env) {

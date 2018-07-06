@@ -8,7 +8,7 @@
 package org.mule.runtime.module.extension.api.util;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -27,14 +26,13 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
-
-import com.sun.org.apache.xalan.internal.lib.Extensions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,7 +78,7 @@ public class MuleExtensionUtils {
     // TODO MULE-11797: as this utils is consumed from
     // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
     // this util should get dropped once the ticket gets implemented.
-    final DslResolvingContext dslResolvingContext = getDefault(emptySet());
+    final DslResolvingContext dslResolvingContext = getDefault(singleton(MuleExtensionModelProvider.getExtensionModel()));
     return new DefaultJavaExtensionModelLoader().loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
 
@@ -94,7 +92,7 @@ public class MuleExtensionUtils {
   }
 
   /**
-   * Creates an empty event for extension initialization pusposes
+   * Creates an empty event for extension initialization purposes
    *
    * @param muleContext context on which the event will be associated.
    * @return a new {@link CoreEvent}

@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.supportsInlineDeclaration;
 import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.typeRequiresWrapperElement;
-import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.*;
+import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -26,6 +26,7 @@ import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarat
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 
 /**
  * Enhances the declaration of the {@link ParameterDslConfiguration} taking into account
@@ -95,7 +96,8 @@ public class ParameterDslDeclarationEnricher implements DeclarationEnricher {
               if (isMap(objectType)) {
                 builder.allowsInlineDefinition(dslConfiguration.allowsInlineDefinition());
 
-              } else {
+              } else if (!declaration.getModelProperty(InfrastructureParameterModelProperty.class).isPresent()) {
+
                 boolean supportsInline = supportsInlineDeclaration(objectType, declaration.getExpressionSupport(),
                                                                    dslConfiguration, isContent);
 

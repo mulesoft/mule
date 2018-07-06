@@ -13,6 +13,7 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -20,6 +21,8 @@ import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -115,6 +118,10 @@ public class ExtensionModelDiscoverer {
     ExtensionModelLoader loader = extensionModelLoaderRepository.getExtensionModelLoader(loaderDescriber)
         .orElseThrow(() -> new IllegalArgumentException(format("The identifier '%s' does not match with the describers available "
             + "to generate an ExtensionModel (working with the plugin '%s')", loaderDescriber.getId(), artifactName)));
+    ExtensionModel coreModel = MuleExtensionModelProvider.getExtensionModel();
+    if (!extensions.contains(coreModel)) {
+      extensions = ImmutableSet.<ExtensionModel>builder().addAll(extensions).add(coreModel).build();
+    }
     return loader.loadExtensionModel(artifactClassloader, getDefault(extensions), loaderDescriber.getAttributes());
   }
 }
