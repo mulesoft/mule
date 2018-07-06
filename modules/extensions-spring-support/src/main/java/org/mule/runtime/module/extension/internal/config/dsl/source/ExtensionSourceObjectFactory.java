@@ -31,12 +31,12 @@ import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessag
 import org.mule.runtime.module.extension.internal.runtime.source.SourceAdapterFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import com.google.common.base.Joiner;
-
 import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+
+import com.google.common.base.Joiner;
 
 
 /**
@@ -134,6 +134,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                     cursorProviderFactory,
                                     backPressureStrategy,
                                     reflectionCache,
+                                    properties,
                                     muleContext);
   }
 

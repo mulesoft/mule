@@ -12,6 +12,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureAction;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -40,6 +41,7 @@ public class SourceAdapterFactory {
   private final CursorProviderFactory cursorProviderFactory;
   private final Optional<BackPressureAction> backPressureAction;
   private final ReflectionCache reflectionCache;
+  private ConfigurationProperties properties;
   private final MuleContext muleContext;
 
   public SourceAdapterFactory(ExtensionModel extensionModel,
@@ -50,6 +52,7 @@ public class SourceAdapterFactory {
                               CursorProviderFactory cursorProviderFactory,
                               BackPressureStrategy backPressureStrategy,
                               ReflectionCache reflectionCache,
+                              ConfigurationProperties properties,
                               MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
@@ -59,6 +62,7 @@ public class SourceAdapterFactory {
     this.cursorProviderFactory = cursorProviderFactory;
     this.backPressureAction = toBackPressureAction(backPressureStrategy);
     this.reflectionCache = reflectionCache;
+    this.properties = properties;
     this.muleContext = muleContext;
   }
 
@@ -77,7 +81,7 @@ public class SourceAdapterFactory {
     Source source = getSourceFactory(sourceModel).createSource();
     try {
       source =
-          new SourceConfigurer(sourceModel, component.getLocation(), sourceParameters, reflectionCache, muleContext)
+          new SourceConfigurer(sourceModel, component.getLocation(), sourceParameters, reflectionCache, properties, muleContext)
               .configure(source, configurationInstance);
 
       return new SourceAdapter(extensionModel,
