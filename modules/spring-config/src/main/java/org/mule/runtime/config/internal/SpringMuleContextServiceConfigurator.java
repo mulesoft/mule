@@ -100,7 +100,6 @@ import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
-import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
@@ -325,13 +324,7 @@ class SpringMuleContextServiceConfigurator {
         beanDefinition = getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) customServiceImpl.get(),
                                                                                                 serviceLocator));
       } else {
-        //if (OBJECT_QUEUE_MANAGER.equals(serviceId)) {
-        //  beanDefinition = getBeanDefinitionBuilder(TestFactoryBean.class).addConstructorArgValue(customServiceImpl.get()).getBeanDefinition();
-        //} else {
         beanDefinition = getConstantObjectBeanDefinition(customServiceImpl.get());
-        beanDefinitionRegistry.registerAlias(serviceId, "&" + serviceId);
-
-        //}
       }
     } else {
       throw new IllegalStateException("A custom service must define a service class or instance");
@@ -342,19 +335,6 @@ class SpringMuleContextServiceConfigurator {
     }
 
     return beanDefinition;
-  }
-
-  public static class TestFactoryBean extends ConstantFactoryBean<QueueManager> {
-
-    public TestFactoryBean(QueueManager queueManager) {
-      super(queueManager);
-    }
-
-    @Override
-    public Class<?> getObjectType() {
-      return QueueManager.class;
-    }
-
   }
 
   private void createQueueManagerBeanDefinitions() {
