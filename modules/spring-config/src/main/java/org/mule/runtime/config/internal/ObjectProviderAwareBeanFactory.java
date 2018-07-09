@@ -13,6 +13,7 @@ import static java.util.Optional.of;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
+import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 
 /**
  * {@link org.springframework.beans.factory.ListableBeanFactory} implementation that will resolve beans using a list of
@@ -114,6 +116,17 @@ public class ObjectProviderAwareBeanFactory extends DefaultListableBeanFactory {
     }
     beans.putAll(super.getBeansOfType(type, includeNonSingletons, allowEagerInit));
     return unmodifiableMap(beans);
+  }
+
+  @Override
+  protected Class<?> determineTargetType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
+    if (mbd.getBeanClass().equals(ConstantFactoryBean.class)) {
+      Object value = mbd.getConstructorArgumentValues().getArgumentValue(0, Object.class).getValue();
+      if (value != null) {
+        return value.getClass();
+      }
+    }
+    return super.determineTargetType(beanName, mbd, typesToMatch);
   }
 
   public <T> Map<String, T> getBeansOfTypeWithObjectProviderObjects(Class<T> type, boolean includeNonSingletons,
