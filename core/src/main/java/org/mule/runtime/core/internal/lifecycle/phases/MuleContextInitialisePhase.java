@@ -45,8 +45,8 @@ import javax.annotation.PostConstruct;
  */
 public class MuleContextInitialisePhase extends DefaultLifecyclePhase {
 
-  public MuleContextInitialisePhase() {
-    super(Initialisable.PHASE_NAME, LifecycleUtils::initialiseIfNeeded);
+  public MuleContextInitialisePhase(MuleContext muleContext) {
+    super(Initialisable.PHASE_NAME, o -> LifecycleUtils.initialiseIfNeeded(o, true, muleContext));
     registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
     setOrderedLifecycleTypes(new Class<?>[] {
         StreamingManager.class,
