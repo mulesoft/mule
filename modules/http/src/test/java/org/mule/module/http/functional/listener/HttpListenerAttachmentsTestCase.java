@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang.StringUtils.countMatches;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -48,7 +49,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.activation.DataHandler;
 import javax.servlet.ServletException;
@@ -98,6 +101,7 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
     @Rule
     public SystemProperty multipartResponse = new SystemProperty("multipartResponse", "multipartResponse");
 
+    private static Set<String> inboundAttachmentNames;
 
     @Override
     protected String getConfigFile()
@@ -161,6 +165,43 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
             assertThat(receivedPart.getContentType(), equalTo("application/pdf"));
             assertThat(receivedPart.getHeader(CONTENT_TRANSFER_ENCODING), equalTo("base64"));
             assertThat(receivedPart.getHeader(CONTENT_DISPOSITION), equalTo("file; name=\"partName\"; documentId=1"));
+        }
+    }
+
+    @Test
+    public void receiveAndReturnMultipleAttachments() throws Exception
+    {
+        RequestBuilder requestBuilder = new RequestBuilder();
+        AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().build();
+        GrizzlyAsyncHttpProvider grizzlyAsyncHttpProvider = new GrizzlyAsyncHttpProvider(asyncHttpClientConfig);
+
+        requestBuilder.setMethod("POST");
+        requestBuilder.setUrl(getUrl("multiple"));
+
+        requestBuilder.setHeader(CONTENT_TYPE, "multipart/form-data");
+        ByteArrayPart byteArrayPart = new ByteArrayPart("another", "no".getBytes(), "text/plain", null, null, null, null);
+        requestBuilder.addBodyPart(byteArrayPart);
+        ByteArrayPart byteArrayPart2 = new ByteArrayPart(TEXT_BODY_FIELD_NAME, TEXT_BODY_FIELD_VALUE.getBytes(), "text/plain", null, null, null, null);
+        requestBuilder.addBodyPart(byteArrayPart2);
+
+        try (AsyncHttpClient asyncHttpClient = new AsyncHttpClient(grizzlyAsyncHttpProvider, asyncHttpClientConfig))
+        {
+            ListenableFuture<Response> responseFuture = asyncHttpClient.executeRequest(requestBuilder.build());
+            com.ning.http.client.Response response = responseFuture.get();
+
+            assertThat(inboundAttachmentNames, hasSize(2));
+            Iterator<String> iterator = inboundAttachmentNames.iterator();
+            assertThat(iterator.next(), is("another"));
+            assertThat(iterator.next(), is(TEXT_BODY_FIELD_NAME));
+
+            final Collection<HttpPart> parts = parseMultipartContent(response.getResponseBodyAsStream(), response.getContentType());
+            assertThat(parts.size(), is(2));
+            HttpPart receivedPart1 = new ArrayList<>(parts).get(0);
+            assertThat(receivedPart1.getContentType(), equalTo(TEXT_PLAIN));
+            assertThat(receivedPart1.getHeader(CONTENT_DISPOSITION), equalTo("form-data; name=\"another\""));
+            HttpPart receivedPart2 = new ArrayList<>(parts).get(1);
+            assertThat(receivedPart2.getContentType(), equalTo(TEXT_PLAIN));
+            assertThat(receivedPart2.getHeader(CONTENT_DISPOSITION), equalTo("form-data; name=\"field1\""));
         }
     }
 
@@ -361,6 +402,17 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
             {
                 //do nothing
             }
+            return event;
+        }
+    }
+
+    public static class GatherAttachmentsMessageProcessor implements MessageProcessor
+    {
+
+        @Override
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            inboundAttachmentNames = event.getMessage().getInboundAttachmentNames();
             return event;
         }
     }

@@ -59,6 +59,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,12 +109,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * Collection of attachments that were attached to the incoming message
      */
-    private transient Map<String, DataHandler> inboundAttachments = new HashMap<String, DataHandler>();
+    private transient Map<String, DataHandler> inboundAttachments = new LinkedHashMap<>();
 
     /**
      * Collection of attachments that will be sent out with this message
      */
-    private transient Map<String, DataHandler> outboundAttachments = new HashMap<String, DataHandler>();
+    private transient Map<String, DataHandler> outboundAttachments = new LinkedHashMap<>();
 
     private transient byte[] cache;
     protected transient MuleContext muleContext;

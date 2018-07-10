@@ -91,7 +91,7 @@ public class HttpRequestToMuleEvent
                                            .setSslSessionProperties(requestContext.getClientConnection().getSslSession())
                                            .addPropertiesTo(inboundProperties);
 
-        final Map<String, DataHandler> inboundAttachments = new HashMap<>();
+        Map<String, DataHandler> inboundAttachments = null;
         Object payload = NullPayload.getInstance();
         if (parseRequest)
         {
@@ -100,7 +100,7 @@ public class HttpRequestToMuleEvent
             {
                 if (entity instanceof MultipartHttpEntity)
                 {
-                    inboundAttachments.putAll(createDataHandlerFrom(((MultipartHttpEntity) entity).getParts()));
+                    inboundAttachments = createDataHandlerFrom(((MultipartHttpEntity) entity).getParts());
                 }
                 else
                 {
