@@ -62,6 +62,7 @@ public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolve
 
   @Override
   public void initialise() throws InitialisationException {
+    super.initialise();
     this.typeSafeTransformer = new TypeSafeTransformer(transformationService);
   }
 }
