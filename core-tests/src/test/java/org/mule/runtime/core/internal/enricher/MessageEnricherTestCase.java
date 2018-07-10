@@ -18,9 +18,11 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -66,9 +68,13 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
         .message(InternalMessage.builder(event.getMessage()).value(TEST_PAYLOAD).build()).build());
     initialiseIfNeeded(enricher, muleContext);
 
-    Message result = process(enricher, testEvent()).getMessage();
-    assertEquals(TEST_PAYLOAD, ((InternalMessage) result).getOutboundProperty("myHeader"));
-    assertEquals(TEST_PAYLOAD, result.getPayload().getValue());
+    try {
+      Message result = process(enricher, testEvent()).getMessage();
+      assertEquals(TEST_PAYLOAD, ((InternalMessage) result).getOutboundProperty("myHeader"));
+      assertEquals(TEST_PAYLOAD, result.getPayload().getValue());
+    } finally {
+      disposeIfNeeded(enricher, getLogger(getClass()));
+    }
   }
 
   private MessageEnricher createEnricher() {

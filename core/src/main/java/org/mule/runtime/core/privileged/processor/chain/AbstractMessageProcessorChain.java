@@ -203,25 +203,20 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
    * @return the interceptors to apply to a processor, sorted from inside-out.
    */
   private List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> resolveInterceptors() {
-    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors =
-        new ArrayList<>();
+    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors = new ArrayList<>();
 
     // Set thread context
     interceptors.add((processor, next) -> stream -> from(stream)
         // #2 Wrap execution, after processing strategy, on processor execution thread.
-        .cast(PrivilegedEvent.class)
         .doOnNext(event -> {
           currentMuleContext.set(muleContext);
-          setCurrentEvent(event);
+          setCurrentEvent((PrivilegedEvent) event);
         })
-        .cast(CoreEvent.class)
         // #1 Update TCCL with the one from the Region of the processor to execute once in execution thread.
-        .transform(doOnNextOrErrorWithContext(context -> context.getOrEmpty(TCCL_REACTOR_CTX_KEY)
-            .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl))))
-        .transform(next)
-        // #1 Set back previous TCCL.
-        .transform(doOnNextOrErrorWithContext(context -> context.getOrEmpty(TCCL_ORIGINAL_REACTOR_CTX_KEY)
-            .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl)))));
+        .transform(doOnNextOrErrorWithContext(TCCL_REACTOR_CTX_KEY)
+            .andThen(next)
+            // #1 Set back previous TCCL.
+            .andThen(doOnNextOrErrorWithContext(TCCL_ORIGINAL_REACTOR_CTX_KEY))));
 
     // Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
@@ -234,23 +229,22 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     // #4 Wrap execution, before processing strategy, on flow thread.
     interceptors.add((processor, next) -> stream -> from(stream)
-        .cast(PrivilegedEvent.class)
         .doOnNext(preNotification(processor))
-        .cast(CoreEvent.class)
         .transform(next)
-        .cast(PrivilegedEvent.class)
         .map(result -> {
           postNotification(processor).accept(result);
-          setCurrentEvent(result);
+          setCurrentEvent((PrivilegedEvent) result);
           // If the processor returns a CursorProvider, then have the StreamingManager manage it
           return updateEventForStreaming(streamingManager).apply(result);
-        })
-        .cast(CoreEvent.class));
+        }));
 
     return interceptors;
   }
 
-  private Function<? super Publisher<CoreEvent>, ? extends Publisher<CoreEvent>> doOnNextOrErrorWithContext(Consumer<Context> contextConsumer) {
+  private Function<? super Publisher<CoreEvent>, ? extends Publisher<CoreEvent>> doOnNextOrErrorWithContext(String tcclCtxKey) {
+    Consumer<Context> contextConsumer = context -> context.getOrEmpty(tcclCtxKey)
+        .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl));
+
     return lift((scannable, subscriber) -> new CoreSubscriber<CoreEvent>() {
 
       private Context context = subscriber.currentContext();
@@ -302,18 +296,18 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
   }
 
-  private Consumer<PrivilegedEvent> preNotification(Processor processor) {
+  private Consumer<CoreEvent> preNotification(Processor processor) {
     return event -> {
-      if (event.isNotificationsEnabled()) {
+      if (((PrivilegedEvent) event).isNotificationsEnabled()) {
         fireNotification(muleContext.getNotificationManager(), event, processor, null,
                          MESSAGE_PROCESSOR_PRE_INVOKE);
       }
     };
   }
 
-  private Consumer<PrivilegedEvent> postNotification(Processor processor) {
+  private Consumer<CoreEvent> postNotification(Processor processor) {
     return event -> {
-      if (event.isNotificationsEnabled()) {
+      if (((PrivilegedEvent) event).isNotificationsEnabled()) {
         fireNotification(muleContext.getNotificationManager(), event, processor, null,
                          MESSAGE_PROCESSOR_POST_INVOKE);
 

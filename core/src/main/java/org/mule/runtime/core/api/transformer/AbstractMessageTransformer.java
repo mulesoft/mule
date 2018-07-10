@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.privileged.transformer.TransformerUtils.checkTransformerReturnClass;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
@@ -18,12 +19,12 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.privileged.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.client.MuleClientFlowConstruct;
 
 import java.nio.charset.Charset;
 
@@ -162,4 +163,10 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
    * Transform the message
    */
   public abstract Object transformMessage(CoreEvent event, Charset outputEncoding) throws MessageTransformerException;
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    disposeIfNeeded(flowConstruct, logger);
+  }
 }

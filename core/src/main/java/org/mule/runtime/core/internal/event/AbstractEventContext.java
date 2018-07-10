@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.event;
 
+import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
@@ -55,6 +57,8 @@ abstract class AbstractEventContext implements BaseEventContext {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
   private static final FlowExceptionHandler NULL_EXCEPTION_HANDLER = NullExceptionHandler.getInstance();
 
+  private static final int MAX_DEPTH = getInteger(BaseEventContext.class.getName() + ".maxDepth", 25);
+
   private transient final List<BaseEventContext> childContexts = new ArrayList<>();
   private transient final FlowExceptionHandler exceptionHandler;
   private transient final CompletableFuture<Void> externalCompletion;
@@ -64,6 +68,8 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   private ReadWriteLock childContextsReadWriteLock = new ReentrantReadWriteLock();
 
+  private final int depthLevel;
+
   private volatile byte state = STATE_READY;
   private volatile Either<Throwable, CoreEvent> result;
 
@@ -72,11 +78,11 @@ abstract class AbstractEventContext implements BaseEventContext {
   protected FlowCallStack flowCallStack = new DefaultFlowCallStack();
 
   public AbstractEventContext() {
-    this(NULL_EXCEPTION_HANDLER, Optional.empty());
+    this(NULL_EXCEPTION_HANDLER, 0, Optional.empty());
   }
 
   public AbstractEventContext(FlowExceptionHandler exceptionHandler) {
-    this(exceptionHandler, Optional.empty());
+    this(exceptionHandler, 0, Optional.empty());
   }
 
   /**
@@ -85,13 +91,32 @@ abstract class AbstractEventContext implements BaseEventContext {
    * @param externalCompletion optional future that allows an external entity (e.g. a source) to signal completion of response
    *        processing and delay termination.
    */
-  public AbstractEventContext(FlowExceptionHandler exceptionHandler, Optional<CompletableFuture<Void>> externalCompletion) {
+  public AbstractEventContext(FlowExceptionHandler exceptionHandler, int depthLevel,
+                              Optional<CompletableFuture<Void>> externalCompletion) {
+    this.depthLevel = depthLevel;
     this.externalCompletion = externalCompletion.orElse(null);
     externalCompletion.ifPresent(completableFuture -> completableFuture.thenAccept((aVoid) -> tryTerminate()));
     this.exceptionHandler = exceptionHandler;
   }
 
   void addChildContext(BaseEventContext childContext) {
+    if (getDepthLevel() >= MAX_DEPTH) {
+      StringBuilder messageBuilder = new StringBuilder();
+
+      messageBuilder.append("Too many child contexts nested." + lineSeparator());
+
+      if (LOGGER.isDebugEnabled()) {
+        messageBuilder.append("  > " + this.toString() + lineSeparator());
+        Optional<BaseEventContext> current = getParentContext();
+        while (current.isPresent()) {
+          messageBuilder.append("  > " + current.get().toString() + lineSeparator());
+          current = current.get().getParentContext();
+        }
+      }
+
+      throw new EventContextDeepNestingException(messageBuilder.toString());
+    }
+
     childContextsReadWriteLock.writeLock().lock();
     try {
       childContexts.add(childContext);
@@ -361,6 +386,11 @@ abstract class AbstractEventContext implements BaseEventContext {
         sink.success(result.getRight());
       }
     }
+  }
+
+  @Override
+  public int getDepthLevel() {
+    return depthLevel;
   }
 
 }

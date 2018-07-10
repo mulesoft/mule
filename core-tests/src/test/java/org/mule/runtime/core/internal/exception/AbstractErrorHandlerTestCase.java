@@ -22,13 +22,14 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.util.Collection;
-
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.util.Collection;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTestCase {
@@ -61,5 +62,10 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
 
     context = create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = InternalEvent.builder(context).message(of("")).build();
+  }
+
+  @After
+  public void after() {
+    flow.dispose();
   }
 }

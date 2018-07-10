@@ -53,7 +53,11 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
       }
     });
 
-    assertFalse((Boolean) transformer.transform("test"));
+    try {
+      assertFalse((Boolean) transformer.transform("test"));
+    } finally {
+      transformer.dispose();
+    }
   }
 
   @Test
