@@ -7,6 +7,7 @@ Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for mo
 Migration changes from 3.9.1 to 3.9.x
 MULE-8817: spring-messaging was upgraded from 4.1.9 to 4.3.17
 MULE-15004: The HTTP listener's socket server timeout default was changed from 0 to 60 seconds, while respecting the connectionIdleTimeout settings.
+MULE-15264: Message attachments now respect the order of their introduction, meaning their addition order will match the order in which they are sent to external services and the order in which they are received from external services will match the order in which they are stored.
 
 Migration changes from 3.9.0 to 3.9.x
 MULE-14381: By default, the File Connector processes empty files. For disabling this behavior use the mule.transport.file.ignoreEmptyFiles=true system property
