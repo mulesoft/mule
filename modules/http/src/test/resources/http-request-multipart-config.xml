@@ -12,4 +12,10 @@
         <http:request config-ref="requestConfig" method="GET" path="#[requestPath]" />
     </flow>
 
+    <flow name="multiple">
+        <set-attachment attachmentName="another" value="no" contentType="text/plain"/>
+        <set-attachment attachmentName="field1" value="yes" contentType="text/plain"/>
+        <http:request config-ref="requestConfig" method="POST" path="#[requestPath]" />
+    </flow>
+
 </mule>
