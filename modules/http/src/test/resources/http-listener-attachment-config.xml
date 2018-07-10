@@ -38,4 +38,11 @@
         <custom-processor class="org.mule.module.http.functional.listener.HttpListenerAttachmentsTestCase$CustomAttachmentMessageProcessor"/>
         <set-attachment attachmentName="field1" value="yes" contentType="text/plain"/>
     </flow>
+
+    <flow name="testFlow6">
+        <http:listener config-ref="listenerConfig" path="multiple"/>
+        <custom-processor class="org.mule.module.http.functional.listener.HttpListenerAttachmentsTestCase$GatherAttachmentsMessageProcessor"/>
+        <set-attachment attachmentName="another" value="no" contentType="text/plain"/>
+        <set-attachment attachmentName="field1" value="yes" contentType="text/plain"/>
+    </flow>
 </mule>

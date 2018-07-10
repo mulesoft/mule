@@ -41,14 +41,13 @@ import org.mule.util.AttributeEvaluator;
 import org.mule.util.DataTypeUtils;
 import org.mule.util.StringUtils;
 
-import com.google.common.collect.Maps;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -310,7 +309,7 @@ public class MuleEventToHttpRequest
 
     protected MultipartHttpEntity createMultiPart(final MuleMessage msg) throws IOException
     {
-        Map<String, DataHandler> attachments = Maps.newHashMap();
+        Map<String, DataHandler> attachments = new LinkedHashMap<>();
 
         for (String outboundAttachmentName : msg.getOutboundAttachmentNames())
         {

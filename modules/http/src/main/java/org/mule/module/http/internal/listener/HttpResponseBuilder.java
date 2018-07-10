@@ -54,6 +54,7 @@ import org.mule.util.UUID;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -402,7 +403,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         {
             logger.debug("Message contains outbound attachments. Ignoring payload and trying to generate multipart response");
         }
-        final HashMap<String, DataHandler> parts = new HashMap<>();
+        final HashMap<String, DataHandler> parts = new LinkedHashMap<>();
         for (String outboundAttachmentName : event.getMessage().getOutboundAttachmentNames())
         {
             parts.put(outboundAttachmentName, event.getMessage().getOutboundAttachment(outboundAttachmentName));
