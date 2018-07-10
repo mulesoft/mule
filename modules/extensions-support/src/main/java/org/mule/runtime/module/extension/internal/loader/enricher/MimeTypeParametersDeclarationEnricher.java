@@ -154,21 +154,6 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
             return builder.build();
           });
         }
-
-        @Override
-        public void visitAnyType(AnyType anyType) {
-          if (!property.isStrict()) {
-            ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
-            declareOutputMimeTypeParameter(group);
-            declareOutputEncodingParameter(group);
-          }
-
-          replaceOutputType(declaration, property, format -> {
-            AnyTypeBuilder builder = BaseTypeBuilder.create(format).anyType();
-            declaration.getOutput().getType().getAnnotation(ClassInformationAnnotation.class).ifPresent(builder::with);
-            return builder.build();
-          });
-        }
       });
     }
 
