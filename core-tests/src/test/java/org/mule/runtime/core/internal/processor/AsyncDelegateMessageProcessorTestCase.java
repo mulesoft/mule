@@ -81,6 +81,8 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   protected void doTearDown() throws Exception {
     messageProcessor.stop();
     messageProcessor.dispose();
+
+    flow.dispose();
     super.doTearDown();
   }
 

@@ -25,9 +25,11 @@ import static org.mule.runtime.api.notification.PipelineMessageNotification.PROC
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -123,6 +125,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   @After
   public void after() throws MuleException {
     stopIfNeeded(pipeline);
+    disposeIfNeeded(pipeline, getLogger(getClass()));
     stopIfNeeded(muleContext.getSchedulerService());
   }
 

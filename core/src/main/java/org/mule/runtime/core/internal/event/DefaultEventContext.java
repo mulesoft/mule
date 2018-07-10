@@ -69,7 +69,8 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    */
   public static BaseEventContext child(BaseEventContext parent, Optional<ComponentLocation> componentLocation,
                                        FlowExceptionHandler exceptionHandler) {
-    BaseEventContext child = new ChildEventContext(parent, componentLocation.orElse(null), exceptionHandler);
+    BaseEventContext child =
+        new ChildEventContext(parent, componentLocation.orElse(null), exceptionHandler, parent.getDepthLevel() + 1);
     if (parent instanceof AbstractEventContext) {
       ((AbstractEventContext) parent).addChildContext(child);
     }
@@ -166,7 +167,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    */
   public DefaultEventContext(FlowConstruct flow, FlowExceptionHandler exceptionHandler, ComponentLocation location,
                              String correlationId, Optional<CompletableFuture<Void>> externalCompletion) {
-    super(exceptionHandler, externalCompletion);
+    super(exceptionHandler, 0, externalCompletion);
     this.id = flow.getUniqueIdString();
     this.serverId = flow.getServerId();
     this.location = location;
@@ -193,7 +194,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    */
   public DefaultEventContext(String id, String serverId, ComponentLocation location, String correlationId,
                              Optional<CompletableFuture<Void>> externalCompletion, FlowExceptionHandler exceptionHandler) {
-    super(exceptionHandler, externalCompletion);
+    super(exceptionHandler, 0, externalCompletion);
     this.id = id;
     this.serverId = serverId;
     this.location = location;
@@ -225,8 +226,8 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private final String id;
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
-                              FlowExceptionHandler messagingExceptionHandler) {
-      super(messagingExceptionHandler, empty());
+                              FlowExceptionHandler messagingExceptionHandler, int depthLevel) {
+      super(messagingExceptionHandler, depthLevel, empty());
       this.flowCallStack = parent.getFlowCallStack().clone();
       this.parent = parent;
       this.componentLocation = componentLocation;

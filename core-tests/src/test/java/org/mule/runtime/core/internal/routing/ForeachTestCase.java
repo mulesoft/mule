@@ -21,12 +21,14 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -45,10 +47,12 @@ import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.slf4j.Logger;
 
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
@@ -59,6 +63,9 @@ import java.util.Optional;
 
 public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
+  private static final Logger LOGGER = getLogger(ForeachTestCase.class);
+
+  protected Foreach foreach;
   protected Foreach simpleForeach;
   protected Foreach nestedForeach;
   protected ArrayList<CoreEvent> processedEvents;
@@ -80,6 +87,13 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     processedEvents = new ArrayList<>();
     simpleForeach = createForeach(getSimpleMessageProcessors(new TestMessageProcessor("zas")));
     nestedForeach = createForeach(getNestedMessageProcessors());
+  }
+
+  @After
+  public void after() {
+    disposeIfNeeded(nestedForeach, LOGGER);
+    disposeIfNeeded(simpleForeach, LOGGER);
+    disposeIfNeeded(foreach, LOGGER);
   }
 
   private List<Processor> getSimpleMessageProcessors(Processor innerProcessor) {
@@ -180,7 +194,6 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void mapEntrySetExpression() throws Exception {
     simpleForeach.setCollectionExpression("#[dw::core::Objects::entrySet(payload)]");
-    simpleForeach.initialise();
     process(simpleForeach, eventBuilder(muleContext).message(of(singletonMap("foo", "bar"))).build());
   }
 
@@ -262,7 +275,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void failingNestedProcessor() throws Exception {
     RuntimeException throwable = new BufferOverflowException();
-    Foreach foreach = createForeach();
+    foreach = createForeach();
     SensingNullMessageProcessor firstProcessor = new SensingNullMessageProcessor();
     InternalTestProcessor failingProcessor = event -> {
       throw throwable;
@@ -286,7 +299,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void failingNestedProcessorInChain() throws Exception {
     RuntimeException throwable = new BufferOverflowException();
-    Foreach foreach = createForeach();
+    foreach = createForeach();
     SensingNullMessageProcessor firstProcessor = new SensingNullMessageProcessor();
     InternalTestProcessor failingProcessor = event -> {
       throw throwable;
@@ -309,7 +322,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void failingExpression() throws Exception {
-    Foreach foreach = createForeach();
+    foreach = createForeach();
     foreach.setCollectionExpression("!@INVALID");
     SensingNullMessageProcessor firstProcessor = new SensingNullMessageProcessor();
     List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
@@ -328,7 +341,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void failingExpressionInChain() throws Exception {
-    Foreach foreach = createForeach();
+    foreach = createForeach();
     foreach.setCollectionExpression("!@INVALID");
     SensingNullMessageProcessor firstProcessor = new SensingNullMessageProcessor();
     List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
@@ -352,13 +365,13 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void batchSize() throws Exception {
-    Foreach foreachMp = createForeach();
+    foreach = createForeach();
     List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
-    foreachMp.setMessageProcessors(processors);
-    foreachMp.setBatchSize(2);
-    initialiseIfNeeded(foreachMp, muleContext);
+    foreach.setMessageProcessors(processors);
+    foreach.setBatchSize(2);
+    initialiseIfNeeded(foreach, muleContext);
 
-    foreachMp.process(eventBuilder(muleContext).message(of(asList(1, 2, 3))).build());
+    foreach.process(eventBuilder(muleContext).message(of(asList(1, 2, 3))).build());
 
     assertThat(processedEvents, hasSize(2));
     assertThat(((PrivilegedEvent) processedEvents.get(0)).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
@@ -367,13 +380,13 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void batchSizeWithCollectionAttributes() throws Exception {
-    Foreach foreachMp = createForeach();
+    foreach = createForeach();
     List<Processor> processors = getSimpleMessageProcessors(new TestMessageProcessor("zas"));
-    foreachMp.setMessageProcessors(processors);
-    foreachMp.setBatchSize(2);
-    foreachMp.setCollectionExpression("vars.collection");
-    initialiseIfNeeded(foreachMp, muleContext);
-    foreachMp.process(eventBuilder(muleContext).addVariable("collection", asList(1, 2, 3)).message(of(null)).build());
+    foreach.setMessageProcessors(processors);
+    foreach.setBatchSize(2);
+    foreach.setCollectionExpression("vars.collection");
+    initialiseIfNeeded(foreach, muleContext);
+    foreach.process(eventBuilder(muleContext).addVariable("collection", asList(1, 2, 3)).message(of(null)).build());
 
     assertThat(processedEvents, hasSize(2));
     assertThat(((PrivilegedEvent) processedEvents.get(0)).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));

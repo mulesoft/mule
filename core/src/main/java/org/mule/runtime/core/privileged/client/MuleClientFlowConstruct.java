@@ -8,10 +8,14 @@
 package org.mule.runtime.core.privileged.client;
 
 import static java.util.Optional.empty;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
@@ -19,10 +23,14 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import org.slf4j.Logger;
+
 /**
  * Placeholder class which makes the default exception handler available.
  */
-public final class MuleClientFlowConstruct extends AbstractComponent implements FlowConstruct {
+public final class MuleClientFlowConstruct extends AbstractComponent implements FlowConstruct, Disposable {
+
+  private static final Logger LOGGER = getLogger(MuleClientFlowConstruct.class);
 
   MuleContext muleContext;
   FlowExceptionHandler exceptionHandler;
@@ -76,5 +84,10 @@ public final class MuleClientFlowConstruct extends AbstractComponent implements 
 
   public MessageProcessorChain getMessageProcessorChain() {
     return null;
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(exceptionHandler, LOGGER);
   }
 }

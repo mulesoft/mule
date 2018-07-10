@@ -10,6 +10,7 @@ import static com.google.common.cache.CacheBuilder.newBuilder;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
@@ -224,7 +225,8 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
       super.dispose();
       routes = emptyList();
       initialised.set(false);
-      processorChainCache.invalidateAll();;
+      processorChainCache.asMap().values().forEach(chain -> disposeIfNeeded(chain, logger));
+      processorChainCache.invalidateAll();
     }
   }
 
