@@ -46,7 +46,6 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
   public DefaultBindingContextBuilder() {
     this.parent = NULL_BINDING_CONTEXT;
-    // this.bindings = new HashMap<>();
   }
 
   public DefaultBindingContextBuilder(BindingContext bindingContext) {
@@ -97,14 +96,14 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
   @Override
   public BindingContext.Builder addAll(BindingContext context) {
-    if (parent == null) {
+    if (parent == NULL_BINDING_CONTEXT) {
+      // If no parent, instead of copyng the values from the inner maps, just set the parent.
       parent = context;
 
       payloadBinding = context.lookup(PAYLOAD).orElse(null);
       attributesBinding = context.lookup(ATTRIBUTES).orElse(null);
       varsBinding = () -> context.lookup(VARS).orElse(null);
     } else {
-      // context.identifiers().forEach(id -> bindings.put(id, () -> context.lookup(id).get()));
       context.bindings().forEach(binding -> {
         addBinding(binding.identifier(), binding.value());
       });
