@@ -97,7 +97,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
   @Override
   public BindingContext.Builder addAll(BindingContext context) {
     if (parent == NULL_BINDING_CONTEXT) {
-      // If no parent, instead of copyng the values from the inner maps, just set the parent.
+      // If no parent, instead of copying the values from the inner maps, just set the parent.
       parent = context;
 
       payloadBinding = context.lookup(PAYLOAD).orElse(null);
@@ -198,7 +198,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
           if (varsBinding == null) {
             return parent.lookup(VARS);
           } else {
-            return of(varsBinding.get());
+            return ofNullable(varsBinding.get());
           }
         default:
           final Supplier<TypedValue> supplier = bindings.get(identifier);
