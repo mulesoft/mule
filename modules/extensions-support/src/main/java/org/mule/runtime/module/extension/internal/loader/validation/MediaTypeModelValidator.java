@@ -20,17 +20,23 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 
 import java.util.Optional;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toMetadataFormat;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
 
 /**
@@ -63,8 +69,27 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
       }
 
       private Optional<Type> getOperationReturnType(OperationModel operationModel) {
-        return operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
-            .map(mp -> mp.getOperationMethod().getReturnType());
+        Optional<ExtensionOperationDescriptorModelProperty> modelProperty =
+            operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class);
+        if (!modelProperty.isPresent()) {
+          return empty();
+        }
+        ExtensionOperationDescriptorModelProperty modelPropertyValue = modelProperty.get();
+        if (!isNonBlocking(modelPropertyValue.getOperationMethod())) {
+          return of(getPayloadType(modelPropertyValue.getOperationMethod().getReturnType()));
+        } else {
+          Type returnType = ((ParameterWrapper) (modelPropertyValue.getOperationMethod().getParameters().stream()
+              .filter(p -> p.getType().isAssignableTo(CompletionCallback.class)).findFirst().get())).getType().getGenerics()
+                  .get(0).getConcreteType();
+          return of(getPayloadType(returnType));
+        }
+      }
+
+      private Type getPayloadType(Type type) {
+        if (type.isAssignableTo(Result.class)) {
+          return type.getGenerics().get(0).getConcreteType();
+        }
+        return type;
       }
 
       @Override
@@ -88,7 +113,7 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
                           componentType, model.getName(),
                           org.mule.runtime.extension.api.annotation.param.MediaType.class.getSimpleName());
           problemsReporter.addError(new Problem(model, message));
-        } else if (staticResolverClashesWithMediaTypeAnnotationValue(model)) {
+        } else if (staticResolverClashesWithMediaTypeAnnotationValue(model, outputMetadataType)) {
           if (isCompiletime(extensionModel)) {
             String componentType = NameUtils.getComponentModelTypeName(model);
             String message =
@@ -123,9 +148,11 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
             !hasStaticMetadataDefined(model, null);
       }
 
-      private boolean staticResolverClashesWithMediaTypeAnnotationValue(ConnectableComponentModel model) {
+      private boolean staticResolverClashesWithMediaTypeAnnotationValue(ConnectableComponentModel model,
+                                                                        MetadataType outputMetadataType) {
         MediaTypeModelProperty mediaTypeModelProperty = model.getModelProperty(MediaTypeModelProperty.class).orElse(null);
-        return hasMediaTypeModelProperty(model) &&
+        return outputTypeNeedsMediaTypeAnnotation(outputMetadataType) &&
+            hasMediaTypeModelProperty(model) &&
             !mediaTypeModelPropertyHasDefaultValue(mediaTypeModelProperty) &&
             hasStaticMetadataDefined(model, mediaTypeModelProperty.getMediaType().get());
       }

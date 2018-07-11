@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -15,11 +17,17 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toM
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADVANCED_TAB_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
+import org.mule.metadata.api.annotation.TypeAnnotation;
 import org.mule.metadata.api.builder.AnyTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.BinaryTypeBuilder;
+import org.mule.metadata.api.builder.StringTypeBuilder;
+import org.mule.metadata.api.builder.TypeBuilder;
+import org.mule.metadata.api.builder.WithAnnotation;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.MetadataFormat;
@@ -43,6 +51,8 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -51,10 +61,12 @@ import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefin
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -93,8 +105,27 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
         }
 
         private Optional<Type> getOperationReturnType(OperationDeclaration declaration) {
-          return declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
-              .map(mp -> mp.getOperationMethod().getReturnType());
+          Optional<ExtensionOperationDescriptorModelProperty> modelProperty =
+              declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class);
+          if (!modelProperty.isPresent()) {
+            return empty();
+          }
+          ExtensionOperationDescriptorModelProperty modelPropertyValue = modelProperty.get();
+          if (!isNonBlocking(modelPropertyValue.getOperationMethod())) {
+            return of(getPayloadType(modelPropertyValue.getOperationMethod().getReturnType()));
+          } else {
+            Type returnType = ((ParameterWrapper) (modelPropertyValue.getOperationMethod().getParameters().stream()
+                .filter(p -> p.getType().isAssignableTo(CompletionCallback.class)).findFirst().get())).getType().getGenerics()
+                    .get(0).getConcreteType();
+            return of(getPayloadType(returnType));
+          }
+        }
+
+        private Type getPayloadType(Type type) {
+          if (type.isAssignableTo(Result.class)) {
+            return type.getGenerics().get(0).getConcreteType();
+          }
+          return type;
         }
 
         @Override
@@ -135,7 +166,11 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
             declareOutputMimeTypeParameter(declaration.getParameterGroup(DEFAULT_GROUP_NAME));
           }
 
-          replaceOutputType(declaration, property, format -> BaseTypeBuilder.create(format).stringType().build());
+          replaceOutputType(declaration, property, format -> {
+            StringTypeBuilder stringTypeBuilder = BaseTypeBuilder.create(format).stringType();
+            enrichWithAnnotations(stringTypeBuilder, declaration.getOutput().getType().getAnnotations());
+            return stringTypeBuilder.build();
+          });
         }
 
         @Override
@@ -149,10 +184,13 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
 
           replaceOutputType(declaration, property, format -> {
             BinaryTypeBuilder builder = BaseTypeBuilder.create(format).binaryType();
-            declaration.getOutput().getType().getAnnotation(ClassInformationAnnotation.class).ifPresent(builder::with);
-
+            enrichWithAnnotations(builder, declaration.getOutput().getType().getAnnotations());
             return builder.build();
           });
+        }
+
+        private void enrichWithAnnotations(WithAnnotation withAnnotationBuilder, Set<TypeAnnotation> annotations) {
+          annotations.stream().forEach(typeAnnotation -> withAnnotationBuilder.with(typeAnnotation));
         }
       });
     }
@@ -165,7 +203,7 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
       }
 
       final MediaType mediaType = property.getMediaType().orElse(null);
-      if (mediaType != null || mediaType.matches(ANY)) {
+      if (mediaType == null) {
         return;
       }
 

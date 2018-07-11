@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.internal.stubbing.defaultanswers.ReturnsDeepStubs;
@@ -22,7 +18,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -31,7 +26,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -44,7 +38,6 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Sourc
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.springframework.core.ResolvableType;
-import sun.reflect.annotation.ExceptionProxy;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;

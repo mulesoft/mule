@@ -31,7 +31,6 @@ import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.notification.Fires;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -139,11 +138,17 @@ public class HeisenbergOperations implements Disposable {
     return enemies;
   }
 
-
   @OutputResolver(output = TucoMetadataResolver.class)
-  @MediaType(value = "*/*", strict = false)
-  public String stringReturnOperation() {
-    return "20";
+  @MediaType(strict = false)
+  public String colorizeMeth() {
+    return "Blue";
+  }
+
+  // This operation will only pass the validation in the MediaTypeModelValidator in runtime
+  @OutputResolver(output = TucoMetadataResolver.class)
+  @MediaType(value = TEXT_PLAIN, strict = false)
+  public String callDea() {
+    return "Help DEA!";
   }
 
   @Stereotype(KillingStereotype.class)
