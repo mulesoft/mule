@@ -12,6 +12,8 @@
     <description>Micro-benchmarks to test the performance of core Mule functionality</description>
 
     <properties>
+        <jmh.version>1.21</jmh.version>
+    
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
@@ -117,12 +119,12 @@
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-core</artifactId>
-            <version>1.17.3</version>
+            <version>${jmh.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-generator-annprocess</artifactId>
-            <version>1.17.3</version>
+            <version>${jmh.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -198,27 +200,27 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>org.mule.jmh</groupId>
-                        <artifactId>jmh-elasticsearch-maven-plugin</artifactId>
-                        <version>${mule.jmh.elasticsearch.maven.plugin.version}</version>
-                            <executions>
-                                <execution>
-                                    <phase>post-integration-test</phase>
-                                    <goals>
-                                        <goal>generate-report</goal>
-                                    </goals>
-                                    <configuration>
-                                        <index>/runtime/jmh/</index>
-                                        <host>${elasticsearch.url}</host>
-                                        <userName>${elasticsearch.user}</userName>
-                                        <userPassword>${elasticsearch.password}</userPassword>
-                                        <version>${project.version}</version>
-                                        <reportPath>${basedir}/target/jmh-result.json</reportPath>
-                                    </configuration>
-                                </execution>
-                            </executions>
-                    </plugin>
+<!--                     <plugin> -->
+<!--                         <groupId>org.mule.jmh</groupId> -->
+<!--                         <artifactId>jmh-elasticsearch-maven-plugin</artifactId> -->
+<!--                         <version>${mule.jmh.elasticsearch.maven.plugin.version}</version> -->
+<!--                             <executions> -->
+<!--                                 <execution> -->
+<!--                                     <phase>post-integration-test</phase> -->
+<!--                                     <goals> -->
+<!--                                         <goal>generate-report</goal> -->
+<!--                                     </goals> -->
+<!--                                     <configuration> -->
+<!--                                         <index>/runtime/jmh/</index> -->
+<!--                                         <host>${elasticsearch.url}</host> -->
+<!--                                         <userName>${elasticsearch.user}</userName> -->
+<!--                                         <userPassword>${elasticsearch.password}</userPassword> -->
+<!--                                         <version>${project.version}</version> -->
+<!--                                         <reportPath>${basedir}/target/jmh-result.json</reportPath> -->
+<!--                                     </configuration> -->
+<!--                                 </execution> -->
+<!--                             </executions> -->
+<!--                     </plugin> -->
                 </plugins>
             </build>
         </profile>
