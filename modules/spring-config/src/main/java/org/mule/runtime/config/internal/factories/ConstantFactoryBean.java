@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.factories;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -43,7 +44,11 @@ public class ConstantFactoryBean<T> extends AbstractComponent implements Factory
     if (value instanceof Component) {
       ((Component) value).setAnnotations(getAnnotations());
     }
-    muleContext.getInjector().inject(value);
+
+    if (!(value instanceof Initialisable)) {
+      muleContext.getInjector().inject(value);
+    }
+
     return value;
   }
 
