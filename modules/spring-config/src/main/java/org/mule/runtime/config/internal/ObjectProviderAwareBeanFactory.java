@@ -121,7 +121,10 @@ public class ObjectProviderAwareBeanFactory extends DefaultListableBeanFactory {
   @Override
   protected Class<?> determineTargetType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
     if (mbd.getBeanClass().equals(ConstantFactoryBean.class)) {
-      return mbd.getConstructorArgumentValues().getArgumentValue(0, Object.class).getValue().getClass();
+      Object value = mbd.getConstructorArgumentValues().getArgumentValue(0, Object.class).getValue();
+      if (value != null) {
+        return value.getClass();
+      }
     }
     return super.determineTargetType(beanName, mbd, typesToMatch);
   }
