@@ -65,32 +65,8 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
 
       @Override
       protected void onOperation(OperationModel model) {
-        validateMediaType(model, getOperationReturnType(model));
-      }
-
-      private Optional<Type> getOperationReturnType(OperationModel operationModel) {
-        Optional<ExtensionOperationDescriptorModelProperty> modelProperty =
-            operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class);
-        if (!modelProperty.isPresent()) {
-          return empty();
-        }
-        ExtensionOperationDescriptorModelProperty modelPropertyValue = modelProperty.get();
-        if (isNonBlocking(modelPropertyValue.getOperationMethod())) {
-          Type returnType = ((ParameterWrapper) (modelPropertyValue.getOperationMethod().getParameters().stream()
-              .filter(p -> p.getType().isAssignableTo(CompletionCallback.class)).findFirst().get())).getType().getGenerics()
-                  .get(0).getConcreteType();
-          return of(getPayloadType(returnType));
-
-        } else {
-          return of(getPayloadType(modelPropertyValue.getOperationMethod().getReturnType()));
-        }
-      }
-
-      private Type getPayloadType(Type type) {
-        if (type.isAssignableTo(Result.class)) {
-          return type.getGenerics().get(0).getConcreteType();
-        }
-        return type;
+        validateMediaType(model, model.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+            .map(mp -> mp.getOperationReturnType()));
       }
 
       @Override

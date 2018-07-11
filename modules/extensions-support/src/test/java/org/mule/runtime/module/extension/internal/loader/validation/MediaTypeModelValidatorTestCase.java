@@ -144,7 +144,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
         mock(ExtensionOperationDescriptorModelProperty.class, new ReturnsDeepStubs());
     when(operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class))
         .thenReturn(of(extensionOperationDescriptorModelProperty));
-    when(extensionOperationDescriptorModelProperty.getOperationMethod().getReturnType()).thenReturn(operationReturnType);
+    when(extensionOperationDescriptorModelProperty.getOperationReturnType()).thenReturn(operationReturnType);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)

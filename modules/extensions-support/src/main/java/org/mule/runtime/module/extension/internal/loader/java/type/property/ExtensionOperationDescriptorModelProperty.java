@@ -8,8 +8,16 @@ package org.mule.runtime.module.extension.internal.loader.java.type.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterWrapper;
+
+import java.util.Optional;
+
+import static java.util.Optional.of;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
 
 /**
  * Binds an {@link OperationModel} with a {@link MethodElement}
@@ -36,5 +44,23 @@ public class ExtensionOperationDescriptorModelProperty implements ModelProperty 
   @Override
   public boolean isPublic() {
     return false;
+  }
+
+  public Type getOperationReturnType() {
+    if (isNonBlocking(getOperationMethod())) {
+      Type returnType = ((ParameterWrapper) (getOperationMethod().getParameters().stream()
+          .filter(p -> p.getType().isAssignableTo(CompletionCallback.class)).findFirst().get())).getType().getGenerics()
+              .get(0).getConcreteType();
+      return getPayloadType(returnType);
+    } else {
+      return getPayloadType(getOperationMethod().getReturnType());
+    }
+  }
+
+  private Type getPayloadType(Type type) {
+    if (type.isAssignableTo(Result.class)) {
+      return type.getGenerics().get(0).getConcreteType();
+    }
+    return type;
   }
 }

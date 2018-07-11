@@ -93,32 +93,9 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
 
         @Override
         protected void onOperation(OperationDeclaration declaration) {
-          declareMimeTypeParameters(declaration, getOperationReturnType(declaration));
-        }
-
-        private Optional<Type> getOperationReturnType(OperationDeclaration declaration) {
-          Optional<ExtensionOperationDescriptorModelProperty> modelProperty =
-              declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class);
-          if (!modelProperty.isPresent()) {
-            return empty();
-          }
-          ExtensionOperationDescriptorModelProperty modelPropertyValue = modelProperty.get();
-          if (isNonBlocking(modelPropertyValue.getOperationMethod())) {
-            Type returnType = ((ParameterWrapper) (modelPropertyValue.getOperationMethod().getParameters().stream()
-                .filter(p -> p.getType().isAssignableTo(CompletionCallback.class)).findFirst().get())).getType().getGenerics()
-                    .get(0).getConcreteType();
-            return of(getPayloadType(returnType));
-          } else {
-
-            return of(getPayloadType(modelPropertyValue.getOperationMethod().getReturnType()));
-          }
-        }
-
-        private Type getPayloadType(Type type) {
-          if (type.isAssignableTo(Result.class)) {
-            return type.getGenerics().get(0).getConcreteType();
-          }
-          return type;
+          declareMimeTypeParameters(declaration,
+                                    declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+                                        .map(mp -> mp.getOperationReturnType()));
         }
 
         @Override
