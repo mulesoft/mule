@@ -16,6 +16,7 @@ import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
 import org.mule.runtime.module.artifact.api.classloader.exception.CompositeClassNotFoundException;
+import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -202,7 +203,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     }
   }
 
-  protected static class NonCachingURLStreamHandlerFactory implements URLStreamHandlerFactory {
+  public static class NonCachingURLStreamHandlerFactory implements URLStreamHandlerFactory {
 
     @Override
     public URLStreamHandler createURLStreamHandler(String protocol) {
@@ -214,10 +215,23 @@ public class FineGrainedControlClassLoader extends URLClassLoader
    * Prevents jar caching for this classloader, mainly to fix the static ResourceBundle mess/cache that keeps connections open no
    * matter what.
    */
-  private static class NonCachingJarResourceURLStreamHandler extends Handler {
+  public static class NonCachingJarResourceURLStreamHandler extends Handler {
+
+    /**
+     * JAR Protocol that will be used to reference resources inside jars.
+     */
+    public final static String PROTOCOL = "jar";
 
     public NonCachingJarResourceURLStreamHandler() {
       super();
+    }
+
+    /**
+     * Registers the JAR protocol {@link #PROTOCOL} into the {@link URL#setURLStreamHandlerFactory(URLStreamHandlerFactory)}
+     * through the {@link MuleUrlStreamHandlerFactory}.
+     */
+    public static void register() {
+      MuleUrlStreamHandlerFactory.registerHandler(PROTOCOL, new NonCachingJarResourceURLStreamHandler());
     }
 
     @Override
