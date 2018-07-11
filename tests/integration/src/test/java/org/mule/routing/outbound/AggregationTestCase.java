@@ -6,13 +6,23 @@
  */
 package org.mule.routing.outbound;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.junit.Test;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -24,15 +34,9 @@ import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
 import org.mule.routing.SimpleCollectionAggregator;
 import org.mule.routing.correlation.CollectionCorrelatorCallback;
+import org.mule.routing.correlation.CorrelationTimeoutException;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.junit4.FunctionalTestCase;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.junit.Test;
 
 /**
  * Test that aggregators preserve message order in synchronous scenarios (MULE-5998)
@@ -46,6 +50,18 @@ public class AggregationTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void testCollectionAggregationTimeout() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+
+        String payload = "Long string that wil be broken uop into multiple messages";
+        client.dispatch("vm://inTimeout", payload, null);     
+        client.request("vm://collectionCreated2", 5000);
+        assertThat(TestExceptionStrategy.exception, instanceOf(CorrelationTimeoutException.class));
+        assertThat(TestExceptionStrategy.event, not(instanceOf(VoidMuleEvent.class)));
+    }
+    
+    @Test
     public void testCollectionAggregator() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -53,8 +69,8 @@ public class AggregationTestCase extends FunctionalTestCase
         String payload = "Long string that wil be broken uop into multiple messages";
         client.dispatch("vm://in", payload, null);
         MuleMessage msg = client.request("vm://collectionCreated", 5000);
-        assertNotNull(msg);
-        assertTrue(msg instanceof MuleMessageCollection);
+        assertThat(msg, not(nullValue()));
+        assertThat(msg, instanceOf(MuleMessageCollection.class));
 
         MuleMessageCollection collection = (MuleMessageCollection) msg;
 
@@ -66,7 +82,7 @@ public class AggregationTestCase extends FunctionalTestCase
             baos.write(chunk);
         }
         String aggregated = baos.toString();
-        assertEquals(payload, aggregated);
+        assertThat(payload, equalTo(aggregated));
     }
 
     @Test
@@ -76,20 +92,20 @@ public class AggregationTestCase extends FunctionalTestCase
         String payload = "Long string that wil be broken uop into multiple messages";
         client.dispatch("vm://in2", payload, null);
         MuleMessage msg = client.request("vm://collectionCreated2", 5000);
-        assertNotNull(msg);
-        assertNotNull(msg.getPayload());
-        assertTrue(msg.getPayload() instanceof List);
+        assertThat(msg, is(not(nullValue())));
+        assertThat(msg.getPayload(), is(not(nullValue())));
+        assertThat(msg.getPayload(), instanceOf(List.class));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (Object obj : (List<?>)msg.getPayload())
         {
-            assertTrue(obj instanceof MuleEvent);
+            assertThat(obj, instanceOf(MuleEvent.class));
             MuleEvent event = (MuleEvent) obj;
-            assertTrue(event.getMessage().getPayload() instanceof byte[]);
+            assertThat(event.getMessage().getPayload(), instanceOf(byte[].class));
             baos.write((byte[])event.getMessage().getPayload());
         }
         String aggregated = baos.toString();
-        assertEquals(payload, aggregated);
+        assertThat(payload, equalTo(aggregated));
     }
     public static class Aggregator extends SimpleCollectionAggregator
     {
@@ -132,4 +148,6 @@ public class AggregationTestCase extends FunctionalTestCase
             return new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, fc);
         }
     }
+    
+
 }
