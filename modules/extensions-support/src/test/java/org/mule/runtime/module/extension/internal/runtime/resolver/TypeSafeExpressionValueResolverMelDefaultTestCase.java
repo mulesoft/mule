@@ -28,7 +28,7 @@ import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -68,7 +68,7 @@ public class TypeSafeExpressionValueResolverMelDefaultTestCase extends AbstractM
     expressionManager = spy(muleContext.getExpressionManager());
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("_muleExpressionManager", expressionManager);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("_muleExpressionManager", expressionManager);
   }
 
   @Test
