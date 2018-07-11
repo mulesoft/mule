@@ -33,5 +33,19 @@
         <custom-aggregator class="org.mule.routing.outbound.AggregationTestCase$Aggregator" timeout="2000" failOnTimeout="false"/>
         <vm:outbound-endpoint path="collectionCreated2"/>
     </flow>
+    
+     <flow name="SplitterFlowTimeout">
+        <vm:inbound-endpoint path="inTimeout"/>
+        <message-chunk-splitter messageSize="2" enableCorrelation="NEVER" />
+        <vm:outbound-endpoint path="afterSplitTimeout" exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="AggregationFlowTimeout">
+        <vm:inbound-endpoint path="afterSplitTimeout" exchange-pattern="request-response"/>
+        <custom-aggregator class="org.mule.routing.outbound.AggregationTestCase$Aggregator" timeout="1" failOnTimeout="true"/>
+        <vm:outbound-endpoint path="collectionCreated2"/>
+		<custom-exception-strategy
+			class="org.mule.routing.outbound.TestExceptionStrategy" />
+    </flow>
 
 </mule>

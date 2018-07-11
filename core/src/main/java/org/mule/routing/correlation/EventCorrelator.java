@@ -6,6 +6,8 @@
  */
 package org.mule.routing.correlation;
 
+import static org.mule.MessageExchangePattern.ONE_WAY;
+
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -14,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -40,6 +44,7 @@ import org.mule.context.notification.RoutingNotification;
 import org.mule.execution.ErrorHandlingExecutionTemplate;
 import org.mule.routing.EventGroup;
 import org.mule.routing.EventProcessingThread;
+import org.mule.transport.NullPayload;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.monitor.Expirable;
@@ -415,8 +420,17 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 logger.warn("Failed to clear group with id " + group.getGroupId()
                             + " since underlying ObjectStore threw Exception:" + e.getMessage());
             }
-            throw new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
-                                                  groupCollectionEvent);
+            
+            // This is intended to avoid an error in the handling of the correlation exception
+            // in case no event group was created before the timeout (no message for aggregate
+            // were received yet). A "custom" mule event is created so that a message is available.
+            if (groupCollectionEvent instanceof VoidMuleEvent)
+            {
+                groupCollectionEvent =
+                        new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), muleContext), ONE_WAY, flowConstruct);
+            }
+            
+            throw new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()), groupCollectionEvent);
         }
         else
         {
