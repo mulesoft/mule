@@ -22,6 +22,7 @@ import org.mule.runtime.extension.internal.loader.enricher.StereotypesDiscoveryD
 import org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator;
 import org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurationPropertiesValidator;
 import org.mule.runtime.extension.internal.loader.validator.GlobalElementNamesValidator;
+import org.mule.runtime.extension.internal.loader.validator.TestConnectionValidator;
 import org.mule.runtime.module.extension.internal.loader.enricher.stereotypes.StereotypesDeclarationEnricher;
 
 import java.util.List;
@@ -40,7 +41,8 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
 
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(new CorrectPrefixesValidator(),
                                                                                          new GlobalElementNamesValidator(),
-                                                                                         new ForbiddenConfigurationPropertiesValidator()));
+                                                                                         new ForbiddenConfigurationPropertiesValidator(),
+                                                                                         new TestConnectionValidator()));
 
   /**
    * Attribute to look for in the parametrized attributes picked up from the descriptor.

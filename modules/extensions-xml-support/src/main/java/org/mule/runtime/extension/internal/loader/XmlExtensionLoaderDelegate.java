@@ -87,6 +87,7 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.internal.loader.validator.ForbiddenConfigurationPropertiesValidator;
+import org.mule.runtime.extension.internal.loader.validator.property.InvalidTestConnectionMarkerModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
@@ -163,7 +164,7 @@ public final class XmlExtensionLoaderDelegate {
 
   private static final String TRANSFORMATION_FOR_TNS_RESOURCE = "META-INF/transform_for_tns.xsl";
   private static final String XMLNS_TNS = XMLNS_ATTRIBUTE + ":" + TNS_PREFIX;
-  private static final String MODULE_CONNECTION_MARKER_ATTRIBUTE = "xmlns:connection";
+  public static final String MODULE_CONNECTION_MARKER_ATTRIBUTE = "xmlns:connection";
   private static final String GLOBAL_ELEMENT_NAME_ATTRIBUTE = "name";
 
   /**
@@ -581,9 +582,9 @@ public final class XmlExtensionLoaderDelegate {
    *
    * @param configurationDeclarer declarer to add the {@link ConnectionProviderDeclarer} if applies.
    * @param connectionProperties collection of <property/>s that should be added to the {@link ConnectionProviderDeclarer}.
-   * @param globalElementsComponentModel collection of global elements where through {@link #getTestConnectionGlobalElement(List, Set)}
+   * @param globalElementsComponentModel collection of global elements where through {@link #getTestConnectionGlobalElement(ConfigurationDeclarer, List, Set)}
    *                                     will look for one that supports test connectivity.
-   * @param extensions used also in {@link #getTestConnectionGlobalElement(List, Set)}, through the {@link #findTestConnectionGlobalElementFrom},
+   * @param extensions used also in {@link #getTestConnectionGlobalElement(ConfigurationDeclarer, List, Set)}, through the {@link #findTestConnectionGlobalElementFrom},
    *                   as the XML of the extensions might change of the values that the {@link ExtensionModel} has (heavily relies
    *                   on {@link DslSyntaxResolver#resolve(NamedObject)}).
    */
@@ -591,7 +592,7 @@ public final class XmlExtensionLoaderDelegate {
                                      List<ComponentModel> connectionProperties,
                                      List<ComponentModel> globalElementsComponentModel, Set<ExtensionModel> extensions) {
     final Optional<ComponentModel> testConnectionGlobalElementOptional =
-        getTestConnectionGlobalElement(globalElementsComponentModel, extensions);
+        getTestConnectionGlobalElement(configurationDeclarer, globalElementsComponentModel, extensions);
 
     if (testConnectionGlobalElementOptional.isPresent() || !connectionProperties.isEmpty()) {
       final ConnectionProviderDeclarer connectionProviderDeclarer =
@@ -611,7 +612,8 @@ public final class XmlExtensionLoaderDelegate {
 
   }
 
-  private Optional<ComponentModel> getTestConnectionGlobalElement(List<ComponentModel> globalElementsComponentModel,
+  private Optional<ComponentModel> getTestConnectionGlobalElement(ConfigurationDeclarer configurationDeclarer,
+                                                                  List<ComponentModel> globalElementsComponentModel,
                                                                   Set<ExtensionModel> extensions) {
     final List<ComponentModel> markedAsTestConnectionGlobalElements =
         globalElementsComponentModel.stream()
@@ -636,10 +638,8 @@ public final class XmlExtensionLoaderDelegate {
           findTestConnectionGlobalElementFrom(Collections.singletonList(testConnectionGlobalElement.get()), extensions);
       if ((!temporalTestConnectionGlobalElement.isPresent())
           || (!temporalTestConnectionGlobalElement.get().equals(testConnectionGlobalElement.get()))) {
-        throw new MuleRuntimeException(createStaticMessage(format("The annotated element [%s] with [%s] is not valid to be used as a test connection (the [%s] does not supports it)",
-                                                                  testConnectionGlobalElement.get().getNameAttribute(),
-                                                                  MODULE_CONNECTION_MARKER_ATTRIBUTE,
-                                                                  testConnectionGlobalElement.get().getIdentifier().toString())));
+        configurationDeclarer.withModelProperty(new InvalidTestConnectionMarkerModelProperty(testConnectionGlobalElement.get()
+            .getNameAttribute(), testConnectionGlobalElement.get().getIdentifier().toString()));
       }
     }
     return testConnectionGlobalElement;
