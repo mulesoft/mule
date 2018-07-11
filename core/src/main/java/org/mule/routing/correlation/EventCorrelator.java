@@ -6,6 +6,8 @@
  */
 package org.mule.routing.correlation;
 
+import static org.mule.MessageExchangePattern.ONE_WAY;
+
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -16,7 +18,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -43,6 +44,7 @@ import org.mule.context.notification.RoutingNotification;
 import org.mule.execution.ErrorHandlingExecutionTemplate;
 import org.mule.routing.EventGroup;
 import org.mule.routing.EventProcessingThread;
+import org.mule.transport.NullPayload;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.monitor.Expirable;
@@ -425,7 +427,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             if (groupCollectionEvent instanceof VoidMuleEvent)
             {
                 groupCollectionEvent =
-                        new DefaultMuleEvent(new DefaultMuleMessage("No Group Collection Event was created before the timeout", muleContext), MessageExchangePattern.ONE_WAY, flowConstruct);
+                        new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), muleContext), ONE_WAY, flowConstruct);
             }
             
             throw new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()), groupCollectionEvent);

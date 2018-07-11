@@ -12,31 +12,34 @@ import org.mule.api.exception.RollbackSourceCallback;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.exception.AbstractExceptionListener;
 
+/**
+ * Exception used to obtain event and exception in a test.
+ */
 public class TestExceptionStrategy extends AbstractExceptionListener implements MessagingExceptionHandler, SystemExceptionHandler
+{
+
+    public static Exception exception;
+    public static MuleEvent event;
+
+    @Override
+    public void handleException(Exception exception, RollbackSourceCallback rollbackMethod)
     {
+        this.exception = exception;
 
-        public static Exception exception;
-        public static MuleEvent event;
-        
-        @Override
-        public void handleException(Exception exception, RollbackSourceCallback rollbackMethod)
-        {
-            this.exception = exception;
-            
-        }
-
-        @Override
-        public void handleException(Exception exception)
-        {
-            this.exception = exception;
-        }
-
-        @Override
-        public MuleEvent handleException(Exception exception, MuleEvent event)
-        {
-            this.event = event;
-            this.exception = exception;
-            return event;
-        }
-        
     }
+
+    @Override
+    public void handleException(Exception exception)
+    {
+        this.exception = exception;
+    }
+
+    @Override
+    public MuleEvent handleException(Exception exception, MuleEvent event)
+    {
+        this.event = event;
+        this.exception = exception;
+        return event;
+    }
+
+}
