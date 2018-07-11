@@ -55,6 +55,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -81,8 +82,8 @@ public final class DefaultMessageBuilder
 
   private Map<String, TypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>();
   private Map<String, TypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>();
-  private Map<String, DataHandler> inboundAttachments = new HashMap<>();
-  private Map<String, DataHandler> outboundAttachments = new HashMap<>();
+  private Map<String, DataHandler> inboundAttachments = new LinkedHashMap<>();
+  private Map<String, DataHandler> outboundAttachments = new LinkedHashMap<>();
 
   public DefaultMessageBuilder() {}
 
@@ -330,14 +331,14 @@ public final class DefaultMessageBuilder
   @Override
   public InternalMessage.CollectionBuilder inboundAttachments(Map<String, DataHandler> inboundAttachments) {
     requireNonNull(inboundAttachments);
-    this.inboundAttachments = new HashMap<>(inboundAttachments);
+    this.inboundAttachments = new LinkedHashMap<>(inboundAttachments);
     return this;
   }
 
   @Override
   public InternalMessage.CollectionBuilder outboundAttachments(Map<String, DataHandler> outbundAttachments) {
     requireNonNull(outbundAttachments);
-    this.outboundAttachments = new HashMap<>(outbundAttachments);
+    this.outboundAttachments = new LinkedHashMap<>(outbundAttachments);
     return this;
   }
 
@@ -395,12 +396,12 @@ public final class DefaultMessageBuilder
     /**
      * Collection of attachments that were attached to the incoming message
      */
-    private transient Map<String, DataHandler> inboundAttachments = new HashMap<>();
+    private transient Map<String, DataHandler> inboundAttachments = new LinkedHashMap<>();
 
     /**
      * Collection of attachments that will be sent out with this message
      */
-    private transient Map<String, DataHandler> outboundAttachments = new HashMap<>();
+    private transient Map<String, DataHandler> outboundAttachments = new LinkedHashMap<>();
 
     private transient TypedValue typedValue;
     private TypedValue typedAttributes;
