@@ -117,7 +117,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   }
 
   private MediaType getMediaTypeFromMetadataType(MetadataType output) {
-    if (output.getMetadataFormat().getValidMimeTypes().size() == 1) {
+    if (output.getMetadataFormat() != null && output.getMetadataFormat().getValidMimeTypes().size() == 1) {
       return MediaType.parse(output.getMetadataFormat().getValidMimeTypes().iterator().next());
     } else {
       return ANY;
