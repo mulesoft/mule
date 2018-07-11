@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.lang.Boolean.valueOf;
+import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
+import static org.mule.runtime.core.internal.el.DefaultExpressionManager.hasDwExpression;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.hasMelExpression;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -21,11 +25,11 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.function.BiConsumer;
 
 import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions
@@ -62,6 +66,7 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
         }
       };
 
+  private boolean melDefault;
   private boolean melAvailable;
 
   ExpressionValueResolver(String expression, DataType expectedDataType) {
@@ -85,6 +90,7 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
     // TODO (elrodro83) MULE-13627 remove this initialization
     initialiseIfNeeded(extendedExpressionManager);
     initEvaluator();
+    melDefault = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
     melAvailable = registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent();
   }
 
@@ -102,7 +108,9 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
   }
 
   protected <V> TypedValue<V> resolveTypedValue(ValueResolvingContext context) {
-    if (isMelAvailable() && hasMelExpression(expression)) {
+    if (isMelAvailable()
+        && (!hasDwExpression(expression) && !hasMelExpression(expression) && melDefault)
+        || hasMelExpression(expression)) {
       // MEL requires an actual event, so in this case we may not optimize by using a precalculated binding context
       return evaluator.resolveTypedValue(context.getEvent());
     } else {
