@@ -38,10 +38,10 @@ class PrecalculatedExecutionContextAdapter<T extends ComponentModel> extends Abs
 
     configuration = decorated.getConfiguration().map(config -> {
       if (config instanceof Interceptable) {
-        return new ExecutionContextConfigurationDecorator(config,
-                                                          ((Interceptable) config).getInterceptors().stream()
-                                                              .map(InterceptorDecorator::new)
-                                                              .collect(toList()));
+        return new DefaultExecutionContextConfigurationDecorator(config,
+                                                                 ((Interceptable) config).getInterceptors().stream()
+                                                                     .map(InterceptorDecorator::new)
+                                                                     .collect(toList()));
       } else {
         return config;
       }
@@ -88,12 +88,12 @@ class PrecalculatedExecutionContextAdapter<T extends ComponentModel> extends Abs
 
   }
 
-  private static class ExecutionContextConfigurationDecorator implements Interceptable, ConfigurationInstance {
+  private static class DefaultExecutionContextConfigurationDecorator implements ExecutionContextConfigurationDecorator {
 
     private ConfigurationInstance decorated;
     private List<Interceptor> interceptors;
 
-    public ExecutionContextConfigurationDecorator(ConfigurationInstance decorated, List<Interceptor> interceptors) {
+    public DefaultExecutionContextConfigurationDecorator(ConfigurationInstance decorated, List<Interceptor> interceptors) {
       this.decorated = decorated;
       this.interceptors = interceptors;
     }
@@ -133,6 +133,10 @@ class PrecalculatedExecutionContextAdapter<T extends ComponentModel> extends Abs
       return interceptors;
     }
 
+    @Override
+    public ConfigurationInstance getDecorated() {
+      return decorated;
+    }
   }
 
   private static class InterceptorDecorator<M extends ComponentModel> implements Interceptor<M> {
