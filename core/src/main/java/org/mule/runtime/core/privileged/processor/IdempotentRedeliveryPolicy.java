@@ -103,9 +103,9 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     }
     if (!useSecureHash && messageDigestAlgorithm != null) {
       throw new InitialisationException(
-          initialisationFailure(format("The message digest algorithm '%s' was specified when a secure hash will not be used",
-                                       messageDigestAlgorithm)),
-          this);
+                                        initialisationFailure(format("The message digest algorithm '%s' was specified when a secure hash will not be used",
+                                                                     messageDigestAlgorithm)),
+                                        this);
     }
     if (!useSecureHash && idExpression == null) {
       throw new InitialisationException(initialisationFailure("No method for identifying messages was specified"),
@@ -122,8 +122,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     idrId = format("%s-%s-%s", muleContext.getConfiguration().getId(), getLocation().getRootContainerName(), "idr");
     if (store != null && privateStore != null) {
       throw new InitialisationException(
-          createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
-          this);
+                                        createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
+                                        this);
     }
     if (store == null) {
       // If no object store was defined, create one
@@ -181,7 +181,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     } catch (ExpressionRuntimeException e) {
       LOGGER
           .warn(
-              "The message cannot be processed because the digest could not be generated. Either make the payload serializable or use an expression.");
+                "The message cannot be processed because the digest could not be generated. Either make the payload serializable or use an expression.");
       return null;
     } catch (Exception ex) {
       exceptionSeen = of(ex);

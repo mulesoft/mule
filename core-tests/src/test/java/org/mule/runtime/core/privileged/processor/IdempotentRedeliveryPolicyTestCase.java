@@ -163,7 +163,8 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   @Test
   public void testMessageRedeliveryUsingSerializationStore() throws Exception {
     when(expressionManager.evaluate(eq(format(SECURE_HASH_EXPR_FORMAT, "SHA-256")), eq(STRING), eq(NULL_BINDING_CONTEXT), any()))
-        .thenAnswer(inv -> new TypedValue<>("" + inv.getArgumentAt(3, CoreEvent.class).getMessage().getPayload().hashCode(), STRING));
+        .thenAnswer(inv -> new TypedValue<>("" + inv.getArgumentAt(3, CoreEvent.class).getMessage().getPayload().hashCode(),
+                                            STRING));
 
     when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
     reset(mockObjectStoreManager);
@@ -177,7 +178,8 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   @Test
   public void testThreadSafeObjectStoreUsage() throws Exception {
     when(expressionManager.evaluate(eq(format(SECURE_HASH_EXPR_FORMAT, "SHA-256")), eq(STRING), eq(NULL_BINDING_CONTEXT), any()))
-        .thenAnswer(inv -> new TypedValue<>("" + inv.getArgumentAt(3, CoreEvent.class).getMessage().getPayload().hashCode(), STRING));
+        .thenAnswer(inv -> new TypedValue<>("" + inv.getArgumentAt(3, CoreEvent.class).getMessage().getPayload().hashCode(),
+                                            STRING));
 
     when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
     irp.setListener(mockWaitingMessageProcessor);
