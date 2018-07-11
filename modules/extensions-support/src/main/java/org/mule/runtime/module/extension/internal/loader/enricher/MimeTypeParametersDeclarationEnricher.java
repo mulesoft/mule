@@ -103,13 +103,14 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
             return empty();
           }
           ExtensionOperationDescriptorModelProperty modelPropertyValue = modelProperty.get();
-          if (!isNonBlocking(modelPropertyValue.getOperationMethod())) {
-            return of(getPayloadType(modelPropertyValue.getOperationMethod().getReturnType()));
-          } else {
+          if (isNonBlocking(modelPropertyValue.getOperationMethod())) {
             Type returnType = ((ParameterWrapper) (modelPropertyValue.getOperationMethod().getParameters().stream()
                 .filter(p -> p.getType().isAssignableTo(CompletionCallback.class)).findFirst().get())).getType().getGenerics()
                     .get(0).getConcreteType();
             return of(getPayloadType(returnType));
+          } else {
+
+            return of(getPayloadType(modelPropertyValue.getOperationMethod().getReturnType()));
           }
         }
 
@@ -182,7 +183,7 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
         }
 
         private void enrichWithAnnotations(WithAnnotation withAnnotationBuilder, Set<TypeAnnotation> annotations) {
-          annotations.stream().forEach(typeAnnotation -> withAnnotationBuilder.with(typeAnnotation));
+          annotations.forEach(typeAnnotation -> withAnnotationBuilder.with(typeAnnotation));
         }
       });
     }

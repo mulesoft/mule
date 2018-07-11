@@ -75,13 +75,14 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
           return empty();
         }
         ExtensionOperationDescriptorModelProperty modelPropertyValue = modelProperty.get();
-        if (!isNonBlocking(modelPropertyValue.getOperationMethod())) {
-          return of(getPayloadType(modelPropertyValue.getOperationMethod().getReturnType()));
-        } else {
+        if (isNonBlocking(modelPropertyValue.getOperationMethod())) {
           Type returnType = ((ParameterWrapper) (modelPropertyValue.getOperationMethod().getParameters().stream()
               .filter(p -> p.getType().isAssignableTo(CompletionCallback.class)).findFirst().get())).getType().getGenerics()
                   .get(0).getConcreteType();
           return of(getPayloadType(returnType));
+
+        } else {
+          return of(getPayloadType(modelPropertyValue.getOperationMethod().getReturnType()));
         }
       }
 

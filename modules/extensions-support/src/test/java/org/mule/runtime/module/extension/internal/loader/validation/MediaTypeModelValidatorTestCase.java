@@ -239,7 +239,6 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     validate(extensionModel, validator);
   }
 
-
   @Test
   public void mediaTypeAnnotationAndStaticResolverOnOperationInRuntime() throws Exception {
     setCompileTime(false);
@@ -262,12 +261,10 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     validate(extensionModel, validator);
   }
 
-
   @Test
   public void sourceAndOperationReturnsAnObject() throws Exception {
     validate(extensionModel, validator);
   }
-
 
   public class TestMethods {
 
@@ -311,14 +308,5 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
     @Override
     public void onStop() {}
   }
-
-  /**
-   * SUCESS SCENARIOS
-   *
-   * has static resolver, no media type annotation metadata format is XML, no static resolver media type annotation configured, no
-   * static resolver annotation with value + static resolver but in runtime
-   *
-   */
-
 
 }

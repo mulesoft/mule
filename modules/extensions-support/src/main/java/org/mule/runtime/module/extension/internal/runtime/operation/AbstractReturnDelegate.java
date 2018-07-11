@@ -112,7 +112,6 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
           ? MediaType.APPLICATION_JAVA
           : getMediaTypeFromMetadataType(output);
     }
-
     return ANY;
   }
 
