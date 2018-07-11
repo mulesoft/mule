@@ -80,7 +80,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
   class SpringContextInitialisePhase extends MuleContextInitialisePhase {
 
     public SpringContextInitialisePhase() {
-      super(muleContext);
+      super();
 
       setOrderedLifecycleTypes(new Class<?>[] {
           LockFactory.class,
