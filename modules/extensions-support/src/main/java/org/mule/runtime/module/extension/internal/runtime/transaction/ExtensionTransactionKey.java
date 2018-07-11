@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.transaction;
 
-import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionContextConfigurationDecorator;
 
 /**
  * The key used to bind a {@link ExtensionTransactionalResource} into a {@link Transaction}. Although logically speaking it is the
@@ -22,7 +23,9 @@ public class ExtensionTransactionKey {
   private final Reference<ConfigurationInstance> configReference;
 
   public ExtensionTransactionKey(ConfigurationInstance config) {
-    configReference = new Reference<>(config);
+    configReference = new Reference<>(config instanceof ExecutionContextConfigurationDecorator
+        ? ((ExecutionContextConfigurationDecorator) config).getDecorated()
+        : config);
   }
 
   @Override
