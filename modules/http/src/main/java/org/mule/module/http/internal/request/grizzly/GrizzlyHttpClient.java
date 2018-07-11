@@ -413,7 +413,7 @@ public class GrizzlyHttpClient implements HttpClient
         }
     }
 
-    private HttpResponse createMuleResponse(Response response, InputStream inputStream) throws IOException
+    protected HttpResponse createMuleResponse(Response response, InputStream inputStream) throws IOException
     {
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
         responseBuilder.setStatusCode(response.getStatusCode());
