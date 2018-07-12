@@ -292,6 +292,8 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
       return initialiseObject((ConfigurableApplicationContext) applicationContext, EMPTY, object);
     } catch (LifecycleException e) {
       throw new MuleRuntimeException(e);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(new LifecycleException(e, object));
     }
   }
 
