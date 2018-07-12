@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import org.mule.runtime.api.exception.MuleException;
@@ -31,12 +32,16 @@ public class AbstractMuleObjectOwnerTestCase {
 
   @Mock
   private TestClass mockObject1;
+
   @Mock
   private TestClass mockObject2;
-  @Mock
+
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContext mockMuleContext;
+
   @Mock
   private FlowConstruct mockFlowConstruct;
+
   private AbstractMuleObjectOwner<TestClass> abstractMuleObjectOwner;
 
   @Before
@@ -57,8 +62,8 @@ public class AbstractMuleObjectOwnerTestCase {
     verify(mockObject1).initialise();
     verify(mockObject2).initialise();
     // TODO TMULE-10764 Injection should only happen once
-    verify(mockObject1, times(2)).setMuleContext(mockMuleContext);
-    verify(mockObject2, times(2)).setMuleContext(mockMuleContext);
+    verify(mockObject1, times(3)).setMuleContext(mockMuleContext);
+    verify(mockObject2, times(3)).setMuleContext(mockMuleContext);
   }
 
   @Test
