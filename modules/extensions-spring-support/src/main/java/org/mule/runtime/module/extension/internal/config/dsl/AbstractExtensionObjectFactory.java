@@ -44,7 +44,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
     implements ObjectTypeParametersResolver {
 
   @Inject
-  private ConfigurationProperties properties;
+  protected ConfigurationProperties properties;
 
   @Inject
   protected ReflectionCache reflectionCache;

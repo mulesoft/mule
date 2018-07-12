@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
@@ -14,6 +15,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRefName;
 
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -29,6 +31,7 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -47,23 +50,26 @@ public final class SourceConfigurer {
   private final ResolverSet resolverSet;
   private final ComponentLocation componentLocation;
   private final ReflectionCache reflectionCache;
+  private final ConfigurationProperties properties;
   private final MuleContext muleContext;
 
   /**
    * Create a new instance
    *
-   * @param model the {@link SourceModel} which describes the instances that the {@link #configure(Source, Optional)} method will
-   *        accept
-   * @param resolverSet the {@link ResolverSet} used to resolve the parameters
+   * @param model           the {@link SourceModel} which describes the instances that the {@link #configure(Source, Optional)} method will
+   *                        accept
+   * @param resolverSet     the {@link ResolverSet} used to resolve the parameters
    * @param reflectionCache the cache for expensive reflection lookups
-   * @param muleContext the current {@link MuleContext}
+   * @param properties      deployment configuration properties
+   * @param muleContext     the current {@link MuleContext}
    */
   public SourceConfigurer(SourceModel model, ComponentLocation componentLocation, ResolverSet resolverSet,
-                          ReflectionCache reflectionCache, MuleContext muleContext) {
+                          ReflectionCache reflectionCache, ConfigurationProperties properties, MuleContext muleContext) {
     this.model = model;
     this.resolverSet = resolverSet;
     this.componentLocation = componentLocation;
     this.reflectionCache = reflectionCache;
+    this.properties = properties;
     this.muleContext = muleContext;
   }
 
@@ -101,9 +107,16 @@ public final class SourceConfigurer {
       Source configuredSource = builder.build(from(initialiserEvent, config));
 
       if (configuredSource instanceof PollingSource) {
-        Scheduler scheduler = (Scheduler) resolverSet.getResolvers().get(SCHEDULING_STRATEGY_PARAMETER_NAME)
-            .resolve(ValueResolvingContext.from(initialiserEvent));
-        configuredSource = new PollingSourceWrapper((PollingSource) configuredSource, scheduler);
+        ValueResolver<?> valueResolver = resolverSet.getResolvers().get(SCHEDULING_STRATEGY_PARAMETER_NAME);
+        if (valueResolver == null) {
+          if (!lazyInit()) {
+            throw new IllegalStateException("The scheduling strategy has not been configured");
+          }
+        } else {
+          Scheduler scheduler = (Scheduler) valueResolver
+              .resolve(ValueResolvingContext.from(initialiserEvent));
+          configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler);
+        }
       }
 
       return configuredSource;
@@ -115,6 +128,10 @@ public final class SourceConfigurer {
         ((BaseEventContext) initialiserEvent.getContext()).success();
       }
     }
+  }
+
+  private Boolean lazyInit() {
+    return properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
   }
 
 }

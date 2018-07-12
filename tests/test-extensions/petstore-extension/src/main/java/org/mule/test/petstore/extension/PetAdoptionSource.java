@@ -13,6 +13,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -23,6 +24,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import java.util.ArrayList;
 import java.util.List;
 
+@MetadataScope(outputResolver = PollingSourceMetadataResolver.class)
 @MediaType(TEXT_PLAIN)
 public class PetAdoptionSource extends PollingSource<String, Void> {
 
@@ -32,7 +34,6 @@ public class PetAdoptionSource extends PollingSource<String, Void> {
   public static int COMPLETED_POLLS;
   public static int REJECTED_ADOPTIONS;
   private List<String> pets;
-
 
   @Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "false")
