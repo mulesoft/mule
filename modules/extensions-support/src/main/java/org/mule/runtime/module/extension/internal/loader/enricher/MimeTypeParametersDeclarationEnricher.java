@@ -100,12 +100,8 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
 
         @Override
         protected void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
-          declareMimeTypeParameters(declaration, getSourceOutputType(declaration));
-        }
-
-        private Optional<Type> getSourceOutputType(SourceDeclaration declaration) {
-          return declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
-              .map(mp -> (Type) ((SourceTypeWrapper) (mp.getType())).getSuperClassGenerics().get(0));
+          declareMimeTypeParameters(declaration, declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+              .map(mp -> ((SourceTypeWrapper) (mp.getType())).getOutputType()));
         }
 
       }.walk(declaration);
@@ -172,13 +168,10 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
         return;
       }
 
-      final MediaType mediaType = property.getMediaType().orElse(null);
-      if (mediaType == null) {
-        return;
-      }
-
-      final OutputDeclaration output = declaration.getOutput();
-      output.setType(type.apply(toMetadataFormat(mediaType)), output.hasDynamicType());
+      property.getMediaType().ifPresent(mediaType -> {
+        final OutputDeclaration output = declaration.getOutput();
+        output.setType(type.apply(toMetadataFormat(mediaType)), output.hasDynamicType());
+      });
     }
 
     private boolean shouldOverrideMetadataFormat(ExecutableComponentDeclaration declaration) {

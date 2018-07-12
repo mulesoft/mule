@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.BinaryType;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
@@ -30,6 +31,8 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Sourc
 
 import java.util.Optional;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toMetadataFormat;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
 
@@ -50,11 +53,11 @@ import static org.mule.runtime.module.extension.internal.loader.validation.Model
  */
 public class MediaTypeModelValidator implements ExtensionModelValidator {
 
-  private static String JAVA_METADATA_FORMAT_ID = "java";
-
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
-
+    if (!isCompiletime(extensionModel)) {
+      return;
+    }
     new IdempotentExtensionWalker() {
 
       @Override
@@ -65,12 +68,9 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
 
       @Override
       protected void onSource(SourceModel model) {
-        validateMediaType(model, getSourceOutputType(model));
-      }
-
-      private Optional<Type> getSourceOutputType(SourceModel sourceModel) {
-        return sourceModel.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
-            .map(mp -> (Type) ((SourceTypeWrapper) (mp.getType())).getSuperClassGenerics().get(0));
+        validateMediaType(model,
+                          model.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+                              .map(mp -> ((SourceTypeWrapper) (mp.getType())).getOutputType()));
       }
 
       private void validateMediaType(ConnectableComponentModel model, Optional<Type> outputType) {
@@ -79,35 +79,32 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
         if (mediaTypeAnnotationIsMissing(model, outputMetadataType)) {
           String componentType = NameUtils.getComponentModelTypeName(model);
           String message =
-              String
-                  .format("%s '%s' has a String or InputStream output but doesn't specify a default mime type. Please annotate it with @%s",
-                          componentType, model.getName(),
-                          org.mule.runtime.extension.api.annotation.param.MediaType.class.getSimpleName());
+              format("%s '%s' has a %s type output but doesn't specify a default mime type. Please annotate it with @%s",
+                     capitalize(componentType), model.getName(),
+                     outputMetadataType instanceof StringType ? "String" : "InputStream",
+                     org.mule.runtime.extension.api.annotation.param.MediaType.class.getSimpleName());
           problemsReporter.addError(new Problem(model, message));
         } else if (staticResolverClashesWithMediaTypeAnnotationValue(model, outputMetadataType)) {
-          if (isCompiletime(extensionModel)) {
-            String componentType = NameUtils.getComponentModelTypeName(model);
-            String message =
-                String
-                    .format("%s '%s' is both using a Static Metadata Resolver for the output, and enforcing a media type through"
-                        +
-                        " the @%s annotation. You can use the default value for the annotation to keep letting the" +
-                        " user configure the outputMimeType parameter.",
-                            componentType, model.getName(),
-                            org.mule.runtime.extension.api.annotation.param.MediaType.class.getSimpleName());
-            problemsReporter.addError(new Problem(model, message));
-          }
-        } else if (mediaTypeAnnotationIsMissingValue(model, outputMetadataType)) {
           String componentType = NameUtils.getComponentModelTypeName(model);
           String message =
               String
-                  .format("%s '%s' has a String or InputStream output but doesn't specify a default mime type. " +
-                      "Please give a value to the @%s annotation",
-                          componentType, model.getName(),
-                          org.mule.runtime.extension.api.annotation.param.MediaType.class.getSimpleName());
+                  .format("%s '%s' is declaring both a custom output Type using a Static MetadataResolver, and a custom" +
+                      " media type through the @%s annotation. Enforce 'MediaType' you want using the '%s' " +
+                      "given to your Type Builder. You can still use the @%s annotation to set `strict=false` " +
+                      "and keep letting the user configure the outputMimeType parameter.",
+                          capitalize(componentType), model.getName(), MediaType.class.getSimpleName(),
+                          org.mule.metadata.api.model.MetadataFormat.class.getName(), MediaType.class.getSimpleName());
+          problemsReporter.addError(new Problem(model, message));
+        } else if (mediaTypeAnnotationIsMissingValue(model, outputMetadataType)) {
+          String componentType = NameUtils.getComponentModelTypeName(model);
+          String message =
+              format("%s '%s' has a %s type output but doesn't specify a default mime type. " +
+                  "Please give a value to the @%s annotation",
+                     capitalize(componentType), model.getName(),
+                     outputMetadataType instanceof StringType ? "String" : "InputStream",
+                     org.mule.runtime.extension.api.annotation.param.MediaType.class.getSimpleName());
           problemsReporter.addError(new Problem(model, message));
         }
-
       }
 
       private boolean mediaTypeAnnotationIsMissingValue(ConnectableComponentModel model, MetadataType outputMetadataType) {
@@ -145,7 +142,7 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
       }
 
       private boolean hasJavaAsMetadataFormat(OutputModel model) {
-        return model.getType().getMetadataFormat().getId().equals(JAVA_METADATA_FORMAT_ID);
+        return model.getType().getMetadataFormat().getId().equals(MetadataFormat.JAVA.getId());
       }
 
       private boolean hasMediaTypeModelProperty(ConnectableComponentModel model) {

@@ -25,11 +25,7 @@ public class MediaTypeModelProperty implements ModelProperty {
   private final boolean strict;
 
   public MediaTypeModelProperty(String mimeType, boolean strict) {
-    if (isBlank(mimeType)) {
-      mediaType = null;
-    } else {
-      mediaType = MediaType.parse(mimeType);
-    }
+    mediaType = isBlank(mimeType) ? null : MediaType.parse(mimeType);
     this.strict = strict;
   }
 

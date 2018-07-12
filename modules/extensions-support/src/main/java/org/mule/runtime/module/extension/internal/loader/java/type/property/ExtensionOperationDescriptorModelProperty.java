@@ -58,7 +58,7 @@ public class ExtensionOperationDescriptorModelProperty implements ModelProperty 
   }
 
   private Type getPayloadType(Type type) {
-    if (type.isAssignableTo(Result.class)) {
+    if (type.isAssignableTo(Result.class) && type.getGenerics().size() == 2) {
       return type.getGenerics().get(0).getConcreteType();
     }
     return type;

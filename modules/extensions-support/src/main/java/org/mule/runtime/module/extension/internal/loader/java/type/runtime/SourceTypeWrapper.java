@@ -80,6 +80,10 @@ public final class SourceTypeWrapper<T extends Source> extends TypeWrapper imple
     return getMethodAnnotatedWith(OnBackPressure.class);
   }
 
+  public Type getOutputType() {
+    return getSuperClassGenerics().get(0);
+  }
+
   private Optional<MethodElement> getMethodAnnotatedWith(Class<? extends Annotation> annotationType) {
     Class<?> searchClass = aClass;
     Collection<Method> methods = null;
