@@ -23,7 +23,7 @@ import org.mule.runtime.module.extension.internal.resources.documentation.XmlExt
 import org.mule.runtime.module.extension.internal.resources.documentation.XmlExtensionElementDocumentation;
 
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -49,14 +49,13 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
   public void enrich(ExtensionLoadingContext loadingContext) {
     String name = loadingContext.getExtensionDeclarer().getDeclaration().getName();
     ClassLoader classLoader = loadingContext.getExtensionClassLoader();
-    URL resource = classLoader.getResource("META-INF/" + serializer.getFileName(name));
-    if (resource != null) {
-      try {
-        XmlExtensionDocumentation documenter = serializer.deserialize(IOUtils.toString(resource.openStream()));
+    try (InputStream resource = classLoader.getResourceAsStream("META-INF/" + serializer.getFileName(name))) {
+      if (resource != null) {
+        XmlExtensionDocumentation documenter = serializer.deserialize(IOUtils.toString(resource));
         document(loadingContext.getExtensionDeclarer().getDeclaration(), documenter);
-      } catch (IOException e) {
-        throw new RuntimeException("Cannot get descriptions persisted in the extensions-descriptions.xml file", e);
       }
+    } catch (IOException e) {
+      throw new RuntimeException("Cannot get descriptions persisted in the extensions-descriptions.xml file", e);
     }
   }
 
