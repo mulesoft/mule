@@ -18,6 +18,7 @@ import static org.mule.module.http.api.HttpConstants.HttpProperties.GRIZZLY_MEMO
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
@@ -31,6 +32,8 @@ import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
 import org.mule.module.http.internal.domain.ByteArrayHttpEntity;
+import org.mule.module.http.internal.domain.EmptyHttpEntity;
+import org.mule.module.http.internal.domain.HttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
@@ -418,7 +421,7 @@ public class GrizzlyHttpClient implements HttpClient
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
         responseBuilder.setStatusCode(response.getStatusCode());
         responseBuilder.setReasonPhrase(response.getStatusText());
-        responseBuilder.setEntity(new InputStreamHttpEntity(inputStream));
+        responseBuilder.setEntity(getEntity(response, inputStream));
 
         if (response.hasResponseHeaders())
         {
@@ -431,6 +434,15 @@ public class GrizzlyHttpClient implements HttpClient
             }
         }
         return responseBuilder.build();
+    }
+
+    private HttpEntity getEntity(Response response, InputStream inputStream) {
+        String length = response.getHeader(CONTENT_LENGTH);
+        if (length != null && "0".equals(length))
+        {
+            return new EmptyHttpEntity();
+        }
+        return new InputStreamHttpEntity(inputStream);
     }
 
     private Request createGrizzlyRequest(final HttpRequest request, final int responseTimeout, final boolean followRedirects,

@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.request;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -14,21 +15,23 @@ import static org.mule.module.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.module.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
+import static org.mule.transformer.types.DataTypeFactory.INPUT_STREAM;
+import static org.mule.transformer.types.MimeTypes.ANY;
+import static org.mule.transformer.types.MimeTypes.BINARY;
+import static org.mule.util.DataTypeUtils.getContentType;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.transformer.DataType;
 import org.mule.module.http.internal.HttpParser;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
+import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.response.HttpResponse;
+import org.mule.module.http.internal.domain.response.StreamedHttpEntity;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
-import org.mule.transformer.types.MimeTypes;
 import org.mule.transport.NullPayload;
 import org.mule.util.AttributeEvaluator;
-import org.mule.util.DataTypeUtils;
 import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
 
 import com.google.common.net.MediaType;
 
@@ -74,13 +77,28 @@ public class HttpResponseToMuleEvent
     public void convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException
     {
         String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
+        StreamedHttpEntity entity = (StreamedHttpEntity) response.getEntity();
         DataType<?> dataType = muleEvent.getMessage().getDataType();
-        if (StringUtils.isEmpty(responseContentType) && !MimeTypes.ANY.equals(dataType.getMimeType()))
+        if (isEmpty(responseContentType) && !ANY.equals(dataType.getMimeType()))
         {
-            responseContentType = DataTypeUtils.getContentType(dataType);
+            // Check whether or not we have content
+            if (entity instanceof EmptyHttpEntity)
+            {
+                // Body is empty, so we must use */* as mime type
+                dataType = INPUT_STREAM;
+                // This is not accurate but we must keep it for compatibility
+                responseContentType = getContentType(dataType);
+            }
+            else
+            {
+                // RFC-2616 specifies application/octet-stream as default when none is received
+                responseContentType = BINARY;
+                dataType = INPUT_STREAM.cloneDataType();
+                dataType.setMimeType(BINARY);
+            }
         }
 
-        InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
+        InputStream responseInputStream = entity.getInputStream();
         String encoding = getEncoding(responseContentType);
 
         Map<String, Object> inboundProperties = getInboundProperties(response);
@@ -110,7 +128,7 @@ public class HttpResponseToMuleEvent
         String requestMessageId = muleEvent.getMessage().getUniqueId();
         String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
         DefaultMuleMessage message = new DefaultMuleMessage(muleEvent.getMessage().getPayload(), inboundProperties,
-                                                     null, inboundAttachments, muleContext, muleEvent.getMessage().getDataType());
+                                                            null, inboundAttachments, muleContext, dataType);
 
         if (encoding != null)
         {
@@ -129,7 +147,6 @@ public class HttpResponseToMuleEvent
             processCookies(response, uri);
         }
     }
-
 
     private String getEncoding(String responseContentType)
     {
@@ -199,7 +216,7 @@ public class HttpResponseToMuleEvent
      */
     private void setResponsePayload(Object payload, MuleEvent muleEvent)
     {
-        if (StringUtils.isEmpty(requester.getTarget()) || DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getTarget()) )
+        if (isEmpty(requester.getTarget()) || DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getTarget()) )
         {
             muleEvent.getMessage().setPayload(payload, muleEvent.getMessage().getDataType());
         }
