@@ -100,8 +100,10 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
 
         @Override
         protected void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
-          declareMimeTypeParameters(declaration, declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
-              .map(mp -> ((SourceTypeWrapper) (mp.getType())).getOutputType()));
+          Optional<ExtensionTypeDescriptorModelProperty> mp =
+              declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+          Optional<Type> outputType = mp.isPresent() ? ((SourceTypeWrapper) mp.get().getType()).getOutputType() : empty();
+          declareMimeTypeParameters(declaration, outputType);
         }
 
       }.walk(declaration);

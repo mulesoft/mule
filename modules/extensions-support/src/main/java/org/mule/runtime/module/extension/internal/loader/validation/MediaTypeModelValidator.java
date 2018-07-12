@@ -32,6 +32,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.Sourc
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toMetadataFormat;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
@@ -68,9 +69,9 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
 
       @Override
       protected void onSource(SourceModel model) {
-        validateMediaType(model,
-                          model.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
-                              .map(mp -> ((SourceTypeWrapper) (mp.getType())).getOutputType()));
+        Optional<ExtensionTypeDescriptorModelProperty> mp = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
+        Optional<Type> outputType = mp.isPresent() ? ((SourceTypeWrapper)mp.get().getType()).getOutputType() : empty();
+        validateMediaType(model,  outputType);
       }
 
       private void validateMediaType(ConnectableComponentModel model, Optional<Type> outputType) {
