@@ -138,6 +138,19 @@ public class HeisenbergOperations implements Disposable {
     return enemies;
   }
 
+  @OutputResolver(output = TucoMetadataResolver.class)
+  @MediaType(strict = false)
+  public String colorizeMeth() {
+    return "Blue";
+  }
+
+  // This operation will only pass the validation in the MediaTypeModelValidator in runtime
+  @OutputResolver(output = TucoMetadataResolver.class)
+  @MediaType(value = TEXT_PLAIN, strict = false)
+  public String callDea() {
+    return "Help DEA!";
+  }
+
   @Stereotype(KillingStereotype.class)
   @MediaType(TEXT_PLAIN)
   public String kill(@Optional(defaultValue = PAYLOAD) String victim, String goodbyeMessage) throws Exception {

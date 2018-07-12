@@ -11378,7 +11378,13 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "*/*",
+            "label": "*/*",
+            "validMimeTypes": [
+              "*/*"
+            ]
+          },
           "type": "String",
           "annotations": {
             "classInformation": {
@@ -11569,7 +11575,13 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "*/*",
+            "label": "*/*",
+            "validMimeTypes": [
+              "*/*"
+            ]
+          },
           "type": "String",
           "annotations": {
             "classInformation": {
@@ -11762,7 +11774,13 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "*/*",
+            "label": "*/*",
+            "validMimeTypes": [
+              "*/*"
+            ]
+          },
           "type": "String",
           "annotations": {
             "classInformation": {

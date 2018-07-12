@@ -19,6 +19,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.CON
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler.nullHandler;
+import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -54,10 +55,9 @@ import java.util.Optional;
  * Contains the logic for taking an operation's output value and turn it into a {@link Message} which not only contains the
  * updated payload but also the proper {@link DataType} and attributes.
  * <p>
- * It also consider the case in which the value is a {@code List<Result>} which should be turned into a {@code List<Message>}.
- * For any of this cases, it also allows specifying a {@link CursorProviderFactory} which will transform the streaming payload
- * values into {@link CursorProvider} instances. As said before, this is also applied then the value is a message or list of
- * them
+ * It also consider the case in which the value is a {@code List<Result>} which should be turned into a {@code List<Message>}. For
+ * any of this cases, it also allows specifying a {@link CursorProviderFactory} which will transform the streaming payload values
+ * into {@link CursorProvider} instances. As said before, this is also applied then the value is a message or list of them
  *
  * @since 4.0
  */
@@ -73,9 +73,10 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   /**
    * Creates a new instance
    *
-   * @param componentModel        the component which produces the return value
-   * @param cursorProviderFactory the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be {@code null}
-   * @param muleContext           the {@link MuleContext} of the owning application
+   * @param componentModel the component which produces the return value
+   * @param cursorProviderFactory the {@link CursorProviderFactory} to use when a message is doing cursor based streaming. Can be
+   *        {@code null}
+   * @param muleContext the {@link MuleContext} of the owning application
    */
   protected AbstractReturnDelegate(ComponentModel componentModel,
                                    CursorProviderFactory cursorProviderFactory,
@@ -98,18 +99,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
     this.muleContext = muleContext;
     this.cursorProviderFactory = cursorProviderFactory;
-    defaultMediaType = componentModel.getModelProperty(MediaTypeModelProperty.class)
-        .map(MediaTypeModelProperty::getMediaType)
-        .orElseGet(() -> {
-          if (componentModel instanceof HasOutputModel) {
-            MetadataType output = ((HasOutputModel) componentModel).getOutput().getType();
-            return JAVA.equals(output.getMetadataFormat()) && output instanceof ObjectType
-                ? MediaType.APPLICATION_JAVA
-                : ANY;
-          }
-
-          return ANY;
-        });
+    defaultMediaType = getDefaultMediaType(componentModel);
   }
 
   protected Message toMessage(Object value, ExecutionContextAdapter operationContext) {
@@ -140,7 +130,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
       Message.Builder messageBuilder;
 
-      //TODO MULE-13302: this doesn't completely makes sense. IT doesn't account for an Iterator<Message>
+      // TODO MULE-13302: this doesn't completely makes sense. IT doesn't account for an Iterator<Message>
       // org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION doesn't completely makes sense
       if (returnsListOfMessages && value instanceof Collection) {
         messageBuilder = Message.builder().collectionValue((Collection) value, Message.class);

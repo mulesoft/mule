@@ -45,6 +45,8 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -103,6 +105,8 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
     when(declaration.getModelProperty(MediaTypeModelProperty.class)).thenReturn(Optional.of(
                                                                                             new MediaTypeModelProperty(TEXT_PLAIN,
                                                                                                                        strict)));
+    when(declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)).thenReturn(empty());
+    when(declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)).thenReturn(empty());
   }
 
   @Test

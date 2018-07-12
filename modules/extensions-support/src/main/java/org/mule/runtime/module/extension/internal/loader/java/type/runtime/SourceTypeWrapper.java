@@ -38,12 +38,12 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements SourceElement, ParameterizableTypeElement {
+public final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements SourceElement, ParameterizableTypeElement {
 
   private final Class<T> aClass;
   private LazyValue<List<Type>> sourceGenerics;
 
-  SourceTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
+  public SourceTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
     super(aClass, typeLoader);
     this.aClass = aClass;
     this.sourceGenerics = new LazyValue<>(() -> IntrospectionUtils.getSuperClassGenerics(aClass, Source.class)
@@ -78,6 +78,10 @@ final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements S
   @Override
   public Optional<MethodElement> getOnBackPressureMethod() {
     return getMethodAnnotatedWith(OnBackPressure.class);
+  }
+
+  public Optional<Type> getOutputType() {
+    return getSuperClassGenerics().size() == 2 ? of(getSuperClassGenerics().get(0)) : empty();
   }
 
   private Optional<MethodElement> getMethodAnnotatedWith(Class<? extends Annotation> annotationType) {
