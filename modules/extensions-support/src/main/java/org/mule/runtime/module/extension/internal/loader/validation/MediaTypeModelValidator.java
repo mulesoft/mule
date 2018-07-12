@@ -70,8 +70,8 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
       @Override
       protected void onSource(SourceModel model) {
         Optional<ExtensionTypeDescriptorModelProperty> mp = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
-        Optional<Type> outputType = mp.isPresent() ? ((SourceTypeWrapper)mp.get().getType()).getOutputType() : empty();
-        validateMediaType(model,  outputType);
+        Optional<Type> outputType = mp.isPresent() ? ((SourceTypeWrapper) mp.get().getType()).getOutputType() : empty();
+        validateMediaType(model, outputType);
       }
 
       private void validateMediaType(ConnectableComponentModel model, Optional<Type> outputType) {
