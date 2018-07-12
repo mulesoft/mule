@@ -344,7 +344,7 @@
 /mule-standalone-${productVersion}/lib/opt/jnr-posix-3.0.42.jar
 /mule-standalone-${productVersion}/lib/opt/jnr-unixsocket-0.17.jar
 /mule-standalone-${productVersion}/lib/opt/jnr-x86asm-1.0.2.jar
-/mule-standalone-${productVersion}/lib/opt/joda-time-2.9.1.jar
+/mule-standalone-${productVersion}/lib/opt/joda-time-2.9.7.jar
 /mule-standalone-${productVersion}/lib/opt/joni-2.1.11.jar
 /mule-standalone-${productVersion}/lib/opt/jopt-simple-5.0.3.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-stdlib-9.1.16.0.jar
