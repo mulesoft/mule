@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.module.artifact.internal.classloader.DefaultResourceInitializer;
@@ -173,6 +174,7 @@ public class MuleContainer {
     // properties
     MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
     MuleArtifactUrlStreamHandler.register();
+    FineGrainedControlClassLoader.NonCachingJarResourceURLStreamHandler.register();
 
     // Startup properties
     String propertiesFile = (String) commandlineOptions.get("props");
