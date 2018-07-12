@@ -16,11 +16,17 @@
     </spring:beans>
 
     <sftp:connector name="sftpAppendConnector" duplicateHandling="append" tempDirInbound="archive" useTempFileTimestampSuffix="true" />
+    <sftp:connector name="sftpAppendConnectorWithTempDirOutbound" duplicateHandling="append" tempDirInbound="archive" useTempFileTimestampSuffix="true" tempDirOutbound="tempFolder" />
     <sftp:connector name="sftpOverwriteConnector" duplicateHandling="overwrite" tempDirInbound="archive" useTempFileTimestampSuffix="true" />
     
     <flow name="testAppend">
         <vm:inbound-endpoint path="append" exchange-pattern="request-response" />
         <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir" outputPattern="append.txt" connector-ref="sftpAppendConnector" />
+    </flow>
+
+    <flow name="testAppendWithTempDirOutbound">
+        <vm:inbound-endpoint path="append-with-temp-dir-outbound" exchange-pattern="request-response" />
+        <sftp:outbound-endpoint address="sftp://${USER1_NAME}:${USER1_PASSWORD}@${SFTP_HOST}:${SFTP_PORT}/~/testdir" outputPattern="append.txt" connector-ref="sftpAppendConnectorWithTempDirOutbound" />
     </flow>
 
     <flow name="testDefault">
