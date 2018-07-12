@@ -26,36 +26,39 @@ import org.joda.time.format.DateTimeFormat;
 public class TimeValidator extends AbstractValidator
 {
 
-    private final String time;
-    private final String locale;
-    private final String pattern;
-    private Message errorMessage;
+  private final String time;
+  private final String locale;
+  private final String pattern;
+  private Message errorMessage;
 
-    public TimeValidator(String time, String locale, String pattern, ValidationContext validationContext)
+  public TimeValidator(String time, String locale, String pattern, ValidationContext validationContext)
+  {
+    super(validationContext);
+    this.time = time;
+    this.locale = locale;
+    this.pattern = pattern;
+  }
+
+  @Override
+  public ValidationResult validate(MuleEvent event)
+  {
+    Locale locale = new Locale(this.locale);
+    try
     {
-        super(validationContext);
-        this.time = time;
-        this.locale = locale;
-        this.pattern = pattern;
+      DateTimeFormat.forPattern(pattern).withLocale(locale).parseDateTime(time);
+    }
+    catch (IllegalArgumentException e)
+    {
+      errorMessage = getMessages().invalidTime(time, this.locale, pattern);
+      return fail();
     }
 
-    @Override
-    public ValidationResult validate(MuleEvent event)
-    {
-        Locale locale = new Locale(this.locale);
-        try {
-            DateTimeFormat.forPattern(pattern).withLocale(locale).parseDateTime(time);
-        } catch (IllegalArgumentException e) {
-            errorMessage = getMessages().invalidTime(time, this.locale, pattern);
-            return fail();
-        }
+    return ok();
+  }
 
-        return ok();
-    }
-
-    @Override
-    protected Message getDefaultErrorMessage()
-    {
-        return errorMessage;
-    }
+  @Override
+  protected Message getDefaultErrorMessage()
+  {
+    return errorMessage;
+  }
 }
