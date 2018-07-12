@@ -146,6 +146,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="encoding" type="substitutableString">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The encoding of the file with the configuration properties to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
