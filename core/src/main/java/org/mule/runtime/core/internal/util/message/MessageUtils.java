@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
@@ -26,6 +27,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 /**
  * Utility methods for handling {@link Message messages}
@@ -147,10 +149,13 @@ public final class MessageUtils {
   }
 
   private static Message toMessage(Result<?, ?> result, DataType dataType, Object value) {
-    Message.Builder builder = Message.builder().payload(new TypedValue<>(value, dataType, result.getLength()));
+    Message.Builder builder = Message.builder().payload(new TypedValue<>(value, dataType, result.getByteLength()));
 
-    result.getAttributes().ifPresent(builder::attributesValue);
-    result.getAttributesMediaType().ifPresent(builder::attributesMediaType);
+    result.getAttributes().ifPresent(att -> {
+      final DataTypeParamsBuilder dataTypeBuilder = builder(DataType.fromObject(att));
+      result.getAttributesMediaType().ifPresent(amt -> dataTypeBuilder.mediaType(amt));
+      builder.attributes(new TypedValue<>(att, dataTypeBuilder.build(), OptionalLong.empty()));
+    });
 
     return builder.build();
   }

@@ -85,6 +85,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
 
+  private static final Consumer<Context> TCCL_REACTOR_CTX_CONSUMER =
+      context -> context.getOrEmpty(TCCL_REACTOR_CTX_KEY)
+          .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl));
+
+  private static final Consumer<Context> TCCL_ORIGINAL_REACTOR_CTX_CONSUMER =
+      context -> context.getOrEmpty(TCCL_ORIGINAL_REACTOR_CTX_KEY)
+          .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl));
+
   static {
     try {
       appClClass = (Class<ClassLoader>) AbstractMessageProcessorChain.class.getClassLoader()
@@ -213,10 +221,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           setCurrentEvent((PrivilegedEvent) event);
         })
         // #1 Update TCCL with the one from the Region of the processor to execute once in execution thread.
-        .transform(doOnNextOrErrorWithContext(TCCL_REACTOR_CTX_KEY)
+        .transform(doOnNextOrErrorWithContext(TCCL_REACTOR_CTX_CONSUMER)
             .andThen(next)
             // #1 Set back previous TCCL.
-            .andThen(doOnNextOrErrorWithContext(TCCL_ORIGINAL_REACTOR_CTX_KEY))));
+            .andThen(doOnNextOrErrorWithContext(TCCL_ORIGINAL_REACTOR_CTX_CONSUMER))));
 
     // Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
@@ -241,10 +249,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     return interceptors;
   }
 
-  private Function<? super Publisher<CoreEvent>, ? extends Publisher<CoreEvent>> doOnNextOrErrorWithContext(String tcclCtxKey) {
-    Consumer<Context> contextConsumer = context -> context.getOrEmpty(tcclCtxKey)
-        .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl));
-
+  private Function<? super Publisher<CoreEvent>, ? extends Publisher<CoreEvent>> doOnNextOrErrorWithContext(Consumer<Context> contextConsumer) {
     return lift((scannable, subscriber) -> new CoreSubscriber<CoreEvent>() {
 
       private Context context = subscriber.currentContext();
