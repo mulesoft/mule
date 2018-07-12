@@ -23,6 +23,12 @@
             <artifactId>commons-validator</artifactId>
             <version>1.6</version>
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${jodaTimeVersion}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

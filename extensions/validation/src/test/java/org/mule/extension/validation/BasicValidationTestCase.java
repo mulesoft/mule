@@ -14,7 +14,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 import static org.mule.extension.validation.internal.ValidationExtension.DEFAULT_LOCALE;
-
 import org.mule.api.MuleEvent;
 import org.mule.extension.validation.api.MultipleValidationException;
 import org.mule.extension.validation.api.MultipleValidationResult;
@@ -104,11 +103,15 @@ public class BasicValidationTestCase extends ValidationTestCase
     @Test
     public void time() throws Exception
     {
-        final String time = "12:08 PM";
+        String time = "12:08 PM";
 
         assertValid("time", getTimeEvent(time, "h:mm a"));
         assertValid("time", getTimeEvent("Wed, Jul 4, '01", "EEE, MMM d, ''yy"));
-        final String invalidPattern = "yyMMddHHmmssZ";
+        String invalidPattern = "yyMMddHHmmssZ";
+        assertInvalid("time", getTimeEvent(time, invalidPattern), messages.invalidTime(time, DEFAULT_LOCALE, invalidPattern));
+
+        invalidPattern = "MM/dd/YYYY";
+        time = "34/02/2";
         assertInvalid("time", getTimeEvent(time, invalidPattern), messages.invalidTime(time, DEFAULT_LOCALE, invalidPattern));
     }
 
