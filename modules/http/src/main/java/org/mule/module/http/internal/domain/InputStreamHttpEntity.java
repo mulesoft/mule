@@ -6,9 +6,11 @@
  */
 package org.mule.module.http.internal.domain;
 
+import org.mule.module.http.internal.domain.response.StreamedHttpEntity;
+
 import java.io.InputStream;
 
-public class InputStreamHttpEntity implements HttpEntity
+public class InputStreamHttpEntity implements StreamedHttpEntity
 {
 
     private Integer contentLength;

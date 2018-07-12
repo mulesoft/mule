@@ -6,10 +6,15 @@
  */
 package org.mule.module.http.internal.domain;
 
+import org.mule.module.http.internal.domain.response.StreamedHttpEntity;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 /**
  * Represents a byte array entity message.
  */
-public class ByteArrayHttpEntity implements HttpEntity
+public class ByteArrayHttpEntity implements StreamedHttpEntity
 {
 
     private byte[] content;
@@ -22,5 +27,11 @@ public class ByteArrayHttpEntity implements HttpEntity
     public byte[] getContent()
     {
         return this.content;
+    }
+
+    @Override
+    public InputStream getInputStream()
+    {
+        return new ByteArrayInputStream(content);
     }
 }
