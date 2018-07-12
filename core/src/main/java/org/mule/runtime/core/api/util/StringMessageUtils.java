@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Useful methods for formatting message strings for logging or exceptions.
@@ -61,6 +62,11 @@ public final class StringMessageUtils {
     int size;
     StringBuilder buf = new StringBuilder(messages.size() * maxlength);
     int trimLength = maxlength - (c == ' ' ? 2 : 4);
+
+    messages = messages.stream()
+        .map(string -> string.split(lineSeparator()))
+        .flatMap(Arrays::stream)
+        .collect(Collectors.toList());
 
     for (int i = 0; i < messages.size(); i++) {
       size = messages.get(i).toString().length();

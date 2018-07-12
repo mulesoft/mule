@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.classloader;
 
 import static java.lang.Math.max;
+import static java.lang.System.lineSeparator;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.center;
 import static org.apache.commons.lang3.StringUtils.repeat;
@@ -85,14 +86,14 @@ public class DefaultClassLoaderNode implements ClassLoaderNode {
       ClassLoaderNode classLoaderNode = classLoaderNodes.pop();
       boolean isLastNode = classLoaderNodes.empty();
       if (!isFirst.get()) {
-        stringBuilder.append(center("^", frameSize)).append("\n");
-        stringBuilder.append(center("|", frameSize)).append("\n");
+        stringBuilder.append(center("^", frameSize)).append(lineSeparator());
+        stringBuilder.append(center("|", frameSize)).append(lineSeparator());
       }
       isFirst.set(false);
       printNodeFrame(stringBuilder, frameSize, classLoaderNode, false, false);
       for (int i = 0; i < classLoaderNode.getDelegateNodes().size(); i++) {
         ClassLoaderNode delegateNode = classLoaderNode.getDelegateNodes().get(i);
-        stringBuilder.append(center("|", frameSize)).append("\n");
+        stringBuilder.append(center("|", frameSize)).append(lineSeparator());
         boolean isLastItem = i == classLoaderNode.getDelegateNodes().size() - 1;
         printNodeFrame(stringBuilder, frameSize, delegateNode, true,
                        isLastNode && isLastItem);
@@ -126,15 +127,15 @@ public class DefaultClassLoaderNode implements ClassLoaderNode {
     if (includeDelegateLines) {
       stringBuilder.append(repeat(" ", frameSize / 2)).append(repeat("-", frameSize / 2)).append("> ");
     }
-    stringBuilder.append(repeat("-", frameSize)).append("\n");
+    stringBuilder.append(repeat("-", frameSize)).append(lineSeparator());
     if (includeDelegateLines) {
       stringBuilder.append(center(doNotAddHierarchyLines ? " " : "|", frameSize)).append(repeat(" ", 2));
     }
-    stringBuilder.append("|").append(center(classLoaderNode.getId(), frameSize - 2)).append("|").append("\n");
+    stringBuilder.append("|").append(center(classLoaderNode.getId(), frameSize - 2)).append("|").append(lineSeparator());
     if (includeDelegateLines) {
       stringBuilder.append(center(doNotAddHierarchyLines ? " " : "|", frameSize)).append(repeat(" ", 2));
     }
-    stringBuilder.append(repeat("-", frameSize)).append("\n");
+    stringBuilder.append(repeat("-", frameSize)).append(lineSeparator());
   }
 
   public List<ClassLoaderNode> findPossibleResourceOwners(String resourceName) {
