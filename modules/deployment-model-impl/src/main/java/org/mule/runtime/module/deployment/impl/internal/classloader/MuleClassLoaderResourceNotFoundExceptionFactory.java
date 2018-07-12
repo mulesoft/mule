@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.classloader;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
+import static java.lang.System.lineSeparator;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getClassNotFoundErrorMessage;
 import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getResourceNotFoundErrorMessage;
@@ -103,13 +104,15 @@ public class MuleClassLoaderResourceNotFoundExceptionFactory implements ClassLoa
                        .map(cln -> cln.getId()).collect(Collectors.toList())),
                    exportMsg);
       }
-      return detailedExceptionProviderFunction.apply(format("%s \n %s \n %s \n %s", genericMsgProviderFunction.apply(resource),
-                                                            classLoaderNode.toString(),
-                                                            format("Current classloader in context is (%s)",
-                                                                   currentContextClassLoaderNode
-                                                                       .getId()),
-                                                            possibleResourceOwnersMessage),
-                                                     classLoaderNode);
+      return detailedExceptionProviderFunction
+          .apply(format("%s " + lineSeparator() + " %s " + lineSeparator() + " %s " + lineSeparator() + " %s",
+                        genericMsgProviderFunction.apply(resource),
+                        classLoaderNode.toString(),
+                        format("Current classloader in context is (%s)",
+                               currentContextClassLoaderNode
+                                   .getId()),
+                        possibleResourceOwnersMessage),
+                 classLoaderNode);
     } else {
       return genericExceptionProviderFunction.apply(resource, classLoader);
     }
