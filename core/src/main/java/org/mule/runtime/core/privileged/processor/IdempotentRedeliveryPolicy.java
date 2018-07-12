@@ -35,7 +35,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.internal.util.store.ObjectStorePartition;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 
 import java.io.Serializable;
@@ -65,7 +64,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       "---" + lineSeparator() +
       "Crypto::hashWith(payload, '%s')";
 
-  private static final Logger logger = getLogger(IdempotentRedeliveryPolicy.class);
+  private static final Logger LOGGER = getLogger(IdempotentRedeliveryPolicy.class);
 
   private LockFactory lockFactory;
   private ObjectStoreManager objectStoreManager;
@@ -77,6 +76,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   private ObjectStore<RedeliveryCounter> store;
   private ObjectStore<RedeliveryCounter> privateStore;
   private String idrId;
+
 
   /**
    * Holds information about the redelivery failures.
@@ -97,12 +97,13 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     super.initialise();
     if (useSecureHash && idExpression != null) {
       useSecureHash = false;
-      if (logger.isWarnEnabled()) {
-        logger.warn("Disabling useSecureHash in idempotent-redelivery-policy since an idExpression has been configured");
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn("Disabling useSecureHash in idempotent-redelivery-policy since an idExpression has been configured");
       }
     }
     if (!useSecureHash && messageDigestAlgorithm != null) {
-      throw new InitialisationException(initialisationFailure(format("The message digest algorithm '%s' was specified when a secure hash will not be used",
+      throw new InitialisationException(
+                                        initialisationFailure(format("The message digest algorithm '%s' was specified when a secure hash will not be used",
                                                                      messageDigestAlgorithm)),
                                         this);
     }
@@ -120,7 +121,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
     idrId = format("%s-%s-%s", muleContext.getConfiguration().getId(), getLocation().getRootContainerName(), "idr");
     if (store != null && privateStore != null) {
-      throw new InitialisationException(createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
+      throw new InitialisationException(
+                                        createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
                                         this);
     }
     if (store == null) {
@@ -136,27 +138,23 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   }
 
   private Supplier<ObjectStore> internalObjectStoreSupplier() {
-    return () -> {
-      return objectStoreManager.createObjectStore(getLocation().getRootContainerName() + "." + getClass().getName(),
-                                                  ObjectStoreSettings.builder()
-                                                      .persistent(false)
-                                                      .entryTtl((long) 60 * 5 * 1000)
-                                                      .expirationInterval(6000L).build());
-    };
+    return () -> objectStoreManager.createObjectStore(getLocation().getRootContainerName() + "." + getClass().getName(),
+                                                      ObjectStoreSettings.builder()
+                                                          .persistent(false)
+                                                          .entryTtl((long) 60 * 5 * 1000)
+                                                          .expirationInterval(6000L).build());
   }
 
   @Override
   public void dispose() {
     super.dispose();
-    if (store instanceof ObjectStorePartition) {
-      try {
-        ((ObjectStorePartition) store).close();
-      } catch (ObjectStoreException e) {
-        logger.warn("error closing object store: " + e.getMessage(), e);
-      }
-    }
     if (store != null) {
-      disposeIfNeeded(store, logger);
+      try {
+        store.close();
+      } catch (ObjectStoreException e) {
+        LOGGER.warn("error closing object store: " + e.getMessage(), e);
+      }
+      disposeIfNeeded(store, LOGGER);
       store = null;
     }
   }
@@ -181,8 +179,9 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     try {
       messageId = getIdForEvent(event);
     } catch (ExpressionRuntimeException e) {
-      logger
-          .warn("The message cannot be processed because the digest could not be generated. Either make the payload serializable or use an expression.");
+      LOGGER
+          .warn(
+                "The message cannot be processed because the digest could not be generated. Either make the payload serializable or use an expression.");
       return null;
     } catch (Exception ex) {
       exceptionSeen = of(ex);
