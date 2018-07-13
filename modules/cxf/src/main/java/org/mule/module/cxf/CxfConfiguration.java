@@ -70,6 +70,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         if (!initializeStaticBusInstance)
         {
             BusFactory.setDefaultBus(null);
+            logger.warn("initializeStaticBusInstance=false is currently deprecated because of security implications. Use it at your own risk.");
         }
 
         MuleUniversalTransport transport = new MuleUniversalTransport(this);
