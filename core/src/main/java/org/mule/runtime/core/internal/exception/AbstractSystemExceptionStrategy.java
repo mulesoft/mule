@@ -16,8 +16,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
@@ -39,11 +37,10 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
     logger.debug("Rolling back transaction");
     rollback(ex, rollbackMethod);
 
-    ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
     if (getCurrentEvent() != null) {
       PrivilegedEvent currentEvent = getCurrentEvent();
       currentEvent = PrivilegedEvent.builder(currentEvent)
-          .message(InternalMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build()).build();
+          .message(InternalMessage.builder(currentEvent.getMessage()).build()).build();
       setCurrentEvent(currentEvent);
     }
 

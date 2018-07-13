@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.el.context.MessageContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.el.context.EventVariablesMapContext;
 import org.mule.runtime.core.privileged.el.context.SessionVariableMapContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -87,9 +86,6 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
       } else if (EXCEPTION.equals(name)) {
         if (event.getError().isPresent()) {
           Throwable exception = event.getError().get().getCause();
-          return new MuleImmutableVariableResolver<>(EXCEPTION, wrapIfNecessary(event, exception), null);
-        } else if (((InternalMessage) event.getMessage()).getExceptionPayload() != null) {
-          Throwable exception = ((InternalMessage) event.getMessage()).getExceptionPayload().getException();
           return new MuleImmutableVariableResolver<>(EXCEPTION, wrapIfNecessary(event, exception), null);
         } else {
           return new MuleImmutableVariableResolver<Message>(EXCEPTION, null, null);

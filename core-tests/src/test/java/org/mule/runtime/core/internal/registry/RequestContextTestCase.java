@@ -13,8 +13,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -65,7 +63,6 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
       try {
         Exception exception = new Exception();
         event = PrivilegedEvent.builder(event)
-            .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
             .error(createErrorMock(exception)).build();
         setCurrentEvent(event);
         success.set(true);

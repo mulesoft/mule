@@ -50,7 +50,10 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
    * and Mule error code, plus any other related info
    *
    * @return The exception payload (if any) attached to this message
+   * 
+   * @deprecated This field is no longer populated
    */
+  @Deprecated
   ExceptionPayload getExceptionPayload();
 
   interface PayloadBuilder extends Message.PayloadBuilder {
@@ -94,7 +97,10 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param exceptionPayload
      * @return this builder.
+     * 
+     * @deprecated This field is no longer populated
      */
+    @Deprecated
     Builder exceptionPayload(ExceptionPayload exceptionPayload);
 
     /**
@@ -261,6 +267,10 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     @Override
     CollectionBuilder attributesMediaType(MediaType mediaType);
 
+    /* 
+    * @deprecated This field is no longer populated
+    */
+    @Deprecated
     @Override
     CollectionBuilder exceptionPayload(ExceptionPayload exceptionPayload);
 
