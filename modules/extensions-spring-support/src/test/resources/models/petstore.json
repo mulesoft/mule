@@ -17058,7 +17058,7 @@
           },
           "type": "String"
         },
-        "hasDynamicType": false,
+        "hasDynamicType": true,
         "description": "",
         "modelProperties": {}
       },
