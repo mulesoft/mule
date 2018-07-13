@@ -16,21 +16,16 @@ import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
 import org.mule.runtime.module.artifact.api.classloader.exception.CompositeClassNotFoundException;
-import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLStreamHandler;
-import java.net.URLStreamHandlerFactory;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
 import org.slf4j.Logger;
-import sun.net.www.protocol.jar.Handler;
 
 /**
  * Defines a {@link ClassLoader} which enables the control of the class loading lookup mode.
@@ -52,7 +47,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
   private final boolean verboseLogging;
 
   public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy) {
-    super(urls, parent, new NonCachingURLStreamHandlerFactory());
+    super(urls, parent);
     checkArgument(lookupPolicy != null, "Lookup policy cannot be null");
     this.lookupPolicy = lookupPolicy;
     verboseLogging = LOGGER.isDebugEnabled() || isVerboseLoggingEnabled();
@@ -203,42 +198,4 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     }
   }
 
-  public static class NonCachingURLStreamHandlerFactory implements URLStreamHandlerFactory {
-
-    @Override
-    public URLStreamHandler createURLStreamHandler(String protocol) {
-      return new NonCachingJarResourceURLStreamHandler();
-    }
-  }
-
-  /**
-   * Prevents jar caching for this classloader, mainly to fix the static ResourceBundle mess/cache that keeps connections open no
-   * matter what.
-   */
-  public static class NonCachingJarResourceURLStreamHandler extends Handler {
-
-    /**
-     * JAR Protocol that will be used to reference resources inside jars.
-     */
-    public final static String PROTOCOL = "jar";
-
-    public NonCachingJarResourceURLStreamHandler() {
-      super();
-    }
-
-    /**
-     * Registers the JAR protocol {@link #PROTOCOL} into the {@link URL#setURLStreamHandlerFactory(URLStreamHandlerFactory)}
-     * through the {@link MuleUrlStreamHandlerFactory}.
-     */
-    public static void register() {
-      MuleUrlStreamHandlerFactory.registerHandler(PROTOCOL, new NonCachingJarResourceURLStreamHandler());
-    }
-
-    @Override
-    protected java.net.URLConnection openConnection(URL u) throws IOException {
-      JarURLConnection c = new sun.net.www.protocol.jar.JarURLConnection(u, this);
-      c.setUseCaches(false);
-      return c;
-    }
-  }
 }
