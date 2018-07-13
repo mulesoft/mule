@@ -28,6 +28,14 @@
           "methodName": "exportsPackage",
           "elementKind": "method",
           "justification": "This interface is not meant to be implemented by the user"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader.NonCachingURLStreamHandlerFactory",
+          "package": "org.mule.runtime.module.artifact.api.classloader",
+          "classSimpleName": "NonCachingURLStreamHandlerFactory",
+          "elementKind": "class",
+          "justification": "In the context of Mule Runtime this stream handler factory is not used, instead it uses org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory"
         }
       ]
     }
