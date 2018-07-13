@@ -136,6 +136,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected PolicyManager policyManager;
   private final ReflectionCache reflectionCache;
   protected ReturnDelegate returnDelegate;
+  private String resolvedProcessorRepresentation;
   private boolean initialised = false;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
@@ -209,10 +210,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             }
 
             if (getLocation() != null) {
-              String resolveProcessorRepresentation =
-                  resolveProcessorRepresentation(muleContext.getConfiguration().getId(), getLocation().getLocation(), this);
-
-              ((DefaultFlowCallStack) event.getFlowCallStack()).setCurrentProcessorPath(resolveProcessorRepresentation);
+              ((DefaultFlowCallStack) event.getFlowCallStack()).setCurrentProcessorPath(resolvedProcessorRepresentation);
               return Mono.from(policyManager
                   .createOperationPolicy(this, event, resolutionResult,
                                          operationExecutionFunction)
@@ -280,6 +278,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       componentExecutor = createComponentExecutor();
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
+
+      if (getLocation() != null) {
+        resolvedProcessorRepresentation =
+            resolveProcessorRepresentation(muleContext.getConfiguration().getId(), getLocation().getLocation(), this);
+      }
+
       initialised = true;
     }
   }

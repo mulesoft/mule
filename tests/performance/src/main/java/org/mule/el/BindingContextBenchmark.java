@@ -62,6 +62,14 @@ public class BindingContextBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
+  public Object addAllThreeTimes() {
+    return BindingContext.builder(globalCtx)
+        .addAll(childCtx)
+        .addAll(event.asBindingContext())
+        .build();
+  }
+
+  @Benchmark
   public Object payloadBinding() {
     return bctx.lookup(BindingContextUtils.PAYLOAD);
   }
