@@ -30,6 +30,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
@@ -1543,6 +1544,17 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     Application dependantApplication = deploymentService.getApplications().get(0);
     assertThat(dependantApplication, is(notNullValue()));
     assertThat(dependantApplication.getStatus(), is(DESTROYED));
+  }
+
+  @Test
+  public void domainWithNonExistentConfigResourceOnDeclaration() throws Exception {
+    DomainFileBuilder domainBundleNonExistentConfigResource = new DomainFileBuilder("non-existent-domain-config-resource")
+        .definedBy("empty-domain-config.xml").deployedWith(PROPERTY_CONFIG_RESOURCES, "mule-non-existent-config.xml");
+
+    addPackedDomainFromBuilder(domainBundleNonExistentConfigResource);
+    startDeployment();
+
+    assertDeploymentFailure(domainDeploymentListener, domainBundleNonExistentConfigResource.getId());
   }
 
 

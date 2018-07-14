@@ -30,11 +30,10 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.core.internal.logging.LogUtil;
-import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.DeploymentStopException;
+import org.mule.runtime.deployment.model.api.InstallException;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -46,6 +45,7 @@ import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderMan
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -127,6 +127,18 @@ public class DefaultMuleDomain implements Domain {
         log(miniSplash(format("New domain '%s'", getArtifactName())));
       }
     });
+
+    try {
+      for (String configFile : this.descriptor.getConfigResources()) {
+        URL configFileUrl = getArtifactClassLoader().getClassLoader().getResource(configFile);
+        if (configFileUrl == null) {
+          String message = format("Config for domain '%s' not found: %s", getArtifactName(), configFile);
+          throw new InstallException(createStaticMessage(message));
+        }
+      }
+    } catch (Exception e) {
+      throw e;
+    }
   }
 
   @Override
