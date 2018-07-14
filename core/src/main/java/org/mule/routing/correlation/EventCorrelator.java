@@ -13,6 +13,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -93,6 +94,8 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     private final String name;
 
     private final FlowConstruct flowConstruct;
+    
+    private final Lock lock;
 
     public EventCorrelator(EventCorrelatorCallback callback,
                            MessageProcessor timeoutMessageProcessor,
@@ -101,8 +104,11 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                            FlowConstruct flowConstruct,
                            PartitionableObjectStore correlatorStore,
                            String storePrefix,
-                           ObjectStore<Long> processedGroups)
+                           ObjectStore<Long> processedGroups,
+                           Lock lock)
     {
+        this.lock = lock;
+        
         if (callback == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("EventCorrelatorCallback")
@@ -176,33 +182,26 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
         // spinloop for the EventGroup lookup
         while (true)
         {
-            try
-            {
-                if (isGroupAlreadyProcessed(groupId))
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("An event was received for an event group that has already been processed, "
-                                     + "this is probably because the async-reply timed out. Correlation Id is: "
-                                     + groupId + ". Dropping event");
-                    }
-                    // Fire a notification to say we received this message
-                    muleContext.fireNotification(new RoutingNotification(event.getMessage(),
-                                                                         event.getMessageSourceURI().toString(),
-                                                                         RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT));
-                    return null;
-                }
-            }
-            catch (ObjectStoreException e)
-            {
-                throw new RoutingException(event, timeoutMessageProcessor, e);
-            }
-
             // check for an existing group first
             EventGroup group;
             try
             {
                 group = this.getEventGroup(groupId);
+            }
+            catch (ObjectStoreException e)
+            {
+                throw new RoutingException(event, timeoutMessageProcessor, e);
+            }
+            
+            // This verification has to be here to verify that after retrieval of the group
+            // no invalid storage of the group in the correlation map is performed.
+            try
+            {
+                if (isGroupAlreadyProcessed(groupId))
+                {
+                    fireMissedAggregationGroupEvent(event, groupId);
+                    return null;
+                }
             }
             catch (ObjectStoreException e)
             {
@@ -226,8 +225,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             }
 
             // ensure that only one thread at a time evaluates this EventGroup
-            synchronized (groupsLock)
+            try
             {
+                lock.lock();
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Adding event to aggregator group: " + groupId);
@@ -296,10 +296,41 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                     return null;
                 }
             }
+            finally
+            {
+                lock.unlock();
+            }
         }
     }
 
+    private void fireMissedAggregationGroupEvent(MuleEvent event, final String groupId)
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("An event was received for an event group that has already been processed, "
+                         + "this is probably because the async-reply timed out. Correlation Id is: "
+                         + groupId + ". Dropping event");
+        }
+        // Fire a notification to say we received this message
+        muleContext.fireNotification(new RoutingNotification(event.getMessage(),
+                                                             event.getMessageSourceURI().toString(),
+                                                             RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT));
+    }
+
     protected EventGroup getEventGroup(Serializable groupId) throws ObjectStoreException
+    {
+        try
+        {
+            lock.lock();
+            return doGetEventGroup(groupId);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    private EventGroup doGetEventGroup(Serializable groupId) throws ObjectStoreException
     {
         try
         {
@@ -340,29 +371,44 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     protected void removeEventGroup(EventGroup group) throws ObjectStoreException
     {
         final Object groupId = group.getGroupId();
-        synchronized (groupsLock)
+        try
         {
+            lock.lock();
             if (!isGroupAlreadyProcessed(groupId))
             {
                 correlatorStore.remove((Serializable) groupId, getEventGroupsPartitionKey());
                 addProcessedGroup(groupId);
             }
         }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     protected void addProcessedGroup(Object id) throws ObjectStoreException
     {
-        synchronized (groupsLock)
+        try
         {
+            lock.lock();
             processedGroups.store((Serializable) id, System.currentTimeMillis());
+        }
+        finally
+        {
+            lock.unlock();
         }
     }
 
     protected boolean isGroupAlreadyProcessed(Object id) throws ObjectStoreException
     {
-        synchronized (groupsLock)
+        try
         {
+            lock.lock();
             return processedGroups.contains((Serializable) id);
+        }
+        finally
+        {
+            lock.unlock();
         }
     }
 

@@ -14,6 +14,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.concurrent.locks.Lock;
+
 import org.mule.DefaultMessageCollection;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
@@ -69,6 +71,8 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     private EventGroup mockEventGroup;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private ListableObjectStore mockProcessedGroups;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private Lock mockLock;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private DefaultMessageCollection mockMessageCollection;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -216,7 +220,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         when(mockEventGroup.getCreated()).thenReturn(currentTimeMillis());
         when(mockEventCorrelatorCallback.aggregateEvents(mockEventGroup)).thenReturn(null);
         EventCorrelator eventCorrelator = new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, mockFlowConstruct, memoryObjectStore,
-                "prefix", mockProcessedGroups);
+                "prefix", mockProcessedGroups, mockLock);
         eventCorrelator.setFailOnTimeout(false);
         eventCorrelator.handleGroupExpiry(mockEventGroup);
     }
@@ -230,7 +234,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         when(mockEventGroup.toMessageCollection()).thenReturn(null);
         when(mockFlowConstruct.getName()).thenReturn("flowName");
         return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, mockFlowConstruct, memoryObjectStore,
-                "prefix", mockProcessedGroups);
+                "prefix", mockProcessedGroups, mockLock);
     }
 
     public interface DisposableListableObjectStore extends ListableObjectStore, Disposable

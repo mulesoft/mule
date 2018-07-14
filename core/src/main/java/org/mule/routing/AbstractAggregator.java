@@ -9,6 +9,8 @@ package org.mule.routing;
 import static org.mule.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
 
+import java.util.concurrent.locks.Lock;
+
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -34,6 +36,7 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.routing.correlation.EventCorrelator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.util.concurrent.ThreadNameHelper;
+import org.mule.util.lock.MuleLockFactory;
 import org.mule.util.store.ProvidedObjectStoreWrapper;
 import org.mule.util.store.ProvidedPartitionableObjectStoreWrapper;
 
@@ -84,9 +87,9 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
         initProcessedGroupsObjectStore();
         initEventGroupsObjectStore();
-
+        
         eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next, messageInfoMapping,
-                muleContext, flowConstruct, eventGroupsObjectStore, storePrefix, processedGroupsObjectStore);
+                muleContext, flowConstruct, eventGroupsObjectStore, storePrefix, processedGroupsObjectStore, createLock());
 
         // Inherit failOnTimeout from async-reply if this aggregator is being used
         // for async-reply
@@ -101,6 +104,14 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
         eventCorrelator.setTimeout(timeout);
         eventCorrelator.setFailOnTimeout(isFailOnTimeout());
+    }
+
+    private Lock createLock() throws InitialisationException
+    {
+        MuleLockFactory muleLockFactory = new MuleLockFactory();
+        muleLockFactory.setMuleContext(muleContext);
+        muleLockFactory.initialise();
+        return muleLockFactory.createLock("agregator_" + flowConstruct.getName());
     }
 
     protected void initProcessedGroupsObjectStore()
