@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
+import javax.inject.Inject;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.DefaultMuleEvent;
@@ -48,6 +50,7 @@ import org.mule.routing.EventProcessingThread;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
+import org.mule.util.lock.LockFactory;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -95,7 +98,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
     private final FlowConstruct flowConstruct;
     
-    private final Lock lock;
+    private Lock lock;
 
     public EventCorrelator(EventCorrelatorCallback callback,
                            MessageProcessor timeoutMessageProcessor,
@@ -104,11 +107,8 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                            FlowConstruct flowConstruct,
                            PartitionableObjectStore correlatorStore,
                            String storePrefix,
-                           ObjectStore<Long> processedGroups,
-                           Lock lock)
+                           ObjectStore<Long> processedGroups)
     {
-        this.lock = lock;
-        
         if (callback == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("EventCorrelatorCallback")
@@ -227,7 +227,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             // ensure that only one thread at a time evaluates this EventGroup
             try
             {
-                lock.lock();
+                getLock().lock();
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Adding event to aggregator group: " + groupId);
@@ -298,7 +298,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
             }
             finally
             {
-                lock.unlock();
+                getLock().unlock();
             }
         }
     }
@@ -321,12 +321,12 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     {
         try
         {
-            lock.lock();
+            getLock().lock();
             return doGetEventGroup(groupId);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -373,7 +373,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
         final Object groupId = group.getGroupId();
         try
         {
-            lock.lock();
+            getLock().lock();
             if (!isGroupAlreadyProcessed(groupId))
             {
                 correlatorStore.remove((Serializable) groupId, getEventGroupsPartitionKey());
@@ -382,7 +382,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -390,12 +390,12 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     {
         try
         {
-            lock.lock();
+            getLock().lock();
             processedGroups.store((Serializable) id, System.currentTimeMillis());
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -403,12 +403,12 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     {
         try
         {
-            lock.lock();
+            getLock().lock();
             return processedGroups.contains((Serializable) id);
         }
         finally
         {
-            lock.unlock();
+            getLock().unlock();
         }
     }
 
@@ -685,5 +685,15 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
         {
             ((Disposable) o).dispose();
         }
+    }
+    
+    private Lock getLock()
+    {
+        if (lock == null)
+        {
+            lock = muleContext.getLockFactory().createLock("agregator_" + flowConstruct.getName());
+        }
+        
+        return lock;
     }
 }
