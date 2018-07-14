@@ -98,7 +98,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
 
     private final FlowConstruct flowConstruct;
     
-    private Lock lock;
+    private volatile Lock lock;
 
     public EventCorrelator(EventCorrelatorCallback callback,
                            MessageProcessor timeoutMessageProcessor,
@@ -691,7 +691,13 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
     {
         if (lock == null)
         {
-            lock = muleContext.getLockFactory().createLock("agregator_" + flowConstruct.getName());
+            synchronized (this)
+            {
+                if (lock == null)
+                {
+                    lock = muleContext.getLockFactory().createLock("agregator_" + flowConstruct.getName());
+                }
+            }
         }
         
         return lock;
