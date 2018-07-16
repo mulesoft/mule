@@ -258,7 +258,11 @@ public class SpringRegistry extends AbstractRegistry implements Injector {
    */
   @Override
   public Object applyLifecycle(Object object) throws MuleException {
-    getLifecycleManager().applyCompletedPhases(object);
+    final LifecycleManager lifecycleManager = getLifecycleManager();
+    lifecycleManager.applyCompletedPhases(object);
+    if (lifecycleManager.getExecutingPhase() != null) {
+      lifecycleManager.applyPhase(object, lifecycleManager.getCurrentPhase(), lifecycleManager.getExecutingPhase());
+    }
     return object;
   }
 
