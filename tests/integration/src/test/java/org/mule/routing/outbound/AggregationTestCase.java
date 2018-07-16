@@ -146,7 +146,8 @@ public class AggregationTestCase extends FunctionalTestCase
             }
             catch (InterruptedException e)
             {
-
+                logger.warn("The thread was interrupted.");
+                throw new RuntimeException("The processor thread was interrupted while waiting for the correlation timeout to be raised.");
             }
             return true;
         }
