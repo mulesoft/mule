@@ -7,9 +7,9 @@
 package org.mule.runtime.config.privileged.dsl.processor;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
-
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.MuleContext;
@@ -22,8 +22,10 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBui
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
+import javax.xml.namespace.QName;
 
 @NoExtend
 public class MessageProcessorChainFactoryBean extends AbstractComponentFactory<MessageProcessorChain>
@@ -38,6 +40,11 @@ public class MessageProcessorChainFactoryBean extends AbstractComponentFactory<M
 
   public void setMessageProcessors(List processors) {
     this.processors = processors;
+  }
+
+  @Override
+  public Map<QName, Object> getAnnotations() {
+    return emptyMap();
   }
 
   @Override
