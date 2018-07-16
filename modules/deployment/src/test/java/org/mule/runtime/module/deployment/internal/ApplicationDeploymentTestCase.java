@@ -225,6 +225,18 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  public void deploysAppWithNonExistentConfigResourceOnDeclaration() throws Exception {
+    ApplicationFileBuilder appBundleNonExistentConfigResource = new ApplicationFileBuilder("non-existent-app-config-resource")
+        .definedBy("empty-config.xml").deployedWith(PROPERTY_CONFIG_RESOURCES, "mule-non-existent-config.xml");
+
+    addPackedAppFromBuilder(appBundleNonExistentConfigResource);
+    startDeployment();
+
+    assertDeploymentFailure(applicationDeploymentListener, appBundleNonExistentConfigResource.getId());
+  }
+
+
+  @Test
   public void deploysBrokenAppZipOnStartup() throws Exception {
     addPackedAppFromBuilder(brokenAppFileBuilder);
 
