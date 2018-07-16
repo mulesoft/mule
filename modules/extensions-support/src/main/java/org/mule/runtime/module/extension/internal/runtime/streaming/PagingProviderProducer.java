@@ -95,12 +95,16 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    */
   @Override
   public void close() throws IOException {
+    ConnectionSupplier connectionSupplier = null;
     try {
-      ConnectionSupplier connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
+      connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
       delegate.close(connectionSupplier.getConnection());
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     } finally {
+      if (connectionSupplier != null) {
+        connectionSupplier.close();
+      }
       connectionSupplierFactory.dispose();
     }
   }
