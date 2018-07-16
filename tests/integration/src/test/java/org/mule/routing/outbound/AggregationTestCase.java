@@ -6,12 +6,12 @@
  */
 package org.mule.routing.outbound;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -29,7 +29,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.client.MuleClient;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.RollbackSourceCallback;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.exception.AbstractExceptionListener;
+import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
 import org.mule.routing.SimpleCollectionAggregator;
@@ -37,12 +42,15 @@ import org.mule.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.routing.correlation.CorrelationTimeoutException;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.util.concurrent.Latch;
 
 /**
  * Test that aggregators preserve message order in synchronous scenarios (MULE-5998)
  */
 public class AggregationTestCase extends FunctionalTestCase
 {
+    private static Latch timeoutLatch;
+    
     @Override
     protected String getConfigFile()
     {
@@ -115,7 +123,36 @@ public class AggregationTestCase extends FunctionalTestCase
             return new MyCollectionCorrelatorCallback(context, persistentStores, storePrefix);
         }
     }
+    
+    static class WaitTillTimeoutProcessor extends AbstractFilteringMessageProcessor
+    {
 
+        @Override
+        protected boolean accept(MuleEvent event)
+        {
+            try
+            {
+                // The first splitted part is the one that has to create the latch
+                // because at least one part has to be processed for the event group
+                // to be created and the timeout exception to be spawned.
+                if (timeoutLatch == null)
+                {
+                    timeoutLatch = new Latch();
+                }
+                else 
+                {
+                    timeoutLatch.await();
+                }
+            }
+            catch (InterruptedException e)
+            {
+
+            }
+            return true;
+        }
+        
+    }
+    
     static class MyCollectionCorrelatorCallback extends CollectionCorrelatorCallback
     {
         public MyCollectionCorrelatorCallback(MuleContext muleContext, boolean persistentStores, String storePrefix)
@@ -149,5 +186,34 @@ public class AggregationTestCase extends FunctionalTestCase
         }
     }
     
+    public static class TestExceptionStrategy extends AbstractExceptionListener implements MessagingExceptionHandler, SystemExceptionHandler
+    {
+
+        public static Exception exception;
+        public static MuleEvent event;
+
+        @Override
+        public void handleException(Exception exception, RollbackSourceCallback rollbackMethod)
+        {
+            this.exception = exception;
+
+        }
+
+        @Override
+        public void handleException(Exception exception)
+        {
+            this.exception = exception;
+        }
+
+        @Override
+        public MuleEvent handleException(Exception exception, MuleEvent event)
+        {
+            this.event = event;
+            this.exception = exception;
+            timeoutLatch.countDown();
+            return event;
+        }
+
+    }
 
 }
