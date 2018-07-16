@@ -8,19 +8,7 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="listCities">
-        <mulexml:xslt-transformer xsl-file="cities-result-document-xslt.xsl" maxActiveTransformers="1">
-            <mulexml:context-property key="output_location" value="#[sessionVars.outputFile]" />
-        </mulexml:xslt-transformer>
-    </flow>
-    
-    <flow name="listCitiesWithControllerReset">
-        <mulexml:xslt-transformer xsl-file="cities-result-document-xslt.xsl" maxActiveTransformers="1" transformerFactoryClass="org.mule.transformers.xml.xslt.TestTransformerFactoryImpl" resetControllerAfterEachTransformation="true">
-            <mulexml:context-property key="output_location" value="#[sessionVars.outputFile]" />
-        </mulexml:xslt-transformer>
-    </flow>
-    
-        <flow name="listCitiesWithoutControllerReset">
-        <mulexml:xslt-transformer xsl-file="cities-result-document-xslt.xsl" maxActiveTransformers="1" transformerFactoryClass="org.mule.transformers.xml.xslt.TestTransformerFactoryImpl">
+        <mulexml:xslt-transformer xsl-file="cities-result-document-xslt.xsl" maxActiveTransformers="1" >
             <mulexml:context-property key="output_location" value="#[sessionVars.outputFile]" />
         </mulexml:xslt-transformer>
     </flow>
