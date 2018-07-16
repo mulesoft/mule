@@ -23,7 +23,7 @@ import org.mule.routing.EventGroup;
 import org.mule.routing.correlation.EventCorrelator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
+import org.mule.util.lock.LockFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -35,10 +35,13 @@ import static org.mockito.Matchers.any;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class EventCorrelatorTestCase extends AbstractMuleTestCase
@@ -55,6 +58,8 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     private MuleContext muleContext = mock(MuleContext.class);
     private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     private EventGroup eventGroup = mock(EventGroup.class);
+    private LockFactory lockFactory = mock(LockFactory.class);
+    private Lock lock = new ReentrantLock();
     private int countOfEventGroups = 0;
     private boolean eventGroupWasSaved = false;
 
@@ -63,6 +68,8 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     {
         setReturnsAndExceptions();
         setAnswers();
+        when(lockFactory.createLock(any(String.class))).thenReturn(lock);
+        when(muleContext.getLockFactory()).thenReturn(lockFactory);
         eventCorrelator = new EventCorrelator(eventCorrelatorCallback, messageProcessor, messageInfoMapping,
                                               muleContext, flowConstruct, partitionableObjectStore, "prefix", objectStore);
     }
