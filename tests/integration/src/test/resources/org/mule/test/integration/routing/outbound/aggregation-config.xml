@@ -42,10 +42,11 @@
 
     <flow name="AggregationFlowTimeout">
         <vm:inbound-endpoint path="afterSplitTimeout" exchange-pattern="request-response"/>
+        <custom-processor class="org.mule.routing.outbound.AggregationTestCase$WaitTillTimeoutProcessor" />
         <custom-aggregator class="org.mule.routing.outbound.AggregationTestCase$Aggregator" timeout="1" failOnTimeout="true"/>
         <vm:outbound-endpoint path="collectionCreated2"/>
 		<custom-exception-strategy
-			class="org.mule.routing.outbound.TestExceptionStrategy" />
+			class="org.mule.routing.outbound.AggregationTestCase$TestExceptionStrategy" />
     </flow>
 
 </mule>
