@@ -20,6 +20,9 @@ import org.mule.module.xml.util.LocalURIResolver;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.util.IOUtils;
 
+import net.sf.saxon.Controller;
+import net.sf.saxon.jaxp.TransformerImpl;
+
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -101,6 +104,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     private volatile String xslFile;
     private volatile String xslt;
     private volatile Map<String, Object> contextProperties;
+    private boolean resetControllerAfterEachTransformation;
 
     private URIResolver uriResolver;
 
@@ -358,18 +362,40 @@ public class XsltTransformer extends AbstractXmlTransformer
         @Override
         public void passivateObject(Object object) throws Exception
         {
-            javax.xml.transform.Transformer transformer = (javax.xml.transform.Transformer) object;
-
-            // Clear transformation parameters before returning transformer to the pool
-            transformer.clearParameters();
-
-            // Clean up transformer before return it to the pool
-            transformer.reset();
-
-            super.passivateObject(transformer);
+            super.passivateObject(XsltTransformer.passivateObject(object, resetControllerAfterEachTransformation));
         }
     }
 
+    private static javax.xml.transform.Transformer passivateObject(Object object, boolean resetControllerAfterEachTransformation) throws Exception 
+    {
+        javax.xml.transform.Transformer transformer = (javax.xml.transform.Transformer) object;
+
+        // Clear transformation parameters before returning transformer to the pool
+        transformer.clearParameters();
+
+        // Clean up transformer before return it to the pool
+        if (resetControllerAfterEachTransformation)
+        {
+            resetUnderlyingControllerIfNecessary(transformer);
+        }
+        transformer.reset();
+
+        
+        return transformer;
+    }
+
+    private static void resetUnderlyingControllerIfNecessary(javax.xml.transform.Transformer transformer)
+    {
+        if (transformer instanceof TransformerImpl)
+        {
+            Controller controller = ((TransformerImpl)transformer).getUnderlyingController();
+            if (controller != null)
+            {
+                controller.reset();
+            }
+        }
+    }
+    
     protected class DefaultErrorListener implements ErrorListener
     {
         private TransformerException e = null;
@@ -501,5 +527,10 @@ public class XsltTransformer extends AbstractXmlTransformer
         }
 
         return value;
+    }
+
+    public void setResetControllerAfterEachTransformation(boolean resetControllerAfterEachTransformation)
+    {
+        this.resetControllerAfterEachTransformation = resetControllerAfterEachTransformation;
     }
 }

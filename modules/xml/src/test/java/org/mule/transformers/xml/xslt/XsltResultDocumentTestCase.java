@@ -7,6 +7,8 @@
 package org.mule.transformers.xml.xslt;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.api.MuleEvent;
 import org.mule.api.transport.PropertyScope;
@@ -14,6 +16,8 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.UUID;
+
+import net.sf.saxon.Controller;
 
 import java.io.File;
 
@@ -26,7 +30,9 @@ public class XsltResultDocumentTestCase extends FunctionalTestCase
 
     private static final String INPUT_FILE = "cities.xml";
     private static final String OUTPUT_FILE_PROPERTY = "outputFile";
-    private static final String FLOW_NAME = "listCities";
+    private static final String FLOW_NAME_WITH_CONTROLLER_RESET = "listCitiesWithControllerReset";
+    private static final String FLOW_NAME_WITHOUT_CONTROLLER_RESET = "listCitiesWithoutControllerReset";
+    private static final String FLOW_NAME_SIMPLE_LIST_CITIES = "listCities";
     private static final String EXPECTED_OUTPUT = "italy - milan - 5 | france - paris - 7 | germany - munich - 4 | france - lyon - 2 | italy - venice - 1 | ";
 
     @Rule
@@ -45,14 +51,40 @@ public class XsltResultDocumentTestCase extends FunctionalTestCase
 
         File outputFile = temporaryFolder.newFile(UUID.getUUID());
 
-        executeFlowAndValidateOutput(cities, outputFile);
-        executeFlowAndValidateOutput(cities, outputFile);
+        executeFlowAndValidateOutput(cities, outputFile, FLOW_NAME_SIMPLE_LIST_CITIES);
+        executeFlowAndValidateOutput(cities, outputFile, FLOW_NAME_SIMPLE_LIST_CITIES);
+        Controller controller = ((net.sf.saxon.jaxp.TransformerImpl) TestTransformerFactoryImpl.TRANSFORMER).getUnderlyingController();
+    }
+    
+    @Test
+    public void writeToFileWithoutControllerReset() throws Exception
+    {
+        String cities = IOUtils.getResourceAsString(INPUT_FILE, getClass());
+
+        File outputFile = temporaryFolder.newFile(UUID.getUUID());
+
+        executeFlowAndValidateOutput(cities, outputFile, FLOW_NAME_WITHOUT_CONTROLLER_RESET);
+        Controller controller = ((net.sf.saxon.jaxp.TransformerImpl) TestTransformerFactoryImpl.TRANSFORMER).getUnderlyingController();
+        assertThat(controller.getInitialContextItem(), is(not(nullValue())));
+    }
+    
+    @Test
+    public void writeToFileWithControllerReset() throws Exception
+    {
+        String cities = IOUtils.getResourceAsString(INPUT_FILE, getClass());
+
+        File outputFile = temporaryFolder.newFile(UUID.getUUID());
+
+        executeFlowAndValidateOutput(cities, outputFile, FLOW_NAME_WITH_CONTROLLER_RESET);
+        Controller controller = ((net.sf.saxon.jaxp.TransformerImpl) TestTransformerFactoryImpl.TRANSFORMER).getUnderlyingController();
+        assertThat(controller.getInitialContextItem(), is(nullValue()));
     }
 
-    private void executeFlowAndValidateOutput(String payload, File outputFile) throws Exception
+
+    private void executeFlowAndValidateOutput(String payload, File outputFile, String flow) throws Exception
     {
         outputFile.delete();
-        runFlow(FLOW_NAME, createEventWithPayloadAndSessionProperty(payload, OUTPUT_FILE_PROPERTY, outputFile.getAbsolutePath()));
+        runFlow(flow, createEventWithPayloadAndSessionProperty(payload, OUTPUT_FILE_PROPERTY, outputFile.getAbsolutePath()));
         assertThat(FileUtils.readFileToString(outputFile), is(EXPECTED_OUTPUT));
     }
 
