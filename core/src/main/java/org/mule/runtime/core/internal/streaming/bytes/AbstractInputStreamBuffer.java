@@ -165,10 +165,13 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     return result;
   }
 
-  protected void deallocate(ByteBuffer byteBuffer) {
+  protected boolean deallocate(ByteBuffer byteBuffer) {
     if (byteBuffer != null) {
       closeSafely(() -> bufferManager.deallocate(byteBuffer));
+      return true;
     }
+
+    return false;
   }
 
   protected boolean isStreamFullyConsumed() {
@@ -180,19 +183,19 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   }
 
 
-  protected final ByteBuffer copy(long position, int length) {
+  protected ByteBuffer copy(long position, int length) {
     return canDoSoftCopy() ? softCopy(position, length) : hardCopy(position, length);
   }
 
   protected abstract boolean canDoSoftCopy();
 
-  private ByteBuffer softCopy(long position, int length) {
+  protected ByteBuffer softCopy(long position, int length) {
     final int offset = toIntExact(position);
     final ByteBuffer b = buffer.get();
     return ByteBuffer.wrap(b.array(), offset, min(length, b.limit() - offset)).slice();
   }
 
-  private ByteBuffer hardCopy(long position, int length) {
+  protected ByteBuffer hardCopy(long position, int length) {
     final int offset = toIntExact(position);
     final ByteBuffer bf = buffer.get();
     length = min(length, bf.limit() - offset);
