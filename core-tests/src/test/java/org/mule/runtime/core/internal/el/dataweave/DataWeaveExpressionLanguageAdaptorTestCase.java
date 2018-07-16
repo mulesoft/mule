@@ -42,6 +42,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.ERROR;
 import static org.mule.runtime.api.el.BindingContextUtils.FLOW;
 import static org.mule.runtime.api.el.BindingContextUtils.ITEM_SEQUENCE_INFO;
 import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
@@ -52,6 +53,7 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
@@ -81,6 +83,8 @@ import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.internal.message.BaseAttributes;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.weave.v2.model.structure.QualifiedName;
 
 import org.junit.Before;
@@ -92,6 +96,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
 import java.io.IOException;
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -108,12 +114,14 @@ import io.qameta.allure.Story;
 @Story(SUPPORT_DW)
 public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExpressionLanguageTestCase {
 
+  private static final int GC_POLLING_TIMEOUT = 10000;
+
   @Rule
   public ExpectedException expectedEx = none();
 
   private ExpressionLanguage genericExpressionLanguage = spy(ExpressionLanguage.class);
   private DefaultExpressionLanguageFactoryService genericExpressionLanguageService;
-  private BindingContext bindingContext = BindingContext.builder().build();
+  private BindingContext bindingContext = NULL_BINDING_CONTEXT;
 
   @Before
   public void before() {
@@ -518,6 +526,24 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     expectedEx.expect(ExpressionExecutionException.class);
     expectedEx.expectMessage(containsString("Unbalanced brackets in expression"));
     expressionLanguage.evaluate("#[unbalanced", event, BindingContext.builder().build());
+  }
+
+  @Test
+  public void bindingValueNotReferencedByDWParserCache() throws MuleException {
+    Object bindingValue = new Object();
+    PhantomReference<CoreEvent> bindingValueRef = new PhantomReference(bindingValue, new ReferenceQueue<>());
+
+    expressionLanguage.evaluate("#[value]", null, BindingContext.builder()
+        .addBinding("value", new TypedValue<>(bindingValue, OBJECT))
+        .build());
+
+    bindingValue = null;
+
+    new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      System.gc();
+      assertThat(bindingValueRef.isEnqueued(), is(true));
+      return true;
+    }, "A hard reference is being mantained to the bindingValue."));
   }
 
   private CoreEvent getEventWithError(Optional<Error> error) {
