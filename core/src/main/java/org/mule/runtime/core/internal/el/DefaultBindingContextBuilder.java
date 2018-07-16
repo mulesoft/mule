@@ -37,13 +37,13 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
   private TypedValue payloadBinding;
   private TypedValue attributesBinding;
-  private Supplier<TypedValue> varsBinding;
+  private Optional<Supplier<TypedValue>> varsBinding = Optional.empty();
 
   private boolean bindingAdded = false;
 
   private LinkedList<BindingContext> delegates = new LinkedList<>();
 
-  private final Map<String, Supplier<TypedValue>> bindings = new HashMap<>();
+  private Map<String, Supplier<TypedValue>> bindings = new HashMap<>();
   private Collection<ExpressionModule> modules = null;
 
   public DefaultBindingContextBuilder() {}
@@ -53,7 +53,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
     payloadBinding = bindingContext.lookup(PAYLOAD).orElse(null);
     attributesBinding = bindingContext.lookup(ATTRIBUTES).orElse(null);
-    varsBinding = () -> bindingContext.lookup(VARS).orElse(null);
+    varsBinding = of(() -> bindingContext.lookup(VARS).orElse(null));
   }
 
   @Override
@@ -67,7 +67,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
         attributesBinding = value;
         break;
       case VARS:
-        varsBinding = () -> value;
+        varsBinding = of(() -> value);
         break;
       default:
         bindings.put(identifier, () -> value);
@@ -87,7 +87,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
         attributesBinding = lazyValue.get();
         break;
       case VARS:
-        varsBinding = lazyValue;
+        varsBinding = of(lazyValue);
         break;
       default:
         bindings.put(identifier, lazyValue);
@@ -101,19 +101,18 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
     if (bindingAdded) {
       // Because of how the lookup is expected to work, we need to create this context so its bindings are in the correct position
       // in the delegates list.
-      delegates.addFirst(new BindingContextImplementation(emptyList(), bindings,
-                                                          payloadBinding, attributesBinding, varsBinding, modules));
+      delegates.addFirst(new BindingContextImplementation(emptyList(), unmodifiableMap(bindings),
+                                                          payloadBinding, attributesBinding, varsBinding,
+                                                          modules != null ? unmodifiableCollection(modules) : emptyList()));
       payloadBinding = null;
       attributesBinding = null;
-      varsBinding = null;
-      bindings.clear();
-      if (modules != null) {
-        modules.clear();
-      }
+      varsBinding = Optional.empty();
+      bindings = new HashMap<>();
+      modules = null;
       bindingAdded = false;
     }
-    delegates.addFirst(context);
 
+    delegates.addFirst(context);
     return this;
   }
 
@@ -134,6 +133,27 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
                                             modules != null ? unmodifiableCollection(modules) : emptyList());
   }
 
+  public BindingContext flattenAndBuild() {
+    BindingContext original = build();
+
+    Map<String, Supplier<TypedValue>> flattenedBindings = new HashMap<>();
+    for (Binding binding : original.bindings()) {
+      if (!(flattenedBindings.containsKey(binding.identifier())
+          || PAYLOAD.equals(binding.identifier())
+          || ATTRIBUTES.equals(binding.identifier())
+          || VARS.equals(binding.identifier()))) {
+        flattenedBindings.put(binding.identifier(), () -> binding.value());
+      }
+    }
+
+    return new BindingContextImplementation(emptyList(), flattenedBindings,
+                                            original.lookup(PAYLOAD).orElse(null),
+                                            original.lookup(ATTRIBUTES).orElse(null),
+                                            of(() -> original.lookup(VARS).orElse(null)),
+                                            original.modules());
+  }
+
+
   public static class BindingContextImplementation implements BindingContext {
 
     private final List<BindingContext> delegates;
@@ -147,14 +167,14 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
     private BindingContextImplementation(List<BindingContext> delegates, Map<String, Supplier<TypedValue>> bindings,
                                          TypedValue payloadBinding, TypedValue attributesBinding,
-                                         Supplier<TypedValue> varsBinding,
+                                         Optional<Supplier<TypedValue>> varsBinding,
                                          Collection<ExpressionModule> modules) {
       this.delegates = delegates;
       this.bindings = bindings;
 
-      this.payloadBinding = payloadBinding != null ? of(payloadBinding) : lookUpInDelegates(PAYLOAD);
-      this.attributesBinding = attributesBinding != null ? of(attributesBinding) : lookUpInDelegates(ATTRIBUTES);
-      this.varsBinding = varsBinding;
+      this.payloadBinding = ofNullable(payloadBinding);
+      this.attributesBinding = ofNullable(attributesBinding);
+      this.varsBinding = varsBinding.orElse(() -> null);
 
       this.modules = modules;
     }
@@ -179,7 +199,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
       payloadBinding.ifPresent(pb -> bindingsMap.put(PAYLOAD, new Binding(PAYLOAD, payloadBinding.get())));
       attributesBinding.ifPresent(pb -> bindingsMap.put(ATTRIBUTES, new Binding(ATTRIBUTES, attributesBinding.get())));
-      if (varsBinding != null && varsBinding.get() != null) {
+      if (varsBinding.get() != null) {
         bindingsMap.put(VARS, new Binding(VARS, varsBinding.get()));
       }
 
@@ -198,7 +218,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
       payloadBinding.ifPresent(pb -> identifiers.add(PAYLOAD));
       attributesBinding.ifPresent(pb -> identifiers.add(ATTRIBUTES));
-      if (varsBinding != null && varsBinding.get() != null) {
+      if (varsBinding.get() != null) {
         identifiers.add(VARS);
       }
 
@@ -217,11 +237,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
         case ATTRIBUTES:
           return attributesBinding;
         case VARS:
-          if (varsBinding == null) {
-            return lookUpInDelegates(VARS);
-          } else {
-            return ofNullable(varsBinding.get());
-          }
+          return ofNullable(varsBinding.get());
         default:
           final Supplier<TypedValue> supplier = bindings.get(identifier);
           return supplier != null ? ofNullable(supplier.get()) : lookUpInDelegates(identifier);

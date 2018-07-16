@@ -47,6 +47,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
   private static final String MOCK_EXPR_EXECUTOR = "mockExpressionExecutor";
 
   private static DefaultExpressionLanguageFactoryService cachedExprLanguageFactory;
+  private static int cachedExprLanguageFactoryCounter = 0;
 
   private final SimpleUnitTestSupportSchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
   private boolean mockHttpService;
@@ -73,7 +74,9 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
       registry.registerObject(MOCK_EXPR_EXECUTOR, expressionExecutor);
     } else {
       // Avoid doing the DW warm-up for every test, reusing the ExpressionLanguage implementation
-      if (cachedExprLanguageFactory == null) {
+      // Still have to recreate ever once in a while so global bindings added for each test are accumulated.
+      if (cachedExprLanguageFactory == null || cachedExprLanguageFactoryCounter > 20) {
+        cachedExprLanguageFactoryCounter = 0;
         final DefaultExpressionLanguageFactoryService exprExecutor = new WeaveDefaultExpressionLanguageFactoryService();
         ExpressionLanguage exprLanguage = exprExecutor.create();
         // Force initialization of internal DataWeave stuff
@@ -93,6 +96,8 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
             return exprExecutor.getName();
           }
         };
+      } else {
+        cachedExprLanguageFactoryCounter++;
       }
 
       registry.registerObject(cachedExprLanguageFactory.getName(), cachedExprLanguageFactory);
