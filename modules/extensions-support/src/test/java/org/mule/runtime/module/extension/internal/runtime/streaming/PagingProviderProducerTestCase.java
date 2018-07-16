@@ -106,8 +106,12 @@ public class PagingProviderProducerTestCase {
 
   @Test
   public void closeQuietly() throws Exception {
+    ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
+    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+
     producer.close();
     verify(delegate).close(any());
+    verify(connectionHandler, times(1)).release();
   }
 
   @Test(expected = Exception.class)
