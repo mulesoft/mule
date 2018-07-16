@@ -88,5 +88,20 @@
         }
       ]
     }
+  },
+  "4.1.3": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method java.util.Optional<org.mule.runtime.module.extension.api.loader.java.type.Type> org.mule.runtime.module.extension.api.loader.java.type.SourceElement::getOutputType()",
+          "package": "org.mule.runtime.module.extension.api.loader.java.type",
+          "classSimpleName": "SourceElement",
+          "methodName": "getOutputType",
+          "elementKind": "method",
+          "justification": "Refactor method to superclass to provide default behaviour"
+        }
+      ]
+    }
   }
 }

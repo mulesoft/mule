@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -16,8 +14,6 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toM
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADVANCED_TAB_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeAnnotation;
@@ -39,22 +35,18 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarat
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterWrapper;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -100,9 +92,10 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
 
         @Override
         protected void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
-          Optional<ExtensionTypeDescriptorModelProperty> mp =
-              declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
-          Optional<Type> outputType = mp.isPresent() ? ((SourceTypeWrapper) mp.get().getType()).getOutputType() : empty();
+          Optional<Type> outputType = declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+              .filter(mp -> mp.getType() instanceof SourceElement)
+              .map(mp -> (SourceElement) mp.getType())
+              .map(t -> t.getOutputType().orElse(null));
           declareMimeTypeParameters(declaration, outputType);
         }
 

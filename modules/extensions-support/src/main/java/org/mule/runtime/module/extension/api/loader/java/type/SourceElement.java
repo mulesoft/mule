@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.type;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceReturnType;
 import org.mule.api.annotation.NoImplement;
 import org.mule.metadata.api.model.MetadataType;
@@ -50,6 +52,10 @@ public interface SourceElement extends ParameterizableTypeElement, WithReturnTyp
   @Override
   default MetadataType getAttributesMetadataType() {
     return getSourceReturnType(getSuperClassGenerics().get(1));
+  }
+
+  default Optional<Type> getOutputType() {
+    return getSuperClassGenerics().size() == 2 ? of(getSuperClassGenerics().get(0)) : empty();
   }
 
 }
