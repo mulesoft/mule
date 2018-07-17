@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
@@ -27,6 +28,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.util.func.Once;
+import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
@@ -176,7 +179,23 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private MediaType defaultMediaType;
   private TransactionSourceBinder transactionSourceBinder;
 
+  private Charset defaultEncoding;
+
+  private Optional<MediaType> mimeTypeInitParam;
+  private Optional<Charset> encodingParam;
+
   private DefaultSourceCallback() {}
+
+  private RunOnce resolveInitializationParams = Once.of(() -> {
+    defaultEncoding = getDefaultEncoding(muleContext);
+
+    Map<String, Object> initialisationParameters = messageSource.getInitialisationParameters();
+
+    encodingParam = ofNullable((String) initialisationParameters.get(ENCODING_PARAMETER_NAME))
+        .map(encoding -> parseCharset(encoding));
+    mimeTypeInitParam = ofNullable((String) initialisationParameters.get(MIME_TYPE_PARAMETER_NAME))
+        .map(mimeType -> MediaType.parse(mimeType));
+  });
 
   /**
    * {@inheritDoc}
@@ -191,20 +210,18 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
    */
   @Override
   public void handle(Result<T, A> result, SourceCallbackContext context) {
+    resolveInitializationParams.runOnce();
     checkArgument(context instanceof SourceCallbackContextAdapter, "The supplied context was not created through this callback, "
         + "you naughty developer");
 
     SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     validateNotifications(contextAdapter);
     MessageProcessContext messageProcessContext = processContextSupplier.get();
-    Map<String, Object> initialisationParameters = messageSource.getInitialisationParameters();
-    MediaType mediaType = resolveMediaType(result, initialisationParameters);
+    MediaType mediaType = resolveMediaType(result);
     PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(getDefaultEncoding(muleContext),
                                                                                      defaultMediaType,
-                                                                                     ofNullable((String) initialisationParameters
-                                                                                         .get(ENCODING_PARAMETER_NAME)),
-                                                                                     ofNullable((String) initialisationParameters
-                                                                                         .get(MIME_TYPE_PARAMETER_NAME)));
+                                                                                     encodingParam,
+                                                                                     mimeTypeInitParam);
 
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
@@ -233,36 +250,18 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
                                             messageProcessContext);
   }
 
-  protected MediaType resolveMediaType(Object value, Map<String, Object> initialisationParameters) {
-    Charset existingEncoding = getDefaultEncoding(muleContext);
+  protected MediaType resolveMediaType(Object value) {
+    Charset existingEncoding = defaultEncoding;
     MediaType mediaType = defaultMediaType;
     if (value instanceof Result) {
       final Optional<MediaType> optionalMediaType = ((Result) value).getMediaType();
       if (optionalMediaType.isPresent()) {
         mediaType = optionalMediaType.get();
-        if (mediaType.getCharset().isPresent()) {
-          existingEncoding = mediaType.getCharset().get();
-        }
+        existingEncoding = mediaType.getCharset().orElse(existingEncoding);
       }
     }
 
-    if (mediaType == null) {
-      mediaType = ANY;
-    }
-
-    Object mimeType = initialisationParameters.get(MIME_TYPE_PARAMETER_NAME);
-    if (mimeType != null) {
-      mediaType = MediaType.parse((String) mimeType);
-    }
-
-    Object encoding = initialisationParameters.get(ENCODING_PARAMETER_NAME);
-    if (encoding != null) {
-      mediaType = mediaType.withCharset(parseCharset((String) encoding));
-    } else {
-      mediaType = mediaType.withCharset(existingEncoding);
-    }
-
-    return mediaType;
+    return mimeTypeInitParam.orElse(mediaType).withCharset(encodingParam.orElse(existingEncoding));
   }
 
   /**

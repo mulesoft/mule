@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.streaming;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -45,9 +46,21 @@ public interface StreamingManager {
    * which is managed by the runtime, allowing for automatic resource handling
    *
    * @param provider     the provider to be tracked
-   * @param creatorEvent the event that created the provider
+   * @param creatorRootEventContext the event context on which the stream was created
    * @return a {@link CursorContext}
    */
+  CursorProvider manage(CursorProvider provider, EventContext creatorRootEventContext);
+
+  /**
+   * Becomes aware of the given {@code provider} and returns a replacement provider which is managed by the runtime, allowing for
+   * automatic resource handling
+   *
+   * @param provider the provider to be tracked
+   * @param creatorEvent the event that created the provider
+   * @return a {@link CursorContext}
+   * @deprecated Use {@link #manage(InputStream, EventContext)} instead.
+   */
+  @Deprecated
   CursorProvider manage(CursorProvider provider, CoreEvent creatorEvent);
 
   /**
@@ -58,8 +71,22 @@ public interface StreamingManager {
    * {@link #manage(CursorProvider, CoreEvent)} for those cases.
    *
    * @param inputStream  the stream to track
-   * @param creatorEvent the event on which the stream was created
+   * @param creatorRootEventContext the event context on which the stream was created
    */
-  void manage(InputStream inputStream, CoreEvent creatorEvent);
+  void manage(InputStream inputStream, EventContext creatorRootEventContext);
 
+  /**
+   * Becomes aware of the given {@code inputStream} and makes sure it is closed by the time the given {@code creatorEvent} (and
+   * all its parent events) are completed.
+   * <p>
+   * If {@code inputStream} is a {@link Cursor} then nothing happens. Use {@link #manage(CursorProvider, CoreEvent)} for those
+   * cases.
+   *
+   * @param inputStream the stream to track
+   * @param creatorEvent the event on which the stream was created
+   *
+   * @deprecated Use {@link #manage(InputStream, EventContext)} instead
+   */
+  @Deprecated
+  void manage(InputStream inputStream, CoreEvent creatorEvent);
 }

@@ -32,6 +32,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -60,9 +61,12 @@ import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+
+import org.reactivestreams.Publisher;
 
 import java.util.Collection;
 import java.util.Map;
@@ -71,7 +75,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -282,24 +285,25 @@ public class ModuleFlowProcessingPhase
       SourceResultAdapter adapter = (SourceResultAdapter) message.getPayload().getValue();
       eventBuilder =
           createEventBuilder(sourceLocation, responseCompletion, flowConstruct, adapter.getCorrelationId().orElse(null), message);
-      CoreEvent templateEvent = eventBuilder.build();
 
-      final Result<?, ?> result = adapter.getResult();
-      final Object resultValue = result.getOutput();
+      return eventBuilder.message(eventCtx -> {
+        final Result<?, ?> result = adapter.getResult();
+        final Object resultValue = result.getOutput();
 
-      if (resultValue instanceof Collection && adapter.isCollection()) {
-        message = toMessage(Result.<Collection<Message>, TypedValue>builder()
-            .output(toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
-                                                                               adapter.getPayloadMediaTypeResolver()),
-                                        adapter.getCursorProviderFactory(),
-                                        templateEvent))
-            .mediaType(result.getMediaType().orElse(ANY))
-            .build());
-      } else {
-        message = toMessage(result, adapter.getMediaType(), adapter.getCursorProviderFactory(), templateEvent);
-      }
+        if (resultValue instanceof Collection && adapter.isCollection()) {
+          return toMessage(Result.<Collection<Message>, TypedValue>builder()
+              .output(toMessageCollection(new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
+                                                                                 adapter.getPayloadMediaTypeResolver()),
+                                          adapter.getCursorProviderFactory(),
+                                          ((BaseEventContext) eventCtx).getRootContext()))
+              .mediaType(result.getMediaType().orElse(ANY))
+              .build());
+        } else {
+          return toMessage(result, adapter.getMediaType(), adapter.getCursorProviderFactory(),
+                           ((BaseEventContext) eventCtx).getRootContext());
+        }
 
-      return eventBuilder.message(message).build();
+      }).build();
     }
 
     return createEventBuilder(sourceLocation, responseCompletion, flowConstruct, null, message).build();

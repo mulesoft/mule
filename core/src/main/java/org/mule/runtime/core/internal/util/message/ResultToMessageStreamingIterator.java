@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.util.message;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -25,14 +26,14 @@ final class ResultToMessageStreamingIterator implements StreamingIterator<Messag
 
   private final StreamingIterator<Result> delegate;
   private final CursorProviderFactory cursorProviderFactory;
-  private final CoreEvent event;
+  private final BaseEventContext eventContext;
 
   ResultToMessageStreamingIterator(StreamingIterator<Result> delegate,
                                    CursorProviderFactory cursorProviderFactory,
-                                   CoreEvent event) {
+                                   BaseEventContext eventContext) {
     this.delegate = delegate;
     this.cursorProviderFactory = cursorProviderFactory;
-    this.event = event;
+    this.eventContext = eventContext;
   }
 
   @Override
@@ -42,7 +43,7 @@ final class ResultToMessageStreamingIterator implements StreamingIterator<Messag
 
   @Override
   public Message next() {
-    return toMessage(delegate.next(), cursorProviderFactory, event);
+    return toMessage(delegate.next(), cursorProviderFactory, eventContext);
   }
 
   @Override
@@ -52,7 +53,7 @@ final class ResultToMessageStreamingIterator implements StreamingIterator<Messag
 
   @Override
   public void forEachRemaining(Consumer<? super Message> action) {
-    delegate.forEachRemaining(result -> action.accept(toMessage(result, cursorProviderFactory, event)));
+    delegate.forEachRemaining(result -> action.accept(toMessage(result, cursorProviderFactory, eventContext)));
   }
 
   @Override

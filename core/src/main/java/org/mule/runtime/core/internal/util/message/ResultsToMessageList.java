@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.util.message;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
@@ -32,8 +33,8 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
 
   public ResultsToMessageList(List<Object> delegate,
                               CursorProviderFactory cursorProviderFactory,
-                              CoreEvent event) {
-    super(delegate, cursorProviderFactory, event);
+                              BaseEventContext eventContext) {
+    super(delegate, cursorProviderFactory, eventContext);
     this.delegate = delegate;
   }
 
@@ -73,8 +74,8 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
 
   @Override
   public void sort(Comparator<? super Message> c) {
-    lock.withWriteLock(() -> delegate.sort((o1, o2) -> c.compare(toMessage(o1, cursorProviderFactory, event),
-                                                                 toMessage(o2, cursorProviderFactory, event))));
+    lock.withWriteLock(() -> delegate.sort((o1, o2) -> c.compare(toMessage(o1, cursorProviderFactory, eventContext),
+                                                                 toMessage(o2, cursorProviderFactory, eventContext))));
   }
 
   @Override
@@ -90,7 +91,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
         if (update instanceof Message) {
           return update;
         }
-        update = toMessage(update, cursorProviderFactory, event);
+        update = toMessage(update, cursorProviderFactory, eventContext);
         delegate.set(index, update);
         return update;
       });
@@ -101,7 +102,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
   public Message set(int index, Message message) {
     return lock.withWriteLock(() -> {
       Object previous = delegate.set(index, message);
-      return previous != null ? toMessage(previous, cursorProviderFactory, event) : null;
+      return previous != null ? toMessage(previous, cursorProviderFactory, eventContext) : null;
     });
   }
 
@@ -109,7 +110,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
   public Message remove(int index) {
     return lock.withWriteLock(() -> {
       Object previous = delegate.remove(index);
-      return previous != null ? toMessage(previous, cursorProviderFactory, event) : null;
+      return previous != null ? toMessage(previous, cursorProviderFactory, eventContext) : null;
     });
   }
 
@@ -132,7 +133,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
   public List<Message> subList(int fromIndex, int toIndex) {
     return lock.withReadLock(r -> {
       List results = delegate.subList(fromIndex, toIndex);
-      return new ResultsToMessageList(results, cursorProviderFactory, event);
+      return new ResultsToMessageList(results, cursorProviderFactory, eventContext);
     });
   }
 

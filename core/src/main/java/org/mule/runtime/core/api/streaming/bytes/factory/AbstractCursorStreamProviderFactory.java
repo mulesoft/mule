@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.streaming.bytes.factory;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -15,6 +16,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.streaming.CursorManager;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.io.InputStream;
 
@@ -42,21 +44,23 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
     this.streamingManager = streamingManager;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public final Object of(CoreEvent event, InputStream inputStream) {
+  public final Object of(EventContext eventContext, InputStream inputStream) {
     if (inputStream instanceof CursorStream) {
-      return streamingManager.manage(((CursorStream) inputStream).getProvider(), event);
+      return streamingManager.manage(((CursorStream) inputStream).getProvider(), eventContext);
     }
 
-    Object value = resolve(inputStream, event);
+    Object value = resolve(inputStream, eventContext);
     if (value instanceof CursorStreamProvider) {
-      value = streamingManager.manage((CursorStreamProvider) value, event);
+      value = streamingManager.manage((CursorStreamProvider) value, eventContext);
     }
 
     return value;
+  }
+
+  @Override
+  public final Object of(CoreEvent event, InputStream inputStream) {
+    return of(((BaseEventContext) event.getContext()).getRootContext(), inputStream);
   }
 
   /**
@@ -70,9 +74,20 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
    * Implementations should use this method to actually create the output value
    *
    * @param inputStream
-   * @param event
+   * @param eventContext
    * @return
    */
-  protected abstract Object resolve(InputStream inputStream, CoreEvent event);
+  protected abstract Object resolve(InputStream inputStream, EventContext eventContext);
 
+  /**
+   * Implementations should use this method to actually create the output value
+   *
+   * @param inputStream
+   * @param creatorRootEventContext
+   * @return
+   *
+   * @deprecated Use {@link #resolve(InputStream, EventContext)} instead.
+   */
+  @Deprecated
+  protected abstract Object resolve(InputStream inputStream, CoreEvent event);
 }

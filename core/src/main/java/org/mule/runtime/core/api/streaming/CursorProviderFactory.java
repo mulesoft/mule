@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.streaming;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -26,10 +27,25 @@ public interface CursorProviderFactory<T> {
    * Implementations might resolve that the given stream is/should not be buffered and thus
    * it will return the same given stream. In that case, the stream will be unaltered.
    *
-   * @param event the event on which buffering is talking place
+   * @param eventContext the context of the event on which buffering is talking place
    * @param value the stream to be cursored
    * @return A {@link CursorProvider} or the same given {@code inputStream}
    */
+  Object of(EventContext eventContext, T value);
+
+  /**
+   * Optionally creates a new {@link CursorProvider} to buffer the given {@code value}.
+   * <p>
+   * Implementations might resolve that the given stream is/should not be buffered and thus it will return the same given stream.
+   * In that case, the stream will be unaltered.
+   *
+   * @param event the event on which buffering is talking place
+   * @param value the stream to be cursored
+   * @return A {@link CursorProvider} or the same given {@code inputStream}
+   *
+   * @deprecated use {@link #of(EventContext, Object)} instead.
+   */
+  @Deprecated
   Object of(CoreEvent event, T value);
 
   /**

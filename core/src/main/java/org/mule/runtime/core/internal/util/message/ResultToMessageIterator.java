@@ -10,6 +10,7 @@ import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Iterator;
@@ -28,14 +29,14 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   private final Iterator<Object> delegate;
   private final CursorProviderFactory cursorProviderFactory;
-  private final CoreEvent event;
+  private final BaseEventContext eventContext;
 
   ResultToMessageIterator(Iterator<Object> delegate,
                           CursorProviderFactory cursorProviderFactory,
-                          CoreEvent event) {
+                          BaseEventContext eventContext) {
     this.delegate = delegate;
     this.cursorProviderFactory = cursorProviderFactory;
-    this.event = event;
+    this.eventContext = eventContext;
   }
 
   @Override
@@ -51,7 +52,7 @@ final class ResultToMessageIterator implements Iterator<Message> {
       return (Message) value;
     }
 
-    return toMessage((Result) value, cursorProviderFactory, event);
+    return toMessage((Result) value, cursorProviderFactory, eventContext);
   }
 
   @Override
@@ -63,7 +64,7 @@ final class ResultToMessageIterator implements Iterator<Message> {
   public void forEachRemaining(Consumer<? super Message> action) {
     delegate.forEachRemaining(value -> {
       if (value instanceof Result) {
-        value = toMessage((Result) value, cursorProviderFactory, event);
+        value = toMessage((Result) value, cursorProviderFactory, eventContext);
       }
       action.accept((Message) value);
     });

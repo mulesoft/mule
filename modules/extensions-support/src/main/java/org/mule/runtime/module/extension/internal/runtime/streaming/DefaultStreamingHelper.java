@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils;
 
@@ -99,7 +100,7 @@ public class DefaultStreamingHelper implements StreamingHelper {
         ? cursorProviderFactory
         : streamingManager.forBytes().getDefaultCursorProviderFactory();
 
-    return factory.of(event, value);
+    return factory.of(((BaseEventContext) event.getContext()).getRootContext(), value);
   }
 
   private Object resolveCursorIteratorProvider(Iterator value) {
@@ -107,7 +108,7 @@ public class DefaultStreamingHelper implements StreamingHelper {
         ? cursorProviderFactory
         : streamingManager.forObjects().getDefaultCursorProviderFactory();
 
-    return factory.of(event, value);
+    return factory.of(((BaseEventContext) event.getContext()).getRootContext(), value);
   }
 
   private TypedValue resolveCursorTypedValueProvider(TypedValue value) {
