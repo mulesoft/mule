@@ -8,6 +8,7 @@
 package org.mule.runtime.module.artifact.api.classloader.exception;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -72,5 +73,14 @@ public final class ClassNotFoundInRegionException extends ClassNotFoundException
    */
   public String getArtifactName() {
     return artifactName;
+  }
+
+  @Override
+  public synchronized Throwable fillInStackTrace() {
+    if (isVerboseExceptions()) {
+      return super.fillInStackTrace();
+    } else {
+      return this;
+    }
   }
 }
