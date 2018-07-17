@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toMetadataFormat;
+import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.MetadataFormat;
@@ -22,6 +27,7 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.util.NameUtils;
+import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
@@ -30,12 +36,6 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 
 import java.util.Optional;
-
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toMetadataFormat;
-import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
 
 /**
  * {@link ExtensionModelValidator} which verifies if a {@link org.mule.runtime.extension.api.annotation.param.MediaType} is
@@ -69,8 +69,10 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
 
       @Override
       protected void onSource(SourceModel model) {
-        Optional<ExtensionTypeDescriptorModelProperty> mp = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class);
-        Optional<Type> outputType = mp.isPresent() ? ((SourceTypeWrapper) mp.get().getType()).getOutputType() : empty();
+        Optional<Type> outputType = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
+            .filter(mp -> mp.getType() instanceof SourceElement)
+            .map(mp -> (SourceElement) mp.getType())
+            .map(t -> t.getOutputType().orElse(null));
         validateMediaType(model, outputType);
       }
 
