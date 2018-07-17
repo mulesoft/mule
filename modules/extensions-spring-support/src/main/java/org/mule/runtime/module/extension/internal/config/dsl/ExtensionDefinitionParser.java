@@ -44,6 +44,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTargetParameter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
@@ -739,13 +740,13 @@ public abstract class ExtensionDefinitionParser {
       resolver = stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(value, expectedClass);
       //TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be removed once implemented
     } else if (isParameterResolver(expectedType)) {
-      resolver = new ExpressionBasedParameterResolverValueResolver<>(value, expectedClass, expectedType);
+      resolver = new ExpressionBasedParameterResolverValueResolver<>(value, expectedClass, toDataType(expectedType));
     } else if (isTypedValue(expectedType)) {
       resolver = new ExpressionTypedValueValueResolver<>(value, expectedClass);
     } else if (isLiteral(expectedType) || isTargetParameter(modelProperties)) {
       resolver = new StaticLiteralValueResolver<>(value, expectedClass);
     } else {
-      resolver = new TypeSafeExpressionValueResolver<>(value, expectedClass, expectedType);
+      resolver = new TypeSafeExpressionValueResolver<>(value, expectedClass, toDataType(expectedType));
     }
     return resolver;
   }
@@ -1099,7 +1100,7 @@ public abstract class ExtensionDefinitionParser {
   private ValueResolver parseDate(Object value, MetadataType dateType, Object defaultValue) {
     Class<?> type = getType(dateType);
     if (isExpression(value)) {
-      return new TypeSafeExpressionValueResolver<>((String) value, type, dateType);
+      return new TypeSafeExpressionValueResolver<>((String) value, type, toDataType(dateType));
     }
 
     if (value == null) {

@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -31,23 +30,27 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
 
   private final String expression;
   private final ValueResolvingContext context;
-  private final MetadataType metadataType;
+  private final DataType expectedDataType;
   private TypeSafeExpressionValueResolver<T> valueResolver;
 
   @Inject
   private TransformationService transformationService;
+
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
+
   @Inject
   private MuleContext muleContext;
 
   private Class<T> type;
+  private Boolean melDefault;
+  private Boolean melAvailable;
 
-  ExpressionBasedParameterResolver(String expression, Class<T> type, ValueResolvingContext context, MetadataType metadataType) {
+  ExpressionBasedParameterResolver(String expression, Class<T> type, ValueResolvingContext context, DataType expectedDataType) {
     this.expression = expression;
     this.type = type;
     this.context = context;
-    this.metadataType = metadataType;
+    this.expectedDataType = expectedDataType;
   }
 
   /**
@@ -72,10 +75,14 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
 
   @Override
   public void initialise() throws InitialisationException {
-    valueResolver = new TypeSafeExpressionValueResolver<>(expression, type, metadataType);
+    valueResolver = new TypeSafeExpressionValueResolver<>(expression, type, expectedDataType);
     valueResolver.setExtendedExpressionManager(extendedExpressionManager);
     valueResolver.setTransformationService(transformationService);
-    initialiseIfNeeded(valueResolver, muleContext);
+    valueResolver.setMuleContext(muleContext);
+    valueResolver.setMelDefault(melDefault);
+    valueResolver.setMelAvailable(melAvailable);
+
+    valueResolver.initialise();
   }
 
   public void setTransformationService(TransformationService transformationService) {
@@ -84,5 +91,17 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
 
   public void setExtendedExpressionManager(ExtendedExpressionManager extendedExpressionManager) {
     this.extendedExpressionManager = extendedExpressionManager;
+  }
+
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
+  public void setMelDefault(Boolean melDefault) {
+    this.melDefault = melDefault;
+  }
+
+  public void setMelAvailable(Boolean melAvailable) {
+    this.melAvailable = melAvailable;
   }
 }

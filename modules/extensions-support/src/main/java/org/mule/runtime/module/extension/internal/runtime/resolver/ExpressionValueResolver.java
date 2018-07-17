@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.hasDwExpression;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.hasMelExpression;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -23,9 +22,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.util.func.Once;
+import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
-
-import java.util.function.BiConsumer;
 
 import javax.inject.Inject;
 
@@ -49,30 +48,26 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
   private Registry registry;
 
   final AttributeEvaluator evaluator;
-  private volatile boolean evaluatorInitialized = false;
   private final String expression;
-  private volatile BiConsumer<AttributeEvaluator, ExtendedExpressionManager> evaluatorInitialiser =
-      (evaluator, extendedExpressionManager) -> {
-        if (!evaluatorInitialized) {
-          synchronized (extendedExpressionManager) {
-            if (!evaluatorInitialized) {
 
-              evaluator.initialize(extendedExpressionManager);
-              evaluatorInitialiser = (e, c) -> {
-              };
-              evaluatorInitialized = true;
-            }
-          }
-        }
-      };
+  private final RunOnce evaluatorInitialiser = Once.of(() -> {
+    initialiseIfNeeded(extendedExpressionManager);
+    getEvaluator().initialize(extendedExpressionManager);
+  });
 
-  private boolean melDefault;
-  private boolean melAvailable;
+  private Boolean melDefault;
+  private Boolean melAvailable;
 
   ExpressionValueResolver(String expression, DataType expectedDataType) {
     checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
     this.expression = expression;
     this.evaluator = new AttributeEvaluator(expression, expectedDataType);
+  }
+
+  public ExpressionValueResolver(String expression, DataType expectedDataType, Boolean melDefault, Boolean melAvailable) {
+    this(expression, expectedDataType);
+    this.melDefault = melDefault;
+    this.melAvailable = melAvailable;
   }
 
   public ExpressionValueResolver(String expression) {
@@ -87,11 +82,14 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
 
   @Override
   public void initialise() throws InitialisationException {
-    // TODO (elrodro83) MULE-13627 remove this initialization
-    initialiseIfNeeded(extendedExpressionManager);
     initEvaluator();
-    melDefault = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
-    melAvailable = registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent();
+    if (melDefault == null) {
+      melDefault = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
+    }
+
+    if (melAvailable == null) {
+      melAvailable = registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent();
+    }
   }
 
   @Override
@@ -119,7 +117,7 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
   }
 
   void initEvaluator() {
-    evaluatorInitialiser.accept(evaluator, extendedExpressionManager);
+    evaluatorInitialiser.runOnce();
   }
 
   /**
@@ -140,5 +138,13 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
 
   public boolean isMelAvailable() {
     return melAvailable;
+  }
+
+  public void setRegistry(Registry registry) {
+    this.registry = registry;
+  }
+
+  private AttributeEvaluator getEvaluator() {
+    return evaluator;
   }
 }

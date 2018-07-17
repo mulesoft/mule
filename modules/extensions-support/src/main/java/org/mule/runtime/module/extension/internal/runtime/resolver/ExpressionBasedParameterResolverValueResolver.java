@@ -6,9 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import org.mule.metadata.api.model.MetadataType;
+import static java.lang.Boolean.valueOf;
+import static java.lang.System.getProperty;
+import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -21,10 +27,11 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ExpressionBasedParameterResolverValueResolver<T> implements ExpressionBasedValueResolver<ParameterResolver<T>> {
+public class ExpressionBasedParameterResolverValueResolver<T> implements ExpressionBasedValueResolver<ParameterResolver<T>>,
+    Initialisable {
 
   private final String expression;
-  private final MetadataType metadataType;
+  private final DataType expectedDataType;
 
   @Inject
   private TransformationService transformationService;
@@ -35,12 +42,23 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
   @Inject
   private MuleContext muleContext;
 
-  private Class<T> type;
+  @Inject
+  private Registry registry;
 
-  public ExpressionBasedParameterResolverValueResolver(String expression, Class<T> type, MetadataType metadataType) {
+  private Class<T> type;
+  private boolean melDefault;
+  private boolean melAvailable;
+
+  public ExpressionBasedParameterResolverValueResolver(String expression, Class<T> type, DataType expectedDataType) {
     this.expression = expression;
     this.type = type;
-    this.metadataType = metadataType;
+    this.expectedDataType = expectedDataType;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    melDefault = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
+    melAvailable = registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent();
   }
 
   /**
@@ -49,10 +67,14 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
   @Override
   public ParameterResolver<T> resolve(ValueResolvingContext context) throws MuleException {
     ExpressionBasedParameterResolver<T> resolver =
-        new ExpressionBasedParameterResolver<>(expression, type, context, metadataType);
+        new ExpressionBasedParameterResolver<>(expression, type, context, expectedDataType);
     resolver.setTransformationService(transformationService);
     resolver.setExtendedExpressionManager(extendedExpressionManager);
-    initialiseIfNeeded(resolver, muleContext);
+    resolver.setMuleContext(muleContext);
+    resolver.setMelAvailable(melAvailable);
+    resolver.setMelDefault(melDefault);
+
+    resolver.initialise();
     return resolver;
   }
 
