@@ -22,7 +22,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.transport.NullPayload;
 import org.mule.util.ObjectUtils;
 
-public class MessageProcessorNotification extends AbstractBlockingServerEvent
+public class MessageProcessorNotification extends ServerNotification implements BlockingServerEvent
 {
 
     private static final long serialVersionUID = 1L;
@@ -55,7 +55,7 @@ public class MessageProcessorNotification extends AbstractBlockingServerEvent
                                         MessageProcessor processor,
                                         MessagingException exceptionThrown, int action)
     {
-        super(produceEvent(event, flowConstruct), action, flowConstruct != null ? flowConstruct.getName() : null);
+        super(produceEvent(event, flowConstruct), action, flowConstruct != null ? flowConstruct.getName() : null, resolveEventReference(event));
         this.exceptionThrown = exceptionThrown;
         this.processor = processor;
     }

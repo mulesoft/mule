@@ -8,7 +8,9 @@ package org.mule.api.context.notification;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextAware;
@@ -264,4 +266,18 @@ public abstract class ServerNotification extends EventObject implements MuleCont
         return resource;
     }
 
+    public static boolean resolveEventReference(MuleEvent event)
+    {
+        if (event instanceof VoidMuleEvent)
+        {
+            return true;
+        }
+        
+        if (event instanceof DefaultMuleEvent)
+        {
+            return ((DefaultMuleEvent) event).resolveEventSynchronicity();
+        }
+        
+        return event.isSynchronous();
+    }
 }
