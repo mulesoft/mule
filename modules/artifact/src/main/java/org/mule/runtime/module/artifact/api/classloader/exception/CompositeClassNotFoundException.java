@@ -10,6 +10,8 @@ import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
+
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
@@ -64,5 +66,14 @@ public final class CompositeClassNotFoundException extends ClassNotFoundExceptio
    */
   public List<ClassNotFoundException> getExceptions() {
     return exceptions;
+  }
+
+  @Override
+  public synchronized Throwable fillInStackTrace() {
+    if (isVerboseExceptions()) {
+      return super.fillInStackTrace();
+    } else {
+      return this;
+    }
   }
 }

@@ -10,9 +10,11 @@ import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.System.lineSeparator;
+import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 
 import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
 
@@ -75,6 +77,15 @@ public final class NotExportedClassException extends ClassNotFoundException {
       return super.getMessage() + lineSeparator() + filter.toString();
     } else {
       return super.getMessage();
+    }
+  }
+
+  @Override
+  public synchronized Throwable fillInStackTrace() {
+    if (isVerboseExceptions()) {
+      return super.fillInStackTrace();
+    } else {
+      return this;
     }
   }
 }
