@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java.contributor;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.metadata.DataType.fromType;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
@@ -126,8 +127,7 @@ public class StackableTypesParameterContributor implements ParameterDeclarerCont
             .setDelegateResolverFactory(resolver -> new ParameterResolverValueResolverWrapper(resolver))
             .setExpressionBasedResolverFactory((value, expectedType) -> new ExpressionBasedParameterResolverValueResolver(value,
                                                                                                                           expectedType,
-                                                                                                                          typeLoader
-                                                                                                                              .load(expectedType)))
+                                                                                                                          fromType(expectedType)))
             .build())
         .addType(StackableType
             .builder(TypedValue.class)

@@ -14,7 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
-
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.runtime.api.exception.MuleException;
@@ -158,13 +158,13 @@ public class ResolverUtils {
         resolver = valueResolver;
       } else if (isParameterResolver.getAsBoolean()) {
         ExpressionBasedParameterResolverValueResolver<Object> valueResolver =
-            new ExpressionBasedParameterResolverValueResolver<>(expression, getType(type), type);
+            new ExpressionBasedParameterResolverValueResolver<>(expression, getType(type), toDataType(type));
         valueResolver.setTransformationService(muleContext.getTransformationService());
         valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
         resolver = valueResolver;
       } else if (muleContext.getExpressionManager().isExpression(expression)) {
         TypeSafeExpressionValueResolver<Object> valueResolver =
-            new TypeSafeExpressionValueResolver<>(expression, getType(type), type);
+            new TypeSafeExpressionValueResolver<>(expression, getType(type), toDataType(type));
         valueResolver.setTransformationService(muleContext.getTransformationService());
         valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
         resolver = valueResolver;

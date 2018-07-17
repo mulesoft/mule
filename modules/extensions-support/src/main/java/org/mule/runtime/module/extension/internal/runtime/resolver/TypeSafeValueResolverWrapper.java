@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -16,8 +15,9 @@ import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.Transformer;
 
-import javax.inject.Inject;
 import java.io.InputStream;
+
+import javax.inject.Inject;
 
 /**
  * {@link ValueResolver} wrapper implementation which wraps another {@link ValueResolver} and ensures that the output is always of
@@ -59,7 +59,6 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   @Override
   public void initialise() throws InitialisationException {
     TypeSafeTransformer typeSafeTransformer = new TypeSafeTransformer(transformationService);
-    initialiseIfNeeded(valueResolverDelegate, muleContext);
     resolver = context -> {
       Object resolvedValue = valueResolverDelegate.resolve(context);
       return isInstance(expectedType, resolvedValue)
@@ -74,6 +73,10 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
   public void setTransformationService(TransformationService transformationService) {
     this.transformationService = transformationService;
+  }
+
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
   }
 
   @FunctionalInterface
