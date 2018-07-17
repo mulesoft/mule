@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.toMetadataFormat;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.isCompiletime;
@@ -33,7 +32,6 @@ import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefin
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 
 import java.util.Optional;
 
@@ -72,7 +70,7 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
         Optional<Type> outputType = model.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
             .filter(mp -> mp.getType() instanceof SourceElement)
             .map(mp -> (SourceElement) mp.getType())
-            .map(t -> t.getOutputType().orElse(null));
+            .map(SourceElement::getReturnType);
         validateMediaType(model, outputType);
       }
 

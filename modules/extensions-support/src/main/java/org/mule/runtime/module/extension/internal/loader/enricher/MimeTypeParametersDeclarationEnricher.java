@@ -95,7 +95,7 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
           Optional<Type> outputType = declaration.getModelProperty(ExtensionTypeDescriptorModelProperty.class)
               .filter(mp -> mp.getType() instanceof SourceElement)
               .map(mp -> (SourceElement) mp.getType())
-              .map(t -> t.getOutputType().orElse(null));
+              .map(SourceElement::getReturnType);
           declareMimeTypeParameters(declaration, outputType);
         }
 
