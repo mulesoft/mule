@@ -606,7 +606,7 @@ public final class DefaultMessageBuilder
               .transform(this, DataType.BYTE_ARRAY).getPayload().getValue();
           out.writeInt(valueAsByteArray.length);
           new DataOutputStream(out).write(valueAsByteArray);
-          out.writeObject(DataType.BYTE_ARRAY);
+          out.writeObject(DataType.builder(DataType.BYTE_ARRAY).mediaType(typedValue.getDataType().getMediaType()).build());
         } else {
           throw new NotSerializableException(typedValue.getDataType().getType().getName());
         }

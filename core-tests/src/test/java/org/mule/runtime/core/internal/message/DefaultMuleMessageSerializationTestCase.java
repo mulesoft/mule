@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
@@ -69,6 +73,16 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     assertEquals(byte[].class, deserializedMessage.getPayload().getDataType().getType());
     byte[] payload = (byte[]) deserializedMessage.getPayload().getValue();
     assertTrue(Arrays.equals(TEST_MESSAGE.getBytes(), payload));
+  }
+
+  @Test
+  public void messageSerializationKeepsMediaType() throws Exception {
+    final Message message = InternalMessage.builder()
+        .payload(new TypedValue<>(new ByteArrayInputStream("{\"id\":\"1\"}".getBytes()), DataType.JSON_STRING)).build();
+    currentMuleContext.set(muleContext);
+    InternalMessage deserializedMessage = serializationRoundtrip(message);
+    assertThat(deserializedMessage.getPayload().getDataType().getMediaType(),
+               is(equalTo(message.getPayload().getDataType().getMediaType())));
   }
 
   private InternalMessage serializationRoundtrip(Message message) throws Exception {
