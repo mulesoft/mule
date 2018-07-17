@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.streaming.object.factory;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -14,6 +15,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.internal.streaming.CursorManager;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.Iterator;
 
@@ -38,26 +40,31 @@ public abstract class AbstractCursorIteratorProviderFactory extends AbstractComp
    * {@inheritDoc}
    */
   @Override
-  public final Object of(CoreEvent event, Iterator iterator) {
+  public final Object of(EventContext eventContext, Iterator iterator) {
     if (iterator instanceof CursorIterator) {
-      return streamingManager.manage(((CursorIterator) iterator).getProvider(), event);
+      return streamingManager.manage(((CursorIterator) iterator).getProvider(), eventContext);
     }
 
-    Object value = resolve(iterator, event);
+    Object value = resolve(iterator, eventContext);
     if (value instanceof CursorProvider) {
-      value = streamingManager.manage((CursorProvider) value, event);
+      value = streamingManager.manage((CursorProvider) value, eventContext);
     }
 
     return value;
+  }
+
+  @Override
+  public Object of(CoreEvent event, Iterator value) {
+    return of(((BaseEventContext) event.getContext()).getRootContext(), value);
   }
 
   /**
    * Implementations should use this method to actually create the output value
    *
    * @param iterator the streaming iterator
-   * @param event the event on which streaming is happening
+   * @param eventContext the root context of the event on which streaming is happening
    */
-  protected abstract Object resolve(Iterator iterator, CoreEvent event);
+  protected abstract Object resolve(Iterator iterator, EventContext eventContext);
 
   /**
    * {@inheritDoc}

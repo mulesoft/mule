@@ -19,6 +19,7 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
@@ -57,7 +58,20 @@ public final class MessageUtils {
    * @return a {@link Message}
    */
   public static Message toMessage(Result result, MediaType mediaType) {
-    return toMessage(result, mediaType, (CursorProviderFactory) null, null);
+    return toMessage(result, mediaType, (CursorProviderFactory) null, (BaseEventContext) null);
+  }
+
+  /**
+   * Transforms the given {@code result} into a {@link Message}.
+   *
+   * @param result a {@link Result} object
+   * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
+   *        {@link Iterator}), will create a {@link CursorProvider}
+   * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
+   * @return a {@link Message}
+   */
+  public static Message toMessage(Result result, CursorProviderFactory cursorProviderFactory, BaseEventContext eventContext) {
+    return toMessage(result, ((Optional<MediaType>) result.getMediaType()).orElse(ANY), cursorProviderFactory, eventContext);
   }
 
   /**
@@ -70,8 +84,48 @@ public final class MessageUtils {
    * @return a {@link Message}
    */
   public static Message toMessage(Result result, CursorProviderFactory cursorProviderFactory, CoreEvent event) {
-    return toMessage(result, ((Optional<MediaType>) result.getMediaType()).orElse(ANY), cursorProviderFactory, event);
+    return toMessage(result, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
   }
+
+  /**
+   * Transforms the given {@code result} into a {@link Message}.
+   *
+   * @param result a {@link Result} object
+   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
+   * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
+   *        {@link Iterator}), will create a {@link CursorProvider}
+   * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *
+   * @return a {@link Message}
+   */
+  public static Message toMessage(Result<?, ?> result,
+                                  MediaType mediaType,
+                                  CursorProviderFactory cursorProviderFactory,
+                                  BaseEventContext eventContext) {
+    Object value = streamingContent(result.getOutput(), cursorProviderFactory, eventContext);
+    return toMessage(result, builder().fromObject(value).mediaType(mediaType).build(), value);
+  }
+
+  /**
+   * Transforms the given {@code result} into a {@link Message}.
+   *
+   * @param result a {@link Result} object
+   * @param mediaType the {@link MediaType} for the message payload, overrides the described in the {@code result}
+   * @param cursorProviderFactory Factory that in case of finding a value which can create a cursor (eg.: {@link InputStream} or
+   *        {@link Iterator}), will create a {@link CursorProvider}
+   * @param eventContext Used for the case where a {@link CursorProvider} is created, register the one in it.
+   *
+   * @return a {@link Message}
+   */
+  public static Message toMessage(Result<?, ?> result,
+                                  MediaType mediaType,
+                                  CursorProviderFactory cursorProviderFactory,
+                                  BaseEventContext eventContext,
+                                  DataType dataType) {
+    Object value = streamingContent(result.getOutput(), cursorProviderFactory, eventContext);
+    return toMessage(result, builder(dataType).mediaType(mediaType).build(), value);
+  }
+
 
   /**
    * Transforms the given {@code result} into a {@link Message}.
@@ -88,8 +142,7 @@ public final class MessageUtils {
                                   MediaType mediaType,
                                   CursorProviderFactory cursorProviderFactory,
                                   CoreEvent event) {
-    Object value = streamingContent(result.getOutput(), cursorProviderFactory, event);
-    return toMessage(result, builder().fromObject(value).mediaType(mediaType).build(), value);
+    return toMessage(result, mediaType, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
   }
 
   /**
@@ -108,8 +161,8 @@ public final class MessageUtils {
                                   CursorProviderFactory cursorProviderFactory,
                                   CoreEvent event,
                                   DataType dataType) {
-    Object value = streamingContent(result.getOutput(), cursorProviderFactory, event);
-    return toMessage(result, builder(dataType).mediaType(mediaType).build(), value);
+    return toMessage(result, mediaType, cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext(),
+                     dataType);
   }
 
   /**
@@ -117,17 +170,17 @@ public final class MessageUtils {
    *
    * @param results a collection of {@link Result} items
    * @param cursorProviderFactory the {@link CursorProviderFactory} used to handle streaming cursors
-   * @param event the {@link CoreEvent} which originated the results being transformed
+   * @param eventContext the toot context of the {@link CoreEvent} which originated the results being transformed
    * @return a {@link List} of {@link Message}
    */
   public static List<Message> toMessageCollection(Collection<Result> results,
                                                   CursorProviderFactory cursorProviderFactory,
-                                                  CoreEvent event) {
+                                                  BaseEventContext eventContext) {
     if (!(results instanceof List)) {
       results = new ArrayList<>(results);
     }
 
-    return new ResultsToMessageList((List) results, cursorProviderFactory, event);
+    return new ResultsToMessageList((List) results, cursorProviderFactory, eventContext);
   }
 
   /**
@@ -135,16 +188,16 @@ public final class MessageUtils {
    *
    * @param results a collection of {@link Result} items
    * @param cursorProviderFactory the {@link CursorProviderFactory} used to handle streaming cursors
-   * @param event the {@link CoreEvent} which originated the results being transformed
+   * @param eventContext the root context of the {@link CoreEvent} which originated the results being transformed
    * @return a similar collection of {@link Message}
    */
   public static Iterator<Message> toMessageIterator(Iterator<Result> results,
                                                     CursorProviderFactory cursorProviderFactory,
-                                                    CoreEvent event) {
+                                                    BaseEventContext eventContext) {
     if (results instanceof StreamingIterator) {
-      return new ResultToMessageStreamingIterator((StreamingIterator<Result>) results, cursorProviderFactory, event);
+      return new ResultToMessageStreamingIterator((StreamingIterator<Result>) results, cursorProviderFactory, eventContext);
     } else {
-      return new ResultToMessageIterator((Iterator) results, cursorProviderFactory, event);
+      return new ResultToMessageIterator((Iterator) results, cursorProviderFactory, eventContext);
     }
   }
 

@@ -27,6 +27,7 @@ import org.slf4j.MDC;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Allows access to the privileged behavior of the {@link Event} implementation.
@@ -194,6 +195,7 @@ public interface PrivilegedEvent extends CoreEvent {
     return new DefaultEventBuilder((BaseEventContext) context, (InternalEvent) event);
   }
 
+  @NoImplement
   public interface Builder extends CoreEvent.Builder {
 
     /**
@@ -252,6 +254,9 @@ public interface PrivilegedEvent extends CoreEvent {
 
     @Override
     Builder message(Message message);
+
+    @Override
+    Builder message(Function<EventContext, Message> messageFactory);
 
     @Override
     Builder variables(Map<String, ?> variables);

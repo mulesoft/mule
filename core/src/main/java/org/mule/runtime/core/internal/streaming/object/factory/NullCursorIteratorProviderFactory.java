@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.object.factory;
 
-import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 
 import java.util.Iterator;
@@ -18,7 +18,7 @@ public class NullCursorIteratorProviderFactory extends AbstractCursorIteratorPro
   }
 
   @Override
-  protected Object resolve(Iterator iterator, CoreEvent event) {
+  protected Object resolve(Iterator iterator, EventContext eventContext) {
     return iterator;
   }
 }

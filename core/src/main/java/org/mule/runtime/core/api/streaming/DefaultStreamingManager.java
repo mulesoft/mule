@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -124,11 +125,31 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
    * {@inheritDoc}
    */
   @Override
-  public CursorProvider manage(CursorProvider provider, CoreEvent creatorEvent) {
+  public CursorProvider manage(CursorProvider provider, EventContext creatorEventContext) {
     if (provider instanceof ManagedCursorProvider) {
       return provider;
     }
-    return cursorManager.manage(provider, creatorEvent);
+    return cursorManager.manage(provider, (BaseEventContext) creatorEventContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void manage(InputStream stream, EventContext creatorEventContext) {
+    if (stream instanceof Cursor) {
+      return;
+    }
+
+    ((BaseEventContext) creatorEventContext).onTerminated((response, throwable) -> closeQuietly(stream));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CursorProvider manage(CursorProvider provider, CoreEvent creatorEvent) {
+    return manage(provider, ((BaseEventContext) creatorEvent.getContext()).getRootContext());
   }
 
   /**
@@ -136,12 +157,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
    */
   @Override
   public void manage(InputStream stream, CoreEvent creatorEvent) {
-    if (stream instanceof Cursor) {
-      return;
-    }
-
-    final BaseEventContext ctx = ((BaseEventContext) creatorEvent.getContext()).getRootContext();
-    ctx.onTerminated((response, throwable) -> closeQuietly(stream));
+    manage(stream, ((BaseEventContext) creatorEvent.getContext()).getRootContext());
   }
 
   /**

@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -21,8 +20,8 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIM
 import static org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler.nullHandler;
 import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -35,9 +34,9 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.util.StreamingUtils;
 import org.mule.runtime.core.internal.util.message.MessageUtils;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.CollectionReturnHandler;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.MapReturnHandler;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.ReturnHandler;
@@ -47,6 +46,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -69,6 +69,8 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   private final MediaType defaultMediaType;
   private boolean isSpecialHandling = false;
   private ReturnHandler returnHandler = nullHandler();
+
+  private Charset defaultEncoding;
 
   /**
    * Creates a new instance
@@ -100,10 +102,15 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     this.muleContext = muleContext;
     this.cursorProviderFactory = cursorProviderFactory;
     defaultMediaType = getDefaultMediaType(componentModel);
+
+    defaultEncoding = getDefaultEncoding(muleContext);
   }
 
   protected Message toMessage(Object value, ExecutionContextAdapter operationContext) {
-    final MediaType mediaType = resolveMediaType(value, operationContext);
+    Map<String, Object> params = operationContext.getParameters();
+    Optional<MediaType> contextMimeTypeParam = getContextMimeType(params);
+    Optional<Charset> contextEncodingParam = getContextEncoding(params);
+    final MediaType mediaType = resolveMediaType(value, contextMimeTypeParam, contextEncodingParam);
     final CoreEvent event = operationContext.getEvent();
 
     if (value instanceof Result) {
@@ -121,12 +128,15 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
           : MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event);
     } else {
       if (value instanceof Collection && returnsListOfMessages) {
-        value = toMessageCollection((Collection<Result>) value, cursorProviderFactory, event);
+        value = toMessageCollection((Collection<Result>) value,
+                                    cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
       } else if (value instanceof Iterator && returnsListOfMessages) {
-        value = toMessageIterator((Iterator<Result>) value, cursorProviderFactory, event);
+        value = toMessageIterator((Iterator<Result>) value,
+                                  cursorProviderFactory, ((BaseEventContext) event.getContext()).getRootContext());
       }
 
-      value = streamingContent(value, operationContext, cursorProviderFactory, event);
+      value = streamingContent(value, operationContext, cursorProviderFactory,
+                               ((BaseEventContext) event.getContext()).getRootContext());
 
       Message.Builder messageBuilder;
 
@@ -144,10 +154,18 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     }
   }
 
+  private Optional<MediaType> getContextMimeType(Map<String, Object> params) {
+    return ofNullable((String) params.get(MIME_TYPE_PARAMETER_NAME)).map(mimeType -> MediaType.parse(mimeType));
+  }
+
+  private Optional<Charset> getContextEncoding(Map<String, Object> params) {
+    return ofNullable((String) params.get(ENCODING_PARAMETER_NAME)).map(encoding -> parseCharset(encoding));
+  }
+
   private Object streamingContent(Object value,
                                   ExecutionContextAdapter operationContext,
                                   CursorProviderFactory cursorProviderFactory,
-                                  CoreEvent event) {
+                                  BaseEventContext eventContext) {
     if (value instanceof InputStream) {
       ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
       if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {
@@ -155,7 +173,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       }
     }
 
-    return StreamingUtils.streamingContent(value, cursorProviderFactory, event);
+    return StreamingUtils.streamingContent(value, cursorProviderFactory, eventContext);
   }
 
   /**
@@ -166,34 +184,20 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
    * @param operationContext
    * @return
    */
-  protected MediaType resolveMediaType(Object value, ExecutionContextAdapter<ComponentModel> operationContext) {
-    Charset existingEncoding = getDefaultEncoding(muleContext);
+  protected MediaType resolveMediaType(Object value, Optional<MediaType> contextMimeType, Optional<Charset> contextEncoding) {
+    Charset existingEncoding = defaultEncoding;
     MediaType mediaType = defaultMediaType;
     if (value instanceof Result) {
       final Optional<MediaType> optionalMediaType = ((Result) value).getMediaType();
       if (optionalMediaType.isPresent()) {
         mediaType = optionalMediaType.get();
         if (mediaType.getCharset().isPresent()) {
-          existingEncoding = mediaType.getCharset().get();
+          existingEncoding = mediaType.getCharset().orElse(existingEncoding);
         }
       }
     }
 
-    if (mediaType == null) {
-      mediaType = ANY;
-    }
-
-    if (operationContext.hasParameter(MIME_TYPE_PARAMETER_NAME)) {
-      mediaType = MediaType.parse(operationContext.getParameter(MIME_TYPE_PARAMETER_NAME));
-    }
-
-    if (operationContext.hasParameter(ENCODING_PARAMETER_NAME)) {
-      mediaType = mediaType.withCharset(parseCharset(operationContext.getParameter(ENCODING_PARAMETER_NAME)));
-    } else {
-      mediaType = mediaType.withCharset(existingEncoding);
-    }
-
-    return mediaType;
+    return contextMimeType.orElse(mediaType).withCharset(contextEncoding.orElse(existingEncoding));
   }
 
   private class ConnectedInputStreamWrapper extends InputStream {

@@ -32,6 +32,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.Component;
@@ -77,15 +78,15 @@ import org.mule.tck.core.streaming.SimpleByteBufferManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
 
@@ -249,7 +250,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
 
     messageSource = getNewExtensionMessageSourceInstance();
 
-    sourceCallback = spy(DefaultSourceCallback.builder()
+    sourceCallback = DefaultSourceCallback.builder()
         .setSourceModel(sourceModel)
         .setProcessingManager(messageProcessingManager)
         .setListener(messageProcessor)
@@ -259,7 +260,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         .setCompletionHandlerFactory(completionHandlerFactory)
         .setExceptionCallback(exceptionCallback)
         .setCursorStreamProviderFactory(cursorStreamProviderFactory)
-        .build());
+        .build();
 
     when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);
   }

@@ -23,6 +23,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -103,7 +104,14 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void setNullMessage() throws Exception {
     expected.expect(NullPointerException.class);
-    builder(messageContext).message(null);
+    builder(messageContext).message((Message) null);
+  }
+
+  @Test
+  public void setNullReturningMessageFactory() throws Exception {
+    Builder builder = builder(messageContext).message(c -> null);
+    expected.expect(NullPointerException.class);
+    builder.build();
   }
 
   @Test

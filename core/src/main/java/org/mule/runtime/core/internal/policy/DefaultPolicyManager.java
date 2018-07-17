@@ -11,6 +11,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.process;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.fromSupplier;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.Component;
@@ -77,7 +78,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters);
     if (parameterizedPolicies.isEmpty()) {
       return event -> from(process(event, flowExecutionProcessor))
-          .defaultIfEmpty(CoreEvent.builder(sourceEvent).message(of(null)).build())
+          .switchIfEmpty(fromSupplier(() -> CoreEvent.builder(sourceEvent).message(of(null)).build()))
           .<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>map(flowExecutionResult -> right(new SourcePolicySuccessResult(flowExecutionResult,
                                                                                                                                         () -> messageSourceResponseParametersProcessor
                                                                                                                                             .getSuccessfulExecutionResponseParametersFunction()

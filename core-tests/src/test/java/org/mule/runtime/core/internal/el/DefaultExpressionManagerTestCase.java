@@ -346,10 +346,10 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     initialiseIfNeeded(expressionManager, false, muleContext);
     final CoreEvent event = testEvent();
 
-    when(streamingManager.manage(cursorProvider, event)).thenReturn(cursorProvider);
+    when(streamingManager.manage(cursorProvider, event.getContext())).thenReturn(cursorProvider);
 
     expressionManager.evaluate("someExpression", event);
-    verify(streamingManager).manage(cursorProvider, event);
+    verify(streamingManager).manage(cursorProvider, event.getContext());
   }
 
   @Test

@@ -10,15 +10,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.mockito.Mockito.mock;
 
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.junit.Test;
 
 @SmallTest
 public class ResultToMessageIteratorTestCase {
@@ -58,9 +58,9 @@ public class ResultToMessageIteratorTestCase {
     list.add(resultOf(5));
 
     CursorProviderFactory cursorProviderFactory = mock(CursorProviderFactory.class);
-    CoreEvent coreEvent = mock(CoreEvent.class);
+    BaseEventContext eventCtx = mock(BaseEventContext.class);
 
-    return new ResultToMessageIterator(list.iterator(), cursorProviderFactory, coreEvent);
+    return new ResultToMessageIterator(list.iterator(), cursorProviderFactory, eventCtx);
   }
 
   private static Result<Object, Object> resultOf(int output) {

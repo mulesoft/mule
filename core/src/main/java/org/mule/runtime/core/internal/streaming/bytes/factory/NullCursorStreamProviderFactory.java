@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes.factory;
 
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.factory.AbstractCursorStreamProviderFactory;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.io.InputStream;
 
@@ -35,8 +37,13 @@ public class NullCursorStreamProviderFactory extends AbstractCursorStreamProvide
    * @return the given {@code inputStream} wrapped in an {@link Either} instance
    */
   @Override
-  protected Object resolve(InputStream inputStream, CoreEvent event) {
-    streamingManager.manage(inputStream, event);
+  protected Object resolve(InputStream inputStream, EventContext creatorRootEventContext) {
+    streamingManager.manage(inputStream, creatorRootEventContext);
     return inputStream;
+  }
+
+  @Override
+  protected Object resolve(InputStream inputStream, CoreEvent event) {
+    return resolve(inputStream, ((BaseEventContext) event.getContext()).getRootContext());
   }
 }
