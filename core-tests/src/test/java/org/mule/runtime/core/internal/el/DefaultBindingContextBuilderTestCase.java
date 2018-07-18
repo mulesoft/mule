@@ -113,6 +113,7 @@ public class DefaultBindingContextBuilderTestCase extends AbstractMuleTestCase {
 
     TypedValue vars = composite.lookup("vars").get();
     assertThat(((Map<String, TypedValue<String>>) vars.getValue()).get("key").getValue(), is("value"));
+    assertThat(composite.lookup("g").get().getValue(), is("gValue"));
   }
 
   @Test
@@ -126,5 +127,6 @@ public class DefaultBindingContextBuilderTestCase extends AbstractMuleTestCase {
 
     TypedValue vars = composite.lookup("vars").get();
     assertThat(((Map<String, TypedValue<String>>) vars.getValue()).get("key").getValue(), is("value"));
+    assertThat(composite.lookup("g").get().getValue(), is("gValue"));
   }
 }
