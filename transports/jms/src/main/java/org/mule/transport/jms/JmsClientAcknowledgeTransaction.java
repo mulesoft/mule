@@ -13,6 +13,8 @@ import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transport.jms.i18n.JmsMessages;
 
+import static java.lang.System.identityHashCode;
+
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -106,5 +108,11 @@ public class JmsClientAcknowledgeTransaction extends AbstractSingleResourceTrans
     public boolean supports(Object key, Object resource)
     {
         return false;
+    }
+    
+    @Override
+    protected Object keyToString()
+    {
+        return identityHashCode(key);
     }
 }
