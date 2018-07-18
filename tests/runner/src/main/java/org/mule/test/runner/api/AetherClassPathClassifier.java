@@ -34,13 +34,12 @@ import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
-
-import com.google.common.collect.Lists;
-import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
+
+import com.google.common.collect.Lists;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -68,6 +67,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -633,7 +633,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     for (ArtifactClassificationNode node : classificationNodes) {
       final List<String> pluginDependencies = node.getArtifactDependencies().stream()
-          .map(dependency -> toId(dependency.getArtifact()))
+          .map(dependency -> toVersionlessId(dependency.getArtifact()))
           .collect(toList());
       final String classifierLessId = toVersionlessId(node.getArtifact());
       final PluginUrlClassification pluginUrlClassification =
@@ -648,7 +648,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     for (PluginUrlClassification pluginUrlClassification : classifiedPluginUrls.values()) {
       for (String dependency : pluginUrlClassification.getPluginDependencies()) {
         final PluginUrlClassification dependencyPlugin =
-            classifiedPluginUrls.get(toVersionlessId(new DefaultArtifact(dependency)));
+            classifiedPluginUrls.get(dependency);
         if (dependencyPlugin == null) {
           throw new IllegalStateException("Unable to find a plugin dependency: " + dependency);
         }

@@ -45,7 +45,7 @@ public class PluginLookPolicyFactory {
         continue;
       }
 
-      if (pluginClassification.getPluginDependencies().contains(dependencyPluginClassification.getName())) {
+      if (pluginClassification.getPluginDependencies().contains(dependencyPluginClassification.getArtifactId())) {
         LookupStrategy lookUpPolicyStrategy = PARENT_FIRST;
 
         for (String exportedPackage : dependencyPluginClassification.getExportedPackages()) {
