@@ -166,7 +166,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
         return new StringBuilder().append(getClass().getName())
                 .append('@').append(id)
                 .append("[status=").append(statusName)
-                .append(", key=").append(key)
+                .append(", key=").append(keyToString())
                 .append("]").toString();
     }
 
@@ -184,5 +184,10 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     protected Class getKeyType()
     {
         throw new MuleRuntimeException(CoreMessages.createStaticMessage("Transaction type: " + this.getClass().getName() + " doesn't support supports(..) method"));
+    }
+    
+    protected Object keyToString()
+    {
+        return key;
     }
 }
