@@ -25,7 +25,7 @@ import java.nio.ByteBuffer;
  */
 public final class BufferedCursorStream extends AbstractCursorStream {
 
-  private static final int LOCAL_BUFFER_SIZE = KB.toBytes(32);
+  private static final int LOCAL_BUFFER_SIZE = KB.toBytes(8);
   private static final ByteBuffer NULL_BUFFER = ByteBuffer.allocate(0);
 
   private final InputStreamBuffer streamBuffer;
