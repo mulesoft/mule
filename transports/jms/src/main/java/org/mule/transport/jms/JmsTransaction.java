@@ -6,6 +6,8 @@
  */
 package org.mule.transport.jms;
 
+import static java.lang.System.identityHashCode;
+
 import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
@@ -133,5 +135,11 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
     protected Class getKeyType()
     {
         return Connection.class;
+    }
+    
+    @Override
+    protected Object keyToString()
+    {
+        return identityHashCode(key);
     }
 }
