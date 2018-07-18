@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
-
-import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.dsl.api.component.TypeConverter;
 
 import java.util.Map;
 import java.util.Optional;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
+import org.mule.runtime.dsl.api.component.TypeConverter;
 
 /**
  * Bean definition creator for elements that end up representing simple types.
@@ -48,8 +50,14 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
         return false;
       }
 
-      final String value =
-          componentModel.getTextContent() != null ? componentModel.getTextContent() : parameters.values().iterator().next();
+      final String value = componentModel.getTextContent() != null ? componentModel.getTextContent()
+          : (parameters.values().isEmpty() ? null : parameters.values().iterator().next());
+      if (value == null) {
+        throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
+                                                           componentModel.getConfigFileName()
+                                                               .orElse("unknown"),
+                                                           componentModel.getLineNumber().orElse(-1)));
+      }
       Optional<TypeConverter> typeConverterOptional =
           createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeConverter();
       componentModel.setBeanDefinition(getConvertibleBeanDefinition(type, value, typeConverterOptional));
