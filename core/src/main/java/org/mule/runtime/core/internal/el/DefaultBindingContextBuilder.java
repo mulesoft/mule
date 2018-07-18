@@ -53,7 +53,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
     payloadBinding = bindingContext.lookup(PAYLOAD).orElse(null);
     attributesBinding = bindingContext.lookup(ATTRIBUTES).orElse(null);
-    varsBinding = of(() -> bindingContext.lookup(VARS).orElse(null));
+    varsBinding = bindingContext.lookup(VARS).flatMap(vars -> of(() -> vars));
   }
 
   @Override
@@ -111,6 +111,12 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
       modules = null;
       bindingAdded = false;
     }
+
+    payloadBinding = context.lookup(PAYLOAD).orElse(null);
+    attributesBinding = context.lookup(ATTRIBUTES).orElse(null);
+    context.lookup(VARS).ifPresent(vars -> {
+      varsBinding = of(() -> vars);
+    });
 
     delegates.addFirst(context);
     return this;
