@@ -108,7 +108,7 @@ public final class DisplayDeclarationEnricher extends AbstractAnnotatedDeclarati
 
   private void enrichOperation(OperationDeclaration declaration) {
     declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
-        .map(ExtensionOperationDescriptorModelProperty::getOperationMethod)
+        .map(ExtensionOperationDescriptorModelProperty::getOperationElement)
         .ifPresent(annotatedElement -> enrichDeclaration(declaration, annotatedElement));
   }
 

@@ -57,7 +57,7 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
 
   @BeforeClass
   public static void before() throws Exception {
-    customEncoding = defaultCharset().name().equals(UTF_8) ? ISO_8859_1 : UTF_8;
+    customEncoding = defaultCharset().equals(UTF_8) ? UTF_8 : ISO_8859_1;
   }
 
   @Before

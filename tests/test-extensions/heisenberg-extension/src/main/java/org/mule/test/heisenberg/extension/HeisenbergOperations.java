@@ -199,6 +199,19 @@ public class HeisenbergOperations implements Disposable {
             .output((CursorProvider) (streamingHelper.resolveCursorProvider(new ByteArrayInputStream(name.getBytes())))).build();
       }
 
+      @OutputResolver(output = TucoMetadataResolver.class)
+      @MediaType(strict = false)
+      public String colorizeMeth() {
+        return "Blue";
+      }
+
+      // This operation will only pass the validation in the MediaTypeModelValidator in runtime
+      @OutputResolver(output = TucoMetadataResolver.class)
+      @MediaType(value = TEXT_PLAIN, strict = false)
+      public String callDea() {
+        return "Help DEA!";
+      }
+
       @Override
       public List<Result<CursorProvider, Object>> getPage(HeisenbergConnection connection) {
         if (blacklist == null) {

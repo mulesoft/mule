@@ -32,6 +32,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.module.extension.api.ApiTestClass;
@@ -129,7 +130,7 @@ public class ExportedPackagesValidatorTestCase {
         .thenReturn(optionalMethod.map(ImplementingMethodModelProperty::new));
     when(operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class))
         .thenReturn(optionalMethod
-            .map(method -> new ExtensionOperationDescriptorModelProperty(new MethodWrapper(method, loader))));
+            .map(method -> new ExtensionOperationDescriptorModelProperty(new OperationWrapper(method, loader))));
   }
 
   private OutputModel mockOutputModel(Type type) {

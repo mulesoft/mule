@@ -48,7 +48,7 @@ public class JavaConfigurationDeclarationEnricher extends AbstractAnnotatedDecla
         @Override
         protected void onOperation(OperationDeclaration declaration) {
           enrich(declaration, ExtensionOperationDescriptorModelProperty.class,
-                 (operation, property) -> enrich(operation, property.getOperationMethod()));
+                 (operation, property) -> enrich(operation, property.getOperationElement()));
         }
 
         @Override

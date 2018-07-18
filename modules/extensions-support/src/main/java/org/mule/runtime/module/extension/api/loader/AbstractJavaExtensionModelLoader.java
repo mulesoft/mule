@@ -57,6 +57,7 @@ import org.mule.runtime.module.extension.internal.loader.validation.ConnectionPr
 import org.mule.runtime.module.extension.internal.loader.validation.InjectedFieldsModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.InputParametersTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.JavaSubtypesModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.MediaTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.MetadataComponentModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.NullSafeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.OAuthConnectionProviderModelValidator;
@@ -84,6 +85,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new ConnectionProviderModelValidator(),
                                                                                          new InputParametersTypeModelValidator(),
                                                                                          new JavaSubtypesModelValidator(),
+                                                                                         new MediaTypeModelValidator(),
                                                                                          new MetadataComponentModelValidator(),
                                                                                          new NullSafeModelValidator(),
                                                                                          new OperationReturnTypeModelValidator(),

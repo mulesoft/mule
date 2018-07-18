@@ -54,10 +54,14 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
+import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -215,7 +219,6 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
 
   @Test
   public void listResultString() throws Exception {
-    mockArrayOutput(operation);
     mockExtensionOperationDescriptorModelProperty("listResultString");
     enricher.enrich(extensionLoadingContext);
     assertStringMimeTypeParams(operation);
@@ -223,7 +226,6 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
 
   @Test
   public void listResultStream() throws Exception {
-    mockArrayOutput(operation);
     mockExtensionOperationDescriptorModelProperty("listResultStream");
     enricher.enrich(extensionLoadingContext);
     assertMimeTypeParams(operation);
@@ -231,7 +233,6 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
 
   @Test
   public void listResultApple() throws Exception {
-    mockArrayOutput(operation);
     mockExtensionOperationDescriptorModelProperty("listResultApple");
     enricher.enrich(extensionLoadingContext);
     assertNoMimeTypeParams(operation);
@@ -239,7 +240,6 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
 
   @Test
   public void pagedResultString() throws Exception {
-    mockArrayOutput(operation);
     mockExtensionOperationDescriptorModelProperty("pagedResultString");
     enricher.enrich(extensionLoadingContext);
     assertStringMimeTypeParams(operation);
@@ -247,7 +247,6 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
 
   @Test
   public void pagedResultCursorProvider() throws Exception {
-    mockArrayOutput(operation);
     mockExtensionOperationDescriptorModelProperty("pagedResultCursorProvider");
     enricher.enrich(extensionLoadingContext);
     assertMimeTypeParams(operation);
@@ -255,7 +254,6 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
 
   @Test
   public void pagedResultApple() throws Exception {
-    mockArrayOutput(operation);
     mockExtensionOperationDescriptorModelProperty("pagedResultApple");
     enricher.enrich(extensionLoadingContext);
     assertNoMimeTypeParams(operation);
@@ -263,7 +261,6 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
 
   @Test
   public void listResultStringSource() throws Exception {
-    mockArrayOutput(source);
     mockExtensionTypeDescriptorModelProperty(TestListResultStringSource.class);
     enricher.enrich(extensionLoadingContext);
     assertStringMimeTypeParams(source);
@@ -296,13 +293,6 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
     assertThat(parameter.getDefaultValue(), is(nullValue()));
   }
 
-  private void mockArrayOutput(ExecutableComponentDeclaration operation) {
-    ArrayTypeBuilder arrayTypeBuilder = BaseTypeBuilder.create(JAVA).arrayType();
-    arrayTypeBuilder.of(BaseTypeBuilder.create(JAVA).stringType());
-    ArrayType arrayType = arrayTypeBuilder.build();
-    mockOutput(operation, arrayType);
-  }
-
   private void mockOutput(WithOutputDeclaration declaration, MetadataType type) {
     OutputDeclaration output = mock(OutputDeclaration.class);
     when(output.getType()).thenReturn(type);
@@ -310,23 +300,16 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
   }
 
   private void mockExtensionTypeDescriptorModelProperty(Class sourceClass) {
-    Type sourceType = new TypeWrapper(ResolvableType.forClass(sourceClass), typeLoader);
-    Type sourceOutputType = sourceType.getSuperTypeGenerics(Source.class).get(0);
-    ExtensionTypeDescriptorModelProperty extensionTypeDescriptorModelProperty =
-        mock(ExtensionTypeDescriptorModelProperty.class, new ReturnsDeepStubs());
+    SourceElement sourceElement = new SourceTypeWrapper(sourceClass, typeLoader);
     when(source.getModelProperty(ExtensionTypeDescriptorModelProperty.class))
-        .thenReturn(of(extensionTypeDescriptorModelProperty));
-    when(extensionTypeDescriptorModelProperty.getType().getSuperTypeGenerics(Source.class).get(0)).thenReturn(sourceOutputType);
+        .thenReturn(of(new ExtensionTypeDescriptorModelProperty(sourceElement)));
   }
 
   private void mockExtensionOperationDescriptorModelProperty(String operationMethodName) throws NoSuchMethodException {
     Method operationMethod = TestMethods.class.getMethod(operationMethodName);
-    Type operationReturnType = new TypeWrapper(ResolvableType.forMethodReturnType(operationMethod), typeLoader);
-    ExtensionOperationDescriptorModelProperty extensionOperationDescriptorModelProperty =
-        mock(ExtensionOperationDescriptorModelProperty.class, new ReturnsDeepStubs());
+    OperationElement operationElement = new OperationWrapper(operationMethod, typeLoader);
     when(operation.getModelProperty(ExtensionOperationDescriptorModelProperty.class))
-        .thenReturn(of(extensionOperationDescriptorModelProperty));
-    when(extensionOperationDescriptorModelProperty.getOperationMethod().getReturnType()).thenReturn(operationReturnType);
+        .thenReturn(of(new ExtensionOperationDescriptorModelProperty(operationElement)));
   }
 
   public class TestMethods {

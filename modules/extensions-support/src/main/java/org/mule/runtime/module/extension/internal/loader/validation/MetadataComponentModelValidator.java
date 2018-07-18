@@ -252,7 +252,7 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
                                        component.getName())));
     } else if (isCustomStaticType(modelOutputType)) {
       component.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
-          .map(mp -> mp.getOperationMethod().getReturnMetadataType())
+          .map(mp -> mp.getOperationElement().getOperationReturnMetadataType())
           .filter(t -> t instanceof VoidType)
           .ifPresent(t -> problemsReporter.addError(new Problem(component,
                                                                 format("An Static Metadata OutputResolver was defined for the Void Operation '%s'. "
@@ -340,7 +340,7 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
   }
 
   private boolean shouldValidateComponentOutputMetadata(ConnectableComponentModel model) {
-    return model.getModelProperty(ExtensionOperationDescriptorModelProperty.class).map(mp -> mp.getOperationMethod())
+    return model.getModelProperty(ExtensionOperationDescriptorModelProperty.class).map(mp -> mp.getOperationElement())
         .map(m -> !isScope(m) && !isRouter(m))
         .orElse(true);
   }

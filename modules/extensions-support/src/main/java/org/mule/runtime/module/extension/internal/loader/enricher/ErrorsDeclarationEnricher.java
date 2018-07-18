@@ -120,7 +120,7 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
       private void addComponent(ComponentDeclaration<?> declaration) {
         declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
             .ifPresent(implementingMethodModelProperty -> operations
-                .add(new Pair<>(declaration, implementingMethodModelProperty.getOperationMethod())));
+                .add(new Pair<>(declaration, implementingMethodModelProperty.getOperationElement())));
       }
 
     }.walk(declaration);

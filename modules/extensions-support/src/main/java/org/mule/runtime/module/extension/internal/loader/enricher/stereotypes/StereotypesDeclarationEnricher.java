@@ -51,6 +51,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
+import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
 import java.lang.reflect.Method;
@@ -143,7 +144,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
           final StereotypeModel defaultStereotype = createStereotype(declaration.getName(), processorParent);
           ifPresent(declaration.getModelProperty(ImplementingMethodModelProperty.class)
               .map(ImplementingMethodModelProperty::getMethod)
-              .map(method -> new MethodWrapper(method, typeLoader)),
+              .map(method -> new OperationWrapper(method, typeLoader)),
                     methodElement -> resolveStereotype(methodElement, declaration, defaultStereotype),
                     () -> declaration.withStereotype(defaultStereotype));
         }

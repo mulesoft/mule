@@ -56,7 +56,7 @@ public final class AnnotationProcessorProblemsHandler implements ProblemsHandler
 
       Element element;
       element = getElement(enrichableModel, ExtensionOperationDescriptorModelProperty.class,
-                           mp -> mp.getOperationMethod().getElement());
+                           mp -> mp.getOperationElement().getElement());
       if (element != null) {
         return element;
       }
