@@ -33,7 +33,8 @@ public class DefaultConfigurationParameters implements ConfigurationParameters {
 
   @Override
   public String getStringParameter(String parameterName) {
-    return simpleConfigurationParameters.get(parameterName).toString();
+    Object parameter = simpleConfigurationParameters.get(parameterName);
+    return parameter != null ? parameter.toString() : null;
   }
 
   @Override
