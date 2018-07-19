@@ -966,9 +966,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     }
 
     directDependencies = directDependencies.stream()
-        .filter(dependency -> !dependency.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER))
         .map(toTransform -> {
-          if (toTransform.getScope().equals(TEST)) {
+          if (toTransform.getScope().equals(TEST) && !MULE_PLUGIN_CLASSIFIER.equals(toTransform.getArtifact().getClassifier())) {
             if (TESTS_CLASSIFIER.equals(toTransform.getArtifact().getClassifier())) {
               // Exclude transitive dependencies of test-jar artifacts
               return toTransform.setScope(COMPILE).setExclusions(singleton(new Exclusion("*", "*", "*", "*")));
