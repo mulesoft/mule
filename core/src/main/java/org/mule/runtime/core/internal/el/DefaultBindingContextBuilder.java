@@ -112,8 +112,8 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
       bindingAdded = false;
     }
 
-    payloadBinding = context.lookup(PAYLOAD).orElse(null);
-    attributesBinding = context.lookup(ATTRIBUTES).orElse(null);
+    payloadBinding = context.lookup(PAYLOAD).orElse(payloadBinding);
+    attributesBinding = context.lookup(ATTRIBUTES).orElse(attributesBinding);
     context.lookup(VARS).ifPresent(vars -> {
       varsBinding = of(() -> vars);
     });

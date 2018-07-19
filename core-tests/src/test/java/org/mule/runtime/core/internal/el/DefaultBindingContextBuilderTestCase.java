@@ -13,13 +13,13 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 
 import org.mule.runtime.api.el.Binding;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.el.ModuleNamespace;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -96,37 +96,98 @@ public class DefaultBindingContextBuilderTestCase extends AbstractMuleTestCase {
     assertThat(context.modules(), hasItems(module));
   }
 
-  private static final DataType VARS_DATA_TYPE = DataType.builder()
-      .mapType(Map.class)
-      .keyType(String.class)
-      .valueType(TypedValue.class)
-      .build();
+  @Test
+  public void payloadLookupInFirstDelegate() {
+    BindingContext localBinding = BindingContext.builder()
+        .addBinding("payload", mapValue())
+        .build();
+    assertLookup(BindingContext.builder(localBinding).addAll(globalBinding()).build(), "payload");
+  }
+
+  @Test
+  public void payloadLookupInSecondDelegate() {
+    BindingContext localBinding = BindingContext.builder()
+        .addBinding("payload", new LazyValue<>(() -> mapValue()))
+        .build();
+    assertLookup(BindingContext.builder(globalBinding()).addAll(localBinding).build(), "payload");
+  }
+
+  @Test
+  public void attributesLookupInFirstDelegate() {
+    BindingContext localBinding = BindingContext.builder()
+        .addBinding("attributes", mapValue())
+        .build();
+    assertLookup(BindingContext.builder(localBinding).addAll(globalBinding()).build(), "attributes");
+  }
+
+  @Test
+  public void attributesLookupInSecondDelegate() {
+    BindingContext localBinding = BindingContext.builder()
+        .addBinding("attributes", new LazyValue<>(() -> mapValue()))
+        .build();
+    assertLookup(BindingContext.builder(globalBinding()).addAll(localBinding).build(), "attributes");
+  }
 
   @Test
   public void varLookupInFirstDelegate() {
     BindingContext localBinding = BindingContext.builder()
-        .addBinding("vars", new LazyValue<>(() -> new TypedValue<>(singletonMap("key", new TypedValue<>("value", STRING)),
-                                                                   VARS_DATA_TYPE)))
+        .addBinding("vars", new LazyValue<>(() -> mapValue()))
         .build();
-    BindingContext globalBinding = BindingContext.builder().addBinding("g", new TypedValue<>("gValue", STRING)).build();
-    BindingContext composite = BindingContext.builder(localBinding).addAll(globalBinding).build();
-
-    TypedValue vars = composite.lookup("vars").get();
-    assertThat(((Map<String, TypedValue<String>>) vars.getValue()).get("key").getValue(), is("value"));
-    assertThat(composite.lookup("g").get().getValue(), is("gValue"));
+    assertLookup(BindingContext.builder(localBinding).addAll(globalBinding()).build(), "vars");
   }
 
   @Test
   public void varLookupInSecondDelegate() {
     BindingContext localBinding = BindingContext.builder()
-        .addBinding("vars", new LazyValue<>(() -> new TypedValue<>(singletonMap("key", new TypedValue<>("value", STRING)),
-                                                                   VARS_DATA_TYPE)))
+        .addBinding("vars", new LazyValue<>(() -> mapValue()))
         .build();
-    BindingContext globalBinding = BindingContext.builder().addBinding("g", new TypedValue<>("gValue", STRING)).build();
-    BindingContext composite = BindingContext.builder(globalBinding).addAll(localBinding).build();
+    assertLookup(BindingContext.builder(globalBinding()).addAll(localBinding).build(), "vars");
+  }
 
-    TypedValue vars = composite.lookup("vars").get();
+  @Test
+  public void miscLazyLookupInFirstDelegate() {
+    BindingContext localBinding = BindingContext.builder()
+        .addBinding("misc", mapValue())
+        .build();
+    assertLookup(BindingContext.builder(localBinding).addAll(globalBinding()).build(), "misc");
+  }
+
+  @Test
+  public void miscLazyLookupInSecondDelegate() {
+    BindingContext localBinding = BindingContext.builder()
+        .addBinding("misc", new LazyValue<>(() -> mapValue()))
+        .build();
+    assertLookup(BindingContext.builder(globalBinding()).addAll(localBinding).build(), "misc");
+  }
+
+  @Test
+  public void miscLookupInFirstDelegate() {
+    BindingContext localBinding = BindingContext.builder()
+        .addBinding("misc", mapValue())
+        .build();
+    assertLookup(BindingContext.builder(localBinding).addAll(globalBinding()).build(), "misc");
+  }
+
+  @Test
+  public void miscLookupInSecondDelegate() {
+    BindingContext localBinding = BindingContext.builder()
+        .addBinding("misc", new LazyValue<>(() -> mapValue()))
+        .build();
+    assertLookup(BindingContext.builder(globalBinding()).addAll(localBinding).build(), "misc");
+  }
+
+  private TypedValue<Map<String, TypedValue<String>>> mapValue() {
+    return new TypedValue<>(singletonMap("key", new TypedValue<>("value", STRING)), OBJECT);
+  }
+
+  private BindingContext globalBinding() {
+    return BindingContext.builder().addBinding("g", new TypedValue<>("gValue", STRING)).build();
+  }
+
+  private void assertLookup(BindingContext composite, String identifier) {
+    TypedValue vars = composite.lookup(identifier).get();
     assertThat(((Map<String, TypedValue<String>>) vars.getValue()).get("key").getValue(), is("value"));
     assertThat(composite.lookup("g").get().getValue(), is("gValue"));
   }
+
 }
