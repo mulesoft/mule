@@ -150,10 +150,11 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
             }
           }
 
-          ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
           if (itemType instanceof StringType && !itemType.getAnnotation(EnumAnnotation.class).isPresent()) {
+            ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
             declareOutputMimeTypeParameter(group);
           } else if (itemType instanceof BinaryType) {
+            ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
             declareOutputMimeTypeParameter(group);
             declareOutputEncodingParameter(group);
           }
