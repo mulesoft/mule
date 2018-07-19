@@ -74,7 +74,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testRouteReturnsNullMessage() throws Exception {
-    Processor nullEventMp = event -> CoreEvent.builder(event).message(null).build();
+    Processor nullEventMp = event -> CoreEvent.builder(event).message(c -> null).build();
     FirstSuccessful fs = createFirstSuccessfulRouter(nullEventMp);
     fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     fs.initialise();

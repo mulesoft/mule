@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.streaming.bytes.factory;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -41,6 +42,11 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
     this.config = config;
   }
 
+  @Override
+  protected Object resolve(InputStream inputStream, EventContext eventContext) {
+    return doResolve(inputStream);
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -48,6 +54,10 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
    */
   @Override
   protected Object resolve(InputStream inputStream, CoreEvent event) {
+    return doResolve(inputStream);
+  }
+
+  private Object doResolve(InputStream inputStream) {
     InMemoryCursorStreamProvider inMemoryCursorStreamProvider =
         new InMemoryCursorStreamProvider(inputStream, config, getBufferManager());
     inMemoryCursorStreamProvider.setAnnotations(getAnnotations());

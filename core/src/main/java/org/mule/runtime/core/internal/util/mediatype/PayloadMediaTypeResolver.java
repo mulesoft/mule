@@ -12,31 +12,28 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
-import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
-
 /**
  * Holds the logic to resolve which is the {@link MediaType} a {@link Result} payload should have.
- * 
+ *
  * @since 4.2
  */
 public class PayloadMediaTypeResolver {
 
   private Charset defaultEncoding;
   private MediaType defaultMediaType;
-  private Optional<String> encoding;
-  private Optional<String> mimeType;
+  private Optional<Charset> encoding;
+  private Optional<MediaType> mimeType;
 
   /**
    * Creates a new instance
-   * 
+   *
    * @param defaultEncoding     the default encoding used by the system
    * @param defaultMediaType    the default {@link MediaType} to use in case one is not specified
    * @param encoding            {@link Optional} encoding to be used if present
    * @param mimeType            {@link Optional} mimeType to be used if present
    */
-  public PayloadMediaTypeResolver(Charset defaultEncoding, MediaType defaultMediaType, Optional<String> encoding,
-                                  Optional<String> mimeType) {
+  public PayloadMediaTypeResolver(Charset defaultEncoding, MediaType defaultMediaType, Optional<Charset> encoding,
+                                  Optional<MediaType> mimeType) {
     this.defaultEncoding = defaultEncoding;
     this.defaultMediaType = defaultMediaType;
     this.encoding = encoding;
@@ -44,7 +41,7 @@ public class PayloadMediaTypeResolver {
   }
 
   /**
-   * 
+   *
    * @param result  {@link Result} whose payload {@link MediaType} has to be resolved
    * @return        {@link Result} with the payload {@link MediaType} resolved
    */
@@ -58,14 +55,7 @@ public class PayloadMediaTypeResolver {
     if (result.getMediaType().isPresent() && mediaType.getCharset().isPresent()) {
       existingEncoding = mediaType.getCharset().get();
     }
-    if (mimeType.isPresent()) {
-      mediaType = MediaType.parse(mimeType.get());
-    }
-    if (encoding.isPresent()) {
-      mediaType = mediaType.withCharset(parseCharset(encoding.get()));
-    } else {
-      mediaType = mediaType.withCharset(existingEncoding);
-    }
-    return mediaType;
+
+    return mimeType.orElse(mediaType).withCharset(encoding.orElse(existingEncoding));
   }
 }

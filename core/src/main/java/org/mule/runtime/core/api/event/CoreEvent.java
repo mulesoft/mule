@@ -13,9 +13,10 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.security.SecurityContext;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
-import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -24,6 +25,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Represents any data event occurring in the Mule environment. All data sent or received within the mule environment will be
@@ -52,6 +54,7 @@ public interface CoreEvent extends Serializable, Event {
    *
    * @deprecated use {@link #getItemSequenceInfo()} instead
    */
+  @Deprecated
   Optional<GroupCorrelation> getGroupCorrelation();
 
   /**
@@ -102,6 +105,7 @@ public interface CoreEvent extends Serializable, Event {
     return new DefaultEventBuilder((BaseEventContext) context, (InternalEvent) event);
   }
 
+  @NoImplement
   interface Builder {
 
     /**
@@ -111,6 +115,14 @@ public interface CoreEvent extends Serializable, Event {
      * @return the builder instance
      */
     Builder message(Message message);
+
+    /**
+     * Set the {@link Function} that generates a {@link Message} to construct {@link CoreEvent} with.
+     *
+     * @param messageFactory the message factory instance.
+     * @return the builder instance
+     */
+    Builder message(Function<EventContext, Message> messageFactory);
 
     /**
      * Set a map of variables. Any existing variables added to the builder will be removed.
@@ -154,6 +166,7 @@ public interface CoreEvent extends Serializable, Event {
      * @return the builder instance
      * @deprecated use {@link #itemSequenceInfo(Optional)}} instead
      */
+    @Deprecated
     Builder groupCorrelation(Optional<GroupCorrelation> groupCorrelation);
 
     /**

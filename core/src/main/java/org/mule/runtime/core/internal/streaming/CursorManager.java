@@ -75,11 +75,10 @@ public class CursorManager {
    * automatic resource handling
    *
    * @param provider the provider to be tracked
-   * @param creatorEvent the event that created the provider
+   * @param ownerContext the root context of the event that created the provider
    * @return a {@link CursorContext}
    */
-  public CursorProvider manage(CursorProvider provider, CoreEvent creatorEvent) {
-    final BaseEventContext ownerContext = ((BaseEventContext) creatorEvent.getContext()).getRootContext();
+  public CursorProvider manage(CursorProvider provider, BaseEventContext ownerContext) {
     registerEventContext(ownerContext);
     registry.getUnchecked(ownerContext.getId()).addProvider(provider);
 
