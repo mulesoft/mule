@@ -44,6 +44,8 @@ import org.mule.runtime.module.extension.internal.runtime.source.SourceWrapper;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -57,9 +59,8 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
- * A {@link SourceWrapper} implementation that provides Polling related
- * capabilities to any wrapped {@link Source}, like scheduled polling,
- * watermarking and idempotent processing.
+ * A {@link SourceWrapper} implementation that provides Polling related capabilities to any wrapped {@link Source}, like scheduled
+ * polling, watermarking and idempotent processing.
  *
  * @param <T>
  * @param <A>
@@ -164,7 +165,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
       DefaultPollContext pollContext = new DefaultPollContext(sourceCallback, getCurrentWatermark());
       try {
         delegate.poll(pollContext);
-        pollContext.getUpdatedWatermark().ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator()));
+        pollContext.getUpdatedWatermark()
+            .ifPresent(w -> updateWatermark(w, pollContext.getWatermarkComparator(), pollContext.getIdsOnUpdatedWatermark()));
       } catch (Throwable t) {
         LOGGER.error(format("Found exception trying to process item on source at flow '%s'. %s",
                             flowName, t.getMessage()),
@@ -194,10 +196,15 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
     private Serializable currentWatermark;
     private Serializable updatedWatermark = null;
     private Comparator<Serializable> watermarkComparator = null;
+    private List<String> idsOnUpdatedWatermark = new LinkedList();
 
     private DefaultPollContext(SourceCallback<T, A> sourceCallback, Serializable currentWatermark) {
       this.sourceCallback = sourceCallback;
       this.currentWatermark = currentWatermark;
+    }
+
+    public List<String> getIdsOnUpdatedWatermark() {
+      return idsOnUpdatedWatermark;
     }
 
     @Override
@@ -269,10 +276,17 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
       if (currentWatermark == null && updatedWatermark == null) {
         updatedWatermark = itemWatermark;
       } else {
-        Serializable actingWatermark = currentWatermark != null ? currentWatermark : updatedWatermark;
-        compare = compareWatermarks(actingWatermark, itemWatermark, watermarkComparator);
+        compare = currentWatermark != null ? compareWatermarks(currentWatermark, itemWatermark, watermarkComparator) : -1;
         if (compare < 0) {
-          updatedWatermark = itemWatermark;
+          int updatedWatermarkCompare =
+              updatedWatermark != null ? compareWatermarks(updatedWatermark, itemWatermark, watermarkComparator) : -1;
+          if (updatedWatermarkCompare == 0) {
+            pollItem.getItemId().ifPresent(idsOnUpdatedWatermark::add);
+          } else if (updatedWatermarkCompare < 0) {
+            idsOnUpdatedWatermark.clear();
+            pollItem.getItemId().ifPresent(idsOnUpdatedWatermark::add);
+            updatedWatermark = itemWatermark;
+          }
         } else if (compare == 0 && pollItem.getItemId().isPresent()) {
           try {
             accept = !recentlyProcessedIds.contains(itemId);
@@ -396,7 +410,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
     return lockFactory.createLock(formatKey("watermark"));
   }
 
-  private void updateWatermark(Serializable value, Comparator comparator) {
+  private void updateWatermark(Serializable value, Comparator comparator, List<String> idsOnUpdatedWatermark) {
     try {
       if (watermarkObjectStore.contains(WATERMARK_OS_KEY)) {
         Serializable currentValue = watermarkObjectStore.retrieve(WATERMARK_OS_KEY);
@@ -405,6 +419,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
         }
         watermarkObjectStore.remove(WATERMARK_OS_KEY);
         recentlyProcessedIds.clear();
+      }
+
+      for (String id : idsOnUpdatedWatermark) {
+        recentlyProcessedIds.store(id, id);
       }
 
       watermarkObjectStore.store(WATERMARK_OS_KEY, value);

@@ -44,6 +44,24 @@
         <flow-ref name="adopt"/>
     </flow>
 
+    <flow name="multiplePhasesOfWaterMark" initialState="stopped">
+        <petstore:partial-pet-adoption-source watermark="true">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+        </petstore:partial-pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+    <flow name="multiplePhasesOfWatermarkWithIncreasingAndDecreasingWatermarks" initialState="stopped">
+        <petstore:number-pet-adoption-source watermark="true">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+        </petstore:number-pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
     <flow name="failingPoll" initialState="stopped">
         <petstore:pet-adoption-source>
             <scheduling-strategy>

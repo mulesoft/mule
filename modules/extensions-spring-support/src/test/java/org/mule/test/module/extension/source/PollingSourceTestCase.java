@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
+import static org.mule.test.petstore.extension.NumberPetAdoptionSource.ALL_NUMBERS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.FAILED_ADOPTION_COUNT;
 import org.mule.runtime.api.exception.MuleException;
@@ -98,6 +99,18 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
     check(5000, 100, () -> FAILED_ADOPTION_COUNT >= ALL_PETS.size());
   }
 
+  @Test
+  public void multiplePhasesOfWatermarkPoll() throws Exception {
+    startFlow("multiplePhasesOfWaterMark");
+    assertIdempotentAdoptions();
+  }
+
+  @Test
+  public void multiplePhasesOfWatermarkWithIncreasingAndDecreasingWatermarksPoll() throws Exception {
+    startFlow("multiplePhasesOfWatermarkWithIncreasingAndDecreasingWatermarks");
+    assertAllNumbersAdopted();
+  }
+
   private void assertIdempotentAdoptions() {
     checkNot(5000, 100, () -> {
       synchronized (ADOPTION_EVENTS) {
@@ -110,9 +123,18 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
     check(5000, 200, () -> {
       synchronized (ADOPTION_EVENTS) {
         return ADOPTION_EVENTS.size() >= ALL_PETS.size() &&
-            ALL_PETS.containsAll(ADOPTION_EVENTS.stream()
-                .map(e -> e.getMessage().getPayload().getValue().toString())
-                .collect(toList()));
+            ADOPTION_EVENTS.stream().map(e -> e.getMessage().getPayload().getValue().toString()).collect(toList())
+                .containsAll(ALL_PETS);
+      }
+    });
+  }
+
+  private void assertAllNumbersAdopted() {
+    check(5000, 200, () -> {
+      synchronized (ADOPTION_EVENTS) {
+        return ADOPTION_EVENTS.size() >= ALL_NUMBERS.size() &&
+            ADOPTION_EVENTS.stream().map(e -> e.getMessage().getPayload().getValue().toString()).collect(toList())
+                .containsAll(ALL_NUMBERS);
       }
     });
   }
