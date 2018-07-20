@@ -8,7 +8,7 @@
 package org.mule.runtime.module.service.internal.discoverer;
 
 import static java.util.Collections.emptyList;
-import static org.apache.commons.io.FileUtils.moveFile;
+import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.empty;
@@ -134,13 +134,14 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
   private void installService(String serviceName, Class<? extends ServiceProvider> providerClass, boolean corrupted)
       throws Exception {
     final ServiceFileBuilder fooService =
-        new ServiceFileBuilder(serviceName).withServiceProviderClass(providerClass.getName());
+        new ServiceFileBuilder(serviceName).withServiceProviderClass(providerClass.getName()).unpack(true);
     if (corrupted) {
       fooService.corrupted();
     }
 
-    File installedService = new File(getServicesFolder(), fooService.getArtifactFile().getName());
-    moveFile(fooService.getArtifactFile(), installedService);
+    final File artifactFile = fooService.getArtifactFile();
+    File installedService = new File(getServicesFolder(), artifactFile.getName());
+    moveDirectory(artifactFile, installedService);
   }
 
   public static class FooServiceProvider implements ServiceProvider {

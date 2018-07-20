@@ -9,13 +9,10 @@ package org.mule.runtime.module.service.internal.discoverer;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
-import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesTempFolder;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.api.util.Pair;
@@ -23,20 +20,17 @@ import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 /**
  * Discovers services artifacts from the {@link MuleFoldersUtil#SERVICES_FOLDER} folder.
@@ -84,16 +78,13 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   private List<ServiceDescriptor> getServiceDescriptors(ServiceDescriptorFactory serviceDescriptorFactory)
       throws ServiceResolutionError {
     List<ServiceDescriptor> foundServices = new LinkedList<>();
-    for (String serviceFile : getServicesFolder().list(new SuffixFileFilter(".jar"))) {
-      final File tempFolder = new File(getServicesTempFolder(), getBaseName(serviceFile));
+    for (File serviceDirectory : getServicesFolder().listFiles(File::isDirectory)) {
       try {
-        unzip(new File(getServicesFolder(), serviceFile), tempFolder);
-      } catch (IOException e) {
+        final ServiceDescriptor serviceDescriptor = serviceDescriptorFactory.create(serviceDirectory, empty());
+        foundServices.add(serviceDescriptor);
+      } catch (Exception e) {
         throw new ServiceResolutionError("Error processing service JAR file", e);
       }
-
-      final ServiceDescriptor serviceDescriptor = serviceDescriptorFactory.create(tempFolder, empty());
-      foundServices.add(serviceDescriptor);
     }
     return foundServices;
   }
