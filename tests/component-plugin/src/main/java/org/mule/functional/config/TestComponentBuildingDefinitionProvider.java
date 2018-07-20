@@ -31,8 +31,6 @@ import org.mule.functional.api.component.SharedConfig;
 import org.mule.functional.api.component.SharedSource;
 import org.mule.functional.api.component.SkeletonSource;
 import org.mule.functional.api.component.StacktraceLogChecker;
-import org.mule.functional.api.component.StreamConsumerProcessor;
-import org.mule.functional.api.component.StreamProviderProcessor;
 import org.mule.functional.api.component.SummaryLogChecker;
 import org.mule.functional.api.component.TestNonBlockingProcessor;
 import org.mule.functional.api.component.ThrowProcessor;
@@ -182,18 +180,6 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(LifecycleObject.class))
         .withSetterParameterDefinition("otherLifecycleObject", fromSimpleReferenceParameter("otherLifecycleObject").build())
         .withSetterParameterDefinition("failurePhase", fromSimpleParameter("failurePhase").build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition
-        .withIdentifier("stream-provider")
-        .withTypeDefinition(fromType(StreamProviderProcessor.class))
-        .withConstructorParameterDefinition(fromSimpleParameter("size").build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition
-        .withIdentifier("stream-consumer")
-        .withTypeDefinition(fromType(StreamConsumerProcessor.class))
-        .withConstructorParameterDefinition(fromSimpleParameter("chunked").build())
         .build());
 
     addOnErrorCheckLogComponentBuildingDefinitions(componentBuildingDefinitions);
