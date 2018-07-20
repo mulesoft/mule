@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.core.internal.lock;
 
+import org.mule.runtime.api.scheduler.SchedulerService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -16,22 +21,37 @@ import java.util.concurrent.locks.Lock;
  */
 public class LockAdapter implements Lock {
 
+  private static final boolean CHECK_LOCKABLE = Boolean.getBoolean(LockAdapter.class.getName() + ".CHECK_LOCKABLE");
+  private static final Logger LOGGER = LoggerFactory.getLogger(LockAdapter.class);
+
   private LockGroup lockGroup;
   private String lockId;
+  private SchedulerService schedulerService;
 
-  public LockAdapter(String lockId, LockGroup lockGroup) {
+  public LockAdapter(String lockId, LockGroup lockGroup, SchedulerService schedulerService) {
     this.lockGroup = lockGroup;
     this.lockId = lockId;
+    this.schedulerService = schedulerService;
   }
 
   @Override
   public void lock() {
+    checkLockableThread();
     lockGroup.lock(lockId);
   }
 
   @Override
   public void lockInterruptibly() throws InterruptedException {
+    checkLockableThread();
     lockGroup.lockInterruptibly(lockId);
+  }
+
+  private void checkLockableThread() {
+    if (CHECK_LOCKABLE && schedulerService.isCurrentThreadForCpuWork()) {
+      LOGGER
+          .warn("About to lock current thread, which is not waitAllowed. Either dispatch the work to a waitAllowed Scheduler or use `tryLock`",
+                new NonWaitAllowedThreadBlocked());
+    }
   }
 
   @Override
@@ -52,5 +72,14 @@ public class LockAdapter implements Lock {
   @Override
   public Condition newCondition() {
     throw new UnsupportedOperationException("Operation not supported by mule locks");
+  }
+
+  private static class NonWaitAllowedThreadBlocked extends RuntimeException {
+
+    private static final long serialVersionUID = 123139630158524821L;
+
+    public NonWaitAllowedThreadBlocked() {
+      super("An exception is logged so the stack trace that leads to this situation can be traced.");
+    }
   }
 }

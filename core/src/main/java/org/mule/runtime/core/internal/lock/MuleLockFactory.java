@@ -12,6 +12,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.scheduler.SchedulerService;
 
 import java.util.concurrent.locks.Lock;
 
@@ -23,9 +24,12 @@ public class MuleLockFactory implements LockFactory, Initialisable, Disposable {
   private LockGroup lockGroup;
   private LockProvider lockProvider;
 
+  @Inject
+  private SchedulerService schedulerService;
+
   @Override
   public synchronized Lock createLock(String lockId) {
-    return new LockAdapter(lockId, lockGroup);
+    return new LockAdapter(lockId, lockGroup, schedulerService);
   }
 
   @Override
