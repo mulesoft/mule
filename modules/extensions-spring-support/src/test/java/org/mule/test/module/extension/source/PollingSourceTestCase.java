@@ -59,8 +59,12 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
     startFlow("vanilla");
     assertAllPetsAdopted();
 
-    assertThat(PetAdoptionSource.COMPLETED_POLLS, is(greaterThan(1)));
-    assertThat(PetAdoptionSource.ADOPTED_PET_COUNT, is(greaterThanOrEqualTo(ADOPTION_EVENTS.size())));
+    check(5000, 200, () -> {
+      synchronized (ADOPTION_EVENTS) {
+        return PetAdoptionSource.COMPLETED_POLLS > 1 &&
+            PetAdoptionSource.ADOPTED_PET_COUNT >= ADOPTION_EVENTS.size();
+      }
+    });
   }
 
   @Test
@@ -108,7 +112,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   @Test
   public void multiplePhasesOfWatermarkWithIncreasingAndDecreasingWatermarksPoll() throws Exception {
     startFlow("multiplePhasesOfWatermarkWithIncreasingAndDecreasingWatermarks");
-    assertAllNumbersAdopted();
+    assertAllNumbersAdoptedExactlyOnce();
   }
 
   private void assertIdempotentAdoptions() {
@@ -129,10 +133,10 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
     });
   }
 
-  private void assertAllNumbersAdopted() {
+  private void assertAllNumbersAdoptedExactlyOnce() {
     check(5000, 200, () -> {
       synchronized (ADOPTION_EVENTS) {
-        return ADOPTION_EVENTS.size() >= ALL_NUMBERS.size() &&
+        return ADOPTION_EVENTS.size() == ALL_NUMBERS.size() &&
             ADOPTION_EVENTS.stream().map(e -> e.getMessage().getPayload().getValue().toString()).collect(toList())
                 .containsAll(ALL_NUMBERS);
       }

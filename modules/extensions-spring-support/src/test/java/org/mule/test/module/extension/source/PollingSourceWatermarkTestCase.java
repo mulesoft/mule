@@ -26,7 +26,7 @@ public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalT
 
   private static int TEST_TIMEOUT = 120000;
   private static int SHORT_TIMEOUT = 5000;
-  private static int LONG_TIMEOUT = 90000;
+  private static int LONG_TIMEOUT = 30000;
   private static int PROBER_FREQUENCY = 100;
 
   private static final List<CoreEvent> ADOPTION_EVENTS = new LinkedList<>();
@@ -81,9 +81,8 @@ public class PollingSourceWatermarkTestCase extends AbstractExtensionFunctionalT
     check(SHORT_TIMEOUT, PROBER_FREQUENCY, () -> {
       synchronized (ADOPTION_EVENTS) {
         return ADOPTION_EVENTS.size() >= ALL_PETS.size() &&
-            ALL_PETS.containsAll(ADOPTION_EVENTS.stream()
-                .map(e -> e.getMessage().getPayload().getValue().toString())
-                .collect(toList()));
+            ADOPTION_EVENTS.stream().map(e -> e.getMessage().getPayload().getValue().toString()).collect(toList())
+                .containsAll(ALL_PETS);
       }
     });
   }
