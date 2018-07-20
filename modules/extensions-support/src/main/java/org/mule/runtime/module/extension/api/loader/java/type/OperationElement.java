@@ -29,7 +29,10 @@ public interface OperationElement extends MethodElement<OperationContainerElemen
     Type returnType;
     if (isNonBlocking(this)) {
       returnType = getParameters().stream()
-          .filter(p -> p.getType().isAssignableTo(CompletionCallback.class)).findAny().get().getType();
+          .filter(p -> p.getType().isAssignableTo(CompletionCallback.class))
+          .findAny()
+          .get()
+          .getType();
       List<TypeGeneric> generics = returnType.getGenerics();
       if (generics.isEmpty()) {
         return BaseTypeBuilder.create(JAVA).anyType().build();

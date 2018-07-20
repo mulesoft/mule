@@ -49,7 +49,7 @@ import static org.mule.runtime.module.extension.internal.loader.validation.Model
  * <li>If it has an OutputStaticResolver it must NOT have the MediaType annotation with a value</li>
  * </ul>
  *
- * @since 4.2
+ * @since 4.2.0
  */
 public class MediaTypeModelValidator implements ExtensionModelValidator {
 

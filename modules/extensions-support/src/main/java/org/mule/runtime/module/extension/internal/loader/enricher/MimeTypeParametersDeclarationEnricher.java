@@ -198,7 +198,13 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
       });
     }
 
+
     private boolean shouldOverrideMetadataFormat(ExecutableComponentDeclaration declaration) {
+      /**
+       * On top of looking for the CustomDefinedStaticTypeAnnotation to see if there is a Static Resolution involved, you have to
+       * check that the MetadataFormat is not JAVA, since there are other ways of Static Resolved Metadata that do not add this
+       * annotation (none of the set the metadata format as JAVA), for example: @OutputJsonType and @OutputXmlType.
+       */
       return !declaration.getOutput().getType().getAnnotation(CustomDefinedStaticTypeAnnotation.class).isPresent() &&
           declaration.getOutput().getType().getMetadataFormat().equals(JAVA);
     }

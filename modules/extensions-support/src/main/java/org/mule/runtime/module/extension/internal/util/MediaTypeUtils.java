@@ -23,6 +23,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
  */
 public class MediaTypeUtils {
 
+  private MediaTypeUtils() {}
 
   /**
    * This method returns a default {@link MediaType} given a {@link ComponentModel}.
