@@ -44,8 +44,6 @@ import org.mule.runtime.module.extension.internal.runtime.source.SourceWrapper;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -279,10 +277,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
       }
     }
 
-    private void addToIdsOnUpdatedWatermark(String itemId) {
+    private void addToIdsOnUpdatedWatermark(String itemId, Serializable itemWatermark) {
       try {
         if (!idsOnUpdatedWatermark.contains(itemId)) {
-          idsOnUpdatedWatermark.store(itemId, itemId);
+          idsOnUpdatedWatermark.store(itemId, itemWatermark);
         }
       } catch (ObjectStoreException e) {
         throw new MuleRuntimeException(
@@ -304,7 +302,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
       int compare;
       if (currentWatermark == null && updatedWatermark == null) {
         setUpdatedWatermark(itemWatermark);
-        pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id));
+        pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
       } else {
         compare = currentWatermark != null ? compareWatermarks(currentWatermark, itemWatermark, watermarkComparator) : -1;
         if (compare < 0) {
@@ -319,10 +317,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
               int updatedWatermarkCompare =
                   updatedWatermark != null ? compareWatermarks(updatedWatermark, itemWatermark, watermarkComparator) : -1;
               if (updatedWatermarkCompare == 0) {
-                pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id));
+                pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
               } else if (updatedWatermarkCompare < 0) {
                 idsOnUpdatedWatermark.clear();
-                pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id));
+                pollItem.getItemId().ifPresent(id -> addToIdsOnUpdatedWatermark(id, itemWatermark));
                 setUpdatedWatermark(itemWatermark);
               }
 
