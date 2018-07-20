@@ -250,7 +250,8 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
     @Override
     public <C> ConnectionHandler<C> getConnection(Object config) throws ConnectionException {
       Object proxyInstance =
-          newProxyInstance(config.getClass().getClassLoader(), new Class[] {ConnectionHandler.class},
+          newProxyInstance(config.getClass().getClassLoader(),
+                           new Class[] {ConnectionHandler.class, ConnectionHandlerAdapter.class},
                            new LazyInvocationHandler(config));
       return (ConnectionHandler<C>) proxyInstance;
     }
