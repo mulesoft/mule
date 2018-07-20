@@ -309,7 +309,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
         if (compare < 0) {
 
           try {
-            if (recentlyProcessedIds.contains(itemId)) {
+            if (itemId != null && recentlyProcessedIds.contains(itemId)) {
               Serializable previousItemWatermark = recentlyProcessedIds.retrieve(itemId);
               if (compareWatermarks(itemWatermark, previousItemWatermark, watermarkComparator) <= 0) {
                 accept = false;
