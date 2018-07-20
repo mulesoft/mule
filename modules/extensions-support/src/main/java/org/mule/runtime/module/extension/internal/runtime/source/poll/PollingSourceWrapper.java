@@ -274,7 +274,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
         watermarkObjectStore.store(UPDATED_WATERMARK_OS_KEY, updatedWatermark);
       } catch (ObjectStoreException e) {
         throw new MuleRuntimeException(
-                                       createStaticMessage("An error occurred while checking the watermark status"),
+                                       createStaticMessage("An error occurred while trying to update the updatedWatermark in the the object store"),
                                        e);
       }
     }
@@ -286,7 +286,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
         }
       } catch (ObjectStoreException e) {
         throw new MuleRuntimeException(
-                                       createStaticMessage("An error occurred while checking the watermark status for Item with ID [%s]",
+                                       createStaticMessage("An error occurred while adding an item id to the object store" +
+                                           " of the items with the highest updated watermark for Item with ID [%s]",
                                                            itemId),
                                        e);
       }
@@ -328,7 +329,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
             }
           } catch (ObjectStoreException e) {
             throw new MuleRuntimeException(
-                                           createStaticMessage("An error occurred while checking the watermark status for Item with ID [%s]",
+                                           createStaticMessage("An error occurred while checking the previus watermark" +
+                                               " for an item id that was recently processed. Item with ID [%s]",
                                                                itemId),
                                            e);
           }
@@ -337,7 +339,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
             accept = !recentlyProcessedIds.contains(itemId);
           } catch (ObjectStoreException e) {
             throw new MuleRuntimeException(
-                                           createStaticMessage("An error occurred while checking the watermark status for Item with ID [%s]",
+                                           createStaticMessage("An error occurred while checking the existance for Item with ID [%s]",
                                                                itemId),
                                            e);
           }
