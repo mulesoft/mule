@@ -468,13 +468,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
         watermarkObjectStore.remove(WATERMARK_OS_KEY);
       }
 
-      recentlyProcessedIds.clear();
-
-      // Object Stores are swaped to avoid copying one to another.
-      ObjectStore temp = recentlyProcessedIds;
-      recentlyProcessedIds = idsOnUpdatedWatermark;
-      idsOnUpdatedWatermark = temp;
-
+      updateRecentlyProcessedIds();
       watermarkObjectStore.store(WATERMARK_OS_KEY, value);
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(
@@ -482,6 +476,16 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
                                                                 flowName, e.getMessage())),
                                      e);
     }
+  }
+
+  private void updateRecentlyProcessedIds() throws ObjectStoreException {
+    recentlyProcessedIds.clear();
+
+    // Object Stores are swaped to avoid copying one to another.
+    ObjectStore temp = recentlyProcessedIds;
+    recentlyProcessedIds = idsOnUpdatedWatermark;
+    idsOnUpdatedWatermark = temp;
+
   }
 
   private Serializable getCurrentWatermark() {
