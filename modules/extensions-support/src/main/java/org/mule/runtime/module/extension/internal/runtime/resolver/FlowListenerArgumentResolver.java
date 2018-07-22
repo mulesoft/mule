@@ -13,6 +13,8 @@ import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultFlowListener;
 
+import java.util.function.Supplier;
+
 /**
  * An {@link ArgumentResolver} which produces instances of {@link FlowListener}
  *
@@ -21,7 +23,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.DefaultFlowL
 public class FlowListenerArgumentResolver implements ArgumentResolver<FlowListener> {
 
   @Override
-  public LazyValue<FlowListener> resolve(ExecutionContext executionContext) {
+  public Supplier<FlowListener> resolve(ExecutionContext executionContext) {
     return new LazyValue<>(() -> new DefaultFlowListener(executionContext.getExtensionModel(),
                                                          (OperationModel) executionContext.getComponentModel(),
                                                          ((EventedExecutionContext) executionContext).getEvent()));

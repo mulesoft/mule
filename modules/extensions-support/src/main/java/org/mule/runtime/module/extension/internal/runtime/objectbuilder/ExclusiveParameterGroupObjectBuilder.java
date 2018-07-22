@@ -24,6 +24,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import com.google.common.base.Joiner;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -57,6 +58,17 @@ public final class ExclusiveParameterGroupObjectBuilder<T> extends DefaultObject
     checkArgument(!isBlank(propertyName), "property name cannot be blank");
     checkArgument(resolver != null, "resolver cannot be null");
 
+    return super.addPropertyResolver(propertyName, wrapResolver(propertyName, resolver));
+  }
+
+  @Override
+  public ObjectBuilder<T> addPropertyResolver(Field field, ValueResolver<? extends Object> resolver) {
+    checkArgument(resolver != null, "resolver cannot be null");
+
+    return super.addPropertyResolver(field, wrapResolver(field.getName(), resolver));
+  }
+
+  private ValueResolver<? extends Object> wrapResolver(String propertyName, ValueResolver<? extends Object> resolver) {
     if (exclusiveOptionalsTypeAnnotation.isOneRequired() && resolver.isDynamic()
         && exclusiveOptionalsTypeAnnotation.getExclusiveParameterNames().contains(propertyName)) {
       if (resolver instanceof ExpressionBasedValueResolver) {
@@ -66,8 +78,7 @@ public final class ExclusiveParameterGroupObjectBuilder<T> extends DefaultObject
         resolver = new RequiredParameterValueResolverWrapper<>(resolver, propertyName);
       }
     }
-
-    return super.addPropertyResolver(propertyName, resolver);
+    return resolver;
   }
 
   @Override

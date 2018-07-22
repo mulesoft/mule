@@ -7,11 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.streaming.DefaultStreamingHelper;
+
+import java.util.function.Supplier;
 
 /**
  * An argument resolver which provides instances of {@link StreamingHelper}
@@ -24,10 +25,10 @@ public class StreamingHelperArgumentResolver implements ArgumentResolver<Streami
    * {@inheritDoc}
    */
   @Override
-  public LazyValue<StreamingHelper> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> {
+  public Supplier<StreamingHelper> resolve(ExecutionContext executionContext) {
+    return () -> {
       ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter<OperationModel>) executionContext;
       return new DefaultStreamingHelper(context.getCursorProviderFactory(), context.getStreamingManager(), context.getEvent());
-    });
+    };
   }
 }

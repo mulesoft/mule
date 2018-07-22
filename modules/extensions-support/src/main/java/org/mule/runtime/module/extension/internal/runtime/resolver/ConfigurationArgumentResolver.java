@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+
+import java.util.function.Supplier;
 
 /**
  * An implementation of {@link ArgumentResolver} which returns the value obtained through
@@ -19,7 +20,7 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 public final class ConfigurationArgumentResolver implements ArgumentResolver<Object> {
 
   @Override
-  public LazyValue<Object> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> ((ConfigurationInstance) executionContext.getConfiguration().get()).getValue());
+  public Supplier<Object> resolve(ExecutionContext executionContext) {
+    return () -> executionContext.getConfiguration().map(cfg -> ((ConfigurationInstance) cfg).getValue()).orElse(null);
   }
 }

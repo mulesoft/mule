@@ -193,7 +193,7 @@ final class MetadataKeyIdObjectResolver {
       throws MetadataResolvingException {
     try {
       DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder<>(metadataKeyType, reflectionCache);
-      fieldValueMap.forEach((f, v) -> objectBuilder.addPropertyResolver(f.getName(), new StaticValueResolver<>(v)));
+      fieldValueMap.forEach((f, v) -> objectBuilder.addPropertyResolver(f, new StaticValueResolver<>(v)));
       return objectBuilder.build(null);
     } catch (Exception e) {
       throw buildException(format("MetadataKey object of type '%s' from the component '%s' could not be instantiated",

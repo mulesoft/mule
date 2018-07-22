@@ -7,12 +7,14 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_CALLBACK_CONTEXT_PARAM;
+
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
+
+import java.util.function.Supplier;
 
 /**
  * An {@link ArgumentResolver} which returns a {@link SourceCallbackContext} registered as an {@link ExecutionContext} variable
@@ -25,8 +27,8 @@ import org.mule.runtime.module.extension.internal.ExtensionProperties;
 public class SourceCallbackContextArgumentResolver implements ArgumentResolver<SourceCallbackContext> {
 
   @Override
-  public LazyValue<SourceCallbackContext> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> ((ExecutionContextAdapter<ComponentModel>) executionContext)
-        .getVariable(SOURCE_CALLBACK_CONTEXT_PARAM));
+  public Supplier<SourceCallbackContext> resolve(ExecutionContext executionContext) {
+    return () -> ((ExecutionContextAdapter<ComponentModel>) executionContext)
+        .getVariable(SOURCE_CALLBACK_CONTEXT_PARAM);
   }
 }

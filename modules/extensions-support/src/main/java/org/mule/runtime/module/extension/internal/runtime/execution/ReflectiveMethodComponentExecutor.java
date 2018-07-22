@@ -16,26 +16,26 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
+
+import org.slf4j.Logger;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
-import org.slf4j.Logger;
+import java.util.function.Supplier;
 
 /**
  * Executes a task associated to a {@link ExecutionContext} by invoking a given {@link Method}
@@ -48,10 +48,10 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate {
 
-    private static final LazyValue[] EMPTY = new LazyValue[] {};
+    private static final Supplier[] EMPTY = new Supplier[] {};
 
     @Override
-    public LazyValue<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
+    public Supplier<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
       return EMPTY;
     }
   }
@@ -59,49 +59,49 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   private static final Logger LOGGER = getLogger(ReflectiveMethodOperationExecutor.class);
   private static final ArgumentResolverDelegate NO_ARGS_DELEGATE = new NoArgumentsResolverDelegate();
 
+  private final List<ParameterGroupModel> groups;
   private final Method method;
   private final Object componentInstance;
   private final ClassLoader extensionClassLoader;
 
-  // Needs to be lazy to wait the muleContext to be injected
-  private final LazyValue<ArgumentResolverDelegate> argumentResolverDelegate;
+  private ArgumentResolverDelegate argumentResolverDelegate;
 
   private MuleContext muleContext;
 
   public ReflectiveMethodComponentExecutor(List<ParameterGroupModel> groups, Method method, Object componentInstance) {
+    this.groups = groups;
     this.method = method;
     this.componentInstance = componentInstance;
-    argumentResolverDelegate =
-        isEmpty(method.getParameterTypes()) ? new LazyValue<>(NO_ARGS_DELEGATE) : getMethodArgumentResolver(groups, method);
     extensionClassLoader = method.getDeclaringClass().getClassLoader();
-  }
-
-  private LazyValue<ArgumentResolverDelegate> getMethodArgumentResolver(List<ParameterGroupModel> groups, Method method) {
-    return new LazyValue<>(() -> {
-      try {
-        MethodArgumentResolverDelegate resolver = new MethodArgumentResolverDelegate(groups, method);
-        initialiseIfNeeded(resolver, muleContext);
-        return resolver;
-      } catch (Exception e) {
-        throw new MuleRuntimeException(createStaticMessage("Could not initialize argument resolver resolver"), e);
-      }
-    });
   }
 
   public Object execute(ExecutionContext<M> executionContext) {
     return withContextClassLoader(extensionClassLoader,
                                   () -> invokeMethod(method, componentInstance,
                                                      stream(getParameterValues(executionContext, method.getParameterTypes()))
-                                                         .map(LazyValue::get).toArray(Object[]::new)));
+                                                         .map(Supplier::get).toArray(Object[]::new)));
   }
 
-  private LazyValue<Object>[] getParameterValues(ExecutionContext<M> executionContext, Class<?>[] parameterTypes) {
-    return argumentResolverDelegate.get().resolve(executionContext, parameterTypes);
+  private Supplier<Object>[] getParameterValues(ExecutionContext<M> executionContext, Class<?>[] parameterTypes) {
+    return argumentResolverDelegate.resolve(executionContext, parameterTypes);
   }
 
   @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(componentInstance, true, muleContext);
+
+    argumentResolverDelegate =
+        isEmpty(method.getParameterTypes()) ? NO_ARGS_DELEGATE : getMethodArgumentResolver(groups, method);
+  }
+
+  private ArgumentResolverDelegate getMethodArgumentResolver(List<ParameterGroupModel> groups, Method method) {
+    try {
+      MethodArgumentResolverDelegate resolver = new MethodArgumentResolverDelegate(groups, method);
+      initialiseIfNeeded(resolver, muleContext);
+      return resolver;
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not initialize argument resolver resolver"), e);
+    }
   }
 
   @Override

@@ -17,6 +17,8 @@ import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescripto
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ParameterGroupObjectBuilder;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.function.Supplier;
+
 public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver<T> {
 
   private final ParameterGroupDescriptor group;
@@ -33,7 +35,7 @@ public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver
    * {@inheritDoc}
    */
   @Override
-  public LazyValue<T> resolve(ExecutionContext executionContext) {
+  public Supplier<T> resolve(ExecutionContext executionContext) {
     return new LazyValue<>(() -> {
       try {
         return new ParameterGroupObjectBuilder<T>(group, reflectionCache).build((EventedExecutionContext) executionContext);

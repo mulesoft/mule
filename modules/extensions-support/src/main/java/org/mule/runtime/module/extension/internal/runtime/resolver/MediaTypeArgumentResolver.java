@@ -7,9 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+
+import java.util.function.Supplier;
 
 /**
  * An {@link ArgumentResolver} which returns the {@link MediaType} of the current message
@@ -19,8 +20,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 public final class MediaTypeArgumentResolver implements ArgumentResolver<MediaType> {
 
   @Override
-  public LazyValue<MediaType> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> ((ExecutionContextAdapter) executionContext).getEvent().getMessage().getPayload().getDataType()
-        .getMediaType());
+  public Supplier<MediaType> resolve(ExecutionContext executionContext) {
+    return () -> ((ExecutionContextAdapter) executionContext).getEvent().getMessage().getPayload().getDataType().getMediaType();
   }
 }

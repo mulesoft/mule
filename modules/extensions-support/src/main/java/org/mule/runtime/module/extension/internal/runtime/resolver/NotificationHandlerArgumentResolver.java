@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.notification.DefaultNotificationEmitter;
+
+import java.util.function.Supplier;
 
 /**
  * {@link ArgumentResolver} implementation for {@link NotificationEmitter} parameters.
@@ -20,14 +21,14 @@ import org.mule.runtime.module.extension.internal.runtime.notification.DefaultNo
 public class NotificationHandlerArgumentResolver implements ArgumentResolver<NotificationEmitter> {
 
   @Override
-  public LazyValue<NotificationEmitter> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> {
+  public Supplier<NotificationEmitter> resolve(ExecutionContext executionContext) {
+    return () -> {
       ExecutionContextAdapter adaptedExecutionContext = (ExecutionContextAdapter) executionContext;
       return new DefaultNotificationEmitter(adaptedExecutionContext.getMuleContext().getNotificationManager(),
                                             adaptedExecutionContext.getEvent(),
                                             adaptedExecutionContext.getComponent(),
                                             adaptedExecutionContext.getComponentModel());
-    });
+    };
   }
 
 }

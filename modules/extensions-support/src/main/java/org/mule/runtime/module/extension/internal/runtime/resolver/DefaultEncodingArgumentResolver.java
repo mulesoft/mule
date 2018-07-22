@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+
+import java.util.function.Supplier;
 
 /**
  * An implementation of {@link ArgumentResolver} which returns the value obtained through
@@ -19,8 +20,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 public final class DefaultEncodingArgumentResolver implements ArgumentResolver<String> {
 
   @Override
-  public LazyValue<String> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> ((ExecutionContextAdapter) executionContext).getMuleContext().getConfiguration()
-        .getDefaultEncoding());
+  public Supplier<String> resolve(ExecutionContext executionContext) {
+    return () -> ((ExecutionContextAdapter) executionContext).getMuleContext().getConfiguration().getDefaultEncoding();
   }
 }

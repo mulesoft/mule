@@ -19,6 +19,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import static org.springframework.util.ReflectionUtils.setField;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -77,13 +78,26 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
    */
   public ObjectBuilder<T> addPropertyResolver(String propertyName, ValueResolver<? extends Object> resolver) {
     checkArgument(!isBlank(propertyName), "property name cannot be blank");
-    checkArgument(resolver != null, "resolver cannot be null");
 
     Field field = getField(prototypeClass, propertyName, reflectionCache)
         .orElseThrow(() -> new IllegalArgumentException(format("Class '%s' does not contain property '%s'",
                                                                prototypeClass.getName(), propertyName)));
 
-    resolverByFieldName.put(propertyName, resolver);
+    return addPropertyResolver(field, resolver);
+  }
+
+  /**
+   * Adds a property which value is to be obtained from a {@link ValueResolver}
+   *
+   * @param field the property in which the value is to be assigned
+   * @param resolver a {@link ValueResolver} used to provide the actual value
+   * @return this builder
+   * @throws {@link java.lang.IllegalArgumentException} if method or resolver are {@code null}
+   */
+  public ObjectBuilder<T> addPropertyResolver(Field field, ValueResolver<? extends Object> resolver) {
+    checkArgument(resolver != null, "resolver cannot be null");
+
+    resolverByFieldName.put(field.getName(), resolver);
 
     field.setAccessible(true);
     resolvers.put(field, (ValueResolver<Object>) resolver);

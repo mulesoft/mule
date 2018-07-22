@@ -7,13 +7,15 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
-import org.mule.runtime.api.util.LazyValue;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+
+import java.util.function.Supplier;
 
 /**
  * {@link ArgumentResolver} which returns the {@link org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties#COMPLETION_CALLBACK_CONTEXT_PARAM} context variable.
@@ -25,8 +27,8 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 public final class VoidCallbackArgumentResolver implements ArgumentResolver<VoidCompletionCallback> {
 
   @Override
-  public LazyValue<VoidCompletionCallback> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> {
+  public Supplier<VoidCompletionCallback> resolve(ExecutionContext executionContext) {
+    return () -> {
       ExecutionContextAdapter adapter = (ExecutionContextAdapter) executionContext;
       CompletionCallback completionCallback = (CompletionCallback) adapter.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
       final CoreEvent event = adapter.getEvent();
@@ -43,7 +45,7 @@ public final class VoidCallbackArgumentResolver implements ArgumentResolver<Void
           completionCallback.error(e);
         }
       };
-    });
+    };
 
   }
 }
