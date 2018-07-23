@@ -8,20 +8,13 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import org.mule.runtime.module.extension.internal.runtime.client.DefaultExtensionsClient;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 
-import javax.inject.Inject;
+import java.util.function.Supplier;
 
 /**
  * An argument resolver that yields instances of {@link ExtensionsClient}.
@@ -39,10 +32,10 @@ public class ExtensionsClientArgumentResolver implements ArgumentResolver<Extens
   }
 
   @Override
-  public LazyValue<ExtensionsClient> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> {
+  public Supplier<ExtensionsClient> resolve(ExecutionContext executionContext) {
+    return () -> {
       ExecutionContextAdapter cxt = (ExecutionContextAdapter) executionContext;
       return new DefaultExtensionsClient(cxt.getMuleContext(), cxt.getEvent(), registry, policyManager);
-    });
+    };
   }
 }

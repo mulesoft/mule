@@ -303,7 +303,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
           final ObjectType groupType = (ObjectType) groupField.getValue();
           final Field objectField = getField(objectClass, getLocalPart(groupField));
           DefaultObjectBuilder groupBuilder = getParameterGroupObjectBuilder(groupField);
-          builder.addPropertyResolver(objectField.getName(), new ObjectBuilderValueResolver<>(groupBuilder, muleContext));
+          builder.addPropertyResolver(objectField, new ObjectBuilderValueResolver<>(groupBuilder, muleContext));
 
           resolveParameters(groupType, groupBuilder);
           resolveParameterGroups(groupType, groupBuilder);
@@ -345,7 +345,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       if (valueResolver != null) {
         try {
           initialiseIfNeeded(valueResolver, true, muleContext);
-          builder.addPropertyResolver(objectField.getName(), valueResolver);
+          builder.addPropertyResolver(objectField, valueResolver);
         } catch (InitialisationException e) {
           throw new MuleRuntimeException(e);
         }

@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+
+import java.util.function.Supplier;
 
 /**
  * An implementation of {@link ArgumentResolver} which resolves to a parameter value of name {@link #parameterName}
@@ -30,14 +31,8 @@ public class ByParameterNameArgumentResolver<T> implements ArgumentResolver<T> {
    * @return the result of invoking {@link ExecutionContext#getParameter(String)} with {@link #parameterName}
    */
   @Override
-  public LazyValue<T> resolve(ExecutionContext executionContext) {
-    return new LazyValue<T>(() -> {
-      if (executionContext.hasParameter(parameterName)) {
-        return (T) executionContext.getParameter(parameterName);
-      } else {
-        return null;
-      }
-    });
+  public Supplier<T> resolve(ExecutionContext executionContext) {
+    return () -> (T) executionContext.getParameters().get(parameterName);
 
   }
 }

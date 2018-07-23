@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
@@ -29,12 +28,12 @@ public final class ParameterResolverArgumentResolver<T> implements ArgumentResol
    * {@inheritDoc}
    */
   @Override
-  public LazyValue<ParameterResolver<T>> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> {
+  public Supplier<ParameterResolver<T>> resolve(ExecutionContext executionContext) {
+    return () -> {
       Object value = argumentResolver.resolve(executionContext).get();
       return ParameterResolver.class.isInstance(value)
           ? (ParameterResolver<T>) value
           : new StaticParameterResolver<>((T) value);
-    });
+    };
   }
 }

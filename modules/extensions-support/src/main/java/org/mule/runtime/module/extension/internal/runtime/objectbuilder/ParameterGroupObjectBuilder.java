@@ -68,7 +68,7 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
     reflectionCache.fieldElementsFor(groupDescriptor).forEach(field -> {
       String name = field.getName();
       if (hasParameter.test(name)) {
-        addPropertyResolver(name, new StaticValueResolver<>(parameters.apply(name)));
+        addPropertyResolver(field.getField().get(), new StaticValueResolver<>(parameters.apply(name)));
       }
     });
 

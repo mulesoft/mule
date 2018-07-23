@@ -7,12 +7,14 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
-import org.mule.runtime.api.util.LazyValue;
+
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+
+import java.util.function.Supplier;
 
 /**
  * {@link ArgumentResolver} which returns the {@link org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties#COMPLETION_CALLBACK_CONTEXT_PARAM}
@@ -25,8 +27,8 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 public final class RouterCallbackArgumentResolver implements ArgumentResolver<RouterCompletionCallback> {
 
   @Override
-  public LazyValue<RouterCompletionCallback> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> {
+  public Supplier<RouterCompletionCallback> resolve(ExecutionContext executionContext) {
+    return () -> {
       CompletionCallback completionCallback = (CompletionCallback) ((ExecutionContextAdapter) executionContext)
           .getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
 
@@ -42,7 +44,6 @@ public final class RouterCallbackArgumentResolver implements ArgumentResolver<Ro
           completionCallback.error(e);
         }
       };
-    });
-
+    };
   }
 }

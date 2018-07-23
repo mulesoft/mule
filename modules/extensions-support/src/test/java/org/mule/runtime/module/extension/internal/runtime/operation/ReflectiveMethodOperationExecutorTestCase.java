@@ -13,13 +13,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
@@ -52,7 +52,9 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
@@ -69,6 +71,9 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
 
   private static final String CONFIG_NAME = "config";
   private static final DataType DATA_TYPE = STRING;
+
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private CoreEvent muleEvent;
@@ -137,7 +142,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   public void operationWithReturnValueAndWithoutParameters() throws Exception {
     Method method = ClassUtils.getMethod(HeisenbergOperations.class, "sayMyName", new Class<?>[] {HeisenbergExtension.class});
     executor = new ReflectiveMethodOperationExecutor(operationModel, method, operations);
-    executor.setMuleContext(muleContext);
+    initialiseIfNeeded(executor, muleContext);
     assertResult(execute(), HEISENBERG);
   }
 
@@ -147,19 +152,15 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     operations = mock(HeisenbergOperations.class);
     when(operations.sayMyName(any(HeisenbergExtension.class))).thenThrow(exception);
 
-    try {
-      operationWithReturnValueAndWithoutParameters();
-      fail("was expecting an exception");
-    } catch (Exception e) {
-      assertThat(e, is(sameInstance(exception)));
-    }
+    expected.expect(sameInstance(exception));
+    operationWithReturnValueAndWithoutParameters();
   }
 
   @Test
   public void voidOperationWithoutParameters() throws Exception {
     Method method = ClassUtils.getMethod(HeisenbergOperations.class, "die", new Class<?>[] {HeisenbergExtension.class});
     executor = new ReflectiveMethodOperationExecutor(operationModel, method, operations);
-    executor.setMuleContext(muleContext);
+    initialiseIfNeeded(executor, muleContext);
     assertThat(execute(), is(nullValue()));
     assertThat(config.getEndingHealth(), is(DEAD));
   }
@@ -174,7 +175,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     Method method =
         ClassUtils.getMethod(HeisenbergOperations.class, "getEnemy", new Class<?>[] {HeisenbergExtension.class, int.class});
     executor = new ReflectiveMethodOperationExecutor(operationModel, method, operations);
-    executor.setMuleContext(muleContext);
+    initialiseIfNeeded(executor, muleContext);
 
     assertResult(((Result) execute()).getOutput(), "Hank");
   }
@@ -183,7 +184,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   public void voidWithArguments() throws Exception {
     Method method = ClassUtils.getMethod(HeisenbergOperations.class, "die", new Class<?>[] {HeisenbergExtension.class});
     executor = new ReflectiveMethodOperationExecutor(operationModel, method, operations);
-    executor.setMuleContext(muleContext);
+    initialiseIfNeeded(executor, muleContext);
     assertThat(execute(), is(nullValue()));
   }
 
@@ -196,7 +197,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
       Method method = ClassUtils.getMethod(PrimitiveTypesTestOperations.class, (String) primitiveOperation[0],
                                            new Class<?>[] {(Class<?>) primitiveOperation[1]});
       executor = new ReflectiveMethodOperationExecutor(operationModel, method, primitiveTypesTestOperations);
-      executor.setMuleContext(muleContext);
+      initialiseIfNeeded(executor, muleContext);
       execute();
     }
   }
@@ -207,7 +208,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
         {char.class, byte.class, short.class, int.class, long.class, float.class, double.class, boolean.class};
     Method method = ClassUtils.getMethod(PrimitiveTypesTestOperations.class, "allCombined", parameterTypes);
     executor = new ReflectiveMethodOperationExecutor(operationModel, method, primitiveTypesTestOperations);
-    executor.setMuleContext(muleContext);
+    initialiseIfNeeded(executor, muleContext);
     execute();
   }
 

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.util.function.Supplier;
@@ -25,5 +24,5 @@ public interface ArgumentResolver<T> {
    * @param executionContext an {@link ExecutionContext}
    * @return a value
    */
-  LazyValue<T> resolve(ExecutionContext executionContext);
+  Supplier<T> resolve(ExecutionContext executionContext);
 }
