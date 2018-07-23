@@ -18,10 +18,11 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Provides helper methods for encoding and decoding http request and response content.
- * 
+ *
  * @since 4.0
  */
 public final class HttpEncoderDecoderUtils {
@@ -30,11 +31,12 @@ public final class HttpEncoderDecoderUtils {
     // Nothing to do
   }
 
+  private static final Pattern SPACES_MATCHER = Pattern.compile(" ");
   private static final String SPACE_ENTITY = "%20";
 
   /**
    * Extracts the path (what's left of the {@code ?} character) from the passed uri.
-   * 
+   *
    * @param uri the uri to extract the path from
    * @return the path form the uri
    */
@@ -49,7 +51,7 @@ public final class HttpEncoderDecoderUtils {
 
   /**
    * Extracts the query parameters (what's right of the {@code ?} character) from the passed uri.
-   * 
+   *
    * @param uri the uri to extract the parameters from
    * @return the parameters form the uri
    */
@@ -66,7 +68,7 @@ public final class HttpEncoderDecoderUtils {
    * Converts a query-string from a request url into a {@link MultiMap}.
    * <p>
    * This is the inverse of {@link #encodeQueryString(Map)}.
-   * 
+   *
    * @param queryString the query string to parse
    * @return a map representation of the {@code queryString}
    */
@@ -78,7 +80,7 @@ public final class HttpEncoderDecoderUtils {
    * Converts a map to a request url query-string form.
    * <p>
    * This is the inverse of {@link #decodeQueryString(String)}.
-   * 
+   *
    * @param parameters a map representation of the {@code queryString}
    * @return the generated query string
    */
@@ -90,7 +92,7 @@ public final class HttpEncoderDecoderUtils {
    * Converts an url-encoded body into a {@link MultiMap} with a given encoding.
    * <p>
    * This is the inverse of {@link #encodeString(String, Charset)}.
-   * 
+   *
    * @param queryString the string to parse
    * @param encoding {@link URLDecoder#decode(String, String)}.
    * @return a map representation of the {@code queryString}
@@ -158,7 +160,7 @@ public final class HttpEncoderDecoderUtils {
    * Converts a map to a request url query-string form.
    * <p>
    * This is the inverse of {@link #decodeUrlEncodedBody(String, Charset)}.
-   * 
+   *
    * @param parameters a map representation of the {@code queryString}
    * @param encoding {@link URLDecoder#decode(String, String)}.
    * @return the generated query string
@@ -202,7 +204,7 @@ public final class HttpEncoderDecoderUtils {
    * @return The path with all spaces replaced by %20.
    */
   public static String encodeSpaces(String path) {
-    return path.replaceAll(" ", SPACE_ENTITY);
+    return SPACES_MATCHER.matcher(path).replaceAll(SPACE_ENTITY);
   }
 
   /**

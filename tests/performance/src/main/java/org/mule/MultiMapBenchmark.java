@@ -9,9 +9,13 @@ package org.mule;
 import static java.util.Arrays.asList;
 
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Setup;
+
+import java.util.List;
+import java.util.Map.Entry;
 
 public class MultiMapBenchmark extends AbstractBenchmark {
 
@@ -32,6 +36,23 @@ public class MultiMapBenchmark extends AbstractBenchmark {
     targetMap.putAll(multiMap);
 
     return targetMap;
+  }
+
+  @Benchmark
+  public List<Entry<String, String>> entryList() {
+    return multiMap.entryList();
+  }
+
+  @Benchmark
+  public CaseInsensitiveMultiMap copy() {
+    return new CaseInsensitiveMultiMap(multiMap);
+  }
+
+  @Benchmark
+  public CaseInsensitiveMultiMap putAll() {
+    CaseInsensitiveMultiMap mm = new CaseInsensitiveMultiMap();
+    mm.putAll(multiMap);
+    return mm;
   }
 
 }

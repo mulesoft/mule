@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.http.api.domain.message.request;
 
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 import static org.mule.runtime.http.api.utils.UriCache.getUriFromString;
 
@@ -127,7 +127,7 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
    */
   @Override
   public HttpRequest build() {
-    checkNotNull(uri, "URI must be specified to create an HTTP request");
+    requireNonNull(uri, "URI must be specified to create an HTTP request");
     return new DefaultHttpRequest(uri, path, method, headers.toImmutableMultiMap(), queryParams.toImmutableMultiMap(),
                                   entity);
 
