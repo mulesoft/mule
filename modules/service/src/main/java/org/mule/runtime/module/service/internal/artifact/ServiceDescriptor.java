@@ -7,22 +7,24 @@
 
 package org.mule.runtime.module.service.internal.artifact;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
-import java.util.Optional;
-import java.util.Properties;
-
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Describes how to create a {@link Service} instance.
  */
 public class ServiceDescriptor extends ArtifactDescriptor {
 
-  public static final String SERVICE_PROPERTIES = "service.properties";
-
+  private List<String> satisfiedServiceClassNames = emptyList();
   private String serviceProviderClassName;
 
   /**
@@ -47,9 +49,17 @@ public class ServiceDescriptor extends ArtifactDescriptor {
     return serviceProviderClassName;
   }
 
+  public List<String> getSatisfiedServiceClassNames() {
+    return satisfiedServiceClassNames;
+  }
+
   public void setServiceProviderClassName(String serviceProviderClassName) {
     checkArgument(!isEmpty(serviceProviderClassName), "serviceProviderClassName cannot be empty");
-
     this.serviceProviderClassName = serviceProviderClassName;
+  }
+
+  public void setSatisfiedServiceClassNames(List<String> satisfiedServiceClassNames) {
+    checkArgument(!isEmpty(satisfiedServiceClassNames), "serviceProviderClassName cannot be null or empty");
+    this.satisfiedServiceClassNames = unmodifiableList(satisfiedServiceClassNames);
   }
 }

@@ -365,6 +365,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     File descriptor = new File(metaInfFolder, MULE_ARTIFACT_JSON_DESCRIPTOR);
     MuleServiceModel muleServiceModel = new MuleServiceModelBuilder().setName("Foo").setMinMuleVersion("4.0.0")
         .withServiceProviderClassName("org.foo.ServiceProvider")
+        .satisfyingServiceClassNames("FooService")
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
         .withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
         .build();

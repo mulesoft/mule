@@ -9,6 +9,7 @@ package org.mule.runtime.module.service.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.emptyMap;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -36,6 +37,7 @@ import java.util.List;
 public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileBuilder> {
 
   private String serviceProviderClassName;
+  private String[] satisfiedServiceClassNames = null;
   private boolean unpack = false;
 
   /**
@@ -45,15 +47,6 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
    */
   public ServiceFileBuilder(String artifactId) {
     super(artifactId);
-  }
-
-  /**
-   * Creates a new builder from another instance.
-   *
-   * @param source instance used as template to build the new one. Non null.
-   */
-  public ServiceFileBuilder(ServiceFileBuilder source) {
-    super(source);
   }
 
   @Override
@@ -76,6 +69,14 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
     checkImmutable();
     checkArgument(!isBlank(className), "Property value cannot be blank");
     serviceProviderClassName = className;
+
+    return this;
+  }
+
+  public ServiceFileBuilder satisfyingServiceClassNames(String... satisfiedServiceClassNames) {
+    checkImmutable();
+    checkArgument(!isEmpty(satisfiedServiceClassNames), "Property value cannot be null or empty");
+    this.satisfiedServiceClassNames = satisfiedServiceClassNames;
 
     return this;
   }
@@ -110,6 +111,7 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
     serviceModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     serviceModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     serviceModelBuilder.withServiceProviderClassName(serviceProviderClassName);
+    serviceModelBuilder.satisfyingServiceClassNames(satisfiedServiceClassNames);
     String serviceDescriptorContent = new MuleServiceModelJsonSerializer().serialize(serviceModelBuilder.build());
     try (FileWriter fileWriter = new FileWriter(serviceDescriptor)) {
       fileWriter.write(serviceDescriptorContent);

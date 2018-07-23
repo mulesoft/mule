@@ -25,6 +25,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.internal.artifact.LazyServiceProviderWrapper;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
 
@@ -45,9 +46,9 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   /**
    * Creates a new instance.
    *
-   * @param containerClassLoader container artifact classLoader. Non null.
-   * @param serviceClassLoaderFactory factory used to create service's classloaders. Non null.
-   * @param descriptorLoaderRepository contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
+   * @param containerClassLoader               container artifact classLoader. Non null.
+   * @param serviceClassLoaderFactory          factory used to create service's classloaders. Non null.
+   * @param descriptorLoaderRepository         contains all the {@link ClassLoaderModelLoader} registered on the container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the {@link org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator} in order to check the state of the descriptor once loaded.
    */
   public FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
@@ -90,15 +91,14 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   }
 
   private List<Pair<ArtifactClassLoader, ServiceProvider>> createServiceProviders(List<ServiceDescriptor> serviceDescriptors,
-                                                                                  ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory)
-      throws ServiceResolutionError {
+                                                                                  ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory) {
     List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new LinkedList<>();
     for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {
       final ArtifactClassLoader serviceClassLoader =
           serviceClassLoaderFactory.create(getServiceArtifactId(serviceDescriptor), serviceDescriptor,
                                            apiClassLoader.getClassLoader(), apiClassLoader.getClassLoaderLookupPolicy());
-      final ServiceProvider serviceProvider =
-          instantiateServiceProvider(serviceClassLoader.getClassLoader(), serviceDescriptor.getServiceProviderClassName());
+      final ServiceProvider serviceProvider = new LazyServiceProviderWrapper(
+          () -> instantiateServiceProvider(serviceClassLoader.getClassLoader(), serviceDescriptor.getServiceProviderClassName()));
 
       serviceProviders.add(new Pair<>(serviceClassLoader, serviceProvider));
     }

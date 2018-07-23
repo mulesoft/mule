@@ -13,8 +13,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -51,15 +49,21 @@ import org.junit.Test;
 
 public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTestCase {
 
-  private final ServiceClassLoaderFactory serviceClassLoaderFactory = mock(ServiceClassLoaderFactory.class);
+  private static final String API_SERVICE_CLASS_NAME = "org.foo.MyService";
+
   @Rule
   public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
+
+  private final ServiceClassLoaderFactory serviceClassLoaderFactory = mock(ServiceClassLoaderFactory.class);
   private ArtifactClassLoader containerClassLoader = mock(ArtifactClassLoader.class);
   private DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
   private ArtifactDescriptorValidator artifactDescriptorValidator = mock(ArtifactDescriptorValidator.class);
 
   @Before
   public void setUp() throws Exception {
+    FooServiceProvider.INVOKED = false;
+    BarServiceProvider.INVOKED = false;
+
     final File servicesFolder = getServicesFolder();
     assertThat(servicesFolder.mkdir(), is(true));
     when(containerClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
@@ -103,8 +107,14 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
     List<ServiceProvider> serviceProviders = serviceProvidersPairs.stream().map(Pair::getSecond).collect(Collectors.toList());
 
     assertThat(serviceProviders.size(), equalTo(2));
-    assertThat(serviceProviders, hasItem(instanceOf(FooServiceProvider.class)));
-    assertThat(serviceProviders, hasItem(instanceOf(BarServiceProvider.class)));
+
+    assertThat(FooServiceProvider.INVOKED, is(false));
+    assertThat(BarServiceProvider.INVOKED, is(false));
+
+    serviceProviders.forEach(ServiceProvider::providedServices);
+
+    assertThat(FooServiceProvider.INVOKED, is(true));
+    assertThat(BarServiceProvider.INVOKED, is(true));
   }
 
   @Test(expected = ServiceResolutionError.class)
@@ -134,7 +144,9 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
   private void installService(String serviceName, Class<? extends ServiceProvider> providerClass, boolean corrupted)
       throws Exception {
     final ServiceFileBuilder fooService =
-        new ServiceFileBuilder(serviceName).withServiceProviderClass(providerClass.getName()).unpack(true);
+        new ServiceFileBuilder(serviceName)
+            .satisfyingServiceClassNames(API_SERVICE_CLASS_NAME)
+            .withServiceProviderClass(providerClass.getName()).unpack(true);
     if (corrupted) {
       fooService.corrupted();
     }
@@ -146,16 +158,22 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
 
   public static class FooServiceProvider implements ServiceProvider {
 
+    private static boolean INVOKED = false;
+
     @Override
     public List<ServiceDefinition> providedServices() {
+      INVOKED = true;
       return emptyList();
     }
   }
 
   public static class BarServiceProvider implements ServiceProvider {
 
+    private static boolean INVOKED = false;
+
     @Override
     public List<ServiceDefinition> providedServices() {
+      INVOKED = true;
       return emptyList();
     }
   }
