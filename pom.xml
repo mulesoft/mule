@@ -251,7 +251,7 @@
         <muleMetadataExtensionTestVersion>4.1.3</muleMetadataExtensionTestVersion>
         <muleVeganExtensionTestVersion>4.1.3</muleVeganExtensionTestVersion>
         <muleHeisenbergExtensionTestVersion>4.1.3</muleHeisenbergExtensionTestVersion>
-        <muleMarvelExtensionTestVersion>4.1.3-SNAPSHOT</muleMarvelExtensionTestVersion>
+        <muleMarvelExtensionTestVersion>4.1.3</muleMarvelExtensionTestVersion>
         <mulePetstoreExtensionTestVersion>4.1.3-SNAPSHOT</mulePetstoreExtensionTestVersion>
         <muleSubtypesExtensionTestVersion>4.1.3-SNAPSHOT</muleSubtypesExtensionTestVersion>
 
