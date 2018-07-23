@@ -32,7 +32,7 @@ public class PagedOperationModelValidator implements ExtensionModelValidator {
       @Override
       protected void onOperation(OperationModel operationModel) {
         boolean hasConnectionParameter = operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
-            .map(property -> property.getOperationMethod()
+            .map(property -> property.getOperationElement()
                 .getParametersAnnotatedWith(Connection.class).size() > 0)
             .orElse(false);
         if (hasConnectionParameter && operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {

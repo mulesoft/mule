@@ -16,6 +16,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -72,9 +73,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     public Builder<T, A> setSourceModel(SourceModel sourceModel) {
       product.sourceModel = sourceModel;
       product.returnsListOfMessages = returnsListOfMessages(sourceModel);
-      product.defaultMediaType = sourceModel.getModelProperty(MediaTypeModelProperty.class)
-          .map(MediaTypeModelProperty::getMediaType)
-          .orElse(ANY);
+      product.defaultMediaType = getDefaultMediaType(sourceModel);
       product.notificationModelNames = sourceModel.getNotificationModels()
           .stream()
           .map(NotificationModel::getIdentifier)

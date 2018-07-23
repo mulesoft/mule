@@ -226,6 +226,18 @@ public class HeisenbergOperations implements Disposable {
     };
   }
 
+  @OutputResolver(output = TucoMetadataResolver.class)
+  @MediaType(strict = false)
+  public String colorizeMeth() {
+    return "Blue";
+  }
+
+  @OutputResolver(output = TucoMetadataResolver.class)
+  @MediaType(strict = false)
+  public String callDea() {
+    return "Help DEA!";
+  }
+
   @Streaming
   @MediaType(value = ANY, strict = false)
   public String sayMyName(@Config HeisenbergExtension config) {

@@ -57,8 +57,8 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
 
         operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
             .ifPresent(mp -> {
-              MethodElement<? extends Type> operationMethod = mp.getOperationMethod();
-              Type returnType = mp.getOperationMethod().getReturnType();
+              MethodElement<? extends Type> operationMethod = mp.getOperationElement();
+              Type returnType = mp.getOperationElement().getReturnType();
               validateNonBlockingCallback(operationMethod, problemsReporter, operationModel, extensionModel);
               validateResultReturnType(returnType, problemsReporter, operationModel, extensionModel);
               validateMessageCollectionsReturnType(returnType, problemsReporter, operationModel, extensionModel);

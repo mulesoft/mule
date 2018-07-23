@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java.type.property;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
+import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 
 /**
@@ -18,14 +19,14 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
  */
 public class ExtensionOperationDescriptorModelProperty implements ModelProperty {
 
-  private MethodElement operationMethod;
+  private OperationElement operationElement;
 
-  public ExtensionOperationDescriptorModelProperty(MethodElement operationMethod) {
-    this.operationMethod = operationMethod;
+  public ExtensionOperationDescriptorModelProperty(OperationElement operationMethod) {
+    this.operationElement = operationMethod;
   }
 
-  public MethodElement<? extends Type> getOperationMethod() {
-    return operationMethod;
+  public OperationElement getOperationElement() {
+    return operationElement;
   }
 
   @Override

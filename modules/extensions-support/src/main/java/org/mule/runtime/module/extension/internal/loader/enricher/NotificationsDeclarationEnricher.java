@@ -87,7 +87,7 @@ public class NotificationsDeclarationEnricher implements DeclarationEnricher {
                 declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class);
 
             if (modelProperty.isPresent()) {
-              MethodElement method = modelProperty.get().getOperationMethod();
+              MethodElement method = modelProperty.get().getOperationElement();
               Optional<Fires> emitsNotifications =
                   getOperationNotificationDeclaration(method, extensionElement);
               includeNotificationDeclarationIfNeeded(declaration, emitsNotifications);

@@ -169,7 +169,7 @@ final public class ExportedArtifactsCollector {
 
   private void collectExceptionTypes(OperationModel operationModel) {
     operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
-        .map(ExtensionOperationDescriptorModelProperty::getOperationMethod)
+        .map(ExtensionOperationDescriptorModelProperty::getOperationElement)
         .ifPresent(method -> exportedClasses.addAll(method.getExceptionTypes().stream().map(Type::getTypeName).collect(toSet())));
   }
 }

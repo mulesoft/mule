@@ -384,6 +384,11 @@
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionList" use="optional" name="mainProducers"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -912,6 +917,11 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="apples"></xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -1001,6 +1011,11 @@
         </xs:sequence>
         <xs:attribute type="mule:expressionList" use="optional" name="products"></xs:attribute>
         <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

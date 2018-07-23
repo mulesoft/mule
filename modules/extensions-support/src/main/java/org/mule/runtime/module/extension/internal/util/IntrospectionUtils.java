@@ -248,7 +248,7 @@ public final class IntrospectionUtils {
     return getReturnType(returnType);
   }
 
-  private static MetadataType getReturnType(Type returnType) {
+  public static MetadataType getReturnType(Type returnType) {
     Type type = returnType;
 
     if (returnType.isAssignableTo(Result.class)) {

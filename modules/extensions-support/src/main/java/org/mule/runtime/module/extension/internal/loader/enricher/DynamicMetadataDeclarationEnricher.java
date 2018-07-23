@@ -107,7 +107,7 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
 
     private void enrichOperationMetadata(OperationDeclaration declaration) {
       declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
-          .map(ExtensionOperationDescriptorModelProperty::getOperationMethod)
+          .map(ExtensionOperationDescriptorModelProperty::getOperationElement)
           .ifPresent(operation -> {
             if (operation.isAnnotatedWith(Query.class)) {
               enrichWithDsql(declaration, operation);

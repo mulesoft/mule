@@ -119,7 +119,7 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
           private void validateArguments(NamedObject model, Optional<ExtensionOperationDescriptorModelProperty> modelProperty,
                                          Class<? extends Annotation> annotationClass) {
             modelProperty.ifPresent(operationDescriptorModelProperty -> {
-              MethodElement operation = operationDescriptorModelProperty.getOperationMethod();
+              MethodElement operation = operationDescriptorModelProperty.getOperationElement();
               int size = operation.getParametersAnnotatedWith(annotationClass).size();
 
               if (size == 0) {
