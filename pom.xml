@@ -240,7 +240,7 @@
         <muleExtensionsApiVersion>1.1.3</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.1.2</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.1.2</muleMavenClientApi>
-        <muleMavenClientImpl>1.1.3-SNAPSHOT</muleMavenClientImpl>
+        <muleMavenClientImpl>1.1.2</muleMavenClientImpl>
         <muleMavenClientTest>1.1.2</muleMavenClientTest>
         <mulePolicyApiVersion>1.1.2</mulePolicyApiVersion>
         <muleApiVersion>1.1.3</muleApiVersion>
