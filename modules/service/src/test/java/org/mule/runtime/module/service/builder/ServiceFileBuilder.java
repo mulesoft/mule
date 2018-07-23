@@ -126,8 +126,9 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
 
   @Override
   public File getArtifactFile() {
+    boolean newlyCreated = artifactFile == null;
     File file = super.getArtifactFile();
-    if (unpack && !file.isDirectory()) {
+    if (unpack && newlyCreated && !file.isDirectory()) {
       File unpacked = new File(file.getParentFile(), file.getName() + "-unpack");
       unpacked.mkdirs();
       try {
@@ -140,6 +141,7 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
       final File newFile = new File(file.getParentFile(), file.getName().replaceAll(".jar", ""));
       unpacked.renameTo(newFile);
       file = new File(newFile.getAbsolutePath());
+      artifactFile = file;
     }
 
     return file;

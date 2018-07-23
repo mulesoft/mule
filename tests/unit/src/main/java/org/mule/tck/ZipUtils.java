@@ -26,7 +26,8 @@ import java.util.zip.ZipOutputStream;
  */
 public class ZipUtils {
 
-  private ZipUtils() {}
+  private ZipUtils() {
+  }
 
   /**
    * Describes a resource that can be compressed in a ZIP file
@@ -75,6 +76,12 @@ public class ZipUtils {
     }
   }
 
+  /**
+   * Uncompresses the given {@code zipFile} into the {@code targetFile}
+   *
+   * @param zipFile    the source file
+   * @param targetFile the target directory
+   */
   public static void uncompress(File zipFile, File targetFile) throws IOException {
     byte[] buffer = new byte[1024];
     try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
