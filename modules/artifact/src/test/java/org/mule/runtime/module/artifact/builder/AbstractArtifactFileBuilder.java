@@ -44,7 +44,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     implements TestArtifactDescriptor {
 
   private final boolean upperCaseInExtension;
-  private File artifactFile;
+  protected File artifactFile;
   protected List<ZipResource> resources = new LinkedList<>();
   protected boolean corrupted;
 

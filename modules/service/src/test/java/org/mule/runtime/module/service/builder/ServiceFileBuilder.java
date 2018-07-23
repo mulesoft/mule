@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
+import static org.mule.tck.ZipUtils.uncompress;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel.MuleServiceModelBuilder;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
@@ -35,6 +36,7 @@ import java.util.List;
 public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileBuilder> {
 
   private String serviceProviderClassName;
+  private boolean unpack = false;
 
   /**
    * Creates a new builder
@@ -56,6 +58,11 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
 
   @Override
   protected ServiceFileBuilder getThis() {
+    return this;
+  }
+
+  public ServiceFileBuilder unpack(boolean unpack) {
+    this.unpack = unpack;
     return this;
   }
 
@@ -115,5 +122,28 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
   @Override
   public String getConfigFile() {
     return null;
+  }
+
+  @Override
+  public File getArtifactFile() {
+    boolean newlyCreated = artifactFile == null;
+    File file = super.getArtifactFile();
+    if (unpack && newlyCreated && !file.isDirectory()) {
+      File unpacked = new File(file.getParentFile(), file.getName() + "-unpack");
+      unpacked.mkdirs();
+      try {
+        uncompress(file, unpacked);
+      } catch (IOException e) {
+        throw new MuleRuntimeException(e);
+      }
+
+      file.delete();
+      final File newFile = new File(file.getParentFile(), file.getName().replaceAll(".jar", ""));
+      unpacked.renameTo(newFile);
+      file = new File(newFile.getAbsolutePath());
+      artifactFile = file;
+    }
+
+    return file;
   }
 }

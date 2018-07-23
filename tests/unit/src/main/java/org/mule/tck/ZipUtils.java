@@ -18,6 +18,7 @@ import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -45,7 +46,7 @@ public class ZipUtils {
    * Compress a set of resource files into a ZIP file
    *
    * @param targetFile file that will contain the zipped files
-   * @param resources resources to compress
+   * @param resources  resources to compress
    * @throws UncheckedIOException in case of any error processing the files
    */
   public static void compress(File targetFile, ZipResource[] resources) {
@@ -71,6 +72,35 @@ public class ZipUtils {
       }
     } catch (IOException e) {
       throw new UncheckedIOException(e);
+    }
+  }
+
+  /**
+   * Uncompresses the given {@code zipFile} into the {@code targetFile}
+   *
+   * @param zipFile    the source file
+   * @param targetFile the target directory
+   */
+  public static void uncompress(File zipFile, File targetFile) throws IOException {
+    byte[] buffer = new byte[1024];
+    try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
+      ZipEntry zipEntry = zis.getNextEntry();
+      try {
+        while (zipEntry != null) {
+          String fileName = zipEntry.getName();
+          File newFile = new File(targetFile, fileName);
+          newFile.getParentFile().mkdirs();
+          try (FileOutputStream fos = new FileOutputStream(newFile)) {
+            int len;
+            while ((len = zis.read(buffer)) > 0) {
+              fos.write(buffer, 0, len);
+            }
+          }
+          zipEntry = zis.getNextEntry();
+        }
+      } finally {
+        zis.closeEntry();
+      }
     }
   }
 }

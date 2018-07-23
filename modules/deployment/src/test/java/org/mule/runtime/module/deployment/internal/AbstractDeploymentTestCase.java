@@ -15,8 +15,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
-import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
@@ -75,33 +75,6 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.in
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
-
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -169,6 +142,32 @@ import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.test.runner.classloader.TestModuleDiscoverer;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
+
 @RunWith(Parameterized.class)
 /**
  * Base class for deployment tests using a {@link MuleDeploymentService} instance.
@@ -177,6 +176,8 @@ import org.mule.test.runner.classloader.TestModuleDiscoverer;
  */
 public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
+  private static final String EXPRESSION_LANGUAGE_SERVICE_NAME = "expressionLanguageService";
+  private static final String SCHEDULER_SERVICE_NAME = "schedulerService";
   protected static final int FILE_TIMESTAMP_PRECISION_MILLIS = 2000;
   protected static final String FLOW_PROPERTY_NAME = "flowName";
   protected static final String COMPONENT_NAME = "componentValue";
@@ -409,8 +410,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     services = getServicesFolder();
     services.mkdirs();
-    copyFileToDirectory(buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService")), services);
-    copyFileToDirectory(buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder("expressionLanguageService")), services);
+    copyDirectory(buildSchedulerServiceFile(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME)),
+                  new File(services, SCHEDULER_SERVICE_NAME));
+    copyDirectory(buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME)),
+                  new File(services, EXPRESSION_LANGUAGE_SERVICE_NAME));
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     testDeploymentListener = new TestDeploymentListener();
@@ -516,11 +519,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   private void installService(String serviceName, String serviceProviderClassName, File serviceJarFile) throws IOException {
-    final ServiceFileBuilder echoService =
+    final File echoService =
         new ServiceFileBuilder(serviceName).withServiceProviderClass(serviceProviderClassName)
-            .usingLibrary(serviceJarFile.getAbsolutePath());
-    File installedService = new File(services, echoService.getArtifactFile().getName());
-    copyFile(echoService.getArtifactFile(), installedService);
+            .usingLibrary(serviceJarFile.getAbsolutePath())
+            .unpack(true)
+            .getArtifactFile();
+
+    File installedService = new File(services, echoService.getName());
+    copyDirectory(echoService, installedService);
   }
 
   protected void doSynchronizedArtifactDeploymentActionTest(final Action deploymentAction, final Action assertAction,
