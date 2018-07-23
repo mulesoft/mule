@@ -8,14 +8,12 @@
 package org.mule.runtime.http.api.domain;
 
 import static java.util.Collections.unmodifiableMap;
-import static java.util.stream.Collectors.toCollection;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.api.util.MultiMap;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 
 /**
  * {@link MultiMap} where the key's case is not taken into account when looking for it, adding or aggregating it.
@@ -46,9 +44,7 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> {
     this.paramsMap = optimized
         ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
         : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
-    for (String key : paramsMap.keySet()) {
-      this.paramsMap.put(key, paramsMap.getAll(key).stream().collect(toCollection(LinkedList::new)));
-    }
+    putAll(paramsMap);
   }
 
   @Override
