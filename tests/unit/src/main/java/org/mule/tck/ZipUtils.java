@@ -26,8 +26,7 @@ import java.util.zip.ZipOutputStream;
  */
 public class ZipUtils {
 
-  private ZipUtils() {
-  }
+  private ZipUtils() {}
 
   /**
    * Describes a resource that can be compressed in a ZIP file
