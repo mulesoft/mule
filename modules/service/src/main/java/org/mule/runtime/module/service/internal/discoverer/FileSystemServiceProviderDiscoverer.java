@@ -9,15 +9,20 @@ package org.mule.runtime.module.service.internal.discoverer;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
@@ -25,7 +30,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
-import org.mule.runtime.module.service.internal.artifact.LazyServiceProviderWrapper;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
 
@@ -91,18 +95,36 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   }
 
   private List<Pair<ArtifactClassLoader, ServiceProvider>> createServiceProviders(List<ServiceDescriptor> serviceDescriptors,
-                                                                                  ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory) {
+                                                                                  ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory)
+      throws ServiceResolutionError {
+
     List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new LinkedList<>();
     for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {
       final ArtifactClassLoader serviceClassLoader =
           serviceClassLoaderFactory.create(getServiceArtifactId(serviceDescriptor), serviceDescriptor,
                                            apiClassLoader.getClassLoader(), apiClassLoader.getClassLoaderLookupPolicy());
-      final ServiceProvider serviceProvider = new LazyServiceProviderWrapper(
-          () -> instantiateServiceProvider(serviceClassLoader.getClassLoader(), serviceDescriptor.getServiceProviderClassName()));
+      final ServiceProvider serviceProvider = createServiceProvider(serviceDescriptor, serviceClassLoader);
 
       serviceProviders.add(new Pair<>(serviceClassLoader, serviceProvider));
     }
     return serviceProviders;
+  }
+
+  private ServiceProvider createServiceProvider(ServiceDescriptor serviceDescriptor,
+                                                ArtifactClassLoader serviceClassLoader) throws ServiceResolutionError {
+
+    try {
+      List<Class<? extends Service>> contracts = serviceDescriptor.getSatisfiedServiceClassNames().stream()
+          .map((CheckedFunction<String, Class<? extends Service>>) s -> loadClass(s, FileSystemServiceProviderDiscoverer.class))
+          .collect(toList());
+
+      ServiceProvider delegate = new LazyServiceProviderWrapper(
+          () -> instantiateServiceProvider(serviceClassLoader.getClassLoader(), serviceDescriptor.getServiceProviderClassName()));
+
+      return new ContractAwareServiceProviderWrapper(delegate, contracts);
+    } catch (Exception e) {
+      throw new ServiceResolutionError("Error resolving service " + serviceDescriptor.getName(), unwrap(e));
+    }
   }
 
   private String getServiceArtifactId(ServiceDescriptor serviceDescriptor) {
