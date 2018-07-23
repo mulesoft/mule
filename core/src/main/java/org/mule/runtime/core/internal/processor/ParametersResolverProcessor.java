@@ -8,12 +8,12 @@ package org.mule.runtime.core.internal.processor;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 /**
  * Implementations provide a means of resolving the parameters that the processor will receive, performing any required value
@@ -32,7 +32,7 @@ public interface ParametersResolverProcessor<T extends ComponentModel> {
    * @throws MuleException for any exception that occurs while resolving the parameters
    */
   void resolveParameters(CoreEvent.Builder eventBuilder,
-                         BiConsumer<Map<String, LazyValue<Object>>, ExecutionContext> afterConfigurer)
+                         BiConsumer<Map<String, Supplier<Object>>, ExecutionContext> afterConfigurer)
       throws MuleException;
 
   /**

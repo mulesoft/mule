@@ -108,6 +108,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
@@ -1844,7 +1845,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     @Override
     public void resolveParameters(CoreEvent.Builder eventBuilder,
-                                  BiConsumer<Map<String, LazyValue<Object>>, ExecutionContext> afterConfigurer) {
+                                  BiConsumer<Map<String, Supplier<Object>>, ExecutionContext> afterConfigurer) {
       afterConfigurer.accept(singletonMap("operationParam", new LazyValue<>(new ProcessorParameterValue() {
 
         @Override

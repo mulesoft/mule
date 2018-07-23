@@ -7,8 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+
+import java.util.function.Supplier;
 
 /**
  * Extracts argument values from an {@link ExecutionContext} and exposes them as an array
@@ -24,5 +25,5 @@ interface ArgumentResolverDelegate {
    * @param parameterTypes
    * @return an object array
    */
-  LazyValue<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes);
+  Supplier<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes);
 }

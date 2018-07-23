@@ -24,7 +24,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -230,9 +229,9 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   }
 
   @Override
-  public LazyValue<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
+  public Supplier<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
 
-    LazyValue<Object>[] parameterValues = new LazyValue[argumentResolvers.length];
+    Supplier<Object>[] parameterValues = new Supplier[argumentResolvers.length];
     int i = 0;
     for (ArgumentResolver<?> argumentResolver : argumentResolvers) {
       parameterValues[i] = wrapParameterResolution(parameterTypes[i], argumentResolver.resolve(executionContext));
@@ -242,38 +241,38 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     return parameterValues;
   }
 
-  private LazyValue<Object> wrapParameterResolution(Class<?> parameterType, Supplier<?> valueSupplier) {
-    return new LazyValue<>(() -> {
+  private Supplier<Object> wrapParameterResolution(Class<?> parameterType, Supplier<?> valueSupplier) {
+    return () -> {
       Object parameterValue = valueSupplier.get();
       if (parameterValue == null) {
         return resolvePrimitiveTypeDefaultValue(parameterType);
       } else {
         return resolveCursor(parameterValue);
       }
-    });
+    };
   }
 
   private Object resolvePrimitiveTypeDefaultValue(Class<?> type) {
+    if (type.equals(int.class)) {
+      return 0;
+    }
+    if (type.equals(boolean.class)) {
+      return false;
+    }
+    if (type.equals(float.class)) {
+      return 0.0f;
+    }
+    if (type.equals(long.class)) {
+      return 0l;
+    }
     if (type.equals(byte.class)) {
       return (byte) 0;
     }
     if (type.equals(short.class)) {
       return (short) 0;
     }
-    if (type.equals(int.class)) {
-      return 0;
-    }
-    if (type.equals(long.class)) {
-      return 0l;
-    }
-    if (type.equals(float.class)) {
-      return 0.0f;
-    }
     if (type.equals(double.class)) {
       return 0.0d;
-    }
-    if (type.equals(boolean.class)) {
-      return false;
     }
     if (type.equals(char.class)) {
       return '\u0000';

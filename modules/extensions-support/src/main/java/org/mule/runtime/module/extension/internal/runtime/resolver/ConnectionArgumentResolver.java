@@ -6,18 +6,22 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
+
+import java.util.function.Supplier;
 
 /**
  * Returns the value of the {@link ExtensionProperties#CONNECTION_PARAM} variable, which is expected to have been previously set
@@ -39,7 +43,7 @@ public class ConnectionArgumentResolver implements ArgumentResolver<Object> {
    * @throws ClassCastException if {@code executionContext} is not an {@link ExecutionContextAdapter}
    */
   @Override
-  public LazyValue<Object> resolve(ExecutionContext executionContext) {
+  public Supplier<Object> resolve(ExecutionContext executionContext) {
     return new LazyValue<>(() -> {
       ConnectionHandler connectionHandler =
           ((ExecutionContextAdapter<ComponentModel>) executionContext).getVariable(CONNECTION_PARAM);
@@ -49,13 +53,12 @@ public class ConnectionArgumentResolver implements ArgumentResolver<Object> {
       try {
         return connectionHandler.getConnection();
       } catch (ConnectionException e) {
-        throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage(String
-            .format("Error was found trying to obtain a connection to execute %s '%s' of extension '%s'",
-                    getComponentModelTypeName(executionContext.getComponentModel()),
-                    executionContext.getComponentModel().getName(),
-                    executionContext.getExtensionModel().getName())), e);
+        throw new MuleRuntimeException(createStaticMessage(format("Error was found trying to obtain a connection to execute %s '%s' of extension '%s'",
+                                                                  getComponentModelTypeName(executionContext.getComponentModel()),
+                                                                  executionContext.getComponentModel().getName(),
+                                                                  executionContext.getExtensionModel().getName())),
+                                       e);
       }
     });
-
   }
 }

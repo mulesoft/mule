@@ -34,6 +34,7 @@ import static org.mule.runtime.module.extension.api.loader.java.type.PropertyEle
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.springframework.core.ResolvableType.NONE;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -105,6 +106,9 @@ import org.mule.runtime.module.extension.internal.loader.java.property.InjectedF
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 
+import org.reflections.ReflectionUtils;
+import org.springframework.core.ResolvableType;
+
 import com.google.common.collect.ImmutableList;
 
 import java.beans.IntrospectionException;
@@ -139,9 +143,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-
-import org.reflections.ReflectionUtils;
-import org.springframework.core.ResolvableType;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -529,6 +530,10 @@ public final class IntrospectionUtils {
   public static String getMemberName(EnrichableModel enrichableModel, String defaultName) {
     return enrichableModel.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField().getName())
         .orElse(defaultName);
+  }
+
+  public static Optional<Field> getMemberField(EnrichableModel enrichableModel) {
+    return enrichableModel.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField());
   }
 
   public static List<? extends TypeMirror> getInterfaceGenerics(TypeMirror type, TypeElement superTypeElement,

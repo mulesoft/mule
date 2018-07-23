@@ -15,6 +15,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.property.st
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.runtime.api.exception.MuleException;
@@ -131,7 +132,7 @@ public class ResolverUtils {
         return new TypedValue<>(cursor, DataType.builder()
             .type(cursor.getClass())
             .mediaType(typedValue.getDataType().getMediaType())
-            .build(), typedValue.getLength());
+            .build(), typedValue.getByteLength());
       }
     }
 

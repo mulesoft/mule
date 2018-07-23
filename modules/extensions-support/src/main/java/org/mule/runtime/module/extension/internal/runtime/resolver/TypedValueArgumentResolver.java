@@ -8,8 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+
+import java.util.function.Supplier;
 
 /**
  * An implementation of {@link ArgumentResolver} which resolves the {@link TypedValue} of a parameter
@@ -29,12 +30,12 @@ public final class TypedValueArgumentResolver<T> implements ArgumentResolver<Typ
    * {@inheritDoc}
    */
   @Override
-  public LazyValue<TypedValue<T>> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> {
+  public Supplier<TypedValue<T>> resolve(ExecutionContext executionContext) {
+    return () -> {
       T value = argumentResolver.resolve(executionContext).get();
       return value instanceof TypedValue
           ? (TypedValue<T>) value
           : new TypedValue<>(value, DataType.fromObject(value));
-    });
+    };
   }
 }
