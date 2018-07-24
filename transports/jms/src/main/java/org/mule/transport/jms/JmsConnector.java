@@ -311,7 +311,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     {
         // if an initial factory class was configured that takes precedence over the 
         // spring-configured connection factory or the one that our subclasses may provide
-        if (jndiInitialFactory != null || jndiNameResolver != null)
+        if (isConnectionFactoryRetrievedThroughJndi())
         {
             if (jndiNameResolver == null)
             {
@@ -360,6 +360,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             }
             return factory;
         }
+    }
+
+    private boolean isConnectionFactoryRetrievedThroughJndi()
+    {
+        return jndiInitialFactory != null || jndiNameResolver != null;
     }
 
     private JndiNameResolver createDefaultJndiResolver()
@@ -443,7 +448,13 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     protected Connection createConnection() throws MuleException, JMSException
     {
-        if (connectionFactory == null)
+        // In case the connection factory is retrieved through Jndi,
+        // the connection factory should not be cached. There are cases where there are several
+        // failover URLs but each connection factory in the node only
+        // contains the URL for that node. In case of reconnection, it
+        // is necessary to attempt to retrieve the connection factory again
+        // using all the URLs in the jndiProviderUrl.
+        if (connectionFactory == null || isConnectionFactoryRetrievedThroughJndi())
         {
             try
             {
