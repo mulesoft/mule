@@ -11,7 +11,6 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.compression.InvalidZipFileException;
 
@@ -138,7 +137,7 @@ public class FileUtils {
    * Reads the incoming String into a file at at the given destination.
    *
    * @param filename name and path of the file to create
-   * @param data the contents of the file
+   * @param data     the contents of the file
    * @return the new file.
    * @throws IOException If the creating or writing to the file stream fails
    */
@@ -192,7 +191,7 @@ public class FileUtils {
   /**
    * Remove from uri to file prefix file:/ Add if need file separator to begin
    *
-   * @param url file uri to resource
+   * @param url      file uri to resource
    * @param encoding - Java encoding names
    * @return normalized file path
    * @throws UnsupportedEncodingException if encoding is unknown
@@ -214,7 +213,7 @@ public class FileUtils {
 
   /**
    * Delete a file tree recursively.
-   * 
+   *
    * @param dir dir to wipe out
    * @return false when the first unsuccessful attempt encountered
    */
@@ -226,8 +225,8 @@ public class FileUtils {
    * Delete a file tree recursively. This method additionally tries to be gentle with specified top-level dirs. E.g. this is the
    * case when a transaction manager asynchronously handles the recovery log, and the test wipes out everything, leaving the
    * transaction manager puzzled.
-   * 
-   * @param dir dir to wipe out
+   *
+   * @param dir                  dir to wipe out
    * @param topLevelDirsToIgnore which top-level directories to ignore, if null or empty then ignored
    * @return false when the first unsuccessful attempt encountered
    */
@@ -261,9 +260,24 @@ public class FileUtils {
   }
 
   /**
-   * Unzip the specified archive to the given directory
+   * Unzip the specified archive to the given directory. Equivalent to invoking {@link #unzip(File, File, boolean)}
+   * with a {@code true} value for the {@code verify} parameter
+   *
+   * @param archive   the archive to be unzipped
+   * @param directory the target directory
    */
   public static void unzip(File archive, File directory) throws IOException {
+    unzip(archive, directory, true);
+  }
+
+  /**
+   * Unzip the specified {@code archive} to the given {@code directory}.
+   *
+   * @param archive   the archive to be unzipped
+   * @param directory the target directory
+   * @param verify    whether to verify all entries before extractions
+   */
+  public static void unzip(File archive, File directory, boolean verify) throws IOException {
     ZipFile zip = null;
 
     if (directory.exists()) {
@@ -275,10 +289,13 @@ public class FileUtils {
         throw new IOException("Could not create directory: " + directory);
       }
     }
+
     try {
       zip = new ZipFile(archive);
 
-      verifyZipFilePaths(zip);
+      if (verify) {
+        verifyZipFilePaths(zip);
+      }
 
       for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
         ZipEntry entry = (ZipEntry) entries.nextElement();
@@ -396,11 +413,11 @@ public class FileUtils {
   /**
    * Extract the specified resource to the given directory for remain all directory struct
    *
-   * @param resourceName - full resource name
-   * @param callingClass - classloader for this class is used
-   * @param outputDir - extract to this directory
+   * @param resourceName        - full resource name
+   * @param callingClass        - classloader for this class is used
+   * @param outputDir           - extract to this directory
    * @param keepParentDirectory true - full structure of directories is kept; false - file - removed all directories, directory -
-   *        started from resource point
+   *                            started from resource point
    * @throws IOException if any errors
    */
   public static void extractResources(String resourceName, Class callingClass, File outputDir, boolean keepParentDirectory)
@@ -417,11 +434,11 @@ public class FileUtils {
   /**
    * Extract resources contain in file
    *
-   * @param path - path to file
-   * @param outputDir Directory for unpack resources
+   * @param path                - path to file
+   * @param outputDir           Directory for unpack resources
    * @param resourceName
    * @param keepParentDirectory true - full structure of directories is kept; false - file - removed all directories, directory -
-   *        started from resource point
+   *                            started from resource point
    * @throws IOException if any error
    */
   private static void extractFileResources(String path, File outputDir, String resourceName, boolean keepParentDirectory)
@@ -454,10 +471,10 @@ public class FileUtils {
   /**
    * Extract recources contain if jar (have to in classpath)
    *
-   * @param connection JarURLConnection to jar library
-   * @param outputDir Directory for unpack recources
+   * @param connection          JarURLConnection to jar library
+   * @param outputDir           Directory for unpack recources
    * @param keepParentDirectory true - full structure of directories is kept; false - file - removed all directories, directory -
-   *        started from resource point
+   *                            started from resource point
    * @throws IOException if any error
    */
   private static void extractJarResources(JarURLConnection connection, File outputDir, boolean keepParentDirectory)
@@ -665,13 +682,13 @@ public class FileUtils {
    * <p>
    * This method copies the contents of the specified source file to the specified destination file. The directory holding the
    * destination file is created if it does not exist. If the destination file exists, then this method will overwrite it.
-   * 
-   * @param srcFile an existing file to copy, must not be <code>null</code>
-   * @param destFile the new file, must not be <code>null</code>
+   *
+   * @param srcFile          an existing file to copy, must not be <code>null</code>
+   * @param destFile         the new file, must not be <code>null</code>
    * @param preserveFileDate true if the file date of the copy should be the same as the original
    * @throws NullPointerException if source or destination is <code>null</code>
-   * @throws IOException if source or destination is invalid
-   * @throws IOException if an IO error occurs during copying
+   * @throws IOException          if source or destination is invalid
+   * @throws IOException          if an IO error occurs during copying
    * @see org.apache.commons.io.FileUtils#copyFileToDirectory(File, File, boolean)
    */
   public static void copyFile(File srcFile, File destFile, boolean preserveFileDate) throws IOException {
@@ -703,9 +720,9 @@ public class FileUtils {
 
   /**
    * Internal copy file method.
-   * 
-   * @param srcFile the validated source file, must not be <code>null</code>
-   * @param destFile the validated destination file, must not be <code>null</code>
+   *
+   * @param srcFile          the validated source file, must not be <code>null</code>
+   * @param destFile         the validated destination file, must not be <code>null</code>
    * @param preserveFileDate whether to preserve the file date
    * @throws IOException if an error occurs
    */
@@ -738,7 +755,7 @@ public class FileUtils {
    * Unconditionally close a <code>Channel</code>.
    * <p>
    * Equivalent to {@link Channel#close()}, except any exceptions will be ignored. This is typically used in finally blocks.
-   * 
+   *
    * @param channel the Channel to close, may be null or already closed
    */
   public static void closeQuietly(Channel channel) {
