@@ -10,11 +10,11 @@ package org.mule.runtime.module.service.builder;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
+import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
-import static org.mule.tck.ZipUtils.uncompress;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel.MuleServiceModelBuilder;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
@@ -132,7 +132,7 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
       File unpacked = new File(file.getParentFile(), file.getName() + "-unpack");
       unpacked.mkdirs();
       try {
-        uncompress(file, unpacked);
+        unzip(file, unpacked, false);
       } catch (IOException e) {
         throw new MuleRuntimeException(e);
       }
