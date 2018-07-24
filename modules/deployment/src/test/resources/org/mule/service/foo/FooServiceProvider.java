@@ -18,13 +18,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 public class FooServiceProvider implements ServiceProvider {
-    @Inject
-    private EchoService echoService;
 
-    public FooServiceProvider() {
-    }
+  @Inject
+  private EchoService echoService;
 
-    public List<ServiceDefinition> providedServices() {
-        return Collections.singletonList(new ServiceDefinition(FooService.class, new DefaultFooService(this.echoService)));
-    }
+  @Override
+  public ServiceDefinition getServiceDefinition() {
+    return new ServiceDefinition(FooService.class, new DefaultFooService(echoService));
+  }
 }

@@ -9,8 +9,8 @@ package org.mule.runtime.module.service.internal.artifact;
 
 import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -22,6 +22,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getServiceFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder.builder;
+import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
@@ -73,14 +74,18 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
     final ServiceFileBuilder fooService =
         new ServiceFileBuilder(SERVICE_NAME)
             .withServiceProviderClass(PROVIDER_CLASS_NAME)
-            .satisfyingServiceClassNames(SERVICE_API_CLASS_NAME);
+            .satisfyingServiceClassName(SERVICE_API_CLASS_NAME);
     
     unzip(fooService.getArtifactFile(), getServiceFolder(SERVICE_NAME));
 
     ServiceDescriptor descriptor = serviceDescriptorFactory.create(getServiceFolder(SERVICE_NAME), empty());
     assertThat(descriptor.getName(), equalTo(SERVICE_NAME));
-    assertThat(descriptor.getServiceProviderClassName(), equalTo(PROVIDER_CLASS_NAME));
-    assertThat(descriptor.getSatisfiedServiceClassNames(), contains(SERVICE_API_CLASS_NAME));
     assertThat(descriptor.getRootFolder(), equalTo(getServiceFolder(SERVICE_NAME)));
+
+    assertThat(descriptor.getContractModels(), hasSize(1));
+    MuleServiceContractModel contractModel = descriptor.getContractModels().get(0);
+
+    assertThat(contractModel.getServiceProviderClassName(), equalTo(PROVIDER_CLASS_NAME));
+    assertThat(contractModel.getSatisfiedServiceClassName(), equalTo(SERVICE_API_CLASS_NAME));
   }
 }

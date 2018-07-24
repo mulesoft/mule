@@ -11,14 +11,10 @@ import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.service.test.api.EchoService;
 
-import java.util.Collections;
-import java.util.List;
-
 public class EchoServiceProvider implements ServiceProvider {
-    public EchoServiceProvider() {
-    }
 
-    public List<ServiceDefinition> providedServices() {
-        return Collections.singletonList(new ServiceDefinition(EchoService.class, new DefaultEchoService()));
-    }
+  @Override
+  public ServiceDefinition getServiceDefinition() {
+    return new ServiceDefinition(EchoService.class, new DefaultEchoService());
+  }
 }

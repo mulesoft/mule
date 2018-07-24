@@ -10,8 +10,6 @@ package org.mule.runtime.module.service.api.discoverer;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.util.List;
 
@@ -22,10 +20,10 @@ import java.util.List;
 public interface ServiceProviderDiscoverer {
 
   /**
-   * Discovers available service providers.
+   * Discovers available service locators.
    *
-   * @return a non null list of {@link ServiceProvider} foiund in the container.
+   * @return a non null list of {@link ServiceLocator} found in the container.
    * @throws ServiceResolutionError when a {@link ServiceProvider} cannot be properly instantiated.
    */
-  List<Pair<ArtifactClassLoader, ServiceProvider>> discover() throws ServiceResolutionError;
+  List<ServiceLocator> discover() throws ServiceResolutionError;
 }

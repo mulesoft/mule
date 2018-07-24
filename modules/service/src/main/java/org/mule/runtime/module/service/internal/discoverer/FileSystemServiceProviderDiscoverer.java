@@ -7,35 +7,30 @@
 
 package org.mule.runtime.module.service.internal.discoverer;
 
-import static java.lang.String.format;
 import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.service.Service;
+import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
+import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
 
 import java.io.File;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Discovers services artifacts from the {@link MuleFoldersUtil#SERVICES_FOLDER} folder.
@@ -59,95 +54,89 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
                                              ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
                                              DescriptorLoaderRepository descriptorLoaderRepository,
                                              ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
-    this.descriptorLoaderRepository = descriptorLoaderRepository;
     checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
     checkArgument(serviceClassLoaderFactory != null, "serviceClassLoaderFactory cannot be null");
     checkArgument(artifactDescriptorValidatorBuilder != null, "artifactDescriptorValidatorBuilder cannot be null");
+
+    this.descriptorLoaderRepository = descriptorLoaderRepository;
     this.apiClassLoader = containerClassLoader;
     this.serviceClassLoaderFactory = serviceClassLoaderFactory;
     this.artifactDescriptorValidatorBuilder = artifactDescriptorValidatorBuilder;
   }
 
   @Override
-  public List<Pair<ArtifactClassLoader, ServiceProvider>> discover() throws ServiceResolutionError {
+  public List<ServiceLocator> discover() throws ServiceResolutionError {
     final ServiceDescriptorFactory serviceDescriptorFactory =
         new ServiceDescriptorFactory(descriptorLoaderRepository, artifactDescriptorValidatorBuilder);
 
-    final List<ServiceDescriptor> serviceDescriptors = new LinkedList<>();
+    final List<ServiceDescriptor> serviceDescriptors = getServiceDescriptors(serviceDescriptorFactory);
 
-    serviceDescriptors.addAll(getServiceDescriptors(serviceDescriptorFactory));
-
-    return createServiceProviders(serviceDescriptors, serviceClassLoaderFactory);
+    return createServiceLocators(serviceDescriptors, serviceClassLoaderFactory);
   }
 
   private List<ServiceDescriptor> getServiceDescriptors(ServiceDescriptorFactory serviceDescriptorFactory)
       throws ServiceResolutionError {
-    List<ServiceDescriptor> foundServices = new LinkedList<>();
-    for (File serviceDirectory : getServicesFolder().listFiles(File::isDirectory)) {
+
+    final File[] serviceDirectories = getServicesFolder().listFiles(File::isDirectory);
+    List<ServiceDescriptor> foundServices = new ArrayList<>(serviceDirectories.length);
+
+    for (File serviceDirectory : serviceDirectories) {
       try {
         final ServiceDescriptor serviceDescriptor = serviceDescriptorFactory.create(serviceDirectory, empty());
         foundServices.add(serviceDescriptor);
       } catch (Exception e) {
-        throw new ServiceResolutionError("Error processing service JAR file", e);
+        throw new ServiceResolutionError("Error processing service JAR file", unwrap(e));
       }
     }
     return foundServices;
   }
 
-  private List<Pair<ArtifactClassLoader, ServiceProvider>> createServiceProviders(List<ServiceDescriptor> serviceDescriptors,
-                                                                                  ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory)
+  private List<ServiceLocator> createServiceLocators(List<ServiceDescriptor> serviceDescriptors,
+                                                     ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory)
       throws ServiceResolutionError {
 
-    List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new LinkedList<>();
+    List<ServiceLocator> locators = new ArrayList<>(serviceDescriptors.size());
     for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {
-      final ArtifactClassLoader serviceClassLoader =
-          serviceClassLoaderFactory.create(getServiceArtifactId(serviceDescriptor), serviceDescriptor,
-                                           apiClassLoader.getClassLoader(), apiClassLoader.getClassLoaderLookupPolicy());
-      final ServiceProvider serviceProvider = createServiceProvider(serviceDescriptor, serviceClassLoader);
 
-      serviceProviders.add(new Pair<>(serviceClassLoader, serviceProvider));
+      final Supplier<ArtifactClassLoader> serviceClassLoader = new LazyValue<>(() ->
+                                                                                   serviceClassLoaderFactory.create(
+                                                                                       getServiceArtifactId(serviceDescriptor),
+                                                                                       serviceDescriptor,
+                                                                                       apiClassLoader.getClassLoader(),
+                                                                                       apiClassLoader
+                                                                                           .getClassLoaderLookupPolicy()));
+
+      for (MuleServiceContractModel contract : serviceDescriptor.getContractModels()) {
+        ServiceLocator locator = LazyServiceLocator.builder()
+            .withName(serviceDescriptor.getName())
+            .withClassLoader(serviceClassLoader)
+            .withServiceProvider(() -> instantiateServiceProvider(contract))
+            .forContract(contract.getSatisfiedServiceClassName())
+            .build();
+
+        locators.add(locator);
+      }
     }
-    return serviceProviders;
-  }
 
-  private ServiceProvider createServiceProvider(ServiceDescriptor serviceDescriptor,
-                                                ArtifactClassLoader serviceClassLoader) throws ServiceResolutionError {
-
-    try {
-      List<Class<? extends Service>> contracts = serviceDescriptor.getSatisfiedServiceClassNames().stream()
-          .map((CheckedFunction<String, Class<? extends Service>>) s -> loadClass(s, FileSystemServiceProviderDiscoverer.class))
-          .collect(toList());
-
-      ServiceProvider delegate = new LazyServiceProviderWrapper(
-          () -> instantiateServiceProvider(serviceClassLoader.getClassLoader(), serviceDescriptor.getServiceProviderClassName()));
-
-      return new ContractAwareServiceProviderWrapper(delegate, contracts);
-    } catch (Exception e) {
-      throw new ServiceResolutionError("Error resolving service " + serviceDescriptor.getName(), unwrap(e));
-    }
+    return locators;
   }
 
   private String getServiceArtifactId(ServiceDescriptor serviceDescriptor) {
     return "service/" + serviceDescriptor.getName();
   }
 
-  private ServiceProvider instantiateServiceProvider(ClassLoader classLoader, String className) throws ServiceResolutionError {
+  private ServiceProvider instantiateServiceProvider(MuleServiceContractModel contractModel) throws ServiceResolutionError {
+    final String className = contractModel.getServiceProviderClassName();
     Object reflectedObject;
     try {
-      reflectedObject = withContextClassLoader(classLoader, () -> {
-        try {
-          return ClassUtils.instantiateClass(className);
-        } catch (Exception e) {
-          throw new MuleRuntimeException(createStaticMessage("Unable to create service from class: " + className), e);
-        }
-      });
-    } catch (RuntimeException e) {
-      throw new ServiceResolutionError(e.getMessage());
+      reflectedObject = ClassUtils.instantiateClass(className);
+    } catch (Exception e) {
+      throw new ServiceResolutionError("Unable to create service from class: " + className, e);
     }
 
     if (!(reflectedObject instanceof ServiceProvider)) {
-      throw new ServiceResolutionError(format("Provided service class '%s' does not implement '%s'", className,
-                                              ServiceProvider.class.getName()));
+      throw new ServiceResolutionError(String.format("Provided service class '%s' does not implement '%s'", className,
+                                                     ServiceProvider.class.getName()));
     }
 
     return (ServiceProvider) reflectedObject;

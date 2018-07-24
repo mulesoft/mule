@@ -8,10 +8,9 @@
 package org.mule.runtime.module.service.internal.artifact;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -24,8 +23,7 @@ import java.util.Properties;
  */
 public class ServiceDescriptor extends ArtifactDescriptor {
 
-  private List<String> satisfiedServiceClassNames = emptyList();
-  private String serviceProviderClassName;
+  private List<MuleServiceContractModel> contractModels = emptyList();
 
   /**
    * Creates a new service descriptor
@@ -45,21 +43,12 @@ public class ServiceDescriptor extends ArtifactDescriptor {
     super(name, properties);
   }
 
-  public String getServiceProviderClassName() {
-    return serviceProviderClassName;
+  public List<MuleServiceContractModel> getContractModels() {
+    return contractModels;
   }
 
-  public List<String> getSatisfiedServiceClassNames() {
-    return satisfiedServiceClassNames;
-  }
-
-  public void setServiceProviderClassName(String serviceProviderClassName) {
-    checkArgument(!isEmpty(serviceProviderClassName), "serviceProviderClassName cannot be empty");
-    this.serviceProviderClassName = serviceProviderClassName;
-  }
-
-  public void setSatisfiedServiceClassNames(List<String> satisfiedServiceClassNames) {
-    checkArgument(!isEmpty(satisfiedServiceClassNames), "serviceProviderClassName cannot be null or empty");
-    this.satisfiedServiceClassNames = unmodifiableList(satisfiedServiceClassNames);
+  public void setContractModels(List<MuleServiceContractModel> contractModels) {
+    checkArgument(!isEmpty(contractModels), "contractModels cannot be empty");
+    this.contractModels = contractModels;
   }
 }

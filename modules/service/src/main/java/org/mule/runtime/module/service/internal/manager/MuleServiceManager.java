@@ -7,44 +7,34 @@
 
 package org.mule.runtime.module.service.internal.manager;
 
-import static java.lang.Thread.currentThread;
+import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
-import static org.mule.runtime.module.service.internal.manager.LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy;
-import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.lifecycle.StartException;
-import org.mule.runtime.core.internal.logging.LogUtil;
-import org.mule.runtime.core.internal.util.splash.SplashScreen;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
-
-import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service manager to use in the Mule container.
  */
 public class MuleServiceManager implements ServiceManager {
 
-  private static final Logger logger = getLogger(MuleServiceManager.class);
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(MuleServiceManager.class);
+  
   private final ServiceDiscoverer serviceDiscoverer;
-  private List<Pair<ArtifactClassLoader, Service>> registeredServices = new ArrayList<>();
-  private List<Service> wrappedServices;
-  private List<Service> startedServices = new ArrayList<>();
+  private List<Service> services = new ArrayList<>();
 
   /**
    * Creates a new instance.
@@ -64,70 +54,32 @@ public class MuleServiceManager implements ServiceManager {
     }
 
     try {
-      registeredServices = serviceDiscoverer.discoverServices();
-      wrappedServices = wrapServices(registeredServices);
-
+      services = serviceDiscoverer.discoverServices();
       startServices();
     } catch (Exception e) {
       throw new StartException(e, this);
     }
   }
 
-  private List<Service> wrapServices(List<Pair<ArtifactClassLoader, Service>> registeredServices) {
-    final List<Service> result = new ArrayList<>(registeredServices.size());
-    for (Pair<ArtifactClassLoader, Service> pair : registeredServices) {
-      final Service serviceProxy = createLifecycleFilterServiceProxy(pair.getSecond());
-      result.add(serviceProxy);
-    }
-
-    return unmodifiableList(result);
-  }
-
   private void startServices() throws MuleException {
-    for (Pair<ArtifactClassLoader, Service> pair : registeredServices) {
-      Service service = pair.getSecond();
-      if (service instanceof Startable) {
-        ClassLoader originalContextClassLoader = currentThread().getContextClassLoader();
-        try {
-          currentThread().setContextClassLoader(service.getClass().getClassLoader());
-          ((Startable) service).start();
-
-          startedServices.add(service);
-
-          if (isNotEmpty(service.getSplashMessage())) {
-            log(new ServiceSplashScreen(service).toString());
-          }
-        } finally {
-          currentThread().setContextClassLoader(originalContextClassLoader);
-        }
-      }
+    for (Service service : services) {
+      ((Startable) service).start();
     }
   }
 
   @Override
   public void stop() throws MuleException {
-    for (int i = registeredServices.size() - 1; i >= 0; i--) {
-      Service service = registeredServices.get(i).getSecond();
-      if (service instanceof Stoppable && (!(service instanceof Startable) || startedServices.contains(service))) {
-        try {
-          ((Stoppable) service).stop();
-        } catch (Exception e) {
-          logger.warn("Service '{}' was not stopped properly: {}", service.getName(), e.getMessage());
-        }
-      }
-
+    for (Service service : services) {
       try {
-        registeredServices.get(i).getFirst().dispose();
+        ((Stoppable) service).stop();
       } catch (Exception e) {
-        logger.warn("Service '{}' class loader was not stopped properly: {}", service.getName(), e.getMessage());
+        LOGGER.warn(format("Failed to stop service '%s': %s", service.getName(), e.getMessage()), e);
       }
     }
-
-    startedServices.clear();
   }
 
   @Override
   public List<Service> getServices() {
-    return wrappedServices;
+    return unmodifiableList(services);
   }
 }

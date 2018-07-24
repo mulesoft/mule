@@ -530,7 +530,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                               File serviceJarFile) throws IOException {
     final File echoService =
         new ServiceFileBuilder(serviceName)
-            .satisfyingServiceClassNames(satisfiedServiceClassName)
+            .satisfyingServiceClassName(satisfiedServiceClassName)
             .withServiceProviderClass(serviceProviderClassName)
             .usingLibrary(serviceJarFile.getAbsolutePath())
             .unpack(true)

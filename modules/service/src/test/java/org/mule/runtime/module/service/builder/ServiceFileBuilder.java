@@ -9,7 +9,6 @@ package org.mule.runtime.module.service.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.emptyMap;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -17,6 +16,7 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationDescr
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel.MuleServiceModelBuilder;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,7 +38,7 @@ import java.util.List;
 public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileBuilder> {
 
   private String serviceProviderClassName;
-  private String[] satisfiedServiceClassNames = null;
+  private String satisfiedServiceClassName = null;
   private boolean unpack = false;
 
   /**
@@ -73,10 +74,10 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
     return this;
   }
 
-  public ServiceFileBuilder satisfyingServiceClassNames(String... satisfiedServiceClassNames) {
+  public ServiceFileBuilder satisfyingServiceClassName(String satisfiedServiceClassName) {
     checkImmutable();
-    checkArgument(!isEmpty(satisfiedServiceClassNames), "Property value cannot be null or empty");
-    this.satisfiedServiceClassNames = satisfiedServiceClassNames;
+    checkArgument(!isBlank(satisfiedServiceClassName), "Property value cannot be blank");
+    this.satisfiedServiceClassName = satisfiedServiceClassName;
 
     return this;
   }
@@ -106,12 +107,14 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
   private File createServiceJsonDescriptorFile() {
     File serviceDescriptor = new File(getTempFolder(), getArtifactId() + "service.json");
     serviceDescriptor.deleteOnExit();
-    MuleServiceModelBuilder serviceModelBuilder = new MuleServiceModelBuilder();
-    serviceModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0").setRequiredProduct(MULE);
-    serviceModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    serviceModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    serviceModelBuilder.withServiceProviderClassName(serviceProviderClassName);
-    serviceModelBuilder.satisfyingServiceClassNames(satisfiedServiceClassNames);
+    MuleServiceModelBuilder serviceModelBuilder = new MuleServiceModelBuilder()
+        .setName(getArtifactId())
+        .setMinMuleVersion("4.0.0")
+        .setRequiredProduct(MULE)
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+        .withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+        .withContracts(Arrays.asList(new MuleServiceContractModel(serviceProviderClassName, satisfiedServiceClassName)));
+
     String serviceDescriptorContent = new MuleServiceModelJsonSerializer().serialize(serviceModelBuilder.build());
     try (FileWriter fileWriter = new FileWriter(serviceDescriptor)) {
       fileWriter.write(serviceDescriptorContent);

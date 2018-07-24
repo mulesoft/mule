@@ -6,21 +6,17 @@
  */
 package org.mule.service.scheduler;
 
-import static java.util.Collections.singletonList;
-
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.api.scheduler.SchedulerService;
-
-import java.util.List;
 
 public class MockSchedulerServiceProvider implements ServiceProvider {
 
   private final SchedulerService service = new MockSchedulerService();
 
   @Override
-  public List<ServiceDefinition> providedServices() {
-    return singletonList(new ServiceDefinition(SchedulerService.class, service));
+  public SchedulerService getServiceDefinition() {
+    return new ServiceDefinition(SchedulerService.class, service);
   }
 
 }

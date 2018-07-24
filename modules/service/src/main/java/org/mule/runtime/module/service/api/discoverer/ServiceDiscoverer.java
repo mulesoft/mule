@@ -9,8 +9,6 @@ package org.mule.runtime.module.service.api.discoverer;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscoverer;
 
 import java.util.List;
@@ -24,10 +22,10 @@ public interface ServiceDiscoverer {
   /**
    * Discover services.
    *
-   * @return a non null list of {@link Service} availables in the container.
+   * @return a non null list of {@link Service services} available in the container.
    * @throws ServiceResolutionError when a {@link Service} cannot be properly resolved during the discovery process.
    */
-  List<Pair<ArtifactClassLoader, Service>> discoverServices() throws ServiceResolutionError;
+  List<Service> discoverServices() throws ServiceResolutionError;
 
   static ServiceDiscoverer create(ServiceProviderDiscoverer serviceProviderDiscoverer) {
     return new DefaultServiceDiscoverer(serviceProviderDiscoverer);

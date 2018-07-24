@@ -10,9 +10,7 @@ package org.mule.runtime.module.service.internal.discoverer;
 
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
 
 import java.util.List;
 
@@ -24,11 +22,9 @@ public interface ServiceResolver {
   /**
    * Resolves the services instances provided by the given service providers.
    *
-   * @param serviceProviders service providers to be resolved. Non null.
+   * @param serviceLocators service locators to be resolved. Non null.
    * @return A list of pairs with the resolved services and their class loaders, sorted by the dependency relationship, i.e., all the services required by a given
    *         service must be located in the list before the dependant service.
-   * @throws ServiceResolutionError
    */
-  List<Pair<ArtifactClassLoader, Service>> resolveServices(List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders)
-      throws ServiceResolutionError;
+  List<Service> resolveServices(List<ServiceLocator> serviceLocators);
 }
