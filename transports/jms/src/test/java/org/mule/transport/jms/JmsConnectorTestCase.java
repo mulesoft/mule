@@ -6,6 +6,7 @@
  */
 package org.mule.transport.jms;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -21,15 +22,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.api.context.notification.ClusterNodeNotificationListener;
-import org.mule.api.transaction.Transaction;
-import org.mule.context.notification.ClusterNodeNotification;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
-
 import java.lang.reflect.UndeclaredThrowableException;
 
 import javax.jms.Connection;
@@ -37,12 +29,22 @@ import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Session;
 import javax.jms.XAConnectionFactory;
+import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.api.context.notification.ClusterNodeNotificationListener;
+import org.mule.api.transaction.Transaction;
+import org.mule.context.notification.ClusterNodeNotification;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.transaction.TransactionCoordination;
+import org.mule.transport.jms.jndi.JndiNameResolver;
+import org.mule.transport.jms.xa.DefaultXAConnectionFactoryWrapper;
 import org.springframework.jms.connection.CachingConnectionFactory;
 
 public class JmsConnectorTestCase extends AbstractMuleContextTestCase
@@ -73,6 +75,48 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
         assertEquals(connection, createdConnection);
         verify(connection, times(1)).setClientID(Matchers.anyString());
         verify(connection, times(1)).setClientID(CLIENT_ID1);
+    }
+    
+    
+    @Test
+    public void verifyConnectionFactoryIsNotCachedWhenRetrievedThroughJndi() throws Exception
+    {
+        final Connection connection = mock(Connection.class);
+        when(connection.getClientID()).thenReturn(null);
+
+        JmsSupport jmsSupport = mock(JmsSupport.class);
+        when(jmsSupport.createConnection(Matchers.<ConnectionFactory> any())).thenReturn(connection);
+
+        JndiNameResolver jndiNameResolver = mock(JndiNameResolver.class);
+        ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
+        when(jndiNameResolver.lookup(any(String.class))).thenReturn(mockConnectionFactory);
+        
+        TestJMSConnector connector = new TestJMSConnector(muleContext);
+        connector.setClientId(CLIENT_ID1);
+        connector.setJmsSupport(jmsSupport);
+        connector.setConnectionFactory(mockConnectionFactory);
+        connector.setJndiNameResolver(jndiNameResolver);
+        connector.createConnection();
+        assertThat(connector.getInvocationsCreateConnectionFactory(), equalTo(1));
+    }
+    
+    @Test
+    public void verifyConnectionFactoryIsCachedWhenNotRetrievedThroughJndi() throws Exception
+    {
+        final Connection connection = mock(Connection.class);
+        when(connection.getClientID()).thenReturn(null);
+
+        JmsSupport jmsSupport = mock(JmsSupport.class);
+        when(jmsSupport.createConnection(Matchers.<ConnectionFactory> any())).thenReturn(connection);
+
+        ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
+        
+        TestJMSConnector connector = new TestJMSConnector(muleContext);
+        connector.setClientId(CLIENT_ID1);
+        connector.setJmsSupport(jmsSupport);
+        connector.setConnectionFactory(mockConnectionFactory);
+        connector.createConnection();
+        assertThat(connector.getInvocationsCreateConnectionFactory(), equalTo(0));
     }
 
     /**
@@ -307,6 +351,29 @@ public class JmsConnectorTestCase extends AbstractMuleContextTestCase
 
     private interface TestXAConnectionFactory extends ConnectionFactory, XAConnectionFactory
     {
+    }
+    
+    private static class TestJMSConnector extends JmsConnector
+    {
+
+        private int invocationsCreateConnectionFactory = 0;
+        
+        public TestJMSConnector(MuleContext context)
+        {
+            super(context);
+        }
+        
+        @Override
+        protected ConnectionFactory createConnectionFactory() throws NamingException, MuleException
+        {
+            invocationsCreateConnectionFactory++;
+            return super.createConnectionFactory();
+        }
+
+        public int getInvocationsCreateConnectionFactory()
+        {
+            return invocationsCreateConnectionFactory;
+        }
     }
 
 }
