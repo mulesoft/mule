@@ -76,11 +76,13 @@ public final class HttpResponseBuilder extends HttpMessageBuilder<HttpResponseBu
   }
 
   /**
+   * Discard this builder after calling this method.
+   * 
    * @return an {@link HttpResponse} as described
    */
   @Override
   public HttpResponse build() {
-    return new DefaultHttpResponse(responseStatus, headers.toImmutableMultiMap(), entity);
+    return new DefaultHttpResponse(responseStatus, headers, entity);
   }
 
 }

@@ -133,6 +133,9 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
     return headers.toImmutableMultiMap();
   }
 
+  /**
+   * Discard this builder after calling this method.
+   */
   public abstract M build();
 
 }
