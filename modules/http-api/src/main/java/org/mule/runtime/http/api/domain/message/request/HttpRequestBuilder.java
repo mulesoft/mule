@@ -123,13 +123,14 @@ public final class HttpRequestBuilder extends HttpMessageBuilder<HttpRequestBuil
   }
 
   /**
-   * @return an {@link HttpRequest} as described
+   * Discard this builder after calling this method.
+   *
+   * @return an {@link HttpRequest} as described.
    */
   @Override
   public HttpRequest build() {
     requireNonNull(uri, "URI must be specified to create an HTTP request");
-    return new DefaultHttpRequest(uri, path, method, headers.toImmutableMultiMap(), queryParams.toImmutableMultiMap(),
-                                  entity);
+    return new DefaultHttpRequest(uri, path, method, headers, queryParams, entity);
 
   }
 
