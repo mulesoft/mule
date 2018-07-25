@@ -62,6 +62,11 @@ REALDIR=`pwd`
 # Customized for Mule
 ######################################################################
 
+# Check if MULE_HOME is a syslink. In that case, set the real path.
+if ! [ -z "`readlink ${MULE_HOME}`" ] ; then
+   MULE_HOME=`readlink ${MULE_HOME}`
+fi
+
 # Check for MULE_HOME
 if [ -z "$MULE_HOME" ] ; then
     # REALDIR points to $MULE_HOME/bin now, strip off the bin part so
