@@ -16,7 +16,7 @@ import org.mule.api.context.notification.ServerNotification;
 /**
  * <code>PipelineMessageNotification</code> is fired at key steps in the processing of {@link Pipeline}
  */
-public class PipelineMessageNotification extends AbstractBlockingServerEvent
+public class PipelineMessageNotification extends ServerNotification implements BlockingServerEvent
 {
 
     private static final long serialVersionUID = 6065691696506216248L;
@@ -39,7 +39,7 @@ public class PipelineMessageNotification extends AbstractBlockingServerEvent
 
     public PipelineMessageNotification(Pipeline pipeline, MuleEvent event, int action)
     {
-        super(event, action, pipeline.getName());
+        super(event, action, pipeline.getName(), resolveEventReference(event));
     }
 
     public PipelineMessageNotification(Pipeline pipeline,

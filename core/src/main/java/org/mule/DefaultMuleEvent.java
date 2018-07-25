@@ -540,7 +540,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         this.outputStream = outputStream;
     }
 
-    protected boolean resolveEventSynchronicity()
+    public boolean resolveEventSynchronicity()
     {
         return transacted
                || isFlowConstructSynchronous()
