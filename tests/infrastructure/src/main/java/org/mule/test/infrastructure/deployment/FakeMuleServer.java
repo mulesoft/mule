@@ -10,6 +10,7 @@ import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.apache.commons.io.FilenameUtils.getName;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mockito.Matchers.any;
@@ -329,7 +330,7 @@ public class FakeMuleServer {
    * @throws IOException if the plugin URL cannot be accessed
    */
   public void addZippedServerPlugin(URL resource) throws IOException {
-    String baseName = org.apache.commons.io.FilenameUtils.getName(resource.getPath());
+    String baseName = getName(resource.getPath());
     File tempFile = new File(getServerPluginsDir(), baseName);
     copyURLToFile(resource, tempFile);
   }
@@ -341,19 +342,9 @@ public class FakeMuleServer {
    * @throws IOException if the servcie file cannot be accessed
    */
   public void addZippedService(File service) throws IOException {
-    addZippedService(service.toURI().toURL());
-  }
-
-  /**
-   * Adds a service implementation to the Mule server .
-   *
-   * @param resource points to the service to add. Non null.
-   * @throws IOException if the service URL cannot be accessed
-   */
-  public void addZippedService(URL resource) throws IOException {
-    String baseName = org.apache.commons.io.FilenameUtils.getName(resource.getPath());
+    String baseName = getName(service.getPath());
     File tempFile = new File(getServicesDir(), baseName);
-    copyURLToFile(resource, tempFile);
+    copyDirectory(service, tempFile);
   }
 
   public File getMuleHome() {

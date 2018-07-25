@@ -20,6 +20,7 @@ import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 
@@ -117,20 +118,24 @@ public class LazyServiceProxy implements InvocationHandler {
         LOGGER.warn(format("Service '%s' was not stopped properly: %s", serviceLocator.getName(), e.getMessage()), e);
       }
 
-      try {
-        serviceLocator.getClassLoader().dispose();
-      } catch (Exception e) {
-        LOGGER
-            .warn(format("Service '%s' class loader was not stopped properly: %s", serviceLocator.getName(), e.getMessage()), e);
+      if (serviceLocator.getClassLoader() instanceof DisposableClassLoader) {
+        try {
+          ((DisposableClassLoader) serviceLocator.getClassLoader()).dispose();
+        } catch (Exception e) {
+          LOGGER
+              .warn(format("Service '%s' class loader was not stopped properly: %s", serviceLocator.getName(), e.getMessage()),
+                    e);
+        }
+
       }
     });
   }
 
   private void withServiceClassLoader(CheckedRunnable task) {
-    withContextClassLoader((ClassLoader) serviceLocator.getClassLoader(), task);
+    withContextClassLoader(serviceLocator.getClassLoader(), task);
   }
 
   private <T> T withServiceClassLoader(Callable<T> callable) {
-    return withContextClassLoader((ClassLoader) serviceLocator.getClassLoader(), callable);
+    return withContextClassLoader(serviceLocator.getClassLoader(), callable);
   }
 }

@@ -14,7 +14,6 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 
@@ -29,7 +28,7 @@ public class LazyServiceLocator implements ServiceLocator {
   public static class Builder {
 
     private String name;
-    private Supplier<ArtifactClassLoader> artifactClassLoader;
+    private Supplier<ClassLoader> artifactClassLoader;
     private Supplier<ServiceProvider> serviceProviderSupplier;
     private String contractClassName;
 
@@ -40,7 +39,7 @@ public class LazyServiceLocator implements ServiceLocator {
       return this;
     }
 
-    public Builder withClassLoader(Supplier<ArtifactClassLoader> artifactClassLoader) {
+    public Builder withClassLoader(Supplier<ClassLoader> artifactClassLoader) {
       this.artifactClassLoader = artifactClassLoader;
       return this;
     }
@@ -73,12 +72,12 @@ public class LazyServiceLocator implements ServiceLocator {
   }
 
   private final String name;
-  private final LazyValue<ArtifactClassLoader> classLoader;
+  private final LazyValue<ClassLoader> classLoader;
   private final LazyValue<ServiceProvider> serviceProvider;
   private final Class<? extends Service> serviceContract;
 
   private LazyServiceLocator(String name,
-                             Supplier<ArtifactClassLoader> classLoader,
+                             Supplier<ClassLoader> classLoader,
                              Supplier<ServiceProvider> serviceProvider,
                              Class<? extends Service> satisfiedContract) {
     checkArgument(!isBlank(name), "name cannot be blank");
@@ -103,7 +102,7 @@ public class LazyServiceLocator implements ServiceLocator {
   }
 
   @Override
-  public ArtifactClassLoader getClassLoader() {
+  public ClassLoader getClassLoader() {
     return classLoader.get();
   }
 

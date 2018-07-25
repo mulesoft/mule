@@ -15,7 +15,7 @@ public class MockSchedulerServiceProvider implements ServiceProvider {
   private final SchedulerService service = new MockSchedulerService();
 
   @Override
-  public SchedulerService getServiceDefinition() {
+  public ServiceDefinition getServiceDefinition() {
     return new ServiceDefinition(SchedulerService.class, service);
   }
 

@@ -98,13 +98,12 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
     List<ServiceLocator> locators = new ArrayList<>(serviceDescriptors.size());
     for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {
 
-      final Supplier<ArtifactClassLoader> serviceClassLoader = new LazyValue<>(() -> serviceClassLoaderFactory.create(
-                                                                                                                      getServiceArtifactId(serviceDescriptor),
-                                                                                                                      serviceDescriptor,
-                                                                                                                      apiClassLoader
-                                                                                                                          .getClassLoader(),
-                                                                                                                      apiClassLoader
-                                                                                                                          .getClassLoaderLookupPolicy()));
+      final Supplier<ClassLoader> serviceClassLoader = new LazyValue<>(
+                                                                       () -> (ClassLoader) serviceClassLoaderFactory
+                                                                           .create(getServiceArtifactId(serviceDescriptor),
+                                                                                   serviceDescriptor,
+                                                                                   apiClassLoader.getClassLoader(),
+                                                                                   apiClassLoader.getClassLoaderLookupPolicy()));
 
       for (MuleServiceContractModel contract : serviceDescriptor.getContractModels()) {
         ServiceLocator locator = LazyServiceLocator.builder()

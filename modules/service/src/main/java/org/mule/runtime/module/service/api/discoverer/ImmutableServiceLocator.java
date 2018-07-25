@@ -4,22 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.service.internal.discoverer;
+package org.mule.runtime.module.service.api.discoverer;
 
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
 
 public class ImmutableServiceLocator implements ServiceLocator {
 
   private final String name;
   private final ServiceProvider serviceProvider;
-  private final ArtifactClassLoader classLoader;
+  private final ClassLoader classLoader;
   private final Class<? extends Service> serviceContract;
 
   public ImmutableServiceLocator(String name, ServiceProvider serviceProvider,
-                                 ArtifactClassLoader classLoader,
+                                 ClassLoader classLoader,
                                  Class<? extends Service> serviceContract) {
     this.name = name;
     this.serviceProvider = serviceProvider;
@@ -38,7 +36,7 @@ public class ImmutableServiceLocator implements ServiceLocator {
   }
 
   @Override
-  public ArtifactClassLoader getClassLoader() {
+  public ClassLoader getClassLoader() {
     return classLoader;
   }
 

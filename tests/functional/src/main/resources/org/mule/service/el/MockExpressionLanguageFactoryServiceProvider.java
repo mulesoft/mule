@@ -19,7 +19,7 @@ public class MockExpressionLanguageFactoryServiceProvider implements ServiceProv
   private final DefaultExpressionLanguageFactoryService service = new MockExpressionLanguageFactoryService();
 
   @Override
-  public DefaultExpressionLanguageFactoryService getServiceDefinition() {
+  public ServiceDefinition getServiceDefinition() {
     return new ServiceDefinition(DefaultExpressionLanguageFactoryService.class, service);
   }
 }
