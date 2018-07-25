@@ -17,22 +17,11 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_MAX
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 import static org.slf4j.LoggerFactory.getLogger;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
-
-import org.apache.commons.pool2.BasePooledObjectFactory;
-import org.apache.commons.pool2.KeyedObjectPool;
-import org.apache.commons.pool2.ObjectPool;
-import org.apache.commons.pool2.PooledObject;
-import org.apache.commons.pool2.impl.DefaultPooledObject;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.slf4j.Logger;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -45,6 +34,15 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.commons.pool2.BasePooledObjectFactory;
+import org.apache.commons.pool2.KeyedObjectPool;
+import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.slf4j.Logger;
 
 /**
  * {@link ByteBufferManager} implementation which pools instances for better performance.
@@ -120,7 +118,7 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
    * {@code memoryManager}, and has {@code waitTimeoutMillis} as wait timeout.
    *
    * @param allocationScheduler executor to use to allocate the buffer. The pools expiration thread group will be inherited by
-   *        this schedulet threadGroup.
+   *        this scheduler threadGroup.
    * @param memoryManager a {@link MemoryManager} used to determine the runtime's max memory
    * @param waitTimeoutMillis how long to wait when the pool is exhausted
    */
@@ -150,11 +148,12 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
    */
   @Override
   public ByteBuffer allocate(int capacity) {
-    try {
-      return pools.getUnchecked(capacity).take();
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not allocate byte buffer. " + e.getMessage()), e);
-    }
+    return ByteBuffer.allocate(capacity);
+    //try {
+    //  return pools.getUnchecked(capacity).take();
+    //} catch (Exception e) {
+    //  throw new MuleRuntimeException(createStaticMessage("Could not allocate byte buffer. " + e.getMessage()), e);
+    //}
   }
 
   /**
@@ -162,15 +161,15 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
    */
   @Override
   public void deallocate(ByteBuffer byteBuffer) {
-    int capacity = byteBuffer.capacity();
-    BufferPool pool = pools.getIfPresent(capacity);
-    if (pool != null) {
-      try {
-        pool.returnBuffer(byteBuffer);
-      } catch (Exception e) {
-        throw new MuleRuntimeException(createStaticMessage("Could not deallocate buffer of capacity " + capacity), e);
-      }
-    }
+    //int capacity = byteBuffer.capacity();
+    //BufferPool pool = pools.getIfPresent(capacity);
+    //if (pool != null) {
+    //  try {
+    //    pool.returnBuffer(byteBuffer);
+    //  } catch (Exception e) {
+    //    throw new MuleRuntimeException(createStaticMessage("Could not deallocate buffer of capacity " + capacity), e);
+    //  }
+    //}
   }
 
   @Override
