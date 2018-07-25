@@ -20,6 +20,4 @@ public interface ServiceLocator {
 
   Class<? extends Service> getServiceContract();
 
-  boolean satisfies(Class<? extends Service> contract);
-  
 }

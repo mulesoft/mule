@@ -98,20 +98,20 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
     List<ServiceLocator> locators = new ArrayList<>(serviceDescriptors.size());
     for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {
 
-      final Supplier<ArtifactClassLoader> serviceClassLoader = new LazyValue<>(() ->
-                                                                                   serviceClassLoaderFactory.create(
-                                                                                       getServiceArtifactId(serviceDescriptor),
-                                                                                       serviceDescriptor,
-                                                                                       apiClassLoader.getClassLoader(),
-                                                                                       apiClassLoader
-                                                                                           .getClassLoaderLookupPolicy()));
+      final Supplier<ArtifactClassLoader> serviceClassLoader = new LazyValue<>(() -> serviceClassLoaderFactory.create(
+                                                                                                                      getServiceArtifactId(serviceDescriptor),
+                                                                                                                      serviceDescriptor,
+                                                                                                                      apiClassLoader
+                                                                                                                          .getClassLoader(),
+                                                                                                                      apiClassLoader
+                                                                                                                          .getClassLoaderLookupPolicy()));
 
       for (MuleServiceContractModel contract : serviceDescriptor.getContractModels()) {
         ServiceLocator locator = LazyServiceLocator.builder()
             .withName(serviceDescriptor.getName())
             .withClassLoader(serviceClassLoader)
             .withServiceProvider(() -> instantiateServiceProvider(contract))
-            .forContract(contract.getSatisfiedServiceClassName())
+            .forContract(contract.getContractClassName())
             .build();
 
         locators.add(locator);

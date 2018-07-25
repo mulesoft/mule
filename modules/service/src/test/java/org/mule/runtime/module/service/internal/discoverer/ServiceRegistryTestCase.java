@@ -31,7 +31,7 @@ public class ServiceRegistryTestCase extends AbstractMuleTestCase {
   public void injectsDependencies() throws Exception {
     FooService service = mockFooService();
     final InjectableServiceProvider serviceProvider = new InjectableServiceProvider();
-    
+
     serviceRegistry.inject(serviceProvider);
 
     assertThat(serviceProvider.fooService, is(service));

@@ -38,7 +38,7 @@ import java.util.List;
 public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileBuilder> {
 
   private String serviceProviderClassName;
-  private String satisfiedServiceClassName = null;
+  private String contractClassName = null;
   private boolean unpack = false;
 
   /**
@@ -74,10 +74,10 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
     return this;
   }
 
-  public ServiceFileBuilder satisfyingServiceClassName(String satisfiedServiceClassName) {
+  public ServiceFileBuilder forContract(String contractClassName) {
     checkImmutable();
-    checkArgument(!isBlank(satisfiedServiceClassName), "Property value cannot be blank");
-    this.satisfiedServiceClassName = satisfiedServiceClassName;
+    checkArgument(!isBlank(contractClassName), "Property value cannot be blank");
+    this.contractClassName = contractClassName;
 
     return this;
   }
@@ -113,7 +113,7 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
         .setRequiredProduct(MULE)
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
         .withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
-        .withContracts(Arrays.asList(new MuleServiceContractModel(serviceProviderClassName, satisfiedServiceClassName)));
+        .withContracts(Arrays.asList(new MuleServiceContractModel(serviceProviderClassName, contractClassName)));
 
     String serviceDescriptorContent = new MuleServiceModelJsonSerializer().serialize(serviceModelBuilder.build());
     try (FileWriter fileWriter = new FileWriter(serviceDescriptor)) {

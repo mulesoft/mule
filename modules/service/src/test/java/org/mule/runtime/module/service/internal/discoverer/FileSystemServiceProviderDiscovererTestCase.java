@@ -118,7 +118,7 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
       throws Exception {
     final ServiceFileBuilder fooService =
         new ServiceFileBuilder(serviceName)
-            .satisfyingServiceClassName(FooService.class.getName())
+            .forContract(FooService.class.getName())
             .withServiceProviderClass(providerClass.getName()).unpack(true);
     if (corrupted) {
       fooService.corrupted();

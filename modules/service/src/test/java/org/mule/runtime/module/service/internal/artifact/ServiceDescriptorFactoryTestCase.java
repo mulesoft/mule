@@ -74,8 +74,8 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
     final ServiceFileBuilder fooService =
         new ServiceFileBuilder(SERVICE_NAME)
             .withServiceProviderClass(PROVIDER_CLASS_NAME)
-            .satisfyingServiceClassName(SERVICE_API_CLASS_NAME);
-    
+            .forContract(SERVICE_API_CLASS_NAME);
+
     unzip(fooService.getArtifactFile(), getServiceFolder(SERVICE_NAME));
 
     ServiceDescriptor descriptor = serviceDescriptorFactory.create(getServiceFolder(SERVICE_NAME), empty());
@@ -86,6 +86,6 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
     MuleServiceContractModel contractModel = descriptor.getContractModels().get(0);
 
     assertThat(contractModel.getServiceProviderClassName(), equalTo(PROVIDER_CLASS_NAME));
-    assertThat(contractModel.getSatisfiedServiceClassName(), equalTo(SERVICE_API_CLASS_NAME));
+    assertThat(contractModel.getContractClassName(), equalTo(SERVICE_API_CLASS_NAME));
   }
 }

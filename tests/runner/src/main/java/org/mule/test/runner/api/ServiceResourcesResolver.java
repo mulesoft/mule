@@ -95,8 +95,9 @@ public class ServiceResourcesResolver {
               .getOrDefault(PRIVILEGED_ARTIFACTS_IDS,
                             new ArrayList<>()));
 
+      //TODO: Guille to fix one service per package assumption
       return new ArtifactUrlClassification(serviceUrlClassification.getArtifactId(),
-                                           muleServiceModel.getServiceProviderClassName(),
+                                           muleServiceModel.getContracts().get(0).getServiceProviderClassName(),
                                            serviceUrlClassification.getUrls());
     } catch (IOException e) {
       throw new UncheckedIOException(e);

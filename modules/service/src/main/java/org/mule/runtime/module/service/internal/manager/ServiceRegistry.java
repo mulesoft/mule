@@ -38,7 +38,8 @@ public class ServiceRegistry {
         field.set(serviceProvider, dependency);
       } catch (Exception e) {
         throw new ServiceResolutionError(format("Could not inject dependency on field %s of type %s", field.getName(),
-                                                dependency.getClass().getName()), e);
+                                                dependency.getClass().getName()),
+                                         e);
       }
     }
   }

@@ -112,11 +112,6 @@ public class LazyServiceLocator implements ServiceLocator {
     return serviceContract;
   }
 
-  @Override
-  public boolean satisfies(Class<? extends Service> contract) {
-    return serviceContract.isAssignableFrom(contract);
-  }
-
   private <T> LazyValue<T> lazy(Supplier<T> supplier) {
     if (supplier instanceof LazyValue) {
       return (LazyValue<T>) supplier;

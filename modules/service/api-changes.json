@@ -1,4 +1,34 @@
 {
+  "4.2.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.List<org.mule.runtime.api.util.Pair<org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader, org.mule.runtime.api.service.Service>> org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer::discoverServices() throws org.mule.runtime.module.service.api.discoverer.ServiceResolutionError",
+          "new": "method java.util.List<org.mule.runtime.api.service.Service> org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer::discoverServices() throws org.mule.runtime.module.service.api.discoverer.ServiceResolutionError",
+          "oldType": "java.util.List<org.mule.runtime.api.util.Pair<org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader, org.mule.runtime.api.service.Service>>",
+          "newType": "java.util.List<org.mule.runtime.api.service.Service>",
+          "package": "org.mule.runtime.module.service.api.discoverer",
+          "classSimpleName": "ServiceDiscoverer",
+          "methodName": "discoverServices",
+          "elementKind": "method",
+          "justification": "This API is only used by the runtime and the change is necessary for performance reasons"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.List<org.mule.runtime.api.util.Pair<org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader, org.mule.runtime.api.service.ServiceProvider>> org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer::discover() throws org.mule.runtime.module.service.api.discoverer.ServiceResolutionError",
+          "new": "method java.util.List<org.mule.runtime.module.service.api.discoverer.ServiceLocator> org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer::discover() throws org.mule.runtime.module.service.api.discoverer.ServiceResolutionError",
+          "oldType": "java.util.List<org.mule.runtime.api.util.Pair<org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader, org.mule.runtime.api.service.ServiceProvider>>",
+          "newType": "java.util.List<org.mule.runtime.module.service.api.discoverer.ServiceLocator>",
+          "package": "org.mule.runtime.module.service.api.discoverer",
+          "classSimpleName": "ServiceProviderDiscoverer",
+          "methodName": "discover",
+          "elementKind": "method",
+          "justification": "This API is only used by the runtime and the change is necessary for performance reasons"
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [

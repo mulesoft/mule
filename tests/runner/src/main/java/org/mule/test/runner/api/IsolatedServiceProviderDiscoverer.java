@@ -10,15 +10,22 @@ package org.mule.test.runner.api;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
+import org.mule.runtime.api.deployment.meta.MuleServiceModel;
+import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.internal.discoverer.ImmutableServiceLocator;
 
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,9 +42,9 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
    * Creates a new instance.
    *
    * @param serviceArtifactClassLoaders {@link List} of {@link ArtifactClassLoader}s created for services discovered
-   *        during classification process. The {@code artifactName} of each {@link ArtifactClassLoader} represents the
-   *        {@value AetherClassPathClassifier#SERVICE_PROVIDER_CLASS_NAME} defined by the service in its
-   *        {@value AetherClassPathClassifier##SERVICE_PROPERTIES_FILE_NAME}and it is used for instantiating the {@link ServiceProvider}.
+   *                                    during classification process. The {@code artifactName} of each {@link ArtifactClassLoader} represents the
+   *                                    {@value AetherClassPathClassifier#SERVICE_PROVIDER_CLASS_NAME} defined by the service in its
+   *                                    {@value AetherClassPathClassifier##SERVICE_PROPERTIES_FILE_NAME}and it is used for instantiating the {@link ServiceProvider}.
    */
   public IsolatedServiceProviderDiscoverer(final List<ArtifactClassLoader> serviceArtifactClassLoaders) {
     checkNotNull(serviceArtifactClassLoaders, "serviceArtifactClassLoaders cannot be null");
@@ -45,26 +52,31 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
   }
 
   @Override
-  public List<Pair<ArtifactClassLoader, ServiceProvider>> discover() throws ServiceResolutionError {
-    List<Pair<ArtifactClassLoader, ServiceProvider>> serviceProviders = new LinkedList<>();
+  public List<ServiceLocator> discover() throws ServiceResolutionError {
+    List<ServiceLocator> locators = new LinkedList<>();
+    MuleServiceModelJsonSerializer serializer = new MuleServiceModelJsonSerializer();
     for (Object serviceArtifactClassLoader : serviceArtifactClassLoaders) {
       try {
-        final ServiceProvider serviceProvider;
-        String artifactName =
-            (String) serviceArtifactClassLoader.getClass().getMethod("getArtifactId").invoke(serviceArtifactClassLoader);
         ClassLoader classLoader =
             (ClassLoader) serviceArtifactClassLoader.getClass().getMethod("getClassLoader").invoke(serviceArtifactClassLoader);
 
-        serviceProvider = instantiateServiceProvider(classLoader,
-                                                     artifactName);
-        // TODO MULE-12254 - Remove null which is needed in order to avoid class cast exceptions
-        serviceProviders.add(new Pair(null, serviceProvider));
+        MuleServiceModel serviceModel;
+        try (InputStream descriptor = classLoader.getResourceAsStream("META-INF/mule-artifact/mule-artifact.json")) {
+          serviceModel = serializer.deserialize(IOUtils.toString(descriptor));
+        }
+
+        for (MuleServiceContractModel contract : serviceModel.getContracts()) {
+          ServiceProvider serviceProvider = instantiateServiceProvider(classLoader, contract.getServiceProviderClassName());
+          // TODO MULE-12254 - Remove null which is needed in order to avoid class cast exceptions
+          locators.add(new ImmutableServiceLocator(serviceModel.getName(), serviceProvider, null,
+                                                   loadClass(contract.getContractClassName(), getClass().getClassLoader())));
+        }
       } catch (Exception e) {
         throw new IllegalStateException("Couldn't discover service from class loader: " + serviceArtifactClassLoader, e);
       }
     }
 
-    return serviceProviders;
+    return locators;
   }
 
   private ServiceProvider instantiateServiceProvider(ClassLoader classLoader, String className) throws ServiceResolutionError {

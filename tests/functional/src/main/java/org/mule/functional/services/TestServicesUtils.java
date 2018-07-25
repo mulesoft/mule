@@ -49,7 +49,7 @@ public class TestServicesUtils {
 
     return new ServiceFileBuilder("schedulerService")
         .withServiceProviderClass("org.mule.service.scheduler.MockSchedulerServiceProvider")
-        .satisfyingServiceClassNames("org.mule.runtime.api.scheduler.SchedulerService")
+        .forContract("org.mule.runtime.api.scheduler.SchedulerService")
         .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath())
         .unpack(true)
         .getArtifactFile();
@@ -70,7 +70,7 @@ public class TestServicesUtils {
 
     return new ServiceFileBuilder("expressionLanguageService")
         .withServiceProviderClass("org.mule.service.el.MockExpressionLanguageFactoryServiceProvider")
-        .satisfyingServiceClassNames("org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService")
+        .forContract("org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService")
         .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath())
         .unpack(true)
         .getArtifactFile();
@@ -90,7 +90,7 @@ public class TestServicesUtils {
 
     return new ServiceFileBuilder("http-service")
         .withServiceProviderClass("org.mule.service.http.MockHttpServiceProvider")
-        .satisfyingServiceClassNames("org.mule.runtime.http.api.HttpService")
+        .forContract("org.mule.runtime.http.api.HttpService")
         .unpack(true)
         .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath()).getArtifactFile();
   }

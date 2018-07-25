@@ -58,8 +58,8 @@ import org.mule.runtime.module.service.internal.artifact.ServiceClassLoaderFacto
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscoverer;
 import org.mule.runtime.module.service.internal.discoverer.FileSystemServiceProviderDiscoverer;
-import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceProviderResolutionHelper;
 import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceResolver;
+import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
 
 /**
  * Registry of mule artifact resources required to construct new artifacts.
@@ -165,7 +165,7 @@ public class MuleArtifactResourcesRegistry {
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
-                                                           new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
+                                                           new ReflectionServiceResolver(new ServiceRegistry())));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
     domainFactory =
         new DefaultDomainFactory(domainDescriptorFactory, domainManager,

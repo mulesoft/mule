@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public class MuleServiceManager implements ServiceManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MuleServiceManager.class);
-  
+
   private final ServiceDiscoverer serviceDiscoverer;
   private List<Service> services = new ArrayList<>();
 
