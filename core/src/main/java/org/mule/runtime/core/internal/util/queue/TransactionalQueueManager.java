@@ -20,6 +20,7 @@ import org.mule.runtime.core.internal.util.xa.XaTransactionRecoverer;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The Transactional Queue Manager is responsible for creating and Managing transactional Queues. Queues can also be persistent by
@@ -36,6 +37,7 @@ public class TransactionalQueueManager extends AbstractQueueManager {
   // since queue configuration is applied after recovery and not taking into consideration once queues are created
   // for recovery. See https://www.mulesoft.org/jira/browse/MULE-7420
   private Map<String, RecoverableQueueStore> queuesAccessedForRecovery = new HashMap<String, RecoverableQueueStore>();
+  private final AtomicBoolean initialised = new AtomicBoolean(false);
 
   /**
    * {@inheritDoc}
@@ -54,6 +56,7 @@ public class TransactionalQueueManager extends AbstractQueueManager {
 
   @Override
   protected void doDispose() {
+    initialised.set(false);
     if (localTxTransactionJournal != null) {
       localTxTransactionJournal.close();
     }
@@ -64,14 +67,21 @@ public class TransactionalQueueManager extends AbstractQueueManager {
 
   @Override
   public void initialise() throws InitialisationException {
-    String workingDirectory = getMuleContext().getConfiguration().getWorkingDirectory();
-    int queueTransactionFilesSizeInMegabytes = getMuleContext().getConfiguration().getMaxQueueTransactionFilesSizeInMegabytes();
-    localTxTransactionJournal = new LocalTxQueueTransactionJournal(workingDirectory + File.separator + "queue-tx-log",
-                                                                   getMuleContext(), queueTransactionFilesSizeInMegabytes);
-    localTxQueueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(localTxTransactionJournal, this);
-    xaTransactionJournal = new XaTxQueueTransactionJournal(workingDirectory + File.separator + "queue-xa-tx-log",
-                                                           getMuleContext(), queueTransactionFilesSizeInMegabytes);
-    xaTransactionRecoverer = new XaTransactionRecoverer(xaTransactionJournal, this);
+    if (initialised.compareAndSet(false, true)) {
+      String workingDirectory = getMuleContext().getConfiguration().getWorkingDirectory();
+      int queueTransactionFilesSizeInMegabytes = getMuleContext().getConfiguration()
+          .getMaxQueueTransactionFilesSizeInMegabytes();
+      localTxTransactionJournal = new LocalTxQueueTransactionJournal(
+                                                                     workingDirectory + File.separator + "queue-tx-log",
+                                                                     getMuleContext(),
+                                                                     queueTransactionFilesSizeInMegabytes);
+      localTxQueueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(localTxTransactionJournal, this);
+      xaTransactionJournal = new XaTxQueueTransactionJournal(
+                                                             workingDirectory + File.separator + "queue-xa-tx-log",
+                                                             getMuleContext(),
+                                                             queueTransactionFilesSizeInMegabytes);
+      xaTransactionRecoverer = new XaTransactionRecoverer(xaTransactionJournal, this);
+    }
   }
 
   @Override
