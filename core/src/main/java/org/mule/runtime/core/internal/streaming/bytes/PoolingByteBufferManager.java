@@ -9,17 +9,15 @@ package org.mule.runtime.core.internal.streaming.bytes;
 import static java.lang.Math.round;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
-import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 
@@ -65,9 +63,9 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
   private static final Logger LOGGER = getLogger(PoolingByteBufferManager.class);
   private static final int MAX_IDLE = Runtime.getRuntime().availableProcessors();
 
-  private final AtomicLong streamingMemory = new AtomicLong(0);
-  private final long maxStreamingMemory;
-  private final long waitTimeoutMillis;
+  //private final AtomicLong streamingMemory = new AtomicLong(0);
+  //private final long maxStreamingMemory;
+  //private final long waitTimeoutMillis;
 
   /**
    * Using a cache of pools instead of a {@link KeyedObjectPool} because performance tests indicates that this
@@ -124,8 +122,8 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
    */
   public PoolingByteBufferManager(ExecutorService allocationScheduler, MemoryManager memoryManager, long waitTimeoutMillis) {
     this.allocationScheduler = allocationScheduler;
-    maxStreamingMemory = calculateMaxStreamingMemory(memoryManager);
-    this.waitTimeoutMillis = waitTimeoutMillis;
+    //maxStreamingMemory = calculateMaxStreamingMemory(memoryManager);
+    //this.waitTimeoutMillis = waitTimeoutMillis;
   }
 
   private long calculateMaxStreamingMemory(MemoryManager memoryManager) {
@@ -148,12 +146,12 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
    */
   @Override
   public ByteBuffer allocate(int capacity) {
-    return ByteBuffer.allocate(capacity);
-    //try {
-    //  return pools.getUnchecked(capacity).take();
-    //} catch (Exception e) {
-    //  throw new MuleRuntimeException(createStaticMessage("Could not allocate byte buffer. " + e.getMessage()), e);
-    //}
+    //return ByteBuffer.allocate(capacity);
+    try {
+      return pools.getUnchecked(capacity).take();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Could not allocate byte buffer. " + e.getMessage()), e);
+    }
   }
 
   /**
@@ -161,15 +159,15 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
    */
   @Override
   public void deallocate(ByteBuffer byteBuffer) {
-    //int capacity = byteBuffer.capacity();
-    //BufferPool pool = pools.getIfPresent(capacity);
-    //if (pool != null) {
-    //  try {
-    //    pool.returnBuffer(byteBuffer);
-    //  } catch (Exception e) {
-    //    throw new MuleRuntimeException(createStaticMessage("Could not deallocate buffer of capacity " + capacity), e);
-    //  }
-    //}
+    int capacity = byteBuffer.capacity();
+    BufferPool pool = pools.getIfPresent(capacity);
+    if (pool != null) {
+      try {
+        pool.returnBuffer(byteBuffer);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Could not deallocate buffer of capacity " + capacity), e);
+      }
+    }
   }
 
   @Override
@@ -187,8 +185,8 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
 
     private final int bufferCapacity;
     private final ObjectPool<ByteBuffer> pool;
-    private final Lock lock = new ReentrantLock();
-    private final Condition poolNotFull = lock.newCondition();
+    //private final Lock lock = new ReentrantLock();
+    //private final Condition poolNotFull = lock.newCondition();
 
     private BufferPool(int bufferCapacity) {
       this.bufferCapacity = bufferCapacity;
@@ -207,14 +205,14 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
 
         @Override
         public ByteBuffer create() throws Exception {
-          if (streamingMemory.addAndGet(bufferCapacity) <= maxStreamingMemory) {
-            return ByteBuffer.allocate(bufferCapacity);
-          }
+          //if (streamingMemory.addAndGet(bufferCapacity) <= maxStreamingMemory) {
+          return ByteBuffer.allocate(bufferCapacity);
+          //}
 
-          streamingMemory.addAndGet(-bufferCapacity);
-          throw new MaxStreamingMemoryExceededException(createStaticMessage(format(
-                                                                                   "Max streaming memory limit of %d bytes was exceeded",
-                                                                                   maxStreamingMemory)));
+          //streamingMemory.addAndGet(-bufferCapacity);
+          //throw new MaxStreamingMemoryExceededException(createStaticMessage(format(
+          //                                                                         "Max streaming memory limit of %d bytes was exceeded",
+          //                                                                         maxStreamingMemory)));
         }
 
         @Override
@@ -229,9 +227,9 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
 
         @Override
         public void destroyObject(PooledObject<ByteBuffer> p) throws Exception {
-          if (streamingMemory.addAndGet(-bufferCapacity) < maxStreamingMemory) {
-            signalPoolNotFull();
-          }
+          //if (streamingMemory.addAndGet(-bufferCapacity) < maxStreamingMemory) {
+          //  signalPoolNotFull();
+          //}
         }
       }, config);
     }
@@ -242,13 +240,13 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
         try {
           buffer = pool.borrowObject();
         } catch (MaxStreamingMemoryExceededException e) {
-          signal(() -> {
-            while (streamingMemory.get() >= maxStreamingMemory) {
-              if (!poolNotFull.await(waitTimeoutMillis, MILLISECONDS)) {
-                throw e;
-              }
-            }
-          });
+          //signal(() -> {
+          //  while (streamingMemory.get() >= maxStreamingMemory) {
+          //    if (!poolNotFull.await(waitTimeoutMillis, MILLISECONDS)) {
+          //      throw e;
+          //    }
+          //  }
+          //});
         }
       } while (buffer == null);
 
@@ -257,24 +255,24 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
 
     private void returnBuffer(ByteBuffer buffer) throws Exception {
       pool.returnObject(buffer);
-      signalPoolNotFull();
+      //signalPoolNotFull();
     }
 
     private void signalPoolNotFull() {
-      signal(poolNotFull::signal);
+      //signal(poolNotFull::signal);
     }
 
     private void close() {
-      streamingMemory.addAndGet(-bufferCapacity * (pool.getNumActive() + pool.getNumIdle()));
+      //streamingMemory.addAndGet(-bufferCapacity * (pool.getNumActive() + pool.getNumIdle()));
       try {
         pool.close();
       } finally {
-        signal(poolNotFull::signalAll);
+        //signal(poolNotFull::signalAll);
       }
     }
 
-    private void signal(CheckedRunnable task) {
-      withLock(lock, task);
-    }
+    //private void signal(CheckedRunnable task) {
+    //  withLock(lock, task);
+    //}
   }
 }
