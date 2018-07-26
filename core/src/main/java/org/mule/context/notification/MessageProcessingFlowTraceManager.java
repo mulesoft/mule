@@ -41,6 +41,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
     private MuleContext muleContext;
 
+    private volatile boolean listenersAdded = false;
     private PropertyChangeListener logConfigChangeListener = new PropertyChangeListener()
     {
         @Override
@@ -86,12 +87,13 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
         removeNotificationListeners();
     }
 
-    protected void handleNotificationListeners()
+    protected synchronized void handleNotificationListeners()
     {
-        if (DefaultMuleConfiguration.isFlowTrace())
+        if (!listenersAdded && DefaultMuleConfiguration.isFlowTrace())
         {
             muleContext.getNotificationManager().addListener(messageProcessorTextDebugger);
             muleContext.getNotificationManager().addListener(pipelineProcessorDebugger);
+            listenersAdded = true;
         }
         else
         {
@@ -99,10 +101,13 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
         }
     }
 
-    protected void removeNotificationListeners()
+    protected synchronized void removeNotificationListeners()
     {
-        muleContext.getNotificationManager().removeListener(messageProcessorTextDebugger);
-        muleContext.getNotificationManager().removeListener(pipelineProcessorDebugger);
+        if(listenersAdded) {
+            muleContext.getNotificationManager().removeListener(messageProcessorTextDebugger);
+            muleContext.getNotificationManager().removeListener(pipelineProcessorDebugger);
+            listenersAdded = false;
+        }
     }
 
     /**
