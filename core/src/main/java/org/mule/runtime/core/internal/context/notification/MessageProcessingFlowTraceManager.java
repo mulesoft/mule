@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.context.notification;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTrace;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -25,15 +26,15 @@ import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
-import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
-
-import java.beans.PropertyChangeListener;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContext;
+
+import java.beans.PropertyChangeListener;
+import java.util.Map;
 
 /**
  * Manager for handling message processing troubleshooting data.
@@ -48,6 +49,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   private MuleContext muleContext;
 
+  private volatile boolean listenersAdded = false;
   private PropertyChangeListener logConfigChangeListener = evt -> handleNotificationListeners();
 
   public MessageProcessingFlowTraceManager() {
@@ -80,21 +82,23 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
     removeNotificationListeners();
   }
 
-  protected void handleNotificationListeners() {
+  protected synchronized void handleNotificationListeners() {
     if (!muleContext.getNotificationManager().isDisposed()) {
-      if (DefaultMuleConfiguration.isFlowTrace()) {
+      if (!listenersAdded && DefaultMuleConfiguration.isFlowTrace()) {
         muleContext.getNotificationManager().addListener(messageProcessorTextDebugger);
         muleContext.getNotificationManager().addListener(pipelineProcessorDebugger);
+        listenersAdded = true;
       } else {
         removeNotificationListeners();
       }
     }
   }
 
-  protected void removeNotificationListeners() {
-    if (!muleContext.getNotificationManager().isDisposed()) {
+  protected synchronized void removeNotificationListeners() {
+    if (listenersAdded && !muleContext.getNotificationManager().isDisposed()) {
       muleContext.getNotificationManager().removeListener(messageProcessorTextDebugger);
       muleContext.getNotificationManager().removeListener(pipelineProcessorDebugger);
+      listenersAdded = false;
     }
   }
 
