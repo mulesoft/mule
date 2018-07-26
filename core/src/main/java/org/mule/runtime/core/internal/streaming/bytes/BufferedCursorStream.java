@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.streaming.bytes;
 
 import static java.lang.Math.toIntExact;
-import static org.mule.runtime.api.util.DataUnit.KB;
+import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 
@@ -25,7 +25,7 @@ import java.nio.ByteBuffer;
  */
 public final class BufferedCursorStream extends AbstractCursorStream {
 
-  private static final int LOCAL_BUFFER_SIZE = KB.toBytes(8);
+  private static final int LOCAL_BUFFER_SIZE = DEFAULT_BUFFER_BUCKET_SIZE;
   private static final ByteBuffer NULL_BUFFER = ByteBuffer.allocate(0);
 
   private final InputStreamBuffer streamBuffer;

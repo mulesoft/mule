@@ -8,10 +8,11 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
+import static java.lang.System.arraycopy;
+import static java.nio.ByteBuffer.wrap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 
@@ -34,6 +35,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
 
   private static final int STREAM_FINISHED_PROBE = 10;
 
+  private ByteBuffer buffer;
   private final int bufferSizeIncrement;
   private final int maxBufferSize;
   private long bufferTip = 0;
@@ -46,8 +48,8 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    * @param config this buffer's configuration.
    */
   public InMemoryStreamBuffer(InputStream stream, InMemoryCursorStreamConfig config, ByteBufferManager bufferManager) {
-    super(stream, bufferManager, config.getInitialBufferSize().toBytes());
-
+    super(stream, bufferManager);
+    buffer = bufferManager.allocate(config.getInitialBufferSize().toBytes());
     this.bufferSizeIncrement = config.getBufferSizeIncrement() != null
         ? config.getBufferSizeIncrement().toBytes()
         : 0;
@@ -89,7 +91,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
                 }
               } else {
                 streamFullyConsumed();
-                buffer.get().limit(buffer.get().position());
+                buffer.limit(buffer.position());
               }
             } catch (IOException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not read stream"), e);
@@ -122,7 +124,8 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    */
   @Override
   public void doClose() {
-    // no - op
+    deallocate(buffer);
+    buffer = null;
   }
 
   /**
@@ -134,7 +137,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    */
   @Override
   public int consumeForwardData() throws IOException {
-    ByteBuffer b = buffer.get();
+    ByteBuffer b = buffer;
     ByteBuffer readBuffer = b.hasRemaining()
         ? b
         : bufferManager.allocate(bufferSizeIncrement > 0 ? bufferSizeIncrement : STREAM_FINISHED_PROBE);
@@ -150,7 +153,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
           b = expandBuffer();
           readBuffer.flip();
           b.put(readBuffer);
-          buffer = new LazyValue<>(b);
+          buffer = b;
         }
 
         bufferTip += read;
@@ -173,7 +176,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    * @return a new, expanded {@link ByteBuffer}
    */
   private ByteBuffer expandBuffer() {
-    ByteBuffer b = buffer.get();
+    ByteBuffer b = buffer;
     int newSize = b.capacity() + bufferSizeIncrement;
     if (!canBeExpandedTo(newSize)) {
       throw new StreamingBufferSizeExceededException(maxBufferSize);
@@ -184,16 +187,33 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
     newBuffer.put(b);
     ByteBuffer oldBuffer = b;
     b = newBuffer;
-    buffer = new LazyValue<>(b);
+    buffer = b;
     deallocate(oldBuffer);
 
     return b;
   }
 
-  @Override
-  protected boolean canDoSoftCopy() {
+  protected ByteBuffer copy(long position, int length) {
+    return canDoSoftCopy() ? softCopy(position, length) : hardCopy(position, length);
+  }
+
+  private ByteBuffer softCopy(long position, int length) {
+    final int offset = toIntExact(position);
+    return wrap(buffer.array(), offset, min(length, buffer.limit() - offset)).slice();
+  }
+
+  protected ByteBuffer hardCopy(long position, int length) {
+    final int offset = toIntExact(position);
+    length = min(length, buffer.limit() - offset);
+
+    byte[] b = new byte[length];
+    arraycopy(buffer.array(), offset, b, 0, length);
+    return wrap(b);
+  }
+
+  private boolean canDoSoftCopy() {
     return streamFullyConsumed ||
-        buffer.get().capacity() >= maxBufferSize ||
+        buffer.capacity() >= maxBufferSize ||
         bufferSizeIncrement == 0;
   }
 

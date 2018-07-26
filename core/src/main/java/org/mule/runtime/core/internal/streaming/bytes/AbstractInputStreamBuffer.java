@@ -6,14 +6,9 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.lang.Math.min;
-import static java.lang.Math.toIntExact;
-import static java.lang.System.arraycopy;
 import static java.nio.channels.Channels.newChannel;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.slf4j.LoggerFactory.getLogger;
-
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
 
@@ -43,17 +38,15 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   private final InputStream stream;
   private ReadableByteChannel streamChannel;
   private boolean streamFullyConsumed = false;
-  protected LazyValue<ByteBuffer> buffer;
 
   /**
    * Creates a new instance
    *
    * @param stream The stream being buffered. This is the original data source
-   * @param bufferSize the buffer size
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    */
-  public AbstractInputStreamBuffer(InputStream stream, ByteBufferManager bufferManager, int bufferSize) {
-    this(stream, openStreamChannel(stream), bufferManager, bufferSize);
+  public AbstractInputStreamBuffer(InputStream stream, ByteBufferManager bufferManager) {
+    this(stream, openStreamChannel(stream), bufferManager);
   }
 
   /**
@@ -62,14 +55,11 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
    * @param stream The stream being buffered. This is the original data source
    * @param streamChannel a {@link ReadableByteChannel} used to read from the {@code stream}
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
-   * @param bufferSize the buffer size
    */
-  public AbstractInputStreamBuffer(InputStream stream, ReadableByteChannel streamChannel, ByteBufferManager bufferManager,
-                                   int bufferSize) {
+  public AbstractInputStreamBuffer(InputStream stream, ReadableByteChannel streamChannel, ByteBufferManager bufferManager) {
     this.stream = stream;
     this.streamChannel = streamChannel;
     this.bufferManager = bufferManager;
-    buffer = new LazyValue<>(() -> bufferManager.allocate(bufferSize));
   }
 
   /**
@@ -106,9 +96,6 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
           if (stream != null) {
             closeSafely(stream::close);
           }
-
-          buffer.ifComputed(this::deallocate);
-          buffer = null;
         }
       });
     }
@@ -131,20 +118,6 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   }
 
   protected abstract ByteBuffer doGet(long position, int length);
-
-  protected void consume(ByteBuffer data) {
-    int read = data.remaining();
-    if (read > 0) {
-      buffer.get().put(data);
-    }
-  }
-
-  /**
-   * @return the {@link #buffer}
-   */
-  public ByteBuffer getBuffer() {
-    return buffer.get();
-  }
 
   protected int consumeStream(ByteBuffer buffer) throws IOException {
     int result;
@@ -182,26 +155,5 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     streamFullyConsumed = true;
   }
 
-
-  protected ByteBuffer copy(long position, int length) {
-    return canDoSoftCopy() ? softCopy(position, length) : hardCopy(position, length);
-  }
-
-  protected abstract boolean canDoSoftCopy();
-
-  protected ByteBuffer softCopy(long position, int length) {
-    final int offset = toIntExact(position);
-    final ByteBuffer b = buffer.get();
-    return ByteBuffer.wrap(b.array(), offset, min(length, b.limit() - offset)).slice();
-  }
-
-  protected ByteBuffer hardCopy(long position, int length) {
-    final int offset = toIntExact(position);
-    final ByteBuffer bf = buffer.get();
-    length = min(length, bf.limit() - offset);
-
-    byte[] b = new byte[length];
-    arraycopy(bf.array(), offset, b, 0, length);
-    return ByteBuffer.wrap(b);
-  }
+  protected abstract ByteBuffer copy(long position, int length);
 }
