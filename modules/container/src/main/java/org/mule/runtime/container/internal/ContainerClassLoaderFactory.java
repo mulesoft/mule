@@ -7,8 +7,12 @@
 
 package org.mule.runtime.container.internal;
 
-import static java.util.Arrays.asList;
+import static java.lang.Boolean.valueOf;
+import static java.lang.System.getProperty;
+import static java.util.Arrays.stream;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ALLOW_JRE_EXTENSION;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_JRE_EXTENSION_PACKAGES;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
@@ -41,6 +45,11 @@ import java.util.Set;
  */
 public class ContainerClassLoaderFactory {
 
+  private static final String DEFAULT_JRE_EXTENSION_PACKAGES = "javax.,org.w3c.dom,org.omg.,org.xml.sax,org.ietf.jgss";
+  private static final boolean ALLOW_JRE_EXTENSION = valueOf(getProperty(MULE_ALLOW_JRE_EXTENSION, "true"));
+  private static final String[] JRE_EXTENDABLE_PACKAGES =
+      getProperty(MULE_JRE_EXTENSION_PACKAGES, DEFAULT_JRE_EXTENSION_PACKAGES).split(",");
+
   private static final class MuleContainerClassLoader extends MuleArtifactClassLoader {
 
     static {
@@ -64,9 +73,6 @@ public class ContainerClassLoaderFactory {
       return new EnumerationAdapter<>(Collections.emptyList());
     }
   }
-
-  private static final List<String> JRE_EXTENDABLE_PACKAGES = asList("javax.", "org.w3c.dom", "org.omg.", "org.xml.sax",
-                                                                     "org.ietf.jgss");
 
   // TODO(pablo.kraan): MULE-9524: Add a way to configure system and boot packages used on class loading lookup
   /**
@@ -168,8 +174,8 @@ public class ContainerClassLoaderFactory {
     for (MuleModule muleModule : modules) {
       for (String exportedPackage : muleModule.getExportedPackages()) {
         // Let artifacts extend non "java." JRE packages
-        result.put(exportedPackage, JRE_EXTENDABLE_PACKAGES.stream()
-            .anyMatch(exportedPackage::startsWith) ? PARENT_FIRST : containerOnlyLookupStrategy);
+        result.put(exportedPackage, ALLOW_JRE_EXTENSION && stream(JRE_EXTENDABLE_PACKAGES).anyMatch(exportedPackage::startsWith)
+            ? PARENT_FIRST : containerOnlyLookupStrategy);
       }
     }
 

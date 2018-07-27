@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -35,7 +36,7 @@ import org.junit.Test;
 public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
-  public void createsClassLoaderLookupPolicy() throws Exception {
+  public void createsClassLoaderLookupPolicy() {
     final ModuleRepository moduleRepository = mock(ModuleRepository.class);
     final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
     final List<MuleModule> modules = new ArrayList<>();
@@ -49,6 +50,33 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.foo1.Foo"), instanceOf(ContainerOnlyLookupStrategy.class));
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.foo1.bar.Bar"), instanceOf(ContainerOnlyLookupStrategy.class));
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.foo2.Fo"), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.foo2.bar.Bar"), sameInstance(CHILD_FIRST));
+  }
+
+  @Test
+  public void considersJreExtensions() {
+    final ModuleRepository moduleRepository = mock(ModuleRepository.class);
+    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
+    final List<MuleModule> modules = new ArrayList<>();
+    modules.add(new TestModuleBuilder("jre1")
+        .exportingPackages("org.w3c.dom.test", "javax.test", "java.applet", "org.w3c.dom", "org.omg.test").build());
+    modules.add(new TestModuleBuilder("jre2")
+        .exportingPackages("org.ietf.jgss", "org.ietf.jgss.test", "org.xml.sax", "org.xml.sax.test").build());
+    when(moduleRepository.getModules()).thenReturn(modules);
+
+    final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
+
+    final ClassLoaderLookupPolicy classLoaderLookupPolicy = containerClassLoader.getClassLoaderLookupPolicy();
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.w3c.dom.Foo"), sameInstance(PARENT_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.w3c.dom.test.Foo"), sameInstance(PARENT_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("javax.test.Bar"), sameInstance(PARENT_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.omg.test.Bar"), sameInstance(PARENT_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.ietf.jgss.Bar"), sameInstance(PARENT_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.ietf.jgss.test.Bar"), sameInstance(PARENT_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.xml.sax.Foo"), sameInstance(PARENT_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.xml.sax.test.Bar"), sameInstance(PARENT_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("java.applet.Applet"),
+               instanceOf(ContainerOnlyLookupStrategy.class));
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.foo2.bar.Bar"), sameInstance(CHILD_FIRST));
   }
 
