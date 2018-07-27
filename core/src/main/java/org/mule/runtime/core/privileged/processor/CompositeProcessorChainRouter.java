@@ -19,6 +19,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -56,10 +57,11 @@ public class CompositeProcessorChainRouter extends AbstractExecutableComponent i
 
   @Override
   protected ReactiveProcessor getExecutableFunction() {
-    return publisher -> from(publisher).flatMapMany(initial -> fromIterable(processorChains).reduce(initial, processChain()));
+    return publisher -> from(publisher)
+        .flatMapMany(initial -> fromIterable(processorChainsToExecute()).reduce(initial, processChain()));
   }
 
-  private BiFunction<CoreEvent, MessageProcessorChain, CoreEvent> processChain() {
+  private BiFunction<CoreEvent, ReactiveProcessor, CoreEvent> processChain() {
     return (event, processorChain) -> {
       Latch completionLatch = new Latch();
       BaseEventContext childContext = child((BaseEventContext) event.getContext(), ofNullable(getLocation()));
@@ -74,6 +76,10 @@ public class CompositeProcessorChainRouter extends AbstractExecutableComponent i
       }
       return result;
     };
+  }
+
+  protected List<? extends ReactiveProcessor> processorChainsToExecute() {
+    return processorChains;
   }
 
   @Override

@@ -10,10 +10,13 @@ package org.mule.runtime.core.privileged.processor;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
@@ -31,6 +34,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -42,7 +47,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -184,6 +191,31 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
     assertThat(future.get(BLOCK_TIMEOUT, MILLISECONDS).get().getMessage(), equalTo(testEvent().getMessage()));
   }
 
+  @Test
+  @Description("Ensure that processing strategies can be applied to router chains")
+  public void applyProcessingStrategyToChain() throws Exception {
+    Message chainOut = of(1);
+    ProcessingStrategy processingStrategyMock = mock(ProcessingStrategy.class);
+
+    AtomicReference<Message> chainIn = new AtomicReference<>();
+
+    MessageProcessorChain chain = newChain(empty(), event -> {
+      chainIn.set(event.getMessage());
+      return builder(event).message(chainOut).build();
+    });
+    when(processingStrategyMock.onPipeline(chain)).thenReturn(chain);
+
+    chainRouter = new ProcessingStrategyChainRouter(processingStrategyMock);
+    chainRouter.setProcessorChains(Collections.singletonList(chain));
+    chainRouter.setMuleContext(muleContext);
+    chainRouter.initialise();
+
+    Message result = chainRouter.execute(testEvent()).get().getMessage();
+
+    verify(processingStrategyMock).onPipeline(chain);
+    assertThat(result, equalTo(chainOut));
+  }
+
   private CompositeProcessorChainRouter createCompositeProcessorChainRouter(MessageProcessorChain chain1,
                                                                             MessageProcessorChain chain2)
       throws InitialisationException {
@@ -194,5 +226,18 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
     return chainRouter;
   }
 
+  private static class ProcessingStrategyChainRouter extends CompositeProcessorChainRouter {
+
+    private ProcessingStrategy processingStrategy;
+
+    ProcessingStrategyChainRouter(ProcessingStrategy processingStrategy) {
+      this.processingStrategy = processingStrategy;
+    }
+
+    @Override
+    protected List<? extends ReactiveProcessor> processorChainsToExecute() {
+      return super.processorChainsToExecute().stream().map(chain -> processingStrategy.onPipeline(chain)).collect(toList());
+    }
+  }
 
 }
