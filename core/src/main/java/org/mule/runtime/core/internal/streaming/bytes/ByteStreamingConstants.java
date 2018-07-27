@@ -10,8 +10,16 @@ import static java.lang.Integer.valueOf;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUCKET_SIZE;
 
+/**
+ * Constants around byte streaming
+ *
+ * @since 4.1.4
+ */
 public class ByteStreamingConstants {
 
+  /**
+   * The default size of a chunk/bucket for buffers which grow elastically
+   */
   public static final int DEFAULT_BUFFER_BUCKET_SIZE;
 
   static {

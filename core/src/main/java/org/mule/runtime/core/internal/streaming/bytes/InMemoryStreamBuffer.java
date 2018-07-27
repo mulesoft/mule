@@ -193,6 +193,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
     return b;
   }
 
+  @Override
   protected ByteBuffer copy(long position, int length) {
     return canDoSoftCopy() ? softCopy(position, length) : hardCopy(position, length);
   }

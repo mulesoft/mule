@@ -197,8 +197,6 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
       seekAndAssert(cursor1, 0, halfDataLength);
       seekAndAssert(cursor2, halfDataLength, halfDataLength);
     }));
-    //withCursor(cursor1 -> withCursor(cursor2 -> doAsync(() -> seekAndAssert(cursor1, 0, halfDataLength),
-    //                                                    () -> seekAndAssert(cursor2, halfDataLength, halfDataLength))));
   }
 
   @Test
