@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
@@ -42,5 +45,20 @@ public abstract class AbstractByteStreamingTestCase extends AbstractMuleTestCase
     buffer.get(data);
 
     return toString(data);
+  }
+
+  protected void assertEquals(String actual, String expect) {
+    int i = 0;
+    for (; i < expect.length(); i++) {
+      if (i >= actual.length()) {
+        fail(format("Actual value was shorter than expected. Was expecting %d but was", expect.length(), actual.length()));
+      }
+
+      if (actual.charAt(i) != expect.charAt(i)) {
+        fail("Breaks at char " + i);
+      }
+    }
+
+    assertThat(actual.length(), is(expect.length()));
   }
 }
