@@ -14,12 +14,12 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 
 import java.util.function.Supplier;
 
-public class LazyServiceLocator implements ServiceLocator {
+public class LazyServiceAssembly implements ServiceAssembly {
 
   public static Builder builder() {
     return new Builder();
@@ -54,9 +54,9 @@ public class LazyServiceLocator implements ServiceLocator {
       return this;
     }
 
-    public ServiceLocator build() throws ServiceResolutionError {
+    public ServiceAssembly build() throws ServiceResolutionError {
       try {
-        return new LazyServiceLocator(name, artifactClassLoader, serviceProviderSupplier, resolveContract());
+        return new LazyServiceAssembly(name, artifactClassLoader, serviceProviderSupplier, resolveContract());
       } catch (Exception e) {
         throw new ServiceResolutionError("Could not load service " + name, e);
       }
@@ -76,10 +76,10 @@ public class LazyServiceLocator implements ServiceLocator {
   private final LazyValue<ServiceProvider> serviceProvider;
   private final Class<? extends Service> serviceContract;
 
-  private LazyServiceLocator(String name,
-                             Supplier<ClassLoader> classLoader,
-                             Supplier<ServiceProvider> serviceProvider,
-                             Class<? extends Service> satisfiedContract) {
+  private LazyServiceAssembly(String name,
+                              Supplier<ClassLoader> classLoader,
+                              Supplier<ServiceProvider> serviceProvider,
+                              Class<? extends Service> satisfiedContract) {
     checkArgument(!isBlank(name), "name cannot be blank");
     checkArgument(classLoader != null, "Classloader cannot be null");
     checkArgument(serviceProvider != null, "ServiceProvider supplier cannot be null");

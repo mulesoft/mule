@@ -7,6 +7,7 @@
 package org.mule.runtime.module.service.internal.manager;
 
 import static java.lang.String.format;
+import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -15,13 +16,14 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
-import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 
 import java.lang.reflect.InvocationHandler;
@@ -34,24 +36,36 @@ public class LazyServiceProxy implements InvocationHandler {
 
   private static final Logger LOGGER = getLogger(LazyServiceProxy.class);
 
-  private final ServiceLocator serviceLocator;
+  private final ServiceAssembly assembly;
   private final ServiceRegistry serviceRegistry;
   private final LazyValue<Service> service;
 
   private boolean started = false;
   private boolean stopped = false;
 
-  public LazyServiceProxy(ServiceLocator serviceLocator, ServiceRegistry serviceRegistry) {
-    this.serviceLocator = serviceLocator;
+  public static Service from(ServiceAssembly assembly, ServiceRegistry serviceRegistry) {
+    final Class<? extends Service> contract = assembly.getServiceContract();
+    return (Service) newProxyInstance(contract.getClassLoader(),
+                                      new Class[] {contract, Startable.class, Stoppable.class},
+                                      new LazyServiceProxy(assembly, serviceRegistry));
+  }
+
+  private LazyServiceProxy(ServiceAssembly assembly, ServiceRegistry serviceRegistry) {
+    this.assembly = assembly;
     this.serviceRegistry = serviceRegistry;
     service = new LazyValue<>(createService());
   }
 
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    if (method.getDeclaringClass() == Startable.class) {
+    final Class<?> methodClass = method.getDeclaringClass();
+    if (methodClass == Object.class) {
+      return method.invoke(this, args);
+    } else if (methodClass == NamedObject.class) {
+      return assembly.getName();
+    } else if (methodClass == Startable.class) {
       return handleStart();
-    } else if (method.getDeclaringClass() == Stoppable.class) {
+    } else if (methodClass == Stoppable.class) {
       return handleStop();
     } else {
       return method.invoke(service.get(), args);
@@ -71,7 +85,7 @@ public class LazyServiceProxy implements InvocationHandler {
   }
 
   private Service instantiateService() throws ServiceResolutionError {
-    ServiceProvider provider = serviceLocator.getServiceProvider();
+    ServiceProvider provider = assembly.getServiceProvider();
     serviceRegistry.inject(provider);
     Service service = provider.getServiceDefinition().getService();
 
@@ -115,15 +129,15 @@ public class LazyServiceProxy implements InvocationHandler {
       try {
         stopIfNeeded(service.get());
       } catch (Exception e) {
-        LOGGER.warn(format("Service '%s' was not stopped properly: %s", serviceLocator.getName(), e.getMessage()), e);
+        LOGGER.warn(format("Service '%s' was not stopped properly: %s", assembly.getName(), e.getMessage()), e);
       }
 
-      if (serviceLocator.getClassLoader() instanceof DisposableClassLoader) {
+      if (assembly.getClassLoader() instanceof DisposableClassLoader) {
         try {
-          ((DisposableClassLoader) serviceLocator.getClassLoader()).dispose();
+          ((DisposableClassLoader) assembly.getClassLoader()).dispose();
         } catch (Exception e) {
           LOGGER
-              .warn(format("Service '%s' class loader was not stopped properly: %s", serviceLocator.getName(), e.getMessage()),
+              .warn(format("Service '%s' class loader was not stopped properly: %s", assembly.getName(), e.getMessage()),
                     e);
         }
 
@@ -132,10 +146,10 @@ public class LazyServiceProxy implements InvocationHandler {
   }
 
   private void withServiceClassLoader(CheckedRunnable task) {
-    withContextClassLoader(serviceLocator.getClassLoader(), task);
+    withContextClassLoader(assembly.getClassLoader(), task);
   }
 
   private <T> T withServiceClassLoader(Callable<T> callable) {
-    return withContextClassLoader(serviceLocator.getClassLoader(), callable);
+    return withContextClassLoader(assembly.getClassLoader(), callable);
   }
 }

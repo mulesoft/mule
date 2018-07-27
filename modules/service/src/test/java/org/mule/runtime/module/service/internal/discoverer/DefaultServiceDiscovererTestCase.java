@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -31,7 +31,7 @@ public class DefaultServiceDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversServices() throws Exception {
-    final List<ServiceLocator> serviceProviders = new ArrayList<>();
+    final List<ServiceAssembly> serviceProviders = new ArrayList<>();
     when(serviceProviderDiscoverer.discover()).thenReturn(serviceProviders);
 
     final List<Service> expectedServices = new ArrayList<>();
@@ -51,7 +51,7 @@ public class DefaultServiceDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test(expected = ServiceResolutionError.class)
   public void propagatesServiceResolutionErrors() throws Exception {
-    final List<ServiceLocator> serviceProviders = new ArrayList<>();
+    final List<ServiceAssembly> serviceProviders = new ArrayList<>();
     when(serviceProviderDiscoverer.discover()).thenReturn(serviceProviders);
     when(serviceResolver.resolveServices(serviceProviders)).thenThrow(new RuntimeException(new ServiceResolutionError("Error")));
 

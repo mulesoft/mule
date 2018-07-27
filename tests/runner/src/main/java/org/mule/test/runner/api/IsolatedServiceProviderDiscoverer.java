@@ -20,11 +20,10 @@ import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
-import org.mule.runtime.module.service.api.discoverer.ImmutableServiceLocator;
+import org.mule.runtime.module.service.api.discoverer.ImmutableServiceAssembly;
 
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -53,8 +52,8 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
   }
 
   @Override
-  public List<ServiceLocator> discover() throws ServiceResolutionError {
-    List<ServiceLocator> locators = new LinkedList<>();
+  public List<ServiceAssembly> discover() throws ServiceResolutionError {
+    List<ServiceAssembly> locators = new LinkedList<>();
     MuleServiceModelJsonSerializer serializer = new MuleServiceModelJsonSerializer();
     for (Object serviceArtifactClassLoader : serviceArtifactClassLoaders) {
       try {
@@ -69,8 +68,8 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
         for (MuleServiceContractModel contract : serviceModel.getContracts()) {
           ServiceProvider serviceProvider = instantiateServiceProvider(classLoader, contract.getServiceProviderClassName());
           // TODO MULE-12254 - Remove null which is needed in order to avoid class cast exceptions
-          locators.add(new ImmutableServiceLocator(serviceModel.getName(), serviceProvider, classLoader,
-                                                   loadClass(contract.getContractClassName(), getClass().getClassLoader())));
+          locators.add(new ImmutableServiceAssembly(serviceModel.getName(), serviceProvider, classLoader,
+                                                    loadClass(contract.getContractClassName(), getClass().getClassLoader())));
         }
       } catch (Exception e) {
         throw new IllegalStateException("Couldn't discover service from class loader: " + serviceArtifactClassLoader, e);

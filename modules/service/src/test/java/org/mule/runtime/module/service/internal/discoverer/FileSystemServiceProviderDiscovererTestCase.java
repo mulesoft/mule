@@ -30,7 +30,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidat
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.runtime.module.service.internal.artifact.ServiceClassLoaderFactory;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
@@ -79,7 +79,7 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
                                                 builder());
 
-    final List<ServiceLocator> discover = serviceProviderDiscoverer.discover();
+    final List<ServiceAssembly> discover = serviceProviderDiscoverer.discover();
     assertThat(discover, is(empty()));
   }
 
@@ -97,14 +97,14 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
                                                 builder());
 
-    final List<ServiceLocator> locators = serviceProviderDiscoverer.discover();
+    final List<ServiceAssembly> assemblies = serviceProviderDiscoverer.discover();
 
-    assertThat(locators.size(), equalTo(2));
+    assertThat(assemblies.size(), equalTo(2));
 
     assertThat(FooServiceProvider.INVOKED, is(false));
     assertThat(BarServiceProvider.INVOKED, is(false));
 
-    locators.forEach(l -> l.getServiceProvider().getServiceDefinition());
+    assemblies.forEach(l -> l.getServiceProvider().getServiceDefinition());
 
     assertThat(FooServiceProvider.INVOKED, is(true));
     assertThat(BarServiceProvider.INVOKED, is(true));

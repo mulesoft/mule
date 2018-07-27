@@ -21,7 +21,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFacto
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
@@ -65,13 +65,13 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   }
 
   @Override
-  public List<ServiceLocator> discover() throws ServiceResolutionError {
+  public List<ServiceAssembly> discover() throws ServiceResolutionError {
     final ServiceDescriptorFactory serviceDescriptorFactory =
         new ServiceDescriptorFactory(descriptorLoaderRepository, artifactDescriptorValidatorBuilder);
 
     final List<ServiceDescriptor> serviceDescriptors = getServiceDescriptors(serviceDescriptorFactory);
 
-    return createServiceLocators(serviceDescriptors, serviceClassLoaderFactory);
+    return assemble(serviceDescriptors, serviceClassLoaderFactory);
   }
 
   private List<ServiceDescriptor> getServiceDescriptors(ServiceDescriptorFactory serviceDescriptorFactory)
@@ -91,11 +91,11 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
     return foundServices;
   }
 
-  private List<ServiceLocator> createServiceLocators(List<ServiceDescriptor> serviceDescriptors,
-                                                     ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory)
+  private List<ServiceAssembly> assemble(List<ServiceDescriptor> serviceDescriptors,
+                                         ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory)
       throws ServiceResolutionError {
 
-    List<ServiceLocator> locators = new ArrayList<>(serviceDescriptors.size());
+    List<ServiceAssembly> assemblies = new ArrayList<>(serviceDescriptors.size());
     for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {
 
       final Supplier<ClassLoader> serviceClassLoader = new LazyValue<>(
@@ -106,18 +106,18 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
                                                                                    apiClassLoader.getClassLoaderLookupPolicy()));
 
       for (MuleServiceContractModel contract : serviceDescriptor.getContractModels()) {
-        ServiceLocator locator = LazyServiceLocator.builder()
+        ServiceAssembly assembly = LazyServiceAssembly.builder()
             .withName(serviceDescriptor.getName())
             .withClassLoader(serviceClassLoader)
             .withServiceProvider(() -> instantiateServiceProvider(contract))
             .forContract(contract.getContractClassName())
             .build();
 
-        locators.add(locator);
+        assemblies.add(assembly);
       }
     }
 
-    return locators;
+    return assemblies;
   }
 
   private String getServiceArtifactId(ServiceDescriptor serviceDescriptor) {

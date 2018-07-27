@@ -9,16 +9,16 @@ package org.mule.runtime.module.service.api.discoverer;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
 
-public class ImmutableServiceLocator implements ServiceLocator {
+public class ImmutableServiceAssembly implements ServiceAssembly {
 
   private final String name;
   private final ServiceProvider serviceProvider;
   private final ClassLoader classLoader;
   private final Class<? extends Service> serviceContract;
 
-  public ImmutableServiceLocator(String name, ServiceProvider serviceProvider,
-                                 ClassLoader classLoader,
-                                 Class<? extends Service> serviceContract) {
+  public ImmutableServiceAssembly(String name, ServiceProvider serviceProvider,
+                                  ClassLoader classLoader,
+                                  Class<? extends Service> serviceContract) {
     this.name = name;
     this.serviceProvider = serviceProvider;
     this.classLoader = classLoader;
