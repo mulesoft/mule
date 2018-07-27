@@ -219,13 +219,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         Object[] objResponse = addHoldersToResponse(response, args);
         MuleEvent muleRes = responseHolder.value;
 
-        // CXF blocks until the response value is aviailable and then proceeds with response processing on the waiting
-        // thread.  When non-blocking is enabled the message owner will be a different thread and so this needs
-        // reseting here.
-        if (event.isAllowNonBlocking())
-        {
-            ((DefaultMuleMessage) muleRes.getMessage()).resetAccessControl();
-        }
+        resetAccessControlIfNonBlocking(muleRes);
 
         return buildResponseMessage(event, muleRes, objResponse);
     }
@@ -289,7 +283,21 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         else
         {
             Object[] response = client.invoke(bop, getArgs(event), ctx, exchange);
+            
+            resetAccessControlIfNonBlocking(responseHolder.value);
+            
             return buildResponseMessage(event, responseHolder.value, response);
+        }
+    }
+
+    protected void resetAccessControlIfNonBlocking(final MuleEvent event)
+    {
+        // CXF blocks until the response value is aviailable and then proceeds with response processing on the waiting
+        // thread.  When non-blocking is enabled the message owner will be a different thread and so this needs
+        // reseting here.
+        if (event.isAllowNonBlocking())
+        {
+            ((DefaultMuleMessage) event.getMessage()).resetAccessControl();
         }
     }
 

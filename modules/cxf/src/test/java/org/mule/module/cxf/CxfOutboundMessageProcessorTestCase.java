@@ -10,6 +10,8 @@ import static org.apache.cxf.endpoint.ClientImpl.THREAD_LOCAL_REQUEST_CONTEXT;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
@@ -47,7 +49,7 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
         builder.setOperation("echo");
         builder.setMuleContext(muleContext);
         
-        CxfOutboundMessageProcessor processor = builder.build();
+        CxfOutboundMessageProcessor processor = spy(builder.build());
         
         MessageProcessor messageProcessor = new MessageProcessor()
         {
@@ -80,6 +82,7 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
         assertThat(processor.getClient().getResponseContext().isEmpty(), is(true));
         Object payload = response.getMessage().getPayload();
         assertThat(payload, IsInstanceOf.instanceOf(String.class));
+        verify(processor).resetAccessControlIfNonBlocking(event);
         assertThat((String) payload, is("hello"));
         assertThat(gotEvent, is(true));
     }
