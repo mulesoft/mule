@@ -15,15 +15,18 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUC
  *
  * @since 4.1.4
  */
-public class ByteStreamingConstants {
+public final class ByteStreamingConstants {
 
   /**
    * The default size of a chunk/bucket for buffers which grow elastically
    */
-  public static final int DEFAULT_BUFFER_BUCKET_SIZE;
+  public static final int DEFAULT_BUFFER_BUCKET_SIZE = getDefaultBucketSize();
 
-  static {
+  private static int getDefaultBucketSize() {
     String bucketSize = System.getProperty(MULE_STREAMING_BUCKET_SIZE);
-    DEFAULT_BUFFER_BUCKET_SIZE = bucketSize != null ? valueOf(bucketSize) : KB.toBytes(8);
+    return bucketSize != null ? valueOf(bucketSize) : KB.toBytes(8);
+  }
+
+  private ByteStreamingConstants() {
   }
 }
