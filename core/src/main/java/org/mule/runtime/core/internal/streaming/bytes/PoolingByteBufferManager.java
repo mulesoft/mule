@@ -188,10 +188,17 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
   @Override
   public void dispose() {
     try {
+      defaultSizePool.close();
+    } catch (Exception e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn("Error disposing default capacity byte buffers pool", e);
+      }
+    }
+    try {
       customSizePools.invalidateAll();
     } catch (Exception e) {
       if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Error disposing pool of byte buffers", e);
+        LOGGER.warn("Error disposing mixed capacity byte buffers pool", e);
       }
     }
   }
