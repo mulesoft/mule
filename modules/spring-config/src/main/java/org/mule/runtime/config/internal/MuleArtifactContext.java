@@ -439,6 +439,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       super.close();
       applicationModel.close();
     }
+    beanDefinitionFactory.destroy();
   }
 
   public static Resource[] convert(ConfigResource[] resources) {
@@ -589,9 +590,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
     super.customizeBeanFactory(beanFactory);
-    new SpringMuleContextServiceConfigurator(muleContext,
-                                             applicationModel.getConfigurationProperties(),
-                                             artifactType,
+    new SpringMuleContextServiceConfigurator(muleContext, applicationModel.getConfigurationProperties(), artifactType,
                                              optionalObjectsController,
                                              beanFactory,
                                              componentLocator,

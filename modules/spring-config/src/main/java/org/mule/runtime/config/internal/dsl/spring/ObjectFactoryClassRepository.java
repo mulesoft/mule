@@ -7,20 +7,21 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
-
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
 
-import org.springframework.beans.factory.SmartFactoryBean;
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
  * Repository for storing the dynamic class generated to mimic {@link org.springframework.beans.factory.FactoryBean} from an
@@ -34,6 +35,8 @@ import java.util.function.Supplier;
  * @since 4.0
  */
 public class ObjectFactoryClassRepository {
+
+  private List<Class> createdClasses = new LinkedList<>();
 
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the
@@ -86,6 +89,7 @@ public class ObjectFactoryClassRepository {
     enhancer.setUseCache(!instancePostCreationFunction.isPresent());
 
     Class<ObjectFactory> factoryBeanClass = enhancer.createClass();
+    createdClasses.add(factoryBeanClass);
     registerStaticCallbacks(factoryBeanClass, new Callback[] {
         (MethodInterceptor) (obj, method, args, proxy) -> {
           final boolean eager = !isLazyInitFunction.get();
@@ -111,6 +115,14 @@ public class ObjectFactoryClassRepository {
         }
     });
     return factoryBeanClass;
+  }
+
+  /**
+   * Removes all registered callbacks create for each created {@code FactoryBean} class. This is a must since it prevents a memory
+   * leak in CGLIB
+   */
+  public void destroy() {
+    createdClasses.stream().forEach(clazz -> registerStaticCallbacks(clazz, null));
   }
 
 }
