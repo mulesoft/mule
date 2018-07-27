@@ -7,12 +7,9 @@
 
 package org.mule.runtime.module.service.internal.discoverer;
 
-import static java.lang.reflect.Proxy.newProxyInstance;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
 import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
 
@@ -39,16 +36,13 @@ public class ReflectionServiceResolver implements ServiceResolver {
   }
 
   @Override
-  public List<Service> resolveServices(List<ServiceLocator> serviceLocators) {
+  public List<Service> resolveServices(List<ServiceAssembly> assemblies) {
 
-    List<Service> services = new ArrayList<>(serviceLocators.size());
-    for (ServiceLocator locator : serviceLocators) {
-      final Class<? extends Service> contract = locator.getServiceContract();
-      Service service = (Service) newProxyInstance(contract.getClassLoader(),
-                                                   new Class[] {contract, Startable.class, Stoppable.class},
-                                                   new LazyServiceProxy(locator, serviceRegistry));
+    List<Service> services = new ArrayList<>(assemblies.size());
+    for (ServiceAssembly assembly : assemblies) {
+      Service service = LazyServiceProxy.from(assembly, serviceRegistry);
 
-      serviceRegistry.register(service, locator);
+      serviceRegistry.register(service, assembly);
       services.add(service);
     }
 

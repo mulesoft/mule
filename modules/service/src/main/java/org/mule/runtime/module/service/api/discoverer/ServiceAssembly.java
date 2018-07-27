@@ -9,7 +9,7 @@ package org.mule.runtime.module.service.api.discoverer;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
 
-public interface ServiceLocator {
+public interface ServiceAssembly {
 
   String getName();
 

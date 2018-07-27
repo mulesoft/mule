@@ -10,7 +10,7 @@ package org.mule.runtime.module.service.internal.discoverer;
 
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 
 import java.util.List;
 
@@ -22,9 +22,9 @@ public interface ServiceResolver {
   /**
    * Resolves the services instances provided by the given service providers.
    *
-   * @param serviceLocators service locators to be resolved. Non null.
+   * @param assemblies service assemblies to be resolved. Non null.
    * @return A list of pairs with the resolved services and their class loaders, sorted by the dependency relationship, i.e., all the services required by a given
    *         service must be located in the list before the dependant service.
    */
-  List<Service> resolveServices(List<ServiceLocator> serviceLocators);
+  List<Service> resolveServices(List<ServiceAssembly> assemblies);
 }

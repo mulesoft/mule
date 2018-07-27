@@ -11,7 +11,7 @@ import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 
 import java.lang.reflect.Field;
@@ -44,8 +44,8 @@ public class ServiceRegistry {
     }
   }
 
-  public void register(Service service, ServiceLocator locator) {
-    services.put(locator.getServiceContract(), service);
+  public void register(Service service, ServiceAssembly assembly) {
+    services.put(assembly.getServiceContract(), service);
   }
 
   private Object lookup(Class<?> type) {

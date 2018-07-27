@@ -20,10 +20,10 @@ import java.util.List;
 public interface ServiceProviderDiscoverer {
 
   /**
-   * Discovers available service locators.
+   * Discovers available service assemblies.
    *
-   * @return a non null list of {@link ServiceLocator} found in the container.
+   * @return a non null list of {@link ServiceAssembly} found in the container.
    * @throws ServiceResolutionError when a {@link ServiceProvider} cannot be properly instantiated.
    */
-  List<ServiceLocator> discover() throws ServiceResolutionError;
+  List<ServiceAssembly> discover() throws ServiceResolutionError;
 }

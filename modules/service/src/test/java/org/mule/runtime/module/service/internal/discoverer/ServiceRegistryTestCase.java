@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.module.service.api.discoverer.ServiceLocator;
+import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.internal.manager.ServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -39,9 +39,9 @@ public class ServiceRegistryTestCase extends AbstractMuleTestCase {
 
   private FooService mockFooService() {
     FooService service = mock(FooService.class);
-    ServiceLocator locator = mock(ServiceLocator.class);
-    when(locator.getServiceContract()).thenReturn((Class) FooService.class);
-    serviceRegistry.register(service, locator);
+    ServiceAssembly assembly = mock(ServiceAssembly.class);
+    when(assembly.getServiceContract()).thenReturn((Class) FooService.class);
+    serviceRegistry.register(service, assembly);
 
     return service;
   }
