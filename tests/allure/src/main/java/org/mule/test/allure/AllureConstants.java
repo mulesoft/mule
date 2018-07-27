@@ -577,4 +577,13 @@ public interface AllureConstants {
 
   }
 
+  interface AggregatorsFeature {
+
+    String AGGREGATORS_EXTENSION = "Aggregators Extension";
+
+    interface AggregatorsStory {
+
+    }
+  }
+
 }
