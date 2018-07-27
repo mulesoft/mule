@@ -295,7 +295,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         // CXF blocks until the response value is aviailable and then proceeds with response processing on the waiting
         // thread.  When non-blocking is enabled the message owner will be a different thread and so this needs
         // reseting here.
-        if (event.isAllowNonBlocking())
+        if (!isVoidMuleEvent(event) && event.isAllowNonBlocking())
         {
             ((DefaultMuleMessage) event.getMessage()).resetAccessControl();
         }
@@ -456,7 +456,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         {
             return null;
         }
-        if (VoidMuleEvent.getInstance().equals(transportResponse))
+        if (isVoidMuleEvent(transportResponse))
         {
             return transportResponse;
         }
@@ -488,6 +488,11 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         message.setPayload(payload, DataTypeFactory.create(payloadClass, getMimeType()));
 
         return transportResponse;
+    }
+
+    private boolean isVoidMuleEvent(MuleEvent event)
+    {
+        return VoidMuleEvent.getInstance().equals(event);
     }
 
     protected Object[] addHoldersToResponse(Object response, Object[] args)
