@@ -7,7 +7,11 @@
 
 package org.mule.runtime.container.internal;
 
+import static java.lang.Boolean.valueOf;
+import static java.lang.System.getProperty;
+import static java.util.Arrays.stream;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
@@ -39,6 +43,13 @@ import java.util.Set;
  * This classLoader must be used as the parent classLoader for any other Mule artifact depending only on the container.
  */
 public class ContainerClassLoaderFactory {
+
+  public static final String MULE_ALLOW_JRE_EXTENSION = SYSTEM_PROPERTY_PREFIX + "classloading.jreExtension";
+  public static final String MULE_JRE_EXTENSION_PACKAGES = SYSTEM_PROPERTY_PREFIX + "classloading.jreExtension.packages";
+  private static final String DEFAULT_JRE_EXTENSION_PACKAGES = "javax.,org.w3c.dom,org.omg.,org.xml.sax,org.ietf.jgss";
+  private static final boolean ALLOW_JRE_EXTENSION = valueOf(getProperty(MULE_ALLOW_JRE_EXTENSION, "true"));
+  private static final String[] JRE_EXTENDABLE_PACKAGES =
+      getProperty(MULE_JRE_EXTENSION_PACKAGES, DEFAULT_JRE_EXTENSION_PACKAGES).split(",");
 
   private static final class MuleContainerClassLoader extends MuleArtifactClassLoader {
 
@@ -163,9 +174,9 @@ public class ContainerClassLoaderFactory {
     final Map<String, LookupStrategy> result = new HashMap<>();
     for (MuleModule muleModule : modules) {
       for (String exportedPackage : muleModule.getExportedPackages()) {
-        // Lets artifacts to extend javax packages
-        result.put(exportedPackage, exportedPackage.startsWith("javax.") ? PARENT_FIRST
-            : containerOnlyLookupStrategy);
+        // Let artifacts extend non "java." JRE packages
+        result.put(exportedPackage, ALLOW_JRE_EXTENSION && stream(JRE_EXTENDABLE_PACKAGES).anyMatch(exportedPackage::startsWith)
+            ? PARENT_FIRST : containerOnlyLookupStrategy);
       }
     }
 
