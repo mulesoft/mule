@@ -27,6 +27,5 @@ public final class ByteStreamingConstants {
     return bucketSize != null ? valueOf(bucketSize) : KB.toBytes(8);
   }
 
-  private ByteStreamingConstants() {
-  }
+  private ByteStreamingConstants() {}
 }
