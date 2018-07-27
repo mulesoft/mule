@@ -459,10 +459,4 @@ public class BeanDefinitionFactory {
     return wrapperIdentifierAndTypeMap;
   }
 
-  /**
-   * Release resources from the bean factory.
-   */
-  public void destroy() {
-    objectFactoryClassRepository.destroy();
-  }
 }
