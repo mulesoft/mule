@@ -22,6 +22,9 @@ import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.core.internal.util.DefaultMethodInvoker;
+import org.mule.runtime.core.internal.util.HasMethodInvoker;
+import org.mule.runtime.core.internal.util.MethodInvoker;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
@@ -42,11 +45,12 @@ public class LazyServiceProxy implements InvocationHandler {
 
   private boolean started = false;
   private boolean stopped = false;
+  private MethodInvoker methodInvoker = new DefaultMethodInvoker();
 
   public static Service from(ServiceAssembly assembly, ServiceRegistry serviceRegistry) {
     final Class<? extends Service> contract = assembly.getServiceContract();
     return (Service) newProxyInstance(contract.getClassLoader(),
-                                      new Class[] {contract, Startable.class, Stoppable.class},
+                                      new Class[] {contract, Startable.class, Stoppable.class, HasMethodInvoker.class},
                                       new LazyServiceProxy(assembly, serviceRegistry));
   }
 
@@ -59,7 +63,10 @@ public class LazyServiceProxy implements InvocationHandler {
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     final Class<?> methodClass = method.getDeclaringClass();
-    if (methodClass == Object.class && !method.getName().equals("toString")) {
+    if (methodClass == HasMethodInvoker.class) {
+      setMethodInvoker((MethodInvoker) args[0]);
+      return null;
+    } else if (methodClass == Object.class && !method.getName().equals("toString")) {
       return method.invoke(this, args);
     } else if (methodClass == NamedObject.class) {
       return assembly.getName();
@@ -68,8 +75,12 @@ public class LazyServiceProxy implements InvocationHandler {
     } else if (methodClass == Stoppable.class) {
       return handleStop();
     } else {
-      return method.invoke(service.get(), args);
+      return methodInvoker.invoke(service.get(), method, args);
     }
+  }
+
+  public void setMethodInvoker(MethodInvoker methodInvoker) {
+    this.methodInvoker = methodInvoker;
   }
 
   private CheckedSupplier<Service> createService() {
