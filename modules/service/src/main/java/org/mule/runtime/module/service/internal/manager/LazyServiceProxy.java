@@ -59,7 +59,7 @@ public class LazyServiceProxy implements InvocationHandler {
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     final Class<?> methodClass = method.getDeclaringClass();
-    if (methodClass == Object.class) {
+    if (methodClass == Object.class && !method.getName().equals("toString")) {
       return method.invoke(this, args);
     } else if (methodClass == NamedObject.class) {
       return assembly.getName();

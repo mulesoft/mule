@@ -17,9 +17,9 @@
         {
           "code": "java.method.returnTypeTypeParametersChanged",
           "old": "method java.util.List<org.mule.runtime.api.util.Pair<org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader, org.mule.runtime.api.service.ServiceProvider>> org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer::discover() throws org.mule.runtime.module.service.api.discoverer.ServiceResolutionError",
-          "new": "method java.util.List<org.mule.runtime.module.service.api.discoverer.ServiceLocator> org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer::discover() throws org.mule.runtime.module.service.api.discoverer.ServiceResolutionError",
+          "new": "method java.util.List<org.mule.runtime.module.service.api.discoverer.ServiceAssembly> org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer::discover() throws org.mule.runtime.module.service.api.discoverer.ServiceResolutionError",
           "oldType": "java.util.List<org.mule.runtime.api.util.Pair<org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader, org.mule.runtime.api.service.ServiceProvider>>",
-          "newType": "java.util.List<org.mule.runtime.module.service.api.discoverer.ServiceLocator>",
+          "newType": "java.util.List<org.mule.runtime.module.service.api.discoverer.ServiceAssembly>",
           "package": "org.mule.runtime.module.service.api.discoverer",
           "classSimpleName": "ServiceProviderDiscoverer",
           "methodName": "discover",
