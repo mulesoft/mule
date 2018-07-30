@@ -28,7 +28,8 @@ public final class InterceptedReactiveProcessor implements ReactiveProcessor {
   private final ProcessingType processingType;
   private final ThreadNotificationLogger threadNotificationLogger;
 
-  public InterceptedReactiveProcessor(Processor processor, ReactiveProcessor next, ThreadNotificationLogger threadNotificationLogger) {
+  public InterceptedReactiveProcessor(Processor processor, ReactiveProcessor next,
+                                      ThreadNotificationLogger threadNotificationLogger) {
     this.processor = processor;
     this.processingType = processor.getProcessingType();
     this.next = next;
@@ -38,9 +39,9 @@ public final class InterceptedReactiveProcessor implements ReactiveProcessor {
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> eventPublisher) {
     return from(eventPublisher)
-            .doOnNext(event -> threadNotificationLogger.setFinishThread(event))
-            .transform(publisher -> next.apply(publisher))
-            .doOnNext(event -> threadNotificationLogger.setStartingThread(event));
+        .doOnNext(event -> threadNotificationLogger.setFinishThread(event))
+        .transform(publisher -> next.apply(publisher))
+        .doOnNext(event -> threadNotificationLogger.setStartingThread(event));
   }
 
   @Override
