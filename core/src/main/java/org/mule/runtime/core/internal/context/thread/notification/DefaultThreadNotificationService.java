@@ -28,7 +28,6 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class DefaultThreadNotificationService implements ThreadNotificationService, Runnable, Lifecycle {
 
-  private static final Logger LOGGER = getLogger(DefaultThreadNotificationService.class);
   private static final int DEFAULT_INTERVAL = 5;
   private static final String newLine = System.getProperty("line.separator").toString();
   private ThreadsStatistics stats = new ThreadsStatistics();
@@ -78,7 +77,7 @@ public class DefaultThreadNotificationService implements ThreadNotificationServi
       // We set this to warn logging level because the entire pipeline is already created, so even if the
       // logging level changes, the pipeline should be defined using a system property (the ThreadNotificationLogger
       // needs to know whether to add logging phases or not).
-      LOGGER.warn(msg);
+      REPORT_LOGGER.warn(msg);
     }
   }
 

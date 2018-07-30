@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.internal.context.thread.notification;
 
+import org.slf4j.Logger;
+
 import java.util.Collection;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ACTIVATE_SCHEDULERS_LATENCY_REPORT;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Allows to track {@link ThreadNotificationElement} to log Thread switches measured latency
@@ -19,6 +22,7 @@ public interface ThreadNotificationService {
 
   String REGISTRY_KEY = "_muleThreadNotificationService";
   boolean THREAD_LOGGING = Boolean.getBoolean(MULE_ACTIVATE_SCHEDULERS_LATENCY_REPORT);
+  Logger REPORT_LOGGER = getLogger(ThreadNotificationService.class);
 
   void addThreadNotificationElement(ThreadNotificationElement notification);
 
