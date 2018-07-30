@@ -22,7 +22,6 @@ import static org.mule.runtime.api.component.location.ConfigurationComponentLoca
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.interception.ProcessorInterceptorManager.PROCESSOR_INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
@@ -209,7 +208,6 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
 
     chainRouter = new ProcessingStrategyChainRouter(processingStrategyMock);
     chainRouter.setProcessorChains(singletonList(chain));
-    setMuleContextIfNeeded(chainRouter, muleContext);
     initialiseIfNeeded(chainRouter, muleContext);
 
     Message result = chainRouter.execute(testEvent()).get().getMessage();
