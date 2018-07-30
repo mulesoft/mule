@@ -39,6 +39,8 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
+import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
@@ -113,6 +115,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   @Inject
   private StreamingManager streamingManager;
+
+  @Inject
+  private ThreadNotificationService threadNotificationService;
+  private ThreadNotificationLogger threadNotificationLogger;
 
   AbstractMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
                                 List<Processor> processors) {
@@ -230,9 +236,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // threads which may be limited to avoid deadlocks.
     if (processingStrategy != null) {
       interceptors.add((processor, next) -> stream -> from(stream)
-              .doOnNext(event -> {})
-              .transform(processingStrategy.onProcessor(new InterceptedReactiveProcessor(processor, next)))
-              .doOnNext(event -> {})
+              .doOnNext(event -> threadNotificationLogger.setStartingThread(event))
+              .transform(processingStrategy.onProcessor(new InterceptedReactiveProcessor(processor, next, threadNotificationLogger)))
+              .doOnNext(event -> threadNotificationLogger.setFinishThread(event))
       );
     }
 
@@ -416,6 +422,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       }
       additionalInterceptors.add(0, reactiveInterceptorAdapter);
     });
+
+    threadNotificationLogger = new ThreadNotificationLogger(threadNotificationService);
 
     initialiseIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
   }

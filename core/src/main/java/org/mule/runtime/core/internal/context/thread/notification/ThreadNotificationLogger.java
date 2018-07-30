@@ -7,10 +7,8 @@
 package org.mule.runtime.core.internal.context.thread.notification;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import reactor.core.publisher.Flux;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationService.THREAD_LOGGING;
@@ -19,31 +17,38 @@ public class ThreadNotificationLogger {
 
   private Map<String, DefaultThreadNotificationElement.Builder> threadNotificationBuilders = new ConcurrentHashMap<>();
 
-  private Optional<ThreadNotificationService> threadNotificationService;
+  private ThreadNotificationService threadNotificationService;
+  private ThreadLocal<Boolean> sameThread = new ThreadLocal<>();
 
-  public ThreadNotificationLogger(Optional<ThreadNotificationService> threadNotificationService) {
+  public ThreadNotificationLogger(ThreadNotificationService threadNotificationService) {
     this.threadNotificationService = threadNotificationService;
+    sameThread.set(false);
   }
 
   private boolean isEnabled() {
-    return THREAD_LOGGING && threadNotificationService.isPresent();
+    return THREAD_LOGGING;
   }
 
-  public void setStartingThread(String id) {
+  public void setStartingThread(CoreEvent event) {
     if (!isEnabled()) {
       return;
     }
+    sameThread.set(true);
     DefaultThreadNotificationElement.Builder builder = new DefaultThreadNotificationElement.Builder();
     builder.fromThread(Thread.currentThread());
-    threadNotificationBuilders.put(id, builder);
+    threadNotificationBuilders.put(event.getContext().getId(), builder);
   }
 
-  public void setFinishThread(String id) {
+  public void setFinishThread(CoreEvent event) {
     if (!isEnabled()) {
       return;
     }
-    DefaultThreadNotificationElement.Builder builder = threadNotificationBuilders.remove(id);
+    if (sameThread.get()) {
+      sameThread.set(false);
+      return;
+    }
+    DefaultThreadNotificationElement.Builder builder = threadNotificationBuilders.remove(event.getContext().getId());
     builder.toThread(Thread.currentThread());
-    threadNotificationService.get().addThreadNotificationElement(builder.build());
+    threadNotificationService.addThreadNotificationElement(builder.build());
   }
 }
