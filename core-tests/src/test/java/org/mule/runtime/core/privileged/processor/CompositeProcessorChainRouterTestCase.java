@@ -8,6 +8,7 @@
 package org.mule.runtime.core.privileged.processor;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
@@ -20,6 +21,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.interception.ProcessorInterceptorManager.PROCESSOR_INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
@@ -47,7 +50,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -206,9 +208,9 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
     when(processingStrategyMock.onPipeline(chain)).thenReturn(chain);
 
     chainRouter = new ProcessingStrategyChainRouter(processingStrategyMock);
-    chainRouter.setProcessorChains(Collections.singletonList(chain));
-    chainRouter.setMuleContext(muleContext);
-    chainRouter.initialise();
+    chainRouter.setProcessorChains(singletonList(chain));
+    setMuleContextIfNeeded(chainRouter, muleContext);
+    initialiseIfNeeded(chainRouter, muleContext);
 
     Message result = chainRouter.execute(testEvent()).get().getMessage();
 
@@ -235,8 +237,8 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
     }
 
     @Override
-    protected List<? extends ReactiveProcessor> processorChainsToExecute() {
-      return super.processorChainsToExecute().stream().map(chain -> processingStrategy.onPipeline(chain)).collect(toList());
+    protected List<? extends ReactiveProcessor> processorChainsToExecute(List<MessageProcessorChain> processorChains) {
+      return processorChains.stream().map(chain -> processingStrategy.onPipeline(chain)).collect(toList());
     }
   }
 

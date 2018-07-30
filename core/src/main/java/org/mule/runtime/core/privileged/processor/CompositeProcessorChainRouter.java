@@ -58,7 +58,7 @@ public class CompositeProcessorChainRouter extends AbstractExecutableComponent i
   @Override
   protected ReactiveProcessor getExecutableFunction() {
     return publisher -> from(publisher)
-        .flatMapMany(initial -> fromIterable(processorChainsToExecute()).reduce(initial, processChain()));
+        .flatMapMany(initial -> fromIterable(processorChainsToExecute(processorChains)).reduce(initial, processChain()));
   }
 
   private BiFunction<CoreEvent, ReactiveProcessor, CoreEvent> processChain() {
@@ -78,7 +78,7 @@ public class CompositeProcessorChainRouter extends AbstractExecutableComponent i
     };
   }
 
-  protected List<? extends ReactiveProcessor> processorChainsToExecute() {
+  protected List<? extends ReactiveProcessor> processorChainsToExecute(List<MessageProcessorChain> processorChains) {
     return processorChains;
   }
 
