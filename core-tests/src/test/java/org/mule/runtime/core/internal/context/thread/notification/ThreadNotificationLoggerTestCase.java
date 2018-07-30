@@ -13,6 +13,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.*;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ACTIVATE_SCHEDULERS_LATENCY_REPORT;
 import static reactor.core.publisher.Flux.just;
+import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.junit.Before;
@@ -79,11 +80,11 @@ public class ThreadNotificationLoggerTestCase {
     }).when(service).addThreadNotificationElement(any());
 
     just(event)
-            .doOnNext(coreEvent -> logger.setStartingThread(event))
-            .publishOn(publishOnScheduler)
-            .map(coreEvent -> coreEvent)
-            .doOnNext(coreEvent -> logger.setFinishThread(event))
-            .subscribe();
+        .doOnNext(coreEvent -> logger.setStartingThread(event))
+        .publishOn(publishOnScheduler)
+        .map(coreEvent -> coreEvent)
+        .doOnNext(coreEvent -> logger.setFinishThread(event))
+        .subscribe();
 
     new PollingProber().check(new JUnitLambdaProbe(() -> {
       verify(service, times(1)).addThreadNotificationElement(any());
@@ -105,11 +106,10 @@ public class ThreadNotificationLoggerTestCase {
     }).when(service).addThreadNotificationElement(any());
 
     just(event)
-            .doOnNext(coreEvent -> logger.setStartingThread(event))
-            .transform(event -> just(event).subscribeOn(subscribeOnScheduler))
-            .map(coreEvent -> coreEvent)
-            .doOnNext(coreEvent -> logger.setFinishThread(event))
-            .subscribe();
+        .doOnNext(coreEvent -> logger.setStartingThread(event))
+        .transform(p -> from(p).subscribeOn(subscribeOnScheduler).map(coreEvent -> coreEvent)
+            .doOnNext(e -> logger.setFinishThread(e)))
+        .subscribe();
 
     new PollingProber().check(new JUnitLambdaProbe(() -> {
       verify(service, times(1)).addThreadNotificationElement(any());
@@ -129,8 +129,8 @@ public class ThreadNotificationLoggerTestCase {
       super(1, new NamedThreadFactory(threadNamePrefix + ".tasks"));
       this.threadNamePrefix = threadNamePrefix;
       executor = new ThreadPoolExecutor(threads, threads, 0l, TimeUnit.MILLISECONDS,
-              new LinkedBlockingQueue(Integer.MAX_VALUE),
-              new NamedThreadFactory(threadNamePrefix, null, new ThreadGroup(threadGroupName)));
+                                        new LinkedBlockingQueue(Integer.MAX_VALUE),
+                                        new NamedThreadFactory(threadNamePrefix, null, new ThreadGroup(threadGroupName)));
     }
 
     @Override
@@ -152,13 +152,13 @@ public class ThreadNotificationLoggerTestCase {
     @Override
     public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression) {
       throw new UnsupportedOperationException(
-              "Cron expression scheduling is not supported in unit tests. You need the productive service implementation.");
+                                              "Cron expression scheduling is not supported in unit tests. You need the productive service implementation.");
     }
 
     @Override
     public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone) {
       throw new UnsupportedOperationException(
-              "Cron expression scheduling is not supported in unit tests. You need the productive service implementation.");
+                                              "Cron expression scheduling is not supported in unit tests. You need the productive service implementation.");
     }
 
     @Override
