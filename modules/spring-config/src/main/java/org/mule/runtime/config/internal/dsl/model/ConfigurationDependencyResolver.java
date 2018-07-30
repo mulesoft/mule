@@ -17,6 +17,7 @@ import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.INN
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP_LEVEL;
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.UNNAMED_TOP_LEVEL;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.util.Reference;
@@ -27,6 +28,7 @@ import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
+import org.mule.runtime.dsl.api.component.TypeConverter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -89,6 +91,16 @@ public class ConfigurationDependencyResolver implements BeanDependencyResolver {
                 public void onSoftReferenceSimpleParameter(String softReference) {
                   parametersReferencingDependencies.add(softReference);
                 }
+
+                @Override
+                public void onReferenceConfigurationParameter(String parameterName, Object defaultValue,
+                                                              Optional<TypeConverter> typeConverter) {
+                  if (requestedComponentModel.getParameters().containsKey(parameterName)
+                      && !isExpression(requestedComponentModel.getParameters().get(parameterName))) {
+                    parametersReferencingDependencies.add(parameterName);
+                  }
+                }
+
               });
             }));
 

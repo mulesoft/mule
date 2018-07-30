@@ -905,16 +905,20 @@ public abstract class ExtensionDefinitionParser {
                                                               List<StereotypeModel> allowedStereotypes) {
     AttributeDefinition.Builder definitionBuilder;
 
+    TypeConverter typeConverter = value -> resolverOf(name, type, value, defaultValue, expressionSupport, required,
+                                                      modelProperties, acceptsReferences);
+
     if (acceptsReferences && type instanceof StringType && !allowedStereotypes.isEmpty()) {
       definitionBuilder = fromSoftReferenceSimpleParameter(name);
 
     } else if (acceptsReferences && expressionSupport == NOT_SUPPORTED && type instanceof ObjectType) {
       definitionBuilder = fromSimpleReferenceParameter(name);
 
+    } else if (acceptsReferences && type instanceof ObjectType) {
+      definitionBuilder = fromSimpleReferenceParameter(name, typeConverter);
+
     } else {
-      definitionBuilder =
-          fromSimpleParameter(name, value -> resolverOf(name, type, value, defaultValue, expressionSupport, required,
-                                                        modelProperties, acceptsReferences));
+      definitionBuilder = fromSimpleParameter(name, typeConverter);
     }
 
     definitionBuilder.withDefaultValue(defaultValue);
